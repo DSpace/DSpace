@@ -115,8 +115,6 @@ var CollReport = function() {
 					});
 				});
 				
-				//If restricted items are returned, data.length may be less than page size
-				//Always pull one extra page
 				if (data.length > 0) {
 					self.addCollectionRows(tbl, offset + self.COLL_LIMIT);
 					return;
@@ -159,6 +157,7 @@ var CollReport = function() {
 		if (self.loadId != curLoadId) return;
 		var tr = $("tr[index="+row+"]");
 		if (!tr.is("*")){
+			self.finishRow(row, threads, curLoadId);
 			return; 
 		}
 			
@@ -214,30 +213,10 @@ var CollReport = function() {
 							td.attr("title", "Collection partially processed, item counts are incomplete");
 						}
 					}
-					
-					
 				});
 				
 				tr.removeClass("processing");
-				if (!$("#table tr.processing").is("*")) {
-					if (self.hasSorttable()) {
-						$("#table").removeClass("sortable");
-						$("#table").addClass("sortable");
-						sorttable.makeSortable($("#table")[0]);						
-					}
-					var colcount = $("#table tr th").length;
-					for(var i=4; i<colcount; i++) {
-						self.myHtmlUtil.totalCol(i);
-					}
-					self.spinner.stop();
-	  	  		    $(".showCollections").attr("disabled", false);
-					return;
-				}
-				if (row % threads == 0 || threads == 1) {
-					for(var i=1; i<=threads; i++) {
-						self.doRow(row+i, threads, curLoadId);
-					}					
-				}
+				self.finishRow(row, threads, curLoadId);
 	 		},
 			error: function(xhr, status, errorThrown) {
 				alert("Error in /rest/filtered-collections "+ status+ " " + errorThrown);
@@ -247,7 +226,32 @@ var CollReport = function() {
 		  		$(".showCollections").attr("disabled", false);
 			}
 		});
-	}			
+	}		
+	
+	this.finishRow = function(row, threads, curLoadId) {
+		if (!$("#table tr.processing").is("*")) {
+			if (self.hasSorttable()) {
+				$("#table").removeClass("sortable");
+				$("#table").addClass("sortable");
+				sorttable.makeSortable($("#table")[0]);						
+			}
+			var colcount = $("#table tr th").length;
+			for(var i=4; i<colcount; i++) {
+				self.myHtmlUtil.totalCol(i);
+			}
+			self.spinner.stop();
+	  		    $(".showCollections").attr("disabled", false);
+			return;
+		}
+		if (row % threads == 0 || threads == 1) {
+			for(var i=1; i<=threads; i++) {
+				if (row+i <= $("tr[index]:last").attr("index")) {
+					self.doRow(row+i, threads, curLoadId);					
+				} 
+			}					
+		}		
+	}
+	
 				
 	this.drawItemTable = function(cid, filter, offset) {
 		self = this;
