@@ -261,7 +261,7 @@ public class Community extends DSpaceObject
             if(DatabaseManager.isOracle()){
                 query += " ORDER BY cast(m.text_value as varchar2(128))";
             }else{
-                query += " ORDER BY m.text_value";
+                query += " ORDER BY upper(m.text_value)";
             }
 
             tri = DatabaseManager.query(context,
@@ -332,7 +332,7 @@ public class Community extends DSpaceObject
             if(DatabaseManager.isOracle()){
                 query += " ORDER BY cast(m.text_value as varchar2(128))";
             }else{
-                query += " ORDER BY m.text_value";
+                query += " ORDER BY upper(m.text_value)";
             }
             tri = DatabaseManager.query(context,
                     query,
@@ -664,7 +664,7 @@ public class Community extends DSpaceObject
             if(DatabaseManager.isOracle()){
                 query += " ORDER BY cast(m.text_value as varchar2(128))";
             }else{
-                query += " ORDER BY m.text_value";
+                query += " ORDER BY upper(m.text_value)";
             }
             tri = DatabaseManager.query(
                     ourContext,
@@ -713,6 +713,55 @@ public class Community extends DSpaceObject
         collectionArray = (Collection[]) collections.toArray(collectionArray);
 
         return collectionArray;
+    }
+
+    public ArrayList<LiteCollection> getCollectionsLite() {
+        String getCollectionsQuery = "SELECT " +
+                "  handle.handle, " +
+                "  text_value as name " +
+                "FROM " +
+                "  public.community2collection, " +
+                "  public.collection, " +
+                "  public.handle, " +
+                "  public.metadatavalue, public.metadatafieldregistry " +
+                "WHERE " +
+                "  community2collection.collection_id = collection.collection_id AND " +
+                "  handle.resource_id = collection.collection_id AND " +
+                "  community2collection.community_id = ? AND " +
+                "  handle.resource_type_id = 3 AND " +
+                "  metadatavalue.resource_type_id = 3 AND " +
+                "  metadatavalue.resource_id = collection.collection_id AND " +
+                "  metadatafieldregistry.metadata_field_id = metadatavalue.metadata_field_id AND " +
+                "  metadatafieldregistry.element = 'title' " +
+                "  ORDER by UPPER(text_value) asc;";
+
+        //OJS comm = 34
+        Integer commID = this.getID();
+        ArrayList<LiteCollection> collectionList = new ArrayList<LiteCollection>();
+
+        try {
+            TableRowIterator tri = DatabaseManager.query(ourContext, getCollectionsQuery, commID);
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                LiteCollection collection = new LiteCollection();
+
+                String handle = row.getStringColumn("handle");
+                String name = row.getStringColumn("name");
+                collection.setHandle(handle);
+                collection.setName(name);
+
+                collectionList.add(collection);
+
+            }
+
+
+        } catch (SQLException e) {
+
+        }
+
+        return collectionList;
     }
 
     /**

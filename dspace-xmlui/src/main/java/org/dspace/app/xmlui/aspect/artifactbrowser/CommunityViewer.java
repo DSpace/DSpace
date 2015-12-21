@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
@@ -20,17 +21,14 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
-import org.dspace.app.xmlui.wing.element.Reference;
-import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.LiteCollection;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
@@ -117,7 +115,6 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            validity.add(community);
 	            
 	            Community[] subCommunities = community.getSubcommunities();
-	            Collection[] collections = community.getCollections();
 	            // Sub communities
 	            for (Community subCommunity : subCommunities)
 	            {
@@ -134,19 +131,11 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	        		}
 	            }
 	            // Sub collections
-	            for (Collection collection : collections)
-	            {
-	                validity.add(collection);
-	                
-	                // Include the item count in the validity, only if the value is shown.
-	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
-	                if (showCount)
-	        		{
-	                    try {
-	                    	int size = new ItemCounter(context).getCount(collection);
-	                    	validity.add("size:"+size);
-	                    } catch(ItemCountException e) { /* ignore */ }
-	        		}
+                ArrayList<LiteCollection> liteCollectionArrayList = community.getCollectionsLite();
+
+                for(LiteCollection liteCollection : liteCollectionArrayList) {
+                    validity.add(liteCollection.getHandle() + liteCollection.getName());
+
 	            }
 
 	            this.validity = validity.complete();
@@ -229,7 +218,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         // Set up the major variables
         Community community = (Community) dso;
         Community[] subCommunities = community.getSubcommunities();
-        Collection[] collections = community.getCollections();
+        ArrayList<LiteCollection> liteCollectionList = community.getCollectionsLite();
 
         // Build the community viewer division.
         Division home = body.addDivision("community-home", "primary repository community");
@@ -271,18 +260,12 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
                     communityReferenceSet.addReference(subCommunity);
                 }
             }
-            if (collections != null && collections.length > 0)
-            {
-                ReferenceSet communityReferenceSet = communityInclude
-                        .addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
 
-                communityReferenceSet.setHead(T_head_sub_collections);
-                       
-
-                // Subcollections
-                for (Collection collection : collections)
-                {
-                    communityReferenceSet.addReference(collection);
+            if(liteCollectionList != null && liteCollectionList.size() > 0) {
+                List liteCollList = viewer.addList("LiteCollectionList");
+                liteCollList.setHead(T_head_sub_collections);
+                for(LiteCollection liteCollection : liteCollectionList) {
+                    liteCollList.addItemXref(contextPath + "/handle/" + liteCollection.getHandle(), liteCollection.getName());
                 }
 
             }
