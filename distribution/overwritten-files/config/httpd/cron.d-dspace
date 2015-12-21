@@ -1,0 +1,3 @@
+# /etc/cron.d/dspace: crontab fragment for dspace
+
+0,15,30,45 * * * * root /usr/sbin/logrotate /etc/logrotate.conf
