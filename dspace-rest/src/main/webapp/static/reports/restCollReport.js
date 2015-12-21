@@ -115,7 +115,9 @@ var CollReport = function() {
 					});
 				});
 				
-				if (data.length == self.COLL_LIMIT) {
+				//If restricted items are returned, data.length may be less than page size
+				//Always pull one extra page
+				if (data.length > 0) {
 					self.addCollectionRows(tbl, offset + self.COLL_LIMIT);
 					return;
 				}  
