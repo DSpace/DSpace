@@ -374,70 +374,70 @@ jQuery(document).ready(function() {
     if ($currencySelector.length === 1) {
         var amountsByCurrency = {
             'USD': {
-                memberDPC_voucher: '$65',
-                nonMemberDPC_voucher: '$70',
-                memberDPC_deferred: '$70',
-                nonMemberDPC_deferred: '$75',
-                memberDPC_subscription: '$25',
-                nonMemberDPC_subscription: '$30',
-                DPC_pay_on_submission: '$80',  // is this the "base charge"?
-                excessDataStorageFee_first_GB: '$15',
-                excessDataStorageFee_per_additional_GB: '$10'
+                memberDPC_voucher: '$95',
+                nonMemberDPC_voucher: '$105',
+                memberDPC_deferred: '$105',
+                nonMemberDPC_deferred: '$115',
+                memberDPC_subscription: '$40',
+                nonMemberDPC_subscription: '$50',
+                DPC_pay_on_submission: '$120',  // is this the "base charge"?
+                excessDataStorageFee_first_GB: '$50',
+                excessDataStorageFee_per_additional_GB: '$50'
             },
             'EUR': {
-                memberDPC_voucher: '&#128;49',  // €
-                nonMemberDPC_voucher: '&#128;53',
-                memberDPC_deferred: '&#128;53',
-                nonMemberDPC_deferred: '&#128;56',
-                memberDPC_subscription: '&#128;19',
-                nonMemberDPC_subscription: '&#128;23',
-                DPC_pay_on_submission: '&#128;60',
-                excessDataStorageFee_first_GB: '&#128;11',
-                excessDataStorageFee_per_additional_GB: '&#128;8'
+                memberDPC_voucher: '&#128;87',  // €
+                nonMemberDPC_voucher: '&#128;96',
+                memberDPC_deferred: '&#128;96',
+                nonMemberDPC_deferred: '&#128;105',
+                memberDPC_subscription: '&#128;37',
+                nonMemberDPC_subscription: '&#128;46',
+                DPC_pay_on_submission: '&#128;110',
+                excessDataStorageFee_first_GB: '&#128;46',
+                excessDataStorageFee_per_additional_GB: '&#128;46'
             },
             'GBP': {
-                memberDPC_voucher: '&#163;42',  // £
-                nonMemberDPC_voucher: '&#163;45',
-                memberDPC_deferred: '&#163;45',
-                nonMemberDPC_deferred: '&#163;48',
-                memberDPC_subscription: '&#163;16',
-                nonMemberDPC_subscription: '&#163;20',
-                DPC_pay_on_submission: '&#163;53',
-                excessDataStorageFee_first_GB: '&#163;10',
-                excessDataStorageFee_per_additional_GB: '&#163;7'
+                memberDPC_voucher: '&#163;64',  // £
+                nonMemberDPC_voucher: '&#163;70',
+                memberDPC_deferred: '&#163;70',
+                nonMemberDPC_deferred: '&#163;77',
+                memberDPC_subscription: '&#163;27',
+                nonMemberDPC_subscription: '&#163;34',
+                DPC_pay_on_submission: '&#163;80',
+                excessDataStorageFee_first_GB: '&#163;34',
+                excessDataStorageFee_per_additional_GB: '&#163;34'
             },
             'CAD': {
-                memberDPC_voucher: '$67',
-                nonMemberDPC_voucher: '$73',
-                memberDPC_deferred: '$73',
-                nonMemberDPC_deferred: '$77',
-                memberDPC_subscription: '$26',
-                nonMemberDPC_subscription: '$30',
-                DPC_pay_on_submission: '$83',
-                excessDataStorageFee_first_GB: '$15',
-                excessDataStorageFee_per_additional_GB: '$10'
+                memberDPC_voucher: '$133',
+                nonMemberDPC_voucher: '$146',
+                memberDPC_deferred: '$146',
+                nonMemberDPC_deferred: '$160',
+                memberDPC_subscription: '$56',
+                nonMemberDPC_subscription: '$70',
+                DPC_pay_on_submission: '$168',
+                excessDataStorageFee_first_GB: '$34',
+                excessDataStorageFee_per_additional_GB: '$34'
             },
             'JPY': {
-                memberDPC_voucher: '&#165;6370',  // ¥
-                nonMemberDPC_voucher: '&#165;6860',
-                memberDPC_deferred: '&#165;6860',
-                nonMemberDPC_deferred: '&#165;7350',
-                memberDPC_subscription: '&#165;2450',
-                nonMemberDPC_subscription: '&#165;2940',
-                DPC_pay_on_submission: '&#165;7840',
-                excessDataStorageFee_first_GB: '&#165;1470',
-                excessDataStorageFee_per_additional_GB: '&#165;980'
+                memberDPC_voucher: '&#165;11500',  // ¥
+                nonMemberDPC_voucher: '&#165;12712',
+                memberDPC_deferred: '&#165;12712',
+                nonMemberDPC_deferred: '&#165;13927',
+                memberDPC_subscription: '&#165;4844',
+                nonMemberDPC_subscription: '&#165;6055',
+                DPC_pay_on_submission: '&#165;14532',
+                excessDataStorageFee_first_GB: '&#165;6055',
+                excessDataStorageFee_per_additional_GB: '&#165;6055'
             },
             'AUD': {
-                memberDPC_voucher: '$72',
-                nonMemberDPC_voucher: '$78',
-                memberDPC_deferred: '$78',
-                nonMemberDPC_deferred: '$84',
-                memberDPC_subscription: '$28',
-                nonMemberDPC_subscription: '$33',
-                DPC_pay_on_submission: '$89',
-                excessDataStorageFee_first_GB: '$17',
-                excessDataStorageFee_per_additional_GB: '$11'
+                memberDPC_voucher: '$132',
+                nonMemberDPC_voucher: '$146',
+                memberDPC_deferred: '$146',
+                nonMemberDPC_deferred: '$160',
+                memberDPC_subscription: '$56',
+                nonMemberDPC_subscription: '$70',
+                DPC_pay_on_submission: '$167',
+                excessDataStorageFee_first_GB: '$70',
+                excessDataStorageFee_per_additional_GB: '$70'
             }
         };
 
