@@ -33,7 +33,16 @@
        <env-entry-type>java.lang.String</env-entry-type>
     </env-entry>
    -->
+    <env-entry>
+        <env-entry-name>solr/home</env-entry-name>
+        <env-entry-value>${dspace.dir}/solr</env-entry-value>
+        <env-entry-type>java.lang.String</env-entry-type>
+    </env-entry>
 
+  <!-- Tell Solr where its log4j configuration is located -->
+  <!-- NOTE: Solr cannot use the default DSpace log4j configuration as it isn't
+       initialized until the DSpace Kernel starts up, and we don't want Solr to
+       depend on the DSpace Kernel/API -->
   <context-param>
       <param-name>log4j.configuration</param-name>
       <param-value>${dspace.dir}/config/log4j-solr.properties</param-value>
@@ -190,14 +199,5 @@
   <welcome-file-list>
     <welcome-file>admin.html</welcome-file>
   </welcome-file-list>
-
-  <!-- People who want to hardcode their "Solr Home" directly into the
-       WAR File can set the JNDI property here...
-   -->
-    <env-entry>
-        <env-entry-name>solr/home</env-entry-name>
-        <env-entry-value>${dspace.dir}/solr</env-entry-value>
-        <env-entry-type>java.lang.String</env-entry-type>
-    </env-entry>
 
 </web-app>
