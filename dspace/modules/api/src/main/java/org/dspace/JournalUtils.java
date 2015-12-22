@@ -641,7 +641,7 @@ public class JournalUtils {
     /**
      * Initialize a publication bean from a publisher's data file.
      */
-    public static PublicationBean getDataFromPublisherFile(String manuscriptNumber, String journalID, String journalPath)
+    private static PublicationBean getDataFromPublisherFile(String manuscriptNumber, String journalID, String journalPath)
     {
         // TODO: This method has very rudimentary XML parsing. It would be much better to actually run it through the Java XML parser.
 
@@ -655,7 +655,7 @@ public class JournalUtils {
         List<String> authors = new ArrayList<String>();
         List<String> keywords = new ArrayList<String>();
 
-
+        pbean.setJournalID(journalID);
         // read the metadata xml by DOM level 3 LSParser
         // InputStream in = new FileInputStream(f);
 
@@ -695,15 +695,7 @@ public class JournalUtils {
                     }
 
                     if (tag.equals("Manuscript")){
-                        // Removing Timestamp.
-
-                        //pbean.setManuscriptNumber(journalID +
-                        //		  "-" + StringEscapeUtils.unescapeXml(text) + "-" + System.currentTimeMillis());
-
-
                         pbean.setManuscriptNumber(StringEscapeUtils.unescapeXml(text));
-
-
                     }
                     if (tag.equals("ISSN")){
                         pbean.setJournalISSN(StringEscapeUtils.unescapeXml(text));
