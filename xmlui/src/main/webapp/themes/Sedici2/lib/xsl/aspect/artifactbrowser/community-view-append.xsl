@@ -145,7 +145,9 @@
     <xsl:template match="dim:dim" mode="communityDetailView-DIM">
         <xsl:if test="string-length(dim:field[@element='description'][not(@qualifier)])&gt;0">
             <div class="intro-text">
-                <xsl:copy-of select="dim:field[@element='description'][not(@qualifier)]/node()"/>
+            	<xsl:call-template name="parseCommunityCollectionMetadata">
+            		<xsl:with-param name="node" select="dim:field[@element='description'][not(@qualifier)]/node()"/>
+            	</xsl:call-template>
             </div>
         </xsl:if>
 
