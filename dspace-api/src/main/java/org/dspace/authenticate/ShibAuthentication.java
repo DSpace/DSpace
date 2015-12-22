@@ -226,7 +226,12 @@ public class ShibAuthentication implements AuthenticationMethod
 			// Step 4: Log the user in.
 			context.setCurrentUser(eperson);
 			request.getSession().setAttribute("shib.authenticated", true);
-            authenticationService.initEPerson(context, request, eperson);
+			
+			//ds-2964 - service may not be authenticated on first use
+			if (authenticationService == null) {
+				authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+			}
+                        authenticationService.initEPerson(context, request, eperson);
 
 			log.info(eperson.getEmail()+" has been authenticated via shibboleth.");
 			return AuthenticationMethod.SUCCESS;
