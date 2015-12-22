@@ -23,7 +23,19 @@
     
         <p>Dryad's <strong>Data Publishing Charges (<abbr title="Data Publishing Charge">DPC</abbr>s)</strong> 
         are designed to sustain its core functions by recovering the basic costs of curating and preserving 
-        data. New innovations are enabled by research and development grants and by support from donors. (See a <a href="http://blog.datadryad.org/2015/12/15/new-pricing-structure-with-simplified-terms-and-increased-size-limits/">breakdown of Dryad's expenses</a>). The base charge per data package is $120.</p>
+        data. New innovations are enabled by research and development grants and by support from donors. (See a <a href="http://blog.datadryad.org/2015/12/15/new-pricing-structure-with-simplified-terms-and-increased-size-limits/">breakdown of Dryad's expenses</a>). The base charge per data package is <span class="msg-DPC_pay_on_submission">$120</span>.</p> 
+        <div style="float: right; margin-top:-24px;">
+            <span class="field-help" style="display: inline;">Show all amounts in </span>
+            <!-- TODO: refactor this to share code with 'MembershipApplicationForm' -->
+            <select id="displayed-currency" name="displayed-currency" class="ds-select-field">
+                <option value="USD">USD$</option>
+                <option value="GBP">GBP£</option>
+                <option value="CAD">CAD$</option>
+                <option value="EUR">EUR€</option>
+                <option value="AUD">AUD$</option>
+                <option value="JPY">JPY¥</option>
+            </select>
+        </div>
         
         <p><strong>Waivers</strong> are granted upon request for submissions originating from researchers based in 
         countries <a href="http://data.worldbank.org/about/country-classifications/country-and-lending-groups">classified 
@@ -36,11 +48,11 @@
 				<li>the submitter is based in a fee-waiver country (see above).</li>
 			</ul>
 		</p>
-		<p>To determine whether your DPC will be covered, <a href="/pages/journalLookup">look up your journal</a>. If there is no payment plan or sponsor in place, the DPC is $120.</p>  
+		<p>To determine whether your DPC will be covered, <a href="/pages/journalLookup">look up your journal</a>. If there is no payment plan or sponsor in place, the DPC is <span class="msg-DPC_pay_on_submission">$120</span>.</p>  
         
       <h3>Excess data storage</h3> 
 	<p>Dryad charges excess storage fees for data packages totaling over 20GB. These overage fees are charged to the submitter, even if there is a sponsor in place for the DPC.</p>
-	<p>For data packages in excess of the 20GB size limit, submitters will be charged $50 for each additional 10GB, or part thereof. (Packages between 20 and 30GB = $50, between 30 and 40GB = $100, and so on).</p>
+	<p>For data packages in excess of the 20GB size limit, submitters will be charged <span class="msg-excessDataStorageFee_first_GB">$50</span> for each additional 10GB, or part thereof. (Packages between 20 and 30GB = <span class="msg-excessDataStorageFee_first_GB">$50</span>, between 30 and 40GB = <span class="msg-excessDataStorageFee_double_first_GB">$100</span>, and so on).</p>
 
       <h3>Payment options</h3> 
 	<p>DPCs and overage fees are payable by credit card. Prepaid DPC vouchers can be purchased by contacting <a href="mailto:help@datadryad.org">help@datadryad.org</a>, with bulk discounts for purchases of 25 or more.</p>
