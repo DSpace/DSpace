@@ -270,7 +270,7 @@ public class ApproveRejectReviewItem {
                         unionKeywords.add(newKeyword);
                     }
                 }
-                dataPackage.addKeywords(unionKeywords);
+                dataPackage.setKeywords(unionKeywords);
             }
             // set title
             if (manuscript.title != null) {
