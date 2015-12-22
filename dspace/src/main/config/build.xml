@@ -354,7 +354,10 @@ Common usage:
         Prepare properly filtered files
         -->
         <copy todir="config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
-            <fileset dir="config" excludes="dspace.cfg" />
+            <fileset dir="config"> 
+                <exclude name="dspace.cfg" />
+                <exclude name="GeoLiteCity.dat" />
+            </fileset> 
             <filterchain>
                 <expandproperties />
             </filterchain>
