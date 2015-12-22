@@ -218,8 +218,10 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         //results.setHead(T_head);
         buildMainForm(search);
 
-        // Add the result division (only if we've actually searched for something)
-		if ( "" != getQuery() ) {
+
+        // TODO: if we've disabled the results division, skip it, otherwise show it
+
+        if(StringUtils.isNotBlank(getQuery())) {
 			try {
 				buildSearchResultsDivision(search);
 			} catch (SearchServiceException e) {
