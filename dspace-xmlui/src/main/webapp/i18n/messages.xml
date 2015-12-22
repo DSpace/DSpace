@@ -2473,6 +2473,22 @@
     <message key="xmlui.aspect.sherpa.submission.yellow">yellow</message>
     <!-- End Versioning -->
 
+        <!-- Request correction -->
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionForm.link">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionForm.title">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionForm.trail">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionForm.head">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionForm.para1">Thanks for reporting the error in the item: {0}. We will review it as soon as possible</message>
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionForm.email">Your email</message>
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionForm.email_help">This address will be used to track your suggestion.</message>
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionForm.comments">Error description</message>
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionForm.submit">Send</message>
+ 	
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionSent.title">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionSent.trail">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionSent.head">Correction request sent</message>
+	<message key="xmlui.ArtifactBrowser.RequestCorrectionSent.para1">Your request has been received</message>
+ 	<!-- End Correction Request -->
 
     <message key="xmlui.mirage2.itemSummaryView.MetaData">Metadata</message>
     <message key="xmlui.mirage2.itemSummaryView.Collections">Collections</message>
