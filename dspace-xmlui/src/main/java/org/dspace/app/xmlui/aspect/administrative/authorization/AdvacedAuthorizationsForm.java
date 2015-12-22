@@ -92,6 +92,7 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
         pageMeta.addTrailLink(contextPath + "/admin/authorize", T_authorize_trail);
         pageMeta.addTrail().addContent(T_trail);
 
+        pageMeta.addMetadata("include-library", "datepicker");
         pageMeta.addMetadata("javascript", "static").addContent("static/js/advancedAuthorizationsForm.js");
     }
 		

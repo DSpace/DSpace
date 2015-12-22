@@ -6,9 +6,6 @@
  * http://www.dspace.org/license/
  */
 $(function() {
-    $("#aspect_administrative_authorization_EditPolicyForm_field_start_date").datepicker({dateFormat: 'yy-mm-dd'});
-    $("#aspect_administrative_authorization_EditPolicyForm_field_end_date").datepicker({dateFormat: 'yy-mm-dd'});
-
-    $( "#aspect_administrative_authorization_EditPolicyForm_field_start_date" ).datepicker();
-    $( "#aspect_administrative_authorization_EditPolicyForm_field_end_date" ).datepicker();
+    $("#aspect_administrative_authorization_EditPolicyForm_field_start_date").datepicker({format: 'yyyy-mm-dd'});
+    $("#aspect_administrative_authorization_EditPolicyForm_field_end_date").datepicker({format: 'yyyy-mm-dd'});
 });
