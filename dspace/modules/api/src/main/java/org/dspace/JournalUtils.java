@@ -640,6 +640,7 @@ public class JournalUtils {
 
     /**
      * Initialize a publication bean from a publisher's data file.
+     * This method can be removed when we finally deprecate the XML file system.
      */
     private static PublicationBean getDataFromPublisherFile(String manuscriptNumber, String journalID, String journalPath)
     {
