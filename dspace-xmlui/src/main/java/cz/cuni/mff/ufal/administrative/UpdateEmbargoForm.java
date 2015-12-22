@@ -8,11 +8,7 @@ import org.dspace.app.xmlui.aspect.administrative.item.ViewItem;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -34,16 +30,10 @@ public class UpdateEmbargoForm extends AbstractDSpaceTransformer {
 	private static final Message T_dspace_home = message("xmlui.general.dspace_home");	
 	private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
 	private static final Message T_option_head = message("xmlui.administrative.item.general.option_head");
-	private static final Message T_option_status = message("xmlui.administrative.item.general.option_status");
-	private static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
-	private static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
-	private static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
-	private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
-	private static final Message T_option_license = message("xmlui.administrative.item.general.option_license");
 
-	
 	private static final Message T_update = message("xmlui.general.update");
 	private static final Message T_return = message("xmlui.general.return");
+	private static final Message T_delete = message("xmlui.general.delete");
 
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -100,7 +90,13 @@ public class UpdateEmbargoForm extends AbstractDSpaceTransformer {
 
 		org.dspace.app.xmlui.wing.element.Item form_item = form.addItem();
 		form_item.addButton("submit_update").setValue(T_update);
+		Button deleteButton = form_item.addButton("submit_delete");
+		deleteButton.setValue(T_delete);
 		form_item.addButton("return").setValue(T_return);
+
+		if(date == null){
+			deleteButton.setDisabled();
+		}
 		
 		main.addPara().addHidden("administrative-continue").setValue(knot.getId());
 

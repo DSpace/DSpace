@@ -938,6 +938,19 @@ public class FlowItemUtils
 
         return result;
     }
+
+	public static FlowResult processEmbargoDelete(Context context, int itemID, Request request)
+			throws SQLException, IOException, AuthorizeException {
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+		Item item = Item.find(context, itemID);
+		//set the embargo to now() + 1 min. This will be in future and adds resonable start date on the policies
+		EmbargoManager.setEmbargo(context, item, new DCDate(new Date(new Date().getTime() + 60000)));
+		EmbargoManager.liftEmbargo(context, item);
+
+		return result;
+
+	}
     
 
     public static FlowResult processReorderBitstream(Context context, int itemID, Request request) throws SQLException, AuthorizeException {
