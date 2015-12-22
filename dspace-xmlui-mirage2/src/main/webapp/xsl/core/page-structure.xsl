@@ -382,18 +382,7 @@
                                         </button>
                                         <ul class="dropdown-menu pull-right" role="menu"
                                             aria-labelledby="user-dropdown-toggle-xs" data-no-collapse="true">
-                                            <li>
-                                                <a href="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='url']}">
-                                                    <i18n:text>xmlui.EPerson.Navigation.profile</i18n:text>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='logoutURL']}">
-                                                    <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
-                                                </a>
-                                            </li>
+                                            <xsl:call-template name="user-dropdown-options" />
                                         </ul>
                                     </li>
                                 </xsl:when>
@@ -434,18 +423,7 @@
                                         </a>
                                         <ul class="dropdown-menu pull-right" role="menu"
                                             aria-labelledby="user-dropdown-toggle" data-no-collapse="true">
-                                            <li>
-                                                <a href="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='url']}">
-                                                    <i18n:text>xmlui.EPerson.Navigation.profile</i18n:text>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='logoutURL']}">
-                                                    <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
-                                                </a>
-                                            </li>
+                                            <xsl:call-template name="user-dropdown-options" />
                                         </ul>
                                     </li>
                                 </xsl:when>
@@ -454,7 +432,7 @@
                                         <a href="{/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='loginURL']}">
                                             <span class="hidden-xs">
-                                                <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
+                                                <i18n:text>xmlui.dri2xhtml.structural.login-register</i18n:text>
                                             </span>
                                         </a>
                                     </li>
@@ -476,6 +454,35 @@
 
     </xsl:template>
 
+    <xsl:template name="user-dropdown-options">
+        <li>
+            <a href="{/dri:document/dri:meta/dri:userMeta/
+                    dri:metadata[@element='identifier' and @qualifier='url']}">
+                <i18n:text>xmlui.EPerson.Navigation.profile</i18n:text>
+            </a>
+        </li>
+        <li>
+            <a href="{/dri:document/dri:meta/dri:userMeta/
+                    dri:metadata[@element='identifier' and @qualifier='submissionsURL']}">
+                <i18n:text>xmlui.Submission.Navigation.submissions</i18n:text>
+            </a>
+        </li>
+        <xsl:if test="/dri:document/dri:meta/dri:userMeta/
+                        dri:metadata[@element='identifier' and @qualifier='accountExportURL']">
+            <li>
+                <a href="{/dri:document/dri:meta/dri:userMeta/
+                        dri:metadata[@element='identifier' and @qualifier='accountExportURL']}">
+                    <i18n:text>xmlui.administrative.Navigation.account_export</i18n:text>
+                </a>
+            </li>
+        </xsl:if>
+        <li>
+            <a href="{/dri:document/dri:meta/dri:userMeta/
+                    dri:metadata[@element='identifier' and @qualifier='logoutURL']}">
+                <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
+            </a>
+        </li>
+    </xsl:template>
 
     <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
         placeholders for header images -->

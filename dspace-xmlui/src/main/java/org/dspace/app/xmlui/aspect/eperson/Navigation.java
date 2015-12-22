@@ -22,14 +22,10 @@ import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.UserMeta;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
@@ -53,22 +49,6 @@ import org.xml.sax.SAXException;
 
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    /** Language Strings */
-    private static final Message T_my_account =
-        message("xmlui.EPerson.Navigation.my_account");
-    
-    private static final Message T_profile =
-        message("xmlui.EPerson.Navigation.profile");
-    
-    private static final Message T_logout =
-        message("xmlui.EPerson.Navigation.logout");
-    
-    private static final Message T_login =
-        message("xmlui.EPerson.Navigation.login");
-    
-    private static final Message T_register =
-        message("xmlui.EPerson.Navigation.register");
-
 	/** Cached validity object */
 	private SourceValidity validity;
 
@@ -165,37 +145,16 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	}
     	return this.validity;
     }
-    
-    /**
-     * Add the eperson aspect navigational options.
-     */
+
     public void addOptions(Options options) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
     	/* Create skeleton menu structure to ensure consistent order between aspects,
-    	 * even if they are never used 
+        * even if they are never used
     	 */
         options.addList("browse");
-        List account = options.addList("account");
         options.addList("context");
         options.addList("administrative");
-        
-        account.setHead(T_my_account);
-        EPerson eperson = this.context.getCurrentUser();
-        if (eperson != null)
-        {
-            String fullName = eperson.getFullName();
-            account.addItemXref(contextPath+"/logout",T_logout);
-            account.addItemXref(contextPath+"/profile",T_profile.parameterize(fullName));
-        } 
-        else 
-        {
-            account.addItemXref(contextPath+"/login",T_login);
-            if (ConfigurationManager.getBooleanProperty("xmlui.user.registration", true))
-            {
-                account.addItemXref(contextPath + "/register", T_register);
-            }
-        }
     }
 
     /**
@@ -205,7 +164,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-        EPerson eperson = context.getCurrentUser();
         if (eperson != null)
         {
             userMeta.setAuthenticated(true);

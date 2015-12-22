@@ -31,6 +31,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
+import org.dspace.app.xmlui.wing.element.UserMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -91,9 +92,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_context_export_item 				= message("xmlui.administrative.Navigation.context_export_item");
     private static final Message T_context_export_collection 		= message("xmlui.administrative.Navigation.context_export_collection");
     private static final Message T_context_export_community 		= message("xmlui.administrative.Navigation.context_export_community");
-    private static final Message T_account_export			 		= message("xmlui.administrative.Navigation.account_export");
-
-    private static final Message T_my_account                       = message("xmlui.EPerson.Navigation.my_account");
 
     /** Cached validity object */
 	private SourceValidity validity;
@@ -202,8 +200,17 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
     }
-    
-    
+
+
+    @Override
+    public void addUserMeta(UserMeta userMeta) throws SAXException, WingException,
+            UIException, SQLException, IOException, AuthorizeException
+    {
+        if (availableExports != null && availableExports.size() > 0) {
+            userMeta.addMetadata("identifier", "accountExportURL")
+                    .addContent(contextPath + "/admin/export");
+        }
+    }
     
     
     public void addOptions(Options options) throws SAXException, WingException,
@@ -213,16 +220,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	 * even if they are never used 
     	 */
         options.addList("browse");
-        List account = options.addList("account");
         List context = options.addList("context");
         List admin = options.addList("administrative");
-        account.setHead(T_my_account);	        
         
-        // My Account options
-        if(availableExports!=null && availableExports.size()>0){
-            account.addItem().addXref(contextPath+"/admin/export", T_account_export);
-        }
-
         //Check if a system administrator
         boolean isSystemAdmin = authorizeService.isAdmin(this.context);
 

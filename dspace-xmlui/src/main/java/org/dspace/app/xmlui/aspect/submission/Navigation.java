@@ -16,11 +16,11 @@ import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
+import org.dspace.app.xmlui.wing.element.UserMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.eperson.EPerson;
 import org.xml.sax.SAXException;
 
 /**
@@ -31,12 +31,6 @@ import org.xml.sax.SAXException;
  */
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-	
-    
-	/** Language Strings **/
-    protected static final Message T_submissions = 
-        message("xmlui.Submission.Navigation.submissions");
-	
 	 /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -53,6 +47,19 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     {
         return NOPValidity.SHARED_INSTANCE;
     }
+
+    @Override
+    public void addUserMeta(UserMeta userMeta) throws SAXException,
+            WingException, UIException, SQLException, IOException,
+            AuthorizeException
+    {
+        EPerson eperson = context.getCurrentUser();
+
+        if (eperson != null) {
+            userMeta.addMetadata("identifier","submissionsURL")
+                    .addContent(contextPath + "/submissions");
+        }
+    }
 	
    
     public void addOptions(Options options) throws SAXException, WingException,
@@ -60,22 +67,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     {
 		// Basic navigation skeleton
         options.addList("browse");
-        List account = options.addList("account");
         options.addList("context");
         options.addList("administrative");
-    	
-//      This doesn't flow very well, lets remove it and see if anyone misses it.  
-//    	DSpaceObject dso = HandleUtil.obtainHandle(objectModel);	
-//    	if (dso != null && dso instanceof Collection)
-//    	{
-//    		Collection collection = (Collection) dso;  		
-//    		if (AuthorizeManager.authorizeActionBoolean(context, collection, Constants.ADD))
-//    		{
-//    	        String submitURL = contextPath + "/handle/" + collection.getHandle() + "/submit";
-//		        account.addItemXref(submitURL,"Submit to this collection");
-//    		}
-//    	}
-    	
-    	account.addItemXref(contextPath+"/submissions",T_submissions);
     }
 }

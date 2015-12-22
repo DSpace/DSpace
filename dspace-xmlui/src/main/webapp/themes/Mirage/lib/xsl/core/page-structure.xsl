@@ -398,7 +398,7 @@
                                         <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
                                         dri:metadata[@element='identifier' and @qualifier='loginURL']"/>
                                     </xsl:attribute>
-                                    <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
+                                    <i18n:text>xmlui.dri2xhtml.structural.login-register</i18n:text>
                                 </a>
                             </p>
                         </div>
