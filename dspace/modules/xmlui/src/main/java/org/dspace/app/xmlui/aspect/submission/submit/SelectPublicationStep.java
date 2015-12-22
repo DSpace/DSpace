@@ -2,12 +2,13 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.log4j.Logger;
 import org.dspace.JournalUtils;
 import org.dspace.app.util.SubmissionInfo;
-import org.dspace.app.xmlui.wing.element.*;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
+import org.dspace.app.xmlui.wing.Message;
+import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
@@ -15,22 +16,20 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.*;
-import org.dspace.handle.HandleManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.handle.HandleManager;
 import org.dspace.paymentsystem.PaymentSystemConfigurationManager;
 import org.dspace.paymentsystem.PaymentSystemService;
 import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.bean.PublicationBean;
-import org.dspace.submit.model.ModelPublication;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
-import org.apache.log4j.Logger;
 
-import java.sql.SQLException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -111,6 +110,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException
     {
+        log.debug("hi");
         Request request = ObjectModelHelper.getRequest(objectModel);
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
@@ -324,7 +324,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private void addJournalSelectStatusNotYetSubmitted(String selectedJournalId, Item newItem) throws WingException,SQLException {
         Composite optionsList = newItem.addComposite("journalID_status_not_yet_submitted");
         Select journalID = optionsList.addSelect("journalIDStatusNotYetSubmitted");
-        Concept[] journalConcepts = JournalUtils.getJournalConcept(context,selectedJournalId);
+        Concept[] journalConcepts = JournalUtils.getJournalConcept(context, selectedJournalId);
 
         for (int i = 0; i < journalConcepts.length; i++) {
             String val =  journalConcepts[i].getPreferredLabel();
