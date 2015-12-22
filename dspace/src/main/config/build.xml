@@ -733,7 +733,7 @@ Common usage:
 
         <mkdir dir="${dspace.dir}/webapps" />
 
-        <mkdir dir="${dspace.dir}/triplestore" />
+        <mkdir dir="${dspace.data.dir}/triplestore" />
 
         <mkdir dir="${org.dspace.app.itemexport.work.dir}" />
 
@@ -751,12 +751,10 @@ Common usage:
 
         <mkdir dir="${report.dir}" />
 
-    	<mkdir dir="${dspace.dir}/solr" />
+        <mkdir dir="${dspace.dir}/solr" />
 
-    	<!-- Runtime files (Could be erased - just for performing purposes) -->
-    	<mkdir dir="${dspace.dir}/var" />
-    	<!-- Runtime files for OAI 2.0 -->
-    	<mkdir dir="${dspace.dir}/var/oai" />
+        <!-- Runtime files for OAI 2.0 (Could be erased - just for performing purposes) -->
+        <mkdir dir="${dspace.data.dir}/oai" />
     </target>
 
 
