@@ -28,6 +28,8 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
              <configuration>
+               <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
+               <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                <!-- This 'dspace-solr' WAR overlays the Apache Solr Web Application
                     available in Maven Central -->
                <overlays>
