@@ -305,12 +305,6 @@ public class ShibAuthentication implements AuthenticationMethod
 			log.debug("Starting to determine special groups");
 			String defaultRoles = ConfigurationManager.getProperty("authentication-shibboleth","default-roles");
 			String roleHeader = ConfigurationManager.getProperty("authentication-shibboleth","role-header");
-			boolean ignoreScope = ConfigurationManager.getBooleanProperty("authentication-shibboleth","role-header.ignore-scope", true);
-			boolean ignoreValue = ConfigurationManager.getBooleanProperty("authentication-shibboleth","role-header.ignore-value", false);
-
-			if (ignoreScope && ignoreValue) {
-				throw new IllegalStateException("Both config parameters for ignoring an roll attributes scope and value are turned on, this is not a permissable configuration. (Note: ignore-scope defaults to true) The configuration parameters are: 'authentication.shib.role-header.ignore-scope' and 'authentication.shib.role-header.ignore-value'");
-			}
 
 			// Get the Shib supplied affiliation or use the default affiliation
 			List<String> affiliations = findMultipleAttributes(request, roleHeader);
@@ -326,33 +320,12 @@ public class ShibAuthentication implements AuthenticationMethod
 			Set<Group> groups = new HashSet<>();
 			if (affiliations != null) {
 				for ( String affiliation : affiliations) {
-					// If we ignore the affiliation's scope then strip the scope if it exists.
-					if (ignoreScope) {
-						int index = affiliation.indexOf('@');
-						if (index != -1) {
-							affiliation = affiliation.substring(0, index);
-						}
-					} 
-					// If we ignore the value, then strip it out so only the scope remains.
-					if (ignoreValue) {
-						int index = affiliation.indexOf('@');
-						if (index != -1) {
-							affiliation = affiliation.substring(index+1, affiliation.length());
-						}
-					} 
-
 					// Get the group names
-					String groupNames = ConfigurationManager.getProperty("authentication-shibboleth","role." + affiliation);
-					if (groupNames == null || groupNames.trim().length() == 0) {
-						groupNames = ConfigurationManager.getProperty("authentication-shibboleth","role." + affiliation.toLowerCase());
-					}
-
-					if (groupNames == null) {
-						log.debug("Unable to find role mapping for the value, '"+affiliation+"', there should be a mapping in config/modules/authentication-shibboleth.cfg:  role."+affiliation+" = <some group name>");
-						continue;
-					} else {
-						log.debug("Mapping role affiliation to DSpace group: '"+groupNames+"'");
-					}
+                    String groupNames = getGroupNames(affiliation);
+                    
+                    if (groupNames == null) {
+                        continue;
+                    } 
 
 					// Add each group to the list.
 					String[] names = groupNames.split(",");
@@ -389,6 +362,89 @@ public class ShibAuthentication implements AuthenticationMethod
 			return ListUtils.EMPTY_LIST;
 		}
 	}
+
+    /**
+     * Checks the affiliation agains all possible rule sets and returns a comma separated string with the
+     * matching groups.
+     * 
+     * @param affiliation
+     * 				String with the affiliation as read the from Shibboleth header
+     * @return
+     */
+	private String getGroupNames(String affiliation){
+    	String group=null;
+    	String group0=getGroupNames(affiliation,false,false);
+    	String group1=getGroupNames(affiliation,true,false);
+		String group2=getGroupNames(affiliation,false,true);
+		
+		if(group0!=null && group0.trim().length()>0){
+			group=group0;
+		}
+		if(group1!=null && group1.trim().length()>0){
+			if(group!=null && group.trim().length()>0){
+				group=group.concat(", ").concat(group1);
+			}else{
+				group=group1;
+			}
+			
+		}
+		if(group2!=null && group2.trim().length()>0){
+			if(group!=null && group.trim().length()>0){
+				group=group.concat(", ").concat(group2);
+			}else{
+				group=group2;
+			}
+			
+		}
+		
+		return group;
+    }
+    
+	/**
+	 * Checks a Shibboleth affiliation against the set of rules.
+	 * 
+	 * @param affiliation
+	 * 				affiliation as read from the shibboleth headers
+	 * @param ignoreScope
+	 * 				whether to ignore the scope of the affiliation
+	 * @param ignoreValue
+	 * 				whether to igrno the value of the affiliation
+	 * @return
+	 * 				String with the assigned group(s)
+	 */
+    private String getGroupNames(String affiliation, boolean ignoreScope, boolean ignoreValue){
+    	// If we ignore the affilation's scope then strip the scope if it exists.
+    	String groupNames;
+    	
+    	if (ignoreScope) {
+            int index = affiliation.indexOf('@');
+            if (index != -1) {
+                affiliation = affiliation.substring(0, index);
+            }
+        } 
+        // If we ignore the value, then strip it out so only the scope remains.
+        if (ignoreValue) {
+            int index = affiliation.indexOf('@');
+            if (index != -1) {
+                affiliation = affiliation.substring(index + 1, affiliation.length());
+            }
+        }
+
+   
+        // Get the group names
+        groupNames = ConfigurationManager.getProperty("authentication-shibboleth", "role." + affiliation);
+        if (groupNames == null || groupNames.trim().length() == 0) {
+        	//try the lower case
+            groupNames = ConfigurationManager.getProperty("authentication-shibboleth", "role." + affiliation.toLowerCase());
+        }
+
+        if (groupNames == null || groupNames.trim().length()==0) {
+            log.debug("Unable to find role mapping for the value, '" + affiliation + "', there should be a mapping in the dspace.cfg:  authentication.shib.role." + affiliation + " = <some group name>");
+        } else {
+            log.debug("Mapping role affiliation to DSpace group: '" + groupNames + "'");
+        }
+        return groupNames;
+    }
 
 
 	/**
