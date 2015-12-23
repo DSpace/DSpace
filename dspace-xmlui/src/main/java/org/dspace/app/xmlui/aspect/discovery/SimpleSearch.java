@@ -145,8 +145,13 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         Item searchBoxItem = searchList.addItem();
         Text text = searchBoxItem.addText("query");
+
+		// set autofocus for the query field
+		text.setAutofocus("autofocus");
+
         text.setValue(queryString);
         searchBoxItem.addButton("submit", "search-icon").setValue(T_go);
+
         if(queryResults != null && StringUtils.isNotBlank(queryResults.getSpellCheckQuery()))
         {
             Item didYouMeanItem = searchList.addItem("did-you-mean", "didYouMean");
