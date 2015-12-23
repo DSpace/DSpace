@@ -766,12 +766,12 @@ public class Group extends DSpaceObject
             break;
 
         case NAME:
-            s = "m_text_value";
+            s = "m.text_value";
 
             break;
 
         default:
-            s = "m_text_value";
+            s = "m.text_value";
         }
 
         // NOTE: The use of 's' in the order by clause can not cause an SQL 
@@ -780,10 +780,9 @@ public class Group extends DSpaceObject
                 context,
                 "select e.* from epersongroup e " +
                         "LEFT JOIN metadatavalue m on (m.resource_id = e.eperson_group_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
-                        "order by ?",
+                        "order by " + s,
                 Constants.GROUP,
-                MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID(),
-                s
+                MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID()
         );
 
 
