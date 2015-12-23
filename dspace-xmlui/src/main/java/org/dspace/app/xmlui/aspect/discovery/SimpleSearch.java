@@ -224,7 +224,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         buildMainForm(search);
 
 
-        // TODO: if we've disabled the results division, skip it, otherwise show it
+        // if we've disabled the results division, skip it, otherwise show it
         if( ! paramExists("advancedMode") ) {
 			try {
 				buildSearchResultsDivision(search);
