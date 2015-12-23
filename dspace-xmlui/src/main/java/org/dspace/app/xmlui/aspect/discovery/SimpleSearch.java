@@ -220,14 +220,13 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
 
         // TODO: if we've disabled the results division, skip it, otherwise show it
-
-        if(StringUtils.isNotBlank(getQuery())) {
+        if( ! paramExists("advancedMode") ) {
 			try {
 				buildSearchResultsDivision(search);
 			} catch (SearchServiceException e) {
 				throw new UIException(e.getMessage(), e);
 			}
-		}
+        }
     }
 
     protected void addFilterRow(java.util.List<DiscoverySearchFilter> filterFields, int index, Row row, String selectedFilterType, String relationalOperator, String value) throws WingException {
@@ -294,6 +293,19 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         }
         return query.trim();
     }
+
+    /**
+     * check for the existence of a URL parameter, if found, return true, otherwise return false
+     */
+    protected boolean paramExists(String param) throws UIException {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        if (request.getParameter(param) != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * Generate a url to the simple search url.
