@@ -1302,12 +1302,6 @@
         </dependency>
           <!-- Google Analytics -->
           <dependency>
-            <groupId>com.google.api-client</groupId>
-            <artifactId>google-api-client</artifactId>
-            <version>1.19.0</version>
-          </dependency>
-
-          <dependency>
               <groupId>com.google.apis</groupId>
               <artifactId>google-api-services-analytics</artifactId>
               <version>v3-rev103-1.19.0</version>
