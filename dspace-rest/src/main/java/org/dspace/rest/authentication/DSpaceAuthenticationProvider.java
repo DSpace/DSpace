@@ -15,8 +15,8 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.utils.DSpace;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -55,14 +55,13 @@ public class DSpaceAuthenticationProvider implements AuthenticationProvider {
             List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
 
 
-
             int implicitStatus = authenticationService.authenticateImplicit(context, null, null, null, httpServletRequest);
 
             if (implicitStatus == AuthenticationMethod.SUCCESS) {
                 log.info(LogManager.getHeader(context, "login", "type=implicit"));
                 addSpecialGroupsToGrantedAuthorityList(context, httpServletRequest, grantedAuthorities);
                 return new UsernamePasswordAuthenticationToken(name, password, grantedAuthorities);
-            }else{
+            } else {
                 int authenticateResult = authenticationService.authenticate(context, name, password, null, httpServletRequest);
                 if (AuthenticationMethod.SUCCESS == authenticateResult) {
                     addSpecialGroupsToGrantedAuthorityList(context, httpServletRequest, grantedAuthorities);
@@ -71,21 +70,20 @@ public class DSpaceAuthenticationProvider implements AuthenticationProvider {
                             .getHeader(context, "login", "type=explicit"));
 
                     return new UsernamePasswordAuthenticationToken(name, password, grantedAuthorities);
-                }else{
+                } else {
                     log.info(LogManager.getHeader(context, "failed_login", "email="
                             + name + ", result="
                             + authenticateResult));
-                    //We always need at least one authority
-                    grantedAuthorities.add(new SimpleGrantedAuthority(Group.ANONYMOUS));
-                    return new AnonymousAuthenticationToken(Group.ANONYMOUS, Group.ANONYMOUS, grantedAuthorities);
+                    throw new BadCredentialsException("Login failed");
                 }
             }
-
-
+        } catch (BadCredentialsException e)
+        {
+            throw e;
         } catch (Exception e) {
             log.error("Error while authenticating in the rest api", e);
         } finally {
-            if (context != null) {
+            if (context != null && context.isValid()) {
                 try {
                     context.complete();
                 } catch (SQLException e) {
@@ -106,6 +104,6 @@ public class DSpaceAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+        return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
     }
 }

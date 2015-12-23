@@ -184,8 +184,9 @@ public class RestIndex {
 		return Response.ok().build();
 	}
 
-	@POST
+	@GET
 	@Path("/login-shibboleth")
+	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response shibbolethLoginEndPoint()
 	{
 		org.dspace.core.Context context = null;

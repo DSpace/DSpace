@@ -17,6 +17,9 @@
 
     <context:annotation-config/>
 
+    <!--
+        Every url in the rest will pass through these filters, login & shibboleth-login will trigger an authentication attempt.
+     -->
     <bean id="springSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
         <security:filter-chain-map path-type="ant">
             <security:filter-chain pattern="/login" filters="sif,passwordLoginAuthenticationFilter"/>
@@ -31,11 +34,13 @@
 
     <!--Authentication filter for login -->
     <bean id="passwordLoginAuthenticationFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+        <!--Custom DSpace authentication manager, will handle the actual login-->
         <property name="authenticationManager" ref="dspaceAuthenticationManager"/>
+        <!-- Ensures that after login no redirect is made to the home page, the rest will return a 200 status code -->
         <property name="authenticationSuccessHandler" ref="org.dspace.rest.authentication.NoRedirectAuthenticationLoginSuccessHandler"/>
         <property name="usernameParameter" value="email"/>
         <property name="passwordParameter" value="password"/>
-        <property name="postOnly" value="true"/>
+        <property name="postOnly" value="false"/>
         <!--Match on any request-->
         <property name="requiresAuthenticationRequestMatcher" ref="org.springframework.security.web.util.matcher.AnyRequestMatcher"/>
     </bean>
@@ -44,6 +49,7 @@
         <security:authentication-provider ref='dspaceAuthenticationProvider'/>
     </security:authentication-manager>
 
+    <!-- Custom DSpace authentication provider, this bean is responsible to login the user, it is triggered by calling the "passwordLoginAuthenticationFilter"  -->
     <bean class="org.dspace.rest.authentication.DSpaceAuthenticationProvider" id="dspaceAuthenticationProvider" lazy-init="true" />
 
 
