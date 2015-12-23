@@ -6,11 +6,6 @@
  * http://www.dspace.org/license/
  */
 $(function() {
-
-    $("#aspect_administrative_item_AddBitstreamForm_field_embargo_until_date").datepicker({dateFormat: 'yy-mm-dd'});
-    $("#aspect_administrative_item_EditBitstreamForm_field_embargo_until_date").datepicker({dateFormat: 'yy-mm-dd'});
-
-    $("#aspect_administrative_item_AddBitstreamForm_field_embargo_until_date").datepicker();
-
-    $("#aspect_administrative_item_EditBitstreamForm_field_embargo_until_date").datepicker();
+    $("#aspect_administrative_item_AddBitstreamForm_field_embargo_until_date").datepicker({format: 'yyyy-mm-dd'});
+    $("#aspect_administrative_item_EditBitstreamForm_field_embargo_until_date").datepicker({format: 'yyyy-mm-dd'});
 });

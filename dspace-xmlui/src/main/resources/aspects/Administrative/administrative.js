@@ -1811,6 +1811,10 @@ function editEmbargo(itemID)
             // Update the item
             result = FlowItemUtils.processEmbargoItem(getDSContext(),itemID,cocoon.request);
         }
+		else if(cocoon.request.get("submit_delete"))
+		{
+			result = FlowItemUtils.processEmbargoDelete(getDSContext(), itemID, cocoon.request);
+		}
     } while (true)
 }
 

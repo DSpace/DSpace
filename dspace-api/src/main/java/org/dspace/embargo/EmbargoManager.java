@@ -354,11 +354,11 @@ public class EmbargoManager
         if (line.hasOption('s'))
         {
         	if ( lift.length > 0 ) {
-        		System.err.println( "Creating new embargo" );
+                DCDate liftDate = new DCDate(lift[0].value);
+                System.err.println( String.format(
+                        "Overriding embargo [%s]", liftDate.toString()) );
         	}else {
-        		DCDate liftDate = new DCDate(lift[0].value);
-        		System.err.println( String.format(
-        				"Overriding embargo [%s]", liftDate.toString()) );
+                System.err.println( "Creating new embargo" );
         	}
             if (!line.hasOption('n'))
             {
