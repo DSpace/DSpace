@@ -145,8 +145,13 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         Item searchBoxItem = searchList.addItem();
         Text text = searchBoxItem.addText("query");
+
+		// set autofocus for the query field
+		text.setAutofocus("autofocus");
+
         text.setValue(queryString);
         searchBoxItem.addButton("submit", "search-icon").setValue(T_go);
+
         if(queryResults != null && StringUtils.isNotBlank(queryResults.getSpellCheckQuery()))
         {
             Item didYouMeanItem = searchList.addItem("did-you-mean", "didYouMean");
@@ -169,20 +174,17 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         addHiddenFormFields("search", request, fqs, mainSearchDiv);
 
 
-        if(0 < filterFields.size())
-        {
+       /* if(0 < filterFields.size())
+        { */
             Division searchFiltersDiv = searchBoxDivision.addInteractiveDivision("search-filters",
-                    "discover", Division.METHOD_GET, "discover-filters-box " + (0 < filterTypes.size() ? "" : "hidden"));
+                    "discover", Division.METHOD_GET, "discover-filters-box");
 
             Division filtersWrapper = searchFiltersDiv.addDivision("discovery-filters-wrapper");
             filtersWrapper.setHead(T_filter_label);
             filtersWrapper.addPara(T_filter_help);
             Table filtersTable = filtersWrapper.addTable("discovery-filters", 1, 4, "discovery-filters");
 
-
-            //If we have any filters, show them
-            if(filterTypes.size() > 0)
-            {
+			// ALWAYS show the filters
 
                 filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header").addContent(T_filter_current_filters);
                 for (int i = 0; i <  filterTypes.size(); i++)
@@ -199,8 +201,6 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
                 }
                 filtersTable.addRow("filler-row", Row.ROLE_DATA, "search-filter filler").addCell(1, 4).addContent("");
                 filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header").addContent(T_filter_new_filters);
-            }
-
 
             int index = filterTypes.size() + 1;
             Row row = filtersTable.addRow("filter-new-" + index, Row.ROLE_DATA, "search-filter");
@@ -213,7 +213,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
             addHiddenFormFields("filter", request, fqs, searchFiltersDiv);
 
-        }
+       /* }*/
 
 
 //        query.addPara(null, "button-list").addButton("submit").setValue(T_go);
@@ -223,13 +223,15 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         //results.setHead(T_head);
         buildMainForm(search);
 
-        // Add the result division
-        try {
-            buildSearchResultsDivision(search);
-        } catch (SearchServiceException e) {
-            throw new UIException(e.getMessage(), e);
-        }
 
+        // if we've disabled the results division, skip it, otherwise show it
+        if( ! paramExists("advancedMode") ) {
+			try {
+				buildSearchResultsDivision(search);
+			} catch (SearchServiceException e) {
+				throw new UIException(e.getMessage(), e);
+			}
+        }
     }
 
     protected void addFilterRow(java.util.List<DiscoverySearchFilter> filterFields, int index, Row row, String selectedFilterType, String relationalOperator, String value) throws WingException {
@@ -298,6 +300,19 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     }
 
     /**
+     * check for the existence of a URL parameter, if found, return true, otherwise return false
+     */
+    protected boolean paramExists(String param) throws UIException {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        if (request.getParameter(param) != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
      * Generate a url to the simple search url.
      */
     protected String generateURL(Map<String, String> parameters)
@@ -357,14 +372,6 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
      * @throws WingException will never occur
      */
     private void addHiddenFormFields(String type, Request request, Map<String, String[]> fqs, Division division) throws WingException {
-        if(type.equals("filter") || type.equals("sort")){
-            if(request.getParameter("query") != null){
-                division.addHidden("query").setValue(request.getParameter("query"));
-            }
-            if(request.getParameter("scope") != null){
-                division.addHidden("scope").setValue(request.getParameter("scope"));
-            }
-        }
 
         //Add the filter queries, current search settings so these remain saved when performing a new search !
         if(type.equals("search") || type.equals("sort"))
@@ -373,20 +380,20 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             {
                 String[] values = fqs.get(parameter);
                 for (String value : values) {
-                    division.addHidden(parameter).setValue(value);
+                   // division.addHidden(parameter).setValue(value);
                 }
             }
         }
 
         if(type.equals("search") || type.equals("filter")){
             if(request.getParameter("rpp") != null){
-                division.addHidden("rpp").setValue(request.getParameter("rpp"));
+                //division.addHidden("rpp").setValue(request.getParameter("rpp"));
             }
             if(request.getParameter("sort_by") != null){
-                division.addHidden("sort_by").setValue(request.getParameter("sort_by"));
+                //division.addHidden("sort_by").setValue(request.getParameter("sort_by"));
             }
             if(request.getParameter("order") != null){
-                division.addHidden("order").setValue(request.getParameter("order"));
+                //division.addHidden("order").setValue(request.getParameter("order"));
             }
         }
     }
