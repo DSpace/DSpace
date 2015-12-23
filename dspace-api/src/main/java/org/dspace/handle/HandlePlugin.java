@@ -480,18 +480,26 @@ class ResolvedHandle {
             Map<String, String> map = HandlePlugin.extractMetadata(dso);
             String key
                     = AbstractPIDService.HANDLE_FIELDS.TITLE.toString();
-            title = map.getOrDefault(key, "");
+            title = getOrDefault(map, key, "");
 
             key = AbstractPIDService.HANDLE_FIELDS.REPOSITORY.toString();
-            repository = map.getOrDefault(key, "");
+            repository = getOrDefault(map, key, "");
 
             key = AbstractPIDService.HANDLE_FIELDS.SUBMITDATE.toString();
-            submitdate = map.getOrDefault(key, "");
+            submitdate = getOrDefault(map, key, "");
 
             key = AbstractPIDService.HANDLE_FIELDS.REPORTEMAIL.toString();
-            reportemail = map.getOrDefault(key, "");
+            reportemail = getOrDefault(map, key, "");
         }
         init(url, title, repository, submitdate, reportemail);
+    }
+
+    private <K,V> V getOrDefault(Map<K,V> map, K key, V defaultValue){
+        if(map.containsKey(key)){
+            return map.get(key);
+        }else{
+            return defaultValue;
+        }
     }
 
     private void init(String url, String title, String repository, String submitdate, String reportemail) {
