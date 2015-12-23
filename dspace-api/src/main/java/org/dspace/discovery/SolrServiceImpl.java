@@ -50,6 +50,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.util.MultiFormatDateParser;
 import org.dspace.utils.DSpace;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -389,10 +390,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
         try {
             Iterator<Item> items = null;
+            int itemCount = 0;
             for (items = itemService.findAllUnfiltered(context); items.hasNext();)
             {
                 Item item = items.next();
                 indexContent(context, item, force);
+                if (itemCount++ >= 1000) {
+                	context.clearCache();
+                	itemCount = 0;
+                }
+                
             }
 
             List<Collection> collections = collectionService.findAll(context);

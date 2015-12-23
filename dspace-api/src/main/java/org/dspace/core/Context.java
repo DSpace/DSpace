@@ -20,6 +20,7 @@ import org.dspace.event.factory.EventServiceFactory;
 import org.dspace.event.service.EventService;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.utils.DSpace;
+import org.hibernate.Session;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -594,5 +595,9 @@ public class Context
 
     public void shutDownDatabase() throws SQLException {
         dbConnection.shutdown();
+    }
+    
+    public void clearCache() throws SQLException {
+    	((Session)this.getDBConnection().getSession()).clear();
     }
 }
