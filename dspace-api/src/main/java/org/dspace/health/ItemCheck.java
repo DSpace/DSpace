@@ -67,6 +67,13 @@ public class ItemCheck extends Check {
         } catch (SQLException e) {
             error(e);
         }
+
+        try {
+            ret += "\nType X Collection counts:\n";
+            ret += Core.getTypeXcollectionCounts();
+        }catch (SQLException e){
+            error(e);
+        }
         return ret;
     }
 }

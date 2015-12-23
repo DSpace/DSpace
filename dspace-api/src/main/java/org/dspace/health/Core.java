@@ -8,9 +8,12 @@
 package org.dspace.health;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.util.CollectionDropDown;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -98,6 +101,64 @@ public class Core {
 
         c.complete();
         return ret;
+    }
+
+    public static String getTypeXcollectionCounts() throws SQLException {
+        StringBuilder ret = new StringBuilder();
+        Map<String, Map<String, Integer>> table = new HashMap<>();
+        Set<String> colnames = new HashSet<>();
+        int lenColname = 0;
+        Context context = new Context();
+        TableRowIterator rows = DatabaseManager.query(context,
+                "SELECT text_value AS type, colname, count(text_value) AS count FROM item JOIN metadatavalue ON item_id=resource_id " +
+                "NATURAL JOIN metadatafieldregistry NATURAL JOIN metadataschemaregistry JOIN " +
+                "(SELECT resource_id, text_value AS colname FROM metadatavalue NATURAL JOIN metadatafieldregistry NATURAL JOIN metadataschemaregistry "+
+                    "WHERE short_id='dc' AND element='title' AND qualifier IS NULL AND resource_type_id=?) " +
+                        "AS colnames ON colnames.resource_id=owning_collection " +
+                "WHERE resource_type_id=? AND short_id='dc' AND element='type' AND withdrawn=false AND in_archive=true GROUP BY text_value, colname;",
+                Constants.COLLECTION, Constants.ITEM);
+        for(TableRow row : rows.toList()){
+            String type = row.getStringColumn("type");
+            String colname = row.getStringColumn("colname");
+            Integer count = row.getIntColumn("count");
+
+            Map<String, Integer> r = table.get(type);
+            if(r == null){
+                r = new HashMap<>();
+                table.put(type, r);
+            }
+            r.put(colname, count);
+
+            if(colname.length() > lenColname){
+                lenColname = colname.length();
+            }
+
+            colnames.add(colname);
+        }
+
+        String fmt = "%-"+lenColname+"s | ";
+        fmt += StringUtils.repeat("%"+lenColname+"s", " | ", colnames.size());
+        //print header row
+        ret.append(String.format(fmt, ArrayUtils.addAll(new String[]{""}, colnames.toArray(new String[0]))))
+                .append('\n');
+
+        for(Map.Entry<String, Map<String, Integer>> rowEntry : table.entrySet()){
+            String[] vals = new String[colnames.size() + 1];
+            int i = 0;
+            vals[i++] = rowEntry.getKey();
+            Map<String, Integer> row = rowEntry.getValue();
+            for(String colname : colnames){
+                Integer count = row.get(colname);
+                if(count == null){
+                    count = 0;
+                }
+                vals[i++] = Integer.toString(count);
+            }
+            ret.append(String.format(fmt, vals))
+                    .append('\n');
+        }
+        context.complete();
+        return ret.toString();
     }
 
 
