@@ -694,9 +694,7 @@ public class ItemsResource extends Resource
             writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting item.");
-            for(Collection collection: dspaceItem.getCollections()){
-                collectionService.removeItem(context, collection, dspaceItem);
-            }
+            itemService.delete(context, dspaceItem);
             context.complete();
 
         }
