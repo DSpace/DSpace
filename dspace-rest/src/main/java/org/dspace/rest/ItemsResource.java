@@ -13,6 +13,7 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -693,8 +694,9 @@ public class ItemsResource extends Resource
             writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting item.");
-            org.dspace.content.Collection collection = collectionService.find(context, dspaceItem.getCollections().get(0).getID());
-            collectionService.removeItem(context, collection, dspaceItem);
+            for(Collection collection: dspaceItem.getCollections()){
+                collectionService.removeItem(context, collection, dspaceItem);
+            }
             context.complete();
 
         }
