@@ -61,6 +61,10 @@ public abstract class DSpaceObject implements Serializable
     @Transient
     private boolean modified = false;
 
+    protected DSpaceObject()
+    {
+
+    }
 
     /**
      * Reset the cache of event details.

@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import org.dspace.core.Context;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -46,6 +47,11 @@ public class MetadataField {
     @Column(name="scope_note", columnDefinition = "text")
     private String scopeNote;
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.MetadataFieldService#create(Context, MetadataSchema, String, String, String)}
+     *
+     */
     protected MetadataField()
     {
 

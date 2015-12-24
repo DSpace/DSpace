@@ -7,6 +7,7 @@
  */
 package org.dspace.workflowbasic;
 
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 import javax.persistence.*;
@@ -33,6 +34,16 @@ public class TaskListItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workflow_id")
     private BasicWorkflowItem workflowItem;
+
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.workflowbasic.service.TaskListItemService#create(Context, BasicWorkflowItem, EPerson)}
+     *
+     */
+    protected TaskListItem()
+    {
+
+    }
 
     public int getTaskListItemId() {
         return taskListItemId;

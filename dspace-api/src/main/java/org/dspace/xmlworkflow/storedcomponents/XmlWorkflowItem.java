@@ -9,6 +9,7 @@ package org.dspace.xmlworkflow.storedcomponents;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 
@@ -49,6 +50,16 @@ public class XmlWorkflowItem implements WorkflowItem {
 
     @Column(name = "multiple_files")
     private boolean multipleFiles = false;
+
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService#create(Context, Item, Collection)}
+     *
+     */
+    protected XmlWorkflowItem()
+    {
+
+    }
 
     /**
      * Get the internal ID of this workflow item

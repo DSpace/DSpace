@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +75,13 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     private transient BitstreamService bitstreamService;
 
 
-    public Bitstream()
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.BitstreamService#create(Context, Bundle, InputStream)}
+     * or
+     * {@link org.dspace.content.service.BitstreamService#create(Context, InputStream)}
+     */
+    protected Bitstream()
     {
     }
 

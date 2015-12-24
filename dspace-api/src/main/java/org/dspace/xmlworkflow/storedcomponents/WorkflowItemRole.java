@@ -7,6 +7,7 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -50,6 +51,15 @@ public class WorkflowItemRole {
     @JoinColumn(name = "group_id")
     private Group group;
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService#create(Context)}
+     *
+     */
+    protected WorkflowItemRole()
+    {
+
+    }
 
 
     public void setRoleId(String id){

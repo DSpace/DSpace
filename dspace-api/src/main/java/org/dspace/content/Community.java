@@ -71,7 +71,16 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     @Transient
     protected transient CommunityService communityService;
 
-    protected Community() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.CommunityService#create(Community, Context)}
+     * or
+     * {@link org.dspace.content.service.CommunityService#create(Community, Context, String)}
+     *
+     */
+    protected Community()
+    {
+
     }
 
     void addSubCommunity(Community subCommunity)

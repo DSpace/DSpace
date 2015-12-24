@@ -9,6 +9,7 @@ package org.dspace.app.requestitem;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -67,7 +68,12 @@ public class RequestItem {
     @Column(name = "accept_request")
     private Boolean accept_request = null;
 
-    public RequestItem() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.app.requestitem.service.RequestItemService#createRequest(Context, Bitstream, Item, boolean, String, String, String)}
+     */
+    protected RequestItem()
+    {
     }
 
     public int getID() {

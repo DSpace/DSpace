@@ -61,6 +61,16 @@ public class MostRecentChecksum implements Serializable
     @JoinColumn(name= "result")
     private ChecksumResult checksumResult;
 
+
+    /**
+     * Protected constructor, create handled by the
+     * {@link org.dspace.checker.service.MostRecentChecksumService}
+     */
+    protected MostRecentChecksum()
+    {
+
+    }
+
     public Bitstream getBitstream() {
         return bitstream;
     }
