@@ -23,13 +23,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.service.SubscribeService;
-import org.dspace.handle.service.HandleService;
 
 /**
  * Servlet for listing communities (and collections within them)
@@ -40,20 +36,13 @@ import org.dspace.handle.service.HandleService;
 public class CommunityListServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(CommunityListServlet.class);
+    private static final Logger log = Logger.getLogger(CommunityListServlet.class);
 
     // services API
-    private CommunityService communityService;
-    
-    private CollectionService collectionService;
+    private final transient CommunityService communityService
+             = ContentServiceFactory.getInstance().getCommunityService();
     
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	communityService = ContentServiceFactory.getInstance().getCommunityService();
-        collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    }
-    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -64,8 +53,8 @@ public class CommunityListServlet extends DSpaceServlet
         // This will map communityIDs to arrays of sub-communities
         Map<String, List<Community>> commMap;
 
-        colMap = new HashMap<String, List<Collection>>();
-        commMap = new HashMap<String, List<Community>>();
+        colMap = new HashMap<>();
+        commMap = new HashMap<>();
 
         log.info(LogManager.getHeader(context, "view_community_list", ""));
 

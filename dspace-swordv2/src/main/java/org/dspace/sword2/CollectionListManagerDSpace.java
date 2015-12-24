@@ -16,7 +16,6 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -34,9 +33,6 @@ import java.util.List;
 public class CollectionListManagerDSpace extends DSpaceSwordAPI
         implements CollectionListManager
 {
-    protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
-
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory
             .getInstance().getWorkspaceItemService();
 

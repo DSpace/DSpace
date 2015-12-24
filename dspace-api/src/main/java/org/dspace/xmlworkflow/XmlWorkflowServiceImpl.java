@@ -361,7 +361,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 e.printStackTrace();
             }
             finally {
-                if((nextStep != null && nextActionConfig != null) || wfi.getItem().isArchived()){
+                if((nextStep != null && currentStep != null && nextActionConfig != null) || (wfi.getItem().isArchived() && currentStep != null)){
                     logWorkflowEvent(c, currentStep.getWorkflow().getID(), currentStep.getId(), currentActionConfig.getId(), wfi, user, nextStep, nextActionConfig);
                 }
             }

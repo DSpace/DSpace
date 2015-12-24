@@ -31,14 +31,10 @@ import org.dspace.eperson.service.GroupService;
  */
 public class GroupListServlet extends DSpaceServlet
 {
-	private GroupService groupService;
+	private final transient GroupService groupService
+             = EPersonServiceFactory.getInstance().getGroupService();
 	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		groupService = EPersonServiceFactory.getInstance().getGroupService();
-	}
-	
+    @Override
 	protected void doDSGet(Context context,
 			HttpServletRequest request,
 			HttpServletResponse response)
@@ -61,8 +57,8 @@ public class GroupListServlet extends DSpaceServlet
 		List<Group> groups = groupService.findAll(context, sortBy);
 		
 		// Set attributes for JSP
-		request.setAttribute("sortby", Integer.valueOf(sortBy));
-		request.setAttribute("first",  Integer.valueOf(first));
+		request.setAttribute("sortby", sortBy);
+		request.setAttribute("first", first);
 		request.setAttribute("groups", groups);
 		if (multiple)
 		{

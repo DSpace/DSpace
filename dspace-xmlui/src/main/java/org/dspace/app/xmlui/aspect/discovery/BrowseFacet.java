@@ -240,11 +240,6 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
             discoverQuery.setMaxResults(1);
             discoverQuery.setSortField(dateField, DiscoverQuery.SORT_ORDER.asc);
             discoverQuery.addFilterQueries(filterquery);
-
-            DiscoverResult rsp = searchService.search(context, discoverQuery);
-//            if(0 < rsp.getResults().getNumFound()){
-//                return (Date) rsp.getResults().get(0).getFieldValue(dateField);
-//            }
         }catch (Exception e){
             log.error("Unable to get lowest date", e);
         }

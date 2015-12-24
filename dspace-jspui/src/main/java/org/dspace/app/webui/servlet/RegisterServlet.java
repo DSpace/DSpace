@@ -57,7 +57,7 @@ import com.sun.mail.smtp.SMTPAddressFailedException;
 public class RegisterServlet extends EditProfileServlet
 {
     /** Logger */
-    private static Logger log = Logger.getLogger(RegisterServlet.class);
+    private static final Logger log = Logger.getLogger(RegisterServlet.class);
 
     /** The "enter e-mail" step */
     public static final int ENTER_EMAIL_PAGE = 1;
@@ -71,22 +71,24 @@ public class RegisterServlet extends EditProfileServlet
     /** true = registering users, false = forgotten passwords */
     private boolean registering;
 
-    /** ldap is enabled */
+    /** LDAP is enabled */
     private boolean ldap_enabled;
 
-    private AuthenticationService authenticationService;
+    private final transient AuthenticationService authenticationService
+             = AuthenticateServiceFactory.getInstance().getAuthenticationService();
     
-    private AccountService accountService;
+    private final transient AccountService accountService
+             = EPersonServiceFactory.getInstance().getAccountService();
     
+    @Override
     public void init() throws ServletException
     {
     	super.init();
         registering = getInitParameter("register").equalsIgnoreCase("true");
         ldap_enabled = ConfigurationManager.getBooleanProperty("authentication-ldap", "enable");
-        authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
-        accountService = EPersonServiceFactory.getInstance().getAccountService();
     }
 
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -143,7 +145,7 @@ public class RegisterServlet extends EditProfileServlet
                 // Indicate if user can set password
                 boolean setPassword =
                     authenticationService.allowSetPassword(context, request, email);
-                request.setAttribute("set.password", Boolean.valueOf(setPassword));
+                request.setAttribute("set.password", setPassword);
 
                 // Forward to "personal info page"
                 JSPManager.showJSP(request, response,
@@ -166,6 +168,7 @@ public class RegisterServlet extends EditProfileServlet
         }
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -544,13 +547,13 @@ public class RegisterServlet extends EditProfileServlet
             request.setAttribute("token", token);
             request.setAttribute("eperson", eperson);
             request.setAttribute("netid", netid);
-            request.setAttribute("missing.fields", Boolean.valueOf(!infoOK));
-            request.setAttribute("password.problem", Boolean.valueOf(!passwordOK));
+            request.setAttribute("missing.fields", !infoOK);
+            request.setAttribute("password.problem", !passwordOK);
 
             // Indicate if user can set password
             boolean setPassword = authenticationService.allowSetPassword(
                     context, request, email);
-            request.setAttribute("set.password", Boolean.valueOf(setPassword));
+            request.setAttribute("set.password", setPassword);
 
             JSPManager.showJSP(request, response,
                     "/register/registration-form.jsp");

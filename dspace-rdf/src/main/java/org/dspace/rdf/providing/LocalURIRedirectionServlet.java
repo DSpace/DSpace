@@ -32,8 +32,8 @@ public class LocalURIRedirectionServlet extends HttpServlet
     
     private final static Logger log = Logger.getLogger(LocalURIRedirectionServlet.class);
     
-    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-    
+    protected final transient HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -62,9 +62,7 @@ public class LocalURIRedirectionServlet extends HttpServlet
         String[] path = request.getPathInfo().substring(1).split("/");
 
         String handle = path[0] + "/" + path[1];
-        String dspaceURL = 
-                    (new DSpace()).getConfigurationService().getProperty("dspace.url");
-        
+
         // Prepare content negotiation
         int requestedMimeType = Negotiator.negotiate(request.getHeader(ACCEPT_HEADER_NAME));
         
@@ -114,6 +112,7 @@ public class LocalURIRedirectionServlet extends HttpServlet
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
@@ -128,6 +127,7 @@ public class LocalURIRedirectionServlet extends HttpServlet
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
@@ -138,6 +138,7 @@ public class LocalURIRedirectionServlet extends HttpServlet
      *
      * @return a String containing servlet description
      */
+    @Override
     public String getServletInfo() {
         return "Ensures that URIs used in RDF can be dereferenced.";
     }

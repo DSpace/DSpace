@@ -32,7 +32,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.usage.UsageEvent;
@@ -51,7 +50,7 @@ import org.dspace.utils.DSpace;
 public class BitstreamServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(BitstreamServlet.class);
+    private static final Logger log = Logger.getLogger(BitstreamServlet.class);
 
     /**
      * Threshold on Bitstream size before content-disposition will be set.
@@ -59,17 +58,17 @@ public class BitstreamServlet extends DSpaceServlet
     private int threshold;
     
     // services API
-    private HandleService handleService;
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
     
-    private BitstreamService bitstreamService;
+    private final transient BitstreamService bitstreamService
+             = ContentServiceFactory.getInstance().getBitstreamService();
     
     @Override
 	public void init(ServletConfig arg0) throws ServletException {
 		super.init(arg0);
 		threshold = ConfigurationManager
 				.getIntProperty("webui.content_disposition_threshold");
-        handleService = HandleServiceFactory.getInstance().getHandleService();
-        bitstreamService = ContentServiceFactory.getInstance().getBitstreamService(); 
 	}
 
     @Override

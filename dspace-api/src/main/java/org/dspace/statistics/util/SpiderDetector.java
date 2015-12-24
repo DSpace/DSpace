@@ -99,7 +99,7 @@ public class SpiderDetector {
      *  private loader to populate the table from files.
      */
 
-    private static void loadSpiderIpAddresses() {
+    private synchronized static void loadSpiderIpAddresses() {
 
         if (table == null) {
             table = new IPTable();

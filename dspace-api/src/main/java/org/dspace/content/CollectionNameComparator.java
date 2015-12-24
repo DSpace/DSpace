@@ -7,9 +7,15 @@
  */
 package org.dspace.content;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class CollectionNameComparator implements Comparator<Collection> {
+/**
+ * Compares the names of two {@link Collection}s.
+ */
+public class CollectionNameComparator
+        implements Comparator<Collection>, Serializable
+{
     @Override
     public int compare(Collection collection1, Collection collection2) {
         return collection1.getName().compareTo(collection2.getName());

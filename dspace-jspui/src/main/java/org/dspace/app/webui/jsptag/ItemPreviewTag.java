@@ -37,17 +37,19 @@ import org.dspace.core.Constants;
 public class ItemPreviewTag extends TagSupport
 {
     /** Item to display */
-    private transient Item item;
+    private Item item;
 
     private static final long serialVersionUID = -5535762797556685631L;
     
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private final transient ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
 
     public ItemPreviewTag()
     {
         super();
     }
 
+    @Override
     public int doStartTag() throws JspException
     {
     	if (!ConfigurationManager.getBooleanProperty("webui.preview.enabled"))
@@ -124,6 +126,7 @@ public class ItemPreviewTag extends TagSupport
         }     
     }
 
+    @Override
     public void release()
     {
         item = null;

@@ -155,8 +155,6 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
 			return;
 		}
 		Request request = ObjectModelHelper.getRequest(objectModel);
-		boolean firstVisit=Boolean.valueOf(request.getParameter("firstVisit"));
-		
 		Item item = (Item) dso;
 		// Build the item viewer division.
 		Division itemRequest = body.addInteractiveDivision("itemRequest-form",

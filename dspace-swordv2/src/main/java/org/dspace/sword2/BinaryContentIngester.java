@@ -17,11 +17,9 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
-import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
@@ -35,9 +33,6 @@ public class BinaryContentIngester extends AbstractSwordContentIngester
 {
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory
             .getInstance().getWorkspaceItemService();
-
-    protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
 
     protected BundleService bundleService = ContentServiceFactory.getInstance()
             .getBundleService();

@@ -375,7 +375,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
             // only complain about missing elements in the DC schema:
             if (elt == null)
             {
-                if (metadataField.getMetadataSchema().equals(MetadataSchema.DC_SCHEMA))
+                if (metadataField.getMetadataSchema().getName().equals(MetadataSchema.DC_SCHEMA))
                 {
                     log.warn("WARNING: " + myName + ": No QDC mapping for \"" + qdc + "\"");
                 }

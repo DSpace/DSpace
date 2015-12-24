@@ -165,8 +165,6 @@ public class BitstreamResource extends Resource
         {
             context = createContext(getUser(headers));
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
-            List<org.dspace.authorize.ResourcePolicy> resourcePolicies = authorizeService.getPolicies(context, dspaceBitstream);
-            //TODO why isn't the above used...
             policies = new Bitstream(dspaceBitstream,"policies", context).getPolicies();
 
             context.complete();
@@ -628,6 +626,8 @@ public class BitstreamResource extends Resource
 
             log.trace("Deleting bitstream from all bundles.");
             bitstreamService.delete(context, dspaceBitstream);
+
+            context.complete();
         }
         catch (SQLException e)
         {

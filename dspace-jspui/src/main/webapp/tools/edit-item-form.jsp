@@ -597,20 +597,20 @@
                        String upButtonValue = null;
                        String downButtonValue = null;
                        if(0 != j){
-                           ArrayList<Integer> temp = (ArrayList<Integer>) bitstreamIdOrder.clone();
+                           ArrayList<UUID> temp = (ArrayList<UUID>) bitstreamIdOrder.clone();
                            //We don't have the first button, so create a value where the current bitstreamId moves one up
-                           Integer tempInt = temp.get(j);
+                           UUID tempInt = temp.get(j);
                            temp.set(j, temp.get(j - 1));
                            temp.set(j - 1, tempInt);
-                           upButtonValue = StringUtils.join(temp.toArray(new Integer[temp.size()]), ",");
+                           upButtonValue = StringUtils.join(temp.toArray(new UUID[temp.size()]), ",");
                        }
                        if(j < (bitstreams.size() -1)){
                            //We don't have the first button, so create a value where the current bitstreamId moves one up
-                           ArrayList<Integer> temp = (ArrayList<Integer>) bitstreamIdOrder.clone();
-                           Integer tempInt = temp.get(j);
+                           ArrayList<UUID> temp = (ArrayList<UUID>) bitstreamIdOrder.clone();
+                           UUID tempInt = temp.get(j);
                            temp.set(j, temp.get(j + 1));
                            temp.set(j + 1, tempInt);
-                           downButtonValue = StringUtils.join(temp.toArray(new Integer[temp.size()]), ",");
+                           downButtonValue = StringUtils.join(temp.toArray(new UUID[temp.size()]), ",");
                        }
 
 

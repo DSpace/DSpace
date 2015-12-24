@@ -24,7 +24,6 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
-import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -50,8 +49,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Autowired(required = true)
     protected CollectionService collectionService;
-    @Autowired(required = true)
-    protected HandleService handleService;
     @Autowired(required = true)
     protected GroupService groupService;
     @Autowired(required = true)
@@ -202,13 +199,14 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             canEdit(context, community);
         }
 
-                // First, delete any existing logo
-        if (community.getLogo() != null)
+        // First, delete any existing logo
+        Bitstream oldLogo = community.getLogo();
+        if (oldLogo != null)
         {
             log.info(LogManager.getHeader(context, "remove_logo",
                     "community_id=" + community.getID()));
             community.setLogo(null);
-            bitstreamService.delete(context, community.getLogo());
+            bitstreamService.delete(context, oldLogo);
         }
 
         if (is != null)

@@ -117,8 +117,6 @@ public class CSVOutputter extends AbstractReader implements Recyclable
             }
             
             ElasticSearchStatsViewer esStatsViewer = new ElasticSearchStatsViewer(dso, fromDate, toDate);
-            StatisticsTransformer statisticsTransformerInstance = new StatisticsTransformer(fromDate, toDate);
-
             if(requestedReport.equalsIgnoreCase("topCountries"))
             {                
                 SearchRequestBuilder requestBuilder = esStatsViewer.facetedQueryBuilder(esStatsViewer.facetTopCountries);

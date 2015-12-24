@@ -74,11 +74,13 @@ public class TokenHolder
             if (status == AuthenticationMethod.SUCCESS)
             {
                 EPerson ePerson = epersonService.findByEmail(context, user.getEmail());
-                if(tokenPersons.inverse().containsKey(ePerson.getID())) {
-                    token = tokenPersons.inverse().get(ePerson.getID());
-                } else {
-                    token = generateToken();
-                    tokenPersons.put(token, ePerson.getID());
+                synchronized (TokenHolder.class) {
+                    if (tokenPersons.inverse().containsKey(ePerson.getID())) {
+                        token = tokenPersons.inverse().get(ePerson.getID());
+                    } else {
+                        token = generateToken();
+                        tokenPersons.put(token, ePerson.getID());
+                    }
                 }
             }
 
@@ -112,7 +114,7 @@ public class TokenHolder
      * @return Return instance of EPerson if is token right, otherwise it
      *         returns NULL.
      */
-    public static EPerson getEPerson(String token)
+    public static synchronized EPerson getEPerson(String token)
     {
         try {
             EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -132,7 +134,7 @@ public class TokenHolder
      *            Token under which is stored eperson.
      * @return Return true if was all okay, otherwise return false.
      */
-    public static boolean logout(String token)
+    public static synchronized boolean logout(String token)
     {
         if ((token == null) || (! tokenPersons.containsKey(token)))
         {

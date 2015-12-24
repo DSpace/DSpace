@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -256,12 +258,23 @@ public class RoleIngester implements PackageIngester
             { // Group already exists, so empty it
                 if (params.replaceModeEnabled()) // -r -f
                 {
-                    for (Group member : collider.getMemberGroups())
+                    // Get a *copy* of our group list to avoid ConcurrentModificationException
+                    // when we remove these groups from the parent Group obj
+                    List<Group> groupRemovalList = new ArrayList<>(collider.getMemberGroups());
+                    Iterator<Group> groupIterator = groupRemovalList.iterator();
+                    while(groupIterator.hasNext())
                     {
+                        Group member = groupIterator.next();
                         groupService.removeMember(context, collider, member);
                     }
-                    for (EPerson member : collider.getMembers())
+
+                    // Get a *copy* of our eperson list to avoid ConcurrentModificationException
+                    // when we remove these epersons from the parent Group obj
+                    List<EPerson> epersonRemovalList = new ArrayList<>(collider.getMembers());
+                    Iterator<EPerson> epersonIterator = epersonRemovalList.iterator();
+                    while(epersonIterator.hasNext())
                     {
+                        EPerson member = epersonIterator.next();
                         // Remove all group members *EXCEPT* we don't ever want
                         // to remove the current user from the list of Administrators
                         // (otherwise remainder of ingest will fail)

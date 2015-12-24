@@ -67,7 +67,6 @@ public class EditPolicyStep extends AbstractStep
 
         Collection collection = submission.getCollection();
 		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
-        Request request = ObjectModelHelper.getRequest(objectModel);
         Division div = body.addInteractiveDivision("submit-edit-policy", actionURL, Division.METHOD_POST, "primary submission");
         div.setHead(T_submission_head);
         addSubmissionProgressList(div);

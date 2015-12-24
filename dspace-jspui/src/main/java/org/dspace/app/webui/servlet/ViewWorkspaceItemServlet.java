@@ -18,8 +18,6 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -41,19 +39,12 @@ public class ViewWorkspaceItemServlet
 {
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(ViewWorkspaceItemServlet.class);
+    private static final Logger log = Logger.getLogger(ViewWorkspaceItemServlet.class);
     
-    private AuthorizeService authorizeService;
+    private final transient WorkspaceItemService workspaceItemService
+             = ContentServiceFactory.getInstance().getWorkspaceItemService();
     
-    private WorkspaceItemService workspaceItemService;
-
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    	workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    }
-    
     protected void doDSGet(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -62,6 +53,7 @@ public class ViewWorkspaceItemServlet
         doDSPost(c, request, response);
     }
     
+    @Override
     protected void doDSPost(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -118,10 +110,10 @@ public class ViewWorkspaceItemServlet
         // display item JSP for both handled and un-handled items
         // Set attributes and display
         // request.setAttribute("wsItem", wsItem);
-        request.setAttribute("display.all", Boolean.valueOf(displayAll));
+        request.setAttribute("display.all", displayAll);
         request.setAttribute("item", item);
         request.setAttribute("collections", collections);
-        request.setAttribute("workspace_id", Integer.valueOf(wsItem.getID()));
+        request.setAttribute("workspace_id", wsItem.getID());
         
         JSPManager.showJSP(request, response, "/display-item.jsp");
     }

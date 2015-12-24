@@ -32,7 +32,7 @@ import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 
 /**
- * This servlet use the SHERPASubmitService to build an html page with the
+ * This servlet uses the SHERPASubmitService to build an html page with the
  * publisher policy for the journal referred in the specified Item
  * 
  * @author Andrea Bollini
@@ -40,23 +40,19 @@ import org.dspace.utils.DSpace;
  */
 public class SHERPAPublisherPolicyServlet extends DSpaceServlet
 {
-    private SHERPASubmitService sherpaSubmitService = new DSpace()
-            .getServiceManager().getServiceByName(
+    private final transient SHERPASubmitService sherpaSubmitService
+            = new DSpace().getServiceManager().getServiceByName(
                     SHERPASubmitService.class.getCanonicalName(),
                     SHERPASubmitService.class);
 
-    private ItemService itemService;
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
     
     /** log4j logger */
-    private static Logger log = Logger
+    private static final Logger log = Logger
             .getLogger(SHERPAPublisherPolicyServlet.class);
-
-    @Override
-    public void init() throws ServletException {
-    	super.init();
-    	itemService = ContentServiceFactory.getInstance().getItemService();
-    }
     
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -71,7 +67,7 @@ public class SHERPAPublisherPolicyServlet extends DSpaceServlet
                 context, item);
         if (shresp.isError())
         {
-            request.setAttribute("error", new Boolean(true));
+            request.setAttribute("error", Boolean.TRUE);
         }
         else
         {
@@ -103,6 +99,7 @@ public class SHERPAPublisherPolicyServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, "/sherpa/sherpa-policy.jsp");
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

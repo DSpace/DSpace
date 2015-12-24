@@ -10,6 +10,11 @@ package org.dspace.submit.step;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -20,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
@@ -28,8 +34,6 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.curate.Curator;
@@ -70,7 +74,6 @@ public class UploadWithEmbargoStep extends UploadStep
     /** log4j logger */
     private static Logger log = Logger.getLogger(UploadWithEmbargoStep.class);
 
-    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
@@ -244,6 +247,44 @@ public class UploadWithEmbargoStep extends UploadStep
         // -------------------------------------------------
         // Step #3: Check for a change in file description
         // -------------------------------------------------
+        // We have to check for descriptions from users using the resumable upload
+        // and from users using the simple upload.
+        // Beginning with the resumable ones.
+        Enumeration<String> parameterNames = request.getParameterNames();
+        Map<String, String> descriptions = new HashMap<String, String>();
+        while (parameterNames.hasMoreElements())
+        {
+            String name = parameterNames.nextElement();
+            if (StringUtils.startsWithIgnoreCase(name, "description["))
+            {
+                descriptions.put(
+                        name.substring("description[".length(), name.length()-1),
+                        request.getParameter(name));
+            }
+        }
+        if (!descriptions.isEmpty())
+        {
+            // we got descriptions from the resumable upload
+            if (item != null)
+            {
+                List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+                for (Bundle bundle : bundles)
+                {
+                    List<Bitstream> bitstreams = bundle.getBitstreams();
+                    for (Bitstream bitstream : bitstreams)
+                    {
+                        if (descriptions.containsKey(bitstream.getName()))
+                        {
+                            bitstream.setDescription(context, descriptions.get(bitstream.getName()));
+                            bitstreamService.update(context, bitstream);
+                        }
+                    }
+                }
+            }
+            return STATUS_COMPLETE;
+        }
+        
+        // Going on with descriptions from the simple upload
         String fileDescription = request.getParameter("description");
 
         if (fileDescription != null && fileDescription.length() > 0)
