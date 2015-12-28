@@ -235,11 +235,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService,
         return presentation.get(fieldKey);
     }
     
-    /**
-     * Get the configured "minLength" value for this field.
-     *
-     * @return configured minLength value for this field, or null if none found
-    */
+    @Override
     public Integer getMinLength(String fieldKey)
     {
     	return minLength.get(fieldKey);
