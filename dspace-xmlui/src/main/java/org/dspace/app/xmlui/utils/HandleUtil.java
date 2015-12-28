@@ -268,7 +268,7 @@ public class HandleUtil
             else if (pop instanceof Item)
             {
             	Item item = (Item) pop;
-            	String name = item.getMetadata("name");
+            	String name = item.getName();
             	if (name == null || name.length() == 0)
                 {
                     pageMeta.addTrailLink(target, new Message("default", "xmlui.general.untitled"));
