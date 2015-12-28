@@ -501,7 +501,7 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
 
 			for (Metadatum dval : item.getMetadataByMetadataString(entry.getKey())) {
 				String val = dval.value;
-				if (val.split(DCInput.ComplexDefinition.SEPARATOR).length != entry
+				if (val.split(DCInput.ComplexDefinition.SEPARATOR, -1).length != entry
 						.getValue()) {
 					throw new CurateException(
 							String.format(

@@ -1,6 +1,7 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal.curation;
 
+import org.dspace.app.util.DCInput;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -41,7 +42,7 @@ public class FixOpenAIREMetadata extends AbstractCurationTask
             
             for(Metadatum m : item.getMetadata("local", "sponsor", null, Item.ANY)) {
             	if(!m.value.contains("euFunds")) continue;
-            	String value[] = m.value.split("@@");
+            	String value[] = m.value.split(DCInput.ComplexDefinition.SEPARATOR);
             	String id_s[] = value[1].split("-");
             	String id = null;            	
             	try{
@@ -61,7 +62,7 @@ public class FixOpenAIREMetadata extends AbstractCurationTask
             		//test if sponsor contains OpenAIRE id at the end
             		if(!value[value.length-1].equals(dc_relation_value)){
             			Metadatum newValue = m.copy();
-            			newValue.value += "@@" + dc_relation_value;
+            			newValue.value += DCInput.ComplexDefinition.SEPARATOR + dc_relation_value;
             			item.replaceMetadataValue(m, newValue);
             		}
             		            		
@@ -83,7 +84,9 @@ public class FixOpenAIREMetadata extends AbstractCurationTask
             try {
 				item.update();
 	            status = Curator.CURATE_SUCCESS;
-	            results.append(item.getHandle() + " synned for OpenAIRE").append("\n");
+				//Curation before approval - might not have handle
+				String prefix = item.getHandle() == null ? "Item" : item.getHandle();
+	            results.append(prefix + " synced for OpenAIRE").append("\n");
 			} catch (SQLException | AuthorizeException e) {
 				status = Curator.CURATE_FAIL;
 				results.append(e.getLocalizedMessage()).append("\n");
