@@ -549,6 +549,12 @@ public class Item extends DSpaceObject
         
         // changing policies to new owner
         List<ResourcePolicy> oldPolicies = AuthorizeManager.getPolicies(ourContext, this);
+        for(Bundle bundle : this.getBundles()){
+            oldPolicies.addAll(AuthorizeManager.getPolicies(ourContext, bundle));
+            for(Bitstream bitstream : bundle.getBitstreams()){
+                oldPolicies.addAll(AuthorizeManager.getPolicies(ourContext, bitstream));
+            }
+        }
         for(ResourcePolicy policy : oldPolicies) {
         	if(policy.getEPerson()!=null) {
         		policy.setEPerson(submitter);
