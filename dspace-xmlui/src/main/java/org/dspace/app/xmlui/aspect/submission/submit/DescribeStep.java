@@ -1358,22 +1358,17 @@ public class DescribeStep extends AbstractSubmissionStep
             }
 
             // Setup the field's values
+            // The values must be added to the right fields, watch out for the fields order!
             for (Metadatum dcValue : dcValues) {
                     java.util.List<String> values = split(dcValue.value);
-                    fillExistingValues(fields, values);
+                    fillExistingValues(definition, fields, values);
                     composite.addInstance().setValue(StringUtils.join(values.iterator(), ";"));
             }
 
              if(regexError.containsKey(fieldName)) {
                  // partially fill the form
                  java.util.List<String> values = split(regexError.get(fieldName));
-                 Map<String,String> value_map = new HashMap<>();
-                 int i = 0;
-                 for ( String key : definition.getSortedInputNames() ) {
-                     value_map.put(key, values.get(i));
-                     ++i;
-                 }
-                fillPartialError(fields, value_map, definition);
+                 fillPartialError(definition, fields, values);
             }
 
             // Setup the full name
@@ -1406,10 +1401,11 @@ public class DescribeStep extends AbstractSubmissionStep
 
         }
 
-        private void fillExistingValues(Map<String, Field> fields, java.util.List<String> values) throws WingException {
+        private void fillExistingValues(ComplexDefinition definition, Map<String, Field> fields, java.util.List<String> values) throws WingException {
             //fill the form
             int i = 0;
-            for (Field field : fields.values()) {
+            for (String name : definition.getSortedInputNames()) {
+                Field field = fields.get(name);
                 try {
                     String value = values.get(i);
                     Instance instance = field.addInstance();
@@ -1428,23 +1424,27 @@ public class DescribeStep extends AbstractSubmissionStep
             }
         }
 
-        private void fillPartialError(Map<String, Field> fields,
-                                      Map<String,String> values,
-                                      ComplexDefinition definition) throws WingException {
-            for (Map.Entry<String,String> item : values.entrySet()) {
-                // input name
-                String input_name = item.getKey();
-                // input value
-                String value = item.getValue();
-                // field specified by input name (could be displayed differently than stored)
-                Field field = fields.get(input_name);
-                field.setValue(value);
-                // any regexp error?
-                String regex = definition.getInput(input_name).get("regexp");
-                if(!DCInput.isAllowedValue(value, regex)){
-                    //attach the regex error to the right field
-                    field.addError(String.format("The field doesn't match the required regular expression (format) \"%s\"", regex));
+        private void fillPartialError(ComplexDefinition definition,
+                                      Map<String, Field> fields,
+                                      java.util.List<String> values) throws WingException {
+            int i = 0;
+            for (String input_name : definition.getSortedInputNames()) {
+                try{
+                    // input value
+                    String value = values.get(i);
+                    // field specified by input name (could be displayed differently than stored)
+                    Field field = fields.get(input_name);
+                    field.setValue(value);
+                    // any regexp error?
+                    String regex = definition.getInput(input_name).get("regexp");
+                    if(!DCInput.isAllowedValue(value, regex)){
+                        //attach the regex error to the right field
+                        field.addError(String.format("The field doesn't match the required regular expression (format) \"%s\"", regex));
+                    }
+                } catch (IndexOutOfBoundsException e){
+                    break;
                 }
+                ++i;
             }
         }
 

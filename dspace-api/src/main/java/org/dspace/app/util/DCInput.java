@@ -710,12 +710,21 @@ public class DCInput
 			return inputs.get(name);
 		}
 
+        /**
+         * Returns the input names in the same order they were added, usually the same order as input-forms.xml
+         * Use this method only to draw the inputs in the specified order. Usually you would use {@link #getSortedInputNames()}
+         * @return
+         */
 		public Set<String> getInputNames() {
 			return inputs.keySet();
 		}
 
-        public List<String> getSortedInputNames() {
-            return new ArrayList<>(new TreeSet<>(inputs.keySet()));
+        /**
+         * Returns the names sorted alphabetically. Use this to add the values in the expected order.
+         * @return
+         */
+        public Set<String> getSortedInputNames() {
+            return new TreeSet<>(inputs.keySet());
         }
 
 		public int inputsCount() {
