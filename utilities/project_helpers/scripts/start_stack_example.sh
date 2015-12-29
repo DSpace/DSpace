@@ -1,15 +1,5 @@
 #!/bin/bash
 #Put start commands here
-
-### nginx ###
-echo "Starting nginx"
-/etc/init.d/nginx start
-
-### supervisor (shibboleth + fastcgi) ###
-echo "Starting all supervised programs"
-supervisorctl start all
-
-
 ### Postgres ###
 echo "Starting postgres"
 /etc/init.d/postgresql-9.4 start
@@ -25,10 +15,13 @@ else
     echo "Handle server not present - ignoring start command";
 fi
 
-service tomcat8 status
+### nginx ###
+#echo "Starting nginx"
+#/etc/init.d/nginx start
 
-now=$(date +"%T")
-echo "Current time : $now"
+### supervisor (shibboleth + fastcgi) ###
+#echo "Starting all supervised programs"
+#supervisorctl start all
 
 ### apache ###
 #echo "Starting apache"

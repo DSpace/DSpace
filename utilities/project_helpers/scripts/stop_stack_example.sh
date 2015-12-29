@@ -1,10 +1,6 @@
 #!/bin/bash
 #Put stop commands and cleanup here
-now=$(date +"%T")
-echo "Current time : $now"
-
 ### Tomcat ###
-service tomcat8 status
 echo "Stopping tomcat"
 /etc/init.d/tomcat8 stop
 ### Postgres ###
@@ -19,11 +15,11 @@ else
     echo "Handle server not present - ignoring stop command";
 fi
 ### nginx ###
-echo "Stopping nginx"
-/etc/init.d/nginx stop
+#echo "Stopping nginx"
+#/etc/init.d/nginx stop
 ### supervisor (shibboleth + fastcgi) ###
-echo "Stopping all supervised programs"
-supervisorctl stop all
+#echo "Stopping all supervised programs"
+#supervisorctl stop all
 ### apache ####
 #echo "Stop apache"
 #apache2ctl stop
