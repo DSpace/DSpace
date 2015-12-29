@@ -493,7 +493,7 @@ public class DescribeStep extends AbstractProcessingStep
         }
         else
         {
-        	for(String name : definition.getInputNames()){
+        	for(String name : definition.getSortedInputNames()){
         		List<String> list = new ArrayList<String>();
         		String value = request.getParameter(metadataField + "_" + name);
         		if(value != null){
