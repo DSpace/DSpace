@@ -27,7 +27,7 @@ public class PagesPaymentTest extends PagesBase {
         "msg-memberDPC_voucher" ,"msg-nonMemberDPC_voucher" ,"msg-memberDPC_deferred"
         ,"msg-nonMemberDPC_deferred" ,"msg-memberDPC_subscription" 
         ,"msg-nonMemberDPC_subscription" ,"msg-DPC_pay_on_submission"
-        ,"msg-excessDataStorageFee_first_GB" ,"msg-excessDataStorageFee_per_additional_GB"
+        ,"msg-excessDataStorageFee_first_surcharge" ,"msg-excessDataStorageFee_per_additional_surcharge"
     );
 
     // make sure data file can be retrieved and has expected currencies
