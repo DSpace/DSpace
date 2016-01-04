@@ -1,9 +1,10 @@
 package org.dspace;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.datadryad.rest.models.Manuscript;
+import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Author;
+import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
@@ -17,23 +18,18 @@ import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.submit.bean.PublicationBean;
-import org.dspace.submit.model.ModelPublication;
+import org.dspace.workflow.DryadWorkflowUtils;
 
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.lang.Math;
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
 /**
  * User: lantian @ atmire . com
  * Date: 9/12/14
@@ -628,7 +624,7 @@ public class JournalUtils {
                 // if nothing, look in the metadata directory:
                 String journalPath = "";
                 journalPath = JournalUtils.getMetadataDir(journalConcept);
-                pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
+                pBean = JournalUtils.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
                 log.info("found manuscript " + manuscriptNumber + " in file");
             }
             context.complete();
@@ -640,6 +636,161 @@ public class JournalUtils {
             log.error("Error getting parameters for invalid JournalID: " + selectedJournalId, e);
         }
         return pBean;
+    }
+
+    /**
+     * Initialize a publication bean from a publisher's data file.
+     * This method can be removed when we finally deprecate the XML file system.
+     */
+    private static PublicationBean getDataFromPublisherFile(String manuscriptNumber, String journalID, String journalPath)
+    {
+        // TODO: This method has very rudimentary XML parsing. It would be much better to actually run it through the Java XML parser.
+
+        log.debug("getting data for manu " + manuscriptNumber + " from journal " + journalID + " at path " + journalPath);
+
+        // read data from file and add it to bean;
+        PublicationBean pbean = new PublicationBean();
+        pbean.setMetadataFromJournal(true);
+        File f = new File(journalPath + File.separator + manuscriptNumber + ".xml");
+        // for a List object for a multipe node
+        List<String> authors = new ArrayList<String>();
+        List<String> keywords = new ArrayList<String>();
+
+        pbean.setJournalID(journalID);
+        // read the metadata xml by DOM level 3 LSParser
+        // InputStream in = new FileInputStream(f);
+
+        try {
+            List<String>  xmlTagNameList = Arrays.asList(
+                    "Journal", "ISSN", "Manuscript", "Article_Title",
+                    "Article_Type", "Author", "Email", "Corresponding_Author",
+                    "keyword", "Abstract", "Article_Status", "Citation_Title",
+                    "Citation_Authors", "Publication_DOI"
+            );
+
+            DocumentBuilder builder =
+                    DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+            Document doc = builder.parse(f);
+
+            Element root = doc.getDocumentElement();
+
+            for (String tag: xmlTagNameList){
+                NodeList nl = root.getElementsByTagName(tag);
+                log.debug(tag+"(how many nodes="+nl.getLength()+"):");
+
+                for (int i=0;i<nl.getLength();i++){
+                    String text = nl.item(i).getTextContent();
+                    log.debug(text);
+
+                    if (tag.equals("Corresponding_Author")){
+                        pbean.setCorrespondingAuthor(StringEscapeUtils.unescapeXml(text));
+                    }
+
+                    if (tag.equals("Article_Title")){
+                        pbean.setTitle(StringEscapeUtils.unescapeXml(text));
+                    }
+
+                    if (tag.equals("Journal")){
+                        pbean.setJournalName(StringEscapeUtils.unescapeXml(text));
+                    }
+
+                    if (tag.equals("Manuscript")){
+                        pbean.setManuscriptNumber(StringEscapeUtils.unescapeXml(text));
+                    }
+                    if (tag.equals("ISSN")){
+                        pbean.setJournalISSN(StringEscapeUtils.unescapeXml(text));
+                    }
+
+                    if (tag.equals("Abstract")){
+                        pbean.setAbstract(StringEscapeUtils.unescapeXml(text));
+                    }
+
+                    if (tag.equals("Author")){
+                        authors.add(StringEscapeUtils.unescapeXml(text).trim());
+                    }
+                    if (tag.equals("keyword")){
+                        keywords.add(StringEscapeUtils.unescapeXml(text).trim());
+                    }
+                    if(tag.equalsIgnoreCase("Email")){
+                        pbean.setEmail(StringEscapeUtils.unescapeXml(text).trim());
+                    }
+                    if(tag.equals("Article_Status")){
+                        String ttext = text.trim().toLowerCase();
+
+                        pbean.setStatus(ttext);
+
+
+                        if(ttext.equals("submitted") ||
+                                ttext.equals("in review")   ||
+                                ttext.equals("under review")  ||
+                                ttext.equals("revision in review") ||
+                                ttext.equals("revision under review")
+                                ) {
+                            pbean.setSkipReviewStep(false);
+                        } else if(ttext.equals("accepted") ||
+                                ttext.startsWith("reject") ||
+                                ttext.equals("open reject") ||
+                                ttext.equals("transferred") ||
+                                ttext.equals("needs revision")) {
+                            pbean.setSkipReviewStep(true);
+                        } else {
+                            log.error("unexpected article status " + text.trim());
+                        }
+
+                    }
+                    if(tag.equals("Article_Type")) {
+                        pbean.setArticleType(StringEscapeUtils.unescapeXml(text).trim());
+                    }
+                    if(tag.equals("Citation_Title")) {
+                        pbean.setCitationTitle(StringEscapeUtils.unescapeXml(text).trim());
+                    }
+                    if(tag.equals("Citation_Authors")) {
+                        pbean.setCitationAuthors(StringEscapeUtils.unescapeXml(text).trim());
+                    }
+                    if(tag.equals("Publication_DOI")) {
+                        String doi = StringEscapeUtils.unescapeXml(text).trim();
+                        if (doi != null && doi.length() > 0) {
+                            doi = doi.trim();
+                            if (doi.startsWith("http://dx.doi.org/")) {
+                                doi = doi.replace("http://dx.doi.org/", "doi:");
+                            }
+                            if (doi.startsWith("10.")) {
+                                doi = "doi:" + doi;
+                            }
+                        }
+                        pbean.setDOI(doi);
+                    }
+
+                }
+
+            }
+        }
+        catch(FileNotFoundException ex)
+        {
+            log.error("unable to find manuscript file " + f, ex);
+            pbean.setMessage("Invalid manuscript number");
+        }
+        catch(IOException ex)
+        {
+            log.error("unable to read from manuscript file " + f, ex);
+            pbean.setMessage("Internal Error: Cannot import publication description. Please notify the Dryad administrators at help@datadryad.org");
+
+        }
+        catch (Exception e) {
+            log.fatal("Exception occurred while parsing:", e);
+            pbean.setMessage("Internal Error: Cannot import publication description because it contains invalid xml. Please notify the Dryad administrators at help@datadryad.org");
+        }
+
+        // set list of author names to the bean only
+        // when the entire file is read
+        pbean.setAuthors(authors);
+        if(keywords.size() > 0) {
+            pbean.setSubjectKeywords(keywords);
+        }
+
+
+        return pbean;
     }
 
 

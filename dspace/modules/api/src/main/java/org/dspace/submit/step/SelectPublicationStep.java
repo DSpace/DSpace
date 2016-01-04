@@ -1,50 +1,30 @@
 package org.dspace.submit.step;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
 import org.dspace.JournalUtils;
+import org.dspace.app.util.SubmissionInfo;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.Concept;
-import org.dspace.content.authority.Scheme;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
-import org.dspace.content.crosswalk.StreamIngestionCrosswalk;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
 import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.app.util.SubmissionInfo;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.handle.HandleManager;
 import org.dspace.submit.bean.PublicationBean;
-import org.dspace.submit.model.ModelPublication;
+import org.dspace.usagelogging.EventLogger;
 import org.dspace.workflow.WorkflowRequirementsManager;
 import org.jdom.Element;
-import org.jdom.input.DOMBuilder;
 import org.jdom.input.SAXBuilder;
-import org.omg.CORBA.PUBLIC_MEMBER;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
-import javax.management.RuntimeErrorException;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.*;
-import org.dspace.usagelogging.EventLogger;
 
 /**
  * User: @author kevinvandevelde (kevin at atmire.com)

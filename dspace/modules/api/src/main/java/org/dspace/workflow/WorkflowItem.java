@@ -286,6 +286,13 @@ public class WorkflowItem implements InProgressSubmission {
                         log.debug("matched " + item.getID() + " by msid");
                         matched = true;
                     }
+
+                    // TEMPORARY FIX: manuscript numbers from metadata files had the JournalCode prefixed onto the manuscript number as well.
+                    String alt_msid = journalCode + "-" + manuscript.manuscriptId;
+                    if (alt_msid.equals(msids[j].value)) {
+                        log.debug("matched " + item.getID() + " by msid (metadata file method)");
+                        matched = true;
+                    }
                 }
 
                 if (matched == false) {
