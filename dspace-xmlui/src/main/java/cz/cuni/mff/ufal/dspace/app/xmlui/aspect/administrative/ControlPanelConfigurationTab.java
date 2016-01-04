@@ -45,7 +45,7 @@ public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
 		dspace.addItem(Site.getSiteHandle());
 
 		dspace.addLabel("OAI url");
-		String oai_url = notempty(ConfigurationManager.getProperty("lr", "lr.dspace.oai.url"));
+		String oai_url = notempty(ConfigurationManager.getProperty("oai", "dspace.oai.url"));
 		dspace.addItemXref(oai_url, oai_url);
 
 		dspace.addLabel("Solr log url");
