@@ -122,7 +122,10 @@
                     </form>
                 </div>
             </xsl:if>
-            <xsl:apply-templates/>
+            <!-- <xsl:apply-templates/> -->
+            <xsl:apply-templates select="dri:list[@n = 'discovery']" mode="filter"/>
+            <!--            <xsl:apply-templates select="dri:list[@id != 'aspect.discovery.Navigation.list.discovery']" /> -->
+
             <!-- DS-984 Add RSS Links to Options Box -->
             <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']) != 0">
                 <div>
