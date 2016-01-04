@@ -32,6 +32,10 @@ dspace.hostname = ufal-point-dev.ms.mff.cuni.cz
 # !!! URL must NOT contain trailing slash !!!
 dspace.baseUrl = https://ufal-point-dev.ms.mff.cuni.cz/repository
 
+# OAI webapp url without context (eg. /request) use http
+# in theory ${dspace.baseUrl}/oai except for the http requirement
+dspace.oai.url = http://ufal-point-dev.ms.mff.cuni.cz/repository/oai
+
 # DSpace URL, usually ending with /xmlui
 # DSpace base URL.  Include port number etc., but NOT trailing slash
 dspace.url = ${dspace.baseUrl}/xmlui
