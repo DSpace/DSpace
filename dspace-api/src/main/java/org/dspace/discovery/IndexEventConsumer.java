@@ -164,7 +164,7 @@ public class IndexEventConsumer implements Consumer {
             // update the changed Items not deleted because they were on create list
             for (DSpaceObject iu : objectsToUpdate) {
                 /* we let all types through here and 
-                 * allow the search DSIndexer to make 
+                 * allow the search indexer to make 
                  * decisions on indexing and/or removal
                  */
                 String hdl = iu.getHandle();
