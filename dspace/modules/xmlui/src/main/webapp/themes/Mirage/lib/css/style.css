@@ -2616,7 +2616,8 @@ span.income { float: right; }
     margin-bottom: 0.5em;
 }
 .pricing-table td, .pricing-table th {
-    text-align: center;
+    text-align: left;
+    font-size:90%;
 }
 .pricing-table th:first-child,
 .pricing-table td:first-child {
