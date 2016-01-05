@@ -436,6 +436,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/repository">Repository features and technology</a>
                                 </li>
                                 <li>
+                                    <a href="/pages/policies">Policies</a>
+                                </li>
+                                <li>
                                     <a href="http://blog.datadryad.org" target="_blank">Blog: News and views</a>
                                 </li>
                                 <li>
@@ -468,10 +471,13 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                   <a href="/pages/faq">FAQs</a>
                                 </li>
                                 <li>
-                                  <a href="/pages/dryadlab" target="_blank">Educational outreach with DryadLab</a>
+                                  <a href="/pages/payment">Payment</a>
                                 </li>
                                 <li>
                                   <a href="/pages/institutionalSponsors">Institutional sponsors</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/dryadlab" target="_blank">Educational outreach with DryadLab</a>
                                 </li>
                                 <li>
                                     <a href="/pages/policies">Terms of service</a>
@@ -494,7 +500,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/membershipMeeting">Membership meeting</a>
                                 </li>                            
                                 <li>
-                                    <a href="/pages/payment">Payment plans</a>
+                                    <a href="/pages/paymentPlans">Payment plans</a>
                                 </li> 
                                 <li>
                                     <a href="/pages/paymentPlanComparisonTool">Payment plan comparison tool</a>

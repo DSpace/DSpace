@@ -47,8 +47,6 @@ public interface PaymentSystemService
 
     public boolean getJournalSubscription(Context context, ShoppingCart transaction, String journal) throws SQLException;
 
-    public double getNoIntegrateFee(Context context, ShoppingCart transaction, String journal) throws SQLException;
-
     public boolean hasDiscount(Context context, ShoppingCart transaction, String journal) throws SQLException;
 
     public void updateTotal(Context context, ShoppingCart transaction, String journal) throws SQLException;

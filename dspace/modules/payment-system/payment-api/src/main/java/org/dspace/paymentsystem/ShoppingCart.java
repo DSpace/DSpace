@@ -65,7 +65,6 @@ public class ShoppingCart {
     public static final int SECURETOKEN = 11;
 
     public static final int BASIC_FEE =12;
-    public static final int NO_INTEG =13;
     public static final int SURCHARGE =14;
 
     public static final int JOURNAL =15;
@@ -847,7 +846,6 @@ public class ShoppingCart {
             }
         }
 //    public static final int BASIC_FEE =12;
-//    public static final int NO_INTEG =13;
 //    public static final int SURCHARGE =14;
     public void setBasicFee(double basicFee){
         myRow.setColumn("basic_fee",basicFee);
@@ -856,13 +854,7 @@ public class ShoppingCart {
     public double getBasicFee(){
        return myRow.getDoubleColumn("basic_fee");
     }
-    public void setNoInteg(double noInteg){
-        myRow.setColumn("no_integ",noInteg);
-        modified = true;
-    }
-    public double getNoInteg(){
-       return myRow.getDoubleColumn("no_integ");
-    }
+
     public void setSurcharge(double surcharge){
         myRow.setColumn("surcharge",surcharge);
         modified = true;

@@ -66,9 +66,8 @@ public class PaymentSystemImplTest {
         boolean discount = true;
         double fileSizeSurcharge = 15.0;
         double basicFee = 80.0;
-        double nonIntegratedFee = 10.0;
         double expResult = 15.0;
-        double result = PaymentSystemImpl.calculateTotal(discount, fileSizeSurcharge, basicFee, nonIntegratedFee);
+        double result = PaymentSystemImpl.calculateTotal(discount, fileSizeSurcharge, basicFee);
         assertEquals("Calculated does not match", expResult, result, 0.0);
     }
 
@@ -78,9 +77,8 @@ public class PaymentSystemImplTest {
         boolean discount = false;
         double fileSizeSurcharge = 0.0;
         double basicFee = 80.0;
-        double nonIntegratedFee = 10.0;
         double expResult = 90.0;
-        double result = PaymentSystemImpl.calculateTotal(discount, fileSizeSurcharge, basicFee, nonIntegratedFee);
+        double result = PaymentSystemImpl.calculateTotal(discount, fileSizeSurcharge, basicFee);
         assertEquals("Calculated does not match", expResult, result, 0.0);
     }
 }

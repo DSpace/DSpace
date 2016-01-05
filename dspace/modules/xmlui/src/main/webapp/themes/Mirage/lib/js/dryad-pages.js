@@ -460,7 +460,6 @@ function showShoppingCartMessage(obj){
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_price div').html(obj.price);
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_total div').html(obj.total);
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_surcharge div').html(obj.surcharge);
-    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_no-integret div').html(obj.noIntegrateFee);
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_errorMessage').html(obj.errorMessage);
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info').html(obj.waiverMessage);
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_payer div').html(obj.payer);
