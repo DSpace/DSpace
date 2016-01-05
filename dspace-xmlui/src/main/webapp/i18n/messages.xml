@@ -106,6 +106,7 @@
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.head2">Communities or Collections matching your query</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.head3">Items matching your query</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">Search produced no results.</message>
+	<message key="xmlui.ArtifactBrowser.AbstractSearch.head.no_items">No items found</message>
     <message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">All of the Repository</message>
 
    <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.title">title</message>
@@ -2537,6 +2538,11 @@
     <message key="xmlui.statistics.Navigation.piwik.title">Piwik Statistics<span class='label label-important' style='font-size: 14px;'>BETA</span></message>
     <message key="xmlui.statistics.piwik.trail">Piwik Statistics</message>
 
+	<message key="PiwikStatisticsTransformer.already_subscribed">  You are subscribed to receive a monthly report of this item via email</message>
+	<message key="PiwikStatisticsTransformer.get_monthly">  Get a monthly report for this item via email</message>
+	<message key="PiwikStatisticsTransformer.subscribe">Subscribe</message>
+	<message key="PiwikStatisticsTransformer.unsubscribe">Unsubscribe</message>
+
     <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                      Google Analytics Statistics Aspect
@@ -2931,6 +2937,8 @@
   <message key="xmlui.UFAL.artifactbrowser.filters.add_filters">Advanced Search</message>
   <message key="xmlui.UFAL.artifactbrowser.filters.clear">Clear All</message>
   <message key="xmlui.UFAL.artifactbrowser.filters.selected">Selected Filters</message>
+  <message key="xmlui.UFAL.artifactbrowser.search.limit">Limit your search</message>
+  <message key="xmlui.UFAL.artifactbrowser.authors">Author(s):</message>
 
   <!-- UFAL/lib/xsl/aspect/artifactbrowser/item-view.xsl -->
   <message key="xmlui.UFAL.artifactbrowser.item-download-all-files">Download all files in item ({0})</message>
@@ -2939,6 +2947,7 @@
   <message key="xmlui.UFAL.artifactbrowser.authors">Authors</message>
   <message key="xmlui.UFAL.artifactbrowser.project.code">Project code: {0}</message>
   <message key="xmlui.UFAL.artifactbrowser.project.name">Project name: {0}</message>
+  <message key="xmlui.UFAL.artifactbrowser.piwik.views">Views Over Time</message>
 
 	<!-- UFAL/lib/xsl/core/navigation.xsl -->
 	<message key="xmlui.UFAL.navigation.menu_head">What can you do?</message>

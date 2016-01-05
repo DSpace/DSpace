@@ -34,7 +34,7 @@
 		<xsl:if test="/dri:document/dri:options/dri:list[@n='discovery']/dri:list[count(dri:item/dri:xref)>1]">
 		<div class="col-md-4 accordion" id="search-filters">
 			<h4>
-				Limit your search
+				<i18n:text>xmlui.UFAL.artifactbrowser.search.limit</i18n:text>
 			</h4>
 			<xsl:for-each select="/dri:document/dri:options/dri:list[@n='discovery']/dri:list[count(dri:item/dri:xref)>1]">
 				<div class="well well-sm well-white accordion-group" style="margin-bottom: 5px;">
@@ -275,7 +275,7 @@
                 &#xFEFF; <!-- non-breaking space to force separating the end tag -->
             </span>        
             <div class="author-head">
-                Author(s):
+               <i18n:text>xmlui.UFAL.artifactbrowser.authors</i18n:text>
             </div>
             <div class="author">
                 <xsl:choose>

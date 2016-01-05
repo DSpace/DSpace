@@ -80,6 +80,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     private static final Message T_no_results =
             message("xmlui.ArtifactBrowser.AbstractSearch.no_results");
 
+    private static final Message T_head_no_items =
+            message("xmlui.ArtifactBrowser.AbstractSearch.head.no_items");
+
     private static final Message T_all_of_dspace =
             message("xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace");
 
@@ -416,7 +419,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             }
 
         } else {
-			results.setHead("No items found");
+			results.setHead(T_head_no_items);
             results.addPara(T_no_results);
         }
         //}// Empty query

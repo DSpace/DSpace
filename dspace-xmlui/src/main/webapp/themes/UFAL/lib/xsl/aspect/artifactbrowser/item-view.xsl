@@ -1012,7 +1012,7 @@
         </xsl:variable>
 
                 <div class="panel panel-default">
-                        <div class="panel-heading bold">Views Over Time 
+                        <div class="panel-heading bold"><i18n:text>xmlui.UFAL.artifactbrowser.piwik.views</i18n:text>
 				<a class="jqplot-to-picture pull-right" href="#" target-div="#visits_over_time_chart">
 					<i class="fa fa-file-image-o">&#160;</i>
 				</a>

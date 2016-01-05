@@ -358,6 +358,9 @@ lr.curation.metadata.checkrequired.ignore = metashare.*
 lr.link.checker.user.agent = "DSpace Link Validator"
 lr.link.checker.connect.timeout = 2000
 lr.link.checker.read.timeout = 3000
+###
+supported.locales = en, cs
+###
 
 mail.server.username = 
 mail.server.password = 

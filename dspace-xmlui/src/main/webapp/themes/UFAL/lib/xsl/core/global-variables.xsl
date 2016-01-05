@@ -61,9 +61,15 @@
     		<xsl:when test="document(concat('../../html/', substring-after($request-uri, 'page/'), '.xml'))">
 				<xsl:variable name="active-locale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
 				<xsl:choose>
-					<xsl:when test="$active-locale='cs'">
-						<xsl:copy-of select="concat('cs/','dummy')" />
-						<!-- xsl:copy-of select="concat('cs/',substring-after($request-uri, 'page/'))" /-->
+					<xsl:when test="$active-locale!='en'">
+						<xsl:choose>
+							<xsl:when test="document(concat('../../html/', $active-locale, '/', substring-after($request-uri, 'page/'), '.xml'))">
+								<xsl:copy-of select="concat($active-locale, '/', substring-after($request-uri, 'page/'))" />
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:copy-of select="concat($active-locale, '/','dummy')" />
+							</xsl:otherwise>
+						</xsl:choose>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:copy-of select="substring-after($request-uri, 'page/')" />
