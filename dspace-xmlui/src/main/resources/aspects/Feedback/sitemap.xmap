@@ -11,9 +11,7 @@
 
 <!-- 
 
-The ArtifactBrowser Aspect is responsible for browsing communities / 
-collections / items / and bitstreams, viewing an individual item, 
-and searching the repository.
+The Feedback Aspect is responsible for managing the feedback form.
 
 -->
 <map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
