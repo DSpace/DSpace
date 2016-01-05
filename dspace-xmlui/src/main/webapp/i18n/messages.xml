@@ -100,7 +100,6 @@
 	<!-- org.dspace.app.xmlui.artifactbrowser.AbstractSearch.java -->
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.head1_community">Search Results for Community: {0}</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.head1_collection">Search Results for Collection: {0}</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.head1_none">Search Results</message>
     <message key="xmlui.ArtifactBrowser.AbstractSearch.head1_none">Showing {0} through {1} out of {2} results</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.result_query">Your query "{0}" produced {1} result(s).</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.head2">Communities or Collections matching your query</message>
@@ -146,7 +145,6 @@
    <!--  some common other possibilities for Advanced Search Fields -->
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contributor">Contributor</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_creator">Creator</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_description">Description</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_relation">Relation</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_mime">Mime-Type</message>
@@ -221,9 +219,6 @@
     <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.mediatype">Browsing by Medium Type</message>
         <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.mediatype.column_heading">Medium Type</message>
 
-    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.rights">Browsing by Rights</message>
-    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.rights">Browsing by Rights</message>    
-    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.rights.column_heading">Rights</message>
 
 	<!-- org.dspace.app.xmlui.administrative.WithdrawnItems.java -->
 	<message key="xmlui.Administrative.WithdrawnItems.title.item.title">Withdrawn Items by Title</message>
@@ -623,7 +618,6 @@
 	<message key="xmlui.EPerson.LDAPLogin.title">Sign in</message>
 	<message key="xmlui.EPerson.LDAPLogin.trail">Sign in</message>
     <message key="xmlui.EPerson.LDAPLogin.head1">Sign in to Repository</message>
-    <message key="xmlui.EPerson.LDAPLogin.title">Sign in</message>
 	<message key="xmlui.EPerson.LDAPLogin.username">User Name</message>
 	<message key="xmlui.EPerson.LDAPLogin.error_bad_login">The user name and/or password supplied were not valid.</message>
 	<message key="xmlui.EPerson.LDAPLogin.password">Password</message>
@@ -2129,7 +2123,6 @@
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.error_oaiurl">You must provide a set id of the target collection.</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaisetid">The persistent identifier used by the OAI provider to designate the target collection</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.error_oaisetid">You must provide a set id of the target collection.</message>
-	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level">Content being harvested</message>
     <message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level">Content being harvested</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_only">Harvest metadata only.</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_and_ref">Harvest metadata and references to bitstreams (requires ORE support).</message>
@@ -2938,7 +2931,7 @@
   <message key="xmlui.UFAL.artifactbrowser.filters.clear">Clear All</message>
   <message key="xmlui.UFAL.artifactbrowser.filters.selected">Selected Filters</message>
   <message key="xmlui.UFAL.artifactbrowser.search.limit">Limit your search</message>
-  <message key="xmlui.UFAL.artifactbrowser.authors">Author(s):</message>
+  <message key="xmlui.UFAL.artifactbrowser.item_list.authors">Author(s):</message>
 
   <!-- UFAL/lib/xsl/aspect/artifactbrowser/item-view.xsl -->
   <message key="xmlui.UFAL.artifactbrowser.item-download-all-files">Download all files in item ({0})</message>
@@ -3188,7 +3181,6 @@
 	<message key="input_forms.complex_definitions.contact_person.2_surname.label">Contact person's surname</message>
 	<message key="input_forms.complex_definitions.contact_person.2_surname.help">Family name</message>
 	<message key="input_forms.complex_definitions.contact_person.3_email.label">Contact person's email</message>
-	<message key="input_forms.complex_definitions.contact_person.4_affiliation.label">Contact person's institution name</message>
 	<message key="input_forms.complex_definitions.contact_person.4_affiliation.label">Contact person's institution name</message>
 	<message key="input_forms.complex_definitions.funding.4_type.label">Funding type</message>
 	<message key="input_forms.complex_definitions.funding.2_code.placeholder">Start typing the name/number of the grant...</message>

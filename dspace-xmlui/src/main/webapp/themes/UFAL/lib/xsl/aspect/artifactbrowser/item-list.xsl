@@ -275,7 +275,7 @@
                 &#xFEFF; <!-- non-breaking space to force separating the end tag -->
             </span>        
             <div class="author-head">
-               <i18n:text>xmlui.UFAL.artifactbrowser.authors</i18n:text>
+               <i18n:text>xmlui.UFAL.artifactbrowser.item_list.authors</i18n:text>
             </div>
             <div class="author">
                 <xsl:choose>

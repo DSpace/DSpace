@@ -154,7 +154,6 @@
 	<!--  some common other possibilities for Advanced Search Fields -->
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contributor">Přispěvatel</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_creator">Tvůrce</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Předmět</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_description">Popis</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_relation">Vztah</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_mime">Typ MIME</message>
@@ -230,9 +229,6 @@
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.mediatype">Procházení dle druhu média</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.mediatype.column_heading">Druh média</message>
 
-	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.rights">Procházení dle práv</message>
-	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.rights">Procházení dle práv</message>
-	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.rights.column_heading">Práva</message>
 
 
 
@@ -447,7 +443,6 @@
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.send">Poslat kopii</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.contactRequester">Počáteční odpověď žadateli</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.contactAuthor"> Požádat autora o povolení</message>
-    <message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.send">Poslat kopii</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.dontSend">Neposlat kopii</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseTrueForm.java -->
@@ -2999,10 +2994,8 @@
     <message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Zobrazují se záznamy {0}-{1}</message>
 
     <message key="xmlui.Discovery.AbstractSearch.type_author">Filtrovat dle: Autora</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Autor</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author_filter">Autor</message>
     <message key="xmlui.Discovery.AbstractSearch.type_subject">Filtrovat dle předmětu</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Předmět</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject_filter">Předmět</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued.year">Datum publikování</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.rights_filter">Práva</message>
@@ -3188,7 +3181,6 @@
     <message key="xmlui.swordclient.SelectPackagingAction.packageFormat_error">Byl zvolen nepodporovaný formát balíku</message>
 
     <message key="xmlui.swordclient.DepositAction.success">Záznam byl úspěšně zkopírován</message>
-    <message key="xmlui.swordclient.DepositAction.package_error">Chyba formátu balíku</message>
     <message key="xmlui.swordclient.DepositAction.invalid_handle">Neplatný handle</message>
     <message key="xmlui.swordclient.DepositAction.package_error">Vyskytla se chyba během vytváření objektu balíku</message>
     <message key="xmlui.swordclient.DepositAction.error">Vyskytla se chyba během zasílání: {0}</message>
@@ -3214,7 +3206,7 @@
 	<message key="xmlui.UFAL.artifactbrowser.filters.clear">Zrušit vše</message>
 	<message key="xmlui.UFAL.artifactbrowser.filters.selected">Vybrané filtry</message>
 	<message key="xmlui.UFAL.artifactbrowser.search.limit">Zúžit hledání</message>
-	<message key="xmlui.UFAL.artifactbrowser.authors">Autoři:</message>
+	<message key="xmlui.UFAL.artifactbrowser.item_list.authors">Autoři:</message>
 
 	<!-- UFAL/lib/xsl/aspect/artifactbrowser/item-view.xsl -->
 	<message key="xmlui.UFAL.artifactbrowser.item-download-all-files">Stáhnout všechny soubory záznamu ({0})</message>
@@ -3451,7 +3443,6 @@
 	<message key="input_forms.complex_definitions.contact_person.2_surname.label">Příjmení kontaktní osoby</message>
 	<message key="input_forms.complex_definitions.contact_person.2_surname.help">Rodinné jméno</message>
 	<message key="input_forms.complex_definitions.contact_person.3_email.label">Email kontaktní osoby</message>
-	<message key="input_forms.complex_definitions.contact_person.4_affiliation.label">Organizace kontaktní osoby</message>
 	<message key="input_forms.complex_definitions.contact_person.4_affiliation.label">Organizace kontaktní osoby</message>
 	<message key="input_forms.complex_definitions.funding.4_type.label">Druh financí</message>
 	<message key="input_forms.complex_definitions.funding.2_code.placeholder">Začněte psát jméno/číslo grantu...</message>
