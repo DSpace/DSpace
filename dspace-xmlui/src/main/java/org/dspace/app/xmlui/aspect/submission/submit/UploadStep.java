@@ -155,6 +155,15 @@ public class UploadStep extends AbstractSubmissionStep
     protected static final Message T_sherpa_more =
             message("xmlui.aspect.sherpa.submission.more");
 
+    protected static final Message T_submit_remove_all =
+            message("xmlui.Submission.submit.UploadStep.submit_remove_all");
+
+    protected static final Message T_column_checksum =
+            message("xmlui.Submission.submit.UploadStep.column_checksum");
+
+    protected static final Message T_column_order =
+            message("xmlui.Submission.submit.UploadStep.column_order");
+
     /**
      * Global reference to edit file page
      * (this is used when a user requests to edit a bitstream)
@@ -345,8 +354,8 @@ public class UploadStep extends AbstractSubmissionStep
             header.addCellContent(T_column2); // file name
             header.addCellContent(T_column3); // size
             header.addCellContent(T_column4); // description
-	        header.addCellContent("Checksum");
-	        header.addCellContent("Order");
+	        header.addCellContent(T_column_checksum);
+	        header.addCellContent(T_column_order);
 	       // header.addCellContent(T_column5); // format
 	       // header.addCellContent(T_column6); // edit button
 
@@ -445,7 +454,7 @@ public class UploadStep extends AbstractSubmissionStep
 		        Button removeSeleceted = c.addButton("submit_remove_selected");
                 removeSeleceted.setValue(T_submit_remove);
 		        Button removeAll = c.addButton("submit_remove_all");
-		        removeAll.setValue("Remove All Files");		        
+		        removeAll.setValue(T_submit_remove_all);
             }
 
             upload = div.addList("submit-upload-new-part2", List.TYPE_FORM);

@@ -885,6 +885,7 @@
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.loading">Please wait while the controlled vocabulary is loading.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">There was an issue when loading the controlled vocabulary, please try again later.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.missing_field">Fill all the fields, please.</message>
+	<message key="xmlui.Submission.submit.DescribeStep.regexp_error">The field doesn't match the required regular expression (format) "{0}"</message>
 
     <!-- org.dspace.app.xmlui.Submission.submit.UFALLicenseStep -->
     <message key="xmlui.Submission.submit.NA">N/A</message>
@@ -1033,6 +1034,9 @@
 	<message key="xmlui.Submission.submit.UploadStep.submit_remove">Remove selected files</message>
     <!-- UFAL -->
     <message key="xmlui.Submission.submit.UploadStep.inform_about_licences">Please note, that you can select licences in the License step of this submission after you upload at least one file.</message>
+	<message key="xmlui.Submission.submit.UploadStep.submit_remove_all">Remove All Files</message>
+	<message key="xmlui.Submission.submit.UploadStep.column_checksum">Checksum</message>
+	<message key="xmlui.Submission.submit.UploadStep.column_order">Order</message>
 
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>
@@ -2941,6 +2945,8 @@
   <message key="xmlui.UFAL.artifactbrowser.project.code">Project code: {0}</message>
   <message key="xmlui.UFAL.artifactbrowser.project.name">Project name: {0}</message>
   <message key="xmlui.UFAL.artifactbrowser.piwik.views">Views Over Time</message>
+  <message key="xmlui.UFAL.artifactbrowser.item_view.replaced_one">This item is replaced by a newer submission:</message>
+  <message key="xmlui.UFAL.artifactbrowser.item_view.replaced_many">This item is replaced by newer submissions:</message>
 
 	<!-- UFAL/lib/xsl/core/navigation.xsl -->
 	<message key="xmlui.UFAL.navigation.menu_head">What can you do?</message>
@@ -2948,12 +2954,14 @@
 	<!-- UFAL/lib/xsl/core/forms.xsl -->
 	<message key="xmlui.UFAL.forms.licenseStep.accepted">Accepted</message>
 	<message key="xmlui.UFAL.forms.licenseStep.click">Click to accept</message>
+	<message key="xmlui.UFAL.forms.buttons.add">Add</message>
+	<message key="xmlui.UFAL.forms.buttons.remove_selected">Remove selected</message>
 
   <!-- DisplayShareLink -->
   <message key="xmlui.aspect.submission.submit.DisplayShareLink.title">Share link</message>
   <message key="xmlui.aspect.submission.submit.DisplayShareLink.trail">Share link</message>
   <message key="xmlui.aspect.submission.submit.DisplayShareLink.head">Share link</message>
-  <message key="xmlui.aspect.submission.submit.DisplayShareLink.para">To pass your submission to another user give them the following link: <span class="linkify">{0}</span></message>
+  <message key="xmlui.aspect.submission.submit.DisplayShareLink.para">To pass your submission to another user give them the following link: <span class="linkify">{0}</span>. You will also receive an email with this link.</message>
 
   <!-- homepage -->
   <message key="homepage.most_viewed_items">Most Viewed Items</message>
@@ -2972,10 +2980,12 @@
 	<message key="input_forms.field.dc.title.required">You must enter a main title for this item.</message>
 	<message key="input_forms.field.dc.source.uri.label">Project URL</message>
 	<message key="input_forms.field.dc.source.uri.hint">Enter the project url.</message>
+	<message key="input_forms.field.dc.source.uri.regexp-warning">The supplied url must start with http/https</message>
 	<message key="input_forms.field.local.demo.uri.label">Demo URL</message>
 	<message key="input_forms.field.local.demo.uri.hint">A url with samples of the resource or, in the case of tools,
 		of samples of the output.
 	</message>
+	<message key="input_forms.field.local.demo.uri.regexp-warning">The supplied url must start with http/https</message>
 	<message key="input_forms.field.dc.date.issued.label">Date issued</message>
 	<message key="input_forms.field.dc.date.issued.hint">Please give the date when the submission data were issued if any e.g., 2014-01-21 or at least
 		the year.
@@ -3061,6 +3071,9 @@
 	<message key="input_forms.field.dc.relation.isreplacedby.hint">A related resource that supplants, displaces, or supersedes the described resource.</message>
 	<message key="input_forms.field.local.embargo.termslift.label">Embargo lift date</message>
 	<message key="input_forms.field.local.embargo.termslift.hint">Date that the resource will become available e.g., 2014-01-21</message>
+	<message key="input_forms.field.local.embargo.termslift.regexp-warning">The supplied date does not follow our date pattern \d\d\d\d-\d\d-\d\d e.g.,
+		2014-01-21
+	</message>
 	<message key="input_forms.value_pairs.common_identifiers.issn">ISSN</message>
 	<message key="input_forms.value_pairs.common_identifiers.other">Other</message>
 	<message key="input_forms.value_pairs.common_identifiers.ismn">ISMN</message>

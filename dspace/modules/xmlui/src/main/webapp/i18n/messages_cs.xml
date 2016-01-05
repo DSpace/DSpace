@@ -898,6 +898,7 @@
         <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.loading">Prosím, čekejte na načítání řízeného slovníku.</message>
         <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">Vyskytl se problém s načtením řízeného slovníku. Zkuste to, prosím, znovu později.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.missing_field">Vyplňte prosím všechna pole.</message>
+	<message key="xmlui.Submission.submit.DescribeStep.regexp_error">Hodnota neodpovídá danému regulárnímu výrazu (formátu) "{0}"</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UFALLicenseStep -->
 	<message key="xmlui.Submission.submit.NA">N/A</message>
@@ -1032,7 +1033,7 @@
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Nahrát soubor a přidat další</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Nahrané soubory</message>
 	<message key="xmlui.Submission.submit.UploadStep.column0">Primární</message>
-	<message key="xmlui.Submission.submit.UploadStep.column1">Delete</message>
+	<message key="xmlui.Submission.submit.UploadStep.column1">Smazat</message>
 	<message key="xmlui.Submission.submit.UploadStep.column2">Soubor</message>
 	<message key="xmlui.Submission.submit.UploadStep.column3">Velikost</message>
 	<message key="xmlui.Submission.submit.UploadStep.column4">Popis</message>
@@ -1078,6 +1079,9 @@
         <message key="xmlui.Submission.submit.UploadWithEmbargoStep.submit_policy">Politiky</message>
 		<!-- UFAL -->
 		<message key="xmlui.Submission.submit.UploadStep.inform_about_licences">Licenci zvolíte v samostatném kroku, poté co nahrajete alespoň jeden soubor.</message>
+	<message key="xmlui.Submission.submit.UploadStep.submit_remove_all">Odstranit všechny soubory</message>
+	<message key="xmlui.Submission.submit.UploadStep.column_checksum">Checksum</message>
+	<message key="xmlui.Submission.submit.UploadStep.column_order">Pořadí</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.EditFileStep -->
 	<message key="xmlui.Submission.submit.EditFileStep.head">Editovat soubor</message>
@@ -1144,9 +1148,9 @@
 	<message key="xmlui.Submission.submit.LicenseStep.distribution_license_head_link">Licenční ujednání k distribuci</message>
 	<message key="xmlui.Submission.submit.LicenseStep.license_list_alert">Pro prohlédnutí všech dostupných licencí a jejich detailů navštivte</message>
 	<message key="xmlui.Submission.submit.LicenseStep.license_list_alert_link">Stránku licencí</message>
-	<message key="xmlui.Submission.submit.LicenseStep.resource_license_text"><i class='fa fa-3x fa-crosshairs  pull-left'> </i>License Selector vám pomůže vybrat nejvhodnější licenci pro vaše data nebo software.</message>
+	<message key="xmlui.Submission.submit.LicenseStep.resource_license_text"><i class='fa fa-3x fa-crosshairs  pull-left'> </i>License Selector vám pomůže vybrat nejvhodnější licenci pro vaše data nebo software. Momentálně pouze v angličtině.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.resource_license_text2">Pokud již víte, pod jakou licencí chcete vaše dílo šířit, můžete si licenci najít přímo v seznamu níže.</message>
-	<message key="xmlui.Submission.submit.LicenseStep.license_selector_button">OPEN License Selector</message>
+	<message key="xmlui.Submission.submit.LicenseStep.license_selector_button">Spustit License Selector</message>
 
 
 	<!-- org.dspace.app.xmlui.Submission.submit.RemovedStep -->
@@ -3216,12 +3220,14 @@
 	<message key="xmlui.UFAL.artifactbrowser.project.code">Kód projektu: {0}</message>
 	<message key="xmlui.UFAL.artifactbrowser.project.name">Jméno projektu: {0}</message>
 	<message key="xmlui.UFAL.artifactbrowser.piwik.views">Zobrazení v čase (prozatím pouze v angličtině)</message>
+	<message key="xmlui.UFAL.artifactbrowser.item_view.replaced_one">Tento záznam byl nahrazen novější verzí:</message>
+	<message key="xmlui.UFAL.artifactbrowser.item_view.replaced_many">Tento záznam byl nahrazen novějšími verzemi:</message>
 
 	<!-- DisplayShareLink -->
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.title">Sdílet odkaz</message>
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.trail">Sdílet odkaz</message>
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.head">Sdílet odkaz</message>
-	<message key="xmlui.aspect.submission.submit.DisplayShareLink.para">Chcete-li tento záznam předat někomu jinému, předejte tento odkaz: <span class="linkify">{0}</span></message>
+	<message key="xmlui.aspect.submission.submit.DisplayShareLink.para">Chcete-li tento záznam předat někomu jinému, předejte tento odkaz: <span class="linkify">{0}</span>. Odkaz vám také přijde emailem (v angličtině).</message>
 
 	<!-- UFAL/lib/xsl/core/navigation.xsl -->
 	<message key="xmlui.UFAL.navigation.menu_head">Kde začít?</message>
@@ -3229,6 +3235,8 @@
 	<!-- UFAL/lib/xsl/core/forms.xsl -->
 	<message key="xmlui.UFAL.forms.licenseStep.accepted">Přijmuto</message>
 	<message key="xmlui.UFAL.forms.licenseStep.click">Přijmout</message>
+	<message key="xmlui.UFAL.forms.buttons.add">Přidat</message>
+	<message key="xmlui.UFAL.forms.buttons.remove_selected">Odstranit vybrané</message>
 
 	<!-- Homepage -->
     <message key="homepage.carousel.quote">&#x201E;Na světě by mělo být jen jedno velké úložiště umění, které by umělec obohatil svými díly a při prezentaci získal přesně, co žádal... &#x201D;</message>
@@ -3263,8 +3271,10 @@
 	<message key="input_forms.field.dc.title.required">Musíte uvést název.</message>
 	<message key="input_forms.field.dc.source.uri.label">URL projektu</message>
 	<message key="input_forms.field.dc.source.uri.hint">Uveďte URL projektu</message>
+	<message key="input_forms.field.dc.source.uri.regexp-warning">URL musí začínat http/https</message>
 	<message key="input_forms.field.local.demo.uri.label">URL dema</message>
 	<message key="input_forms.field.local.demo.uri.hint">URL se vzorky dat, v případě nástrojů předvedení výstupu.</message>
+	<message key="input_forms.field.local.demo.uri.regexp-warning">URL musi začínat http/https</message>
 	<message key="input_forms.field.dc.date.issued.label">Datum vydání</message>
 	<message key="input_forms.field.dc.date.issued.hint">Uveďte prosím datum vydání příspěvku, např 2014-01-21 nebo alespoň rok.</message>
 	<message key="input_forms.field.dc.date.issued.required">Musíte uvést datum v platném formátu.</message>
@@ -3323,6 +3333,9 @@
 	<message key="input_forms.field.dc.relation.isreplacedby.hint">Příbuzný záznam, který nahrazuje tento.</message>
 	<message key="input_forms.field.local.embargo.termslift.label">Datum konce embarga</message>
 	<message key="input_forms.field.local.embargo.termslift.hint">Datum, kdy bude tento záznam k dispozici, např. 2014-01-21</message>
+	<message key="input_forms.field.local.embargo.termslift.regexp-warning">Zadané datum není ve formátu \d\d\d\d-\d\d-\d\d tj. např.
+		2014-01-21
+	</message>
 	<message key="input_forms.value_pairs.common_identifiers.issn">ISSN</message>
 	<message key="input_forms.value_pairs.common_identifiers.other">Other</message>
 	<message key="input_forms.value_pairs.common_identifiers.ismn">ISMN</message>
@@ -3435,10 +3448,10 @@
 	<message key="input_forms.value_pairs.metashare_sizeunit.n-grams">n-grams</message>
 	<message key="input_forms.value_pairs.metashare_sizeunit.rules">rules</message>
 	<message key="input_forms.value_pairs.metashare_sizeunit.other">other</message>
-	<message key="input_forms.value_pairs.metashare_languageDependent.true">Yes</message>
-	<message key="input_forms.value_pairs.metashare_languageDependent.false">No</message>
-	<message key="input_forms.value_pairs.hidden_list.hidden">Yes</message>
-	<message key="input_forms.value_pairs.hidden_list.false">No</message>
+	<message key="input_forms.value_pairs.metashare_languageDependent.true">Ano</message>
+	<message key="input_forms.value_pairs.metashare_languageDependent.false">Ne</message>
+	<message key="input_forms.value_pairs.hidden_list.hidden">Ano</message>
+	<message key="input_forms.value_pairs.hidden_list.false">Ne</message>
 	<message key="input_forms.complex_definitions.contact_person.1_givenname.label">Vlastní jméno kontaktní osoby</message>
 	<message key="input_forms.complex_definitions.contact_person.2_surname.label">Příjmení kontaktní osoby</message>
 	<message key="input_forms.complex_definitions.contact_person.2_surname.help">Rodinné jméno</message>

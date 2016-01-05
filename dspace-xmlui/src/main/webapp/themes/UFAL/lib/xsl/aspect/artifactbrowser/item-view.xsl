@@ -663,10 +663,10 @@
                         <span style="display: table-cell">
 	                         <xsl:choose>
                                  <xsl:when test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) = 1">
-                                         <xsl:text>This item is replaced by a newer submission:</xsl:text><br/>
+                                         <i18n:text>xmlui.UFAL.artifactbrowser.item_view.replaced_one</i18n:text><br/>
                                  </xsl:when>
                                  <xsl:otherwise>
-                                         <xsl:text>This item is replaced by newer submissions:</xsl:text><br/>
+                                         <i18n:text>xmlui.UFAL.artifactbrowser.item_view.replaced_many</i18n:text><br/>
                                  </xsl:otherwise>
 	                         </xsl:choose>
 	                         <xsl:for-each select="dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']">

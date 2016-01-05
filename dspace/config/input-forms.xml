@@ -77,7 +77,7 @@
                     <hint>input_forms.field.dc.source.uri.hint</hint>
                     <required/>
                     <regexp>http.*</regexp>
-                    <regexp-warning>The supplied url must start with http/https</regexp-warning>
+                    <regexp-warning>input_forms.field.dc.source.uri.regexp-warning</regexp-warning>
                 </field>
 
                 <field>
@@ -90,7 +90,7 @@
                     <hint>input_forms.field.local.demo.uri.hint</hint>
                     <required/>
                     <regexp>http.*</regexp>
-                    <regexp-warning>The supplied url must start with http/https</regexp-warning>
+                    <regexp-warning>input_forms.field.local.demo.uri.regexp-warning</regexp-warning>
                 </field>
 
                 <field>
@@ -419,9 +419,7 @@
                     <hint>input_forms.field.local.embargo.termslift.hint</hint>
                     <required/>
                     <regexp>\d\d\d\d-\d\d-\d\d</regexp>
-                    <regexp-warning>The supplied date does not follow our date pattern \d\d\d\d-\d\d-\d\d e.g.,
-                        2014-01-21
-                    </regexp-warning>
+                    <regexp-warning>input_forms.field.local.embargo.termslift.regexp-warning</regexp-warning>
                     <component-label> </component-label>
                     <acl>
                         policy=deny,action=read,grantee-type=user,grantee-id=*

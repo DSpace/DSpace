@@ -78,6 +78,7 @@ import cz.cuni.mff.ufal.dspace.app.util.ACL;
  */
 public class DescribeStep extends AbstractSubmissionStep
 {
+    public static final Message T_regexp_error = message("xmlui.Submission.submit.DescribeStep.regexp_error");
     private static Logger log = Logger.getLogger(DescribeStep.class);
         /** Language Strings **/
     protected static final Message T_head =
@@ -1381,7 +1382,7 @@ public class DescribeStep extends AbstractSubmissionStep
                     String regex = definition.getInput(input_name).get("regexp");
                     if(!DCInput.isAllowedValue(value, regex)){
                         //attach the regex error to the right field
-                        field.addError(String.format("The field doesn't match the required regular expression (format) \"%s\"", regex));
+                        field.addError(T_regexp_error.parameterize(regex));
                     }
                 } catch (IndexOutOfBoundsException e){
                     break;
@@ -1514,10 +1515,9 @@ public class DescribeStep extends AbstractSubmissionStep
                     if( !dcInput.isAllowedValue(dcv.value) ) {
                         regexp_warning_issued = true;
                         if (dcInput.getRegexpWarning() != null && dcInput.getRegexpWarning().length() > 0) {
-                            text.addError(dcInput.getRegexpWarning());
+                            text.addError(message(dcInput.getRegexpWarning()));
                         }else {
-                            text.addError(String.format(
-                                "This value must match the given regular expression [%s].", dcInput.getRegexp()) );
+                            text.addError(T_regexp_error.parameterize(dcInput.getRegexp()) );
                         }
                     }
                 }
