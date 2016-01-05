@@ -139,13 +139,6 @@
         </step>
     </command>
     <command>
-        <name>itemcounter</name>
-        <description>Update the item strength counts in the user interface</description>
-        <step passuserargs="false">
-            <class>org.dspace.browse.ItemCounter</class>
-        </step>
-    </command>
-    <command>
         <name>itemupdate</name>
         <description>Item update tool for altering metadata and bitstream content in items</description>
         <step>
