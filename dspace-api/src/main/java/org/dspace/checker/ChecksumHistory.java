@@ -7,6 +7,8 @@
  */
 package org.dspace.checker;
 
+import org.dspace.core.Context;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
@@ -55,7 +57,11 @@ public class ChecksumHistory
     private ChecksumResult checksumResult;
 
 
-    public ChecksumHistory()
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.checker.service.ChecksumHistoryService#addHistory(Context, MostRecentChecksum)}
+     */
+    protected ChecksumHistory()
     {
     }
 

@@ -60,6 +60,11 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
     @Transient
     protected transient BundleService bundleService;
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.BundleService#create(Context, Item, String)}
+     *
+     */
     protected Bundle()
     {
     }

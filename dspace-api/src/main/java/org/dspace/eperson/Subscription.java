@@ -8,6 +8,7 @@
 package org.dspace.eperson;
 
 import org.dspace.content.Collection;
+import org.dspace.core.Context;
 
 import javax.persistence.*;
 
@@ -34,7 +35,14 @@ public class Subscription {
     @JoinColumn(name = "eperson_id")
     private EPerson ePerson;
 
-    protected Subscription() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.eperson.service.SubscribeService#subscribe(Context, EPerson, Collection)}
+     *
+     */
+    protected Subscription()
+    {
+
     }
 
     public int getId() {

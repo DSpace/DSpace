@@ -96,6 +96,16 @@ public class BitstreamFormat implements Serializable
     public static final int SUPPORTED = 2;
 
     /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.BitstreamFormatService#create(Context)}
+     *
+     */
+    protected BitstreamFormat()
+    {
+
+    }
+
+    /**
      * Get the internal identifier of this bitstream format
      * 
      * @return the internal identifier

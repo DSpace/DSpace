@@ -7,6 +7,7 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 import javax.persistence.*;
@@ -40,7 +41,14 @@ public class InProgressUser {
     @Column(name ="finished")
     private boolean finished = false;
 
-    public InProgressUser() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService#create(Context)}
+     *
+     */
+    protected InProgressUser()
+    {
+
     }
 
     public int getId() {

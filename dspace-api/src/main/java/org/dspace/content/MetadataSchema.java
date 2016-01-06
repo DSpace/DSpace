@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import org.dspace.core.Context;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -43,7 +44,14 @@ public class MetadataSchema
     @Column(name = "short_id", unique = true, length = 32)
     private String name;
 
-    protected MetadataSchema() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.MetadataSchemaService#create(Context, String, String)}
+     *
+     */
+    protected MetadataSchema()
+    {
+
     }
 
     @Override
