@@ -107,7 +107,7 @@ function initFirstSubmissionForm() {
                 jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
                 jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
             }
-            else if (integrated==true) {
+            else if (integrated!=true) {
                 jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").show();
                 jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
             }
@@ -271,7 +271,7 @@ function initFirstSubmissionForm() {
                     jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
                 }
                 //else if (journal.indexOf('*') != -1) {
-                else if(integrated == true){
+                else if(integrated != true){
                     jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").show();
                     jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
                     //update the order form after enter journal name
