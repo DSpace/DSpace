@@ -907,11 +907,14 @@
 
 	<xsl:template match="license">
 		<div class="alert alert-info text-center">
-		This item is 
-			<div class="label label-{@label}">			
-			<xsl:value-of select="@label_title" />
-			</div>
-		and licensed under:<BR/>
+			<i18n:translate>
+				<i18n:text>xmlui.UFAL.artifactbrowser.item_view.licensed_under</i18n:text>
+				<i18n:param>
+					<div class="label label-{@label}">
+						<xsl:value-of select="@label_title" />
+					</div>
+				</i18n:param>
+			</i18n:translate>
 		<a>
 		<xsl:attribute name="href">
 			<xsl:value-of select="@url" />

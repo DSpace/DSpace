@@ -2947,6 +2947,7 @@
   <message key="xmlui.UFAL.artifactbrowser.piwik.views">Views Over Time</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.replaced_one">This item is replaced by a newer submission:</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.replaced_many">This item is replaced by newer submissions:</message>
+  <message key="xmlui.UFAL.artifactbrowser.item_view.licensed_under">This item is {0} and licensed under:<BR/></message>
 
 	<!-- UFAL/lib/xsl/core/navigation.xsl -->
 	<message key="xmlui.UFAL.navigation.menu_head">What can you do?</message>

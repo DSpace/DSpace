@@ -3222,6 +3222,7 @@
 	<message key="xmlui.UFAL.artifactbrowser.piwik.views">Zobrazení v čase (prozatím pouze v angličtině)</message>
 	<message key="xmlui.UFAL.artifactbrowser.item_view.replaced_one">Tento záznam byl nahrazen novější verzí:</message>
 	<message key="xmlui.UFAL.artifactbrowser.item_view.replaced_many">Tento záznam byl nahrazen novějšími verzemi:</message>
+	<message key="xmlui.UFAL.artifactbrowser.item_view.licensed_under">Licenční kategorie: {0} <br/>Licence: </message>
 
 	<!-- DisplayShareLink -->
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.title">Sdílet odkaz</message>
