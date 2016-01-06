@@ -1,34 +1,27 @@
 package org.dspace.workflow;
 
 import org.apache.commons.cli.*;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.WorkspaceItem;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.DCDate;
-import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.discovery.SearchService;
-import org.dspace.utils.DSpace;
-import org.dspace.workflow.actions.WorkflowActionConfig;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
+import org.datadryad.rest.models.Manuscript;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DCDate;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.discovery.SearchService;
+import org.dspace.eperson.EPerson;
+import org.dspace.utils.DSpace;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.actions.WorkflowActionConfig;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.dspace.core.Constants;
-import org.dspace.identifier.DOIIdentifierProvider;
-import org.dspace.identifier.IdentifierNotFoundException;
-import org.dspace.identifier.IdentifierNotResolvableException;
-import org.dspace.identifier.IdentifierService;
-import org.dspace.eperson.EPerson;
-import org.datadryad.rest.models.Manuscript;
-import org.dspace.workflow.WorkflowItem;
-import org.datadryad.api.DryadDataPackage;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -270,8 +263,14 @@ public class ApproveRejectReviewItem {
             }
             // union keywords
             if (manuscript.keywords.size() > 0) {
-                List<String> manuscriptKeywords = manuscript.keywords;
-                dataPackage.addKeywords(manuscriptKeywords);
+                ArrayList<String> unionKeywords = new ArrayList<String>();
+                unionKeywords.addAll(dataPackage.getKeywords());
+                for (String newKeyword : manuscript.keywords) {
+                    if (!unionKeywords.contains(newKeyword)) {
+                        unionKeywords.add(newKeyword);
+                    }
+                }
+                dataPackage.setKeywords(unionKeywords);
             }
             // set title
             if (manuscript.title != null) {
