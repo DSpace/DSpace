@@ -7,15 +7,17 @@
  */
 package org.dspace.app.mediafilter;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Item;
 
 /*
  * ExcelFilter
@@ -55,7 +57,7 @@ public class ExcelFilter extends MediaFilter
     /**
      * @return String bitstream format
      * 
-     *         TODO: Check that this is correct
+     *
      */
     public String getFormatString()
     {
@@ -76,19 +78,24 @@ public class ExcelFilter extends MediaFilter
      * 
      * @return InputStream the resulting input stream
      */
-    public InputStream getDestinationStream(InputStream source)
+    public InputStream getDestinationStream(Item item, InputStream source, boolean verbose)
             throws Exception
     {
         String extractedText = null;
 
         try
         {
-            new ExtractorFactory();
             POITextExtractor theExtractor = ExtractorFactory.createExtractor(source);
-            if (theExtractor instanceof ExcelExtractor) // for xls file
-                extractedText = ((ExcelExtractor ) theExtractor).getText();
-            else if (theExtractor instanceof XSSFExcelExtractor) // for xlsx file
-                extractedText = ((XSSFExcelExtractor ) theExtractor).getText();
+            if (theExtractor instanceof ExcelExtractor)
+            {
+                // for xls file
+                extractedText = (theExtractor).getText();
+            }
+            else if (theExtractor instanceof XSSFExcelExtractor)
+            {
+                // for xlsx file
+                extractedText = (theExtractor).getText();
+            }
         }
         catch (Exception e)
         {
@@ -98,18 +105,8 @@ public class ExcelFilter extends MediaFilter
 
         if (extractedText != null)
         {
-            // if verbose flag is set, print out extracted text
-            // to STDOUT
-            if (MediaFilterManager.isVerbose)
-            {
-                System.out.println(extractedText);
-            }
-
             // generate an input stream with the extracted text
-            byte[] textBytes = extractedText.getBytes();
-            ByteArrayInputStream bais = new ByteArrayInputStream(textBytes);
-
-            return bais;
+            return IOUtils.toInputStream(extractedText, StandardCharsets.UTF_8);
         }
 
         return null;
