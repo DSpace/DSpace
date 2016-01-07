@@ -579,13 +579,9 @@
             <h1 class="ds-div-head ds_large_data_package_head" id="ds_large_data_package_head">Large data packages</h1>
             <div id="ds_large_data_package" class="ds-static-div primary" style="font-size: 14px;">
                 <p style="margin-bottom: 0;">
-                    Note that for data packages over 10GB, submitters will
-                    be asked to pay an additional:
+                    Note that for data packages over 20GB, submitters will
+                    be asked to pay $50 for each additional 10GB, or part thereof.
                 </p>
-                <ul>
-                    <li>$15 for the first GB beyond 10, and</li>
-                    <li>$10 for each GB thereafter.</li>
-                </ul> 
             </div>      
         </div>
     </xsl:template>
