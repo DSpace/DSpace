@@ -68,9 +68,6 @@ public class MostRecentChecksum implements Serializable
     {
     }
 
-    public MostRecentChecksum() {
-    }
-
     public Bitstream getBitstream() {
         return bitstream;
     }
