@@ -10,9 +10,9 @@
 -->
 
 <!--
-  
+
   The Submission Aspect is responsible for submitting new items to DSpace repository.
-  
+
 -->
 <map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
 
@@ -21,9 +21,9 @@
       <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.submission.Navigation"/>
       <map:transformer name="CollectionViewer" src="org.dspace.app.xmlui.aspect.submission.CollectionViewer"/>
       <map:transformer name="Submissions" src="org.dspace.app.xmlui.aspect.submission.Submissions"/>
-      
+
       <map:transformer name="StepTransformer" src="org.dspace.app.xmlui.aspect.submission.StepTransformer"/>
-      
+
       <map:transformer name="SelectCollectionStep" src="org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep"/>
       <map:transformer name="ResumeStep" src="org.dspace.app.xmlui.aspect.submission.submit.ResumeStep"/>
       <map:transformer name="SaveOrRemoveStep" src="org.dspace.app.xmlui.aspect.submission.submit.SaveOrRemoveStep"/>
@@ -31,68 +31,68 @@
       <map:transformer name="CompletedStep" src="org.dspace.app.xmlui.aspect.submission.submit.CompletedStep"/>
       <map:transformer name="ControlledVocabularyTransformer" src="org.dspace.app.xmlui.aspect.submission.ControlledVocabularyTransformer"/>
     </map:transformers>
-    
+
     <map:selectors>
       <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
     </map:selectors>
-    
+
     <map:matchers default="wildcard">
       <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
       <map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
       <map:matcher name="regexp" src="org.apache.cocoon.matching.RegexpURIMatcher"/>
     </map:matchers>
-    
+
     <map:actions>
       <map:action name="RemoveSubmissionsAction" src="org.dspace.app.xmlui.aspect.submission.submit.RemoveSubmissionsAction"/>
+      <map:action name="UploadFileChunk" src="org.dspace.app.xmlui.aspect.submission.submit.UploadFileChunk"/>
     </map:actions>
-    
+
   </map:components>
-  
-  
+
+
   <map:flow language="javascript">
     <map:script src="submission.js"/>
   </map:flow>
-  
+
   <map:pipelines>
     <map:pipeline>
-    
+
       <!-- Make sure the user is atleast logged in -->
       <map:select type="AuthenticatedSelector">
         <map:when test="eperson">
-          
+
           <!--
               There are two major flows that are present in the submissions & workflow
               aspects, one for new submissions to the repository, and another for reviewing
               those submissions in a 3-stage workflow processes. Below are the starting
               points and re-entry points for those workflows.
-              
+
               /submit               -> New submissions that have not selected a collection yet.
               /handle/*/*/submit    -> Submitting a new item to the repository.
               /handle/*/*/workflow  -> Performing workflow tasks to review submissions.
               -->
-          
+
           <!-- Start a new submission, unscoped -->
           <map:match pattern="submit">
               <map:call function="doSubmission"/>
           </map:match>
-          
+
           <!-- Continue creating a new submission, unscoped -->
           <map:match pattern="submit/*.continue">
              <map:call continuation="{1}"/>
           </map:match>
-          
+
           <!-- Start a new submission to specific collection -->
           <map:match pattern="handle/*/*/submit">
             <map:call function="doSubmission">
               <map:parameter name="handle" value="{1}/{2}"/>
             </map:call>
           </map:match>
-          
+
           <!-- Continue an existing submission-->
           <map:match pattern="handle/*/*/submit/*.continue">
              <map:call continuation="{3}"/>
           </map:match>
-          
 
           <map:match pattern="handle/*/*/workflow_edit_metadata">
             <map:call function="doWorkflowEditMetadata">
@@ -100,14 +100,19 @@
             </map:call>
             </map:match>
 
-          
+          <map:match pattern="handle/*/*/upload">
+              <map:act type="UploadFileChunk">
+                  <map:parameter name="handle" value="{1}/{2}"/>
+              </map:act>
+          </map:match>
+
           <map:generate/>
 
-          
+
           <map:transform type="Navigation"/>
-          
-          
-          
+
+
+
           <!--
               To make it easier to start a submission this component
               will add a link to the collection homepage for submitting
@@ -120,7 +125,7 @@
                </map:match>
              </map:match>
           </map:match>
-          
+
           <!--
               The submissions page provides a list of all submission
               related tasks/items/thingys. It is used by both those
@@ -140,25 +145,25 @@
             <map:match type="request" pattern="submit_submissions_remove">
               <map:act type="RemoveSubmissionsAction"/>
             </map:match>
-             
+
             <map:transform type="Submissions"/>
           </map:match>
-          
-          
-          
-          
-          
+
+
+
+
+
           <!--
-           
+
               Flow pages Steps
-              
+
               -->
           <map:match type="WildcardParameterMatcher" pattern="true">
             <map:parameter name="parameter-name" value="flow"/>
             <map:parameter name="flow" value="{flow-attribute:flow}"/>
 
             <!-- Submission related steps -->
-            
+
             <!--
                 This step will ask the user to select a collection they want
                 to submit an item to. It is not part of the 'proper' submission
@@ -170,7 +175,7 @@
                 <map:parameter name="handle" value="{flow-attribute:handle}"/>
               </map:transform>
             </map:match>
-          
+
             <!--
               This is just a continuation of the submission workflow. The generic
               submission step transformer determines which step we are on
@@ -187,7 +192,7 @@
                 <map:parameter name="handle" value="{1}/{2}"/>
               </map:transform>
             </map:match>
-          
+
             <!--
                 This step is used when resuming unfinished submissions, the user is
                 taken here after clicking the link from the submissions page.
@@ -198,7 +203,7 @@
                 <map:parameter name="step" value="{flow-attribute:step}"/>
               </map:transform>
             </map:match>
-              
+
             <!--
                 This step is used throughout the submission processes for when
                 even the user clicks save / cancel. At this page they are asked
@@ -210,7 +215,7 @@
                 <map:parameter name="step" value="{flow-attribute:step}"/>
               </map:transform>
             </map:match>
-          
+
             <!--
                 This is step is a confirmation page that the submission was
                 successfully removed from the system.
@@ -218,7 +223,7 @@
             <map:match pattern="handle/*/*/submit/removedStep">
               <map:transform type="RemovedStep"/>
             </map:match>
-            
+
             <!--
                 This step is merely a confirmation page letting the user
                 know that they have completed submitting a new item to dspace.
@@ -228,9 +233,9 @@
                 <map:parameter name="handle" value="{flow-attribute:handle}"/>
               </map:transform>
             </map:match>
-            
+
           </map:match> <!-- flow match-->
-          
+
           <!-- javascript libraries and utils for choice/authority-control -->
           <map:match type="regexp" pattern="(^submit)|(^handle/.*/submit)|(^handle/.*/workflow)">
             <map:transform type="IncludePageMeta">
@@ -249,13 +254,13 @@
             </map:match>
 
           <map:serialize type="xml"/>
-          
+
         </map:when>
         <map:otherwise>
-          
+
           <!-- non-authenticated users -->
           <map:generate/>
-          
+
           <!--
               If the user is going to the submissions page and they are
               not logged in then ask them to login first. This will also
@@ -273,14 +278,14 @@
           <map:match pattern="handle/*/*/submit">
             <map:act type="StartAuthentication"/>
           </map:match>
-    
+
           <map:serialize/>
-          
+
         </map:otherwise>
       </map:select>
 
     </map:pipeline>
   </map:pipelines>
-  
-  
+
+
 </map:sitemap>

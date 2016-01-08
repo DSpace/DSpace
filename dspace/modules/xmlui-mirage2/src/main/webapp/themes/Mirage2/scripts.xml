@@ -42,6 +42,7 @@
 
 
     <!-- DATASHARE start -->
+    <script src="vendor/resumablejs/resumable.js">&#160;</script>
     <script src="scripts/datashare.js">&#160;</script>
     <!-- DATASHARE end -->
 

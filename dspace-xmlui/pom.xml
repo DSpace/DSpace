@@ -68,6 +68,7 @@
                         <exclude>**/DD_belated*</exclude>
                         <exclude>**/detectmobile*</exclude>
                         <exclude>**/sc-mobile*</exclude>
+                        <exclude>**/resumable.js</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -232,6 +233,13 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.1</version>
+            <type>jar</type>
         </dependency>
 
     </dependencies>
