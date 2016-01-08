@@ -42,7 +42,8 @@
 
     <bean class="org.dspace.identifier.dao.impl.DOIDAOImpl"/>
 
-    <bean class="org.dspace.storage.bitstore.BitstreamStorageServiceImpl"/>
+    <!-- declaration moved to bitstore.xml -->
+    <!--<bean class="org.dspace.storage.bitstore.BitstreamStorageServiceImpl"/>-->
 
     <bean class="org.dspace.versioning.dao.impl.VersionDAOImpl"/>
     <bean class="org.dspace.versioning.dao.impl.VersionHistoryDAOImpl"/>

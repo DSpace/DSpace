@@ -8,24 +8,20 @@
 package org.dspace.checker;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Map;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.checker.service.ChecksumResultService;
 import org.dspace.checker.service.MostRecentChecksumService;
 import org.dspace.content.Bitstream;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
-import org.dspace.core.Utils;
+import org.dspace.storage.bitstore.factory.StorageServiceFactory;
+import org.dspace.storage.bitstore.service.BitstreamStorageService;
 
 /**
  * <p>
@@ -47,12 +43,6 @@ public final class CheckerCommand
     /** Usual Log4J logger. */
     private static final Logger LOG = Logger.getLogger(CheckerCommand.class);
 
-    /** Default digest algorithm (MD5). */
-    private static final String DEFAULT_DIGEST_ALGORITHM = "MD5";
-
-    /** 4 Meg byte array for reading file. */
-    private int BYTE_ARRAY_SIZE = 4 * 1024;
-
     private Context context;
 
     /** BitstreamInfoDAO dependency. */
@@ -62,7 +52,7 @@ public final class CheckerCommand
      * Checksum history Data access object
      */
     private ChecksumHistoryService checksumHistoryService = null;
-    private BitstreamService bitstreamService = null;
+    private BitstreamStorageService bitstreamStorageService = null;
     private ChecksumResultService checksumResultService = null;
 
     /** start time for current process. */
@@ -88,7 +78,7 @@ public final class CheckerCommand
     {
         checksumService = CheckerServiceFactory.getInstance().getMostRecentChecksumService();
         checksumHistoryService = CheckerServiceFactory.getInstance().getChecksumHistoryService();
-        bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        bitstreamStorageService = StorageServiceFactory.getInstance().getBitstreamStorageService();
         checksumResultService = CheckerServiceFactory.getInstance().getChecksumResultService();
         this.context = context;
     }
@@ -183,40 +173,6 @@ public final class CheckerCommand
     }
 
     /**
-     * Digest the stream and get the checksum value.
-     * 
-     * @param stream
-     *            InputStream to digest.
-     * @param algorithm
-     *            the algorithm to use when digesting.
-     * @todo Document the algorithm parameter
-     * @return digest
-     * 
-     * @throws java.security.NoSuchAlgorithmException
-     *             if the requested algorithm is not provided by the system
-     *             security provider.
-     * @throws java.io.IOException
-     *             If an exception arises whilst reading the stream
-     */
-    protected String digestStream(InputStream stream, String algorithm)
-            throws java.security.NoSuchAlgorithmException, java.io.IOException
-    {
-        // create the digest stream
-        DigestInputStream dStream = new DigestInputStream(stream, MessageDigest
-                .getInstance(algorithm));
-
-        byte[] bytes = new byte[BYTE_ARRAY_SIZE];
-
-        // make sure all the data is read by the digester
-        int bytesRead = -1;
-        do {
-            bytesRead = dStream.read(bytes, 0, BYTE_ARRAY_SIZE);
-        } while (bytesRead != -1);
-
-        return Utils.toHex(dStream.getMessageDigest().digest());
-    }
-
-    /**
      * Compares two checksums.
      * 
      * @param checksumA
@@ -294,21 +250,19 @@ public final class CheckerCommand
     protected void processBitstream(MostRecentChecksum info) throws SQLException {
         info.setProcessStartDate(new Date());
 
-        if (info.getChecksumAlgorithm() == null)
-        {
-            info.setChecksumAlgorithm(DEFAULT_DIGEST_ALGORITHM);
-        }
-
         try
         {
-            InputStream bitstream = bitstreamService.retrieve(context, info.getBitstream());
+            Map checksumMap = bitstreamStorageService.computeChecksum(context, info.getBitstream());
+            if(MapUtils.isNotEmpty(checksumMap)) {
+                info.setBitstreamFound(true);
+                if(checksumMap.containsKey("checksum")) {
+                    info.setCurrentChecksum(checksumMap.get("checksum").toString());
+                }
 
-            info.setBitstreamFound(true);
-
-            String checksum = digestStream(bitstream, info
-                    .getChecksumAlgorithm());
-
-            info.setCurrentChecksum(checksum);
+                if(checksumMap.containsKey("checksum_algorithm")) {
+                    info.setChecksumAlgorithm(checksumMap.get("checksum_algorithm").toString());
+                }
+            }
 
             // compare new checksum to previous checksum
             info.setChecksumResult(compareChecksums(info.getExpectedChecksum(), info.getCurrentChecksum()));
@@ -329,15 +283,6 @@ public final class CheckerCommand
             info.setChecksumResult(getChecksumResultByCode(ChecksumResultCode.BITSTREAM_INFO_NOT_FOUND));
             LOG.error("Error retrieving metadata for bitstream ID "
                     + info.getBitstream().getID(), e);
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            info.setChecksumResult(getChecksumResultByCode(ChecksumResultCode.CHECKSUM_ALGORITHM_INVALID));
-            info.setToBeProcessed(false);
-            LOG.error("Invalid digest algorithm type for bitstream ID"
-                    + info.getBitstream().getID(), e);
-        } catch (AuthorizeException e) {
-            e.printStackTrace();
         } finally
         {
             info.setProcessEndDate(new Date());
