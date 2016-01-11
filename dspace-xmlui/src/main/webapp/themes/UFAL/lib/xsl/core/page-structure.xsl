@@ -538,9 +538,20 @@
             </xsl:attribute>&#160;</script>
 
         <script type="text/javascript">
+            <xsl:variable name="currentLocale">
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
+            </xsl:variable>
             <xsl:attribute name="src">
-                 <xsl:value-of select="$theme-path" />
-                 <xsl:text>/lib/lindat/public/js/lindat-refbox.js</xsl:text>
+                <xsl:choose>
+                    <xsl:when test='$currentLocale="cs"'>
+                        <xsl:value-of select="$theme-path" />
+                        <xsl:text>/lib/lindat/public/js/cs/lindat-refbox.js</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$theme-path" />
+                        <xsl:text>/lib/lindat/public/js/lindat-refbox.js</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:attribute>&#160;</script>
 
 
