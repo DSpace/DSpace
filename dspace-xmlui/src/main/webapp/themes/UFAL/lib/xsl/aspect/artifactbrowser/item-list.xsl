@@ -34,7 +34,7 @@
 		<xsl:if test="/dri:document/dri:options/dri:list[@n='discovery']/dri:list[count(dri:item/dri:xref)>1]">
 		<div class="col-md-4 accordion" id="search-filters">
 			<h4>
-				Limit your search
+				<i18n:text>xmlui.UFAL.artifactbrowser.search.limit</i18n:text>
 			</h4>
 			<xsl:for-each select="/dri:document/dri:options/dri:list[@n='discovery']/dri:list[count(dri:item/dri:xref)>1]">
 				<div class="well well-sm well-white accordion-group" style="margin-bottom: 5px;">
@@ -275,7 +275,7 @@
                 &#xFEFF; <!-- non-breaking space to force separating the end tag -->
             </span>        
             <div class="author-head">
-                Author(s):
+               <i18n:text>xmlui.UFAL.artifactbrowser.item_list.authors</i18n:text>
             </div>
             <div class="author">
                 <xsl:choose>
@@ -367,7 +367,7 @@
                 </xsl:if>
                 <div class="bold accordion-heading">
                     <a class="accordion-toggle" data-toggle="collapse" data-parent="#filters" href="#add-filters">
-                        Advanced Search
+                        <i18n:text>xmlui.UFAL.artifactbrowser.filters.add_filters</i18n:text>
                     </a>
                 </div>
                 <div id="add-filters">
@@ -404,8 +404,8 @@
     <xsl:template name="selected-filters">
         <div class="filters well well-light">
         	<h5>
-               Selected Filters
-			</h5>               
+                <i18n:text>xmlui.UFAL.artifactbrowser.filters.selected</i18n:text>
+			</h5>
 	        <xsl:for-each select="/dri:document//dri:div[@n='general-query']/dri:p[@n='hidden-fields']/dri:field[starts-with(@n,'filtertype')]">
 	        	<xsl:variable name="filter_number" select="substring-after(@n, 'filtertype_')" />
 	        	<xsl:variable name="filtertype" select="dri:value/node()" />
@@ -452,8 +452,8 @@
 				</span>
 			</xsl:for-each>
             <span class="badge selected-filter-clearall" style="padding: 5px 10px; margin: 2px; cursor: pointer">
-            	Clear All
-            </span>            
+                <i18n:text>xmlui.UFAL.artifactbrowser.filters.clear</i18n:text>
+            </span>
         </div>
     </xsl:template>
     

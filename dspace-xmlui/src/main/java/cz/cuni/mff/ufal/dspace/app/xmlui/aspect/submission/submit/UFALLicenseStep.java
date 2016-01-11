@@ -67,6 +67,9 @@ public class UFALLicenseStep extends LicenseStep {
 	protected static final Message T_license_not_supported = message("xmlui.Submission.submit.UFALLicenseStep.license_not_supported");
 	protected static final Message T_review_msg= message("xmlui.Submission.submit.UFALLicenseStep.review_no_file");
 	protected static final Message T_review_license_error= message("xmlui.Submission.submit.UFALLicenseStep.review_license_error");
+	protected static final Message T_license_select_placeholder= message("xmlui.Submission.submit.UFALLicenseStep.option_placeholder");
+	protected static final Message T_license_select_head= message("xmlui.Submission.submit.UFALLicenseStep.select_head");
+	protected static final Message T_select_or_label = message("xmlui.Submission.submit.UFALLicenseStep.or_label");
 
 	
 	//
@@ -166,7 +169,7 @@ public class UFALLicenseStep extends LicenseStep {
 		if (file_uploaded) {
 
 			form = controls.addList("submit-ufal-license", List.TYPE_FORM, "");
-			form.setHead("Select the resource license");
+			form.setHead(T_license_select_head);
 			
 			Item selectorLink = form.addItem("", "alert alert-info");
 			selectorLink.addHighlight("").addContent(T_resource_license_text);
@@ -176,7 +179,7 @@ public class UFALLicenseStep extends LicenseStep {
 			selectorLink.addXref("#!", T_license_selector_button, "btn btn-repository licenseselector bold btn-block btn-lg");
 			
 			Item orLbl = form.addItem(null, "text-center");
-			orLbl.addContent("- OR -");
+			orLbl.addContent(T_select_or_label);
 
 			Item helpText2 = form.addItem();
 			helpText2.addHighlight("license-resource-text").addContent(T_resource_license_text2);			
@@ -211,7 +214,7 @@ public class UFALLicenseStep extends LicenseStep {
 				if(selected_license!=null && selected_license[0].equals("")) selected_license = null;
 				int selectedId = (selected_license != null && selected_license.length > 0) ? Integer.parseInt(selected_license[0]) : -1;
 
-				license_select.addOption(true, "", "Select a License ...");
+				license_select.addOption(true, "", T_license_select_placeholder);
 				
 				for (LicenseDefinition license_def : license_defs) {
 					boolean selected = license_def.getLicenseId() == selectedId;

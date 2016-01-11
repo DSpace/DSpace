@@ -14,7 +14,7 @@ function init_dragNdrop() {
 			}).bind('drop', ignoreDrag);
 
 	var dropZone = jQuery(
-			"<li><span class='well well-large bold' id=\"drop_zone\" dropzone=\"copy\" style=\"font-size: 32px; display:block; line-height:100px; text-align:center; margin-bottom: 15px; margin-top: -20px; \">Drop file(s) here.</span></li>")
+			"<li><span class='well well-large bold' id=\"drop_zone\" dropzone=\"copy\" style=\"font-size: 32px; display:block; line-height:100px; text-align:center; margin-bottom: 15px; margin-top: -20px; \">" + $.i18n._("Drop file(s) here.") + "</span></li>")
 			.bind('dragover', dragOver).bind('drop', drop).bind('dragleave',
 					dragLeave);
 
@@ -33,7 +33,7 @@ function drop(e) {
 	ignoreDrag(e);
 	var files = e.originalEvent.dataTransfer.files;
 	if (files === null || files === undefined || files.length === 0) {
-		alert("Can't upload these files.");
+		alert($.i18n._("Can't upload these files."));
 		return false;
 	}
 	processFiles(files);
@@ -57,6 +57,10 @@ function dragLeave(e) {
 jQuery(document)
 .ready(
 		function() {
+			$.i18n.load("cs",{
+				"Can't upload these files.": "Tyto soubory nelze nahrát.",
+				"Drop file(s) here.": "Přetáhněte soubory sem.",
+			});
 			init_dragNdrop();
 		}
 );

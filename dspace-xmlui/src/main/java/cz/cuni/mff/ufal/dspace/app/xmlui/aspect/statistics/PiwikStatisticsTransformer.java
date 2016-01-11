@@ -30,6 +30,11 @@ public class PiwikStatisticsTransformer extends AbstractDSpaceTransformer {
 
 	private static Logger log = Logger.getLogger(GAStatisticsTransformer.class);
 
+	private static final Message T_alredy_subscribed = message("PiwikStatisticsTransformer.already_subscribed");
+	private static final Message T_unsubscribe = message("PiwikStatisticsTransformer.unsubscribe");
+	private static final Message T_get_monthly = message("PiwikStatisticsTransformer.get_monthly");
+	private static final Message T_subscribe = message("PiwikStatisticsTransformer.subscribe");
+
     private static final Message T_dspace_home = message("xmlui.general.dspace_home");
     private static final Message T_head_title = message("xmlui.statistics.piwik.title");
     private static final Message T_statistics_trail = message("xmlui.statistics.piwik.trail");
@@ -86,14 +91,14 @@ public class PiwikStatisticsTransformer extends AbstractDSpaceTransformer {
 				Division subscribe = division.addDivision("subscribe", "alert alert-success");
 				Para para = subscribe.addPara(null, "bold");
 				para.addHighlight("fa fa-envelope").addContent(" ");			
-				para.addContent("  You are subscribed to receive a monthly report of this item via email ");
-				para.addXref("?subscribe=no", "Unsubscribe", "btn btn-xs btn-success pull-right bold", "");				
+				para.addContent(T_alredy_subscribed);
+				para.addXref("?subscribe=no", T_unsubscribe, "btn btn-xs btn-success pull-right bold", "");
 			} else {
 				Division subscribe = division.addDivision("subscribe", "alert alert-warning");
 				Para para = subscribe.addPara(null, "bold");
 				para.addHighlight("fa fa-envelope").addContent(" ");			
-				para.addContent("  Get a monthly report for this item via email ");
-				para.addXref("?subscribe=yes", "Subscribe", "btn btn-xs btn-warning pull-right bold", "");
+				para.addContent(T_get_monthly);
+				para.addXref("?subscribe=yes", T_subscribe, "btn btn-xs btn-warning pull-right bold", "");
 			}
 		}
 				

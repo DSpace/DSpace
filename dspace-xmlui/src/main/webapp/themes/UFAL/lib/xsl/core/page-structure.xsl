@@ -324,7 +324,7 @@
 		                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='simpleURL']"/>
 		            </xsl:attribute>
 		            <div class="input-group input-group-sm">
-	                <input type="text" class="form-control small-search-input" placeholder="Search">
+	                <input type="text" class="form-control small-search-input" placeholder="xmlui.general.search" i18n:attr="placeholder">
 	                     <xsl:attribute name="name">
 	                         <xsl:value-of
 	                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='queryField']"/>
@@ -374,8 +374,8 @@
         templates of the body's child elements (which consists entirely of dri:div tags).
     -->
     <xsl:template match="dri:body">
-        
-        <xsl:call-template name="userbox" />
+
+        <xsl:call-template name="navbar" />
         
         <div class="container-fluid">
             
@@ -418,7 +418,6 @@
         </div>
     </xsl:template>
 
-
     <!-- Currently the dri:meta element is not parsed directly. Instead, parts of it are referenced from inside
         other elements (like reference). The blank template below ends the execution of the meta branch -->
     <xsl:template match="dri:meta" />
@@ -441,7 +440,8 @@
         </xsl:variable>
         <script type="text/javascript" src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
         <script type="text/javascript" src="{$theme-path}/lib/js/jquery-ui.js">&#160;</script>
-      
+        <script type="text/javascript" src="{$theme-path}/lib/js/jquery.i18n.js">&#160;</script>
+
         <script type="text/javascript" src="{concat($aaiURL, '/discojuice/discojuice-2.1.en.min.js')}">&#160;</script>
         <script type="text/javascript" src="{concat($aaiURL, '/aai.js')}">&#160;</script>
 
@@ -538,9 +538,20 @@
             </xsl:attribute>&#160;</script>
 
         <script type="text/javascript">
+            <xsl:variable name="currentLocale">
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
+            </xsl:variable>
             <xsl:attribute name="src">
-                 <xsl:value-of select="$theme-path" />
-                 <xsl:text>/lib/lindat/public/js/lindat-refbox.js</xsl:text>
+                <xsl:choose>
+                    <xsl:when test='$currentLocale="cs"'>
+                        <xsl:value-of select="$theme-path" />
+                        <xsl:text>/lib/lindat/public/js/cs/lindat-refbox.js</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$theme-path" />
+                        <xsl:text>/lib/lindat/public/js/lindat-refbox.js</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:attribute>&#160;</script>
 
 

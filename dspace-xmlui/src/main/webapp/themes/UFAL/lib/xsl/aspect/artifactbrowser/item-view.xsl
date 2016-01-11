@@ -182,7 +182,7 @@
 					<dl id="item-authors" class="dl-horizontal" style="clear:both;">
 					<dt style="text-align: left">
 						<i class="fa fa-pencil">&#160;</i>
-						<span>Authors</span>
+						<span><i18n:text>xmlui.UFAL.artifactbrowser.authors</i18n:text></span>
 					</dt>
 					<dd style="padding-right: 40px;">
 					<xsl:choose>
@@ -534,7 +534,7 @@
 				<dl id="item-sponsor" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-money">&#160;</i>
-						<xsl:text>Acknowledgement</xsl:text>
+						<i18n:text>xmlui.UFAL.artifactbrowser.acknowledgement</i18n:text>
 					</dt>
 					<dd>
 						<xsl:variable name="my_elem">
@@ -562,10 +562,20 @@
 														<p class="funding-org"><xsl:value-of select="."/></p>
 													</xsl:when>
 													<xsl:when test="position()=2">
-														<p class="funding-code"><xsl:value-of select="concat('Project code: ',.)"/></p>
+														<p class="funding-code">
+															<i18n:translate>
+																<i18n:text>xmlui.UFAL.artifactbrowser.project.code</i18n:text>
+																<i18n:param><xsl:value-of select="."/></i18n:param>
+															</i18n:translate>
+														</p>
 													</xsl:when>
 													<xsl:when test="position()=3">
-														<p class="funding-name"><xsl:value-of select="concat('Project name: ',.)"/></p>
+														<p class="funding-name">
+															<i18n:translate>
+																<i18n:text>xmlui.UFAL.artifactbrowser.project.name</i18n:text>
+																<i18n:param><xsl:value-of select="."/></i18n:param>
+															</i18n:translate>
+														</p>
 													</xsl:when>
 												</xsl:choose>
 											</xsl:for-each>
@@ -653,10 +663,10 @@
                         <span style="display: table-cell">
 	                         <xsl:choose>
                                  <xsl:when test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) = 1">
-                                         <xsl:text>This item is replaced by a newer submission:</xsl:text><br/>
+                                         <i18n:text>xmlui.UFAL.artifactbrowser.item_view.replaced_one</i18n:text><br/>
                                  </xsl:when>
                                  <xsl:otherwise>
-                                         <xsl:text>This item is replaced by newer submissions:</xsl:text><br/>
+                                         <i18n:text>xmlui.UFAL.artifactbrowser.item_view.replaced_many</i18n:text><br/>
                                  </xsl:otherwise>
 	                         </xsl:choose>
 	                         <xsl:for-each select="dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']">
@@ -897,11 +907,14 @@
 
 	<xsl:template match="license">
 		<div class="alert alert-info text-center">
-		This item is 
-			<div class="label label-{@label}">			
-			<xsl:value-of select="@label_title" />
-			</div>
-		and licensed under:<BR/>
+			<i18n:translate>
+				<i18n:text>xmlui.UFAL.artifactbrowser.item_view.licensed_under</i18n:text>
+				<i18n:param>
+					<div class="label label-{@label}">
+						<xsl:value-of select="@label_title" />
+					</div>
+				</i18n:param>
+			</i18n:translate>
 		<a>
 		<xsl:attribute name="href">
 			<xsl:value-of select="@url" />
@@ -1002,7 +1015,7 @@
         </xsl:variable>
 
                 <div class="panel panel-default">
-                        <div class="panel-heading bold">Views Over Time 
+                        <div class="panel-heading bold"><i18n:text>xmlui.UFAL.artifactbrowser.piwik.views</i18n:text>
 				<a class="jqplot-to-picture pull-right" href="#" target-div="#visits_over_time_chart">
 					<i class="fa fa-file-image-o">&#160;</i>
 				</a>

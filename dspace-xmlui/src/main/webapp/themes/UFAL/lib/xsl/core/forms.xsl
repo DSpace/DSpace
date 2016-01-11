@@ -276,7 +276,7 @@
 			<xsl:if test="contains(dri:params/@operations,'add')">
 				<!-- Add buttons should be named "submit_[field]_add" so that we can 
 					ignore errors from required fields when simply adding new values -->
-				<input type="submit" value="Add" name="{concat('submit_',@n,'_add')}" class="btn btn-repository">
+				<input type="submit" value="xmlui.UFAL.forms.buttons.add" i18n:attr="value" name="{concat('submit_',@n,'_add')}" class="btn btn-repository">
 					<!-- Make invisible if we have choice-lookup operation that provides  its own Add. -->
 					<xsl:if test="dri:params/@choicesPresentation = 'lookup'">
 						<xsl:attribute name="style">
@@ -322,7 +322,7 @@
 					<xsl:if test="contains(dri:params/@operations,'delete') and (dri:instance or dri:field/dri:instance)">
 						<!-- Delete buttons should be named "submit_[field]_delete" so that 
 							we can ignore errors from required fields when simply removing values -->
-						<input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="btn btn-link btn-small" />
+						<input type="submit" value="xmlui.UFAL.forms.buttons.remove_selected" i18n:attr="value" name="{concat('submit_',@n,'_delete')}" class="btn btn-link btn-small" />
 					</xsl:if>
 					<xsl:for-each select="dri:field">
 						<xsl:apply-templates select="dri:instance" mode="hiddenInterpreter" />
@@ -351,7 +351,7 @@
 		<xsl:if test="contains(dri:params/@operations,'add')">
 			<!-- Add buttons should be named "submit_[field]_add" so that we can ignore 
 				errors from required fields when simply adding new values -->
-			<input type="submit" value="Add" name="{concat('submit_',@n,'_add')}"
+			<input type="submit" value="xmlui.UFAL.forms.buttons.add" i18n:attr="value" name="{concat('submit_',@n,'_add')}"
 				class="btn btn-repository">
 				<!-- Make invisible if we have choice-lookup popup that provides its 
 					own Add. -->
@@ -377,7 +377,7 @@
 				<xsl:if test="contains(dri:params/@operations,'delete') and dri:instance">
 					<!-- Delete buttons should be named "submit_[field]_delete" so that 
 						we can ignore errors from required fields when simply removing values -->
-					<input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}"
+					<input type="submit" value="xmlui.UFAL.forms.buttons.remove_selected" i18n:attr="value" name="{concat('submit_',@n,'_delete')}"
 						class="btn btn-link btn-small" />
 				</xsl:if>
 				<!-- Behind the scenes, add hidden fields for every instance set. This 
@@ -484,7 +484,7 @@
 		<xsl:if test="contains(dri:params/@operations,'add')">
 			<!-- Add buttons should be named "submit_[field]_add" so that we can ignore 
 				errors from required fields when simply adding new values -->
-			<input type="submit" value="Add" name="{concat('submit_',@n,'_add')}"
+			<input type="submit" value="xmlui.UFAL.forms.buttons.add" i18n:attr="value" name="{concat('submit_',@n,'_add')}"
 				class="btn btn-repository">
 				<!-- Make invisible if we have choice-lookup popup that provides its 
 					own Add. -->
@@ -542,7 +542,7 @@
 					test="contains(dri:params/@operations,'delete') and (dri:instance or dri:field/dri:instance)">
 					<!-- Delete buttons should be named "submit_[field]_delete" so that 
 						we can ignore errors from required fields when simply removing values -->
-					<input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}"
+					<input type="submit" value="xmlui.UFAL.forms.buttons.remove_selected" i18n:attr="value" name="{concat('submit_',@n,'_delete')}"
 						class="btn btn-link btn-small" />
 				</xsl:if>
 				<xsl:for-each select="dri:field">
@@ -1086,6 +1086,7 @@
 			<xsl:attribute name="onfocus">javascript:tFocus(this);</xsl:attribute>
 		</xsl:if>
         <xsl:if test="dri:params/@placeholder">
+			<xsl:attribute name="i18n:attr">placeholder</xsl:attribute>
             <xsl:attribute name="placeholder"><xsl:value-of select="dri:params/@placeholder"/></xsl:attribute>
         </xsl:if>
 	</xsl:template>
@@ -1304,7 +1305,7 @@
         </xsl:template>
         
         <xsl:template match="dri:field[@id='aspect.submission.StepTransformer.field.decision']" priority="10">        	
-                <input type="checkbox" data-toggle="toggle" data-on="Accepted" data-off="Click to accept" data-onstyle="success" data-offstyle="danger" data-width="130" data-height="30">
+                <input type="checkbox" data-toggle="toggle" data-on="xmlui.UFAL.forms.licenseStep.accepted" data-off="xmlui.UFAL.forms.licenseStep.click" data-onstyle="success" data-offstyle="danger" data-width="130" data-height="30" i18n:attr="data-on data-off">
                         <xsl:call-template name="standardAttributes" />
                         <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
                         <xsl:attribute name="value"><xsl:value-of select="dri:option/@returnValue"/></xsl:attribute>

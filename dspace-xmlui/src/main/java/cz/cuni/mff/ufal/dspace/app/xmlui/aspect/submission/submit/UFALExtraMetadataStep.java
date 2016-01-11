@@ -513,7 +513,7 @@ public class UFALExtraMetadataStep extends DescribeStep
                     //Only display this field if we have a value to display
                     if (displayValue!=null && displayValue.length()>0)
                     {                        
-                    	reviewSection.addLabel(input.getLabel());
+                    	reviewSection.addLabel(message(input.getLabel()));
                         if (mam.isAuthorityControlled(value.schema, value.element, value.qualifier))
                         {
                             String confidence = (value.authority != null && value.authority.length() > 0) ?

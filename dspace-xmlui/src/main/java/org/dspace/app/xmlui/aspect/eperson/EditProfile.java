@@ -165,6 +165,9 @@ public class EditProfile extends AbstractDSpaceTransformer
 	private static final Message T_invalid_item =
 		message("xmlui.EPerson.EditProfile.invalid_item");
 
+	private static final Message T_signed_licenses =
+			message("xmlui.EPerson.EditProfile.signed_licenses");
+
 
 	//private static final Message T_head_identify =
     //    message("xmlui.EPerson.EditProfile.head_identify");
@@ -671,7 +674,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        }
 
 		Division signed = profile.addDivision("signed-licenses", "well well-light");
-		signed.setHead("Licenses you signed");
+		signed.setHead(T_signed_licenses);
 		add_signed_licenses(signed);
 
 		//
