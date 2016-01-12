@@ -122,7 +122,7 @@
          <repeatable>false</repeatable>
          <label>Мова</label>
          <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-         <hint>Виберіть мову основного змісту матеріалу. Якщо у списку нижче немає відповідної мови, будь ласка, вибирайте 'Інша мова'.  
+         <hint>Виберіть мову основного змісту матеріалу. Якщо у списку нижче немає відповідної мови, будь ласка, вибирайте 'Інша мова'.
                Якщо зміст матеріалу насправді не містить мову (наприклад, якщо це набір даних чи зображення), будь ласка, вибирайте 'Невизначено'.</hint>
          <required></required>
        </field>
@@ -321,7 +321,7 @@
      <pair>
        <displayed-value>Патент</displayed-value>
        <stored-value>Patent</stored-value>
-     </pair>     
+     </pair>
 
      <pair>
        <displayed-value>Підручник</displayed-value>
@@ -331,7 +331,7 @@
      <pair>
        <displayed-value>Презентація</displayed-value>
        <stored-value>Presentation</stored-value>
-     </pair>     
+     </pair>
      <pair>
        <displayed-value>Препринт</displayed-value>
        <stored-value>Preprint</stored-value>
@@ -349,18 +349,19 @@
        <stored-value>Article</stored-value>
      </pair>
      <pair>
+       <displayed-value>Тези доповідей</displayed-value>
+       <stored-value>Theses</stored-value>
+     </pair>
+     <pair>
        <displayed-value>Інше</displayed-value>
        <stored-value>Other</stored-value>
      </pair>
-    
-
-
 
    <!--  <pair>
        <displayed-value>Анімація</displayed-value>
        <stored-value>Animation</stored-value>
      </pair>
-           
+
      <pair>
        <displayed-value>Глава з книги</displayed-value>
        <stored-value>Book chapter</stored-value>
@@ -392,7 +393,7 @@
      <pair>
        <displayed-value>План чи креслення</displayed-value>
        <stored-value>Plan or blueprint</stored-value>
-     </pair>    
+     </pair>
      <pair>
        <displayed-value>Звукозапис, акустичний</displayed-value>
        <stored-value>Recording, acoustical</stored-value>
@@ -408,11 +409,11 @@
      <pair>
        <displayed-value>Програмне забезпечення</displayed-value>
        <stored-value>Software</stored-value>
-     </pair> -->    
+     </pair> -->
      <pair>
        <displayed-value>Списки</displayed-value>
        <stored-value>Lists</stored-value>
-     </pair> 
+     </pair>
    </value-pairs>
 
    <!-- default language order: (from dspace 1.2.1)
