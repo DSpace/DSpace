@@ -407,6 +407,8 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
+                       <!-- “Biotropica” -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3A%E2%80%9Cbiotropica%E2%80%9D%5C%7C%5C%7C%5C%7C%E2%80%9CBiotropica%E2%80%9D"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BITRCover.png" alt="“Biotropica”" /></a>
 						<!-- Development -->
 						<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Adevelopment%5C%7C%5C%7C%5C%7CDevelopment"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-DEVELOPMENT_cover.png" alt="Development" /></a>
 						<!-- American Journal of Botany -->
@@ -414,7 +416,6 @@
                         <!-- International Journal of Plant Sciences -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ainternational%5C+journal%5C+of%5C+plant%5C+sciences%5C%7C%5C%7C%5C%7CInternational%5C+Journal%5C+of%5C+Plant%5C+Sciences"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-IJPS_cover.png" alt="International Journal of Plant Sciences" /></a>
                     	<!-- Physiological and Biochemical Zoology -->
-		  				<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aphysiological%5C+and%5C+biochemical%5C+zoology%5C%7C%5C%7C%5C%7CPhysiological%5C+and%5C+Biochemical%5C+Zoology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-PBZv88n4cover.png" alt="Physiological and Biochemical Zoology" /></a>
                     </div>
                 </div>
             </div>
