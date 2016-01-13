@@ -117,6 +117,10 @@ public class RestIndex {
                   		"<li>DELETE /bitstreams/{bitstream id} - Delete the specified bitstream from DSpace.</li>" +
                   		"<li>DELETE /bitstreams/{bitstream id}/policy/{policy_id} - Delete the specified bitstream policy.</li>" +
                   	"</ul>" +
+                  	"<h2>Hierarchy</h2>" +
+                  	"<ul>" +
+                  		"<li>GET /hierarchy - Return hierarchy of communities and collections in tree form. Each object is minimally populated (name, handle, id) for efficient retrieval.</li>" +
+                  	"</ul>" +
                 "</body></html> ";
     }
     
