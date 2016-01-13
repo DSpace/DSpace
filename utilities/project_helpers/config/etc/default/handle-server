@@ -1,0 +1,22 @@
+# DSPACE_INSTALLATION_DIRECTORY is the base directory for other configuration paremeter
+# this is the only parameter that needs to be set in this file
+DSPACE_INSTALLATION_DIRECTORY=
+
+# PIDFILE can be set to user writable file, so that root privileges are not needed
+# default is /var/run/handle-server
+#PIDFILE=/var/run/handle-server
+
+# CLASSPATH needs to be set to both Handle Server jar and other DSpace jars, because they
+# might be used by DSpace Handle Plugin, DSpace configuration directory also needs
+# to be in the classpath
+CLASSPATH="$DSPACE_INSTALLATION_DIRECTORY/lib/*:$DSPACE_INSTALLATION_DIRECTORY/config"
+
+# JAVA_OPTS sets the memory limit and custom log4j configuration so that Handle Server JVM logging
+# does not interfere with DSpace JVM logging
+JAVA_OPTS="-Xmx256m -Ddspace.log.init.disable=true -Dlog4j.configuration=log4j-handle-plugin.properties"
+
+# HANDLE_SERVER_CONFIG_DIRECTORY is the only parameter needed by Handle Server and points 
+# to the Handle Server configuration directory
+# it might be derived from DSpace configuration or set explicitly
+HANDLE_SERVER_CONFIG_DIRECTORY=`$DSPACE_INSTALLATION_DIRECTORY/bin/dspace dsprop -property handle.dir`
+
