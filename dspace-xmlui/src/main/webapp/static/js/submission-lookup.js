@@ -6,6 +6,21 @@
  * http://www.dspace.org/license/
  */
 (function($) {
+    DSpace.getTemplate = function(name) {
+        if (DSpace.dev_mode || DSpace.templates === undefined || DSpace.templates[name] === undefined) {
+            $.ajax({
+                url : DSpace.theme_path + 'templates/' + name + '.hbs',
+                success : function(data) {
+                    if (DSpace.templates === undefined) {
+                        DSpace.templates = {};
+                    }
+                    DSpace.templates[name] = Handlebars.compile(data);
+                },
+                async : false
+            });
+        }
+        return DSpace.templates[name];
+    };
     var publication_records_template = DSpace.getTemplate('publication_records');
 
     Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
@@ -57,6 +72,7 @@
 
     function fillModal(info){
         var lookupModal = $('#lookup-search-results');
+        lookupModal.removeClass('hidden');
         var htmlData;
         if(info.records.length>0) {
             htmlData = html = publication_records_template(info);
@@ -65,7 +81,9 @@
             htmlData = html = "<p>No records found</p>";
         }
         lookupModal.find('.modal-body').html(htmlData);
-        lookupModal.modal('show');
+        if((typeof $().modal == 'function')){
+            lookupModal.modal('show');
+        }
     }
 
     function setPagination(start, info, searchInput){
@@ -94,6 +112,9 @@
         $("#publication-pagination-next").click(function(event) {
             event.preventDefault();
             startLookup(searchInput, start + 20);
+        });
+        $('.close-modal-results').click(function(){
+            $('#lookup-search-results').addClass('hidden');
         });
     }
 
