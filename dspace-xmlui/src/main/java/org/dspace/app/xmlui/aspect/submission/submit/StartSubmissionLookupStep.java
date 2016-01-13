@@ -53,7 +53,7 @@ public class StartSubmissionLookupStep extends AbstractSubmissionStep {
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         pageMeta.addTrail().addContent(T_submission_trail);
 
-        pageMeta.addMetadata("javascript", null, "handlebars", true).addContent("../../static/Handlebars/handlebars.js");
+        pageMeta.addMetadata("javascript", null, "handlebars", true).addContent("../../static/handlebars/handlebars.js");
         pageMeta.addMetadata("javascript", null, "submission-lookup", true).addContent("../../static/js/submission-lookup.js");
         pageMeta.addMetadata("stylesheet", "screen", "datatables", true).addContent("../../static/Datatables/DataTables-1.8.0/media/css/datatables.css");
         pageMeta.addMetadata("javascript", "static", "datatables", true).addContent("static/Datatables/DataTables-1.8.0/media/js/jquery.dataTables.min.js");

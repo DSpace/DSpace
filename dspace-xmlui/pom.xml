@@ -61,6 +61,7 @@
                         <exclude>**/DD_belated*</exclude>
                         <exclude>**/detectmobile*</exclude>
                         <exclude>**/sc-mobile*</exclude>
+                        <exclude>**/handlebars/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
