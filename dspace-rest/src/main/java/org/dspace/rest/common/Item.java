@@ -86,7 +86,11 @@ public class Item extends DSpaceObject {
         this.setLastModified(item.getLastModified().toString());
 
         if(expandFields.contains("parentCollection") || expandFields.contains("all")) {
+        	if (item.getOwningCollection() != null) {
             this.parentCollection = new Collection(item.getOwningCollection(), null, context, null, null);
+        } else {
+            this.addExpand("parentCollection");
+        }
         } else {
             this.addExpand("parentCollection");
         }
