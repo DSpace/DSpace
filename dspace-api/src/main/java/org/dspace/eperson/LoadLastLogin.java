@@ -168,8 +168,8 @@ public class LoadLastLogin
             {
                 if (PRETEND)
                 {
-                    System.out.printf("%d\t%s\t%s\t%s\t%s\n",
-                            ePerson.getID(),
+                    System.out.printf("%s\t%s\t%s\t%s\t%s\n",
+                            ePerson.getID().toString(),
                             date,
                             ePerson.getEmail(),
                             ePerson.getNetid(),
