@@ -45,6 +45,6 @@ public class JQueryLoaderReader extends AbstractReader {
             out.write(buffer, 0, length);
         }
         out.flush();
-
+        out.close();
     }
 }
