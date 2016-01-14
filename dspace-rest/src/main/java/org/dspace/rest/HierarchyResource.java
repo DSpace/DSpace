@@ -62,7 +62,7 @@ public class HierarchyResource extends Resource {
      *             UNATHORIZED status codes, too.
      */
 	@GET
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public HierarchySite getHierarchy(
     		@QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
     		@Context HttpHeaders headers, @Context HttpServletRequest request) throws UnsupportedEncodingException, WebApplicationException {

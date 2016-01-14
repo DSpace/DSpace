@@ -492,29 +492,16 @@ var CommunitySelector = function(report, parent, paramCollSel) {
 	report.myHtmlUtil.addOpt(collSel, "Whole Repository", "");
 	
 	$.ajax({
-		url: "/rest/communities",
-		data: {
-			limit : report.COLL_LIMIT,
-			expand : "subCommunities,collections"
-		},
+		url: "/rest/hierarchy",
 		dataType: "json",
 		headers: report.myAuth.getHeaders(),
 		success: function(data){
 			var collSel = $("#collSel");
-			var COMMS = {};
-			var TOPCOMMS = {};
-			$.each(data, function(index, comm){
-				COMMS["comm"+report.getId(comm)] = comm;
-				TOPCOMMS["comm"+report.getId(comm)] = comm;
-			});
-			$.each(data, function(index, comm){
-				$.each(comm.subcommunities, function(index, scomm){
-					delete TOPCOMMS["comm"+report.getId(scomm)];
-				});
-			});
-			for(var commindex in TOPCOMMS) {
-				self.addCommLabel(collSel, COMMS, COMMS[commindex], 0, paramCollSel);
-			};
+			if (data.community != null) {
+			    $.each(data.community, function(index, comm){
+				    self.addCommLabel(collSel, comm, 0, paramCollSel);
+			    });
+			}
 		},
 		error: function(xhr, status, errorThrown) {
 			alert("Error in /rest/communities "+ status+ " " + errorThrown);
@@ -523,14 +510,14 @@ var CommunitySelector = function(report, parent, paramCollSel) {
 		}
 	});	
 
-	this.addCommLabel = function(collSel, COMMS, comm, indent, paramCollSel) {
+	this.addCommLabel = function(collSel, comm, indent, paramCollSel) {
 		var prefix = "";
 		for(var i=0; i<indent; i++) {
 			prefix += "--";
 		}
 		report.myHtmlUtil.addDisabledOpt(collSel, prefix + comm.name, "comm" + report.getId(comm));
-		if (comm.collections != null) {
-			$.each(comm.collections, function(index, coll) {
+		if (comm.collection != null) {
+			$.each(comm.collection, function(index, coll) {
 				var opt = report.myHtmlUtil.addOpt(collSel, prefix + "--" + coll.name, report.getId(coll));
 				$.each(paramCollSel, function(index, collid){
 					if (collid == report.getId(coll)) {
@@ -539,9 +526,9 @@ var CommunitySelector = function(report, parent, paramCollSel) {
 				});
 			});		
 		}
-		if (comm.subcommunities != null) {
-			$.each(comm.subcommunities, function(index, scomm) {
-				self.addCommLabel(collSel, COMMS, COMMS["comm"+report.getId(scomm)], indent + 1, paramCollSel);
+		if (comm.community != null) {
+			$.each(comm.community, function(index, scomm) {
+				self.addCommLabel(collSel, scomm, indent + 1, paramCollSel);
 			});		
 		}
 	}
