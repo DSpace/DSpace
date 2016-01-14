@@ -9,6 +9,8 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -34,34 +36,34 @@ import org.dspace.core.LogManager;
  * @author Richard Jones
  * @version  $Revision$
  */
-public class ViewWorkspaceItemServlet 
-    extends DSpaceServlet 
+public class ViewWorkspaceItemServlet
+    extends DSpaceServlet
 {
 
     /** log4j logger */
     private static final Logger log = Logger.getLogger(ViewWorkspaceItemServlet.class);
-    
+
     private final transient WorkspaceItemService workspaceItemService
              = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    
+
     @Override
-    protected void doDSGet(Context c, 
+    protected void doDSGet(Context c,
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // pass all requests to the same place for simplicty
         doDSPost(c, request, response);
     }
-    
+
     @Override
-    protected void doDSPost(Context c, 
+    protected void doDSPost(Context c,
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         String button = UIUtil.getSubmitButton(request, "submit_error");
-        
-        if (button.equals("submit_view") 
-            || button.equals("submit_full") 
+
+        if (button.equals("submit_view")
+            || button.equals("submit_full")
             || button.equals("submit_simple"))
         {
             showMainPage(c, request, response);
@@ -78,18 +80,18 @@ public class ViewWorkspaceItemServlet
      * @param request the servlet request
      * @param response the servlet response
      */
-    private void showMainPage(Context c, 
+    private void showMainPage(Context c,
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // get the value from the request
         int wsItemID = UIUtil.getIntParameter(request,"workspace_id");
-        
+
         // get the workspace item, item and collections from the request value
         WorkspaceItem wsItem = workspaceItemService.find(c, wsItemID);
         Item item = wsItem.getItem();
         //Collection[] collections = item.getCollections();
-        Collection[] collections = {wsItem.getCollection()};
+        List<Collection> collections = Arrays.asList(wsItem.getCollection());
         
         // Ensure the user has authorisation
         authorizeService.authorizeAction(c, item, Constants.READ);
