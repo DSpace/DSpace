@@ -120,7 +120,11 @@ public class EmailParser {
                 XMLValue thisLine = parseLineToXMLValue(line);
                 if (thisLine.key == null) {
                     if (currValue.key != null) {
-                        currValue.value = currValue.value + " " + thisLine.value;
+                        if (currValue.key.equals(ABSTRACT)) {
+                            currValue.value = currValue.value + "\n" + thisLine.value;
+                        } else {
+                            currValue.value = currValue.value + " " + thisLine.value;
+                        }
                         dataForXML.put(currValue.key,currValue.value);
                     }
                 } else {
