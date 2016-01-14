@@ -102,6 +102,15 @@
                                 <div class="row row-offcanvas row-offcanvas-right">
                                     <div class="horizontal-slider clearfix">
                                         <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                                            <div class="word-break hidden-print visible-xs hidden-sm hidden-md hidden-lg">
+                                            <div class="list-group">
+                                                <a class="list-group-item ds-option" href="{$app_path}/discover">advanced search</a>
+                                                <a class="list-group-item ds-option" href="{$app_path}/pages/add">submit works</a>
+                                                <a class="list-group-item ds-option" href="{$app_path}/pages/about">about</a>
+                                                <a class="list-group-item ds-option" href="{$app_path}/pages/help">help</a>
+                                                <a class="list-group-item ds-option" href="{$app_path}/pages/contact">contact us</a>
+                                            </div>
+                                            </div>
                                             <xsl:apply-templates select="dri:options"/>
                                         </div>
                                         <div class="col-xs-12 col-sm-12 col-md-9 main-content">
