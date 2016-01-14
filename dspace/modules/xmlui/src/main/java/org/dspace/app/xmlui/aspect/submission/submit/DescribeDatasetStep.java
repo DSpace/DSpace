@@ -17,6 +17,8 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import org.dspace.app.xmlui.wing.element.List;
+
 
 /**
  * User: @author kevinvandevelde (kevin at atmire.com)

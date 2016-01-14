@@ -49,6 +49,7 @@ import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
 
 import org.xml.sax.SAXException;
+import org.dspace.app.xmlui.wing.element.List;
 
 /**
  * This is a step of the item submission processes. The describe step queries
