@@ -537,7 +537,7 @@
 	<message key="xmlui.EPerson.EditProfile.password">Password</message>
 	<message key="xmlui.EPerson.EditProfile.confirm_password">Retype to confirm</message>
     <message key="xmlui.EPerson.EditProfile.terms">Terms of Service</message>
-    <message key="xmlui.EPerson.EditProfile.terms_help">To use Dryad's data publishing services, you must agree to the <a target="_blank" href="/themes/Mirage/docs/TermsOfService-Letter-2013.08.22.pdf">Terms of Service</a>.</message>
+    <message key="xmlui.EPerson.EditProfile.terms_help">To use Dryad's data publishing services, you must agree to the <a target="_blank" href="/pages/policies">Terms of Service</a>.</message>
     <message key="xmlui.EPerson.EditProfile.terms.checkbox">I agree to Dryad's Terms of Service.</message>
 
     <message key="xmlui.EPerson.EditProfile.submit_update">Complete registration</message>
