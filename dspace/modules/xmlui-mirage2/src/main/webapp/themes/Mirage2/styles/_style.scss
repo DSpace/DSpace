@@ -82,6 +82,12 @@ img.ds-authority-confidence { display: none;}
 	font-size: larger;
 }
 
+// the radio buttons on the search form fall off of small screens, let's bump up the left padding a bit
+.radio label, .checkbox label {
+    padding-left: 35px;
+}
+
+
 // let's add an inline form control utility class
 // suggestion from: http://stackoverflow.com/questions/18539711/input-widths-on-bootstrap-3
 .form-control-inline {
