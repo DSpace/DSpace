@@ -74,10 +74,10 @@ public class CollectionsResource extends Resource
      *            of collection. Options are: "all", "parentCommunityList",
      *            "parentCommunity", "items", "license" and "logo". If you want
      *            to use multiple options, it must be separated by commas.
-     * @param limit
+     * @param itemsLimit
      *            Limit value for items in list in collection. Default value is
      *            100.
-     * @param offset
+     * @param itemsOffset
      *            Offset of start index in list of items of collection. Default
      *            value is 0.
      * @param headers
@@ -97,8 +97,8 @@ public class CollectionsResource extends Resource
     @Path("/{collection_id}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public org.dspace.rest.common.Collection getCollection(@PathParam("collection_id") String collectionId,
-            @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
-            @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
+            @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer itemsLimit,
+            @QueryParam("offset") @DefaultValue("0") Integer itemsOffset, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
@@ -115,7 +115,7 @@ public class CollectionsResource extends Resource
             writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
-            collection = new Collection(dspaceCollection, expand, context, limit, offset);
+            collection = new Collection(dspaceCollection, expand, context, itemsLimit, itemsOffset);
             context.complete();
 
         }
@@ -147,9 +147,14 @@ public class CollectionsResource extends Resource
      *            "parentCommunity", "items", "license" and "logo". If you want
      *            to use multiple options, it must be separated by commas.
      * @param limit
+     *            Limit value for collections in list Default value is 100.
+     * @param offset
+     *            Offset of start index in list of collection. Default value is
+     *             0.
+     * @param itemsLimit
      *            Limit value for items in list in collection. Default value is
      *            100.
-     * @param offset
+     * @param itemsOffset
      *            Offset of start index in list of items of collection. Default
      *            value is 0.
      * @param headers
@@ -167,6 +172,7 @@ public class CollectionsResource extends Resource
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public org.dspace.rest.common.Collection[] getCollections(@QueryParam("expand") String expand,
             @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("itemsLimit") @DefaultValue("100") Integer itemsLimit, @QueryParam("itemsOffset") @DefaultValue("0") Integer itemsOffset,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -182,9 +188,16 @@ public class CollectionsResource extends Resource
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
-                log.warn("Paging was badly set.");
+                log.warn("Pagination was badly set.");
                 limit = 100;
                 offset = 0;
+            }
+
+            if (!((itemsLimit != null) && (itemsLimit >= 0) && (itemsOffset != null) && (itemsOffset >= 0)))
+            {
+                log.warn("Pagination for items was badly set.");
+                itemsLimit = 100;
+                itemsOffset = 0;
             }
 
             List<org.dspace.content.Collection> dspaceCollections = collectionService.findAll(context, limit, offset);
@@ -192,8 +205,8 @@ public class CollectionsResource extends Resource
             {
                 if (authorizeService.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
                 {
-                    Collection collection = new org.dspace.rest.common.Collection(dspaceCollection, null, context, limit,
-                            offset);
+                    Collection collection = new org.dspace.rest.common.Collection(dspaceCollection, null, context, itemsLimit,
+                            itemsOffset);
                     collections.add(collection);
                     writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
