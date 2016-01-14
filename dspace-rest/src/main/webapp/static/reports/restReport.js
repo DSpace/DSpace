@@ -515,10 +515,10 @@ var CommunitySelector = function(report, parent, paramCollSel) {
 		for(var i=0; i<indent; i++) {
 			prefix += "--";
 		}
-		report.myHtmlUtil.addDisabledOpt(collSel, prefix + comm.name, "comm" + report.getId(comm));
+		report.myHtmlUtil.addDisabledOpt(collSel, prefix + comm.name, comm.id);
 		if (comm.collection != null) {
 			$.each(comm.collection, function(index, coll) {
-				var opt = report.myHtmlUtil.addOpt(collSel, prefix + "--" + coll.name, report.getId(coll));
+				var opt = report.myHtmlUtil.addOpt(collSel, prefix + "--" + coll.name, coll.id);
 				$.each(paramCollSel, function(index, collid){
 					if (collid == report.getId(coll)) {
 						opt.attr("selected", true);
