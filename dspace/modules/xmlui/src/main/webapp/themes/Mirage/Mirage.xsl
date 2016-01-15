@@ -783,7 +783,7 @@
                                 <i18n:text><xsl:value-of select="dri:label"/></i18n:text>
                                 <xsl:text>: </xsl:text>
                             </label>
-
+                            <br/>
 
 
                             <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
