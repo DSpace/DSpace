@@ -407,8 +407,8 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
-                       <!-- “Biotropica” -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3A%E2%80%9Cbiotropica%E2%80%9D%5C%7C%5C%7C%5C%7C%E2%80%9CBiotropica%E2%80%9D"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BITRCover.png" alt="“Biotropica”" /></a>
+                        <!-- Biotropica -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abiotropica%5C%7C%5C%7C%5C%7CBiotropica"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BITRCover.png" alt="Biotropica" /></a>
 						<!-- Development -->
 						<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Adevelopment%5C%7C%5C%7C%5C%7CDevelopment"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-DEVELOPMENT_cover.png" alt="Development" /></a>
 						<!-- American Journal of Botany -->
