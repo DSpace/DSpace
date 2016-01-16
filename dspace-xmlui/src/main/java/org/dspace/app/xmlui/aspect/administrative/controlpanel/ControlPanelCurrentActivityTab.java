@@ -210,6 +210,35 @@ public class ControlPanelCurrentActivityTab extends AbstractControlPanelTab {
 			eventRow.addCell().addXref(contextPath + "/" + event.getURL())
 					.addContent("/" + event.getURL());
 			eventRow.addCellContent(event.getDectectedBrowser());
+			eventRow.addCell(null, null,
+					"toggle-onclick-parent-next4 bold btn-link")
+					.addContent(T_show_hide);
+			final String not_present = "not present";
+
+			String host = event.host != null ? (String) (event.host)
+					: not_present;
+			activeUsers.addRow(null, null, "hidden font_smaller").addCell(1, 6)
+					.addContent(T_host.parameterize(host));
+
+			String puser = event.puser != null ? event.puser : not_present;
+			activeUsers.addRow(null, null, "hidden font_smaller").addCell(1, 6)
+					.addContent(T_puser.parameterize(puser));
+
+			//
+			String headers = "";
+			for (Map.Entry<String, String> o : event.headers.entrySet())
+				headers += o.getKey() + ":[" + o.getValue() + "];";
+			headers = headers != "" ? headers : not_present;
+			activeUsers.addRow(null, null, "hidden").addCell(1, 6)
+					.addContent(T_headers.parameterize(headers));
+
+			//
+			String cookies = "";
+			for (Map.Entry<String, String> o : event.cookieMap.entrySet())
+				cookies += o.getKey() + ":[" + o.getValue() + "];";
+			cookies = cookies != "" ? cookies : not_present;
+			activeUsers.addRow(null, null, "hidden font_smaller").addCell(1, 6)
+					.addContent(T_cookies.parameterize(cookies));
 		}
 
 		if (shown == 0) {

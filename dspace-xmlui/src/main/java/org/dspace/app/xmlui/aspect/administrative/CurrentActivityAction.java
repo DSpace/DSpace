@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative;
 
 import java.util.*;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -21,6 +22,10 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
+
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
 /**
  * 
@@ -44,11 +49,18 @@ public class CurrentActivityAction extends AbstractAction
 	/** The ordered list of events, by access time */
 	private static Queue<Event> events = new LinkedList<Event>();
 	
-	/** record events that are from anynmous users */
+	/** record events that are from anonymous users */
 	private static boolean recordAnonymousEvents = true;
 	
-	/** record events from automatic bots */
-	private static boolean recordBotEvents = false;
+    /** record events from automatic bots */
+    private static boolean recordBotEvents = ConfigurationManager
+            .getBooleanProperty("currentActivityAction.recordBotEvents", false);
+
+    private static String[] botStrings = (new DSpace()).getSingletonService(
+            ConfigurationService.class).getPropertyAsType(
+            "currentActivityAction.botStrings",
+            new String[] { "google/", "msnbot/", "googlebot/", "webcrawler/",
+                    "inktomi", "teoma", "baiduspider", "bot" });
 	
 	/**
 	 * Allow the DSpace.cfg to override our activity max and ip header.
@@ -170,6 +182,13 @@ public class CurrentActivityAction extends AbstractAction
     	/** The ip address of the requester */
     	private String ip;
     	
+    	/** The host  address of the requester */
+    	public String host = null;
+    	public Map<String,String> cookieMap = new HashMap<String,String>();
+    	public Map<String,String> headers = new HashMap<String,String>();
+    	public String qs = null;
+    	public String puser = null;
+    	
     	/**
     	 * Construct a new activity event, grabing various bits of data about the request from the context and request.
     	 */
@@ -200,6 +219,25 @@ public class CurrentActivityAction extends AbstractAction
                 {
                     ip = request.getRemoteAddr();
                 }
+
+    			host = request.getRemoteHost();
+    			// values should be copied
+    			if ( request.getCookieMap() != null ) {
+            		for ( Object key : request.getCookieMap().keySet() ) {
+            			Object val = request.getCookieMap().get(key);
+            			String cookstr = ((Cookie)val).getName() + ":" + ((Cookie)val).getValue();
+            			cookieMap.put( (String)key, cookstr );
+            		}
+    			}
+    			// values should be copied
+    			if ( request.getHeaders() != null ) {
+            		for ( Object key : request.getHeaders().keySet() ) {
+            			Object val = request.getHeaders().get(key);
+            			headers.put( (String)key, (String)val );
+            		}
+    			}
+    			qs = request.getQueryString();
+    			puser = request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : "None";
     		}
     		
     		// The current time
@@ -256,14 +294,13 @@ public class CurrentActivityAction extends AbstractAction
             }
 	    String ua = userAgent.toLowerCase();
 
-	    return (ua.contains("google/") ||
-		    ua.contains("msnbot/") ||
-		    ua.contains("googlebot/") || 
-		    ua.contains("webcrawler/") ||
-		    ua.contains("inktomi") ||
-		    ua.contains("teoma") ||
-		    ua.contains("bot"));
-    	}
+	    for(String botString : botStrings){
+	        if (ua.contains(botString)){
+	            return true;
+	        }
+	    }
+	    return false;
+    }
     	
     	/**
     	 * Return the activity viewer's best guess as to what browser or bot
@@ -310,6 +347,12 @@ public class CurrentActivityAction extends AbstractAction
             {
                 return "Teoma (bot)";
             }
+    		
+    		if (userAgentLower.contains("baiduspider"))
+            {
+                return "Baidu (bot)";
+            }
+
     		
     		if (userAgentLower.contains("bot"))
             {
@@ -450,7 +493,7 @@ public class CurrentActivityAction extends AbstractAction
             }
     		
     		// if you get all the way to the end and still nothing, return unknown.
-    		return "Unknown";
+    		return userAgent.length() == 0 ? "Unknown" : escapeHtml( userAgent.substring( 0, Math.min(20, userAgent.length()) ) );
     	}  
     }
     
