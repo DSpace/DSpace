@@ -227,7 +227,7 @@
                     <dc-qualifier>correspondingAuthor</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Primary contact for data associated with this article</label>
-                    <input-type value-pairs-name="dc.contributor.author">metadatadropdown</input-type>
+                    <input-type>onebox</input-type>
                     <hint></hint>
                 </field>
 
