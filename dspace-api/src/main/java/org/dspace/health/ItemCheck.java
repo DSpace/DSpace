@@ -8,7 +8,7 @@
 package org.dspace.health;
 
 
-import org.dspace.storage.rdbms.TableRow;
+import org.dspace.core.Context;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -22,8 +22,10 @@ public class ItemCheck extends Check {
     public String run( ReportInfo ri ) {
         String ret = "";
         int tot_cnt = 0;
+        Context context = new Context();
+        Core core = new Core(context);
         try {
-            for (Map.Entry<String, Integer> name_count : Core.getCommunities()) {
+            for (Map.Entry<String, Integer> name_count : core.getCommunities()) {
                 ret += String.format("Community [%s]: %d\n",
                     name_count.getKey(), name_count.getValue());
                 tot_cnt += name_count.getValue();
@@ -34,7 +36,7 @@ public class ItemCheck extends Check {
 
         try {
             ret += "\nCollection sizes:\n";
-            ret += Core.getCollectionSizesInfo();
+            ret += core.getCollectionSizesInfo();
         } catch (SQLException e) {
             error(e);
         }
@@ -43,27 +45,29 @@ public class ItemCheck extends Check {
             "\nPublished items (archived, not withdrawn): %d\n", tot_cnt);
         try {
             ret += String.format(
-                "Withdrawn items: %d\n", Core.getWithdrawnItemsCount());
+                "Withdrawn items: %d\n", core.getWithdrawnItemsCount());
             ret += String.format(
                 "Not published items (in workspace or workflow mode): %d\n",
-                Core.getNotArchivedItemsCount());
+                core.getNotArchivedItemsCount());
 
-            for (TableRow row : Core.getWorkspaceItemsRows()) {
+            for (Object[] row : core.getWorkspaceItemsRows()) {
                 ret += String.format("\tIn Stage %s: %s\n",
-                    row.getIntColumn("stage_reached"),
-                    row.getLongColumn("cnt"));
+                    row[0],// "stage_reached"),
+                    row[1]// "cnt")
+                );
             }
 
             ret += String.format(
                 "\tWaiting for approval (workflow items): %d\n",
-                Core.getWorkflowItemsCount());
+                core.getWorkflowItemsCount());
 
         } catch (SQLException e) {
             error(e);
         }
 
         try {
-            ret += Core.getObjectSizesInfo();
+            ret += core.getObjectSizesInfo();
+            context.complete();
         } catch (SQLException e) {
             error(e);
         }

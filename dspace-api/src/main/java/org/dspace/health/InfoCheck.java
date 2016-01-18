@@ -10,6 +10,11 @@ package org.dspace.health;
 import java.text.SimpleDateFormat;
 import org.apache.commons.io.FileUtils;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.storage.bitstore.BitstreamStorageServiceImpl;
+import org.dspace.storage.bitstore.DSBitStoreService;
+import org.dspace.storage.bitstore.factory.StorageServiceFactory;
+import org.dspace.storage.bitstore.service.BitstreamStorageService;
+import org.dspace.utils.DSpace;
 
 import java.io.File;
 import java.util.Date;
@@ -38,9 +43,11 @@ public class InfoCheck extends Check {
         ).append("\n");
         sb.append("\n");
 
+        DSBitStoreService localStore = new DSpace().getServiceManager().getServicesByType(DSBitStoreService.class).get(0);
+
         for (String[] ss : new String[][] {
             new String[] {
-                ConfigurationManager.getProperty("assetstore.dir"),
+                localStore.getBaseDir().toString(),
                 "Assetstore size", },
             new String[] {
                 ConfigurationManager.getProperty("search.dir"),

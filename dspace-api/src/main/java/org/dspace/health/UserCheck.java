@@ -11,25 +11,31 @@ package org.dspace.health;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author LINDAT/CLARIN dev team
  */
 public class UserCheck extends Check {
 
+    private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
     @Override
     public String run( ReportInfo ri ) {
+        Context context = new Context();
+        Core core = new Core(context);
         String ret = "";
         Map<String, Integer> info = new HashMap<String, Integer>();
         try {
-            Context context = new Context();
-            EPerson[] epersons = EPerson.findAll(context, EPerson.LASTNAME);
-            info.put("Count", epersons.length);
+            List<EPerson> epersons = ePersonService.findAll(context, EPerson.LASTNAME);
+            info.put("Count", epersons.size());
             info.put("Can log in (password)", 0);
             info.put("Have email", 0);
             info.put("Have 1st name", 0);
@@ -55,7 +61,6 @@ public class UserCheck extends Check {
                 if (e.getNetid() != null && e.getNetid().length() > 0)
                     info.put("Self registered", info.get("Self registered") + 1);
             }
-            context.complete();
 
         } catch (SQLException e) {
             error(e);
@@ -76,20 +81,22 @@ public class UserCheck extends Check {
 
         try {
             // empty group
-            List<String> egs = Core.getEmptyGroups();
+            List<String> egs = core.getEmptyGroups();
             ret += String.format(
                 "Empty groups: #%d\n    %s\n",
                 egs.size(), StringUtils.join(egs, ",\n    "));
 
-            List<Integer> subs = Core.getSubscribers();
+            List<UUID> subs = core.getSubscribers();
             ret += String.format(
                 "Subscribers: #%d [%s]\n",
                 subs.size(), StringUtils.join(subs, ", "));
 
-            subs = Core.getSubscribedCollections();
+            subs = core.getSubscribedCollections();
             ret += String.format(
                 "Subscribed cols.: #%d [%s]\n",
                 subs.size(), StringUtils.join(subs, ", "));
+
+            context.complete();
 
         } catch (SQLException e) {
             error(e);
