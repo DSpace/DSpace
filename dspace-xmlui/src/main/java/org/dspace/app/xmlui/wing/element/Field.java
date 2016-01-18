@@ -311,6 +311,16 @@ public abstract class Field extends AbstractWingElement implements
     {
         params.setChoicesPresentation(value);
     }
+    
+    /**
+     * Set the minLength attribute for autocomplete widget
+     *
+     * @param value true if it is closed
+     */
+    public void setChoicesMinLength(Integer value)
+    {
+    	params.setChoicesMinLength(value);
+    }
 
     /**
      * Set whether set of choices is "closed" to just the values

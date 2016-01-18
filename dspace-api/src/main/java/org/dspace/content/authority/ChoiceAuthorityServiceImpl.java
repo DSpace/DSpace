@@ -52,6 +52,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService,
 
     // map of field key to closed value
     protected Map<String,Boolean> closed = new HashMap<String,Boolean>();
+    protected Map<String,Integer> minLength = new HashMap<String,Integer>();
 
     private ChoiceAuthorityServiceImpl() {
     }
@@ -65,6 +66,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService,
         final String choicesPlugin = "choices.plugin.";
         final String choicesPresentation = "choices.presentation.";
         final String choicesClosed = "choices.closed.";
+        final String choicesMinLength = "choices.minLength.";
       property:
         while (pn.hasMoreElements())
         {
@@ -113,6 +115,16 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService,
                         continue property;
                     }
                     closed.put(fkey, Boolean.valueOf(ConfigurationManager.getBooleanProperty(key)));
+                }
+                else if (key.startsWith(choicesMinLength))
+                {
+                    String fkey = config2fkey(key.substring(choicesMinLength.length()));
+                    if (fkey == null)
+                    {
+                        log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
+                        continue property;
+                    }
+                    minLength.put(fkey, Integer.valueOf(ConfigurationManager.getIntProperty(key)));
                 }
                 else
                 {
@@ -221,6 +233,12 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService,
     public String getPresentation(String fieldKey)
     {
         return presentation.get(fieldKey);
+    }
+    
+    @Override
+    public Integer getMinLength(String fieldKey)
+    {
+    	return minLength.get(fieldKey);
     }
 
     @Override

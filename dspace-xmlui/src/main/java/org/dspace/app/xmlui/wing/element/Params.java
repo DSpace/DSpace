@@ -67,6 +67,8 @@ public class Params extends AbstractWingElement implements StructuralElement
     /** Type of presentation recommended for showing choices to user */
     /** See PRESENTATION_*   */
     public static final String A_CHOICES_PRESENTATION = "choicesPresentation";
+    
+    public static final String A_CHOICES_MIN_LENGTH = "choicesMinLength";
 
     /** The name of the field to use for a list of choices */
     public static final String A_CHOICES_CLOSED = "choicesClosed";
@@ -129,6 +131,9 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /** Value of the Choices Presentation attribute */
     protected String presentation = null;
+    
+    /** Value of the Choices minLength attribute */
+    protected Integer minLength = 1;
 
     /** Value of choicesClosed option */
     protected boolean choicesClosed = false;
@@ -330,6 +335,18 @@ public class Params extends AbstractWingElement implements StructuralElement
                 "The 'presentation' parameter must be one of these values: "+Arrays.deepToString(PRESENTATIONS));
         this.presentation = value;
     }
+    
+    /**
+     * Set the minLength value for the autocomplete widget
+     * 
+     * @param value pre-determined metadata field key
+     */
+    public void setChoicesMinLength(Integer value)
+    {
+    	if (value != null) {
+    		this.minLength = value;
+    	}
+    }
 
     /**
      * Sets whether choices are "closed" to the set returned by plugin.
@@ -453,6 +470,10 @@ public class Params extends AbstractWingElement implements StructuralElement
         if (this.presentation != null)
         {
             attributes.put(A_CHOICES_PRESENTATION, this.presentation);
+        }
+        if (this.minLength != null)
+        {
+            attributes.put(A_CHOICES_MIN_LENGTH, this.minLength);
         }
         if (this.choicesClosed)
         {
