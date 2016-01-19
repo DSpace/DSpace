@@ -13,9 +13,10 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.rest.common.FilteredCollection;
 import org.dspace.rest.exceptions.ContextException;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +38,7 @@ import java.util.List;
 public class FilteredCollectionsResource extends Resource {
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private static Logger log = Logger.getLogger(FilteredCollectionsResource.class);
 
     /**
@@ -82,7 +84,7 @@ public class FilteredCollectionsResource extends Resource {
         try
         {
             context = createContext(getUser(headers));
-            if (ConfigurationManager.getBooleanProperty("rest", "rest-reporting-authenticate", true) == false) {
+            if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
                 context.turnOffAuthorisationSystem();            	
             }
 
@@ -168,7 +170,7 @@ public class FilteredCollectionsResource extends Resource {
         FilteredCollection retColl = new org.dspace.rest.common.FilteredCollection();
         try {
             context = createContext(getUser(headers));
-            if (!ConfigurationManager.getBooleanProperty("rest", "rest-reporting-authenticate", false)) {
+            if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
                 context.turnOffAuthorisationSystem();            	
             }
 

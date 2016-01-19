@@ -8,7 +8,6 @@
  package org.dspace.rest.filter;
 
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -20,8 +19,8 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import com.ibm.icu.util.Calendar;
 
@@ -31,15 +30,15 @@ public class ItemFilterUtil {
 	public enum BundleName{ORIGINAL,TEXT,LICENSE,THUMBNAIL;}
 	
 	static String getDocumentMimeTypes() {
-		return ConfigurationManager.getProperty("rest", "rest-report-mime-document");
+		return DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-mime-document");
 	}
 	
 	static String getSupportedDocumentMimeTypes() {
-		return ConfigurationManager.getProperty("rest", "rest-report-mime-document-supported");
+		return DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-mime-document-supported");
 	}
 
 	static String getSupportedImageMimeTypes() {
-		return ConfigurationManager.getProperty("rest", "rest-report-mime-document-image");
+		return DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-mime-document-image");
 	}
 
 	static int countOriginalBitstream(Item item) {
@@ -117,7 +116,7 @@ public class ItemFilterUtil {
 	}
 
 	static int countBitstreamSmallerThanMinSize(Context context, BundleName bundleName, Item item, String mimeList, String prop) {
-		long size = ConfigurationManager.getLongProperty("rest", prop);
+		long size = DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(prop);
 		int count = 0;
         try {
             for(Bundle bundle: item.getBundles()){
@@ -140,7 +139,7 @@ public class ItemFilterUtil {
 	}
 	
 	static int countBitstreamLargerThanMaxSize(Context context, BundleName bundleName, Item item, String mimeList, String prop) {
-		long size = ConfigurationManager.getLongProperty("rest", prop);
+		long size = DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(prop);
 		int count = 0;
         try {
             for(Bundle bundle: item.getBundles()){
