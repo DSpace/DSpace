@@ -1199,11 +1199,12 @@ public class LogAnalyser
         {
             accessionedQuery.append("*");
         }
+        accessionedQuery.append("]");
         discoverQuery.addFilterQueries(accessionedQuery.toString());
         discoverQuery.addFilterQueries("withdrawn: false");
         discoverQuery.addFilterQueries("archived: true");
 
-        return SearchUtils.getSearchService().search(context, discoverQuery).getMaxResults();
+        return (int)SearchUtils.getSearchService().search(context, discoverQuery).getTotalSearchResults();
     }
     
     
