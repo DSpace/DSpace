@@ -25,6 +25,8 @@
                         <map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
                         <map:generator name="AJAXMenuGenerator"
                              src="org.dspace.app.xmlui.cocoon.AJAXMenuGenerator"/>
+                        <map:generator name="UploadFileChunkGenerator" src="org.dspace.app.xmlui.aspect.submission.submit.UploadFileChunkGenerator"/>
+
                 </map:generators>
                 <map:serializers default="xml">
                         <map:serializer logger="sitemap.serializer.xml" mime-type="text/xml; charset=utf-8" name="xml"
@@ -466,13 +468,16 @@
                                 <map:when test="eperson">
                                     <map:act type="UploadFileChunk">
                                       <map:parameter name="handle" value="{1}/{2}"/>
-                                      <map:read src="static/json/success.json"/>
+                                      <!-- <map:read src="static/json/success.json"/> -->
                                     </map:act>
-                                    <map:read src="static/json/fail.json" status-code="204"/>
+                                    <map:generate type="UploadFileChunkGenerator">
+                                      <map:parameter name="xyz" value="{request-param:abc}"/>
+                                    </map:generate>
+                                    <!-- <map:read src="static/json/fail.json" status-code="204"/> -->
+                                    <map:serialize type="xhtml"/>
                                 </map:when>
                             </map:select>
                         </map:match>
-
 
                 </map:pipeline>
 

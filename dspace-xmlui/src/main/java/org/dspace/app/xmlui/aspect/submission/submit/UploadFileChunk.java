@@ -1,11 +1,20 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,10 +34,13 @@ import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededExcepti
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
+import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 
 public class UploadFileChunk extends AbstractAction{
 
@@ -37,8 +49,8 @@ public class UploadFileChunk extends AbstractAction{
     private static String tempDir;
     private static Object mutex = new Object();
     
-    private String uploadDir;
-    private String finalDir;
+    private String submissionDir;
+    private String chunkDir;
     //private Map objectModel;
     
     static{
@@ -52,32 +64,32 @@ public class UploadFileChunk extends AbstractAction{
     }
     
     private void init(Request request){
-        String resumableIdentifier;
+        /*String resumableIdentifier;
         if(request.getParameter("resumableIdentifier") == null){
             resumableIdentifier = request.get("resumableIdentifier").toString();
         }
         else{
             resumableIdentifier = request.getParameter("resumableIdentifier");
-        }
+        }*/
         
-        // directory to upload chunks
-        this.uploadDir = tempDir + File.separator + resumableIdentifier;
+        // parent directory containing all bitstreams related to a submission
+        this.submissionDir = tempDir + File.separator + request.getParameter("submissionId");
         
-        // directory where file will be reassembled
-        this.finalDir = tempDir + File.separator + resumableIdentifier.split("-")[0];
+        // directory containing chunks of an individual bitstream
+        this.chunkDir = this.submissionDir + File.separator + request.getParameter("resumableIdentifier");
         
         // create upload directories if required
-        File uploadDir = new File(this.uploadDir);
+        File uploadDir = new File(this.submissionDir);
         if (!uploadDir.exists()) {
             uploadDir.mkdir();
         }
-        File finalDir = new File(this.finalDir);
+        File finalDir = new File(this.chunkDir);
         if (!finalDir.exists()) {
             finalDir.mkdir();
         }
 
-        log.info(this.finalDir);
-        log.info(this.uploadDir);
+        log.info(this.submissionDir);
+        log.info(this.chunkDir);
     }
     
     @SuppressWarnings("rawtypes")
@@ -110,45 +122,35 @@ public class UploadFileChunk extends AbstractAction{
                 log.info("ok");
                 
                 // if no exception has been throw then assume success
-                returnValues = new HashMap<String, String>();
+                //returnValues = new HashMap<String, String>();
             }
+            
+            //returnValues.put("status", "211");
+            returnValues = new HashMap<String, String>();
         }
         else{
-            
+            returnValues = new HashMap<String, String>();
             File completedFile = doPostResumable(request);
             
             if(completedFile != null){
-                FileInputStream fis = new FileInputStream(completedFile);
-                SubmissionInfo si = FlowUtils.obtainSubmissionInfo(objectModel, request.getParameter("submissionId"));
-                Item item = si.getSubmissionItem().getItem();
-
-                // do we already have a bundle?
-                Bundle[] bundles = item.getBundles("ORIGINAL");
-                Bitstream b = null;
+                // delete temporary chunk directory 
+                if (!deleteDirectory(new File(this.chunkDir))){
+                    log.warn("Coudln't delete temporary upload path " + this.chunkDir + ", ignoring it.");
+                }
                 
-                if (bundles.length < 1)
-                {
-                    // set bundle's name to ORIGINAL
-                    b = item.createSingleBitstream(fis, "ORIGINAL");
-                }
-                else
-                {
-                    // we have a bundle already, just add bitstream
-                    b = bundles[0].createBitstream(fis);
-                }
-
-                /*HttpSession session = request.getSession(false);
-                synchronized(mutex)
-                {
-                    if (session.getAttribute("assembled_files") == null)
-                    {
-                        session.setAttribute("assembled_files", new ArrayList<File>());
-                    }
-                    ((List<File>) session.getAttribute("assembled_files")).add(completedFile);
-                }*/
+                log.info("sid : " + request.getParameter("submissionId"));
+                SubmissionInfo si = FlowUtils.obtainSubmissionInfo(objectModel, 'S' + request.getParameter("submissionId"));
+                log.info(si);
+                Item item = si.getSubmissionItem().getItem();
+                log.info(item);
+                Bitstream b = this.createBitstream(completedFile, item);
+                returnValues.put("bitstream_id", String.valueOf(b.getID()));
+                
+                Context context = ContextUtil.obtainContext(objectModel);
+                context.commit();
             }
             
-            returnValues = new HashMap<String, String>();
+            returnValues.put("status", "200");
         }
 
         return returnValues;
@@ -168,11 +170,11 @@ public class UploadFileChunk extends AbstractAction{
         String chunkPath;
         if(resumableTotalChunks == 1){
             // there is only one chunk give it the name of the file
-            chunkPath = this.finalDir + File.separator + request.getParameter("resumableFilename").toString(); 
+            chunkPath = this.submissionDir + File.separator + request.getParameter("resumableFilename").toString(); 
         }
         else{
             // use the String "part" and the chunkNumber as filename of a chunk
-            chunkPath = this.uploadDir + File.separator + "part" + request.getParameter("resumableChunkNumber").toString();
+            chunkPath = this.chunkDir + File.separator + "part" + request.getParameter("resumableChunkNumber").toString();
         }
         
         File chunkFile = new File(chunkPath);
@@ -191,7 +193,7 @@ public class UploadFileChunk extends AbstractAction{
         else{
             log.info("* 204 *");
             // if we don't have the chunk send a http status code 204 No content
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            response.sendError(HttpServletResponse.SC_NO_CONTENT);
         }
         
         return exists;
@@ -207,30 +209,33 @@ public class UploadFileChunk extends AbstractAction{
                 
         long resumableTotalSize = Long.valueOf(request.get("resumableTotalSize").toString());
         int resumableTotalChunks = Integer.parseInt(request.get("resumableTotalChunks").toString());
-        
-        /*for (Enumeration<Object> e = request.getParameterNames(); e.hasMoreElements();){
+
+        /*
+        for (Enumeration<Object> e = request.getParameterNames(); e.hasMoreElements();){
             String key = e.nextElement().toString();
             log.info("---");
             log.info(key);
             Object val = request.get(key.toString());
             log.info(val);
             log.info(val.getClass());
-        }*/
+        }
+        */
         
         // determine name of chunk
         String chunkPath;
         if(resumableTotalChunks == 1){
             // there is only one chunk give it the name of the file
-            chunkPath = this.finalDir + File.separator + request.get("resumableFilename").toString(); 
+            chunkPath = this.submissionDir + File.separator + request.get("resumableFilename").toString(); 
         }
         else{
-            chunkPath = this.uploadDir + File.separator + "part" + request.get("resumableChunkNumber").toString();
+            chunkPath = this.chunkDir + File.separator + "part" + request.get("resumableChunkNumber").toString();
         }
         
         // cocoon will have uploaded the chunk automatically
         // now move it to temporary directory
-        File chunk = ((PartOnDisk)request.get("file")).getFile();
-        chunk.renameTo(new File(chunkPath));
+        File chunkOrg = ((PartOnDisk)request.get("file")).getFile();
+        File chunk = new File(chunkPath);
+        chunkOrg.renameTo(new File(chunkPath));
         
         boolean foundAll = true;
         long currentSize = 0l;
@@ -238,7 +243,7 @@ public class UploadFileChunk extends AbstractAction{
         log.info("--------------------------- " + resumableTotalChunks);
         if (resumableTotalChunks > 1){
             for (int p = 1; p <= resumableTotalChunks; p++){
-                File file = new File(this.uploadDir + File.separator + "part" + Integer.toString(p));
+                File file = new File(this.chunkDir + File.separator + "part" + Integer.toString(p));
                 if (!file.exists()) 
                 {
                     foundAll = false;
@@ -268,7 +273,10 @@ public class UploadFileChunk extends AbstractAction{
         }
         else{
             log.info(chunkPath + " Uploaded");
-            this.deleteTempDirectory();
+            
+            completedFile = chunk;
+            // bitstream directory not needed
+            //this.deleteBitstreamDirectory();
         }
         
         return completedFile;
@@ -280,10 +288,10 @@ public class UploadFileChunk extends AbstractAction{
     {
         int resumableTotalChunks = Integer.valueOf(request.getParameter("resumableTotalChunks"));
         String resumableFilename = request.getParameter("resumableFilename");
-        String chunkPath = this.uploadDir + File.separator + "part";
+        String chunkPath = this.chunkDir + File.separator + "part";
         File destFile = null;
 
-        String destFilePath = this.finalDir + File.separator + resumableFilename;
+        String destFilePath = this.submissionDir + File.separator + resumableFilename;
         destFile = new File(destFilePath);
         InputStream is = null;
         OutputStream os = null;
@@ -353,9 +361,55 @@ public class UploadFileChunk extends AbstractAction{
                 // nothing to do here
             }
             
-            this.deleteTempDirectory();
+            //this.deleteBitstreamDirectory();
         }
+        
         return destFile;
+    }
+    
+    private Bitstream createBitstream(File file, Item item)
+    {
+        log.info("Create from " + file);
+        Bitstream b = null;
+        
+        try{
+            FileInputStream fis = new FileInputStream(file);
+
+            // do we already have a bundle?
+            Bundle[] bundles = item.getBundles("ORIGINAL");
+            
+
+            if (bundles.length < 1)
+            {
+                // set bundle's name to ORIGINAL
+                b = item.createSingleBitstream(fis, "ORIGINAL");
+            }
+            else
+            {
+                // we have a bundle already, just add bitstream
+                b = bundles[0].createBitstream(fis);
+            }
+
+            //b.getN
+            log.info("b id: " + b.getID());
+            
+            b.update();
+            item.update();
+        }
+        catch(FileNotFoundException ex){
+            log.error(ex);
+        }
+        catch(SQLException ex){
+            log.error(ex);
+        }
+        catch(AuthorizeException ex){
+            log.error(ex);
+        }
+        catch(IOException ex){
+            log.error(ex);
+        }
+        
+        return b;
     }
     
     private boolean deleteDirectory(File path) 
@@ -377,11 +431,5 @@ public class UploadFileChunk extends AbstractAction{
         }
         
         return (path.delete());
-    }
-    
-    private void deleteTempDirectory(){
-        if (!deleteDirectory(new File(this.uploadDir))){
-            log.warn("Coudln't delete temporary upload path " + this.uploadDir + ", ignoring it.");
-        }        
-    }
+    }    
 }

@@ -14,17 +14,22 @@ $.ajaxSetup ({
 
 var href = window.location.href;
 var params = href.split('/');
-console.log(params);
+console.log("**");
 
+
+// console.log($('input[name="submit-id"]'));
+// console.log($('input[name="submit-id"]').val());
+var sid = $('input[name="submit-id"]').val();
+//console.log($('input[name="submit-id"]').value());
 
 var r = new Resumable({
-    target: '/handle/' + params[4] + '/' + params[5] + '/upload?' + params[7],
+    target: '/handle/' + params[4] + '/' + params[5] + '/upload',
     chunkSize: 1024 * 1024,
     simultaneousUploads: 1,
     testChunks: true,
     throttleProgressCallbacks: 1,
-    method: "multipart"
-    //query:{workspace_item_id: id}
+    method: "multipart",
+    query:{"submissionId": $('input[name="submit-id"]').val()}
 });
 
 var html = '\
@@ -64,7 +69,7 @@ var html = '\
 </div>';
 
 if(r.support) {
-    $('#aspect_submission_StepTransformer_div_submit-upload').append(html);
+    $('#aspect_submission_StepTransformer_div_submit-file-upload').prepend(html);
 
     // Show a place for dropping/selecting files
     $('.resumable-error').hide();
@@ -77,14 +82,19 @@ if(r.support) {
 
 
     console.log(window.DSpace.theme_path);
+    var themePath = window.DSpace.theme_path;
+    $('#progress-resume-link').attr('src', themePath + "images/resume.png");
+    $('#progress-pause-link').attr('src', themePath + "images/pause.png");
 
     // Handle file add event
     r.on('fileAdded', function(file){
         // Show progress pabr
         $('.resumable-progress, .resumable-files, .resumable-list').show();
+
         // Show pause, hide resume
         $('#progress-resume-link').hide();
         $('#progress-pause-link').show();
+
         // Add the file to the list
         $('.resumable-list tbody')
             .append('<tr>')
@@ -93,6 +103,7 @@ if(r.support) {
             .append('<td class="resumable-file-progress"></td>')
             .append('</tr>');
         $('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name').html(file.fileName);
+
         // Actually start the upload
         r.upload();
     });

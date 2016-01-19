@@ -2,6 +2,7 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +21,16 @@ public class ResumableUploadStep extends AbstractProcessingStep{
     @Override
     public int doProcessing(Context context, HttpServletRequest request, HttpServletResponse response,
             SubmissionInfo subInfo) throws ServletException, IOException, SQLException, AuthorizeException {
-        // TODO Auto-generated method stub
+        
+        for (Enumeration<Object> e = request.getParameterNames(); e.hasMoreElements();){
+            String key = e.nextElement().toString();
+            log.info("---");
+            log.info(key);
+            Object val = request.getParameter(key.toString());
+            log.info(val);
+            log.info(val.getClass());
+        }
+
         return 0;
     }
 
