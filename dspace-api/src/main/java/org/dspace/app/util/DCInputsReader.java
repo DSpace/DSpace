@@ -375,28 +375,46 @@ public class DCInputsReader
                         field.put(tagName, value);
                         if (tagName.equals("input-type"))
                         {
-                    if (value.equals("dropdown")
-                            || value.equals("qualdrop_value")
-                            || value.equals("list"))
+                            if (value.equals("dropdown")
+                                    || value.equals("qualdrop_value")
+                                    || value.equals("list"))
+                            {
+                                    String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
+                                    if (pairTypeName == null)
+                                    {
+                                            throw new SAXException("Form " + formName + ", field " +
+                                                                           field.get("dc-element") +
+                                                                           "." + field.get("dc-qualifier") +
+                                                                           " has no name attribute");
+                                    }
+                                    else
+                                    {
+                                            field.put(PAIR_TYPE_NAME, pairTypeName);
+                                    }
+                            }
+                        }
+                        else if (tagName.equals("vocabulary"))
+                        {
+                                String closedVocabularyString = getAttribute(nd, "closed");
+                                field.put("closedVocabulary", closedVocabularyString);
+                        }
+                        else if (tagName.equals("language"))
+                        {
+                                if (Boolean.valueOf(value))
                                 {
                                         String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
                                         if (pairTypeName == null)
                                         {
                                                 throw new SAXException("Form " + formName + ", field " +
-                                                                                                field.get("dc-element") +
-                                                                                                        "." + field.get("dc-qualifier") +
-                                                                                                " has no name attribute");
+                                                                               field.get("dc-element") +
+                                                                               "." + field.get("dc-qualifier") +
+                                                                               " has no language attribute");
                                         }
                                         else
                                         {
                                                 field.put(PAIR_TYPE_NAME, pairTypeName);
                                         }
                                 }
-                        }
-                        else if (tagName.equals("vocabulary"))
-                        {
-                                String closedVocabularyString = getAttribute(nd, "closed");
-                            field.put("closedVocabulary", closedVocabularyString);
                         }
                 }
         }

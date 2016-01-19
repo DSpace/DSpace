@@ -9,8 +9,11 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -280,7 +283,7 @@ public class DescribeStep extends AbstractProcessingStep
                     || (inputType.equals("textarea")))
             {
                 readText(context, request, item, schema, element, qualifier, inputs[j]
-                        .getRepeatable(), LANGUAGE_QUALIFIER);
+                        .getRepeatable(), LANGUAGE_QUALIFIER, inputs[j].getLanguage());
             }
             else
             {
@@ -676,9 +679,13 @@ public class DescribeStep extends AbstractProcessingStep
      *            set to true if the field is repeatable on the form
      * @param lang
      *            language to set (ISO code)
+     * @param hasLanguageTag
+     *            to check if the field has a language tag
      */
     protected void readText(Context context, HttpServletRequest request, Item item, String schema,
-            String element, String qualifier, boolean repeated, String lang) throws SQLException {
+            String element, String qualifier, boolean repeated, String lang, boolean hasLanguageTag)
+            throws SQLException
+    {
         // FIXME: Of course, language should be part of form, or determined
         // some other way
         String metadataField = metadataFieldService.findByElement(context, schema, element, qualifier).toString();
@@ -687,13 +694,13 @@ public class DescribeStep extends AbstractProcessingStep
         boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
 
         // Values to add
-        List<String> vals = null;
+        TreeMap<Integer, String> vals = null;
         List<String> auths = null;
         List<String> confs = null;
 
         if (repeated)
         {
-            vals = getRepeatedParameter(request, metadataField, metadataField);
+            vals = getRepeatedParameterWithTheirIndices(request, metadataField, metadataField);
             if (isAuthorityControlled)
             {
                 auths = getRepeatedParameter(request, metadataField, metadataField+"_authority");
@@ -711,8 +718,11 @@ public class DescribeStep extends AbstractProcessingStep
             {
                 int valToRemove = Integer.parseInt(buttonPressed
                         .substring(removeButton.length()));
-
-                vals.remove(valToRemove);
+                                
+                //find the key from the given position 
+                //for more information take a look at < Edit-metadata.jsp>
+                int key = vals.keySet().toArray(new Integer[vals.size()])[valToRemove];
+                vals.remove(key);
                 if(isAuthorityControlled)
                 {
                    auths.remove(valToRemove);
@@ -723,11 +733,11 @@ public class DescribeStep extends AbstractProcessingStep
         else
         {
             // Just a single name
-            vals = new LinkedList<String>();
+            vals = new TreeMap<Integer, String>();
             String value = request.getParameter(metadataField);
             if (value != null)
             {
-                vals.add(value.trim());
+                vals.put(0, value.trim());
             }
             if (isAuthorityControlled)
             {
@@ -743,13 +753,29 @@ public class DescribeStep extends AbstractProcessingStep
         // Remove existing values, already done in doProcessing see also bug DS-203
         // item.clearMetadata(schema, element, qualifier, Item.ANY);
 
+        int i=0;
+
         // Put the names in the correct form
-        for (int i = 0; i < vals.size(); i++)
+        for(Map.Entry<Integer, String> entry: vals.entrySet())
         {
             // Add to the database if non-empty
-            String s = vals.get(i);
+            
+            String s = entry.getValue();
+            int key = entry.getKey();
             if ((s != null) && !s.equals(""))
             {
+                if (hasLanguageTag && !repeated && key == 0) 
+                {
+                    // the field is like dc_title[lang] for none repeatable element,
+                    // dc_title_alternative_2[lang] otherwise
+                    lang = request.getParameter(metadataField + "[lang]");
+
+                } 
+                else if (hasLanguageTag && repeated) 
+                {
+                    lang = request.getParameter(metadataField + "_" + key + "[lang]");
+                }
+                
                 if (isAuthorityControlled)
                 {
                     String authKey = auths.size() > i ? auths.get(i) : null;
@@ -772,6 +798,7 @@ public class DescribeStep extends AbstractProcessingStep
                     itemService.addMetadata(context, item, schema, element, qualifier, lang, s);
                 }
             }
+            i++;
         }
     }
 
@@ -999,6 +1026,82 @@ public class DescribeStep extends AbstractProcessingStep
                 + " param=" + metadataField + ", return count = "+vals.size());
 
         return vals;
+    }
+    
+    /** 
+     * This Methode has the same function as the getRepeatedParameter.
+     * For repeated values with language tag their indices are needed to
+     * properly identify their language tag
+     * 
+     * @param request    
+     *               the HTTP request containing the form information
+     * @param metadataField    
+     *               the metadata field which can store repeated values
+     * @param param  
+     *               the repeated parameter on the page (used to fill out the
+     *               metadataField)  
+     * @return     a TreeMap of Integer and Strings
+    */ 
+    protected TreeMap<Integer, String> getRepeatedParameterWithTheirIndices(HttpServletRequest request,
+            String metadataField, String param)
+    {
+        LinkedHashMap<Integer, String> vals = new LinkedHashMap<Integer, String>();
+
+        int i = 1;    //start index at the first of the previously entered values
+        boolean foundLast = false;
+
+        // Iterate through the values in the form.
+        while (!foundLast)
+        {
+            String s = null;
+
+            //First, add the previously entered values.
+            // This ensures we preserve the order that these values were entered
+            s = request.getParameter(param + "_" + i);
+
+            // If there are no more previously entered values,
+            // see if there's a new value entered in textbox
+            if (s==null)
+            {
+                s = request.getParameter(param);
+                //this will be the last value added
+                foundLast = true;
+            }
+
+            // We're only going to add non-null values
+            if (s != null)
+            {
+                boolean addValue = true;
+
+                // Check to make sure that this value was not selected to be
+                // removed.
+                String[] selected = request.getParameterValues(metadataField
+                        + "_selected");
+
+                if (selected != null)
+                {
+                    for (int j = 0; j < selected.length; j++)
+                    {
+                        if (selected[j].equals(metadataField + "_" + i))
+                        {
+                            addValue = false;
+                        }
+                    }
+                }
+
+                if (addValue)
+                {
+                    vals.put(i, s.trim());
+                }
+            }
+
+            i++;
+        }
+
+        log.debug("getRepeatedParameterWithTheirIndices: metadataField=" + metadataField
+                + " param=" + metadataField + ", return count = "+vals.size());
+
+        return new TreeMap(vals);
     }
 
     /**

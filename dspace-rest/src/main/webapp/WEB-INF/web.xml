@@ -31,7 +31,12 @@
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
     
-    <!--Security settings and mapping -->
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/static/*</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Security settings and mapping -->
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>DSpace REST API</web-resource-name>

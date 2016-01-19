@@ -10,6 +10,7 @@ package org.dspace.content;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -86,7 +87,14 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
     @Transient
     private transient ItemService itemService;
 
-    protected Item() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.ItemService#create(Context, WorkspaceItem)}
+     *
+     */
+    protected Item()
+    {
+
     }
 
     /**

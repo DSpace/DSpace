@@ -28,6 +28,13 @@ public class ChecksumResult
     @Column(name = "result_description")
     private String resultDescription;
 
+    /**
+     * Protected constructor, new object creation impossible
+     */
+    protected ChecksumResult()
+    {
+
+    }
     public ChecksumResultCode getResultCode() {
         return resultCode;
     }

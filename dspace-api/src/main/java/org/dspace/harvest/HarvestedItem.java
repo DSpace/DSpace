@@ -10,6 +10,7 @@ package org.dspace.harvest;
 import java.util.Date;
 
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 
 import javax.persistence.*;
 
@@ -38,8 +39,12 @@ public class HarvestedItem
     private String oaiId;
 
 
-
-    public HarvestedItem()
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.harvest.service.HarvestedItemService#create(Context, Item, String)}
+     *
+     */
+    protected HarvestedItem()
     {
     }
 

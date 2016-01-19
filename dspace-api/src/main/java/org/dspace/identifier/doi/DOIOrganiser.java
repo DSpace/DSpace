@@ -336,7 +336,7 @@ public class DOIOrganiser {
         
         if(line.hasOption("update-doi"))
         {
-            String identifier = line.getOptionValue('u');
+            String identifier = line.getOptionValue("update-doi");
             
             if(null == identifier)
             {
@@ -361,7 +361,7 @@ public class DOIOrganiser {
         
         if(line.hasOption("delete-doi"))
         {
-            String identifier = line.getOptionValue('d');
+            String identifier = line.getOptionValue("delete-doi");
 
             if (null == identifier) 
             {

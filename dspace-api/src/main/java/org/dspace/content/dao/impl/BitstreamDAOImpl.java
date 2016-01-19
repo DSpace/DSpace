@@ -7,19 +7,16 @@
  */
 package org.dspace.content.dao.impl;
 
-import org.dspace.checker.MostRecentChecksum;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.dao.BitstreamDAO;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDSODAO;
+import org.dspace.core.Context;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.Subqueries;
 
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -65,12 +62,9 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 //                    + "bitstream.bitstream_format_id = bitstreamformatregistry.bitstream_format_id "
 //                    + "where not exists( select 'x' from most_recent_checksum "
 //                    + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id )"
-        Criteria criteria = createCriteria(context, Bitstream.class)
-            .add(Subqueries.propertyNotIn("id", DetachedCriteria.forClass(MostRecentChecksum.class)));
 
-        @SuppressWarnings("unchecked")
-        List<Bitstream> result = (List<Bitstream>) criteria.list();
-        return result;
+        Query query = createQuery(context, "select b from Bitstream b where b not in (select c.bitstream from MostRecentChecksum c)");
+        return query.list();
     }
 
     @Override
@@ -110,5 +104,19 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
         query.setParameter("item", item);
 
         return iterate(query);
+    }
+
+    @Override
+    public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException {
+        Query query = createQuery(context, "select b from Bitstream b where b.storeNumber = :storeNumber");
+        query.setParameter("storeNumber", storeNumber);
+        return iterate(query);
+    }
+
+    @Override
+    public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException {
+        Criteria criteria = createCriteria(context, Bitstream.class);
+        criteria.add(Restrictions.eq("storeNumber", storeNumber));
+        return countLong(criteria);
     }
 }

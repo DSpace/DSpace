@@ -100,6 +100,13 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     @Transient
     public static final String PROVENANCE_TEXT = "provenance_description";
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.CollectionService#create(Context, Community)}
+     * or
+     * {@link org.dspace.content.service.CollectionService#create(Context, Community, String)}
+     *
+     */
     protected Collection()
     {
 

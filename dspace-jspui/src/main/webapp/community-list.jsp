@@ -82,7 +82,7 @@
 		}
 		out.println("<br>");
         // Get the collections in this community
-        List<Collection> cols = (List<Collection>) collectionMap.get(c.getID());
+        List<Collection> cols = (List<Collection>) collectionMap.get(c.getID().toString());
         if (cols != null && cols.size() > 0)
         {
             out.println("<ul class=\"media-list\">");
@@ -114,7 +114,7 @@
         }
 
         // Get the sub-communities in this community
-        List<Community> comms = (List<Community>) subcommunityMap.get(c.getID());
+        List<Community> comms = (List<Community>) subcommunityMap.get(c.getID().toString());
         if (comms != null && comms.size() > 0)
         {
             out.println("<ul class=\"media-list\">");

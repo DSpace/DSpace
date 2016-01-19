@@ -8,6 +8,7 @@
 package org.dspace.harvest;
 
 import org.dspace.content.Collection;
+import org.dspace.core.Context;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -75,8 +76,13 @@ public class HarvestedCollection
 	public static final int STATUS_OAI_ERROR = 3;
     @Transient
 	public static final int STATUS_UNKNOWN_ERROR = -1;
-	
-	public HarvestedCollection()
+
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.harvest.service.HarvestedCollectionService#create(Context, Collection)}
+     *
+     */
+	protected HarvestedCollection()
     {
     }
 

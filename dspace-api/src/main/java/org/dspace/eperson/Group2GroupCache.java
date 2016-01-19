@@ -47,6 +47,16 @@ public class Group2GroupCache implements Serializable {
         this.child = child;
     }
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.eperson.service.GroupService}
+     *
+     */
+    protected Group2GroupCache()
+    {
+
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null)

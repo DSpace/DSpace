@@ -8,6 +8,7 @@
 package org.dspace.xmlworkflow.storedcomponents;
 
 import org.dspace.content.Collection;
+import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
 import javax.persistence.*;
@@ -48,8 +49,14 @@ public class CollectionRole {
     @JoinColumn(name = "group_id")
     private Group group;
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService#create(Context, Collection, String, Group)}
+     *
+     */
+    protected CollectionRole()
+    {
 
-    public CollectionRole() {
     }
 
     public void setRoleId(String id){

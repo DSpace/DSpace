@@ -84,7 +84,14 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     @Transient
     protected transient EPersonService ePersonService;
 
-    protected EPerson() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.eperson.service.EPersonService#create(Context)}
+     *
+     */
+    protected EPerson()
+    {
+
     }
 
     @Override

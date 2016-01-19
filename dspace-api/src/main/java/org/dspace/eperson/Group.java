@@ -74,7 +74,14 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     @Transient
     private transient GroupService groupService;
 
-    public Group() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.eperson.service.GroupService#create(Context)}
+     *
+     */
+    protected Group()
+    {
+
     }
 
     void addMember(EPerson e)

@@ -1,6 +1,13 @@
 <?xml version="1.0"?>
 <commands>
     <command>
+        <name>bitstore-migrate</name>
+        <description>Assetstore migration tool</description>
+        <step>
+            <class>org.dspace.storage.bitstore.BitStoreMigrate</class>
+        </step>
+    </command>
+    <command>
         <name>checker</name>
         <description>Run the checksum checker</description>
         <step>

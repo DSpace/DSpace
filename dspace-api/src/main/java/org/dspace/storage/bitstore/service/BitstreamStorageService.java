@@ -14,6 +14,7 @@ import org.dspace.core.Context;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -103,6 +104,8 @@ public interface BitstreamStorageService {
    	public UUID register(Context context, Bitstream bitstream, int assetstore, String bitstreamPath)
             throws SQLException, IOException, AuthorizeException;
 
+    public Map computeChecksum(Context context, Bitstream bitstream) throws IOException;
+
     /**
    	 * Does the internal_id column in the bitstream row indicate the bitstream
    	 * is a registered file
@@ -145,5 +148,22 @@ public interface BitstreamStorageService {
     public void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException, AuthorizeException;
 
     public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException;
+
+    /**
+     * Print out (log/out) a listing of the assetstores configured, and how many assets they contain
+     * @param context
+     * @throws SQLException
+     */
+    public void printStores(Context context) throws SQLException;
+
+    /**
+     * Migrate all the assets from assetstoreSource to assetstoreDestination
+     * @param context
+     * @param assetstoreSource
+     * @param assetstoreDestination
+     * @param deleteOld
+     * @param batchCommitSize
+     */
+    public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize) throws IOException, SQLException, AuthorizeException;
 
 }
