@@ -54,7 +54,7 @@ public class DSpaceValidity implements SourceValidity
     /** Simple flag to note if the object has been completed. */
     protected boolean completed = false;
     
-    /** A hash of the validityKey taken after completetion */
+    /** A hash of the validityKey taken after completion */
     protected long hash;
     
     /** The time when the validity is no longer assumed to be valid */
@@ -64,9 +64,9 @@ public class DSpaceValidity implements SourceValidity
     protected long assumedValidityDelay = 0;
 
 
-    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-   	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    transient protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+   	transient protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    transient protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
 
     /**

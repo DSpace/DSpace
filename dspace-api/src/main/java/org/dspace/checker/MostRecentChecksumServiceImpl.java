@@ -7,6 +7,7 @@
  */
 package org.dspace.checker;
 
+import org.apache.log4j.Logger;
 import org.dspace.checker.dao.MostRecentChecksumDAO;
 import org.dspace.checker.service.ChecksumResultService;
 import org.dspace.checker.service.MostRecentChecksumService;
@@ -28,6 +29,8 @@ import java.util.List;
  */
 public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
 {
+    private static final Logger log = Logger.getLogger(MostRecentChecksumServiceImpl.class);
+
     @Autowired(required = true)
     protected MostRecentChecksumDAO mostRecentChecksumDAO;
 
@@ -107,7 +110,9 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
         List<Bitstream> unknownBitstreams = bitstreamService.findBitstreamsWithNoRecentChecksum(context);
         for (Bitstream bitstream : unknownBitstreams)
         {
-            MostRecentChecksum mostRecentChecksum = mostRecentChecksumDAO.create(context, new MostRecentChecksum());
+            log.info(bitstream + " " + bitstream.getID().toString() + " " + bitstream.getName());
+
+            MostRecentChecksum mostRecentChecksum = new MostRecentChecksum();
             mostRecentChecksum.setBitstream(bitstream);
             //Only process if our bitstream isn't deleted
             mostRecentChecksum.setToBeProcessed(!bitstream.isDeleted());
@@ -123,9 +128,9 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
             mostRecentChecksum.setProcessEndDate(new Date());
             if(bitstream.getChecksumAlgorithm() == null)
             {
-                bitstream.setChecksumAlgorithm("MD5");
+                mostRecentChecksum.setChecksumAlgorithm("MD5");
             }else{
-                bitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+                mostRecentChecksum.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
             }
             mostRecentChecksum.setMatchedPrevChecksum(true);
             ChecksumResult checksumResult;
@@ -136,6 +141,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
                 checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.CHECKSUM_MATCH);
             }
             mostRecentChecksum.setChecksumResult(checksumResult);
+            mostRecentChecksumDAO.create(context,  mostRecentChecksum);
             mostRecentChecksumDAO.save(context, mostRecentChecksum);
         }
     }

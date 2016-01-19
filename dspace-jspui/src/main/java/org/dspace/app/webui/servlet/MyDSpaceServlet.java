@@ -71,7 +71,7 @@ import org.dspace.workflowbasic.service.BasicWorkflowService;
 public class MyDSpaceServlet extends DSpaceServlet
 {
     /** Logger */
-    private static Logger log = Logger.getLogger(MyDSpaceServlet.class);
+    private static final Logger log = Logger.getLogger(MyDSpaceServlet.class);
 
     /** The main screen */
     public static final int MAIN_PAGE = 0;
@@ -96,44 +96,40 @@ public class MyDSpaceServlet extends DSpaceServlet
 
     public static final int REQUEST_BATCH_IMPORT_ACTION = 7;
     
-    private WorkspaceItemService workspaceItemService;
+    private final transient WorkspaceItemService workspaceItemService
+             = ContentServiceFactory.getInstance().getWorkspaceItemService();
+
+    private final transient BasicWorkflowService workflowService
+             = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
+
+    private final transient BasicWorkflowItemService workflowItemService
+             = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
     
-    private BasicWorkflowService workflowService;
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
     
-    private BasicWorkflowItemService workflowItemService;
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
     
-    private HandleService handleService;
+    private final transient ItemExportService itemExportService
+             =  ItemExportServiceFactory.getInstance().getItemExportService();
     
-    private ItemService itemService;
+    private final transient ItemImportService itemImportService
+             = ItemImportServiceFactory.getInstance().getItemImportService();
     
-    private ItemExportService itemExportService;
+    private final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
     
-    private ItemImportService itemImportService;
+    private final transient CommunityService communityService
+             = ContentServiceFactory.getInstance().getCommunityService();
     
-    private CollectionService collectionService;
+    private final transient GroupService groupService
+             = EPersonServiceFactory.getInstance().getGroupService();
     
-    private CommunityService communityService;
-    
-    private GroupService groupService;
-    
-    private SupervisedItemService supervisedItemService;
+    private final transient SupervisedItemService supervisedItemService
+             =  ContentServiceFactory.getInstance().getSupervisedItemService();
     
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	handleService = HandleServiceFactory.getInstance().getHandleService();
-    	itemService = ContentServiceFactory.getInstance().getItemService();
-		workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-		workflowService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
-		workflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
-		itemExportService =  ItemExportServiceFactory.getInstance().getItemExportService();
-		itemImportService = ItemImportServiceFactory.getInstance().getItemImportService();
-		collectionService = ContentServiceFactory.getInstance().getCollectionService();
-		communityService = ContentServiceFactory.getInstance().getCommunityService();
-		groupService = EPersonServiceFactory.getInstance().getGroupService();
-		supervisedItemService =  ContentServiceFactory.getInstance().getSupervisedItemService();
-    }
-    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -142,6 +138,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         showMainPage(context, request, response);
      }
     
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -886,7 +883,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("workflow.owned", ownedList);
         request.setAttribute("workflow.pooled", pooledList);
         request.setAttribute("group.memberships", memberships);
-        request.setAttribute("display.groupmemberships", Boolean.valueOf(displayMemberships));
+        request.setAttribute("display.groupmemberships", displayMemberships);
         request.setAttribute("supervised.items", supervisedItems);
         request.setAttribute("export.archives", exportArchives);
         request.setAttribute("import.uploads", importUploads);
@@ -911,7 +908,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             AuthorizeException
     {
         // Turn the iterator into a list
-        List<Item> subList = new LinkedList<Item>();
+        List<Item> subList = new LinkedList<>();
         Iterator<Item> subs = itemService.findBySubmitter(context, context
                 .getCurrentUser());
 

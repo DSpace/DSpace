@@ -36,17 +36,11 @@ import java.util.zip.ZipFile;
 
 public class SimpleZipContentIngester extends AbstractSwordContentIngester
 {
-    protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
-
     protected BundleService bundleService = ContentServiceFactory.getInstance()
             .getBundleService();
 
     protected BitstreamService bitstreamService = ContentServiceFactory
             .getInstance().getBitstreamService();
-
-    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory
-            .getInstance().getBitstreamFormatService();
 
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory
             .getInstance().getWorkspaceItemService();

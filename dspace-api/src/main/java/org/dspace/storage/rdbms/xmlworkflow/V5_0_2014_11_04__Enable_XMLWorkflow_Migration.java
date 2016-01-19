@@ -52,8 +52,6 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
     public void migrate(Connection connection)
             throws IOException, SQLException
     {
-        String currentFlyWayState = DatabaseUtils.getCurrentFlywayState(connection);
-
         // Make sure XML Workflow is enabled in workflow.cfg before proceeding
         if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")
                 // If your database was upgraded to DSpace 6 prior to enabling XML Workflow, we MUST skip this 5.x migration, as it is incompatible

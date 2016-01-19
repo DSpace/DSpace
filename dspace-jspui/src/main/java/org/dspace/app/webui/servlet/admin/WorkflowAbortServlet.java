@@ -33,17 +33,13 @@ import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
  */
 public class WorkflowAbortServlet extends DSpaceServlet
 {
-	private WorkflowItemService workflowItemService;
+	private final transient WorkflowItemService workflowItemService
+             = BasicWorkflowServiceFactory.getInstance().getWorkflowItemService();
 	
-	private WorkflowService workflowService;
-	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		workflowService = BasicWorkflowServiceFactory.getInstance().getWorkflowService();
-		workflowItemService = BasicWorkflowServiceFactory.getInstance().getWorkflowItemService();
-	}
-	
+	private final transient WorkflowService workflowService
+             = BasicWorkflowServiceFactory.getInstance().getWorkflowService();
+
+    @Override
     protected void doDSGet(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -52,6 +48,7 @@ public class WorkflowAbortServlet extends DSpaceServlet
         showWorkflows(c, request, response);
     }
 
+    @Override
     protected void doDSPost(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

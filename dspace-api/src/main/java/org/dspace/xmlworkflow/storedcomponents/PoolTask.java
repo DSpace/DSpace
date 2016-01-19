@@ -7,6 +7,7 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -59,6 +60,15 @@ public class PoolTask {
     private Group group;
 
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService#create(Context)}
+     *
+     */
+    protected PoolTask()
+    {
+
+    }
 
     public void setEperson(EPerson eperson){
         this.ePerson = eperson;

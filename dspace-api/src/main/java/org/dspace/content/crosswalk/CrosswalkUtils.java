@@ -70,7 +70,7 @@ public class CrosswalkUtils {
             if (mdField == null) {
                 if (forceCreate && fieldChoice.equals("add")) {
                     try {
-                        mdField = metadataFieldService.create(context, mdSchema, element, qualifier, null);
+                        metadataFieldService.create(context, mdSchema, element, qualifier, null);
                     } catch (NonUniqueMetadataException e) {
                         // This case should also not be possible
                         e.printStackTrace();

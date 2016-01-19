@@ -26,7 +26,7 @@
 
 <!--
     These templates are devoted to rendering the search results for discovery.
-    Since discovery used hit highlighting seperate templates are required !
+    Since discovery uses hit highlighting, separate templates are required !
 -->
 
 

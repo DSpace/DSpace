@@ -15,7 +15,6 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Event;
-import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,9 +33,6 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
-
-    @Autowired(required = true)
-    protected HandleService handleService;
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;

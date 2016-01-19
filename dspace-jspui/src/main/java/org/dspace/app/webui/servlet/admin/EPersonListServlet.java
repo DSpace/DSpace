@@ -32,14 +32,10 @@ import org.dspace.eperson.service.EPersonService;
  */
 public class EPersonListServlet extends DSpaceServlet
 {
-	private EPersonService personService;
+	private final transient EPersonService personService
+             = EPersonServiceFactory.getInstance().getEPersonService();
 	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		personService = EPersonServiceFactory.getInstance().getEPersonService();
-	}
-	
+    @Override
 	protected void doDSPost(Context context, HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException, 
 			SQLException, AuthorizeException 
@@ -47,6 +43,7 @@ public class EPersonListServlet extends DSpaceServlet
 		doDSGet(context, request, response);
 	}
 
+    @Override
 	protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -94,18 +91,18 @@ public class EPersonListServlet extends DSpaceServlet
         if (search != null && !search.equals(""))
         {
             epeople = personService.search(context, search);
-            request.setAttribute("offset", Integer.valueOf(offset));
+            request.setAttribute("offset", offset);
         }
         else
         {
             // Retrieve the e-people in the specified order
             epeople = personService.findAll(context, sortBy);
-            request.setAttribute("offset", Integer.valueOf(0));
+            request.setAttribute("offset", 0);
         }        
         
         // Set attributes for JSP
-        request.setAttribute("sortby", Integer.valueOf(sortBy));
-        request.setAttribute("first", Integer.valueOf(first));
+        request.setAttribute("sortby", sortBy);
+        request.setAttribute("first", first);
         request.setAttribute("epeople", epeople);
         request.setAttribute("search", search);
         

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+
+    <bean name="org.dspace.storage.bitstore.BitstreamStorageService" class="org.dspace.storage.bitstore.BitstreamStorageServiceImpl">
+        <property name="incoming" value="0"/>
+        <property name="stores">
+            <map>
+                <entry key="0" value-ref="localStore"/>
+                <!--<entry key="1" value-ref="s3Store"/>-->
+            </map>
+        </property>
+    </bean>
+
+    <bean name="localStore" class="org.dspace.storage.bitstore.DSBitStoreService" scope="singleton">
+        <property name="baseDir" value="${dspace.dir}/assetstore"/>
+    </bean>
+
+    <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton">
+        <!-- AWS Security credentials, with policies for specified bucket -->
+        <property name="awsAccessKey" value=""/>
+        <property name="awsSecretKey" value=""/>
+
+        <!-- S3 bucket name to store assets in. example: longsight-dspace-auk -->
+        <property name="bucketName" value=""/>
+
+        <!-- AWS S3 Region to use: {us-east-1, us-west-1, eu-west-1, eu-central-1, ap-southeast-1, ... } -->
+        <!-- Optional, sdk default is us-east-1 -->
+        <property name="awsRegionName" value=""/>
+
+        <!-- Subfolder to organize assets within the bucket, in case this bucket is shared  -->
+        <!-- Optional, default is root level of bucket -->
+        <property name="subfolder" value=""/>
+    </bean>
+
+    <!-- <bean name="localStore2 ... -->
+    <!-- <bean name="s3Store2 ... -->
+</beans>

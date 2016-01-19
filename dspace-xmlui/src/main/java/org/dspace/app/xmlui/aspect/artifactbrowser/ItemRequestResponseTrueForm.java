@@ -124,7 +124,7 @@ public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer imple
 		String title;
 		Item item = requestItem.getItem();
 		String titleDC = item.getName();
-		if (titleDC != null || titleDC.length() > 0)
+		if (titleDC != null && titleDC.length() > 0)
 			title = titleDC;
 		else
 			title = "untitled";

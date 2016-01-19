@@ -47,7 +47,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
             inverseJoinColumns={@JoinColumn(name="bitstream_id") }
     )
     @OrderColumn(name="bitstream_order")
-    private List<Bitstream> bitstreams = new ArrayList<>();
+    private final List<Bitstream> bitstreams = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -55,11 +55,16 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
             joinColumns = {@JoinColumn(name = "bundle_id", referencedColumnName = "uuid") },
             inverseJoinColumns = {@JoinColumn(name = "item_id", referencedColumnName = "uuid") }
     )
-    private List<Item> items = new ArrayList<>();
+    private final List<Item> items = new ArrayList<>();
 
     @Transient
-    protected BundleService bundleService;
+    protected transient BundleService bundleService;
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.BundleService#create(Context, Item, String)}
+     *
+     */
     protected Bundle()
     {
     }

@@ -59,30 +59,26 @@ import org.dspace.handle.service.HandleService;
  */
 public class AuthorizeAdminServlet extends DSpaceServlet
 {
-	private ItemService itemService;
-	private CollectionService collectionService;
-	private CommunityService communityService;
-	private BundleService bundleService;
-	private BitstreamService bitstreamService;
-	private GroupService groupService;
-	private EPersonService personService; 
-	private HandleService handleService;
-	private ResourcePolicyService resourcePolicyService;
+	private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
+	private final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
+	private final transient CommunityService communityService
+             = ContentServiceFactory.getInstance().getCommunityService();
+	private final transient BundleService bundleService
+             = ContentServiceFactory.getInstance().getBundleService();
+	private final transient BitstreamService bitstreamService
+             = ContentServiceFactory.getInstance().getBitstreamService();
+	private final transient GroupService groupService
+             = EPersonServiceFactory.getInstance().getGroupService();
+	private final transient EPersonService personService
+             = EPersonServiceFactory.getInstance().getEPersonService();
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
+	private final transient ResourcePolicyService resourcePolicyService
+             = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
 	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		itemService = ContentServiceFactory.getInstance().getItemService();
-		collectionService = ContentServiceFactory.getInstance().getCollectionService();
-		communityService = ContentServiceFactory.getInstance().getCommunityService();
-		bundleService = ContentServiceFactory.getInstance().getBundleService();
-		bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-		groupService = EPersonServiceFactory.getInstance().getGroupService();
-		personService = EPersonServiceFactory.getInstance().getEPersonService();
-		handleService = HandleServiceFactory.getInstance().getHandleService();
-		resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
-	}
-	
+    @Override
     protected void doDSGet(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -94,6 +90,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
         //        showMainPage(c, request, response);
     }
 
+    @Override
     protected void doDSPost(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -298,7 +295,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
 			AuthorizeUtil.authorizeManageItemPolicy(c, item);
             
             // do the remove
-            resourcePolicyService.delete(c, policy);;
+            resourcePolicyService.delete(c, policy);
 
             // show edit form!
             prepItemEditForm(c, request, item);
@@ -765,8 +762,8 @@ public class AuthorizeAdminServlet extends DSpaceServlet
         List<ResourcePolicy> itemPolicies = authorizeService.getPolicies(c, item);
 
         // Put bundle and bitstream policies in their own hashes
-        Map<UUID, List<ResourcePolicy>> bundlePolicies = new HashMap<UUID, List<ResourcePolicy>>();
-        Map<UUID, List<ResourcePolicy>> bitstreamPolicies = new HashMap<UUID, List<ResourcePolicy>>();
+        Map<UUID, List<ResourcePolicy>> bundlePolicies = new HashMap<>();
+        Map<UUID, List<ResourcePolicy>> bitstreamPolicies = new HashMap<>();
 
         List<Bundle> bundles = item.getBundles();
 

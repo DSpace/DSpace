@@ -43,16 +43,12 @@ import org.dspace.statistics.content.StatisticsTable;
 public class DisplayStatisticsServlet extends DSpaceServlet
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(DisplayStatisticsServlet.class);
+    private static final Logger log = Logger.getLogger(DisplayStatisticsServlet.class);
 
-    private HandleService handleService;
-    
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
+
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	handleService = HandleServiceFactory.getInstance().getHandleService();
-    }
-
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -157,7 +153,6 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
 	try
         {
-
             StatisticsTable statisticsTable = new StatisticsTable(new StatisticsDataVisits(dso));
 
             statisticsTable.setTitle("Total Visits Per Month");

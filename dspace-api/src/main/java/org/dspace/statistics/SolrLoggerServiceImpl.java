@@ -568,12 +568,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         {
             Community comm = (Community) dso;
             List<Community> parentCommunities = comm.getParentCommunities();
-            while (CollectionUtils.isNotEmpty(parentCommunities))
-            {
-                for (int i = 0; i < parentCommunities.size(); i++) {
-                    Community community = parentCommunities.get(i);
-                    doc1.addField("owningComm", comm.getID());
-                }
+            for (Community parent : parentCommunities) {
+                doc1.addField("owningComm", parent.getID());
+                storeParents(doc1, parent);
             }
         }
         else if (dso instanceof Collection)
@@ -641,11 +638,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             {
                 return currentValsStored;
             }
-
-            // We have at least one document good
-            SolrDocument document = response.getResults().get(0);
-            // System.out.println("HERE");
-            // Get the info we need
         }
         catch (SolrServerException e)
         {

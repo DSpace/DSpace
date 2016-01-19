@@ -26,7 +26,6 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
@@ -194,10 +193,10 @@ public class ItemTag extends TagSupport
     private static final String DOI_DEFAULT_BASEURL = "http://dx.doi.org/";
 
     /** Item to display */
-    private transient Item item;
+    private Item item;
 
     /** Collections this item appears in */
-    private transient List<Collection> collections;
+    private List<Collection> collections;
 
     /** The style to use - "default" or "full" */
     private String style;
@@ -206,38 +205,45 @@ public class ItemTag extends TagSupport
     private boolean showThumbs;
 
     /** Default DC fields to display, in absence of configuration */
-    private static String defaultFields = "dc.title, dc.title.alternative, dc.contributor.*, dc.subject, dc.date.issued(date), dc.publisher, dc.identifier.citation, dc.relation.ispartofseries, dc.description.abstract, dc.description, dc.identifier.govdoc, dc.identifier.uri(link), dc.identifier.isbn, dc.identifier.issn, dc.identifier.ismn, dc.identifier";
+    private static final String defaultFields
+            = "dc.title, dc.title.alternative, dc.contributor.*, dc.subject, dc.date.issued(date), dc.publisher, dc.identifier.citation, dc.relation.ispartofseries, dc.description.abstract, dc.description, dc.identifier.govdoc, dc.identifier.uri(link), dc.identifier.isbn, dc.identifier.issn, dc.identifier.ismn, dc.identifier";
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(ItemTag.class);
+    private static final Logger log = Logger.getLogger(ItemTag.class);
 
-    private StyleSelection styleSelection = (StyleSelection) PluginManager.getSinglePlugin(StyleSelection.class);
+    private final transient StyleSelection styleSelection
+            = (StyleSelection) PluginManager.getSinglePlugin(StyleSelection.class);
     
     /** Hashmap of linked metadata to browse, from dspace.cfg */
-    private static Map<String,String> linkedMetadata;
+    private static final Map<String,String> linkedMetadata;
     
     /** Hashmap of urn base url resolver, from dspace.cfg */
-    private static Map<String,String> urn2baseurl;
+    private static final Map<String,String> urn2baseurl;
     
     /** regex pattern to capture the style of a field, ie <code>schema.element.qualifier(style)</code> */
-    private Pattern fieldStylePatter = Pattern.compile(".*\\((.*)\\)");
+    private final Pattern fieldStylePatter = Pattern.compile(".*\\((.*)\\)");
 
     private static final long serialVersionUID = -3841266490729417240L;
     
-    private MetadataExposureService metadataExposureService = UtilServiceFactory.getInstance().getMetadataExposureService();
-    
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    
-    private MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
-    
-    private BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
-    
-    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    private final transient MetadataExposureService metadataExposureService
+            = UtilServiceFactory.getInstance().getMetadataExposureService();
+
+    private final transient ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+
+    private final transient MetadataAuthorityService metadataAuthorityService
+            = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+
+    private final transient BundleService bundleService
+            = ContentServiceFactory.getInstance().getBundleService();
+
+    private final transient AuthorizeService authorizeService
+            = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     static {
         int i;
 
-        linkedMetadata = new HashMap<String, String>();
+        linkedMetadata = new HashMap<>();
         String linkMetadata;
 
         i = 1;
@@ -253,7 +259,7 @@ public class ItemTag extends TagSupport
             i++;
         } while (linkMetadata != null);
 
-        urn2baseurl = new HashMap<String, String>();
+        urn2baseurl = new HashMap<>();
 
         String urn;
         i = 1;
@@ -287,6 +293,7 @@ public class ItemTag extends TagSupport
         getThumbSettings();
     }
 
+    @Override
     public int doStartTag() throws JspException
     {
         try
@@ -385,6 +392,7 @@ public class ItemTag extends TagSupport
         style = styleIn;
     }
 
+    @Override
     public void release()
     {
         style = "default";
@@ -517,7 +525,7 @@ public class ItemTag extends TagSupport
                 
                 //If the values are in controlled vocabulary and the display value should be shown
                 if (isDisplay){
-                    List<String> displayValues = new ArrayList<String>();
+                    List<String> displayValues = new ArrayList<>();
                    
 
                     displayValues = Util.getControlledVocabulariesDisplayValueLocalized(item, values, schema, element, qualifier, sessionLocale);
@@ -585,7 +593,7 @@ public class ItemTag extends TagSupport
                             else
                             {
                                 String foundUrn = null;
-                                if (!style.equals("resolver"))
+                                if (!"resolver".equals(style))
                                 {
                                     foundUrn = style;
                                 }

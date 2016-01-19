@@ -35,17 +35,14 @@ import org.dspace.utils.DSpace;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class SearchResultLogServlet extends DSpaceServlet{
-	private HandleService handleService;
+public class SearchResultLogServlet extends DSpaceServlet
+{
+	private final transient HandleService handleService
+            = HandleServiceFactory.getInstance().getHandleService();
 
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		handleService = HandleServiceFactory.getInstance().getHandleService();
-	}
-	
     @Override
-    protected void doDSPost(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, AuthorizeException {
+    protected void doDSPost(Context context, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException, AuthorizeException {
         String redirectUrl = request.getParameter("redirectUrl");
         String scopeHandle = request.getParameter("scope");
         DSpaceObject scope = handleService.resolveToObject(context, scopeHandle);

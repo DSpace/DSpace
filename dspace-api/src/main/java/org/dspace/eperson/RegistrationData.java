@@ -7,6 +7,8 @@
  */
 package org.dspace.eperson;
 
+import org.dspace.core.Context;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -34,6 +36,16 @@ public class RegistrationData {
     @Column(name = "expires")
     @Temporal(TemporalType.TIMESTAMP)
     private Date expires;
+
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.eperson.service.RegistrationDataService#create(Context)}
+     *
+     */
+    protected RegistrationData()
+    {
+
+    }
 
     public int getId() {
         return id;

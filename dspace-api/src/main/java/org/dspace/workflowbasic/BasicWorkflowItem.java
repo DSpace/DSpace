@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 
@@ -61,6 +62,15 @@ public class BasicWorkflowItem implements WorkflowItem
     @Column(name = "multiple_files")
     private boolean multipleFiles = false;
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.workflowbasic.service.BasicWorkflowItemService#create(Context, Item, Collection)}
+     *
+     */
+    protected BasicWorkflowItem()
+    {
+
+    }
 
     /**
      * Get the internal ID of this workflow item

@@ -60,8 +60,8 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
 
     @Override
     public void addHistory(Context context, MostRecentChecksum mostRecentChecksum) throws SQLException {
-        ChecksumHistory checksumHistory = checksumHistoryDAO.create(context, new ChecksumHistory());
-        checksumHistory.setBitstreamId(mostRecentChecksum.getBitstream().getID());
+        ChecksumHistory checksumHistory = new ChecksumHistory();
+        checksumHistory.setBitstream(mostRecentChecksum.getBitstream());
         checksumHistory.setProcessStartDate(mostRecentChecksum.getProcessStartDate());
         checksumHistory.setProcessEndDate(mostRecentChecksum.getProcessEndDate());
         checksumHistory.setChecksumExpected(mostRecentChecksum.getExpectedChecksum());
@@ -75,6 +75,8 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
         }
 
         checksumHistory.setResult(checksumResult);
+
+        checksumHistoryDAO.create(context, checksumHistory);
         checksumHistoryDAO.save(context, checksumHistory);
     }
 

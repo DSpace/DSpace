@@ -142,6 +142,12 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
             log.error("SQLException: ", e);
             return;
         }
+        if(jsonString == null)
+        {
+            //No handle found bad request
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
         
         try {
             ObjectModelHelper.getResponse(objectModel).setHeader("Content-Type", CONTENTTYPE);

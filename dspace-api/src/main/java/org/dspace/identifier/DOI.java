@@ -9,6 +9,7 @@
 package org.dspace.identifier;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 
 import javax.persistence.*;
 
@@ -41,6 +42,15 @@ public class DOI
 
     @Column(name = "status")
     private Integer status;
+
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.identifier.service.DOIService#create(Context)}
+     *
+     */
+    protected DOI()
+    {
+    }
 
     public Integer getId() {
         return id;

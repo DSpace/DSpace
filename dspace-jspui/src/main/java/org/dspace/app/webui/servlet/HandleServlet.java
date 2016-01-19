@@ -27,8 +27,6 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -77,38 +75,30 @@ import org.jdom.output.XMLOutputter;
 public class HandleServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(HandleServlet.class);
+    private static final Logger log = Logger.getLogger(HandleServlet.class);
 
     /** For obtaining &lt;meta&gt; elements to put in the &lt;head&gt; */
-    private DisseminationCrosswalk xHTMLHeadCrosswalk;
+    private final transient DisseminationCrosswalk xHTMLHeadCrosswalk
+             = (DisseminationCrosswalk) PluginManager
+                .getNamedPlugin(DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
 
     // services API
-    private HandleService handleService; 
-    
-    private SubscribeService subscribeService;
-    
-    private ItemService itemService;
-    
-    private CommunityService communityService;
-    
-    private CollectionService collectionService;
-    
-    public HandleServlet()
-    {
-        super();
-        xHTMLHeadCrosswalk = (DisseminationCrosswalk) PluginManager
-                .getNamedPlugin(DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
-    }
-    
-    public void init() throws ServletException {
-    	super.init();
-    	handleService = HandleServiceFactory.getInstance().getHandleService(); 
-        subscribeService = EPersonServiceFactory.getInstance().getSubscribeService(); 
-        itemService = ContentServiceFactory.getInstance().getItemService();
-        communityService = ContentServiceFactory.getInstance().getCommunityService();
-        collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    }   
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
 
+    private final transient SubscribeService subscribeService
+             = EPersonServiceFactory.getInstance().getSubscribeService();
+    
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
+    
+    private final transient CommunityService communityService
+             = ContentServiceFactory.getInstance().getCommunityService();
+    
+    private final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
+
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -469,7 +459,7 @@ public class HandleServlet extends DSpaceServlet
             else
             {
                 // check whether there is a logged in user
-                suggestEnable = (context.getCurrentUser() == null ? false : true);
+                suggestEnable = (context.getCurrentUser() != null);
             }
         }
 
@@ -482,8 +472,8 @@ public class HandleServlet extends DSpaceServlet
             				item));
 
         // Set attributes and display
-        request.setAttribute("suggest.enable", Boolean.valueOf(suggestEnable));
-        request.setAttribute("display.all", Boolean.valueOf(displayAll));
+        request.setAttribute("suggest.enable", suggestEnable);
+        request.setAttribute("display.all", displayAll);
         request.setAttribute("item", item);
         request.setAttribute("collections", collections);
         request.setAttribute("dspace.layout.head", headMetadata);
@@ -716,8 +706,8 @@ public class HandleServlet extends DSpaceServlet
             // Forward to collection home page
             request.setAttribute("collection", collection);
             request.setAttribute("community", community);
-            request.setAttribute("logged.in", Boolean.valueOf(e != null));
-            request.setAttribute("subscribed", Boolean.valueOf(subscribed));
+            request.setAttribute("logged.in", e != null);
+            request.setAttribute("subscribed", subscribed);
             JSPManager.showJSP(request, response, "/collection-home.jsp");
 
             if (updated)
@@ -823,7 +813,7 @@ public class HandleServlet extends DSpaceServlet
         List<Community> parents = communityService.getAllParents(context, c);
 
         // put into an array in reverse order
-        List<Community> reversedParents = new ArrayList<Community>();
+        List<Community> reversedParents = new ArrayList<>();
         int index = parents.size() - 1;
 
         for (int i = 0; i < parents.size(); i++)

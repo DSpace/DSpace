@@ -5,9 +5,6 @@
  *
  * http://www.dspace.org/license/
  */
-/*
- *
- */
 
 package org.dspace.app.webui.servlet;
 
@@ -28,7 +25,6 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.ChoicesXMLGenerator;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
-import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
@@ -38,23 +34,17 @@ import org.apache.xml.serializer.Serializer;
 import org.apache.xml.serializer.OutputPropertiesFactory;
 import org.apache.xml.serializer.Method;
 
-
-
 /**
  *
  * @author bollini
  */
 public class AuthorityChooseServlet extends DSpaceServlet {
-	private ChoiceAuthorityService choiceAuthorityService;
+	private final transient ChoiceAuthorityService choiceAuthorityService
+             = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
 	
-	private CollectionService collectionService;
-	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
-		collectionService = ContentServiceFactory.getInstance().getCollectionService();
-	}
+	private final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
+
     @Override
     protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, AuthorizeException {
         process(context, request, response);

@@ -11,6 +11,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -26,7 +27,17 @@ public class Site extends DSpaceObject
 {
 
     @Transient
-    private SiteService siteService;
+    private transient SiteService siteService;
+
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.SiteService#createSite(Context)}
+     *
+     */
+    protected Site()
+    {
+
+    }
 
     /**
      * Get the type of this object, found in Constants

@@ -52,17 +52,17 @@ public class CurateServlet extends DSpaceServlet
     private static final String TASK_QUEUE_NAME = ConfigurationManager.getProperty("curate", "ui.queuename");
 
     // curation status codes in Admin UI: key=status code, value=localized name
-    private static final Map<String, String> statusMessages = new HashMap<String, String>();
+    private static final Map<String, String> statusMessages = new HashMap<>();
 
     // curation tasks to appear in admin UI: key=taskID, value=friendly name
-    private static Map<String, String> allTasks = new LinkedHashMap<String, String>();
+    private static Map<String, String> allTasks = new LinkedHashMap<>();
 
     // named groups which display together in admin UI: key=groupID, value=friendly group name
-    private static Map<String, String> taskGroups = new LinkedHashMap<String, String>();
+    private static Map<String, String> taskGroups = new LinkedHashMap<>();
 
     // group membership: key=groupID, value=array of taskID
-    private static Map<String, String[]> groupedTasks = new LinkedHashMap<String, String[]>();
-    
+    private static Map<String, String[]> groupedTasks = new LinkedHashMap<>();
+
     static
     {
         try
@@ -79,25 +79,21 @@ public class CurateServlet extends DSpaceServlet
     }
 
     /** Logger */
-    private static Logger log = Logger.getLogger(CurateServlet.class);
+    private static final Logger log = Logger.getLogger(CurateServlet.class);
 
-    private CommunityService communityService;
+    private final transient CommunityService communityService
+             = ContentServiceFactory.getInstance().getCommunityService();
     
-    private CollectionService collectionService;
+    private final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
     
-    private ItemService itemService;
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
     
-    private HandleService handleService;
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
     
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	communityService = ContentServiceFactory.getInstance().getCommunityService();
-    	collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    	itemService = ContentServiceFactory.getInstance().getItemService();
-    	handleService = HandleServiceFactory.getInstance().getHandleService();
-    }
-    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -105,6 +101,7 @@ public class CurateServlet extends DSpaceServlet
         doDSPost(context, request, response);
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

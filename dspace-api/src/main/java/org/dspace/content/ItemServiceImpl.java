@@ -26,7 +26,6 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
-import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.versioning.service.VersioningService;
@@ -57,15 +56,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired(required = true)
     protected CommunityService communityService;
     @Autowired(required = true)
-    protected HandleService handleService;
-    @Autowired(required = true)
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
     protected BundleService bundleService;
     @Autowired(required = true)
     protected BitstreamFormatService bitstreamFormatService;
-    @Autowired(required = true)
-    protected ChoiceAuthorityService choiceAuthorityService;
     @Autowired(required = true)
     protected MetadataSchemaService metadataSchemaService;
     @Autowired(required = true)
@@ -940,6 +935,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         {
             return itemDAO.findByMetadataField(context, mdf, value, true);
         }
+    }
+
+    @Override
+    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause, int offset, int limit)
+          throws SQLException, AuthorizeException, IOException
+    {
+        return itemDAO.findByMetadataQuery(context, listFieldList, query_op, query_val, collectionUuids, regexClause, offset, limit);
     }
 
     @Override

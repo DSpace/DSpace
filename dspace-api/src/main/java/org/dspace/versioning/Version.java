@@ -8,6 +8,7 @@
 package org.dspace.versioning;
 
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -52,6 +53,20 @@ public class Version {
     @ManyToOne
     @JoinColumn(name = "versionhistory_id")
     private VersionHistory versionHistory;
+
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.versioning.service.VersioningService#createNewVersion(Context, Item)}
+     * or
+     * {@link org.dspace.versioning.service.VersioningService#createNewVersion(Context, Item, String)}
+     * or
+     * {@link org.dspace.versioning.service.VersioningService#createNewVersion(Context, VersionHistory, Item, String, Date, int)}
+     *
+     */
+    protected Version()
+    {
+
+    }
 
     public int getId() {
         return id;

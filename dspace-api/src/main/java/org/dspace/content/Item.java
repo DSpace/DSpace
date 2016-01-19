@@ -10,6 +10,7 @@ package org.dspace.content;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -78,15 +79,22 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
             joinColumns = {@JoinColumn(name = "item_id") },
             inverseJoinColumns = {@JoinColumn(name = "collection_id") }
     )
-    private List<Collection> collections = new ArrayList<>();
+    private final List<Collection> collections = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "items")
-    private List<Bundle> bundles = new ArrayList<>();
+    private final List<Bundle> bundles = new ArrayList<>();
 
     @Transient
-    private ItemService itemService;
+    private transient ItemService itemService;
 
-    protected Item() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.ItemService#create(Context, WorkspaceItem)}
+     *
+     */
+    protected Item()
+    {
+
     }
 
     /**

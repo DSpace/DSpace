@@ -47,7 +47,8 @@ public interface ItemExportService {
     public static final String COMPRESSED_EXPORT_MIME_TYPE = "application/zip";
 
     public void exportItem(Context c, Iterator<Item> i,
-            String destDirName, int seqStart, boolean migrate) throws Exception;
+            String destDirName, int seqStart, boolean migrate,
+            boolean excludeBitstreams) throws Exception;
 
     /**
      * Method to perform an export and save it as a zip file.
@@ -62,7 +63,8 @@ public interface ItemExportService {
      */
     public void exportAsZip(Context context, Iterator<Item> items,
                                    String destDirName, String zipFileName,
-                                   int seqStart, boolean migrate) throws Exception;
+                                   int seqStart, boolean migrate,
+                                   boolean excludeBitstreams) throws Exception;
 
     /**
      * Convenience methot to create export a single Community, Collection, or

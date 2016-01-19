@@ -750,7 +750,7 @@ public class ItemAdapter extends AbstractAdapter
                 if (isContentBundle)
                 {
                     contentBitstreams.add(bitstream);
-                    if (bundle.getPrimaryBitstream() != null && bundle.getBitstreams().equals(bitstream))
+                    if (bundle.getPrimaryBitstream() != null && bundle.getPrimaryBitstream().equals(bitstream))
                     {
                         primaryBitstream = bitstream;
                     }

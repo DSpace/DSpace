@@ -83,10 +83,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
             joinColumns = {@JoinColumn(name = "collection_id") },
             inverseJoinColumns = {@JoinColumn(name = "community_id") }
     )
-    private List<Community> communities = new ArrayList<>();
+    private final List<Community> communities = new ArrayList<>();
 
     @Transient
-    private CollectionService collectionService;
+    private transient CollectionService collectionService;
 
     // Keys for accessing Collection metadata
     @Transient
@@ -100,6 +100,13 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     @Transient
     public static final String PROVENANCE_TEXT = "provenance_description";
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.CollectionService#create(Context, Community)}
+     * or
+     * {@link org.dspace.content.service.CollectionService#create(Context, Community, String)}
+     *
+     */
     protected Collection()
     {
 

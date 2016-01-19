@@ -33,7 +33,7 @@ import java.util.*;
 public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(Community.class);
+    private static final Logger log = Logger.getLogger(Community.class);
 
     @Column(name="community_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -44,13 +44,13 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
             joinColumns = {@JoinColumn(name = "parent_comm_id") },
             inverseJoinColumns = {@JoinColumn(name = "child_comm_id") }
     )
-    private List<Community> subCommunities = new ArrayList<>();
+    private final List<Community> subCommunities = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subCommunities")
     private List<Community> parentCommunities = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "communities", cascade = {CascadeType.PERSIST})
-    private List<Collection> collections = new ArrayList<>();
+    private final List<Collection> collections = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "admin")
@@ -69,9 +69,18 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     public static final String SIDEBAR_TEXT = "side_bar_text";
 
     @Transient
-    protected CommunityService communityService;
+    protected transient CommunityService communityService;
 
-    protected Community() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.CommunityService#create(Community, Context)}
+     * or
+     * {@link org.dspace.content.service.CommunityService#create(Community, Context, String)}
+     *
+     */
+    protected Community()
+    {
+
     }
 
     void addSubCommunity(Community subCommunity)
@@ -207,6 +216,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         return true;
     }
 
+    @Override
     public int hashCode()
     {
         return new HashCodeBuilder().append(getID()).toHashCode();

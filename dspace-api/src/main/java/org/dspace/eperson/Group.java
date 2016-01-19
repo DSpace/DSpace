@@ -52,7 +52,7 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
             joinColumns = {@JoinColumn(name = "eperson_group_id") },
             inverseJoinColumns = {@JoinColumn(name = "eperson_id") }
     )
-    private List<EPerson> epeople = new ArrayList<>();
+    private final List<EPerson> epeople = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -60,21 +60,28 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
             joinColumns = {@JoinColumn(name = "parent_id") },
             inverseJoinColumns = {@JoinColumn(name = "child_id") }
     )
-    private List<Group> groups = new ArrayList<>();
+    private final List<Group> groups = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "groups")
-    private List<Group> parentGroups = new ArrayList<>();
+    private final List<Group> parentGroups = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "supervisorGroups")
-    private List<WorkspaceItem> supervisedItems = new ArrayList<>();
+    private final List<WorkspaceItem> supervisedItems = new ArrayList<>();
 
     @Transient
     private boolean groupsChanged;
 
     @Transient
-    private GroupService groupService;
+    private transient GroupService groupService;
 
-    public Group() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.eperson.service.GroupService#create(Context)}
+     *
+     */
+    protected Group()
+    {
+
     }
 
     void addMember(EPerson e)

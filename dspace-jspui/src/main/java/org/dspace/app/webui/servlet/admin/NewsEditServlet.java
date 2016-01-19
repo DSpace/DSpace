@@ -29,14 +29,10 @@ import org.dspace.core.service.NewsService;
  */
 public class NewsEditServlet extends DSpaceServlet
 {
-	private NewsService newsService;
+	private final transient NewsService newsService
+             = CoreServiceFactory.getInstance().getNewsService();
 	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		newsService = CoreServiceFactory.getInstance().getNewsService();
-	}
-	
+    @Override
     protected void doDSGet(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -45,6 +41,7 @@ public class NewsEditServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, "/dspace-admin/news-main.jsp");
     }
 
+    @Override
     protected void doDSPost(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

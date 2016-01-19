@@ -35,8 +35,8 @@ public class DataProviderServlet extends HttpServlet {
     
     private static final Logger log = Logger.getLogger(DataProviderServlet.class);
     
-    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-    
+    protected final transient HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and

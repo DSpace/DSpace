@@ -92,9 +92,6 @@ public class CurateItemForm extends AbstractDSpaceTransformer {
                                     throws WingException, SQLException,
                                                         AuthorizeException, UnsupportedEncodingException
 	{
-                UUID itemID = UUID.fromString(parameters.getParameter("itemID", null));
-		Item item = itemService.find(context, itemID);
-                
 		String baseURL = contextPath + "/admin/item?administrative-continue="
 				+ knot.getId() ;
 

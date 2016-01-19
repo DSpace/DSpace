@@ -191,7 +191,7 @@ public class EPersonCLITool {
         try {
             ePersonService.update(context, eperson);
             context.complete();
-            System.out.printf("Created EPerson %d\n", eperson.getID());
+            System.out.printf("Created EPerson %s\n", eperson.getID().toString());
         } catch (SQLException ex) {
             context.abort();
             System.err.println(ex.getMessage());
@@ -261,7 +261,7 @@ public class EPersonCLITool {
         try {
             ePersonService.delete(context, eperson);
             context.complete();
-            System.out.printf("Deleted EPerson %d\n", eperson.getID());
+            System.out.printf("Deleted EPerson %s\n", eperson.getID().toString());
         } catch (SQLException ex) {
             System.err.println(ex.getMessage());
             return 1;
@@ -390,7 +390,7 @@ public class EPersonCLITool {
                 try {
                     ePersonService.update(context, eperson);
                     context.complete();
-                    System.out.printf("Modified EPerson %d\n", eperson.getID());
+                    System.out.printf("Modified EPerson %s\n", eperson.getID().toString());
                 } catch (SQLException ex) {
                     context.abort();
                     System.err.println(ex.getMessage());
@@ -416,8 +416,8 @@ public class EPersonCLITool {
         try {
             for (EPerson person : ePersonService.findAll(context, EPerson.EMAIL))
             {
-                System.out.printf("%d\t%s/%s\t%s, %s\n",
-                        person.getID(),
+                System.out.printf("%s\t%s/%s\t%s, %s\n",
+                        person.getID().toString(),
                         person.getEmail(),
                         person.getNetid(),
                         person.getLastName(), person.getFirstName()); // TODO more user details

@@ -7,13 +7,16 @@
  */
 package org.dspace.content;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.workflow.WorkflowItem;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -26,7 +29,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "workspaceitem")
-public class WorkspaceItem implements InProgressSubmission
+public class WorkspaceItem implements InProgressSubmission, Serializable
 {
 
     @Id
@@ -67,8 +70,19 @@ public class WorkspaceItem implements InProgressSubmission
             joinColumns = {@JoinColumn(name = "workspace_item_id") },
             inverseJoinColumns = {@JoinColumn(name = "eperson_group_id") }
     )
-    private List<Group> supervisorGroups = new ArrayList<>();
+    private final List<Group> supervisorGroups = new ArrayList<>();
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.WorkspaceItemService#create(Context, Collection, boolean)}
+     * or
+     * {@link org.dspace.content.service.WorkspaceItemService#create(Context, WorkflowItem)}
+     *
+     */
+    protected WorkspaceItem()
+    {
+
+    }
 
     /**
      * Get the internal ID of this workspace item
@@ -131,6 +145,7 @@ public class WorkspaceItem implements InProgressSubmission
      * @param o The other workspace item to compare to
      * @return If they are equal or not
      */
+    @Override
     public boolean equals(Object o) {
         if (this == o)
         {
@@ -150,6 +165,7 @@ public class WorkspaceItem implements InProgressSubmission
         return true;
     }
 
+    @Override
     public int hashCode()
     {
         return new HashCodeBuilder().append(getID()).toHashCode();
