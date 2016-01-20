@@ -76,8 +76,6 @@ public class SpiderDetectorTest
         candidate = "wiki.dspace.org";
         req.setRemoteHost(candidate);
         assertFalse(candidate + " matched DNS patterns", SpiderDetector.isSpider(req));
-        
-        req = null;
     }
 
     /**
@@ -146,7 +144,7 @@ public class SpiderDetectorTest
 
         @Mock
         public void $clinit() {}
-        
+
         @Mock
         public boolean isUseProxies()
         {
