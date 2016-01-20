@@ -36,7 +36,7 @@ import org.dspace.eperson.service.GroupService;
 /**
  * This combined LDAP authentication method supersedes both the 'LDAPAuthentication'
  * and the 'LDAPHierarchicalAuthentication' methods. It's capable of both:
- * - authenticaton  against a flat LDAP tree where all users are in the same unit
+ * - authentication  against a flat LDAP tree where all users are in the same unit
  *   (if search.user or search.password is not set)
  * - authentication against structured hierarchical LDAP trees of users. 
  *   An initial bind is required using a user name and password in order to
@@ -50,7 +50,7 @@ public class LDAPAuthentication
     implements AuthenticationMethod {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(LDAPAuthentication.class);
+    private static final Logger log = Logger.getLogger(LDAPAuthentication.class);
 
     protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -571,7 +571,7 @@ public class LDAPAuthentication
          */
         protected boolean ldapAuthenticate(String netid, String password,
                         Context context) {
-            Hashtable<String, String> env = new Hashtable<String, String>();
+            Hashtable<String, String> env = new Hashtable<>();
             if (null != password && !password.isEmpty()) {
                 // Set up environment for creating initial context
                 env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY,
