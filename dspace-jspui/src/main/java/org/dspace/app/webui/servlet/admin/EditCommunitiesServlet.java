@@ -152,9 +152,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
          */
         Community community = communityService.find(context, UIUtil.getUUIDParameter(
                 request, "community_id"));
-        UUID parentCommunityID = (request.getAttribute("parent_community_id") != null ? UIUtil.getUUIDParameter(request,
-                "parent_community_id") : null);
-        Community parentCommunity = communityService.find(context, parentCommunityID);
+        Community parentCommunity = communityService.find(context, UIUtil
+                .getUUIDParameter(request, "parent_community_id"));
         Collection collection = collectionService.find(context, UIUtil
                 .getUUIDParameter(request, "collection_id"));
 
@@ -518,8 +517,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
         {
             // if there is a parent community id specified, create community
             // as its child; otherwise, create it as a top-level community
-        	UUID parentCommunityID = (request.getAttribute("parent_community_id") != null ? UIUtil.getUUIDParameter(request,
-                    "parent_community_id") : null);
+            UUID parentCommunityID = UIUtil.getUUIDParameter(request,
+                    "parent_community_id");
 
             if (parentCommunityID != null)
             {
