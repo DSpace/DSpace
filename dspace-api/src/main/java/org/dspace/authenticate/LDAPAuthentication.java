@@ -584,8 +584,9 @@ public class LDAPAuthentication
                 env.put(javax.naming.Context.SECURITY_PRINCIPAL, netid);
                 env.put(javax.naming.Context.SECURITY_CREDENTIALS, password);
             }
-            /* Else the LDAP provider may be externally configured in an
-             * application resource file
+            /* Else the LDAP provider may be externally configured in the "jndi.properties"
+             * application resource file.  See "Application Resource Files" in
+             * https://docs.oracle.com/javase/7/docs/api/javax/naming/Context.html
              */
 
             env.put(javax.naming.Context.AUTHORITATIVE, "true");
