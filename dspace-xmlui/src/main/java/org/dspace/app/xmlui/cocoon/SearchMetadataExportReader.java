@@ -38,6 +38,7 @@ import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.aspect.discovery.AbstractSearch;
+import org.dspace.app.xmlui.aspect.discovery.SimpleSearch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.handle.HandleManager;
@@ -97,8 +98,9 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
     /** The Cocoon request */
     protected Request request;
 
-    DSpaceCSV csv = null;
-    String filename = null;
+    private DSpaceCSV csv = null;
+    private String filename = null;
+    private SimpleSearch simpleSearch = null;
     
     /**
      * Set up the export reader.
@@ -123,48 +125,40 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
             String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export");
             
             if(search_export_config.equals("admin")) {            	
-            	if(AuthorizeManager.isAdmin(context)) {
-                	csv = exportMetadata(context, objectModel, query, scope, filters);
-                    filename = "search-results.csv";
-                }
-                else {                	
+            	if(!AuthorizeManager.isAdmin(context)) {
                     /*
                      * Auth should be done by MetadataExport -- pass context through
                      * we should just be catching exceptions and displaying errors here
                      */
                     if(AuthenticationUtil.isLoggedIn(request)) {
                     	String redictURL = request.getContextPath() + "/restricted-resource";
-                        HttpServletResponse httpResponse = (HttpServletResponse)
-                		objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                        HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                 		httpResponse.sendRedirect(redictURL);
                 		return;
                     }
                     else {
                     	String redictURL = request.getContextPath() + "/login";
                         AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
-                        HttpServletResponse httpResponse = (HttpServletResponse)objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                        HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                         httpResponse.sendRedirect(redictURL);
                         return;
                     }
                 }
             }
             else if(search_export_config.equals("user")) {
-            	if(AuthenticationUtil.isLoggedIn(request)) {
-            		csv = exportMetadata(context, objectModel, query, scope, filters);
-                    filename = "search-results.csv";
-                }
-                else {
+            	if(!AuthenticationUtil.isLoggedIn(request)) {            		
                 	String redictURL = request.getContextPath() + "/login";
                     AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
-                    HttpServletResponse httpResponse = (HttpServletResponse)objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                    HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                     httpResponse.sendRedirect(redictURL);
                     return;
                 }
             }
-            else if(search_export_config.equals("anonymous")) {
-            	csv = exportMetadata(context, objectModel, query, scope, filters);
-                filename = "search-results.csv";
-            }
+            
+            csv = exportMetadata(context, objectModel, query, scope, filters);
+            filename = "search-results.csv";
+            simpleSearch = new SimpleSearch();            
+            
         }
         catch (RuntimeException e) {
             throw e;    
@@ -205,10 +199,11 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
      * @throws IOException, UIException, SearchServiceException, SQLException
      */
     public DSpaceCSV exportMetadata(Context context, Map objectModel, String query, String scopeString, String filters) throws IOException, UIException, SearchServiceException, SQLException
-    {
+    {	
     	DiscoverResult qResults = new DiscoverResult();
+    	
     	DiscoverQuery qArgs = new DiscoverQuery();
-        
+    	
     	try {
     		scopeString = scopeString.replace("~", "/");
         }
@@ -225,83 +220,18 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         	scope = HandleManager.resolveToObject(context, scopeString);
         }
         
-    	List<String> filterQueries = new ArrayList<String>();
-
-        String[] fqs = filters.split(",");
         
-        if (fqs != null) {
-            filterQueries.addAll(Arrays.asList(fqs));   
-        }
+        // prepare query from SimpleSearch object
+        qArgs = simpleSearch.prepareQuery(scope);
+        
+        
+        // no paging required
+        qArgs.setStart(0);
+        
         
         // some arbitrary value for first search
         qArgs.setMaxResults(10);
-
-        //Add the configured default filter queries
-        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
-        List<String> defaultFilterQueries = discoveryConfiguration.getDefaultFilterQueries();
-        qArgs.addFilterQueries(defaultFilterQueries.toArray(new String[defaultFilterQueries.size()]));
-
-        if (filterQueries.size() > 0) {
-        	qArgs.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
-        }
-
-        String sortBy = ObjectModelHelper.getRequest(objectModel).getParameter("sort_by");
-        DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration.getSearchSortConfiguration();
-        if(sortBy == null) {
-            //Attempt to find the default one, if none found we use SCORE
-            sortBy = "score";
-            if(searchSortConfiguration != null) {
-                for (DiscoverySortFieldConfiguration sortFieldConfiguration : searchSortConfiguration.getSortFields()) {
-                    if(sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())) {
-                        sortBy = SearchUtils.getSearchService().toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
-                    }
-                }
-            }
-        }
         
-        String sortOrder = ObjectModelHelper.getRequest(objectModel).getParameter("order");
-        if(sortOrder == null && searchSortConfiguration != null) {
-            sortOrder = searchSortConfiguration.getDefaultSortOrder().toString();
-        }
-
-        if (sortOrder == null || sortOrder.equalsIgnoreCase("DESC")) {
-        	qArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.desc);
-        }
-        else {
-        	qArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.asc);
-        }
-
-        String groupBy = ObjectModelHelper.getRequest(objectModel).getParameter("group_by");
-
-        // Enable groupBy collapsing if designated
-        if (groupBy != null && !groupBy.equalsIgnoreCase("none")) {
-            /** Construct a Collapse Field Query */
-        	qArgs.addProperty("collapse.field", groupBy);
-        	qArgs.addProperty("collapse.threshold", "1");
-        	qArgs.addProperty("collapse.includeCollapsedDocs.fl", "handle");
-        	qArgs.addProperty("collapse.facet", "before");
-
-            //queryArgs.a  type:Article^2
-
-            // TODO: This is a hack to get Publications (Articles) to always be at the top of Groups.
-            // TODO: I think that can be more transparently done in the solr solrconfig.xml with DISMAX and boosting
-            /** sort in groups to get publications to top */
-        	qArgs.setSortField("dc.type", DiscoverQuery.SORT_ORDER.asc);
-        }
-        
-        qArgs.setQuery(query != null && !query.trim().equals("") ? query : null);
-
-        // no paging required
-        qArgs.setStart(0);
-
-        if(discoveryConfiguration.getHitHighlightingConfiguration() != null) {
-            List<DiscoveryHitHighlightFieldConfiguration> metadataFields = discoveryConfiguration.getHitHighlightingConfiguration().getMetadataFields();
-            for (DiscoveryHitHighlightFieldConfiguration fieldConfiguration : metadataFields) {
-            	qArgs.addHitHighlightingField(new DiscoverHitHighlightingField(fieldConfiguration.getField(), fieldConfiguration.getMaxSize(), fieldConfiguration.getSnippets()));
-            }
-        }
-        
-        qArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled());
         
         // search once to get total search results
         qResults = SearchUtils.getSearchService().search(context, scope, qArgs);
