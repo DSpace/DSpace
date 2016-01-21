@@ -1877,6 +1877,7 @@
 	<message key="xmlui.administrative.ControlPanel.option_harvest">Harvesting</message>
 	<message key="xmlui.administrative.ControlPanel.harvest_scheduler_head">Harvest Scheduler Controls</message>
 	<message key="xmlui.administrative.ControlPanel.harvest_label_status">Status</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_status_refresh">(refresh)</message>
 	<message key="xmlui.administrative.ControlPanel.harvest_label_actions">Actions</message>
 	<message key="xmlui.administrative.ControlPanel.harvest_submit_start">Start Harvester</message>
 	<message key="xmlui.administrative.ControlPanel.harvest_submit_reset">Reset Harvest Status</message>
@@ -2037,8 +2038,20 @@
 	<message key="xmlui.administrative.ControlPanel.activity_sort_Agent">User-Agent</message>
 	<message key="xmlui.administrative.ControlPanel.activity_anonymous">Anonymous {0}</message>
 	<message key="xmlui.administrative.ControlPanel.activity_none">No page views have been recorded.</message>
+	<message key="xmlui.administrative.ControlPanel.detail">Detail</message>
+	<message key="xmlui.administrative.ControlPanel.show_hide">show/hide</message>
+	<message key="xmlui.administrative.ControlPanel.host">Host: {0}</message>
+	<message key="xmlui.administrative.ControlPanel.puser">Principal user: {0}</message>
+	<message key="xmlui.administrative.ControlPanel.headers">Headers: {0}</message>
+	<message key="xmlui.administrative.ControlPanel.cookies">Cookies: {0}</message>
 
 	<message key="xmlui.administrative.ControlPanel.select_panel">Use the tabs above to select the information to display</message>
+
+	<message key="xmlui.administrative.ControlPanel.tabs.Java Information">Java Information</message>
+	<message key="xmlui.administrative.ControlPanel.tabs.Configuration">Configuration</message>
+	<message key="xmlui.administrative.ControlPanel.tabs.SystemWide Alerts">SystemWide Alerts</message>
+	<message key="xmlui.administrative.ControlPanel.tabs.Harvesting">Harvesting</message>
+	<message key="xmlui.administrative.ControlPanel.tabs.Current Activity">Current Activity</message>
 
 	<!-- org.dspace.app.xmlui.administrative.SystemwideAlerts -->
 	<message key="xmlui.administrative.SystemwideAlerts.countdown"><strong>In {0} minutes</strong>: </message>
