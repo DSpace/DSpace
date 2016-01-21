@@ -384,6 +384,9 @@ public class ConfigurationManager
 
     /**
      * Returns an enumeration of all the keys in the DSpace configuration
+     * <P>
+     * As ConfigurationManager is now deprecated, older code using this method
+     * should consider using ConfigurationService.getPropertyKeys() directly.
      *
      * @return an enumeration of all the keys in the DSpace configuration
      */
@@ -395,7 +398,10 @@ public class ConfigurationManager
 
     /**
      * Returns an enumeration of all the keys in a module configuration
-     *
+     * <P>
+     * As ConfigurationManager is now deprecated, older code using this method
+     * should consider using ConfigurationService.getPropertyKeys(String prefix) directly.
+     * 
      * @param  module    module, or <code>null</code> for regular property
      *
      * @return an enumeration of all the keys in the module configuration,
