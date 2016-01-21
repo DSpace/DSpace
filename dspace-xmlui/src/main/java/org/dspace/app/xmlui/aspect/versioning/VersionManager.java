@@ -11,17 +11,27 @@ import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
-import org.dspace.versioning.VersioningService;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.UUID;
 
 /**
  *
@@ -37,6 +47,12 @@ public class VersionManager {
     private static final Message T_version_updated = new Message("default", "The version has been updated.");
     private static final Message T_version_restored = new Message("default", "The version has been restored.");
 
+    protected static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected static final VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
+    protected static final VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
+    protected static final WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+
 
     /**
      * Create a new version of the specified item
@@ -46,19 +62,16 @@ public class VersionManager {
      * @return A result object
      */
     // Versioning
-    public static FlowResult processCreateNewVersion(Context context, int itemID, String summary) throws SQLException, AuthorizeException, IOException {
+    public static FlowResult processCreateNewVersion(Context context, UUID itemID, String summary) throws SQLException, AuthorizeException, IOException {
         FlowResult result = new FlowResult();
         try {
             result.setContinue(false);
 
-            Item item = Item.find(context, itemID);
+            Item item = itemService.find(context, itemID);
 
-            if (AuthorizeManager.isAdmin(context, item) || item.canEdit()) {
-                VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-                Version version = versioningService.createNewVersion(context, itemID, summary);
-                WorkspaceItem wsi = WorkspaceItem.findByItem(context, version.getItem());
-
-                context.commit();
+            if (authorizeService.isAdmin(context, item) || itemService.canEdit(context, item)) {
+                Version version = versioningService.createNewVersion(context, item, summary);
+                WorkspaceItem wsi = workspaceItemService.findByItem(context, version.getItem());
 
                 result.setParameter("wsid", wsi.getID());
                 result.setOutcome(true);
@@ -81,19 +94,16 @@ public class VersionManager {
      * @return A result object
      */
     // Versioning
-    public static FlowResult processUpdateVersion(Context context, int itemID, String summary) throws SQLException, AuthorizeException, IOException {
+    public static FlowResult processUpdateVersion(Context context, UUID itemID, String summary) throws SQLException, AuthorizeException, IOException {
 
         FlowResult result = new FlowResult();
         try {
             result.setContinue(false);
 
-            Item item = Item.find(context, itemID);
+            Item item = itemService.find(context, itemID);
 
-            if (AuthorizeManager.isAdmin(context, item)) {
-                VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-                versioningService.updateVersion(context, itemID, summary);
-
-                context.commit();
+            if (authorizeService.isAdmin(context, item)) {
+                versioningService.updateVersion(context, item, summary);
 
                 result.setOutcome(true);
                 result.setContinue(true);
@@ -121,10 +131,7 @@ public class VersionManager {
         try {
             result.setContinue(false);
 
-            VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-            versioningService.restoreVersion(context, versionID, summary);
-
-            context.commit();
+            versioningService.restoreVersion(context, versioningService.getVersion(context, versionID), summary);
 
             result.setOutcome(true);
             result.setContinue(true);
@@ -145,26 +152,25 @@ public class VersionManager {
      * @return A result object
      */
     // Versioning
-    public static FlowResult processDeleteVersions(Context context, int itemId, String[] versionIDs) throws SQLException, AuthorizeException, IOException, UIException {
+    public static FlowResult processDeleteVersions(Context context, UUID itemId, String[] versionIDs) throws SQLException, AuthorizeException, IOException, UIException {
         FlowResult result = new FlowResult();
         try {
             result.setContinue(false);
 
-            VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+            Item item = itemService.find(context, itemId);
 
-            VersionHistory versionHistory = versioningService.findVersionHistory(context, itemId);
+            VersionHistory versionHistory = versioningService.findVersionHistory(context, item);
 
             for (String id : versionIDs) {
-                versioningService.removeVersion(context, Integer.parseInt(id));
+                versioningService.removeVersion(context, versioningService.getVersion(context, Integer.parseInt(id)));
             }
-            context.commit();
 
             //Retrieve the latest version of our history (IF any is even present)
-            Version latestVersion = versionHistory.getLatestVersion();
+            Version latestVersion = versionHistoryService.getLatestVersion(versionHistory);
             if(latestVersion == null){
                 result.setParameter("itemID", null);
             }else{
-                result.setParameter("itemID", latestVersion.getItemID());
+                result.setParameter("itemID", latestVersion.getItem().getID());
             }
             result.setContinue(true);
             result.setOutcome(true);

@@ -20,7 +20,9 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -37,6 +39,8 @@ import java.sql.SQLException;
  */
 public class StatisticsSearchResultTransformer extends AbstractDSpaceTransformer {
 
+
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     @Override
     public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException, ProcessingException {
@@ -110,7 +114,7 @@ public class StatisticsSearchResultTransformer extends AbstractDSpaceTransformer
         else
         {
             // Get the search scope from the location parameter
-            dso = HandleManager.resolveToObject(context, scopeString);
+            dso = handleService.resolveToObject(context, scopeString);
         }
 
         return dso;

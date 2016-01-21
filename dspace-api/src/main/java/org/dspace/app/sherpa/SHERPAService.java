@@ -26,7 +26,7 @@ public class SHERPAService
 
     private int maxNumberOfTries;
     private long sleepBetweenTimeouts;
-    private int timeout;
+    private int timeout = 5000;
 
     /** log4j category */
     private static final Logger log = Logger.getLogger(SHERPAService.class);

@@ -21,12 +21,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
-<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.content.WorkspaceItem" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.content.MetadataValue" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
 
 <%
     // get the workspace item from the request
@@ -34,8 +36,8 @@
         (WorkspaceItem) request.getAttribute("wsItem");
 
     // get the title and submitter of the item
-    Metadatum[] titleArray =
-         workspaceItem.getItem().getDC("title", null, Item.ANY);
+    List<MetadataValue> titleArray =
+         ContentServiceFactory.getInstance().getItemService().getMetadata(workspaceItem.getItem(), "dc", "title", null, Item.ANY);
 //    String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
     EPerson submitter = workspaceItem.getItem().getSubmitter();
 %>
@@ -47,10 +49,10 @@
 <div class="container">
         <h2>
 <%
-		if (titleArray.length > 0)
+		if (titleArray.size() > 0)
 		{
 %>
-			<%= titleArray[0].value %>
+			<%= titleArray.get(0).getValue() %>
 <%
 		}
 		else
@@ -67,7 +69,7 @@
     <p><a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a></p>
 
 	<p><fmt:message key="jsp.workspace.ws-main.submitmsg"/> 
-    <%= workspaceItem.getCollection().getMetadata("name") %></p>
+    <%= workspaceItem.getCollection().getName() %></p>
 
     <table class="table">
         <tr>

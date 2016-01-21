@@ -10,11 +10,15 @@ package org.dspace.browse;
 import org.apache.log4j.Logger;
 import org.dspace.content.Community;
 import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * This class provides a standard interface to all item counting
@@ -41,7 +45,10 @@ public class ItemCounter
 	
 	/** DSpace Context */
 	private Context context;
-	
+
+    protected CommunityService communityService;
+    protected ItemService itemService;
+
 	/**
 	 * method invoked by CLI which will result in the number of items
 	 * in each community and collection being cached.  These counts will
@@ -70,6 +77,8 @@ public class ItemCounter
 	{
 		this.context = context;
 		this.dao = ItemCountDAOFactory.getInstance(this.context);
+        this.communityService = ContentServiceFactory.getInstance().getCommunityService();
+        this.itemService = ContentServiceFactory.getInstance().getItemService();
 	}
 	
 	/**
@@ -84,11 +93,10 @@ public class ItemCounter
 	{
 		try
 		{
-			Community[] tlc = Community.findAllTop(context);
-			for (int i = 0; i < tlc.length; i++)
-			{
-				count(tlc[i]);
-			}
+			List<Community> tlc = communityService.findAllTop(context);
+            for (Community aTlc : tlc) {
+                count(aTlc);
+            }
 		}
 		catch (SQLException e)
 		{
@@ -122,7 +130,7 @@ public class ItemCounter
 		if (dso instanceof Collection)
 		{
 			try {
-				return ((Collection) dso).countItems();
+				return itemService.countItems(context, (Collection) dso);
 			} catch (SQLException e) {
 				log.error("caught exception: ", e);
 				throw new ItemCountException(e);
@@ -132,7 +140,7 @@ public class ItemCounter
 		if (dso instanceof Community)
 		{
 			try {
-				return ((Community) dso).countItems();
+				return communityService.countItems(context, ((Community) dso));
 			} catch (SQLException e) {
 				log.error("caught exception: ", e);
 				throw new ItemCountException(e);
@@ -166,28 +174,26 @@ public class ItemCounter
 	 * @param community
 	 * @throws ItemCountException
 	 */
-	private void count(Community community)
+    protected void count(Community community)
 		throws ItemCountException
 	{
 		try
 		{
 			// first count the community we are in
-			int count = community.countItems();
+			int count = communityService.countItems(context, community);
 			dao.communityCount(community, count);
 			
 			// now get the sub-communities
-			Community[] scs = community.getSubcommunities();
-			for (int i = 0; i < scs.length; i++)
-			{
-				count(scs[i]);
-			}
+			List<Community> scs = community.getSubcommunities();
+            for (Community sc : scs) {
+                count(sc);
+            }
 			
 			// now get the collections
-			Collection[] cols = community.getCollections();
-			for (int i = 0; i < cols.length; i++)
-			{
-				count(cols[i]);
-			}
+			List<Collection> cols = community.getCollections();
+            for (Collection col : cols) {
+                count(col);
+            }
 		}
 		catch (SQLException e)
 		{
@@ -202,12 +208,12 @@ public class ItemCounter
 	 * @param collection
 	 * @throws ItemCountException
 	 */
-	private void count(Collection collection)
+	protected void count(Collection collection)
 		throws ItemCountException
 	{
 		try
 		{
-			int ccount = collection.countItems();
+			int ccount = itemService.countItems(context, collection);
 			dao.collectionCount(collection, ccount);
 		}
 		catch (SQLException e)

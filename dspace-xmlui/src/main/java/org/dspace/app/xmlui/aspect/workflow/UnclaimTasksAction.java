@@ -19,8 +19,11 @@ import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
+import org.dspace.workflowbasic.BasicWorkflowItem;
+import org.dspace.workflowbasic.BasicWorkflowServiceImpl;
+import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
+import org.dspace.workflowbasic.service.BasicWorkflowItemService;
+import org.dspace.workflowbasic.service.BasicWorkflowService;
 
 /**
  * Unclaim all the selected workflows. This action returns these
@@ -32,6 +35,9 @@ import org.dspace.workflow.WorkflowManager;
 public class UnclaimTasksAction extends AbstractAction
 {
     private static final Logger log = Logger.getLogger(UnclaimTasksAction.class);
+
+	protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
+	protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
 
     /**
      * @param redirector
@@ -52,20 +58,19 @@ public class UnclaimTasksAction extends AbstractAction
     	{
     		for (String workflowID : workflowIDs)
     		{
-    			WorkflowItem workflowItem = WorkflowItem.find(context, Integer.valueOf(workflowID));
+    			BasicWorkflowItem workflowItem = basicWorkflowItemService.find(context, Integer.valueOf(workflowID));
     			//workflowItem.get
     			
     			int state = workflowItem.getState();
     			// only claim tasks that are in the pool.
-    			if ( state == WorkflowManager.WFSTATE_STEP1 || 
-    				 state == WorkflowManager.WFSTATE_STEP2 || 
-    				 state == WorkflowManager.WFSTATE_STEP3 )
+    			if ( state == BasicWorkflowServiceImpl.WFSTATE_STEP1 ||
+    				 state == BasicWorkflowServiceImpl.WFSTATE_STEP2 ||
+    				 state == BasicWorkflowServiceImpl.WFSTATE_STEP3 )
     			{
                     log.info(LogManager.getHeader(context, "unclaim_workflow", "workflow_id=" + workflowItem.getID()));
-    				WorkflowManager.unclaim(context, workflowItem, context.getCurrentUser());
+					basicWorkflowService.unclaim(context, workflowItem, context.getCurrentUser());
     			}
     		}
-    		context.commit();
     	}
     	
     	return null;

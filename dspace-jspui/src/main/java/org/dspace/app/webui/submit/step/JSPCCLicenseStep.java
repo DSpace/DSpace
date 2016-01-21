@@ -7,6 +7,13 @@
  */
 package org.dspace.app.webui.submit.step;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
@@ -16,18 +23,14 @@ import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
-import org.dspace.content.LicenseUtils;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.license.CreativeCommons;
+import org.dspace.license.factory.LicenseServiceFactory;
+import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.submit.step.LicenseStep;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * License step for DSpace JSP-UI. Presents the user with license information
@@ -71,6 +74,15 @@ public class JSPCCLicenseStep extends JSPStep
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPCCLicenseStep.class);
 
+    private WorkspaceItemService workspaceItemService;
+    
+    private CreativeCommonsService creativeCommonsService;
+    
+    public JSPCCLicenseStep() {
+    	workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    	creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
+    }
+    
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
      * the UI for this step. This method should include the gathering and
@@ -101,7 +113,7 @@ public class JSPCCLicenseStep extends JSPStep
     {
         // Do we already have a CC license?
         Item item = subInfo.getSubmissionItem().getItem();
-        boolean exists = CreativeCommons.hasLicense(context, item);
+        boolean exists = creativeCommonsService.hasLicense(context, item);
         request.setAttribute("cclicense.exists", Boolean.valueOf(exists));
 
         JSPStepManager.showJSP(request, response, subInfo, CC_LICENSE_JSP);
@@ -152,10 +164,7 @@ public class JSPCCLicenseStep extends JSPStep
                     && (SubmissionController.getStepReached(subInfo) <= SubmissionController.FIRST_STEP))
             {
                 WorkspaceItem wi = (WorkspaceItem) subInfo.getSubmissionItem();
-                wi.deleteAll();
-
-                // commit changes
-                context.commit();
+                workspaceItemService.deleteAll(context, wi);
             }
 
             // Show the license rejected page

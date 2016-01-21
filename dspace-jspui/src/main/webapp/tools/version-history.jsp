@@ -20,6 +20,7 @@
 <%@page import="org.dspace.versioning.Version"%>
 <%@page import="org.dspace.app.webui.util.VersionUtil"%>
 <%@page import="org.dspace.versioning.VersionHistory"%>
+<%@ page import="java.util.UUID" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
@@ -29,7 +30,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
-    Integer itemID = (Integer)request.getAttribute("itemID");
+    UUID itemID = (UUID)request.getAttribute("itemID");
 	String versionID = (String)request.getAttribute("versionID");
 	Item item = (Item) request.getAttribute("item");
 	Boolean removeok = UIUtil.getBoolParameter(request, "delete");
@@ -95,17 +96,17 @@ var j = jQuery.noConflict();
 		
 		<% for(Version versRow : history.getVersions()) {  
 		
-			EPerson versRowPerson = versRow.getEperson();
+			EPerson versRowPerson = versRow.getEPerson();
 			String[] identifierPath = VersionUtil.addItemIdentifier(item, versRow);
 
 		%>	
 		<tr>
-			<td headers="t0"><input type="checkbox" class="remove" name="remove" value="<%=versRow.getVersionId()%>"/></td>			
+			<td headers="t0"><input type="checkbox" class="remove" name="remove" value="<%=versRow.getId()%>"/></td>
 			<td headers="t1" class="oddRowEvenCol"><%= versRow.getVersionNumber() %></td>
-			<td headers="t2" class="oddRowOddCol"><a href="<%= request.getContextPath() + identifierPath[0] %>"><%= identifierPath[1] %></a><%= item.getID()==versRow.getItemID()?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
+			<td headers="t2" class="oddRowOddCol"><a href="<%= request.getContextPath() + identifierPath[0] %>"><%= identifierPath[1] %></a><%= item.equals(versRow.getItem())?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
 			<td headers="t3" class="oddRowEvenCol"><a href="mailto:<%= versRowPerson.getEmail() %>"><%=versRowPerson.getFullName() %></a></td>
 			<td headers="t4" class="oddRowOddCol"><%= versRow.getVersionDate() %></td>
-			<td headers="t5" class="oddRowEvenCol"><%= versRow.getSummary() %><a class="btn btn-default pull-right" href="<%= request.getContextPath() %>/tools/version?itemID=<%= versRow.getItemID()%>&versionID=<%= versRow.getVersionId() %>&submit_update_version"><span class="glyphicon glyphicon-pencil"></span>&nbsp;<fmt:message key="jsp.version.history.update"/></a></td>
+			<td headers="t5" class="oddRowEvenCol"><%= versRow.getSummary() %><a class="btn btn-default pull-right" href="<%= request.getContextPath() %>/tools/version?itemID=<%= versRow.getItem().getID()%>&versionID=<%= versRow.getId() %>&submit_update_version"><span class="glyphicon glyphicon-pencil"></span>&nbsp;<fmt:message key="jsp.version.history.update"/></a></td>
 		</tr>
 		<% } %>
 	</table>

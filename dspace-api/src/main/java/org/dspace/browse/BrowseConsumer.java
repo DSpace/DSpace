@@ -7,13 +7,9 @@
  */
 package org.dspace.browse;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -46,20 +42,22 @@ public class BrowseConsumer implements Consumer
     private static Logger log = Logger.getLogger(BrowseConsumer.class);
 
     // items to be updated in browse index
-    private Map<Integer, ItemHolder> toUpdate = null;
+    private Map<UUID, ItemHolder> toUpdate = null;
 
+    @Override
     public void initialize()
         throws Exception
     {
        
     }
 
+    @Override
     public void consume(Context ctx, Event event)
         throws Exception
     {
         if(toUpdate == null)
         {
-            toUpdate = new HashMap<Integer, ItemHolder>();
+            toUpdate = new HashMap<UUID, ItemHolder>();
         }
         
         log.debug("consume() evaluating event: " + event.toString());
@@ -107,6 +105,7 @@ public class BrowseConsumer implements Consumer
         
     }
 
+    @Override
     public void end(Context ctx)
         throws Exception
     {
@@ -139,18 +138,13 @@ public class BrowseConsumer implements Consumer
                             + i.item.getHandle());
                 }
             }
-
-            // NOTE: Removed items are necessarily handled inline (ugh).
-
-            // browse updates wrote to the DB, so we have to commit.
-            ctx.getDBConnection().commit();
-
         }
         
         // clean out toUpdate
         toUpdate = null;
     }
     
+    @Override
     public void finish(Context ctx) {
     	
     }

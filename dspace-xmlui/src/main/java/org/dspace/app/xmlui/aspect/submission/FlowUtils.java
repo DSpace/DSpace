@@ -7,37 +7,30 @@
  */
 package org.dspace.app.xmlui.aspect.submission;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInput;
-import org.dspace.app.util.SubmissionConfig;
-import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * This is a utility class to aid in the submission flow scripts. 
@@ -58,12 +51,15 @@ public class FlowUtils {
     /** Where the submissionInfo is stored on an HTTP Request object */
     private static final String DSPACE_SUBMISSION_INFO = "dspace.submission.info";
 
+    protected static final WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected static final WorkflowItemService workflowService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
+
 	/**
-	 * Return the InProgressSubmission, either workspaceItem or workflowItem, 
+	 * Return the InProgressSubmission, either workspaceItem or workflowItem,
 	 * depending on the id provided. If the id begins with an S then it is a
 	 * considered a workspaceItem. If the id begins with a W then it is
 	 * considered a workflowItem.
-	 * 
+	 *
 	 * @param context
 	 * @param inProgressSubmissionID
 	 * @return The InprogressSubmission or null if non found
@@ -74,15 +70,10 @@ public class FlowUtils {
 		
 		if (type == 'S')
 		{
-			return WorkspaceItem.find(context, id);
+			return workspaceItemService.find(context, id);
 		}
-		else if (type == 'W')
-		{
-			return WorkflowItem.find(context, id);
-		}
-        else if (type == 'X')
-        {
-            return XmlWorkflowItem.find(context, id);
+		else if (type == 'W' || type == 'X') {
+            return workflowService.find(context, id);
         }
 		return null;
 	}
@@ -184,15 +175,13 @@ public class FlowUtils {
 			{
 				workspaceItem.setStageReached(step);
 				workspaceItem.setPageReached(1);  //reset page to first page in new step
-				workspaceItem.update();
-				context.commit();
+				workspaceItemService.update(context, workspaceItem);
 			}
 			else if ((step == workspaceItem.getStageReached()) &&
 					 (page > workspaceItem.getPageReached()))
 			{
 				workspaceItem.setPageReached(page);
-				workspaceItem.update();
-				context.commit();
+                workspaceItemService.update(context, workspaceItem);
 			}
 		}
     }
@@ -217,8 +206,7 @@ public class FlowUtils {
 
             workspaceItem.setStageReached(step);
             workspaceItem.setPageReached(page > 0 ? page : 1);
-            workspaceItem.update();
-            context.commit();
+            workspaceItemService.update(context, workspaceItem);
         }
     }
     
@@ -323,8 +311,7 @@ public class FlowUtils {
 		{
 			// If they selected to remove the item then delete everything.
 			WorkspaceItem workspace = findWorkspace(context,id);
-			workspace.deleteAll();
-	        context.commit();
+			workspaceItemService.deleteAll(context, workspace);
 		}
 	}
 	

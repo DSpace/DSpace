@@ -22,6 +22,8 @@ import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Site;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.SiteService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.discovery.DiscoverResult;
 import org.xml.sax.SAXException;
@@ -44,6 +46,8 @@ public class RecentSubmissionTransformer extends AbstractDSpaceTransformer {
     protected static final Message T_trail = message("xmlui.Discovery.RecentSubmissions.RecentSubmissionTransformer.trail");
 
     protected boolean isHomePage = false;
+
+    protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
 
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
@@ -78,7 +82,7 @@ public class RecentSubmissionTransformer extends AbstractDSpaceTransformer {
 
         // Add the trail back to the repository root.
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(dso, pageMeta,contextPath, !isHomePage);
+        HandleUtil.buildHandleTrail(context, dso, pageMeta,contextPath, !isHomePage);
         if(!isHomePage)
         {
             //Add a trail link indicating that we are on a recent submissions page
@@ -138,7 +142,7 @@ public class RecentSubmissionTransformer extends AbstractDSpaceTransformer {
         }
     }
 
-    protected void setPagination(Request request, DSpaceObject dso, Division mainDivision, DiscoverResult recentlySubmittedItems) {
+    protected void setPagination(Request request, DSpaceObject dso, Division mainDivision, DiscoverResult recentlySubmittedItems) throws SQLException {
         int offset = getOffset(request);
         int rpp = RecentSubmissionUtils.getRecentSubmissionConfiguration(dso).getMax();
         int firstIndex = offset + 1;
@@ -159,7 +163,7 @@ public class RecentSubmissionTransformer extends AbstractDSpaceTransformer {
 
     }
 
-    protected String getNextPageURL(DSpaceObject dso, int currentOffset, int rpp, int total){
+    protected String getNextPageURL(DSpaceObject dso, int currentOffset, int rpp, int total) throws SQLException {
         if((rpp + currentOffset) < total)
         {
             return getBaseUrl(dso) + "?offset=" + (rpp + currentOffset);
@@ -168,7 +172,7 @@ public class RecentSubmissionTransformer extends AbstractDSpaceTransformer {
         }
     }
 
-    protected String getPreviousPageURL(DSpaceObject dso, int currentOffset, int rpp) {
+    protected String getPreviousPageURL(DSpaceObject dso, int currentOffset, int rpp) throws SQLException {
         if((currentOffset - rpp) < 0){
             return null;
         }else{
@@ -176,10 +180,9 @@ public class RecentSubmissionTransformer extends AbstractDSpaceTransformer {
         }
     }
 
-    protected String getBaseUrl(DSpaceObject dso)
-    {
+    protected String getBaseUrl(DSpaceObject dso) throws SQLException {
         String url = contextPath;
-        if(dso != null && dso.getID() != Site.SITE_ID)
+        if(dso != null && dso.equals(siteService.findSite(context)))
         {
             url += "/handle/" + dso.getHandle();
         }
@@ -202,7 +205,7 @@ public class RecentSubmissionTransformer extends AbstractDSpaceTransformer {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if(dso == null)
         {
-            return Site.find(context, Site.SITE_ID);
+            return siteService.findSite(context);
         }else{
             return dso;
         }

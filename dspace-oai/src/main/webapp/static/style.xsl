@@ -13,7 +13,8 @@
 	xmlns:lyn="http://www.lyncode.com/fakeNamespace" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
 	xmlns:dc="http://purl.org/dc/doc:elements/1.1/"
     xmlns:verb="http://informatik.hu-berlin.de/xmlverbatim"
-    exclude-result-prefixes="oai lyn oai_dc dc verb">
+    xmlns:oai_id="http://www.openarchives.org/OAI/2.0/oai-identifier"
+    exclude-result-prefixes="oai lyn oai_dc dc verb oai_id">
 
 	<xsl:output method="html" doctype-public="-//W3C//DTD HTML 4.01//EN" doctype-system="http://www.w3.org/TR/html4/strict.dtd" />
 
@@ -167,14 +168,14 @@
             <tr>
                 <td><b>Repository identifier</b></td>
                 <td>
-                    <xsl:value-of select="oai:description/oai:oai-identifier/oai:repositoryIdentifier/text()" />
+                    <xsl:value-of select="oai:description/oai_id:oai-identifier/oai_id:repositoryIdentifier/text()" />
                 </td>
             </tr>
             <tr>
                 <td><b>Sample identifier</b></td>
                 <td>
                     <xsl:value-of
-                            select="oai:description/oai:oai-identifier/oai:sampleIdentifier/text()" />
+                            select="oai:description/oai_id:oai-identifier/oai_id:sampleIdentifier/text()" />
                 </td>
             </tr>
             <tr>
@@ -284,14 +285,18 @@
                             <h5>Identifier <small><xsl:value-of select="oai:header/oai:identifier/text()"></xsl:value-of></small></h5>
                         </div>
                         <div class="col-lg-6">
-                            <h5>Last Modfied <small><xsl:value-of select="translate(oai:header/oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
+                            <h5>Last Modified <small><xsl:value-of select="translate(oai:header/oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
                         </div>
                     </div>
                 </div>
                 <div class="panel-body">
+                    <!-- If this record has a "status", display it as a warning -->
+                    <xsl:if test="oai:header/@status">
+                      <div class="alert alert-warning">Record Status: <xsl:value-of select="oai:header/@status"/></div>
+                    </xsl:if>
                     <div class="panel panel-success">
                         <a data-toggle="collapse">
-                            <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-heading">
                                 <h5 class="panel-title">
                                     Sets
@@ -299,7 +304,7 @@
                             </div>
                         </a>
                         <div class="panel-collapse collapse">
-                            <xsl:attribute name="id">sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="id">sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-body list-group">
                                 <xsl:for-each select="oai:header/oai:setSpec">
                                     <div class="list-group-item">
@@ -317,7 +322,7 @@
                     </div>
                     <div class="panel panel-info">
                         <a data-toggle="collapse">
-                            <xsl:attribute name="href">#<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="href">#<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-heading">
                                 <h5 class="panel-title">
                                         Metadata
@@ -325,7 +330,7 @@
                             </div>
                         </a>
                         <div class="panel-collapse collapse">
-                            <xsl:attribute name="id"><xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="id"><xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-body">
                                 <xsl:apply-templates select="oai:metadata/*" />
                             </div>
@@ -349,11 +354,15 @@
                             <h5>Identifier <small><xsl:value-of select="oai:header/oai:identifier/text()"></xsl:value-of></small></h5>
                         </div>
                         <div class="col-lg-6">
-                            <h5>Last Modfied <small><xsl:value-of select="translate(oai:header/oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
+                            <h5>Last Modified <small><xsl:value-of select="translate(oai:header/oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
                         </div>
                     </div>
                 </div>
                 <div class="panel-body">
+                    <!-- If this record has a "status", display it as a warning -->
+                    <xsl:if test="oai:header/@status">
+                      <div class="alert alert-warning">Record Status: <xsl:value-of select="oai:header/@status"/></div>
+                    </xsl:if>
                     <div class="panel panel-success">
                             <div class="panel-heading">
                                 <h5 class="panel-title">
@@ -409,7 +418,7 @@
                             <h5>Identifier <small><xsl:value-of select="oai:identifier/text()"></xsl:value-of></small></h5>
                         </div>
                         <div class="col-lg-4">
-                            <h5>Last Modfied <small><xsl:value-of select="translate(oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
+                            <h5>Last Modified <small><xsl:value-of select="translate(oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
                         </div>
                         <div class="col-lg-4">
                             <a class="btn btn-default pull-right">
@@ -422,9 +431,13 @@
                     </div>
                 </div>
                 <div class="panel-body">
+                    <!-- If this record has a "status", display it as a warning -->
+                    <xsl:if test="@status">
+                      <div class="alert alert-warning">Record Status: <xsl:value-of select="@status"/></div>
+                    </xsl:if>
                     <div class="panel panel-success">
                         <a data-toggle="collapse">
-                            <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-heading">
                                 <h5 class="panel-title">
                                     Sets
@@ -432,7 +445,7 @@
                             </div>
                         </a>
                         <div class="panel-collapse collapse">
-                            <xsl:attribute name="id">sets<xsl:value-of select="translate(oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="id">sets<xsl:value-of select="translate(oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-body list-group">
                                 <xsl:for-each select="oai:setSpec">
                                     <div class="list-group-item">
@@ -500,7 +513,7 @@
             <div class="text-center">
                 <a class="btn btn-primary">
                 <xsl:attribute name="href">
-                    <xsl:value-of select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=ListSets&amp;resumptionToken=', text())"></xsl:value-of>
+                    <xsl:value-of select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=',/oai:OAI-PMH/oai:request/@verb,'&amp;resumptionToken=', text())"></xsl:value-of>
                 </xsl:attribute>
                     Show More
                 </a>

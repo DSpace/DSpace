@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.aspect.submission.submit.AccessStepUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -25,8 +26,11 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bundle;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
@@ -63,7 +67,11 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 	private static final String DEFAULT_BUNDLE_LIST = "ORIGINAL, METADATA, THUMBNAIL, LICENSE, CC-LICENSE";
 
     private boolean isAdvancedFormEnabled=true;
-		
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
         pageMeta.addMetadata("title").addContent(T_title);
@@ -78,8 +86,8 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 	{
             isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
-            int itemID = parameters.getParameterAsInteger("itemID", -1);
-            org.dspace.content.Item item = org.dspace.content.Item.find(context, itemID);
+            UUID itemID = UUID.fromString(parameters.getParameter("itemID", null));
+            org.dspace.content.Item item = itemService.find(context, itemID);
 
             // DIVISION: main div
             Division div = body.addInteractiveDivision("add-bitstream", contextPath + "/admin/item", Division.METHOD_MULTIPART, "primary administrative item");
@@ -171,25 +179,25 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
          */
         public boolean addBundleOption(org.dspace.content.Item item, Select select, String bundleName) throws SQLException, WingException
 	{
-            Bundle[] bundles = item.getBundles(bundleName);
-            if (bundles == null || bundles.length == 0)
+            java.util.List<Bundle> bundles = itemService.getBundles(item, bundleName);
+            if (bundles == null || bundles.size() == 0)
             {
                 // No bundle, so the user has to be authorized to add to item.
-                if(!AuthorizeManager.authorizeActionBoolean(context, item, Constants.ADD))
+                if(!authorizeService.authorizeActionBoolean(context, item, Constants.ADD))
                 {
                     return false;
                 }
             } else
             {
                 // At least one bundle exists, does the user have privileges to upload to it?
-                Bundle bundle = bundles[0];
-                if (!AuthorizeManager.authorizeActionBoolean(context, bundle, Constants.ADD))
+                Bundle bundle = bundles.get(0);
+                if (!authorizeService.authorizeActionBoolean(context, bundle, Constants.ADD))
                 {
                     return false; // you can't upload to this bundle.
                 }
 
                 // You also need the write privlege on the bundle.
-                if (!AuthorizeManager.authorizeActionBoolean(context, bundle, Constants.WRITE))
+                if (!authorizeService.authorizeActionBoolean(context, bundle, Constants.WRITE))
                 {
                     return false;  // you can't upload
                 }

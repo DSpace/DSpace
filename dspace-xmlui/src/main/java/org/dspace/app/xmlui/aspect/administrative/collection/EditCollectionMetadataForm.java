@@ -8,6 +8,7 @@
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -22,8 +23,12 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 
 
 /**
@@ -69,6 +74,9 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
     private static final Message T_submit_delete = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete");
     private static final Message T_submit_save = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_save");
 
+	protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+
     @Override
     public void addPageMeta(PageMeta pageMeta)
             throws WingException
@@ -84,20 +92,20 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
     public void addBody(Body body)
             throws WingException, SQLException, AuthorizeException
     {
-		int collectionID = parameters.getParameterAsInteger("collectionID", -1);
-		Collection thisCollection = Collection.find(context, collectionID);
+		UUID collectionID = UUID.fromString(parameters.getParameter("collectionID", null));
+		Collection thisCollection = collectionService.find(context, collectionID);
 		
 		String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
 
             //Check that all HTML input fields contain valid XHTML
-            String short_description_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("short_description"));
-	    String introductory_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("introductory_text"));
-	    String copyright_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("copyright_text"));
-	    String side_bar_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("side_bar_text"));
+            String short_description_error = FlowContainerUtils.checkXMLFragment(collectionService.getMetadata(thisCollection, "short_description"));
+	    String introductory_text_error = FlowContainerUtils.checkXMLFragment(collectionService.getMetadata(thisCollection, "introductory_text"));
+	    String copyright_text_error = FlowContainerUtils.checkXMLFragment(collectionService.getMetadata(thisCollection, "copyright_text"));
+	    String side_bar_text_error = FlowContainerUtils.checkXMLFragment(collectionService.getMetadata(thisCollection, "side_bar_text"));
 	    
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("collection-metadata-edit",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
-	    main.setHead(T_main_head.parameterize(thisCollection.getMetadata("name")));
+	    main.setHead(T_main_head.parameterize(collectionService.getMetadata(thisCollection, "name")));
    
 	    List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
 	    options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_options_metadata);
@@ -113,12 +121,12 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    metadataList.addLabel(T_label_name);
 	    Text name = metadataList.addItem().addText("name");
 	    name.setSize(40);
-	    name.setValue(thisCollection.getMetadata("name"));
+	    name.setValue(collectionService.getMetadata(thisCollection, "name"));
 	    
 	    // short description
 	    metadataList.addLabel(T_label_short_description);
 	    Text short_description = metadataList.addItem().addText("short_description");
-	    short_description.setValue(thisCollection.getMetadata("short_description"));
+	    short_description.setValue(collectionService.getMetadata(thisCollection, "short_description"));
 	    short_description.setSize(40);
 	    if (short_description_error != null)
         {
@@ -128,7 +136,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    // introductory text
 	    metadataList.addLabel(T_label_introductory_text);
 	    TextArea introductory_text = metadataList.addItem().addTextArea("introductory_text");
-	    introductory_text.setValue(thisCollection.getMetadata("introductory_text"));
+	    introductory_text.setValue(collectionService.getMetadata(thisCollection, "introductory_text"));
 	    introductory_text.setSize(6, 40);
 	    if (introductory_text_error != null)
         {
@@ -138,7 +146,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    // copyright text
 	    metadataList.addLabel(T_label_copyright_text);
 	    TextArea copyright_text = metadataList.addItem().addTextArea("copyright_text");
-	    copyright_text.setValue(thisCollection.getMetadata("copyright_text"));
+	    copyright_text.setValue(collectionService.getMetadata(thisCollection, "copyright_text"));
 	    copyright_text.setSize(6, 40);
 	    if (copyright_text_error != null)
         {
@@ -148,7 +156,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    // legacy sidebar text; may or may not be used for news 
 	    metadataList.addLabel(T_label_side_bar_text);
 	    TextArea side_bar_text = metadataList.addItem().addTextArea("side_bar_text");
-	    side_bar_text.setValue(thisCollection.getMetadata("side_bar_text"));
+	    side_bar_text.setValue(collectionService.getMetadata(thisCollection, "side_bar_text"));
 	    side_bar_text.setSize(6, 40);
 	    if (side_bar_text_error != null)
         {
@@ -158,13 +166,13 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    // license text
 	    metadataList.addLabel(T_label_license);
 	    TextArea license = metadataList.addItem().addTextArea("license");
-	    license.setValue(thisCollection.getMetadata("license"));
+	    license.setValue(collectionService.getMetadata(thisCollection, "license"));
 	    license.setSize(6, 40);
 	    
 	    // provenance description
 	    metadataList.addLabel(T_label_provenance_description);
 	    TextArea provenance_description = metadataList.addItem().addTextArea("provenance_description");
-	    provenance_description.setValue(thisCollection.getMetadata("provenance_description"));
+	    provenance_description.setValue(collectionService.getMetadata(thisCollection, "provenance_description"));
 	    provenance_description.setSize(6, 40);
 	    	    
 	    // the row to upload a new logo 
@@ -202,7 +210,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 		Para buttonList = main.addPara();
 	    buttonList.addButton("submit_save").setValue(T_submit_save);
         //Only System Admins can Delete Collections
-	    if (AuthorizeManager.isAdmin(context))
+	    if (authorizeService.isAdmin(context))
         {
 	    	buttonList.addButton("submit_delete").setValue(T_submit_delete);
         }

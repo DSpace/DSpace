@@ -19,8 +19,9 @@ import javax.servlet.jsp.jstl.core.Config;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -40,8 +41,12 @@ import org.dspace.core.LogManager;
 public class PasswordServlet extends DSpaceServlet
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(PasswordServlet.class);
+    private static final Logger log = Logger.getLogger(PasswordServlet.class);
 
+    private final transient AuthenticationService authenticationService
+             = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+    
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -50,6 +55,7 @@ public class PasswordServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, "/login/password.jsp");
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -60,24 +66,12 @@ public class PasswordServlet extends DSpaceServlet
         String jsp = null;
 
         // Locate the eperson
-        int status = AuthenticationManager.authenticate(context, email, password,
-                        null, request);
+        int status = authenticationService.authenticate(context, email, password,
+                null, request);
  
        
         if (status == AuthenticationMethod.SUCCESS)
         {
-            try {
-                // the AuthenticationManager updates the last_active field of the
-                // eperson that logged in. We need to commit the context, to store
-                // the updated field in the database.
-                context.commit();
-            } catch (SQLException ex) {
-                // We can log the SQLException, but we should not interrupt the 
-                // users interaction here.
-                log.error("Failed to write an updated last_active field of an "
-                        + "EPerson into the databse.", ex);
-            }
-
             // Logged in OK.
             Authenticate.loggedIn(context, request, context.getCurrentUser());
 

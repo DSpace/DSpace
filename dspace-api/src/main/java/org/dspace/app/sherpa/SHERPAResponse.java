@@ -55,8 +55,6 @@ public class SHERPAResponse
             Document inDoc = db.parse(xmlData);
 
             Element xmlRoot = inDoc.getDocumentElement();
-            Element dataRoot = XMLUtils.getSingleElement(xmlRoot, "romeoapi");
-
             Element headersElement = XMLUtils.getSingleElement(xmlRoot,
                     "header");
             Element journalsElement = XMLUtils.getSingleElement(xmlRoot,

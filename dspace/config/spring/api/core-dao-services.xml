@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+
+
+    <!-- **************** -->
+    <!-- DAO declarations -->
+    <!-- **************** -->
+    <bean class="org.dspace.app.requestitem.dao.impl.RequestItemDAOImpl"/>
+    <bean class="org.dspace.app.util.dao.impl.WebAppDAOImpl"/>
+
+    <bean class="org.dspace.authorize.dao.impl.ResourcePolicyDAOImpl"/>
+
+    <bean class="org.dspace.checker.dao.impl.ChecksumHistoryDAOImpl"/>
+    <bean class="org.dspace.checker.dao.impl.ChecksumResultDAOImpl"/>
+    <bean class="org.dspace.checker.dao.impl.MostRecentChecksumDAOImpl"/>
+
+
+    <bean class="org.dspace.content.dao.impl.CollectionDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.BitstreamDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.BitstreamFormatDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.BundleDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.CommunityDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.ItemDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.MetadataFieldDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.MetadataSchemaDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.MetadataValueDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.SiteDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.WorkspaceItemDAOImpl"/>
+
+    <bean class="org.dspace.eperson.dao.impl.EPersonDAOImpl"/>
+    <bean class="org.dspace.eperson.dao.impl.Group2GroupCacheDAOImpl"/>
+    <bean class="org.dspace.eperson.dao.impl.GroupDAOImpl"/>
+    <bean class="org.dspace.eperson.dao.impl.RegistrationDataDAOImpl"/>
+    <bean class="org.dspace.eperson.dao.impl.SubscriptionDAOImpl"/>
+
+    <bean class="org.dspace.handle.dao.impl.HandleDAOImpl"/>
+
+    <bean class="org.dspace.harvest.dao.impl.HarvestedItemDAOImpl"/>
+    <bean class="org.dspace.harvest.dao.impl.HarvestedCollectionDAOImpl"/>
+
+    <bean class="org.dspace.identifier.dao.impl.DOIDAOImpl"/>
+
+    <!-- declaration moved to bitstore.xml -->
+    <!--<bean class="org.dspace.storage.bitstore.BitstreamStorageServiceImpl"/>-->
+
+    <bean class="org.dspace.versioning.dao.impl.VersionDAOImpl"/>
+    <bean class="org.dspace.versioning.dao.impl.VersionHistoryDAOImpl"/>
+
+    <bean class="org.dspace.workflowbasic.dao.impl.BasicWorkflowItemDAOImpl"/>
+    <bean class="org.dspace.workflowbasic.dao.impl.TaskListItemDAOImpl"/>
+
+    <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.ClaimedTaskDAOImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.CollectionRoleDAOImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.InProgressUserDAOImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.PoolTaskDAOImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.WorkflowItemRoleDAOImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.XmlWorkflowItemDAOImpl"/>
+
+
+
+</beans>

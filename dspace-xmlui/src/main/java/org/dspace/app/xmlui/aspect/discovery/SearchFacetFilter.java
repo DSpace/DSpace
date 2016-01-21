@@ -31,7 +31,9 @@ import org.dspace.core.Constants;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -73,10 +75,16 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     protected DiscoverQuery queryArgs;
 
     private int DEFAULT_PAGE_SIZE = 10;
+    private int currentOffset = 0;
 
 
     private SearchService searchService = null;
     private static final Message T_go = message("xmlui.general.go");
+    private static final Message T_rpp = message("xmlui.Discovery.AbstractSearch.rpp");
+    private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5, 10, 20, 40, 60, 80, 100};
+
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
 
     public SearchFacetFilter() {
 
@@ -137,7 +145,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
                 if (dso != null) {
                     // Add the actual collection;
-                    validity.add(dso);
+                    validity.add(context, dso);
                 }
 
                 // add recently submitted items, serialize solr query contents.
@@ -146,7 +154,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                 validity.add("numFound:" + response.getDspaceObjects().size());
 
                 for (DSpaceObject resultDso : queryResults.getDspaceObjects()) {
-                    validity.add(resultDso);
+                    validity.add(context, resultDso);
                 }
 
                 for (String facetField : queryResults.getFacetResults().keySet()) {
@@ -220,9 +228,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         DiscoverFacetField discoverFacetField;
         if(request.getParameter(SearchFilterParam.STARTS_WITH) != null)
         {
-            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, DEFAULT_PAGE_SIZE + 1, DiscoveryConfigurationParameters.SORT.VALUE, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
+            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, getPageSize() + 1, DiscoveryConfigurationParameters.SORT.VALUE, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
         }else{
-            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, DEFAULT_PAGE_SIZE + 1, DiscoveryConfigurationParameters.SORT.VALUE);
+            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, getPageSize() + 1, DiscoveryConfigurationParameters.SORT.VALUE);
         }
 
 
@@ -252,7 +260,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if ((dso instanceof Collection) || (dso instanceof Community)) {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
+            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath, true);
         }
 
         pageMeta.addTrail().addContent(message("xmlui.Discovery.AbstractSearch.type_" + facetField));
@@ -263,12 +271,13 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         Request request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-
+        updateQueryResultsAndOffset(request, dso);
         SearchFilterParam browseParams = new SearchFilterParam(request);
         // Build the DRI Body
         Division div = body.addDivision("browse-by-" + request.getParameter(SearchFilterParam.FACET_FIELD), "primary");
 
         addBrowseJumpNavigation(div, browseParams, request);
+        addBrowseControls(div, browseParams);
 
         // Set up the major variables
         //Collection collection = (Collection) dso;
@@ -276,7 +285,6 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         // Build the collection viewer division.
 
         //Make sure we get our results
-        queryResults = getQueryResponse(dso);
         if (this.queryResults != null) {
 
             Map<String, List<DiscoverResult.FacetResult>> facetFields = this.queryResults.getFacetResults();
@@ -304,23 +312,24 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                     if(offSet == -1){
                         offSet = 0;
                     }
+                    currentOffset=offSet;
 
                     //Only show the nextpageurl if we have at least one result following our current results
                     String nextPageUrl = null;
-                    if (values.size() == (DEFAULT_PAGE_SIZE + 1))
+                    if (values.size() == (getPageSize() + 1))
                     {
                         nextPageUrl = getNextPageURL(browseParams, request);
                     }
 
 
 
-                    int shownItemsMax = offSet + (DEFAULT_PAGE_SIZE < values.size() ? values.size() - 1 : values.size());
+                    int shownItemsMax = offSet + (getPageSize() < values.size() ? values.size() - 1 : values.size());
 
 
 
                     // We put our total results to -1 so this doesn't get shown in the results (will be hidden by the xsl)
                     // The reason why we do this is because solr 1.4 can't retrieve the total number of facets found
-                    results.setSimplePagination(-1, offSet + 1,
+                    results.setSimplePagination((int) queryResults.getTotalSearchResults(), offSet + 1,
                                                     shownItemsMax, getPreviousPageURL(browseParams, request), nextPageUrl);
 
                     Table singleTable = results.addTable("browse-by-" + facetField + "-results", (int) (queryResults.getDspaceObjects().size() + 1), 1);
@@ -329,9 +338,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
 
                     int end = values.size();
-                    if(DEFAULT_PAGE_SIZE < end)
+                    if(getPageSize() < end)
                     {
-                        end = DEFAULT_PAGE_SIZE;
+                        end = getPageSize();
                     }
                     for (int i = 0; i < end; i++) {
                         DiscoverResult.FacetResult value = values.get(i);
@@ -341,6 +350,19 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                     results.addPara(message("xmlui.discovery.SearchFacetFilter.no-results"));
                 }
             }
+        }
+    }
+
+    private void updateQueryResultsAndOffset(Request request, DSpaceObject dso) {
+        int configuredOffset=-1;
+        boolean retainOffset = false;
+        if (request.getParameters().containsKey("update")) {
+            configuredOffset = currentOffset;
+            retainOffset=true;
+        }
+        queryResults = getQueryResponse(dso);
+        if (retainOffset) {
+            queryArgs.setFacetOffset(configuredOffset);
         }
     }
 
@@ -435,13 +457,13 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         int offSet = Util.getIntParameter(request, SearchFilterParam.OFFSET);
         if (offSet == -1)
         {
-            offSet = 0;
+            offSet = currentOffset;
         }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(browseParams.getCommonBrowseParams());
         parameters.putAll(browseParams.getControlParameters());
-        parameters.put(SearchFilterParam.OFFSET, String.valueOf(offSet + DEFAULT_PAGE_SIZE));
+        parameters.put(SearchFilterParam.OFFSET, String.valueOf(offSet + getPageSize()));
 
         // Add the filter queries
         String url = generateURL("search-filter", parameters);
@@ -452,13 +474,14 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
     private String getPreviousPageURL(SearchFilterParam browseParams, Request request) throws UnsupportedEncodingException, UIException {
         //If our offset should be 0 then we shouldn't be able to view a previous page url
-        if (0 == queryArgs.getFacetOffset() && Util.getIntParameter(request, "offset") == -1)
+        boolean currentOffsetSmallerOrEqualTO0 = currentOffset <= 0;
+        if (0 == queryArgs.getFacetOffset() && Util.getIntParameter(request, "offset") == -1 && currentOffsetSmallerOrEqualTO0)
         {
             return null;
         }
 
         int offset = Util.getIntParameter(request, SearchFilterParam.OFFSET);
-        if(offset == -1 || offset == 0)
+        if(currentOffsetSmallerOrEqualTO0 && (offset == -1 || offset == 0))
         {
             return null;
         }
@@ -466,7 +489,8 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(browseParams.getCommonBrowseParams());
         parameters.putAll(browseParams.getControlParameters());
-        parameters.put(SearchFilterParam.OFFSET, String.valueOf(offset - DEFAULT_PAGE_SIZE));
+        String offSet = String.valueOf((currentOffset - getPageSize()<0)? 0:currentOffset - getPageSize());
+        parameters.put(SearchFilterParam.OFFSET, offSet);
 
         // Add the filter queries
         String url = generateURL("search-filter", parameters);
@@ -569,10 +593,59 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         else
         {
             // Get the search scope from the location parameter
-            dso = HandleManager.resolveToObject(context, scopeString);
+            dso = handleService.resolveToObject(context, scopeString);
         }
 
         return dso;
+    }
+    protected int getPageSize() {
+        try {
+            int rpp =Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("rpp"));
+            DEFAULT_PAGE_SIZE=rpp;
+            return rpp;
+        }
+        catch (Exception e) {
+            return DEFAULT_PAGE_SIZE;
+        }
+    }
+
+    /**
+     * Add the controls to changing sorting and display options.
+     *
+     * @param div
+     * @param params
+     * @throws WingException
+     */
+    private void addBrowseControls(Division div, SearchFilterParam params)
+            throws WingException
+    {
+        // Prepare a Map of query parameters required for all links
+        Map<String, String> queryParams = new HashMap<String, String>();
+
+        queryParams.putAll(params.getCommonBrowseParams());
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        queryParams.put("order",request.getParameter("order"));
+        String facetField = request.getParameter(SearchFilterParam.FACET_FIELD);
+        Division controls = div.addInteractiveDivision("browse-controls", "search-filter?field="+facetField,
+                Division.METHOD_POST, "browse controls");
+
+        // Add all the query parameters as hidden fields on the form
+        for (Map.Entry<String, String> param : queryParams.entrySet())
+        {
+            controls.addHidden(param.getKey()).setValue(param.getValue());
+        }
+
+        Para controlsForm = controls.addPara();
+        // Create a control for the number of records to display
+        controlsForm.addContent(T_rpp);
+
+        Select rppSelect = controlsForm.addSelect("rpp");
+
+        for (int i : RESULTS_PER_PAGE_PROGRESSION)
+        {
+            rppSelect.addOption((i == getPageSize()), i, Integer.toString(i));
+        }
+        controlsForm.addButton("update").setValue("update");
     }
 
 }

@@ -16,14 +16,20 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
-import org.dspace.versioning.VersioningService;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -46,6 +52,10 @@ public class VersionNoticeTransformer extends AbstractDSpaceTransformer {
     private static final Message T_new_version_help = message("xmlui.aspect.versioning.VersionNoticeTransformer.notice.new_version_help");
     private static final Message T_workflow_version_head = message("xmlui.aspect.versioning.VersionNoticeTransformer.notice.workflow_version_head");
     private static final Message T_workflow_version_help = message("xmlui.aspect.versioning.VersionNoticeTransformer.notice.workflow_version_help");
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
 
     @Override
     public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException, ProcessingException {
@@ -74,12 +84,11 @@ public class VersionNoticeTransformer extends AbstractDSpaceTransformer {
 
 
         //Check if we have a history for the item
-        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-        VersionHistory history = versioningService.findVersionHistory(context, item.getID());
+        VersionHistory history = versionHistoryService.findByItem(context, item);
 
         if(history != null){
             Version latestVersion = retrieveLatestVersion(history, item);
-            if(latestVersion != null && latestVersion.getItemID() != item.getID())
+            if(latestVersion != null && !latestVersion.getItem().equals(item))
             {
                 //We have a newer version
                 Item latestVersionItem = latestVersion.getItem();
@@ -101,7 +110,7 @@ public class VersionNoticeTransformer extends AbstractDSpaceTransformer {
         //Attempt to retrieve the latest version
         List<Version> allVersions = history.getVersions();
         for (Version version : allVersions) {
-            if (version.getItem().isArchived() || AuthorizeManager.isAdmin(context, item.getOwningCollection()))
+            if (version.getItem().isArchived() || authorizeService.isAdmin(context, item.getOwningCollection()))
             {
                 return version;
             }
@@ -118,7 +127,7 @@ public class VersionNoticeTransformer extends AbstractDSpaceTransformer {
         para.addContent(content);
         if(addItemUrl)
         {
-            String url = HandleManager.resolveToURL(context, item.getHandle());
+            String url = handleService.resolveToURL(context, item.getHandle());
             para.addXref(url, url);
         }
     }

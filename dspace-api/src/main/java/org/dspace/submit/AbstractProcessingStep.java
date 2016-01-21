@@ -21,6 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
 import org.dspace.core.Context;
 
 /**
@@ -97,7 +101,13 @@ public abstract class AbstractProcessingStep
     private Map<Integer, String> errorMessages = null;
 
     private static final String ERROR_FIELDS_ATTRIBUTE = "dspace.submit.error_fields";
-    
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
     /**
      * Do any processing of the information input by the user, and/or perform

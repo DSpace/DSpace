@@ -29,12 +29,15 @@
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.core.Context"%>
 <%@ page import="org.dspace.app.webui.util.UIUtil"%>
-
+<%@ page import="java.util.List" %>
+<%@ page import="org.dspace.content.service.BitstreamFormatService" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
 
 
 <%
-    BitstreamFormat[] formats =
-        (BitstreamFormat[]) request.getAttribute("formats");
+    BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    List<BitstreamFormat> formats =
+        (List<BitstreamFormat>) request.getAttribute("formats");
 %>
 
 <dspace:layout style="submission" titlekey="jsp.dspace-admin.list-formats.title"
@@ -74,63 +77,63 @@
 <%
 
     String row = "even";
-    for (int i = 0; i < formats.length; i++)
+    for (int i = 0; i < formats.size(); i++)
     {
-        String[] extensions = formats[i].getExtensions();
+        List<String> extensions = formats.get(i).getExtensions();
         String extValue = "";
 
-        for (int j = 0 ; j < extensions.length; j++)
+        for (int j = 0 ; j < extensions.size(); j++)
         {
             if (j > 0)
             {
                 extValue = extValue + ", ";
             }
-            extValue = extValue + extensions[j];
+            extValue = extValue + extensions.get(j);
         }
 %>
              <tr>
                  <td>
 				<form class="form-inline" method="post" action="">
   					
-					<span class="col-md-1"><%= formats[i].getID() %></span>
+					<span class="col-md-1"><%= formats.get(i).getID() %></span>
                     <div class="form-group">
                     	<label class="sr-only" for="mimetype"><fmt:message key="jsp.dspace-admin.list-formats.mime"/></label>
-                    	<input class="form-control" type="text" name="mimetype" value="<%= formats[i].getMIMEType()!=null?formats[i].getMIMEType():"" %>" size="14" placeholder="<fmt:message key="jsp.dspace-admin.list-formats.mime"/>"/>
+                    	<input class="form-control" type="text" name="mimetype" value="<%= formats.get(i).getMIMEType()!=null?formats.get(i).getMIMEType():"" %>" size="14" placeholder="<fmt:message key="jsp.dspace-admin.list-formats.mime"/>"/>
                     </div>
                     <div class="form-group">
                     	  <label class="sr-only" for="short_description"><fmt:message key="jsp.dspace-admin.list-formats.name"/></label>
                     <%
-                      if (BitstreamFormat.findUnknown(context).getID() == formats[i].getID()) {
+                      if (bitstreamFormatService.findUnknown(context).getID() == formats.get(i).getID()) {
                     %>
-                      		  <span class="form-control"><i><%= formats[i].getShortDescription() %></i></span>
+                      		  <span class="form-control"><i><%= formats.get(i).getShortDescription() %></i></span>
                     <% } else { %>                    	
-                              <input class="form-control" type="text" name="short_description" value="<%= formats[i].getShortDescription()!=null?formats[i].getShortDescription():"" %>" size="10" placeholder="<fmt:message key="jsp.dspace-admin.list-formats.name"/>"/>
+                              <input class="form-control" type="text" name="short_description" value="<%= formats.get(i).getShortDescription()!=null?formats.get(i).getShortDescription():"" %>" size="10" placeholder="<fmt:message key="jsp.dspace-admin.list-formats.name"/>"/>
                     <% } %>
                      </div>     
                      <div class="form-group">
                      		<label class="sr-only" for="description"><fmt:message key="jsp.dspace-admin.list-formats.description"/></label>     
-                              <input class="form-control" type="text" name="description" value="<%= formats[i].getDescription()!=null?formats[i].getDescription():"" %>" size="20" placeholder="<fmt:message key="jsp.dspace-admin.list-formats.description"/>"/>
+                              <input class="form-control" type="text" name="description" value="<%= formats.get(i).getDescription()!=null?formats.get(i).getDescription():"" %>" size="20" placeholder="<fmt:message key="jsp.dspace-admin.list-formats.description"/>"/>
                      </div>
                      <div class="form-group">                     		
                               <select class="form-control" name="support_level">
-                                  <option value="0" <%= formats[i].getSupportLevel() == 0 ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.unknown"/></option>
-	    	                  <option value="1" <%= formats[i].getSupportLevel() == 1 ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.known"/></option>
-                                  <option value="2" <%= formats[i].getSupportLevel() == 2 ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.supported"/></option>
+                                  <option value="0" <%= formats.get(i).getSupportLevel() == 0 ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.unknown"/></option>
+	    	                  <option value="1" <%= formats.get(i).getSupportLevel() == 1 ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.known"/></option>
+                                  <option value="2" <%= formats.get(i).getSupportLevel() == 2 ? "selected=\"selected\"" : "" %>><fmt:message key="jsp.dspace-admin.list-formats.supported"/></option>
                               </select>
                      </div>
                      <div class="form-group">     
-                              <input class="form-control" type="checkbox" name="internal" value="true"<%= formats[i].isInternal() ? " checked=\"checked\"" : "" %>/>
+                              <input class="form-control" type="checkbox" name="internal" value="true"<%= formats.get(i).isInternal() ? " checked=\"checked\"" : "" %>/>
                           </div>
                           <div class="form-group">
                           	  <label class="sr-only" for="extensions"><fmt:message key="jsp.dspace-admin.list-formats.extensions"/></label>
                               <input class="form-control" type="text" name="extensions" value="<%= extValue %>" size="10" placeholder="<fmt:message key="jsp.dspace-admin.list-formats.extensions"/>"/>
                           </div>
                      <div class="btn-group pull-right">
-                              <input type="hidden" name="format_id" value="<%= formats[i].getID() %>" />
+                              <input type="hidden" name="format_id" value="<%= formats.get(i).getID() %>" />
                               <input class="btn btn-primary" type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>"/>
                           
                     <%
-                      if (BitstreamFormat.findUnknown(context).getID() != formats[i].getID()) {
+                      if (bitstreamFormatService.findUnknown(context).getID() != formats.get(i).getID()) {
                     %>
                              <input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>" />
                      <% 

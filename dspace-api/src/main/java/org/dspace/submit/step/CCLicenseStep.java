@@ -7,7 +7,6 @@
  */
 package org.dspace.submit.step;
 
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.HashMap;
@@ -19,12 +18,13 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.license.CreativeCommons;
 import org.dspace.license.CCLookup;
+import org.dspace.license.LicenseMetadataValue;
+import org.dspace.license.factory.LicenseServiceFactory;
+import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.submit.AbstractProcessingStep;
 
 import javax.servlet.ServletException;
@@ -67,6 +67,8 @@ public class CCLicenseStep extends AbstractProcessingStep
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(CCLicenseStep.class);
+
+    protected final CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
     
     /**
      * Do any processing of the information input by the user, and/or perform
@@ -91,6 +93,7 @@ public class CCLicenseStep extends AbstractProcessingStep
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
+    @Override
     public int doProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
@@ -121,28 +124,28 @@ public class CCLicenseStep extends AbstractProcessingStep
         if (choiceButton.equals(SELECT_CHANGE))
         {
 	        Item item = subInfo.getSubmissionItem().getItem();
-	        CreativeCommons.MdField uriField = CreativeCommons.getCCField("uri");
-	        CreativeCommons.MdField nameField = CreativeCommons.getCCField("name");
+	        LicenseMetadataValue uriField = creativeCommonsService.getCCField("uri");
+	        LicenseMetadataValue nameField = creativeCommonsService.getCCField("name");
 	        String licenseUri = uriField.ccItemValue(item);
 	        if (licenseUri != null)
 	        //if (CreativeCommons.hasLicense(item, "dc", "rights", "uri", Item.ANY) 
 			//	&& !CreativeCommons.getRightsURI(item, "dc", "rights", "uri", Item.ANY).equals(""))
 	        {
         	    //CreativeCommons.setItemMetadata(item, licenseURI, "dc", "rights", "uri", ConfigurationManager.getProperty("default.locale"));
-	        	uriField.removeItemValue(item, licenseUri);
+	        	uriField.removeItemValue(context, item, licenseUri);
                 if (ConfigurationManager.getBooleanProperty("cc.submit.setname"))
                 {
                 	String licenseName = nameField.keyedItemValue(item, licenseUri);
-                	nameField.removeItemValue(item, licenseName);
+                	nameField.removeItemValue(context, item, licenseName);
                 	//CreativeCommons.setItemMetadata(item, CreativeCommons.getRightsName(item, "dc", "rights", null, Item.ANY), "dc", "rights", null, ConfigurationManager.getProperty("default.locale"));
                 }
                 if (ConfigurationManager.getBooleanProperty("cc.submit.addBitstream"))
                 {
-                	CreativeCommons.removeLicense(context, item);
+                    creativeCommonsService.removeLicense(context, item);
                 }
                 removeRequiredAttributes(session);
-                item.update();
-                context.commit();
+                itemService.update(context, item);
+                context.dispatchEvents();
             }
 	        return STATUS_COMPLETE;
         }
@@ -192,7 +195,7 @@ public class CCLicenseStep extends AbstractProcessingStep
         if (buttonPressed.equals("submit_no_cc"))
         {
             // Skipping the CC license - remove any existing license selection
-            CreativeCommons.removeLicense(context, subInfo.getSubmissionItem()
+            creativeCommonsService.removeLicense(context, subInfo.getSubmissionItem()
                     .getItem());
         }
         else if ((ccLicenseUrl != null) && (ccLicenseUrl.length() > 0))
@@ -200,11 +203,11 @@ public class CCLicenseStep extends AbstractProcessingStep
             Item item = subInfo.getSubmissionItem().getItem();
 
             // save the CC license
-            CreativeCommons.setLicense(context, item, ccLicenseUrl);
+            creativeCommonsService.setLicense(context, item, ccLicenseUrl);
         }
 
         // commit changes
-        context.commit();
+        context.dispatchEvents();
 
         // completed without errors
         return STATUS_COMPLETE;
@@ -233,7 +236,6 @@ public class CCLicenseStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException {
        
-        String ccLicenseUrl = request.getParameter("cc_license_url");
         HttpSession session = request.getSession();
     	Map<String, String> map = new HashMap<String, String>();
     	String licenseclass = (request.getParameter("licenseclass_chooser") != null) ? request.getParameter("licenseclass_chooser") : "";
@@ -246,8 +248,8 @@ public class CCLicenseStep extends AbstractProcessingStep
     	}
     	map.put("jurisdiction", jurisdiction);
     	CCLookup ccLookup = new CCLookup();
-    	CreativeCommons.MdField uriField = CreativeCommons.getCCField("uri");
-    	CreativeCommons.MdField nameField = CreativeCommons.getCCField("name");
+    	LicenseMetadataValue uriField = creativeCommonsService.getCCField("uri");
+    	LicenseMetadataValue nameField = creativeCommonsService.getCCField("name");
     	ccLookup.issue(licenseclass, map, ConfigurationManager.getProperty("cc.license.locale"));
     	Item item = subInfo.getSubmissionItem().getItem();
     	if (licenseclass.equals("xmlui.Submission.submit.CCLicenseStep.no_license")) 
@@ -255,18 +257,18 @@ public class CCLicenseStep extends AbstractProcessingStep
     		// only remove any previous licenses
     		String licenseUri = uriField.ccItemValue(item);
     		if (licenseUri != null) {
-    			uriField.removeItemValue(item, licenseUri);
+    			uriField.removeItemValue(context, item, licenseUri);
     			if (ConfigurationManager.getBooleanProperty("cc.submit.setname"))
                 {
                 	String licenseName = nameField.keyedItemValue(item, licenseUri);
-                	nameField.removeItemValue(item, licenseName);
+                	nameField.removeItemValue(context, item, licenseName);
                 }
                 if (ConfigurationManager.getBooleanProperty("cc.submit.addBitstream"))
                 {
-                	CreativeCommons.removeLicense(context, item);
+                    creativeCommonsService.removeLicense(context, item);
                 }
-    			item.update();
-    			context.commit();
+    			itemService.update(context, item);
+                context.dispatchEvents();
     			removeRequiredAttributes(session);
     		}
     		return STATUS_COMPLETE;
@@ -278,15 +280,15 @@ public class CCLicenseStep extends AbstractProcessingStep
     	}
     	else if (ccLookup.isSuccess()) 
     	{
-    		uriField.addItemValue(item, ccLookup.getLicenseUrl());
+    		uriField.addItemValue(context, item, ccLookup.getLicenseUrl());
     		if (ConfigurationManager.getBooleanProperty("cc.submit.addbitstream")) {
-    			CreativeCommons.setLicenseRDF(context, item, ccLookup.getRdf());
+                creativeCommonsService.setLicenseRDF(context, item, ccLookup.getRdf());
     		}	
     		if (ConfigurationManager.getBooleanProperty("cc.submit.setname")) {
-    			nameField.addItemValue(item, ccLookup.getLicenseName());
+    			nameField.addItemValue(context, item, ccLookup.getLicenseName());
     		}
-    		item.update();
-    		context.commit();
+            itemService.update(context, item);
+            context.dispatchEvents();
     		removeRequiredAttributes(session);
     		session.removeAttribute("inProgress");
     	} 
@@ -296,7 +298,7 @@ public class CCLicenseStep extends AbstractProcessingStep
     		String licenseUri = uriField.ccItemValue(item);
     		if (licenseUri != null)
     		{
-    			uriField.removeItemValue(item, licenseUri);
+    			uriField.removeItemValue(context, item, licenseUri);
     		}
     		return STATUS_LICENSE_REJECTED;
     	}
@@ -331,6 +333,7 @@ public class CCLicenseStep extends AbstractProcessingStep
      * 
      * @return the number of pages in this step
      */
+    @Override
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {

@@ -19,19 +19,9 @@
 
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
-<%@ page import="org.dspace.app.util.DCInputSet" %>
-<%@ page import="org.dspace.app.util.DCInput" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.content.Bitstream" %>
-<%@ page import="org.dspace.content.BitstreamFormat" %>
-<%@ page import="org.dspace.content.DCDate" %>
-<%@ page import="org.dspace.content.DCLanguage" %>
-<%@ page import="org.dspace.content.Metadatum" %>
-<%@ page import="org.dspace.content.InProgressSubmission" %>
-<%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.Context" %>
-<%@ page import="org.dspace.core.Utils" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>

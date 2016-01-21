@@ -15,9 +15,8 @@ import java.util.Iterator;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.content.Site;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.rdf.RDFConfiguration;
-import org.dspace.utils.DSpace;
 
 /**
  *
@@ -32,7 +31,7 @@ public class Negotiator {
     public static final int RDFXML = 2;
     public static final int TURTLE = 3;
     public static final int N3 = 4;
-    
+
     public static final String DEFAULT_LANG="html";
     
     private static final Logger log = Logger.getLogger(Negotiator.class);
@@ -245,7 +244,7 @@ public class Negotiator {
         if (StringUtils.isEmpty(handle))
         {
             log.warn("Handle is empty, set it to Site Handle.");
-            handle = Site.getSiteHandle();
+            handle = ConfigurationManager.getProperty("handle.prefix") + "/0";
         }
         
         // don't redirect if HTML is requested and content negotiation is done
@@ -263,9 +262,8 @@ public class Negotiator {
         // if html is requested we have to forward to the repositories webui.
         if ("html".equals(lang))
         {
-            urlBuilder.append((new DSpace()).getConfigurationService()
-                    .getProperty("dspace.url"));
-            if (!handle.equals(Site.getSiteHandle()))
+            urlBuilder.append(ConfigurationManager.getProperty("dspace.url"));
+            if (!handle.equals(ConfigurationManager.getProperty("handle.prefix") + "/0"))
             {
                 urlBuilder.append("/handle/");
                 urlBuilder.append(handle).append("/").append(extraPathInfo);

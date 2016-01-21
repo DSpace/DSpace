@@ -9,13 +9,16 @@ package org.dspace.app.itemmarking;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This is an item marking Strategy class that tries to mark an item availability
@@ -28,6 +31,9 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
 
 	private String availableImageName;
 	private String nonAvailableImageName;
+
+    @Autowired(required = true)
+    protected ItemService itemService;
 	
 	public ItemMarkingAvailabilityBitstreamStrategy() {
 	
@@ -37,27 +43,27 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
 	public ItemMarkingInfo getItemMarkingInfo(Context context, Item item)
 			throws SQLException {
 		
-		Bundle[] bundles = item.getBundles("ORIGINAL");
-		if (bundles.length == 0){
+		List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+		if (bundles.size() == 0){
 			ItemMarkingInfo markInfo = new ItemMarkingInfo();
 			markInfo.setImageName(nonAvailableImageName);	
 			
 			return markInfo;
 		}
 		else {
-			Bundle originalBundle = bundles[0];
-			if (originalBundle.getBitstreams().length == 0){
+			Bundle originalBundle = bundles.iterator().next();
+			if (originalBundle.getBitstreams().size() == 0){
 				ItemMarkingInfo markInfo = new ItemMarkingInfo();
 				markInfo.setImageName(nonAvailableImageName);
 				
 				return markInfo;
 			}
 			else {
-				Bitstream bitstream = originalBundle.getBitstreams()[0];
-				
-				ItemMarkingInfo signInfo = new ItemMarkingInfo();
-				signInfo.setImageName(availableImageName);
-				signInfo.setTooltip(bitstream.getName());
+                Bitstream bitstream = originalBundle.getBitstreams().get(0);
+
+                ItemMarkingInfo signInfo = new ItemMarkingInfo();
+                signInfo.setImageName(availableImageName);
+                signInfo.setTooltip(bitstream.getName());
 				
 				
 				

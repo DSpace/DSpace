@@ -29,6 +29,8 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="java.util.Enumeration" %>
+<%@ page import="org.dspace.content.service.CollectionService" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -93,24 +95,25 @@
     Item template = null;
 
     Bitstream logo = null;
-    
+
+    CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     if (collection != null)
     {
-        name = collection.getMetadata("name");
-        shortDesc = collection.getMetadata("short_description");
-        intro = collection.getMetadata("introductory_text");
-        copy = collection.getMetadata("copyright_text");
-        side = collection.getMetadata("side_bar_text");
-        provenance = collection.getMetadata("provenance_description");
+        name = collectionService.getMetadata(collection, "name");
+        shortDesc = collectionService.getMetadata(collection, "short_description");
+        intro = collectionService.getMetadata(collection, "introductory_text");
+        copy = collectionService.getMetadata(collection, "copyright_text");
+        side = collectionService.getMetadata(collection, "side_bar_text");
+        provenance = collectionService.getMetadata(collection, "provenance_description");
 
-        if (collection.hasCustomLicense())
+        if (collectionService.hasCustomLicense(collection))
         {
-            license = collection.getLicense();
+            license = collectionService.getLicense(collection);
         }
         
-        wfGroups[0] = collection.getWorkflowGroup(1);
-        wfGroups[1] = collection.getWorkflowGroup(2);
-        wfGroups[2] = collection.getWorkflowGroup(3);
+        wfGroups[0] = collection.getWorkflowStep1();
+        wfGroups[1] = collection.getWorkflowStep2();
+        wfGroups[2] = collection.getWorkflowStep3();
 
         admins     = collection.getAdministrators();
         submitters = collection.getSubmitters();

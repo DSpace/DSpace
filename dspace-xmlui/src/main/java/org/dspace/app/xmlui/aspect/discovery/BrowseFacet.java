@@ -123,7 +123,7 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
 
                 if (dso != null) {
                     // Add the actual collection;
-                    validity.add(dso);
+                    validity.add(context, dso);
                 }
 
                 // add recently submitted items, serialize solr query contents.
@@ -132,7 +132,7 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
                 validity.add("numFound:" + response.getDspaceObjects().size());
 
                 for (DSpaceObject resultDso : response.getDspaceObjects()) {
-                    validity.add(resultDso);
+                    validity.add(context, resultDso);
                 }
 
                 for (String facetField : response.getFacetResults().keySet()) {
@@ -240,11 +240,6 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
             discoverQuery.setMaxResults(1);
             discoverQuery.setSortField(dateField, DiscoverQuery.SORT_ORDER.asc);
             discoverQuery.addFilterQueries(filterquery);
-
-            DiscoverResult rsp = searchService.search(context, discoverQuery);
-//            if(0 < rsp.getResults().getNumFound()){
-//                return (Date) rsp.getResults().get(0).getFieldValue(dateField);
-//            }
         }catch (Exception e){
             log.error("Unable to get lowest date", e);
         }
@@ -265,7 +260,7 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if ((dso instanceof Collection) || (dso instanceof Community)) {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath);
         }
 
         pageMeta.addTrail().addContent(message("xmlui.ArtifactBrowser.AbstractSearch.type_" + facetField + "_browse"));

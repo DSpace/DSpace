@@ -269,7 +269,11 @@ public class I18nUtil
         {
             locale = DEFAULTLOCALE;
         }
-        ResourceBundle messages = ResourceBundle.getBundle("Messages", locale);
+        ResourceBundle.Control control = 
+            ResourceBundle.Control.getNoFallbackControl(
+            ResourceBundle.Control.FORMAT_DEFAULT);
+
+        ResourceBundle messages = ResourceBundle.getBundle("Messages", locale, control);
         try {
             String message = messages.getString(key.trim());
             return message;

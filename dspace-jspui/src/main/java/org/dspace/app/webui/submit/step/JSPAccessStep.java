@@ -22,8 +22,9 @@ import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -49,6 +50,8 @@ public class JSPAccessStep extends JSPStep
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPAccessStep.class);
+    
+    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
@@ -188,7 +191,7 @@ public class JSPAccessStep extends JSPStep
         List<ResourcePolicy> rpolicies = new ArrayList<ResourcePolicy>();
         try
         {
-            rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
+            rpolicies = authorizeService.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
         }
         catch (SQLException e)
         {

@@ -7,47 +7,36 @@
  */
 package org.dspace.rest;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.Bundle;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.rest.common.Bitstream;
+import org.dspace.rest.common.Item;
+import org.dspace.rest.common.MetadataEntry;
+import org.dspace.rest.exceptions.ContextException;
+import org.dspace.usage.UsageEvent;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.Metadatum;
-import org.dspace.content.service.ItemService;
-import org.dspace.eperson.Group;
-import org.dspace.rest.common.Bitstream;
-import org.dspace.rest.common.Item;
-import org.dspace.rest.common.MetadataEntry;
-import org.dspace.rest.exceptions.ContextException;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.usage.UsageEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Class which provide all CRUD methods over items.
@@ -60,6 +49,14 @@ import org.dspace.usage.UsageEvent;
 @Path("/items")
 public class ItemsResource extends Resource
 {
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     private static final Logger log = Logger.getLogger(ItemsResource.class);
 
@@ -90,9 +87,9 @@ public class ItemsResource extends Resource
     @GET
     @Path("/{item_id}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Item getItem(@PathParam("item_id") Integer itemId, @QueryParam("expand") String expand,
+    public Item getItem(@PathParam("item_id") String itemId, @QueryParam("expand") String expand,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -105,7 +102,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             item = new Item(dspaceItem, expand, context);
             context.complete();
@@ -152,7 +149,7 @@ public class ItemsResource extends Resource
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Item[] getItems(@QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
             @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -164,12 +161,12 @@ public class ItemsResource extends Resource
         {
             context = createContext(getUser(headers));
 
-            ItemIterator dspaceItems = org.dspace.content.Item.findAllUnfiltered(context);
+            Iterator<org.dspace.content.Item> dspaceItems = itemService.findAllUnfiltered(context);
             items = new ArrayList<Item>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
-                log.warn("Pagging was badly set, using default values.");
+                log.warn("Paging was badly set, using default values.");
                 limit = 100;
                 offset = 0;
             }
@@ -179,10 +176,10 @@ public class ItemsResource extends Resource
                 org.dspace.content.Item dspaceItem = dspaceItems.next();
                 if (i >= offset)
                 {
-                    if (ItemService.isItemListedForUser(context, dspaceItem))
+                    if (itemService.isItemListedForUser(context, dspaceItem))
                     {
                         items.add(new Item(dspaceItem, expand, context));
-                        writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
+                        writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                                 headers, request, context);
                     }
                 }
@@ -227,8 +224,8 @@ public class ItemsResource extends Resource
     @GET
     @Path("/{item_id}/metadata")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public MetadataEntry[] getItemMetadata(@PathParam("item_id") Integer itemId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+    public MetadataEntry[] getItemMetadata(@PathParam("item_id") String itemId, @QueryParam("userIP") String user_ip,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -241,7 +238,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             metadata = new org.dspace.rest.common.Item(dspaceItem, "metadata", context).getMetadata();
             context.complete();
@@ -264,7 +261,7 @@ public class ItemsResource extends Resource
     }
 
     /**
-     * Return array of bitstreams in item. It can be pagged.
+     * Return array of bitstreams in item. It can be paged.
      * 
      * @param itemId
      *            Id of item in DSpace.
@@ -276,7 +273,7 @@ public class ItemsResource extends Resource
      *            If you want to access to item under logged user into context.
      *            In headers must be set header "rest-dspace-token" with passed
      *            token from login method.
-     * @return Return pagged array of bitstreams in item.
+     * @return Return paged array of bitstreams in item.
      * @throws WebApplicationException
      *             It can be throw by NOT_FOUND, UNAUTHORIZED, SQLException if
      *             was problem with reading from database and ContextException
@@ -285,10 +282,10 @@ public class ItemsResource extends Resource
     @GET
     @Path("/{item_id}/bitstreams")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Bitstream[] getItemBitstreams(@PathParam("item_id") Integer itemId,
+    public Bitstream[] getItemBitstreams(@PathParam("item_id") String itemId,
             @QueryParam("limit") @DefaultValue("20") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -300,7 +297,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             List<Bitstream> itemBitstreams = new Item(dspaceItem, "bitstreams", context).getBitstreams();
 
@@ -357,9 +354,9 @@ public class ItemsResource extends Resource
     @POST
     @Path("/{item_id}/metadata")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response addItemMetadata(@PathParam("item_id") Integer itemId, List<org.dspace.rest.common.MetadataEntry> metadata,
+    public Response addItemMetadata(@PathParam("item_id") String itemId, List<org.dspace.rest.common.MetadataEntry> metadata,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -371,7 +368,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             for (MetadataEntry entry : metadata)
             {
@@ -379,20 +376,15 @@ public class ItemsResource extends Resource
                 String data[] = mySplit(entry.getKey()); // Done by my split, because of java split was not function.
                 if ((data.length >= 2) && (data.length <= 3))
                 {
-                    dspaceItem.addMetadata(data[0], data[1], data[2], entry.getLanguage(), entry.getValue());
+                    itemService.addMetadata(context, dspaceItem, data[0], data[1], data[2], entry.getLanguage(), entry.getValue());
                 }
             }
-            dspaceItem.update();
             context.complete();
 
         }
         catch (SQLException e)
         {
             processException("Could not write metadata to item(id=" + itemId + "), SQLException. Message: " + e, context);
-        }
-        catch (AuthorizeException e)
-        {
-            processException("Could not write metadata to item(id=" + itemId + "), AuthorizeException. Message: " + e, context);
         }
         catch (ContextException e)
         {
@@ -431,14 +423,14 @@ public class ItemsResource extends Resource
      *             ContextException. When was problem with creating context of
      *             DSpace.
      */
-    // TODO Add option to add bitsream by URI.(for very big files)
+    // TODO Add option to add bitstream by URI.(for very big files)
     @POST
     @Path("/{item_id}/bitstreams")
-    public Bitstream addItemBitstream(@PathParam("item_id") Integer itemId, InputStream inputStream,
+    public Bitstream addItemBitstream(@PathParam("item_id") String itemId, InputStream inputStream,
             @QueryParam("name") String name, @QueryParam("description") String description,
-            @QueryParam("groupId") Integer groupId, @QueryParam("year") Integer year, @QueryParam("month") Integer month,
+            @QueryParam("groupId") String groupId, @QueryParam("year") Integer year, @QueryParam("month") Integer month,
             @QueryParam("day") Integer day, @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -451,49 +443,49 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             // Is better to add bitstream to ORIGINAL bundle or to item own?
             log.trace("Creating bitstream in item.");
             org.dspace.content.Bundle bundle = null;
             org.dspace.content.Bitstream dspaceBitstream = null;
-            Bundle[] bundles = dspaceItem.getBundles("ORIGINAL");
-			if(bundles != null && bundles.length != 0)
+            List<Bundle> bundles = itemService.getBundles(dspaceItem, org.dspace.core.Constants.CONTENT_BUNDLE_NAME);
+
+			if(bundles != null && bundles.size() != 0)
 			{
-				bundle = bundles[0]; // There should be only one bundle ORIGINAL.
+				bundle = bundles.get(0); // There should be only one bundle ORIGINAL.
 			}
             if (bundle == null)
             {
                 log.trace("Creating bundle in item.");
-                dspaceBitstream = dspaceItem.createSingleBitstream(inputStream);
+                dspaceBitstream = itemService.createSingleBitstream(context, inputStream, dspaceItem);
             }
             else
             {
                 log.trace("Getting bundle from item.");
-                dspaceBitstream = bundle.createBitstream(inputStream);
+                dspaceBitstream = bitstreamService.create(context, bundle, inputStream);
             }
 
-            dspaceBitstream.setSource("DSpace Rest api");
+            dspaceBitstream.setSource(context, "DSpace REST API");
 
             // Set bitstream name and description
             if (name != null)
             {
                 if (BitstreamResource.getMimeType(name) == null)
                 {
-                    dspaceBitstream.setFormat(BitstreamFormat.findUnknown(context));
+                    dspaceBitstream.setFormat(context, bitstreamFormatService.findUnknown(context));
                 }
                 else
                 {
-                    dspaceBitstream.setFormat(BitstreamFormat.findByMIMEType(context, BitstreamResource.getMimeType(name)));
+                    bitstreamService.setFormat(context, dspaceBitstream, bitstreamFormatService.findByMIMEType(context, BitstreamResource.getMimeType(name)));
                 }
-                dspaceBitstream.setName(name);
+
+                dspaceBitstream.setName(context, name);
             }
             if (description != null)
             {
-                dspaceBitstream.setDescription(description);
+                dspaceBitstream.setDescription(context, description);
             }
-
-            dspaceBitstream.update();
 
             // Create policy for bitstream
             if (groupId != null)
@@ -501,13 +493,12 @@ public class ItemsResource extends Resource
                 bundles = dspaceBitstream.getBundles();
                 for (Bundle dspaceBundle : bundles)
                 {
-                    List<org.dspace.authorize.ResourcePolicy> bitstreamsPolicies = dspaceBundle.getBitstreamPolicies();
+                    List<org.dspace.authorize.ResourcePolicy> bitstreamsPolicies = bundleService.getBitstreamPolicies(context, dspaceBundle);
 
                     // Remove default bitstream policies
                     List<org.dspace.authorize.ResourcePolicy> policiesToRemove = new ArrayList<org.dspace.authorize.ResourcePolicy>();
-                    for (org.dspace.authorize.ResourcePolicy policy : bitstreamsPolicies)
-                    {
-                        if (policy.getResourceID() == dspaceBitstream.getID())
+                    for (org.dspace.authorize.ResourcePolicy policy : bitstreamsPolicies) {
+                        if (policy.getdSpaceObject().getID().equals(dspaceBitstream.getID()))
                         {
                             policiesToRemove.add(policy);
                         }
@@ -517,12 +508,10 @@ public class ItemsResource extends Resource
                         bitstreamsPolicies.remove(policy);
                     }
 
-                    org.dspace.authorize.ResourcePolicy dspacePolicy = org.dspace.authorize.ResourcePolicy.create(context);
+                    org.dspace.authorize.ResourcePolicy dspacePolicy = resourcePolicyService.create(context);
                     dspacePolicy.setAction(org.dspace.core.Constants.READ);
-                    dspacePolicy.setGroup(Group.find(context, groupId));
-                    dspacePolicy.setResourceID(dspaceBitstream.getID());
-                    dspacePolicy.setResource(dspaceBitstream);
-                    dspacePolicy.setResourceType(org.dspace.core.Constants.BITSTREAM);
+                    dspacePolicy.setGroup(groupService.findByIdOrLegacyId(context, groupId));
+                    dspacePolicy.setdSpaceObject(dspaceBitstream);
                     if ((year != null) || (month != null) || (day != null))
                     {
                         Date date = new Date();
@@ -543,16 +532,15 @@ public class ItemsResource extends Resource
                         date.setSeconds(0);
                         dspacePolicy.setStartDate(date);
                     }
-                    dspacePolicy.update();
-                    bitstreamsPolicies.add(dspacePolicy);
 
-                    dspaceBundle.replaceAllBitstreamPolicies(bitstreamsPolicies);
-                    dspaceBundle.update();
+                    resourcePolicyService.update(context, dspacePolicy);
+
+                    bitstreamService.updateLastModified(context, dspaceBitstream);
                 }
             }
 
-            dspaceBitstream = org.dspace.content.Bitstream.find(context, dspaceBitstream.getID());
-            bitstream = new Bitstream(dspaceBitstream, "");
+            dspaceBitstream = bitstreamService.find(context, dspaceBitstream.getID());
+            bitstream = new Bitstream(dspaceBitstream, "", context);
 
             context.complete();
 
@@ -607,9 +595,9 @@ public class ItemsResource extends Resource
     @PUT
     @Path("/{item_id}/metadata")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response updateItemMetadata(@PathParam("item_id") Integer itemId, MetadataEntry[] metadata,
+    public Response updateItemMetadata(@PathParam("item_id") String itemId, MetadataEntry[] metadata,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -621,7 +609,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting original metadata from item.");
             for (MetadataEntry entry : metadata)
@@ -629,7 +617,7 @@ public class ItemsResource extends Resource
                 String data[] = mySplit(entry.getKey());
                 if ((data.length >= 2) && (data.length <= 3))
                 {
-                    dspaceItem.clearMetadata(data[0], data[1], data[2], org.dspace.content.Item.ANY);
+                    itemService.clearMetadata(context, dspaceItem, data[0], data[1], data[2], org.dspace.content.Item.ANY);
                 }
             }
 
@@ -639,11 +627,12 @@ public class ItemsResource extends Resource
                 String data[] = mySplit(entry.getKey());
                 if ((data.length >= 2) && (data.length <= 3))
                 {
-                    dspaceItem.addMetadata(data[0], data[1], data[2], entry.getLanguage(), entry.getValue());
+                    itemService.addMetadata(context, dspaceItem, data[0], data[1], data[2], entry.getLanguage(), entry.getValue());
                 }
             }
+            //Update the item to ensure that all the events get fired.
+            itemService.update(context, dspaceItem);
 
-            dspaceItem.update();
             context.complete();
 
         }
@@ -651,16 +640,14 @@ public class ItemsResource extends Resource
         {
             processException("Could not update metadata in item(id=" + itemId + "), SQLException. Message: " + e, context);
         }
-        catch (AuthorizeException e)
-        {
-            processException("Could not update metadata in item(id=" + itemId + "), AuthorizeException. Message: " + e, context);
-        }
         catch (ContextException e)
         {
             processException(
                     "Could not update metadata in item(id=" + itemId + "), ContextException. Message: " + e.getMessage(), context);
-        }
-        finally
+        } catch (AuthorizeException e) {
+            processException(
+                    "Could not update metadata in item(id=" + itemId + "), AuthorizeException. Message: " + e.getMessage(), context);
+        } finally
         {
             processFinally(context);
         }
@@ -690,8 +677,8 @@ public class ItemsResource extends Resource
      */
     @DELETE
     @Path("/{item_id}")
-    public Response deleteItem(@PathParam("item_id") Integer itemId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+    public Response deleteItem(@PathParam("item_id") String itemId, @QueryParam("userIP") String user_ip,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -703,12 +690,11 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.DELETE);
 
-            writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting item.");
-            org.dspace.content.Collection collection = org.dspace.content.Collection.find(context,
-                    dspaceItem.getCollections()[0].getID());
-            collection.removeItem(dspaceItem);
+            org.dspace.content.Collection collection = collectionService.find(context, dspaceItem.getCollections().get(0).getID());
+            collectionService.removeItem(context, collection, dspaceItem);
             context.complete();
 
         }
@@ -751,16 +737,16 @@ public class ItemsResource extends Resource
      *         found, UNAUTHORIZED(401) if user is not allowed to delete item
      *         metadata.
      * @throws WebApplicationException
-     *             It is thrown by three exceptions. SQLException, when was
-     *             problem with reading item from database or editting metadata
-     *             fields. AuthorizeException, when was problem with
-     *             authorization to item. And ContextException, when was problem
-     *             with creating context of DSpace.
+     *             Thrown by three exceptions. SQLException, when there was
+     *             a problem reading item from database or editing metadata
+     *             fields. AuthorizeException, when there was a problem with
+     *             authorization to item. And ContextException, when there was a problem
+     *             with creating a DSpace context.
      */
     @DELETE
     @Path("/{item_id}/metadata")
-    public Response deleteItemMetadata(@PathParam("item_id") Integer itemId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+    public Response deleteItemMetadata(@PathParam("item_id") String itemId, @QueryParam("userIP") String user_ip,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -772,36 +758,30 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting metadata.");
             // TODO Rewrite without deprecated object. Leave there only generated metadata.
-            Metadatum[] value = dspaceItem.getMetadata("dc", "date", "accessioned", org.dspace.content.Item.ANY);
-            Metadatum[] value2 = dspaceItem.getMetadata("dc", "date", "available", org.dspace.content.Item.ANY);
-            Metadatum[] value3 = dspaceItem.getMetadata("dc", "identifier", "uri", org.dspace.content.Item.ANY);
-            Metadatum[] value4 = dspaceItem.getMetadata("dc", "description", "provenance", org.dspace.content.Item.ANY);
+            
+            String valueAccessioned = itemService.getMetadataFirstValue(dspaceItem, "dc", "date", "accessioned", org.dspace.content.Item.ANY);
+            String valueAvailable = itemService.getMetadataFirstValue(dspaceItem, "dc", "date", "available", org.dspace.content.Item.ANY);
+            String valueURI = itemService.getMetadataFirstValue(dspaceItem, "dc", "identifier", "uri", org.dspace.content.Item.ANY);
+            String valueProvenance = itemService.getMetadataFirstValue(dspaceItem, "dc", "description", "provenance", org.dspace.content.Item.ANY);
 
-            dspaceItem.clearMetadata(org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY,
+            itemService.clearMetadata(context, dspaceItem, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY,
                     org.dspace.content.Item.ANY);
-            dspaceItem.update();
 
-            // Add there generated metadata
-            dspaceItem.addMetadata(value[0].schema, value[0].element, value[0].qualifier, null, value[0].value);
-            dspaceItem.addMetadata(value2[0].schema, value2[0].element, value2[0].qualifier, null, value2[0].value);
-            dspaceItem.addMetadata(value3[0].schema, value3[0].element, value3[0].qualifier, null, value3[0].value);
-            dspaceItem.addMetadata(value4[0].schema, value4[0].element, value4[0].qualifier, null, value4[0].value);
+            // Add their generated metadata
+            itemService.addMetadata(context, dspaceItem, "dc", "date", "accessioned", null, valueAccessioned);
+            itemService.addMetadata(context, dspaceItem, "dc", "date", "available", null, valueAvailable);
+            itemService.addMetadata(context, dspaceItem, "dc", "identifier", "uri", null, valueURI);
+            itemService.addMetadata(context, dspaceItem, "dc", "description", "provenance", null, valueProvenance);
 
-            dspaceItem.update();
             context.complete();
-
         }
         catch (SQLException e)
         {
             processException("Could not delete item(id=" + itemId + "), SQLException. Message: " + e, context);
-        }
-        catch (AuthorizeException e)
-        {
-            processException("Could not delete item(id=" + itemId + "), AuthorizeExcpetion. Message: " + e, context);
         }
         catch (ContextException e)
         {
@@ -839,9 +819,9 @@ public class ItemsResource extends Resource
      */
     @DELETE
     @Path("/{item_id}/bitstreams/{bitstream_id}")
-    public Response deleteItemBitstream(@PathParam("item_id") Integer itemId, @PathParam("bitstream_id") Integer bitstreamId,
+    public Response deleteItemBitstream(@PathParam("item_id") String itemId, @PathParam("bitstream_id") String bitstreamId,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -853,35 +833,26 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item item = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            org.dspace.content.Bitstream bitstream = org.dspace.content.Bitstream.find(context, bitstreamId);
+            org.dspace.content.Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context, bitstreamId);
             if (bitstream == null)
             {
                 context.abort();
                 log.warn("Bitstream(id=" + bitstreamId + ") was not found.");
                 return Response.status(Status.NOT_FOUND).build();
             }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, bitstream, org.dspace.core.Constants.DELETE))
+            else if (!authorizeService.authorizeActionBoolean(context, bitstream, org.dspace.core.Constants.DELETE))
             {
                 context.abort();
                 log.error("User(" + getUser(headers).getEmail() + ") is not allowed to delete bitstream(id=" + bitstreamId + ").");
                 return Response.status(Status.UNAUTHORIZED).build();
             }
 
-            writeStats(item, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
-            writeStats(bitstream, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(item, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
+            writeStats(bitstream, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
             log.trace("Deleting bitstream...");
-            for (org.dspace.content.Bundle bundle : item.getBundles())
-            {
-                for (org.dspace.content.Bitstream bit : bundle.getBitstreams())
-                {
-                    if (bit == bitstream)
-                    {
-                        bundle.removeBitstream(bitstream);
-                    }
-                }
-            }
+            bitstreamService.delete(context, bitstream);
 
             context.complete();
 
@@ -913,32 +884,28 @@ public class ItemsResource extends Resource
     }
 
     /**
-     * Find items by one metadada field.
+     * Find items by one metadata field.
      * 
      * @param metadataEntry
-     *            Metadata field by which will be searched.
-     * @param scheme
-     *            Scheme of metadata(key).
-     * @param value
-     *            Value of metadata field.
+     *            Metadata field to search by.
      * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
-     * @return Return array of founded items.
+     *            If you want to access the item as the user logged into context,
+     *            header "rest-dspace-token" must be set to token value retrieved
+     *            from the login method.
+     * @return Return array of found items.
      * @throws WebApplicationException
-     *             It can be thrown: SQLException, when was problem with
-     *             database reading. AuthorizeException. when was problem with
-     *             authorization to item. IOException when was problem with
-     *             reading from metadata field. ContextException, when was
-     *             problem with creating context of DSpace.
+     *             Can be thrown: SQLException - problem with
+     *             database reading. AuthorizeException - problem with
+     *             authorization to item. IOException - problem with
+     *             reading from metadata field. ContextException -
+     *             problem with creating DSpace context.
      */
     @POST
     @Path("/find-by-metadata-field")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Item[] findItemsByMetadataField(MetadataEntry metadataEntry, @QueryParam("expand") String expand,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -949,83 +916,42 @@ public class ItemsResource extends Resource
         List<Item> items = new ArrayList<Item>();
         String[] metadata = mySplit(metadataEntry.getKey());
 
+        // Must used own style.
+        if ((metadata.length < 2) || (metadata.length > 3))
+        {
+            log.error("Finding failed, bad metadata key.");
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+
         try
         {
             context = createContext(getUser(headers));
 
-            // TODO Repair, it ends by error:
-            // "java.sql.SQLSyntaxErrorException: ORA-00932: inconsistent datatypes: expected - got CLOB"
-            /*
-             * if (metadata.length == 3){
-             *     itemIterator =  org.dspace.content.Item.findByMetadataField(context, metadata[0],
-             *     metadata[1], metadata[2], value);
-             * } else if (metadata.length == 2){
-             *     itemIterator = org.dspace.content.Item.findByMetadataField(context, metadata[0],
-             *     metadata[1], null, value);
-             * } else {
-             *     context.abort();
-             *     log.error("Finding failed, bad metadata key.");
-             *     throw new WebApplicationException(Response.Status.NOT_FOUND);
-             * }
-             * 
-             * if (itemIterator.hasNext()) {
-             * item = new Item(itemIterator.next(), "", context);
-             * }
-             */
+            Iterator<org.dspace.content.Item> itemIterator = itemService.findByMetadataField(context, metadataEntry.getSchema(), metadataEntry.getElement(), metadataEntry.getQualifier(), metadataEntry.getValue());
 
-            // Must used own style.
-            if ((metadata.length < 2) || (metadata.length > 3))
+            while (itemIterator.hasNext())
             {
-                context.abort();
-                log.error("Finding failed, bad metadata key.");
-                throw new WebApplicationException(Response.Status.NOT_FOUND);
-            }
-
-            String sql = "SELECT ITEM_ID, TEXT_VALUE, TEXT_LANG, SHORT_ID, ELEMENT, QUALIFIER " +
-                    "FROM METADATAVALUE " +
-                    "JOIN METADATAFIELDREGISTRY ON METADATAVALUE.METADATA_FIELD_ID = METADATAFIELDREGISTRY.METADATA_FIELD_ID " +
-                    "JOIN METADATASCHEMAREGISTRY ON METADATAFIELDREGISTRY.METADATA_SCHEMA_ID = METADATASCHEMAREGISTRY.METADATA_SCHEMA_ID " +
-                    "WHERE " +
-                    "SHORT_ID='" + metadata[0] + "'  AND " +
-                    "ELEMENT='" + metadata[1] + "' AND ";
-            if (metadata.length > 3)
-            {
-                sql += "QUALIFIER='" + metadata[2] + "' AND ";
-            }
-            sql += "dbms_lob.substr(TEXT_VALUE, 40)='" + metadataEntry.getValue() + "' AND ";
-            if (metadataEntry.getLanguage() != null)
-            {
-                sql += "TEXT_LANG='" + metadataEntry.getLanguage() + "'";
-            }
-            else
-            {
-                sql += "TEXT_LANG is null";
-            }
-
-            TableRowIterator iterator = org.dspace.storage.rdbms.DatabaseManager.query(context, sql);
-            while (iterator.hasNext())
-            {
-                TableRow row = iterator.next();
-                org.dspace.content.Item dspaceItem = this.findItem(context, row.getIntColumn("ITEM_ID"),
-                        org.dspace.core.Constants.READ);
+                org.dspace.content.Item dspaceItem = itemIterator.next();
                 Item item = new Item(dspaceItem, "", context);
-                writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+                writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                         request, context);
                 items.add(item);
             }
 
             context.complete();
-
         }
         catch (SQLException e)
         {
-            processException("Something get wrong while finding item. SQLException, Message: " + e, context);
+            processException("Something went wrong while finding item. SQLException, Message: " + e, context);
         }
         catch (ContextException e)
         {
             processException("Context error:" + e.getMessage(), context);
-        }
-        finally
+        } catch (AuthorizeException e) {
+            processException("Authorize error:" + e.getMessage(), context);
+        } catch (IOException e) {
+            processException("IO error:" + e.getMessage(), context);
+        } finally
         {
             processFinally(context);
         }
@@ -1058,12 +984,12 @@ public class ItemsResource extends Resource
      *             Is thrown when item with passed id is not exists and if user
      *             has no permission to do passed action.
      */
-    private org.dspace.content.Item findItem(org.dspace.core.Context context, int id, int action) throws WebApplicationException
+    private org.dspace.content.Item findItem(org.dspace.core.Context context, String id, int action) throws WebApplicationException
     {
         org.dspace.content.Item item = null;
         try
         {
-            item = org.dspace.content.Item.find(context, id);
+            item = itemService.findByIdOrLegacyId(context, id);
 
             if (item == null)
             {
@@ -1071,7 +997,7 @@ public class ItemsResource extends Resource
                 log.warn("Item(id=" + id + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, item, action))
+            else if (!authorizeService.authorizeActionBoolean(context, item, action))
             {
                 context.abort();
                 if (context.getCurrentUser() != null)

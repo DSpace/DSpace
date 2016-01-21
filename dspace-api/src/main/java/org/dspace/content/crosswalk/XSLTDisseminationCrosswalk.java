@@ -7,7 +7,6 @@
  */
 package org.dspace.content.crosswalk;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,18 +19,17 @@ import java.util.List;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.content.Site;
+import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -81,6 +79,10 @@ public class XSLTDisseminationCrosswalk
     private static Context context;
 
     private static final String DIRECTION = "dissemination";
+
+    protected static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     private static String aliases[] = makeAliases(DIRECTION);
 
@@ -155,6 +157,7 @@ public class XSLTDisseminationCrosswalk
      *
      * @see DisseminationCrosswalk
      */
+    @Override
     public Namespace[] getNamespaces()
     {
         try
@@ -173,6 +176,7 @@ public class XSLTDisseminationCrosswalk
      *
      * @see DisseminationCrosswalk
      */
+    @Override
     public String getSchemaLocation()
     {
         try
@@ -191,7 +195,8 @@ public class XSLTDisseminationCrosswalk
      *
      * @see DisseminationCrosswalk
      */
-    public Element disseminateElement(DSpaceObject dso)
+    @Override
+    public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -231,7 +236,8 @@ public class XSLTDisseminationCrosswalk
      *
      * @see DisseminationCrosswalk
      */
-    public List<Element> disseminateList(DSpaceObject dso)
+    @Override
+    public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -267,6 +273,7 @@ public class XSLTDisseminationCrosswalk
      *
      * @see DisseminationCrosswalk
      */
+    @Override
     public boolean canDisseminate(DSpaceObject dso)
     {
         return dso.getType() == Constants.ITEM;
@@ -278,6 +285,7 @@ public class XSLTDisseminationCrosswalk
      *
      * @see DisseminationCrosswalk
      */
+    @Override
     public boolean preferList()
     {
         try
@@ -296,18 +304,18 @@ public class XSLTDisseminationCrosswalk
      *
      * @param dso The dspace object to build a representation of.
      */
-    public static Element createDIM(DSpaceObject dso, Metadatum[] dcvs)
+    public static Element createDIM(DSpaceObject dso, List<MockMetadataValue> dcvs)
     {
         Element dim = new Element("dim", DIM_NS);
         String type = Constants.typeText[dso.getType()];
         dim.setAttribute("dspaceType",type);
 
-        for (int i = 0; i < dcvs.length; i++)
+        for (int i = 0; i < dcvs.size(); i++)
         {
-            Metadatum dcv = dcvs[i];
+            MockMetadataValue dcv = dcvs.get(i);
             Element field =
-            createField(dcv.schema, dcv.element, dcv.qualifier,
-                        dcv.language, dcv.value, dcv.authority, dcv.confidence);
+            createField(dcv.getSchema(), dcv.getElement(), dcv.getQualifier(),
+                    dcv.getLanguage(), dcv.getValue(), dcv.getAuthority(), dcv.getConfidence());
             dim.addContent(field);
         }
         return dim;
@@ -323,7 +331,7 @@ public class XSLTDisseminationCrosswalk
         if (dso.getType() == Constants.ITEM)
         {
             Item item = (Item) dso;
-            return createDIM(dso, item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY));
+            return createDIM(dso, item2Metadata(item));
         }
         else
         {
@@ -335,14 +343,14 @@ public class XSLTDisseminationCrosswalk
             {
                 Collection collection = (Collection) dso;
 
-                String description = collection.getMetadata("introductory_text");
-                String description_abstract = collection.getMetadata("short_description");
-                String description_table = collection.getMetadata("side_bar_text");
+                String description = collectionService.getMetadata(collection, "introductory_text");
+                String description_abstract = collectionService.getMetadata(collection, "short_description");
+                String description_table = collectionService.getMetadata(collection, "side_bar_text");
                 String identifier_uri = "hdl:" + collection.getHandle();
-                String provenance = collection.getMetadata("provenance_description");
-                String rights = collection.getMetadata("copyright_text");
-                String rights_license = collection.getMetadata("license");
-                String title = collection.getMetadata("name");
+                String provenance = collectionService.getMetadata(collection, "provenance_description");
+                String rights = collectionService.getMetadata(collection, "copyright_text");
+                String rights_license = collectionService.getMetadata(collection, "license");
+                String title = collectionService.getMetadata(collection, "name");
 
                 dim.addContent(createField("dc","description",null,null,description));
                 dim.addContent(createField("dc","description","abstract",null,description_abstract));
@@ -357,12 +365,12 @@ public class XSLTDisseminationCrosswalk
             {
                 Community community = (Community) dso;
 
-                String description = community.getMetadata("introductory_text");
-                String description_abstract = community.getMetadata("short_description");
-                String description_table = community.getMetadata("side_bar_text");
+                String description = communityService.getMetadata(community, "introductory_text");
+                String description_abstract = communityService.getMetadata(community, "short_description");
+                String description_table = communityService.getMetadata(community, "side_bar_text");
                 String identifier_uri = "hdl:" + community.getHandle();
-                String rights = community.getMetadata("copyright_text");
-                String title = community.getMetadata("name");
+                String rights = communityService.getMetadata(community, "copyright_text");
+                String title = communityService.getMetadata(community, "name");
 
                 dim.addContent(createField("dc","description",null,null,description));
                 dim.addContent(createField("dc","description","abstract",null,description_abstract));
@@ -388,6 +396,19 @@ public class XSLTDisseminationCrosswalk
             return dim;
         }
     }
+
+    protected static List<MockMetadataValue> item2Metadata(Item item)
+    {
+        List<MetadataValue> dcvs = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY,
+                Item.ANY);
+        List<MockMetadataValue> result = new ArrayList<>();
+        for (MetadataValue metadataValue : dcvs) {
+            result.add(new MockMetadataValue(metadataValue));
+        }
+
+        return result;
+    }
+
 
 
      /**
@@ -519,7 +540,7 @@ public class XSLTDisseminationCrosswalk
         DSpaceObject dso = null;
         try
         {
-            dso = HandleManager.resolveToObject(context, handle);
+            dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handle);
         }
         catch (SQLException e)
         {
@@ -543,7 +564,7 @@ public class XSLTDisseminationCrosswalk
         Element root = null;
         try
         {
-            root = xwalk.disseminateElement(dso);
+            root = xwalk.disseminateElement(context, dso);
         }
         catch (Exception e)
         {

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.xmlui.aspect.general;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -15,7 +16,9 @@ import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -27,7 +30,6 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -155,7 +157,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException, ResourceNotFoundException
     {
-        if (this.bodyEmpty)
+        if (!isRedirect() && this.bodyEmpty)
         {
             Division notFound = body.addDivision("page-not-found","primary");
             
@@ -168,6 +170,18 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             throw new ResourceNotFoundException("Page cannot be found");
 
 
+        }
+    }
+
+    private boolean isRedirect() {
+        final HttpServletResponse response = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+        try
+        {
+            return ((int) FieldUtils.readField(response, "statusCode", true)) == HttpServletResponse.SC_TEMPORARY_REDIRECT;
+        }
+        catch (Exception e)
+        {
+            return false;
         }
     }
 

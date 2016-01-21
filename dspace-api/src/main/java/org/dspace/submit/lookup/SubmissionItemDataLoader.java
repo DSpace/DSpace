@@ -27,7 +27,7 @@ import org.dspace.submit.util.ItemSubmissionLookupDTO;
  */
 public class SubmissionItemDataLoader implements DataLoader
 {
-    private List<ItemSubmissionLookupDTO> dtoList;
+    protected List<ItemSubmissionLookupDTO> dtoList;
 
     List<DataLoader> providers;
 

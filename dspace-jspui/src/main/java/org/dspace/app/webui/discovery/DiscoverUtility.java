@@ -32,13 +32,14 @@ import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 public class DiscoverUtility
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(DiscoverUtility.class);
-
+    
     public static final int TYPE_FACETS = 1;
     public static final int TYPE_TAGCLOUD = 2;
     
@@ -68,7 +69,8 @@ public class DiscoverUtility
             }
             return null;
         }
-        DSpaceObject scope = HandleManager.resolveToObject(context, location);
+        HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+        DSpaceObject scope = handleService.resolveToObject(context, location);
         return scope;
     }
 
@@ -225,6 +227,8 @@ public class DiscoverUtility
         String query = request.getParameter("query");
         if (StringUtils.isNotBlank(query))
         {
+            // Escape any special characters in this user-entered query
+            query = escapeQueryChars(query);
             queryArgs.setQuery(query);
         }
 
@@ -234,7 +238,7 @@ public class DiscoverUtility
         {
             for (String f : defaultFilterQueries)
             {
-                queryArgs.addFacetQuery(f);
+                queryArgs.addFilterQueries(f);
             }
         }
         List<String[]> filters = getFilters(request);
@@ -265,6 +269,19 @@ public class DiscoverUtility
 
         return userFilters;
 
+    }
+
+    /**
+     * Escape colon-space sequence in a user-entered query, based on the
+     * underlying search service. This is intended to let end users paste in a
+     * title containing colon-space without requiring them to escape the colon.
+     *
+     * @param query user-entered query string
+     * @return query with colon in colon-space sequence escaped
+     */
+    private static String escapeQueryChars(String query)
+    {
+        return StringUtils.replace(query, ": ", "\\: ");
     }
 
     private static void setPagination(HttpServletRequest request,

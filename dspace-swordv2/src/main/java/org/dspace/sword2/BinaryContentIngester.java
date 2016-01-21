@@ -12,172 +12,193 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
 public class BinaryContentIngester extends AbstractSwordContentIngester
 {
-	public DepositResult ingestToCollection(Context context, Deposit deposit, Collection collection, VerboseDescription verboseDescription, DepositResult result)
-			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
-	{
-		try
-		{
-			// decide whether we have a new item or an existing one
-			Item item = null;
-			WorkspaceItem wsi = null;
-			if (result != null)
-			{
-				item = result.getItem();
-			}
-			else
-			{
-				result = new DepositResult();
-			}
-			if (item == null)
-			{
-				// simple zip ingester uses the item template, since there is no native metadata
-				wsi = WorkspaceItem.create(context, collection, true);
-				item = wsi.getItem();
-			}
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory
+            .getInstance().getWorkspaceItemService();
 
-			Bitstream bs = item.createSingleBitstream(deposit.getInputStream());
-			BitstreamFormat format = this.getFormat(context, deposit.getFilename());
-			bs.setName(deposit.getFilename());
-			bs.setFormat(format);
-			bs.update();
+    protected BundleService bundleService = ContentServiceFactory.getInstance()
+            .getBundleService();
 
-			// now we have an item in the workspace, and we need to consider adding some metadata to it,
-			// but since the binary file didn't contain anything, what do we do?
-			item.addMetadata("dc", "title", null, null, "Untitled: " + deposit.getFilename());
-			item.addMetadata("dc", "description", null, null, "Zip file deposted by SWORD without accompanying metadata");
+    protected BitstreamService bitstreamService = ContentServiceFactory
+            .getInstance().getBitstreamService();
 
-			// update the item metadata to inclue the current time as
-			// the updated date
-			this.setUpdatedDate(item, verboseDescription);
+    public DepositResult ingestToCollection(Context context, Deposit deposit,
+            Collection collection, VerboseDescription verboseDescription,
+            DepositResult result)
+            throws DSpaceSwordException, SwordError, SwordAuthException,
+            SwordServerException
+    {
+        try
+        {
+            // decide whether we have a new item or an existing one
+            Item item = null;
+            WorkspaceItem wsi = null;
+            if (result != null)
+            {
+                item = result.getItem();
+            }
+            else
+            {
+                result = new DepositResult();
+            }
+            if (item == null)
+            {
+                // simple zip ingester uses the item template, since there is no native metadata
+                wsi = workspaceItemService.create(context, collection, true);
+                item = wsi.getItem();
+            }
 
-			// DSpace ignores the slug value as suggested identifier, but
-			// it does store it in the metadata
-			this.setSlug(item, deposit.getSlug(), verboseDescription);
+            Bitstream bs = itemService
+                    .createSingleBitstream(context, deposit.getInputStream(),
+                            item);
+            BitstreamFormat format = this
+                    .getFormat(context, deposit.getFilename());
+            bs.setName(context, deposit.getFilename());
+            bs.setFormat(context, format);
+            bitstreamService.update(context, bs);
 
-			// in order to write these changes, we need to bypass the
-			// authorisation briefly, because although the user may be
-			// able to add stuff to the repository, they may not have
-			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
-			item.update();
-			context.setIgnoreAuthorization(ignore);
+            // now we have an item in the workspace, and we need to consider adding some metadata to it,
+            // but since the binary file didn't contain anything, what do we do?
+            itemService.addMetadata(context, item, "dc", "title", null, null,
+                    "Untitled: " + deposit.getFilename());
+            itemService
+                    .addMetadata(context, item, "dc", "description", null, null,
+                            "Zip file deposted by SWORD without accompanying metadata");
 
-			verboseDescription.append("Ingest successful");
-			verboseDescription.append("Item created with internal identifier: " + item.getID());
+            // update the item metadata to inclue the current time as
+            // the updated date
+            this.setUpdatedDate(context, item, verboseDescription);
 
-			result.setItem(item);
-			result.setTreatment(this.getTreatment());
+            // DSpace ignores the slug value as suggested identifier, but
+            // it does store it in the metadata
+            this.setSlug(context, item, deposit.getSlug(), verboseDescription);
+
+            // in order to write these changes, we need to bypass the
+            // authorisation briefly, because although the user may be
+            // able to add stuff to the repository, they may not have
+            // WRITE permissions on the archive.
+            context.turnOffAuthorisationSystem();
+            itemService.update(context, item);
+            context.restoreAuthSystemState();
+
+            verboseDescription.append("Ingest successful");
+            verboseDescription
+                    .append("Item created with internal identifier: " +
+                            item.getID());
+
+            result.setItem(item);
+            result.setTreatment(this.getTreatment());
             result.setOriginalDeposit(bs);
 
-			return result;
-		}
-		catch (AuthorizeException e)
-		{
-			throw new SwordAuthException(e);
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-		catch (IOException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-	}
+            return result;
+        }
+        catch (AuthorizeException e)
+        {
+            throw new SwordAuthException(e);
+        }
+        catch (SQLException | IOException e)
+        {
+            throw new DSpaceSwordException(e);
+        }
+    }
 
-	public DepositResult ingestToItem(Context context, Deposit deposit, Item item, VerboseDescription verboseDescription, DepositResult result)
-			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
-	{
-		try
-		{
-			if (result == null)
-			{
-				result = new DepositResult();
-			}
-			result.setItem(item);
+    public DepositResult ingestToItem(Context context, Deposit deposit,
+            Item item, VerboseDescription verboseDescription,
+            DepositResult result)
+            throws DSpaceSwordException, SwordError, SwordAuthException,
+            SwordServerException
+    {
+        try
+        {
+            if (result == null)
+            {
+                result = new DepositResult();
+            }
+            result.setItem(item);
 
-			// get the original bundle
-			Bundle[] originals = item.getBundles("ORIGINAL");
-			Bundle original = null;
-			if (originals.length > 0)
-			{
-				original = originals[0];
-			}
-			else
-			{
-				original = item.createBundle("ORIGINAL");
-			}
+            // get the original bundle
+            List<Bundle> originals = item.getBundles();
+            Bundle original = null;
+            for (Bundle bundle : originals)
+            {
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
+                {
+                    original = bundle;
+                }
+            }
+            if (original == null)
+            {
+                original = bundleService
+                        .create(context, item, Constants.CONTENT_BUNDLE_NAME);
+            }
 
-            Bitstream bs = original.createBitstream(deposit.getInputStream());
-            BitstreamFormat format = this.getFormat(context, deposit.getFilename());
-            bs.setFormat(format);
-			bs.setName(deposit.getFilename());
-			bs.update();
+            Bitstream bs = bitstreamService
+                    .create(context, original, deposit.getInputStream());
+            BitstreamFormat format = this
+                    .getFormat(context, deposit.getFilename());
+            bs.setFormat(context, format);
+            bs.setName(context, deposit.getFilename());
+            bitstreamService.update(context, bs);
 
-			// update the item metadata to inclue the current time as
-			// the updated date
-			this.setUpdatedDate(item, verboseDescription);
+            // update the item metadata to inclue the current time as
+            // the updated date
+            this.setUpdatedDate(context, item, verboseDescription);
 
-			// in order to write these changes, we need to bypass the
-			// authorisation briefly, because although the user may be
-			// able to add stuff to the repository, they may not have
-			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
-			item.update();
-			context.setIgnoreAuthorization(ignore);
+            // in order to write these changes, we need to bypass the
+            // authorisation briefly, because although the user may be
+            // able to add stuff to the repository, they may not have
+            // WRITE permissions on the archive.
+            context.turnOffAuthorisationSystem();
+            itemService.update(context, item);
+            context.restoreAuthSystemState();
 
-			verboseDescription.append("ingest successful");
+            verboseDescription.append("ingest successful");
 
-			result.setItem(item);
-			result.setTreatment(this.getTreatment());
+            result.setItem(item);
+            result.setTreatment(this.getTreatment());
             result.setOriginalDeposit(bs);
 
-			return result;
-		}
-		catch (AuthorizeException e)
-		{
-			throw new SwordAuthException(e);
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-		catch (IOException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-	}
+            return result;
+        }
+        catch (AuthorizeException e)
+        {
+            throw new SwordAuthException(e);
+        }
+        catch (SQLException | IOException e)
+        {
+            throw new DSpaceSwordException(e);
+        }
+    }
 
-
-	/**
-	 * The human readable description of the treatment this ingester has
-	 * put the deposit through
-	 *
-	 * @return
-	 * @throws DSpaceSwordException
-	 */
-	private String getTreatment() throws DSpaceSwordException
-	{
-		return "The package has been ingested and unpacked into the item.  Template metadata for " +
-				"the collection has been used, and a default title with the name of the file has " +
-				"been set";
-	}
+    /**
+     * The human readable description of the treatment this ingester has
+     * put the deposit through
+     *
+     * @return
+     * @throws DSpaceSwordException
+     */
+    private String getTreatment() throws DSpaceSwordException
+    {
+        return "The package has been ingested and unpacked into the item.  Template metadata for " +
+                "the collection has been used, and a default title with the name of the file has " +
+                "been set";
+    }
 }

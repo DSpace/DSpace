@@ -80,6 +80,7 @@ public class SampleStep extends AbstractProcessingStep
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
+    @Override
     public int doProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
@@ -149,6 +150,7 @@ public class SampleStep extends AbstractProcessingStep
      * 
      * @return the number of pages in this step
      */
+    @Override
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {

@@ -186,6 +186,26 @@
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item.dateaccessioned">Browsing {0} by Submit Date</message>
 
 
+	<!-- org.dspace.app.xmlui.administrative.WithdrawnItems.java -->
+	<message key="xmlui.Administrative.WithdrawnItems.title.item.title">Withdrawn Items by Title</message>
+	<message key="xmlui.Administrative.WithdrawnItems.trail.item.title">Withdrawn Items by Title</message>
+
+	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateissued">Withdrawn Items by Issue Date</message>
+	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateissued">Withdrawn Items by Issue Date</message>
+
+	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateaccessioned">Withdrawn Items by Submit Date</message>
+	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateaccessioned">Withdrawn Items by Submit Date</message>
+
+	<!-- org.dspace.app.xmlui.administrative.PrivateItems.java -->
+	<message key="xmlui.Administrative.PrivateItems.title.item.title">Private Items by Title</message>
+	<message key="xmlui.Administrative.PrivateItems.trail.item.title">Private Items by Title</message>
+
+	<message key="xmlui.Administrative.PrivateItems.title.item.dateissued">Private Items by Issue Date</message>
+	<message key="xmlui.Administrative.PrivateItems.trail.item.dateissued">Private Items by Issue Date</message>
+
+	<message key="xmlui.Administrative.PrivateItems.title.item.dateaccessioned">Private Items by Submit Date</message>
+	<message key="xmlui.Administrative.PrivateItems.trail.item.dateaccessioned">Private Items by Submit Date</message>
+
 	<!-- org.dspace.app.xmlui.artifactbrowser.CollectionViewer.java -->
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.search_scope">Search Scope</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.all_of_dspace">All of DSpace</message>
@@ -1555,7 +1575,7 @@
 	<message key="xmlui.administrative.item.EditBitstreamForm.para2">If the format is not in the above list, <strong>select "format not in list" above</strong> and describe it in the field below.</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.user_label">Other Format</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.user_help">The application you used to create the file, and the version number (for example, "<i>ACMESoft SuperApp version 1.5</i>").</message>
-    <message key="xmlui.administrative.item.EditBitstreamForm.name_label">Filename:</message>
+    <message key="xmlui.administrative.item.EditBitstreamForm.name_label">Filename</message>
     <message key="xmlui.administrative.item.EditBitstreamForm.name_help">Change the filename for this bitstream. Note that this will change the display bitstream URL, but old links will still resolve as long as the sequence ID does not change.</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.EditItemBitstreamsForm -->
@@ -2206,7 +2226,6 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-view">View</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-description">Description</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-files-access-rights">Read access available for</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>

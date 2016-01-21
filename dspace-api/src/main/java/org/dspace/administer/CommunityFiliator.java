@@ -9,6 +9,8 @@ package org.dspace.administer;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -17,10 +19,12 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * A command-line tool for setting/removing community/sub-community
@@ -32,6 +36,15 @@ import org.dspace.storage.rdbms.DatabaseManager;
 
 public class CommunityFiliator
 {
+
+    protected CommunityService communityService;
+    protected HandleService handleService;
+
+    public CommunityFiliator() {
+        communityService = ContentServiceFactory.getInstance().getCommunityService();
+        handleService = HandleServiceFactory.getInstance().getHandleService();
+    }
+
     public static void main(String[] argv) throws Exception
     {
         // create an options object and populate it
@@ -166,7 +179,7 @@ public class CommunityFiliator
         // check that a valid filiation would be established
         // first test - proposed child must currently be an orphan (i.e.
         // top-level)
-        Community childDad = child.getParentCommunity();
+        Community childDad = child.getParentCommunities() != null ? child.getParentCommunities().iterator().next() : null;
 
         if (childDad != null)
         {
@@ -177,11 +190,11 @@ public class CommunityFiliator
 
         // second test - circularity: parent's parents can't include proposed
         // child
-        Community[] parentDads = parent.getAllParents();
+        List<Community> parentDads = parent.getParentCommunities();
 
-        for (int i = 0; i < parentDads.length; i++)
+        for (int i = 0; i < parentDads.size(); i++)
         {
-            if (parentDads[i].getID() == child.getID())
+            if (parentDads.get(i).getID().equals(child.getID()))
             {
                 System.out
                         .println("Error, circular parentage - child is parent of parent");
@@ -190,7 +203,7 @@ public class CommunityFiliator
         }
 
         // everthing's OK
-        parent.addSubcommunity(child);
+        communityService.addSubcommunity(c, parent, child);
 
         // complete the pending transaction
         c.complete();
@@ -202,12 +215,12 @@ public class CommunityFiliator
             throws SQLException, AuthorizeException, IOException
     {
         // verify that child is indeed a child of parent
-        Community[] parentKids = parent.getSubcommunities();
+        List<Community> parentKids = parent.getSubcommunities();
         boolean isChild = false;
 
-        for (int i = 0; i < parentKids.length; i++)
+        for (int i = 0; i < parentKids.size(); i++)
         {
-            if (parentKids[i].getID() == child.getID())
+            if (parentKids.get(i).getID().equals(child.getID()))
             {
                 isChild = true;
 
@@ -224,9 +237,10 @@ public class CommunityFiliator
 
         // OK remove the mappings - but leave the community, which will become
         // top-level
-        DatabaseManager.updateQuery(c,
-                "DELETE FROM community2community WHERE parent_comm_id= ? "+
-                "AND child_comm_id= ? ", parent.getID(), child.getID());
+        child.getParentCommunities().remove(parent);
+        parent.getSubcommunities().remove(child);
+        communityService.update(c, child);
+        communityService.update(c, parent);
 
         // complete the pending transaction
         c.complete();
@@ -235,7 +249,7 @@ public class CommunityFiliator
                 + "'");
     }
 
-    private Community resolveCommunity(Context c, String communityID)
+    protected Community resolveCommunity(Context c, String communityID)
             throws SQLException
     {
         Community community = null;
@@ -243,7 +257,7 @@ public class CommunityFiliator
         if (communityID.indexOf('/') != -1)
         {
             // has a / must be a handle
-            community = (Community) HandleManager.resolveToObject(c,
+            community = (Community) handleService.resolveToObject(c,
                     communityID);
 
             // ensure it's a community
@@ -255,7 +269,7 @@ public class CommunityFiliator
         }
         else
         {
-            community = Community.find(c, Integer.parseInt(communityID));
+            community = communityService.find(c, UUID.fromString(communityID));
         }
 
         return community;

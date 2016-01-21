@@ -8,13 +8,13 @@
 package org.dspace.sword2;
 
 import org.apache.abdera.i18n.iri.IRI;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
 import org.apache.log4j.Logger;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.swordapp.server.DepositReceipt;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
@@ -35,22 +35,28 @@ import java.util.Map;
  */
 public class ReceiptGenerator
 {
-	/** logger */
-	private static Logger log = Logger.getLogger(ReceiptGenerator.class);
+    /** logger */
+    private static Logger log = Logger.getLogger(ReceiptGenerator.class);
 
-	protected DepositReceipt createFileReceipt(Context context, DepositResult result, SwordConfigurationDSpace config)
-			throws DSpaceSwordException, SwordError, SwordServerException
-	{
-		SwordUrlManager urlManager = config.getUrlManager(context, config);
-		DepositReceipt receipt = new DepositReceipt();
+    protected ItemService itemService = ContentServiceFactory.getInstance()
+            .getItemService();
 
-		receipt.setLocation(new IRI(urlManager.getActionableBitstreamUrl(result.getOriginalDeposit())));
-		receipt.setEmpty(true);
+    protected DepositReceipt createFileReceipt(Context context,
+            DepositResult result, SwordConfigurationDSpace config)
+            throws DSpaceSwordException, SwordError, SwordServerException
+    {
+        SwordUrlManager urlManager = config.getUrlManager(context, config);
+        DepositReceipt receipt = new DepositReceipt();
 
-		return receipt;
-	}
+        receipt.setLocation(new IRI(urlManager
+                .getActionableBitstreamUrl(result.getOriginalDeposit())));
+        receipt.setEmpty(true);
 
-    protected DepositReceipt createMediaResourceReceipt(Context context, Item item, SwordConfigurationDSpace config)
+        return receipt;
+    }
+
+    protected DepositReceipt createMediaResourceReceipt(Context context,
+            Item item, SwordConfigurationDSpace config)
             throws DSpaceSwordException, SwordError, SwordServerException
     {
         SwordUrlManager urlManager = config.getUrlManager(context, config);
@@ -59,274 +65,303 @@ public class ReceiptGenerator
         return receipt;
     }
 
-	protected DepositReceipt createReceipt(Context context, DepositResult result, SwordConfigurationDSpace config)
-			throws DSpaceSwordException, SwordError, SwordServerException
-	{
-		return this.createReceipt(context, result, config, false);
-	}
+    protected DepositReceipt createReceipt(Context context,
+            DepositResult result, SwordConfigurationDSpace config)
+            throws DSpaceSwordException, SwordError, SwordServerException
+    {
+        return this.createReceipt(context, result, config, false);
+    }
 
-	/**
-	 * Construct the entry
-	 *
-	 * @throws DSpaceSwordException
-	 */
-	protected DepositReceipt createReceipt(Context context, DepositResult result, SwordConfigurationDSpace config, boolean mediaResourceLocation)
-			throws DSpaceSwordException, SwordError, SwordServerException
-	{
-		SwordUrlManager urlManager = config.getUrlManager(context, config);
-		DepositReceipt receipt = new DepositReceipt();
+    /**
+     * Construct the entry
+     *
+     * @throws DSpaceSwordException
+     */
+    protected DepositReceipt createReceipt(Context context,
+            DepositResult result, SwordConfigurationDSpace config,
+            boolean mediaResourceLocation)
+            throws DSpaceSwordException, SwordError, SwordServerException
+    {
+        SwordUrlManager urlManager = config.getUrlManager(context, config);
+        DepositReceipt receipt = new DepositReceipt();
 
-		receipt.setAtomStatementURI(urlManager.getAtomStatementUri(result.getItem()));
-		receipt.setOREStatementURI(urlManager.getOreStatementUri(result.getItem()));
-		receipt.setEditIRI(urlManager.getEditIRI(result.getItem()));
-		receipt.setSplashUri(urlManager.getSplashUrl(result.getItem()));
-		receipt.setSwordEditIRI(urlManager.getEditIRI(result.getItem()));
-		receipt.setTreatment(result.getTreatment());
-		receipt.setContent(urlManager.getContentUrl(result.getItem()), "application/zip");
-        receipt.addEditMediaIRI(urlManager.getContentUrl(result.getItem()), "application/zip");
+        receipt.setAtomStatementURI(
+                urlManager.getAtomStatementUri(result.getItem()));
+        receipt.setOREStatementURI(
+                urlManager.getOreStatementUri(result.getItem()));
+        receipt.setEditIRI(urlManager.getEditIRI(result.getItem()));
+        receipt.setSplashUri(urlManager.getSplashUrl(result.getItem()));
+        receipt.setSwordEditIRI(urlManager.getEditIRI(result.getItem()));
+        receipt.setTreatment(result.getTreatment());
+        receipt.setContent(urlManager.getContentUrl(result.getItem()),
+                "application/zip");
+        receipt.addEditMediaIRI(urlManager.getContentUrl(result.getItem()),
+                "application/zip");
         receipt.setMediaFeedIRI(urlManager.getMediaFeedUrl(result.getItem()));
         receipt.setLastModified(result.getItem().getLastModified());
 
-		if (mediaResourceLocation)
-		{
-			receipt.setLocation(urlManager.getContentUrl(result.getItem()));
-		}
-		else
-		{
-			receipt.setLocation(urlManager.getEditIRI(result.getItem()));
-		}
+        if (mediaResourceLocation)
+        {
+            receipt.setLocation(urlManager.getContentUrl(result.getItem()));
+        }
+        else
+        {
+            receipt.setLocation(urlManager.getEditIRI(result.getItem()));
+        }
 
-		Bitstream od = result.getOriginalDeposit();
-		if (od != null)
-		{
-			// note here that we don't provide an actionable url
-			receipt.setOriginalDeposit(urlManager.getActionableBitstreamUrl(od), od.getFormat().getMIMEType());
-		}
+        try
+        {
+            Bitstream od = result.getOriginalDeposit();
+            if (od != null)
+            {
+                // note here that we don't provide an actionable url
+                receipt.setOriginalDeposit(
+                        urlManager.getActionableBitstreamUrl(od),
+                        od.getFormat(context).getMIMEType());
+            }
 
-		Map<String, String> derived = new HashMap<String, String>();
-		List<Bitstream> drs = result.getDerivedResources();
-		if (drs != null)
-		{
-			for (Bitstream bs : result.getDerivedResources())
-			{
-				// here we provide actionable urls for the parts of the resource
-				derived.put(urlManager.getActionableBitstreamUrl(bs), bs.getFormat().getMIMEType());
-			}
-		}
-        receipt.setDerivedResources(derived);
+            Map<String, String> derived = new HashMap<String, String>();
+            List<Bitstream> drs = result.getDerivedResources();
+            if (drs != null)
+            {
+                for (Bitstream bs : result.getDerivedResources())
+                {
+                    // here we provide actionable urls for the parts of the resource
+                    derived.put(urlManager.getActionableBitstreamUrl(bs),
+                            bs.getFormat(context).getMIMEType());
+                }
+            }
+            receipt.setDerivedResources(derived);
+        }
+        catch (SQLException e)
+        {
+            throw new DSpaceSwordException(e);
+        }
 
-		// add the category information to the sword entry
-		this.addCategories(result, receipt);
+        // add the category information to the sword entry
+        this.addCategories(result, receipt);
 
-		// add the publish date
-		this.addPublishDate(result, receipt);
+        // add the publish date
+        this.addPublishDate(result, receipt);
 
         // add the item's metadata
-        SwordEntryDisseminator disseminator = SwordDisseminatorFactory.getEntryInstance();
+        SwordEntryDisseminator disseminator = SwordDisseminatorFactory
+                .getEntryInstance();
         disseminator.disseminate(context, result.getItem(), receipt);
-        
-		try
-		{
-			StringBuilder rightsString = new StringBuilder();
-			Bundle[] bundles = result.getItem().getBundles("LICENSE");
-			for (int i = 0; i < bundles.length; i++)
-			{
-				Bitstream[] bss = bundles[i].getBitstreams();
-				for (int j = 0; j < bss.length; j++)
-				{
-					String url = urlManager.getBitstreamUrl(bss[j]);
-					rightsString.append(url + " ");
-				}
-			}
-			receipt.getWrappedEntry().setRights(rightsString.toString());
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
 
-		// add the date on which the entry was last updated
-		this.addLastUpdatedDate(result, receipt);
+        StringBuilder rightsString = new StringBuilder();
+        List<Bundle> bundles = result.getItem().getBundles();
+        for (Bundle bundle : bundles)
+        {
+            if (!Constants.LICENSE_BUNDLE_NAME.equals(bundle.getName()))
+            {
+                continue;
+            }
+            List<Bitstream> bss = bundle.getBitstreams();
+            for (Bitstream bs : bss)
+            {
+                String url = urlManager.getBitstreamUrl(bs);
+                rightsString.append(url).append(" ");
+            }
+        }
+        receipt.getWrappedEntry().setRights(rightsString.toString());
 
-		// do this from configuration
-		receipt.setPackaging(config.getDisseminatePackaging());
+        // add the date on which the entry was last updated
+        this.addLastUpdatedDate(result, receipt);
 
-		return receipt;
-	}
+        // do this from configuration
+        receipt.setPackaging(config.getDisseminatePackaging());
 
-	/**
-	 * Construct the entry
-	 *
-	 * @throws DSpaceSwordException
-	 */
-	protected DepositReceipt createReceipt(Context context, Item item, SwordConfigurationDSpace config)
-			throws DSpaceSwordException, SwordError, SwordServerException
-	{
-		SwordUrlManager urlManager = config.getUrlManager(context, config);
-		DepositReceipt receipt = new DepositReceipt();
+        return receipt;
+    }
 
-		receipt.setAtomStatementURI(urlManager.getAtomStatementUri(item));
-		receipt.setOREStatementURI(urlManager.getOreStatementUri(item));
-		receipt.setEditIRI(urlManager.getEditIRI(item));
-		receipt.setLocation(urlManager.getEditIRI(item));
-		receipt.setSplashUri(urlManager.getSplashUrl(item));
-		receipt.setSwordEditIRI(urlManager.getEditIRI(item));
-		receipt.setContent(urlManager.getContentUrl(item), "application/zip");
-        receipt.addEditMediaIRI(urlManager.getContentUrl(item), "application/zip");
+    /**
+     * Construct the entry
+     *
+     * @throws DSpaceSwordException
+     */
+    protected DepositReceipt createReceipt(Context context, Item item,
+            SwordConfigurationDSpace config)
+            throws DSpaceSwordException, SwordError, SwordServerException
+    {
+        SwordUrlManager urlManager = config.getUrlManager(context, config);
+        DepositReceipt receipt = new DepositReceipt();
+
+        receipt.setAtomStatementURI(urlManager.getAtomStatementUri(item));
+        receipt.setOREStatementURI(urlManager.getOreStatementUri(item));
+        receipt.setEditIRI(urlManager.getEditIRI(item));
+        receipt.setLocation(urlManager.getEditIRI(item));
+        receipt.setSplashUri(urlManager.getSplashUrl(item));
+        receipt.setSwordEditIRI(urlManager.getEditIRI(item));
+        receipt.setContent(urlManager.getContentUrl(item), "application/zip");
+        receipt.addEditMediaIRI(urlManager.getContentUrl(item),
+                "application/zip");
         receipt.setMediaFeedIRI(urlManager.getMediaFeedUrl(item));
         receipt.setLastModified(item.getLastModified());
 
-		// add the category information to the sword entry
-		this.addCategories(item, receipt);
+        // add the category information to the sword entry
+        this.addCategories(item, receipt);
 
-		// add the publish date
-		this.addPublishDate(item, receipt);
+        // add the publish date
+        this.addPublishDate(item, receipt);
 
         // add the item's metadata
-        SwordEntryDisseminator disseminator = SwordDisseminatorFactory.getEntryInstance();
+        SwordEntryDisseminator disseminator = SwordDisseminatorFactory
+                .getEntryInstance();
         disseminator.disseminate(context, item, receipt);
 
-		try
-		{
-			StringBuilder rightsString = new StringBuilder();
-			Bundle[] bundles = item.getBundles("LICENSE");
-			for (int i = 0; i < bundles.length; i++)
-			{
-				Bitstream[] bss = bundles[i].getBitstreams();
-				for (int j = 0; j < bss.length; j++)
-				{
-					String url = urlManager.getBitstreamUrl(bss[j]);
-					rightsString.append(url + " ");
-				}
-			}
-			receipt.getWrappedEntry().setRights(rightsString.toString());
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
+        StringBuilder rightsString = new StringBuilder();
+        List<Bundle> bundles = item.getBundles();
+        for (Bundle bundle : bundles)
+        {
+            if (!Constants.LICENSE_BUNDLE_NAME.equals(bundle.getName()))
+            {
+                continue;
+            }
+            List<Bitstream> bss = bundle.getBitstreams();
+            for (Bitstream bs : bss)
+            {
+                String url = urlManager.getBitstreamUrl(bs);
+                rightsString.append(url).append(" ");
+            }
+        }
+        receipt.getWrappedEntry().setRights(rightsString.toString());
 
-		// add the date on which the entry was last updated
-		this.addLastUpdatedDate(item, receipt);
+        // add the date on which the entry was last updated
+        this.addLastUpdatedDate(item, receipt);
 
-		// do this from configuration
-		receipt.setPackaging(config.getDisseminatePackaging());
+        // do this from configuration
+        receipt.setPackaging(config.getDisseminatePackaging());
 
-		return receipt;
-	}
+        return receipt;
+    }
 
-	/**
-	 * Add all the subject classifications from the bibliographic
-	 * metadata.
-	 *
-	 */
-	protected void addCategories(DepositResult result, DepositReceipt receipt)
-	{
-		Metadatum[] dcv = result.getItem().getMetadataByMetadataString("dc.subject.*");
-		if (dcv != null)
-		{
-			for (int i = 0; i < dcv.length; i++)
-			{
-				receipt.getWrappedEntry().addCategory(UriRegistry.DC_NAMESPACE, dcv[i].value, dcv[i].value);
-			}
-		}
-	}
+    /**
+     * Add all the subject classifications from the bibliographic
+     * metadata.
+     *
+     */
+    protected void addCategories(DepositResult result, DepositReceipt receipt)
+    {
+        List<MetadataValue> dcv = itemService
+                .getMetadataByMetadataString(result.getItem(), "dc.subject.*");
+        if (dcv != null)
+        {
+            for (MetadataValue aDcv : dcv)
+            {
+                receipt.getWrappedEntry()
+                        .addCategory(UriRegistry.DC_NAMESPACE, aDcv.getValue(),
+                                aDcv.getValue());
+            }
+        }
+    }
 
-	protected void addCategories(Item item, DepositReceipt receipt)
-	{
-		Metadatum[] dcv = item.getMetadataByMetadataString("dc.subject.*");
-		if (dcv != null)
-		{
-			for (int i = 0; i < dcv.length; i++)
-			{
-				receipt.getWrappedEntry().addCategory(UriRegistry.DC_NAMESPACE, dcv[i].value, dcv[i].value);
-			}
-		}
-	}
+    protected void addCategories(Item item, DepositReceipt receipt)
+    {
+        List<MetadataValue> dcv = itemService
+                .getMetadataByMetadataString(item, "dc.subject.*");
+        if (dcv != null)
+        {
+            for (MetadataValue aDcv : dcv)
+            {
+                receipt.getWrappedEntry()
+                        .addCategory(UriRegistry.DC_NAMESPACE, aDcv.getValue(),
+                                aDcv.getValue());
+            }
+        }
+    }
 
-	/**
-	 * Add the date of publication from the bibliographic metadata
-	 *
-	 */
-	protected void addPublishDate(DepositResult result, DepositReceipt receipt)
-	{
-		Metadatum[] dcv = result.getItem().getMetadataByMetadataString("dc.date.issued");
-		if (dcv != null && dcv.length == 1)
+    /**
+     * Add the date of publication from the bibliographic metadata
+     *
+     */
+    protected void addPublishDate(DepositResult result, DepositReceipt receipt)
+    {
+        List<MetadataValue> dcv = itemService
+                .getMetadataByMetadataString(result.getItem(),
+                        "dc.date.issued");
+        if (dcv != null && !dcv.isEmpty())
         {
             try
             {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date published = sdf.parse(dcv[0].value);
+                Date published = sdf.parse(dcv.get(0).getValue());
                 receipt.getWrappedEntry().setPublished(published);
             }
             catch (ParseException e)
             {
                 // we tried, but never mind
-                return;
+                log.warn("Couldn't add published date", e);
             }
         }
-	}
+    }
 
-	protected void addPublishDate(Item item, DepositReceipt receipt)
-	{
-		Metadatum[] dcv = item.getMetadataByMetadataString("dc.date.issued");
-		if (dcv != null && dcv.length == 1)
+    protected void addPublishDate(Item item, DepositReceipt receipt)
+    {
+        List<MetadataValue> dcv = itemService
+                .getMetadataByMetadataString(item, "dc.date.issued");
+        if (dcv != null && dcv.size() == 1)
         {
             try
             {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date published = sdf.parse(dcv[0].value);
+                Date published = sdf.parse(dcv.get(0).getValue());
                 receipt.getWrappedEntry().setPublished(published);
             }
             catch (ParseException e)
             {
                 // we tried, but never mind
-                return;
+                log.warn("Couldn't add published date", e);
             }
         }
-	}
+    }
 
-	/**
-	 * Add the date that this item was last updated
-	 *
-	 */
-	protected void addLastUpdatedDate(DepositResult result, DepositReceipt receipt)
-	{
-		String config = ConfigurationManager.getProperty("swordv2-server", "updated.field");
-		Metadatum[] dcv = result.getItem().getMetadataByMetadataString(config);
-		if (dcv != null && dcv.length == 1)
+    /**
+     * Add the date that this item was last updated
+     *
+     */
+    protected void addLastUpdatedDate(DepositResult result,
+            DepositReceipt receipt)
+    {
+        String config = ConfigurationManager
+                .getProperty("swordv2-server", "updated.field");
+        List<MetadataValue> dcv = itemService
+                .getMetadataByMetadataString(result.getItem(), config);
+        if (dcv != null && dcv.size() == 1)
         {
             try
             {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date updated = sdf.parse(dcv[0].value);
+                Date updated = sdf.parse(dcv.get(0).getValue());
                 receipt.getWrappedEntry().setUpdated(updated);
             }
             catch (ParseException e)
             {
                 // we tried, but never mind
-                return;
+                log.warn("Couldn't add last updated date", e);
             }
         }
-	}
+    }
 
-	protected void addLastUpdatedDate(Item item, DepositReceipt receipt)
-	{
-		String config = ConfigurationManager.getProperty("swordv2-server", "updated.field");
-		Metadatum[] dcv = item.getMetadataByMetadataString(config);
-		if (dcv != null && dcv.length == 1)
+    protected void addLastUpdatedDate(Item item, DepositReceipt receipt)
+    {
+        String config = ConfigurationManager
+                .getProperty("swordv2-server", "updated.field");
+        List<MetadataValue> dcv = itemService
+                .getMetadataByMetadataString(item, config);
+        if (dcv != null && dcv.size() == 1)
         {
             try
             {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date updated = sdf.parse(dcv[0].value);
+                Date updated = sdf.parse(dcv.get(0).getValue());
                 receipt.getWrappedEntry().setUpdated(updated);
             }
             catch (ParseException e)
             {
                 // we tried, but never mind
-                return;
+                log.warn("Couldn't add last updated date", e);
             }
         }
-	}
+    }
 }

@@ -62,7 +62,7 @@
             <tr>
                 <td headers="t1" class="evenRowOddCol"><%= subInfo.getBitstream().getName() %></td>
                 <td headers="t2" class="evenRowEvenCol"><%= subInfo.getBitstream().getSize() %> bytes</td>
-                <td headers="t3" class="evenRowOddCol"><%= subInfo.getBitstream().getFormatDescription() %></td>
+                <td headers="t3" class="evenRowOddCol"><%= subInfo.getBitstream().getFormatDescription(context) %></td>
             </tr>
         </table>
 

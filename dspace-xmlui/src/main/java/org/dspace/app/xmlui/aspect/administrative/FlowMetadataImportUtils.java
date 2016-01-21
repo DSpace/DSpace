@@ -67,8 +67,6 @@ public class FlowMetadataImportUtils
                 MetadataImport mImport = new MetadataImport(context, csv);
                 List<BulkEditChange> changes = mImport.runImport(true, false, false, false);
 
-                // Commit the changes
-                context.commit();
                 request.setAttribute("changes",changes);
                 request.getSession().removeAttribute("csv");
 

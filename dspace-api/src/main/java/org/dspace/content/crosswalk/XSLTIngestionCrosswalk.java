@@ -23,7 +23,11 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.PackageUtils;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -55,25 +59,28 @@ public class XSLTIngestionCrosswalk
 
     private static String aliases[] = makeAliases(DIRECTION);
 
+    private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     public static String[] getPluginNames()
     {
         return (String[]) ArrayUtils.clone(aliases);
     }
 
     // apply metadata values returned in DIM to the target item.
-    private static void applyDim(List<Element> dimList, Item item)
-        throws MetadataValidationException
-    {
+    private static void applyDim(Context context, List<Element> dimList, Item item, boolean createMissingMetadataFields)
+            throws CrosswalkException, SQLException, AuthorizeException {
         for (Element elt : dimList)
         {
             if ("field".equals(elt.getName()) && DIM_NS.equals(elt.getNamespace()))
             {
-                applyDimField(elt, item);
+                applyDimField(context, elt, item, createMissingMetadataFields);
             }
             else if ("dim".equals(elt.getName()) && DIM_NS.equals(elt.getNamespace()))
             {
                 // if it's a <dim> container, apply its guts
-                applyDim(elt.getChildren(), item);
+                applyDim(context, elt.getChildren(), item, createMissingMetadataFields);
             }
             else
             {
@@ -84,8 +91,7 @@ public class XSLTIngestionCrosswalk
     }
 
     // adds the metadata element from one <field>
-    private static void applyDimField(Element field, Item item)
-    {
+    private static void applyDimField(Context context, Element field, Item item, boolean createMissingMetadataFields) throws CrosswalkException, SQLException, AuthorizeException {
         String schema = field.getAttributeValue("mdschema");
         String element = field.getAttributeValue("element");
         String qualifier = field.getAttributeValue("qualifier");
@@ -93,6 +99,7 @@ public class XSLTIngestionCrosswalk
         String authority = field.getAttributeValue("authority");
         String sconf = field.getAttributeValue("confidence");
 
+        CrosswalkUtils.checkMetadata(context, schema, element, qualifier, createMissingMetadataFields);
         // sanity check: some XSL puts an empty string in qualifier,
         // change it to null so we match the unqualified DC field:
         if (qualifier != null && qualifier.equals(""))
@@ -105,11 +112,11 @@ public class XSLTIngestionCrosswalk
         {
             int confidence = (sconf != null && sconf.length() > 0) ?
                     Choices.getConfidenceValue(sconf) : Choices.CF_UNSET;
-            item.addMetadata(schema, element, qualifier, lang, field.getText(), authority, confidence);
+            itemService.addMetadata(context, item, schema, element, qualifier, lang, field.getText(), authority, confidence);
         }
         else
         {
-            item.addMetadata(schema, element, qualifier, lang, field.getText());
+            itemService.addMetadata(context, item, schema, element, qualifier, lang, field.getText());
         }
     }
 
@@ -119,7 +126,8 @@ public class XSLTIngestionCrosswalk
      * these correspond directly to Item.addMetadata() calls so
      * they are simply executed.
      */
-    public void ingest(Context context, DSpaceObject dso, List<Element> metadata)
+    @Override
+    public void ingest(Context context, DSpaceObject dso, List<Element> metadata, boolean createMissingMetadataFields)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -131,7 +139,7 @@ public class XSLTIngestionCrosswalk
         try
         {
             List dimList = xform.transform(metadata);
-            ingestDIM(context, dso, dimList);
+            ingestDIM(context, dso, dimList, createMissingMetadataFields);
         }
         catch (XSLTransformException e)
         {
@@ -145,7 +153,8 @@ public class XSLTIngestionCrosswalk
      * and feed that to the transformation, since it may get handled
      * differently than a List of metadata elements.
      */
-    public void ingest(Context context, DSpaceObject dso, Element root)
+    @Override
+    public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         XSLTransformer xform = getTransformer(DIRECTION);
@@ -156,7 +165,7 @@ public class XSLTIngestionCrosswalk
         try
         {
             Document dimDoc = xform.transform(new Document((Element)root.clone()));
-            ingestDIM(context, dso, dimDoc.getRootElement().getChildren());
+            ingestDIM(context, dso, dimDoc.getRootElement().getChildren(), createMissingMetadataFields);
         }
         catch (XSLTransformException e)
         {
@@ -194,14 +203,14 @@ public class XSLTIngestionCrosswalk
      * @param  dim root of a DIM expression
      */
 
-    public static void ingestDIM(Context context, DSpaceObject dso, Element dim)
+    public static void ingestDIM(Context context, DSpaceObject dso, Element dim, boolean createMissingMetadataFields)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
-        ingestDIM(context, dso, dim.getChildren());
+        ingestDIM(context, dso, dim.getChildren(), createMissingMetadataFields);
     }
 
-    public static void ingestDIM(Context context, DSpaceObject dso, List<Element> fields)
+    public static void ingestDIM(Context context, DSpaceObject dso, List<Element> fields, boolean createMissingMetadataFields)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -209,7 +218,7 @@ public class XSLTIngestionCrosswalk
         if (type == Constants.ITEM)
         {
             Item item = (Item)dso;
-            applyDim(fields, item);
+            applyDim(context, fields, item, createMissingMetadataFields);
         }
         else if (type == Constants.COLLECTION ||
                  type == Constants.COMMUNITY)
@@ -219,7 +228,7 @@ public class XSLTIngestionCrosswalk
                 String schema = field.getAttributeValue("mdschema");
                 if ("dim".equals(field.getName()) && DIM_NS.equals(field.getNamespace()))
                 {
-                    ingestDIM(context, dso, field.getChildren());
+                    ingestDIM(context, dso, field.getChildren(), createMissingMetadataFields);
                 }
                 else if ("field".equals(field.getName()) &&
                         DIM_NS.equals(field.getNamespace()) &&
@@ -235,11 +244,11 @@ public class XSLTIngestionCrosswalk
                     {
                         if (type == Constants.COLLECTION)
                         {
-                            ((Collection) dso).setMetadata(md, field.getText());
+                            collectionService.setMetadata(context, (Collection) dso, md, field.getText());
                         }
                         else
                         {
-                            ((Community) dso).setMetadata(md, field.getText());
+                            communityService.setMetadata(context, (Community) dso, md, field.getText());
                         }
                     }
                 }
@@ -327,7 +336,7 @@ public class XSLTIngestionCrosswalk
                 String schema = elt.getAttributeValue("mdschema");
                 String element = elt.getAttributeValue("element");
                 String qualifier = elt.getAttributeValue("qualifier");
-                MetadataSchema ms = MetadataSchema.find(context, schema);
+                MetadataSchema ms = ContentServiceFactory.getInstance().getMetadataSchemaService().find(context, schema);
                 if (ms == null )
                 {
                     System.err.println("DIM Error, Cannot find metadata schema for: schema=\""+schema+
@@ -341,8 +350,8 @@ public class XSLTIngestionCrosswalk
                               " schema=\""+schema+"\", element=\""+element+"\", qualifier=\""+qualifier+"\"");
                         qualifier = null;
                     }
-                    MetadataField mf = MetadataField.findByElement(context,
-                                  ms.getSchemaID(), element, qualifier);
+                    MetadataField mf = ContentServiceFactory.getInstance().getMetadataFieldService().findByElement(context,
+                            ms, element, qualifier);
                     if (mf == null)
                     {
                         System.err.println("DIM Error, Cannot find metadata field for: schema=\"" + schema +

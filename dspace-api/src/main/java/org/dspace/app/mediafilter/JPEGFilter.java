@@ -18,6 +18,7 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -29,6 +30,7 @@ import org.dspace.core.ConfigurationManager;
  */
 public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
 {
+    @Override
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".jpg";
@@ -38,6 +40,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
      * @return String bundle name
      *  
      */
+    @Override
     public String getBundleName()
     {
         return "THUMBNAIL";
@@ -46,6 +49,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
     /**
      * @return String bitstreamformat
      */
+    @Override
     public String getFormatString()
     {
         return "JPEG";
@@ -54,6 +58,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
     /**
      * @return String description
      */
+    @Override
     public String getDescription()
     {
         return "Generated Thumbnail";
@@ -65,7 +70,8 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
      * 
      * @return InputStream the resulting input stream
      */
-    public InputStream getDestinationStream(InputStream source)
+    @Override
+    public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
             throws Exception
     {
         // read in bitstream's image
@@ -87,7 +93,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
 
         // if verbose flag is set, print out dimensions
         // to STDOUT
-        if (MediaFilterManager.isVerbose)
+        if (verbose)
         {
             System.out.println("original size: " + xsize + "," + ysize);
         }
@@ -100,7 +106,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
-            if (MediaFilterManager.isVerbose)
+            if (verbose)
             {
                 System.out.println("x scale factor: " + scale_factor);
             }
@@ -112,7 +118,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
-            if (MediaFilterManager.isVerbose)
+            if (verbose)
             {
                 System.out.println("new size: " + xsize + "," + ysize);
             }
@@ -130,7 +136,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
         }
 
         // if verbose flag is set, print details to STDOUT
-        if (MediaFilterManager.isVerbose)
+        if (verbose)
         {
             System.out.println("created thumbnail size: " + xsize + ", "
                     + ysize);
@@ -173,16 +179,19 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
     }
 
 
+    @Override
     public String[] getInputMIMETypes()
     {
         return ImageIO.getReaderMIMETypes();
     }
 
+    @Override
     public String[] getInputDescriptions()
     {
         return null;
     }
 
+    @Override
     public String[] getInputExtensions()
     {
         // Temporarily disabled as JDK 1.6 only

@@ -9,6 +9,7 @@ package org.dspace.identifier;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;

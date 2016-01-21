@@ -39,7 +39,7 @@ tdb:GraphTDB    rdfs:subClassOf  ja:Model .
 ### Service 1 ###
 #################
 <#service1> rdf:type fuseki:Service ;
-    fuseki:name                       "dspace" ;    # http://host:port/tests
+    fuseki:name                       "dspace" ;    # http://host:port/dspace
     fuseki:serviceQuery               "sparql" ;   # SPARQL query service
     fuseki:serviceReadWriteGraphStore "data" ;     # SPARQL Graph store protocol (read and write)
     # A separate read-only graph store endpoint:

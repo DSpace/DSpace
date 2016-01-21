@@ -15,11 +15,15 @@ import org.swordapp.server.SwordServerException;
 
 import java.util.Map;
 
-public class SimpleDCEntryDisseminator extends AbstractSimpleDC implements SwordEntryDisseminator
+public class SimpleDCEntryDisseminator extends AbstractSimpleDC
+        implements SwordEntryDisseminator
 {
-    public SimpleDCEntryDisseminator() { }
+    public SimpleDCEntryDisseminator()
+    {
+    }
 
-    public DepositReceipt disseminate(Context context, Item item, DepositReceipt receipt)
+    public DepositReceipt disseminate(Context context, Item item,
+            DepositReceipt receipt)
             throws DSpaceSwordException, SwordError, SwordServerException
     {
         SimpleDCMetadata md = this.getMetadata(item);
@@ -37,7 +41,7 @@ public class SimpleDCEntryDisseminator extends AbstractSimpleDC implements Sword
             String value = atom.get(element);
             if ("author".equals(element))
             {
-               receipt.getWrappedEntry().addAuthor(value);
+                receipt.getWrappedEntry().addAuthor(value);
             }
             else if ("published".equals(element))
             {

@@ -7,17 +7,19 @@
  */
 package org.dspace.core;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
-import org.dspace.event.EventManager;
-import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.event.factory.EventServiceFactory;
+import org.dspace.event.service.EventService;
+import org.dspace.storage.rdbms.DatabaseConfigVO;
+import org.dspace.utils.DSpace;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -44,9 +46,6 @@ public class Context
     /** option flags */
     public static final short READ_ONLY = 0x01;
 
-    /** Database connection */
-    private Connection connection;
-
     /** Current user - null means anonymous access */
     private EPerson currentUser;
 
@@ -68,11 +67,8 @@ public class Context
      */
     private Stack<String> authStateClassCallHistory;
 
-    /** Object cache for this context */
-    private Map<String, Object> objectCache;
-
     /** Group IDs of special groups user is a member of */
-    private List<Integer> specialGroups;
+    private List<UUID> specialGroups;
 
     /** Content events */
     private LinkedList<Event> events = null;
@@ -83,6 +79,16 @@ public class Context
     /** options */
     private short options = 0;
 
+    protected EventService eventService;
+
+    private DBConnection dbConnection;
+
+    protected Context(EventService eventService, DBConnection dbConnection)  {
+        this.eventService = eventService;
+        this.dbConnection = dbConnection;
+        init();
+    }
+
     /**
      * Construct a new context object with default options. A database connection is opened.
      * No user is authenticated.
@@ -90,7 +96,7 @@ public class Context
      * @exception SQLException
      *                if there was an error obtaining a database connection
      */
-    public Context() throws SQLException
+    public Context()
     {
         init();
     }
@@ -103,7 +109,7 @@ public class Context
      * @exception SQLException
      *                if there was an error obtaining a database connection
      */
-    public Context(short options) throws SQLException
+    public Context(short options)
     {
         this.options = options;
         init();
@@ -115,19 +121,29 @@ public class Context
      * @exception SQLException
      *                if there was an error obtaining a database connection
      */
-    private void init() throws SQLException
+    private void init()
     {
-        // Obtain a non-auto-committing connection
-        connection = DatabaseManager.getConnection();
-        connection.setAutoCommit(false);
+        if(eventService == null)
+        {
+            eventService = EventServiceFactory.getInstance().getEventService();
+        }
+        if(dbConnection == null)
+        {
+            // Obtain a non-auto-committing connection
+            dbConnection = new DSpace().getSingletonService(DBConnection.class);
+            if(dbConnection == null)
+            {
+                log.fatal("Cannot obtain the bean which provides a database connection. " +
+                        "Check previous entries in the dspace.log to find why the db failed to initialize.");
+            }
+        }
 
         currentUser = null;
         currentLocale = I18nUtil.DEFAULTLOCALE;
         extraLogInfo = "";
         ignoreAuth = false;
 
-        objectCache = new HashMap<String, Object>();
-        specialGroups = new ArrayList<Integer>();
+        specialGroups = new ArrayList<>();
 
         authStateChangeHistory = new Stack<Boolean>();
         authStateClassCallHistory = new Stack<String>();
@@ -138,9 +154,19 @@ public class Context
      * 
      * @return the database connection
      */
-    public Connection getDBConnection()
+    DBConnection getDBConnection()
     {
-        return connection;
+        return dbConnection;
+    }
+
+
+    public DatabaseConfigVO getDBConfig() throws SQLException
+    {
+        return dbConnection.getDatabaseConfig();
+    }
+
+    public String getDbType(){
+        return dbConnection.getType();
     }
 
     /**
@@ -333,77 +359,44 @@ public class Context
             // commit any changes made as part of the transaction
             if (isValid() && !isReadOnly())
             {
-                commit();
+                dispatchEvents();
             }
         }
         finally
         {
-            // Free the DB connection
-            // If connection is closed or null, this is a no-op
-            DatabaseManager.freeConnection(connection);
-            connection = null;
-            clearCache();
+            if(dbConnection != null)
+            {
+                //Commit our changes
+                dbConnection.commit();
+                // Free the DB connection
+                dbConnection.closeDBConnection();
+                dbConnection = null;
+            }
         }
     }
 
-    /**
-     * Commit any transaction that is currently in progress, but do not close
-     * the context.
-     * 
-     * @exception SQLException
-     *                if there was an error completing the database transaction
-     *                or closing the connection
-     * @exception IllegalStateException
-     *                if the Context is read-only or is no longer valid
-     */
-    public void commit() throws SQLException
+
+    public void dispatchEvents()
     {
-        // Invalid Condition. The Context is Read-Only, and transactions cannot
-        // be committed.
-        if (isReadOnly())
-        {
-            throw new IllegalStateException("Attempt to commit transaction in read-only context");
-        }
-
-        // Invalid Condition. The Context has been either completed or aborted
-        // and is no longer valid
-        if (!isValid())
-        {
-            throw new IllegalStateException("Attempt to commit transaction to a completed or aborted context");
-        }
-
         // Commit any changes made as part of the transaction
         Dispatcher dispatcher = null;
 
-        try
-        {
-            if (events != null)
-            {
+        try {
+            if (events != null) {
 
-                if (dispName == null)
-                {
-                    dispName = EventManager.DEFAULT_DISPATCHER;
+                if (dispName == null) {
+                    dispName = EventService.DEFAULT_DISPATCHER;
                 }
 
-                dispatcher = EventManager.getDispatcher(dispName);
-                connection.commit();
+                dispatcher = eventService.getDispatcher(dispName);
                 dispatcher.dispatch(this);
             }
-            else
-            {
-                connection.commit();
-            }
-
-        }
-        finally
-        {
+        } finally {
             events = null;
-            if (dispatcher != null)
-            {
-                EventManager.returnDispatcher(dispName, dispatcher);
+            if (dispatcher != null) {
+                eventService.returnDispatcher(dispName, dispatcher);
             }
         }
-
     }
 
     /**
@@ -492,9 +485,9 @@ public class Context
         try
         {
             // Rollback if we have a database connection, and it is NOT Read Only
-            if (isValid() && !connection.isClosed() && !isReadOnly())
+            if (isValid() && !isReadOnly())
             {
-                connection.rollback();
+                dbConnection.rollback();
             }
         }
         catch (SQLException se)
@@ -505,17 +498,16 @@ public class Context
         {
             try
             {
-                // Free the DB connection
-                // If connection is closed or null, this is a no-op
-                DatabaseManager.freeConnection(connection);
+                if (!dbConnection.isSessionAlive())
+                {
+                    dbConnection.closeDBConnection();
+                }
             }
             catch (Exception ex)
             {
                 log.error("Exception aborting context", ex);
             }
-            connection = null;
             events = null;
-            clearCache();
         }
     }
 
@@ -530,7 +522,7 @@ public class Context
     public boolean isValid()
     {
         // Only return true if our DB connection is live
-        return (connection != null);
+        return dbConnection != null && dbConnection.isTransActionAlive();
     }
 
     /**
@@ -544,89 +536,9 @@ public class Context
         return (options & READ_ONLY) > 0;
     }
 
-    /**
-     * Store an object in the object cache.
-     * 
-     * @param objectClass
-     *            Java Class of object to check for in cache
-     * @param id
-     *            ID of object in cache
-     * 
-     * @return the object from the cache, or <code>null</code> if it's not
-     *         cached.
-     */
-    public Object fromCache(Class<?> objectClass, int id)
+    public void setSpecialGroup(UUID groupID)
     {
-        String key = objectClass.getName() + id;
-
-        return objectCache.get(key);
-    }
-
-    /**
-     * Store an object in the object cache.
-     * 
-     * @param o
-     *            the object to store
-     * @param id
-     *            the object's ID
-     */
-    public void cache(Object o, int id)
-    {
-        // bypass cache if in read-only mode
-        if (! isReadOnly())
-        {
-            String key = o.getClass().getName() + id;
-            objectCache.put(key, o);
-        }
-    }
-
-    /**
-     * Remove an object from the object cache.
-     * 
-     * @param o
-     *            the object to remove
-     * @param id
-     *            the object's ID
-     */
-    public void removeCached(Object o, int id)
-    {
-        String key = o.getClass().getName() + id;
-        objectCache.remove(key);
-    }
-
-    /**
-     * Remove all the objects from the object cache
-     */
-    public void clearCache()
-    {
-        objectCache.clear();
-    }
-
-    /**
-     * Get the count of cached objects, which you can use to instrument an
-     * application to track whether it is "leaking" heap space by letting cached
-     * objects build up. We recommend logging a cache count periodically or
-     * episodically at the INFO or DEBUG level, but ONLY when you are diagnosing
-     * cache leaks.
-     * 
-     * @return count of entries in the cache.
-     * 
-     * @return the number of items in the cache
-     */
-    public int getCacheSize()
-    {
-        return objectCache.size();
-    }
-
-    /**
-     * set membership in a special group
-     * 
-     * @param groupID
-     *            special group's ID
-     */
-    public void setSpecialGroup(int groupID)
-    {
-        specialGroups.add(Integer.valueOf(groupID));
+        specialGroups.add(groupID);
 
         // System.out.println("Added " + groupID);
     }
@@ -638,9 +550,9 @@ public class Context
      *            ID of special group to test
      * @return true if member
      */
-    public boolean inSpecialGroup(int groupID)
+    public boolean inSpecialGroup(UUID groupID)
     {
-        if (specialGroups.contains(Integer.valueOf(groupID)))
+        if (specialGroups.contains(groupID))
         {
             // System.out.println("Contains " + groupID);
             return true;
@@ -654,28 +566,33 @@ public class Context
      * of.
      * @throws SQLException
      */
-    public Group[] getSpecialGroups() throws SQLException
+    public List<Group> getSpecialGroups() throws SQLException
     {
         List<Group> myGroups = new ArrayList<Group>();
-        for (Integer groupId : specialGroups)
+        for (UUID groupId : specialGroups)
         {
-            myGroups.add(Group.find(this, groupId.intValue()));
+            myGroups.add(EPersonServiceFactory.getInstance().getGroupService().find(this, groupId));
         }
 
-        return myGroups.toArray(new Group[myGroups.size()]);
+        return myGroups;
     }
 
+    @Override
     protected void finalize() throws Throwable
     {
         /*
          * If a context is garbage-collected, we roll back and free up the
          * database connection if there is one.
          */
-        if (connection != null)
+        if (dbConnection.isTransActionAlive())
         {
             abort();
         }
 
         super.finalize();
+    }
+
+    public void shutDownDatabase() throws SQLException {
+        dbConnection.shutdown();
     }
 }

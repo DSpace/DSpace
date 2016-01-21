@@ -27,6 +27,7 @@ public abstract class AbstractUsageEventListener implements EventListener {
 	 * Empty String[] flags to have Listener 
 	 * consume any event name prefixes.
 	 */
+	@Override
 	public String[] getEventNamePrefixes() {
 		return new String[0];
 	}
@@ -35,6 +36,7 @@ public abstract class AbstractUsageEventListener implements EventListener {
 	 * Currently consumes events generated for
 	 * all resources.
 	 */
+	@Override
 	public String getResourcePrefix() {
 		return null;
 	}

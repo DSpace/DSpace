@@ -24,6 +24,8 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataSchemaService;
 
 /**
  * This is the main entry point for managing the metadata registry. This transformer 
@@ -84,6 +86,8 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
             message(
             "xmlui.administrative.registries.MetadataRegistryMain.submit_add");
 
+    protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+
     public void addPageMeta(PageMeta pageMeta)
             throws WingException
     {
@@ -108,7 +112,7 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
                 errors.add(error);
             }
         }
-        MetadataSchema[] schemas = MetadataSchema.findAll(context);
+        java.util.List<MetadataSchema> schemas = metadataSchemaService.findAll(context);
 
 
 
@@ -119,7 +123,7 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
         main.setHead(T_head1);
         main.addPara(T_para1);
 
-        Table table = main.addTable("metadata-registry-main-table", schemas.length
+        Table table = main.addTable("metadata-registry-main-table", schemas.size()
                 + 1, 5);
 
         Row header = table.addRow(Row.ROLE_HEADER);
@@ -155,7 +159,7 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
             row.addCell().addXref(url, namespace);
             row.addCell().addXref(url, name);
         }
-        if (schemas.length > 1)
+        if (schemas.size() > 1)
         {
             // Only give the delete option if there are more schema's than the required dublin core.
             main.addPara().addButton("submit_delete").setValue(T_submit_delete);

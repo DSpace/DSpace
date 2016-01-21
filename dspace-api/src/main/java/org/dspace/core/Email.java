@@ -474,8 +474,18 @@ public class Email
         System.out.println(" - To: " + to);
         System.out.println(" - Subject: " + subject);
         System.out.println(" - Server: " + server);
+        boolean disabled = ConfigurationManager.getBooleanProperty("mail.server.disabled", false);
         try
         {
+            if( disabled)
+            {
+                System.err.println("\nError sending email:");
+                System.err.println(" - Error: cannot test email because mail.server.disabled is set to true");
+                System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+                System.err.println("\n");
+                System.exit(1);
+                return;
+            }
             e.send();
         }
         catch (MessagingException me)
@@ -553,20 +563,24 @@ public class Email
                baos.write(buff, 0, read);            
            }        
        }                
-       
-       public String getContentType() {            
+
+       @Override
+       public String getContentType() {
            return contentType;        
        }         
        
-       public InputStream getInputStream() throws IOException {            
-           return new ByteArrayInputStream(baos.toByteArray());        
+       @Override
+       public InputStream getInputStream() throws IOException {
+           return new ByteArrayInputStream(baos.toByteArray());
        }         
        
-       public String getName() {            
+       @Override
+       public String getName() {
            return name;        
        }         
-       
-       public OutputStream getOutputStream() throws IOException {            
+
+       @Override
+       public OutputStream getOutputStream() throws IOException {
            throw new IOException("Cannot write to this read-only resource");        
        }    
    }

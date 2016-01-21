@@ -10,28 +10,30 @@ package org.dspace.app.webui.servlet;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.MissingResourceException;
+
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleManager;
-import org.dspace.content.Item;
-import org.dspace.content.Collection;
-import org.dspace.content.Metadatum;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 
 /**
@@ -43,8 +45,15 @@ import org.dspace.content.Metadatum;
 public class SuggestServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(SuggestServlet.class);
+    private static final Logger log = Logger.getLogger(SuggestServlet.class);
+    
+    private final transient HandleService handleService
+            = HandleServiceFactory.getInstance().getHandleService();
 
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
+
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
     					   HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -83,16 +92,12 @@ public class SuggestServlet extends DSpaceServlet
         String collName = null;
         if (handle != null && !handle.equals(""))
         {
-            Item item = (Item) HandleManager.resolveToObject(context, handle);
+            Item item = (Item) handleService.resolveToObject(context, handle);
             if (item != null)
             {
-                Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
-                if (titleDC != null && titleDC.length > 0)
-                {
-                    title = titleDC[0].value;
-                }
-                Collection[] colls = item.getCollections();
-                collName = colls[0].getMetadata("name");
+                title = itemService.getMetadataFirstValue(item, "dc", "title", null, Item.ANY);
+                List<Collection> colls = item.getCollections();
+                collName = colls.get(0).getName();
             }
         }
         else
@@ -175,8 +180,8 @@ public class SuggestServlet extends DSpaceServlet
             	// use authEmail if available
                 senderAddr = authEmail;
             }
-            String itemUri = HandleManager.getCanonicalForm(handle);
-            String itemUrl = HandleManager.resolveToURL(context,handle);
+            String itemUri = handleService.getCanonicalForm(handle);
+            String itemUrl = handleService.resolveToURL(context, handle);
             String message = request.getParameter("message");
             String siteName = ConfigurationManager.getProperty("dspace.name");
 
@@ -230,6 +235,7 @@ public class SuggestServlet extends DSpaceServlet
         }
    }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
     						HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException

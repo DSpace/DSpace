@@ -7,8 +7,6 @@
  */
 package org.dspace.identifier.doi;
 
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -19,7 +17,6 @@ import org.dspace.event.Event;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierNotFoundException;
-import org.dspace.search.SearchConsumer;
 import org.dspace.utils.DSpace;
 
 /**

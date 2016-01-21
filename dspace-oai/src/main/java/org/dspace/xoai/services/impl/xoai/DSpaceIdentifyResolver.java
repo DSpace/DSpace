@@ -11,7 +11,7 @@ import com.lyncode.xoai.dataprovider.services.api.RepositoryConfiguration;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
-import org.dspace.xoai.services.api.database.EarliestDateResolver;
+import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.xoai.IdentifyResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 

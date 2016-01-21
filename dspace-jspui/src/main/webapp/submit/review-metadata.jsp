@@ -22,21 +22,13 @@
 <%@ page import="org.dspace.submit.step.DescribeStep" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
-<%@ page import="org.dspace.content.InProgressSubmission" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.app.util.DCInputsReader" %>
 <%@ page import="org.dspace.app.util.DCInputsReaderException" %>
 <%@ page import="org.dspace.app.util.DCInputSet" %>
 <%@ page import="org.dspace.app.util.DCInput" %>
-<%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.DCDate" %>
-<%@ page import="org.dspace.content.DCLanguage" %>
-<%@ page import="org.dspace.content.Metadatum" %>
-<%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.Utils" %>
-
-<%@ page import="org.dspace.content.authority.MetadataAuthorityManager" %>
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="javax.servlet.jsp.PageContext" %>
@@ -93,6 +85,7 @@
                        PageContext pageContext)
         throws ServletException, IOException
     {
+       ItemService itemService = ContentServiceFactory.getInstance().getItemService();
        InProgressSubmission ip = subInfo.getSubmissionItem();
 
            //need to actually get the rows for pageNum-1 (since first page is index 0)
@@ -100,7 +93,7 @@
                                                    ip.hasMultipleTitles(),
                                                    ip.isPublishedBefore());
 
-        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
+        MetadataAuthorityService mam = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
 
 
        for (int z = 0; z < inputs.length; z++)
@@ -113,7 +106,7 @@
           String inputType = inputs[z].getInputType();
           String pairsName = inputs[z].getPairsType();
           String value;
-          Metadatum[] values;
+          List<MetadataValue> values;
           StringBuffer row = new StringBuffer();
           
           row.append("<div class=\"row\">");
@@ -124,32 +117,32 @@
 
           if (inputType.equals("qualdrop_value"))
           {
-             values = item.getMetadata(inputs[z].getSchema(), inputs[z].getElement(), Item.ANY, Item.ANY);
+             values = itemService.getMetadata(item, inputs[z].getSchema(), inputs[z].getElement(), Item.ANY, Item.ANY);
           }
           else
           {
-             values = item.getMetadata(inputs[z].getSchema(), inputs[z].getElement(), inputs[z].getQualifier(), Item.ANY);
+             values = itemService.getMetadata(item, inputs[z].getSchema(), inputs[z].getElement(), inputs[z].getQualifier(), Item.ANY);
           }
-          if (values.length == 0)
+          if (values.size() == 0)
           {
              row.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.no_md"));
           }
           else
           {
-             boolean isAuthorityControlled = mam.isAuthorityControlled(inputs[z].getSchema(),
-                                                    inputs[z].getElement(),inputs[z].getQualifier());
+             boolean isAuthorityControlled = mam.isAuthorityControlled(inputs[z].getSchema()+ "." +
+                                                    inputs[z].getElement() + "." + inputs[z].getQualifier());
 
-             for (int i = 0; i < values.length; i++)
+             for (int i = 0; i < values.size(); i++)
              {
                 boolean newline = true;
                 if (inputType.equals("date"))
                 {
-                   DCDate date = new DCDate(values[i].value);
+                   DCDate date = new DCDate(values.get(i).getValue());
                    row.append(UIUtil.displayDate(date, false, true, request));
                 }
                 else if (inputType.equals("dropdown") || inputType.equals("list"))
                 {
-                   String storedVal = values[i].value;
+                   String storedVal = values.get(i).getValue();
                    String displayVal = inputs[z].getDisplayString(pairsName,
                                                                 storedVal);
                    if (displayVal != null && !displayVal.equals(""))
@@ -164,7 +157,7 @@
                 }
                 else if (inputType.equals("qualdrop_value"))
                 {
-                   String qual = values[i].qualifier;
+                   String qual = values.get(i).getMetadataField().getQualifier();
                    if(qual==null)
                    {
                        qual = "";
@@ -173,7 +166,7 @@
                    else
                    {
                         String displayQual = inputs[z].getDisplayString(pairsName,qual);
-                        String displayValue = Utils.addEntities(values[i].value);
+                        String displayValue = Utils.addEntities(values.get(i).getValue());
                         if (displayQual != null)
                         {
                             row.append(displayQual + ":" + displayValue);
@@ -186,12 +179,12 @@
                 }
                 else
                 {
-                   row.append(Utils.addEntities(values[i].value));
+                   row.append(Utils.addEntities(values.get(i).getValue()));
                 }
                                 if (isAuthorityControlled)
                 {
                     row.append("<span class=\"ds-authority-confidence cf-")
-                       .append(values[i].confidence).append("\">")
+                       .append(values.get(i).getConfidence()).append("\">")
                        .append(" </span>");
                 }
                 if (newline)
@@ -212,7 +205,14 @@
 <%--             DESCRIBE ITEM ELEMENTS                     --%>
 <%-- ====================================================== --%>
             
-<%@page import="org.dspace.workflow.WorkflowItem"%>
+<%@page import="org.dspace.workflowbasic.BasicWorkflowItem"%>
+<%@ page import="org.dspace.authority.factory.AuthorityServiceFactory" %>
+<%@ page import="org.dspace.content.authority.factory.ContentAuthorityServiceFactory" %>
+<%@ page import="org.dspace.content.authority.service.MetadataAuthorityService" %>
+<%@ page import="org.dspace.content.service.ItemService" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
+<%@ page import="org.dspace.content.*" %>
+<%@ page import="java.util.List" %>
 <div class="col-md-10">
 
 <%

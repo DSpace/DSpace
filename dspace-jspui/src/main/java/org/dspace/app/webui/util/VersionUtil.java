@@ -10,21 +10,29 @@ package org.dspace.app.webui.util;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Metadatum;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
-import org.dspace.versioning.VersioningService;
-import org.dspace.workflow.WorkflowItem;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * Item level versioning feature utility method
@@ -34,6 +42,29 @@ import org.dspace.workflow.WorkflowItem;
  */
 public class VersionUtil
 {
+	private static boolean initialezed = false;
+	
+	private static ItemService itemService;
+	
+	private static AuthorizeService authorizeService;
+	
+	private static VersioningService versioningService; 
+	
+	private static VersionHistoryService versionHistoryService; 
+	
+	private static WorkspaceItemService workspaceItemService;
+	
+	private static WorkflowItemService workflowItemService;
+	
+	private synchronized static void initialize() {
+		initialezed = true;
+		itemService = ContentServiceFactory.getInstance().getItemService();
+		authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+		versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
+		versioningService = VersionServiceFactory.getInstance().getVersionService();
+		workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+		workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService(); 
+	}
 
     /**
      * Create a new version of the specified item, otherwise return null
@@ -49,30 +80,27 @@ public class VersionUtil
      * @throws AuthorizeException
      * @throws IOException
      */
-    public static Integer processCreateNewVersion(Context context, int itemID,
+    public static Integer processCreateNewVersion(Context context, UUID itemID,
             String summary) throws SQLException, AuthorizeException,
             IOException
     {
-
+    	initialize();
         try
         {
 
-            Item item = Item.find(context, itemID);
+            Item item = itemService.find(context, itemID);
 
-            if (AuthorizeManager.authorizeActionBoolean(context, item,
-                    Constants.WRITE) || item.canEdit())
+            if (authorizeService.authorizeActionBoolean(context, item,
+                    Constants.WRITE) || itemService.canEdit(context, item))
             {
                 VersioningService versioningService = new DSpace()
                         .getSingletonService(VersioningService.class);
                 Version version = versioningService.createNewVersion(context,
-                        itemID, summary);
-                WorkspaceItem wsi = WorkspaceItem.findByItem(context,
+                        item, summary);
+                WorkspaceItem wsi = workspaceItemService.findByItem(context,
                         version.getItem());
 
-                context.commit();
-
                 return wsi.getID();
-
             }
         }
         catch (Exception ex)
@@ -96,24 +124,20 @@ public class VersionUtil
      * @throws AuthorizeException
      * @throws IOException
      */
-    public static void processUpdateVersion(Context context, int itemID,
+    public static void processUpdateVersion(Context context, UUID itemID,
             String summary) throws SQLException, AuthorizeException,
             IOException
     {
-
+    	initialize();
         try
         {
 
-            Item item = Item.find(context, itemID);
+            Item item = itemService.find(context, itemID);
 
-            if (AuthorizeManager.authorizeActionBoolean(context, item,
+            if (authorizeService.authorizeActionBoolean(context, item,
                     Constants.WRITE))
             {
-                VersioningService versioningService = new DSpace()
-                        .getSingletonService(VersioningService.class);
-                versioningService.updateVersion(context, itemID, summary);
-
-                context.commit();
+                versioningService.updateVersion(context, item, summary);
             }
         }
         catch (Exception ex)
@@ -143,26 +167,11 @@ public class VersionUtil
             String summary) throws SQLException, AuthorizeException,
             IOException
     {
-
-        try
-        {
-
-            VersioningService versioningService = new DSpace()
-                    .getSingletonService(VersioningService.class);
-            versioningService.restoreVersion(context, versionID, summary);
-
-            context.commit();
-
-        }
-        catch (Exception ex)
-        {
-            if (context != null && context.isValid())
-            {
-                context.abort();
-            }
-            throw new RuntimeException(ex);
-        }
-
+    	initialize();
+        VersioningService versioningService = new DSpace()
+                .getSingletonService(VersioningService.class);
+        Version version = versioningService.getVersion(context, versionID);
+        versioningService.restoreVersion(context, version, summary);
     }
 
     /**
@@ -179,35 +188,32 @@ public class VersionUtil
      * @throws AuthorizeException
      * @throws IOException
      */
-    public static Integer processDeleteVersions(Context context, int itemId,
+    public static Item processDeleteVersions(Context context, UUID itemId,
             String[] versionIDs) throws SQLException, AuthorizeException,
             IOException
     {
-
+    	initialize();
         try
         {
-
-            VersioningService versioningService = new DSpace()
-                    .getSingletonService(VersioningService.class);
+        	Item item = itemService.find(context, itemId);
             VersionHistory versionHistory = versioningService
-                    .findVersionHistory(context, itemId);
+                    .findVersionHistory(context, item);
 
             for (String id : versionIDs)
             {
-                versioningService.removeVersion(context, Integer.parseInt(id));
+                versioningService.removeVersion(context, item);
             }
-            context.commit();
 
             // Retrieve the latest version of our history (IF any is even
             // present)
-            Version latestVersion = versionHistory.getLatestVersion();
+            Version latestVersion = versionHistoryService.getLatestVersion(versionHistory);
             if (latestVersion == null)
             {
                 return null;
             }
             else
             {
-                return latestVersion.getItemID();
+                return latestVersion.getItem();
             }
 
         }
@@ -228,12 +234,15 @@ public class VersionUtil
      * @param context
      * @param item
      * @return true or false
+     * @throws SQLException 
      */
-    public static boolean isLatest(Context context, Item item)
+    public static boolean isLatest(Context context, Item item) throws SQLException
     {
+    	initialize();
         VersionHistory history = retrieveVersionHistory(context, item);
-        return (history == null || history.getLatestVersion().getItem().getID() == item
-                .getID());
+		return (history == null
+				|| versionHistoryService.getLatestVersion(history).getItem().getID()
+					.equals(item.getID()));
     }
 
     /**
@@ -242,9 +251,11 @@ public class VersionUtil
      * @param context
      * @param item
      * @return true or false
+     * @throws SQLException 
      */
-    public static boolean hasVersionHistory(Context context, Item item)
+    public static boolean hasVersionHistory(Context context, Item item) throws SQLException
     {
+    	initialize();
         VersionHistory history = retrieveVersionHistory(context, item);
         return (history != null);
     }
@@ -261,7 +272,7 @@ public class VersionUtil
     public static Version checkLatestVersion(Context context, Item item)
             throws SQLException
     {
-
+    	initialize();
         VersionHistory history = retrieveVersionHistory(context, item);
 
         if (history != null)
@@ -270,8 +281,8 @@ public class VersionUtil
             for (Version version : allVersions)
             {
                 if (version.getItem().isArchived()
-                        || AuthorizeManager.isAdmin(context,
-                                item.getOwningCollection()))
+                        || authorizeService.isAdmin(context,
+                        item.getOwningCollection()))
                 {
                     // We have a newer version
                     return version;
@@ -288,13 +299,15 @@ public class VersionUtil
      * @param context
      * @param item
      * @return history
+     * @throws SQLException 
      */
     public static VersionHistory retrieveVersionHistory(Context context,
-            Item item)
+            Item item) throws SQLException
     {
+    	initialize();
         VersioningService versioningService = new DSpace()
                 .getSingletonService(VersioningService.class);
-        return versioningService.findVersionHistory(context, item.getID());
+        return versioningService.findVersionHistory(context, item);
     }
 
     /**
@@ -308,8 +321,9 @@ public class VersionUtil
     public static boolean isItemInSubmission(Context context, Item item)
             throws SQLException
     {
-        WorkspaceItem workspaceItem = WorkspaceItem.findByItem(context, item);
-        InProgressSubmission workflowItem = WorkflowItem.findByItem(context,
+    	initialize();
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, item);
+        InProgressSubmission workflowItem = workflowItemService.findByItem(context,
                 item);
 
         return workspaceItem != null || workflowItem != null;
@@ -327,15 +341,16 @@ public class VersionUtil
      */
     public static String[] addItemIdentifier(Item item, Version version)
     {
+    	initialize();
         String[] result = null;
         String itemHandle = version.getItem().getHandle();
 
-        Metadatum[] identifiers = version.getItem().getMetadata(
+        List<MetadataValue> identifiers = itemService.getMetadata(item,
                 MetadataSchema.DC_SCHEMA, "identifier", null, Item.ANY);
         String itemIdentifier = null;
-        if (identifiers != null && identifiers.length > 0)
+        if (identifiers != null && identifiers.size() > 0)
         {
-            itemIdentifier = identifiers[0].value;
+            itemIdentifier = identifiers.get(0).getValue();
         }
 
         if (itemIdentifier != null)
@@ -359,6 +374,7 @@ public class VersionUtil
      */
     public static String getSummary(Context context, String stringVersionID)
     {
+    	initialize();
         String result = "";
 
         try

@@ -7,15 +7,6 @@
  */
 package org.dspace.license;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * @author wbossons

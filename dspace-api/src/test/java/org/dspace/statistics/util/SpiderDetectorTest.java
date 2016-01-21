@@ -9,8 +9,7 @@ package org.dspace.statistics.util;
 
 import mockit.Mock;
 import mockit.MockUp;
-import org.dspace.statistics.SolrLogger;
-import org.junit.BeforeClass;
+import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -77,8 +76,6 @@ public class SpiderDetectorTest
         candidate = "wiki.dspace.org";
         req.setRemoteHost(candidate);
         assertFalse(candidate + " matched DNS patterns", SpiderDetector.isSpider(req));
-        
-        req = null;
     }
 
     /**
@@ -140,14 +137,14 @@ public class SpiderDetectorTest
      * @author mwood
      */
     static public class MockSolrLogger
-            extends MockUp<SolrLogger>
+            extends MockUp<SolrLoggerServiceImpl>
     {
         @Mock
         public void $init() {}
 
         @Mock
         public void $clinit() {}
-        
+
         @Mock
         public boolean isUseProxies()
         {

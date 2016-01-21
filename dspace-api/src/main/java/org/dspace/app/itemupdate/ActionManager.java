@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class ActionManager implements Iterable<UpdateAction> {
 	
-	private Map<Class<? extends UpdateAction>, UpdateAction> registry 
+	protected Map<Class<? extends UpdateAction>, UpdateAction> registry
                      = new LinkedHashMap<Class<? extends UpdateAction>, UpdateAction>();
 	
 	public UpdateAction getUpdateAction(Class<? extends UpdateAction> actionClass) 
@@ -53,24 +53,28 @@ public class ActionManager implements Iterable<UpdateAction> {
 	 * 
 	 * @return iterator for UpdateActions
 	 */
-	public Iterator<UpdateAction> iterator()
+	@Override
+    public Iterator<UpdateAction> iterator()
 	{
 		return new Iterator<UpdateAction>() 
 		{ 			
 			private Iterator<Class<? extends UpdateAction>> itr = registry.keySet().iterator();
 			
-			public boolean hasNext()
+			@Override
+            public boolean hasNext()
 			{
 				return itr.hasNext();
 			}
 			
-			public UpdateAction next()
+			@Override
+            public UpdateAction next()
 			{
 				return registry.get(itr.next());
 			}
 			
 			//not supported
-			public void remove()
+			@Override
+            public void remove()
 			{
 				throw new UnsupportedOperationException();
 			}

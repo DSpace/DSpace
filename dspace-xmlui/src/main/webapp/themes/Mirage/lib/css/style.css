@@ -1466,3 +1466,19 @@ table.discovery-filters th.new-filter-header
 #impact-plumx {
     float:right;
 }
+
+/* Restore standard styling of lists in class ds-ordered-list */
+
+ol.ds-ordered-list {
+    list-style-type: decimal;
+    margin: 1.12em 0;
+    margin-left: 40px;
+}
+
+ol.ds-ordered-list ol.ds-ordered-list {
+    list-style-type: lower-alpha;
+}
+
+ol.ds-ordered-list ol.ds-ordered-list ol.ds-ordered-list {
+    list-style-type: lower-roman;
+}

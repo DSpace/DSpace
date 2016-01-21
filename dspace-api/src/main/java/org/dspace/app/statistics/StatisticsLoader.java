@@ -101,6 +101,7 @@ public class StatisticsLoader
     protected static Date[] sortDatesDescending(Date[] dates)
     {
         Arrays.sort(dates, new Comparator<Date>() {
+            @Override
             public int compare(Date d1, Date d2)
             {
                 if (d1 == null && d2 == null)
@@ -352,6 +353,7 @@ public class StatisticsLoader
      */
     private static class AnalysisAndReportFilter implements FilenameFilter
     {
+        @Override
         public boolean accept(File dir, String name)
         {
             if (analysisMonthlyPattern.matcher(name).matches())

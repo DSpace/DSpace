@@ -33,7 +33,7 @@ public class DatabaseLegacyReindexer implements FlywayCallback
 {
     /** logging category */
     private static final Logger log = LoggerFactory.getLogger(DatabaseLegacyReindexer.class);
-    
+
     /**
      * Method to actually reindex all database contents. This method is "smart"
      * in that it determines which indexing consumer(s) you have enabled, 
@@ -104,92 +104,86 @@ public class DatabaseLegacyReindexer implements FlywayCallback
                 context.abort();
         }
     }
-    
-    
+
+
+
     @Override
-    public void afterClean(Connection connection)
-    {
-        // do nothing
+    public void beforeClean(Connection connection) {
+
     }
-    
+
     @Override
-    public void afterEachMigrate(Connection connection, MigrationInfo info)
-    {
-        // do nothing
+    public void afterClean(Connection connection) {
+
     }
-    
+
     @Override
-    public void afterInfo(Connection connection)
-    {
-        // do nothing
+    public void beforeMigrate(Connection connection) {
+
     }
-    
+
     @Override
-    public void afterInit(Connection connection)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void afterMigrate(Connection connection)
-    {
-        // Reindex after a database migration (upgrade)
+    public void afterMigrate(Connection connection) {
         reindex();
     }
-    
+
     @Override
-    public void afterRepair(Connection connection)
-    {
-        // Reindex after a database repair
-        reindex();
+    public void beforeEachMigrate(Connection connection, MigrationInfo migrationInfo) {
+
     }
-    
+
     @Override
-    public void afterValidate(Connection connection)
-    {
-        // do nothing
+    public void afterEachMigrate(Connection connection, MigrationInfo migrationInfo) {
+
     }
-    
+
     @Override
-    public void beforeClean(Connection connection)
-    {
-        // do nothing
+    public void beforeValidate(Connection connection) {
+
     }
-    
+
     @Override
-    public void beforeEachMigrate(Connection connection, MigrationInfo info)
-    {
-        // do nothing
+    public void afterValidate(Connection connection) {
+
     }
-    
+
     @Override
-    public void beforeInfo(Connection connection)
-    {
-        // do nothing
+    public void beforeInit(Connection connection) {
+
     }
-    
+
     @Override
-    public void beforeInit(Connection connection)
-    {
-        // do nothing
+    public void afterInit(Connection connection) {
+
     }
-    
+
     @Override
-    public void beforeMigrate(Connection connection)
-    {
-        // do nothing
+    public void beforeBaseline(Connection connection) {
+
     }
-    
+
     @Override
-    public void beforeRepair(Connection connection)
-    {
-        // do nothing
+    public void afterBaseline(Connection connection) {
+
     }
-    
+
     @Override
-    public void beforeValidate(Connection connection)
-    {
-        // do nothing
+    public void beforeRepair(Connection connection) {
+
     }
-    
+
+    @Override
+    public void afterRepair(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeInfo(Connection connection) {
+
+    }
+
+    @Override
+    public void afterInfo(Connection connection) {
+
+    }
 }

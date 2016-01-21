@@ -22,6 +22,9 @@ import java.util.Properties;
 import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.OptionConverter;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.LicenseService;
+import org.dspace.core.service.NewsService;
 
 /**
  * Class for reading the DSpace system configuration. The main configuration is
@@ -57,6 +60,7 @@ public class ConfigurationManager
     // limit of recursive depth of property variable interpolation in
     // configuration; anything greater than this is very likely to be a loop.
     private static final int RECURSION_LIMIT = 9;
+
 
     protected ConfigurationManager()
     {
@@ -771,57 +775,57 @@ public class ConfigurationManager
     }
 
     /**
-     * Wrapper for {@link NewsManager#getNewsFilePath()}.
+     * Wrapper for {@link NewsService#getNewsFilePath()}.
      * @deprecated since 4.0
      */
     public static String getNewsFilePath()
     {
-        return NewsManager.getNewsFilePath();
+        return CoreServiceFactory.getInstance().getNewsService().getNewsFilePath();
     }
 
     /**
-     * Wrapper for {@link NewsManager#readNewsFile(java.lang.String)}.
+     * Wrapper for {@link NewsService#readNewsFile(java.lang.String)}.
      * @deprecated since 4.0
      */
     public static String readNewsFile(String name)
     {
-        return NewsManager.readNewsFile(name);
+        return CoreServiceFactory.getInstance().getNewsService().readNewsFile(name);
     }
 
     /**
-     * Wrapper for {@link NewsManager#writeNewsFile(java.lang.String, java.lang.String)}.
+     * Wrapper for {@link NewsService#writeNewsFile(java.lang.String, java.lang.String)}.
      * @deprecated since 4.0
      */
     public static String writeNewsFile(String file, String news)
     {
-        return NewsManager.writeNewsFile(file, news);
+        return CoreServiceFactory.getInstance().getNewsService().writeNewsFile(file, news);
     }
 
     /**
-     * Wrapper for {@link LicenseManager#getLicenseText(java.lang.String)}.
+     * Wrapper for {@link LicenseService#getLicenseText(java.lang.String)}.
      * @deprecated since 4.0
      */
     public static String getLicenseText(String licenseFile)
     {
-        return LicenseManager.getLicenseText(licenseFile);
+        return CoreServiceFactory.getInstance().getLicenseService().getLicenseText(licenseFile);
     }
 
     /**
-     * Wrapper for {@link LicenseManager#getDefaultSubmissionLicense()}.
+     * Wrapper for {@link LicenseService#getDefaultSubmissionLicense()}.
      * @deprecated since 4.0
      */
     public static String getDefaultSubmissionLicense()
     {
-        return LicenseManager.getDefaultSubmissionLicense();
+        return CoreServiceFactory.getInstance().getLicenseService().getDefaultSubmissionLicense();
     }
 
     /**
-     * Wrapper for {@link LicenseManager#writeLicenseFile(java.lang.String, java.lang.String)}.
+     * Wrapper for {@link LicenseService#writeLicenseFile(java.lang.String, java.lang.String)}.
      * @deprecated since 4.0
      */
     public static void writeLicenseFile(String licenseFile, String newLicense)
     {
-        LicenseManager.writeLicenseFile(licenseFile, newLicense);
+        CoreServiceFactory.getInstance().getLicenseService().writeLicenseFile(licenseFile, newLicense);
     }
 
     /**

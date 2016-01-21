@@ -24,7 +24,9 @@ import org.apache.cocoon.generation.AbstractGenerator;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.ExpiresValidity;
-import org.dspace.app.util.OpenSearch;
+import org.dspace.app.util.OpenSearchServiceImpl;
+import org.dspace.app.util.factory.UtilServiceFactory;
+import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
@@ -70,8 +72,8 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
     /** results per page */
     protected int rpp = 0;
 
-    /** first result index */
-    protected int start = 0;
+    /** first result index is 1 because OpenSearch starts counting at 1 */
+    protected int start = 1;
 
     /** the results document (cached) */
     protected Document resultsDoc = null;
@@ -81,6 +83,8 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
 
     /** max allowed value for results per page parameter  */
     public static int MAX_RPP = 100;
+
+    protected OpenSearchService openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
 
     /**
      * Generate the unique caching key.
@@ -122,8 +126,8 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
     {
         if (this.validity == null)
         {
-                long expiry = System.currentTimeMillis() +
-                    ConfigurationManager.getLongProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
+            long expiry = ConfigurationManager
+                    .getLongProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
                 this.validity = new ExpiresValidity(expiry);
         }
         return this.validity;
@@ -160,7 +164,7 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
 
         // Format param (defaults to atom)
         this.format = request.getParameter("format");
-        if (format == null || format.length() == 0 || !OpenSearch.getFormats().contains(format))
+        if (format == null || format.length() == 0 || !openSearchService.getFormats().contains(format))
         {
             format = "atom";
         }
@@ -169,7 +173,7 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
         String scopeParam = request.getParameter("scope");
         try
         {
-            scope = OpenSearch.resolveScope(context, scopeParam);
+            scope = openSearchService.resolveScope(context, scopeParam);
         }
         catch (SQLException e)
         {
@@ -209,17 +213,17 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
                     SortOption.ASCENDING : SortOption.DESCENDING;
         }
 
-        // Start index param
+        // Start index param (has to be >= 1)
         String st = request.getParameter("start");
         try
         {
             this.start = (st == null || st.length() == 0) ? 0 : Integer.valueOf(st);
-            if(this.start < 0)
-                this.start = 0;
+            if (this.start < 1)
+                this.start = 1;
         }
         catch (NumberFormatException e)
         {
-            this.start = 0;
+            this.start = 1;
         }
 
 
@@ -248,7 +252,7 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
         this.scope = null;
         this.sort = null;
         this.rpp = 0;
-        this.start = 0;
+        this.start = 1;
         this.sortOrder = null;
         this.resultsDoc = null;
         this.validity = null;

@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.UUID;
+
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.xml.sax.SAXException;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -57,7 +61,9 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
         private static final Message T_label_name = message("xmlui.administrative.collection.CurateCollectionForm.label_name");
         private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
         
-        
+
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+
         public void setup(SourceResolver resolver, Map objectModel, String src,
 		          Parameters parameters) throws ProcessingException, SAXException, IOException
 		{
@@ -90,8 +96,8 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
                                     throws WingException, SQLException,
                                                         AuthorizeException, UnsupportedEncodingException
 	{
-            int collectionID = parameters.getParameterAsInteger("collectionID", -1);
-            Collection thisCollection = Collection.find(context, collectionID);
+            UUID collectionID = UUID.fromString(parameters.getParameter("collectionID", null));
+            Collection thisCollection = collectionService.find(context, collectionID);
             String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
 
 		// DIVISION: main

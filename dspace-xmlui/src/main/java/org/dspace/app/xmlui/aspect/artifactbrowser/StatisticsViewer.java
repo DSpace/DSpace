@@ -16,7 +16,9 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.statistics.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.ConfigurationManager;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.Request;
@@ -60,6 +62,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     private String reportDate = null;
     private SourceValidity validity;
 
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
     /**
      * Get the caching key for this report.
      */
@@ -93,7 +98,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
                     try
                     {
                         // Administrators can always view reports
-                        showReport = AuthorizeManager.isAdmin(context);
+                        showReport = authorizeService.isAdmin(context);
                     }
                     catch (SQLException sqle)
                     {
@@ -205,7 +210,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         boolean publicise = ConfigurationManager.getBooleanProperty("report.public");
 
         // Check that the reports are either public, or user is an administrator
-        if (!publicise && !AuthorizeManager.isAdmin(context))
+        if (!publicise && !authorizeService.isAdmin(context))
         {
             throw new AuthorizeException();
         }

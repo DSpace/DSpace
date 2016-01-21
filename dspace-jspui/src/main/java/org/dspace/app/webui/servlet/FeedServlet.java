@@ -28,26 +28,29 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
-import org.dspace.sort.SortOption;
-import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
-import org.dspace.search.Harvest;
 import org.dspace.eperson.Group;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.search.Harvest;
+import org.dspace.sort.SortException;
+import org.dspace.sort.SortOption;
 
 import com.sun.syndication.io.FeedException;
 
@@ -57,7 +60,6 @@ import com.sun.syndication.io.FeedException;
  * Currently supports only RSS feed formats.
  * 
  * @author Ben Bosman, Richard Rodgers
- * @version $Revision$
  */
 public class FeedServlet extends DSpaceServlet
 {
@@ -67,10 +69,10 @@ public class FeedServlet extends DSpaceServlet
 	// one hour in milliseconds
 	private static final long HOUR_MSECS = 60 * 60 * 1000;
     /** log4j category */
-    private static Logger log = Logger.getLogger(FeedServlet.class);
-    private String clazz = "org.dspace.app.webui.servlet.FeedServlet";
+    private static final Logger log = Logger.getLogger(FeedServlet.class);
 
-    
+    private static final String clazz = "org.dspace.app.webui.servlet.FeedServlet";
+
     // are syndication feeds enabled?
     private static boolean enabled = false;
     // number of DSpace items per feed
@@ -86,6 +88,16 @@ public class FeedServlet extends DSpaceServlet
     // Whether to include private items or not
     private static boolean includeAll = true;
     
+    // services API
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
+
+    private final transient CommunityService communityService
+             = ContentServiceFactory.getInstance().getCommunityService();
+
+    private final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
+
     static
     {
     	enabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
@@ -96,7 +108,7 @@ public class FeedServlet extends DSpaceServlet
             String fmtsStr = ConfigurationManager.getProperty("webui.feed.formats");
             if ( fmtsStr != null )
             {
-                formats = new ArrayList<String>();
+                formats = new ArrayList<>();
                 String[] fmts = fmtsStr.split(",");
                 for (int i = 0; i < fmts.length; i++)
                 {
@@ -108,12 +120,13 @@ public class FeedServlet extends DSpaceServlet
             cacheSize = ConfigurationManager.getIntProperty("webui.feed.cache.size");
             if (cacheSize > 0)
             {
-                feedCache = new HashMap<String, CacheFeed>();
+                feedCache = new HashMap<>();
                 cacheAge = ConfigurationManager.getIntProperty("webui.feed.cache.age");
             }
         }
     }
-    
+
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -126,7 +139,7 @@ public class FeedServlet extends DSpaceServlet
         // build label map from localized Messages resource bundle
             Locale locale = request.getLocale();
         ResourceBundle msgs = ResourceBundle.getBundle("Messages", locale);
-        Map<String, String> labelMap = new HashMap<String, String>();
+        Map<String, String> labelMap = new HashMap<>();
         labelMap.put(SyndicationFeed.MSG_UNTITLED, msgs.getString(clazz + ".notitle"));
         labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, msgs.getString(clazz + ".logo.title"));
         labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, msgs.getString(clazz + ".general-feed.description"));
@@ -155,7 +168,7 @@ public class FeedServlet extends DSpaceServlet
         if(handle != null && !handle.equals(SITE_FEED_KEY))
         { 	
         	// Determine if handle is a valid reference
-        	dso = HandleManager.resolveToObject(context, handle);
+        	dso = handleService.resolveToObject(context, handle);
                 if (dso == null)
                 {
                     log.info(LogManager.getHeader(context, "invalid_handle", "path=" + path));
@@ -185,14 +198,14 @@ public class FeedServlet extends DSpaceServlet
             labelMap.put(SyndicationFeed.MSG_FEED_TITLE,
                 MessageFormat.format(msgs.getString(clazz + ".feed.title"),
                                      new Object[]{ msgs.getString(clazz + ".feed-type.collection"),
-                                                   ((Collection)dso).getMetadata("short_description")}));
+                                                  collectionService.getMetadata((Collection)dso, "short_description")}));
         }
         else if (dso != null &&  dso.getType() == Constants.COMMUNITY)
         {
             labelMap.put(SyndicationFeed.MSG_FEED_TITLE,
                 MessageFormat.format(msgs.getString(clazz + ".feed.title"),
                                      new Object[]{ msgs.getString(clazz + ".feed-type.community"),
-                                                   ((Community)dso).getMetadata("short_description")}));
+                                                   communityService.getMetadata((Community)dso, "short_description")}));
         }
 
         // Lookup or generate the feed
@@ -228,7 +241,7 @@ public class FeedServlet extends DSpaceServlet
         if (feed == null)
         {
                 feed = new SyndicationFeed(SyndicationFeed.UITYPE_JSPUI);
-                feed.populate(request, dso, getItems(context, dso), labelMap);
+                feed.populate(request, context, dso, getItems(context, dso), labelMap);
         	if (feedCache != null)
         	{
                         cache(cacheKey, new CacheFeed(feed));
@@ -309,31 +322,35 @@ public class FeedServlet extends DSpaceServlet
             // gather & add items to the feed.
     		BrowseEngine be = new BrowseEngine(context);
     		BrowseInfo bi = be.browseMini(scope);
-    		Item[] results = bi.getItemResults(context);
-
+    		List<Item> results = bi.getResults();
+    		Item[] resultsArray;
             if (includeAll)
             {
-                return results;
+            	resultsArray = new Item[results.size()];
+            	resultsArray = results.toArray(resultsArray);
+                return resultsArray;
             }
             else
                 {
                     // Check to see if we can include this item
                 //Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, results[i], Constants.READ);
                 //boolean added = false;
-                List<Item> items = new ArrayList<Item>();
+                List<Item> items = new ArrayList<>();
                 for (Item result : results)
                     {
                 checkAccess:
-                    for (Group group : AuthorizeManager.getAuthorizedGroups(context, result, Constants.READ))
+                    for (Group group : authorizeService.getAuthorizedGroups(context, result, Constants.READ))
                         {
-                        if ((group.getID() == Group.ANONYMOUS_ID))
+                        if ((group.getName() != null && group.getName().equals(Group.ANONYMOUS)))
                         {
                             items.add(result);
                             break checkAccess;
                         }
                     }
                 }
-                return items.toArray(new Item[items.size()]);
+                resultsArray = new Item[items.size()];
+            	resultsArray = items.toArray(resultsArray);
+                return resultsArray;
                 }
             }
         catch (SortException se)

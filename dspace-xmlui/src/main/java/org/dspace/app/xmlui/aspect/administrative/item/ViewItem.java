@@ -8,6 +8,7 @@
 package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -22,6 +23,8 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 
 /**
  * Display basic meta-meta information about the item and allow the user to
@@ -61,6 +64,9 @@ public class ViewItem extends AbstractDSpaceTransformer {
     
         private static final Message T_show_full =
         message("xmlui.ArtifactBrowser.ItemViewer.show_full");
+
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
 	public void addPageMeta(PageMeta pageMeta) throws WingException {
 		pageMeta.addMetadata("title").addContent(T_title);
 
@@ -79,8 +85,8 @@ public class ViewItem extends AbstractDSpaceTransformer {
 			showFullItem = true;
 		}
 		
-		int itemID = parameters.getParameterAsInteger("itemID", -1);
-		Item item = Item.find(context, itemID);
+		UUID itemID = UUID.fromString(parameters.getParameter("itemID", null));
+		Item item = itemService.find(context, itemID);
 		String baseURL = contextPath + "/admin/item?administrative-continue="
 				+ knot.getId() ;
 		

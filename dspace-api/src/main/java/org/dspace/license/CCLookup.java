@@ -16,7 +16,6 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -331,14 +330,7 @@ public class CCLookup {
                  // Example: http://api.creativecommons.org/rest/1.5/details?
                 //  license-uri=http://creativecommons.org/licenses/by-nc-sa/3.0/
 		String issueUrl = cc_root + "/details?license-uri=" + licenseURI;
-		// todo : modify for post as in the above issue
-		String post_data;
-		try {
-			post_data = URLEncoder.encode("license-uri", "UTF-8") + "=" + URLEncoder.encode(licenseURI, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			return;
-		}
-                //end todo
+
 		URL request_url;
 		try {
 			request_url = new URL(issueUrl);
@@ -435,8 +427,7 @@ public class CCLookup {
 
 	public boolean isSuccess() {
 		setSuccess(false);
-		java.io.ByteArrayOutputStream outputstream = new java.io.ByteArrayOutputStream();
-		JDOMXPath xp_Success = null;
+		JDOMXPath xp_Success;
 		String text = null;
 		try {
 			xp_Success = new JDOMXPath("//message");

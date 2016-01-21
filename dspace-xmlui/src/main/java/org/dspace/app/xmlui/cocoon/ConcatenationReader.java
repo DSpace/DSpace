@@ -12,6 +12,7 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.*;
 import org.apache.cocoon.reading.ResourceReader;
 import org.apache.excalibur.source.Source;
@@ -69,10 +70,19 @@ public class ConcatenationReader extends ResourceReader {
 
         // setup list of sources, get relevant parts of path
         this.inputSources = new ArrayList<Source>();
-        String path = src.substring(0, src.lastIndexOf('/'));
+        
+        // Check for an empty path
+        String path = "";
+        if(src.contains("/"))
+        {
+            path = src.substring(0, src.lastIndexOf('/'));
+        }
         String file = src.substring(src.lastIndexOf('/')+1);
 
-        // now build own list of inputsources
+        // Now build own list of inputsources
+        // Several files may be passed in at once, e.g.
+        // "themes/Mirage/lib/css/reset,base,helper,style,print.css"
+        // So, we need to build the fullPath to *each* file individually
         String[] files = file.split(",");
         for (String f : files) {
             if (file.endsWith(".json") && !f.endsWith(".json")) {
@@ -85,8 +95,21 @@ public class ConcatenationReader extends ResourceReader {
                 f += ".css";
             }
 
-            String fullPath = path + "/" + f;
-            this.inputSources.add(resolver.resolveURI(fullPath));
+            // Build full path to this individual file
+            String fullPath;
+            if(!path.isEmpty())
+                fullPath = path + "/" + f;
+            else
+                fullPath = f;
+
+            // Add to list of inputsources if this file exists
+            Source inSource = resolver.resolveURI(fullPath);
+            if(inSource.exists())
+            {
+                this.inputSources.add(inSource);
+            }
+            else // else throw a ResourceNotFound (which triggers a 404)
+                throw new ResourceNotFoundException("Resource not found (" + fullPath + ")");
         }
 
         // do super stuff

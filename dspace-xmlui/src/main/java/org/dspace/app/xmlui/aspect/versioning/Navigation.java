@@ -23,18 +23,27 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.utils.DSpace;
-import org.dspace.versioning.VersioningService;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.UUID;
 
 
 /**
@@ -54,6 +63,11 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     /** Cached validity object */
 	private SourceValidity validity;
+
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
 
 	 /**
      * Generate the unique cache key.
@@ -103,18 +117,18 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 		        try {
 		            DSpaceValidity validity = new DSpaceValidity();
 
-		            validity.add(eperson);
+		            validity.add(context, eperson);
 
-		            Group[] groups = Group.allMemberGroups(context, eperson);
+		            java.util.List<Group> groups = groupService.allMemberGroups(context, eperson);
 		            for (Group group : groups)
 		            {
-		            	validity.add(group);
+		            	validity.add(context, group);
 		            }
 
                     DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                     if(dso != null)
                     {
-                        validity.add(dso);
+                        validity.add(context, dso);
                     }
 
 		            this.validity = validity.complete();
@@ -158,7 +172,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	if (dso != null && dso.getType() == Constants.ITEM)
         {
     		Item item = (Item) dso;
-            if(AuthorizeManager.isAdmin(this.context, item.getOwningCollection()))
+            if(authorizeService.isAdmin(this.context, item.getOwningCollection()))
             {
                 boolean headAdded=false;
                 if(isLatest(item) && item.isArchived())
@@ -185,10 +199,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
         Item item = null;
-        int itemId = Util.getIntParameter(request, "itemID");
-        if (itemId != -1)
+        UUID itemId = Util.getUUIDParameter(request, "itemID");
+        if (itemId != null)
         {
-            item = Item.find(this.context, itemId);
+            item = itemService.find(this.context, itemId);
         }
         return item;
     }
@@ -202,18 +216,16 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         super.recycle();
     }
 
-    private boolean isLatest(Item item)
+    private boolean isLatest(Item item) throws SQLException
     {
-        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-        org.dspace.versioning.VersionHistory history = versioningService.findVersionHistory(context, item.getID());
-        return (history==null || history.getLatestVersion().getItem().getID() == item.getID());
+        org.dspace.versioning.VersionHistory history = versionHistoryService.findByItem(context, item);
+        return (history==null || versionHistoryService.getLatestVersion(history).getItem().equals(item));
     }
 
 
-    private boolean hasVersionHistory(Item item)
+    private boolean hasVersionHistory(Item item) throws SQLException
     {
-        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-        org.dspace.versioning.VersionHistory history = versioningService.findVersionHistory(context, item.getID());
+        org.dspace.versioning.VersionHistory history = versionHistoryService.findByItem(context, item);
         return (history!=null);
     }
 

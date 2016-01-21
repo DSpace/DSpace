@@ -7,20 +7,23 @@
  */
 package org.dspace.app.xmlui.objectmanager;
 
-import org.dspace.app.util.MetadataExposure;
+import org.dspace.app.util.MetadataExposureServiceImpl;
 import org.dspace.app.util.Util;
+import org.dspace.app.util.factory.UtilServiceFactory;
+import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -37,8 +40,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.*;
-
-import org.dspace.content.DSpaceObject;
 
 
 /**
@@ -88,6 +89,13 @@ public class ItemAdapter extends AbstractAdapter
 
     // DSpace DB context
     private Context context;
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected MetadataExposureService metadataExposureService = UtilServiceFactory.getInstance().getMetadataExposureService();
+
 
     /**
      * Construct a new ItemAdapter
@@ -264,31 +272,28 @@ public class ItemAdapter extends AbstractAdapter
             }
             startElement(DIM,"dim",attributes);
                         
-                Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-                for (Metadatum dcv : dcvs)
+                List<MetadataValue> dcvs = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+                for (MetadataValue dcv : dcvs)
                 {
-                        if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier))
-                        {
+                    MetadataField metadataField = dcv.getMetadataField();
+                    if (!metadataExposureService.isHidden(context, dcv.getMetadataField().getMetadataSchema().getName(), metadataField.getElement(), metadataField.getQualifier())) {
                         // ///////////////////////////////
                         // Field element for each metadata field.
                         attributes = new AttributeMap();
-                        attributes.put("mdschema",dcv.schema);
-                        attributes.put("element", dcv.element);
-                        if (dcv.qualifier != null)
-                        {
-                            attributes.put("qualifier", dcv.qualifier);
+                        attributes.put("mdschema", metadataField.getMetadataSchema().getName());
+                        attributes.put("element", metadataField.getElement());
+                        if (metadataField.getQualifier() != null) {
+                            attributes.put("qualifier", metadataField.getQualifier());
                         }
-                        if (dcv.language != null)
-                        {
-                            attributes.put("language", dcv.language);
+                        if (dcv.getLanguage() != null) {
+                            attributes.put("language", dcv.getLanguage());
                         }
-                        if (dcv.authority != null || dcv.confidence != Choices.CF_UNSET)
-                        {
-                                attributes.put("authority", dcv.authority);
-                                attributes.put("confidence", Choices.getConfidenceText(dcv.confidence));
+                        if (dcv.getAuthority() != null || dcv.getConfidence() != Choices.CF_UNSET) {
+                            attributes.put("authority", dcv.getAuthority());
+                            attributes.put("confidence", Choices.getConfidenceText(dcv.getConfidence()));
                         }
-                        startElement(DIM,"field",attributes);
-                        sendCharacters(dcv.value);
+                        startElement(DIM, "field", attributes);
+                        sendCharacters(dcv.getValue());
                         endElement(DIM,"field");
                 }
                 }
@@ -356,7 +361,7 @@ public class ItemAdapter extends AbstractAdapter
                 // ///////////////////////////////
                 // Send the actual XML content
                 try {
-                        Element dissemination = crosswalk.disseminateElement(item);
+                        Element dissemination = crosswalk.disseminateElement(context, item);
         
                         SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler, namespaces);
                         // Allow the basics for XML
@@ -398,10 +403,10 @@ public class ItemAdapter extends AbstractAdapter
                 // Generate a second group id for any extra metadata added.
                 String groupID2 = getGenericID("group_dmd_");
                 
-                Bundle[] bundles = item.getBundles("METADATA");
+                List<Bundle> bundles = itemService.getBundles(item, "METADATA");
                 for (Bundle bundle : bundles)
                 {
-                        Bitstream bitstream = bundle.getBitstreamByName("MODS.xml");
+                        Bitstream bitstream = bundleService.getBitstreamByName(bundle, "MODS.xml");
         
                         if (bitstream == null)
                         {
@@ -441,7 +446,7 @@ public class ItemAdapter extends AbstractAdapter
                         reader.setContentHandler(filter);
                         reader.setProperty("http://xml.org/sax/properties/lexical-handler", filter);
                         try {
-                                InputStream is = bitstream.retrieve();
+                                InputStream is = bitstreamService.retrieve(context, bitstream);
                                 reader.parse(new InputSource(is));
                         }
                         catch (AuthorizeException ae)
@@ -525,7 +530,7 @@ public class ItemAdapter extends AbstractAdapter
             List<Bundle> bundles = findEnabledBundles();
             for (Bundle bundle : bundles)
             {
-              Bitstream[] bitstreams = bundle.getBitstreams();
+              List<Bitstream> bitstreams = bundle.getBitstreams();
 
               // Create a sub-section of <amdSec> for each bitstream in bundle
               for(Bitstream bitstream : bitstreams)
@@ -625,7 +630,7 @@ public class ItemAdapter extends AbstractAdapter
         // Send the actual XML content,
         // using the PREMIS crosswalk for each bitstream
         try {
-            Element dissemination = crosswalk.disseminateElement(dso);
+            Element dissemination = crosswalk.disseminateElement(context, dso);
 
             SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler, namespaces);
             // Allow the basics for XML
@@ -671,7 +676,8 @@ public class ItemAdapter extends AbstractAdapter
      *   </fileGrp>
      * </fileSec>
      */
-    protected void renderFileSection() throws SQLException, SAXException
+    @Override
+    protected void renderFileSection(Context context) throws SQLException, SAXException
     {
         AttributeMap attributes;
         
@@ -744,7 +750,7 @@ public class ItemAdapter extends AbstractAdapter
                 if (isContentBundle)
                 {
                     contentBitstreams.add(bitstream);
-                    if (bundle.getPrimaryBitstreamID() == bitstream.getID())
+                    if (bundle.getPrimaryBitstream() != null && bundle.getPrimaryBitstream().equals(bitstream))
                     {
                         primaryBitstream = bitstream;
                     }
@@ -863,11 +869,11 @@ public class ItemAdapter extends AbstractAdapter
         }
                 
                 
-        Bundle[] bundles = item.getBundles("METADATA");
+        List<Bundle> bundles = itemService.getBundles(item, "METADATA");
 
         for (Bundle bundle : bundles)
         {
-                Bitstream bitstream = bundle.getBitstreamByName("METS.xml");
+                Bitstream bitstream = bundleService.getBitstreamByName(bundle, "METS.xml");
 
                 if (bitstream == null)
                 {
@@ -889,7 +895,7 @@ public class ItemAdapter extends AbstractAdapter
                         XMLReader reader = XMLReaderFactory.createXMLReader();
                         reader.setContentHandler(filter);
                         reader.setProperty("http://xml.org/sax/properties/lexical-handler", filter);
-                        reader.parse(new InputSource(bitstream.retrieve()));
+                        reader.parse(new InputSource(bitstreamService.retrieve(context, bitstream)));
                 }
                         catch (AuthorizeException ae)
                         {
@@ -913,14 +919,14 @@ public class ItemAdapter extends AbstractAdapter
         List<Bundle> bundles;
         if (fileGrpTypes.size() == 0)
         {
-            bundles = Arrays.asList(item.getBundles());
+            bundles = item.getBundles();
         }
         else
         {
                 bundles = new ArrayList<Bundle>();
                 for (String fileGrpType : fileGrpTypes)
                 {
-                        for (Bundle newBundle : item.getBundles(fileGrpType))
+                        for (Bundle newBundle : itemService.getBundles(item, fileGrpType))
                         {
                                 bundles.add(newBundle);
                         }
@@ -953,26 +959,26 @@ public class ItemAdapter extends AbstractAdapter
         // return org.dspace.content.packager.AbstractMetsDissemination
         // .findOriginalBitstream(item, derived);
 
-        Bundle[] bundles = item.getBundles();
+        List<Bundle> bundles = item.getBundles();
 
         // Filename of original will be filename of the derived bitstream
         // minus the extension (ie everything from and including the last "." character)
         String originalFilename = derived.getName().substring(0, derived.getName().lastIndexOf("."));
 
         // First find "original" bundle
-        for (int i = 0; i < bundles.length; i++)
+        for (Bundle bundle : bundles)
         {
-            if ((bundles[i].getName() != null)
-                    && bundles[i].getName().equals("ORIGINAL"))
+            if ((bundle.getName() != null)
+                    && bundle.getName().equals("ORIGINAL"))
             {
                 // Now find the corresponding bitstream
-                Bitstream[] bitstreams = bundles[i].getBitstreams();
+                List<Bitstream> bitstreams = bundle.getBitstreams();
 
-                for (int bsnum = 0; bsnum < bitstreams.length; bsnum++)
+                for (Bitstream bitstream : bitstreams)
                 {
-                    if (bitstreams[bsnum].getName().equals(originalFilename))
+                    if (bitstream.getName().equals(originalFilename))
                     {
-                        return bitstreams[bsnum];
+                        return bitstream;
                     }
                 }
             }
@@ -1001,13 +1007,13 @@ public class ItemAdapter extends AbstractAdapter
     
     // FIXME: this method is a copy of the one inherited. However the
     // original method is final so we must rename it.
-	protected void renderFileWithAllowed(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException
-	{
+	protected void renderFileWithAllowed(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException, SQLException
+    {
 		AttributeMap attributes;
 		
 		// //////////////////////////////
     	// Determine the file attributes
-        BitstreamFormat format = bitstream.getFormat();
+        BitstreamFormat format = bitstream.getFormat(context);
         String mimeType = null;
         if (format != null)
         {
@@ -1087,7 +1093,7 @@ public class ItemAdapter extends AbstractAdapter
 	// Test if we are allowed to see this item
 	String isAllowed = "n";
 	try {
-	    if (AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ)) {
+	    if (authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ)) {
 		isAllowed = "y";
 	    }
 	} catch (SQLException e) {/* Do nothing */}

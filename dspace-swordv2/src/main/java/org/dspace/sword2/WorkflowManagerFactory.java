@@ -12,14 +12,16 @@ import org.swordapp.server.SwordError;
 
 public class WorkflowManagerFactory
 {
-	public static WorkflowManager getInstance()
+    public static WorkflowManager getInstance()
             throws DSpaceSwordException, SwordError
     {
-        WorkflowManager manager = (WorkflowManager) PluginManager.getSinglePlugin("swordv2-server", WorkflowManager.class);
+        WorkflowManager manager = (WorkflowManager) PluginManager
+                .getSinglePlugin("swordv2-server", WorkflowManager.class);
         if (manager == null)
         {
-            throw new SwordError(DSpaceUriRegistry.REPOSITORY_ERROR, "No workflow manager configured");
+            throw new SwordError(DSpaceUriRegistry.REPOSITORY_ERROR,
+                    "No workflow manager configured");
         }
         return manager;
-	}
+    }
 }

@@ -42,8 +42,8 @@
 <%@ page import="org.dspace.eperson.Group"            %>
 
 <%
-    Group      [] groups     = (Group      []) request.getAttribute("groups"     );
-    Collection [] collections= (Collection []) request.getAttribute("collections");
+    List<Group>      groups     = (List<Group>)      request.getAttribute("groups"     );
+    List<Collection> collections= (List<Collection>) request.getAttribute("collections");
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
@@ -70,8 +70,8 @@
             <span class="col-md-2"><label for="tcollection"><fmt:message key="jsp.dspace-admin.authorize-advanced.col"/></label></span>
             <span class="col-md-10">
                 <select class="form-control" size="10" name="collection_id" id="tcollection">
-                    <%  for(int i = 0; i < collections.length; i++ ) { %>
-                            <option value="<%= collections[i].getID() %>"> <%= collections[i].getMetadata("name")%>
+                    <%  for(int i = 0; i < collections.size(); i++ ) { %>
+                            <option value="<%= collections.get(i).getID() %>"> <%= collections.get(i).getName()%>
                             </option>
                         <%  } %>
                 </select>
@@ -94,8 +94,8 @@
 			</span>
             <span class="col-md-10">
             	<select class="form-control" size="10" name="group_id" id="tgroup_id">
-                    <%  for(int i = 0; i < groups.length; i++ ) { %>
-                            <option value="<%= groups[i].getID() %>"> <%= groups[i].getName()%>
+                    <%  for(int i = 0; i < groups.size(); i++ ) { %>
+                            <option value="<%= groups.get(i).getID() %>"> <%= groups.get(i).getName()%>
                             </option>
                         <%  } %>
                 </select>

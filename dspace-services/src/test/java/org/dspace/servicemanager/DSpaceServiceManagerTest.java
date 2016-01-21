@@ -106,16 +106,15 @@ public class DSpaceServiceManagerTest {
     public void testRegisterServiceClass() {
         dsm.startup();
 
-        int currentSize = dsm.getServicesByType(SampleAnnotationBean.class).size();
-
         SampleAnnotationBean sab = dsm.registerServiceClass("newAnnote", SampleAnnotationBean.class);
         assertNotNull(sab);
+
+        SampleAnnotationBean sampleAnnotationBean = dsm.getServiceByName("newAnnote", SampleAnnotationBean.class);
+        assertNotNull(sampleAnnotationBean);
+        assertEquals(sampleAnnotationBean, sab);
+        sampleAnnotationBean = null;
         sab = null;
 
-        List<SampleAnnotationBean> l = dsm.getServicesByType(SampleAnnotationBean.class);
-        assertNotNull(l);
-        assertEquals(currentSize+1, l.size());
-        l = null;
 
         try {
             dsm.registerService("fakey", (Class<?>)null);

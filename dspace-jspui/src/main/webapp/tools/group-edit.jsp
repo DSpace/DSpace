@@ -33,12 +33,13 @@
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group"   %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="java.util.List" %>
 
 <%
     Group group = (Group) request.getAttribute("group");
-    EPerson [] epeople = (EPerson []) request.getAttribute("members");
+    List<EPerson> epeople = (List<EPerson>) request.getAttribute("members");
     
-	Group   [] groups  = (Group   []) request.getAttribute("membergroups");
+	List<Group>   groups  = (List<Group>) request.getAttribute("membergroups");
 	request.setAttribute("LanguageSwitch", "hide");
 %>
 
@@ -67,12 +68,12 @@
     <div class="row">
     <div class="col-md-6"> 
 	    <label for="eperson_id"><fmt:message key="jsp.tools.group-edit.eperson"/></label>
-	    <dspace:selecteperson multiple="true" selected="<%= epeople %>"/> 
+	    <dspace:selecteperson multiple="true" selected="<%= epeople.toArray(new EPerson[epeople.size()]) %>"/>
     </div>
     
     <div class="col-md-6">
 	    <label for="eperson_id"><fmt:message key="jsp.tools.group-edit.group"/></label>
-	    <dspace:selectgroup   multiple="true" selected="<%= groups  %>"/>
+	    <dspace:selectgroup   multiple="true" selected="<%= groups.toArray(new Group[groups.size()])  %>"/>
 	</div>
 	</div>
 	<br/>

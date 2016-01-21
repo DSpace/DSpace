@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -18,16 +19,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.bulkedit.MetadataExport;
 import org.dspace.app.bulkedit.DSpaceCSV;
+import org.dspace.app.bulkedit.MetadataExport;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.*;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.ItemIterator;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.handle.HandleManager;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * Servlet to export metadata as CSV (comma separated values)
@@ -37,7 +43,13 @@ import org.dspace.handle.HandleManager;
 public class MetadataExportServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(MetadataExportServlet.class);
+    private static final Logger log = Logger.getLogger(MetadataExportServlet.class);
+
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
+
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
 
     /**
      * Respond to a post request
@@ -51,6 +63,7 @@ public class MetadataExportServlet extends DSpaceServlet
      * @throws SQLException
      * @throws AuthorizeException
      */
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -61,19 +74,19 @@ public class MetadataExportServlet extends DSpaceServlet
         if (handle != null)
         {
             log.info(LogManager.getHeader(context, "metadataexport", "exporting_handle:" + handle));
-            DSpaceObject thing = HandleManager.resolveToObject(context, handle);
+            DSpaceObject thing = handleService.resolveToObject(context, handle);
             if (thing != null)
             {
                 if (thing.getType() == Constants.ITEM)
                 {
-                    List<Integer> item = new ArrayList<Integer>();
-                    item.add(thing.getID());
-                    exporter = new MetadataExport(context, new ItemIterator(context, item), false);
+                    List<Item> item = new ArrayList<>();
+                    item.add((Item) thing);
+                    exporter = new MetadataExport(context, item.iterator(), false);
                 }
                 else if (thing.getType() == Constants.COLLECTION)
                 {
                     Collection collection = (Collection)thing;
-                    ItemIterator toExport = collection.getAllItems();
+					Iterator<Item> toExport = itemService.findAllByCollection(context, collection);
                     exporter = new MetadataExport(context, toExport, false);
                 }
                 else if (thing.getType() == Constants.COMMUNITY)

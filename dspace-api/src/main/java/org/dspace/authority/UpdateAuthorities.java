@@ -9,17 +9,20 @@ package org.dspace.authority;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
+import org.dspace.authority.factory.AuthorityServiceFactory;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
-import org.dspace.content.Metadatum;
 
 /**
  *
@@ -40,9 +43,14 @@ public class UpdateAuthorities {
     private Context context;
     private List<String> selectedIDs;
 
+    protected final ItemService itemService;
+    protected final AuthorityValueService authorityValueService;
+
     public UpdateAuthorities(Context context) {
         print = new PrintWriter(System.out);
         this.context = context;
+        this.authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
+        this.itemService = ContentServiceFactory.getInstance().getItemService();
     }
 
     public static void main(String[] args) throws ParseException {
@@ -57,8 +65,6 @@ public class UpdateAuthorities {
             }
             UpdateAuthorities.run();
 
-        } catch (SQLException e) {
-            log.error("Error in UpdateAuthorities", e);
         } finally {
             if (c != null) {
                 c.abort();
@@ -111,23 +117,22 @@ public class UpdateAuthorities {
         // This implementation could be very heavy on the REST service.
         // Use with care or make it more efficient.
 
-        AuthorityValueFinder authorityValueFinder = new AuthorityValueFinder();
         List<AuthorityValue> authorities;
 
         if (selectedIDs != null && !selectedIDs.isEmpty()) {
             authorities = new ArrayList<AuthorityValue>();
             for (String selectedID : selectedIDs) {
-                AuthorityValue byUID = authorityValueFinder.findByUID(context, selectedID);
+                AuthorityValue byUID = authorityValueService.findByUID(context, selectedID);
                 authorities.add(byUID);
             }
         } else {
-            authorities = authorityValueFinder.findAll(context);
+            authorities = authorityValueService.findAll(context);
         }
 
         if (authorities != null) {
             print.println(authorities.size() + " authorities found.");
             for (AuthorityValue authority : authorities) {
-                AuthorityValue updated = AuthorityValueGenerator.update(authority);
+                AuthorityValue updated = authorityValueService.update(authority);
                 if (!updated.getLastModified().equals(authority.getLastModified())) {
                     followUp(updated);
                 }
@@ -147,13 +152,13 @@ public class UpdateAuthorities {
 
     protected void updateItems(AuthorityValue authority) {
         try {
-            ItemIterator itemIterator = Item.findByMetadataFieldAuthority(context, authority.getField(), authority.getId());
+            Iterator<Item> itemIterator = itemService.findByMetadataFieldAuthority(context, authority.getField(), authority.getId());
             while (itemIterator.hasNext()) {
                 Item next = itemIterator.next();
-                List<Metadatum> metadata = next.getMetadata(authority.getField(), authority.getId());
-                authority.updateItem(next, metadata.get(0)); //should be only one
-                List<Metadatum> metadataAfter = next.getMetadata(authority.getField(), authority.getId());
-                if (!metadata.get(0).value.equals(metadataAfter.get(0).value)) {
+                List<MetadataValue> metadata = itemService.getMetadata(next, authority.getField(), authority.getId());
+                authority.updateItem(context, next, metadata.get(0)); //should be only one
+                List<MetadataValue> metadataAfter = itemService.getMetadata(next, authority.getField(), authority.getId());
+                if (!metadata.get(0).getValue().equals(metadataAfter.get(0).getValue())) {
                     print.println("Updated item with handle " + next.getHandle());
                 }
             }

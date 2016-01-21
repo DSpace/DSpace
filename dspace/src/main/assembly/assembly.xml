@@ -43,51 +43,27 @@
          </excludes>
       </fileSet>
       <!-- Copy necessary subdirectories to resulting directory -->
+      <!-- First, copy over our configurations -->
       <fileSet>
-         <outputDirectory>.</outputDirectory>
-         <includes>
-            <include>bin/**</include>
-            <include>config/**</include>
-            <include>docs/**</include>
-            <include>etc/**</include>
-            <include>solr/**</include>
-         </includes>
-         <!-- Exclude source code & configs (we'll copy configs below) -->
-         <excludes>
-            <exclude>src</exclude>
-            <exclude>config/dspace.cfg</exclude>
-            <exclude>config/log4j.properties</exclude>
-            <exclude>config/modules/**</exclude>
-         </excludes>
-      </fileSet>
-      <!-- Copy over all module configs & filter them -->
-      <fileSet>
-         <outputDirectory>.</outputDirectory>
-         <includes>
-            <include>config/modules/**</include>
-         </includes>
+         <directory>config</directory>
+         <outputDirectory>config</outputDirectory>
+         <!-- Filter all config files -->
          <filtered>true</filtered>
+      </fileSet>
+      <!-- Then, copy over all other necessary directories -->
+      <fileSet>
+         <directory>bin</directory>
+         <outputDirectory>bin</outputDirectory>
+      </fileSet>
+      <fileSet>
+         <directory>etc</directory>
+         <outputDirectory>etc</outputDirectory>
+      </fileSet>
+      <fileSet>
+         <directory>solr</directory>
+         <outputDirectory>solr</outputDirectory>
       </fileSet>
    </fileSets>
-
-   <!-- Copy over the dspace.cfg and log4j.properties files & filter them -->
-   <files>
-      <file>
-         <source>config/dspace.cfg</source>
-         <outputDirectory>config</outputDirectory>
-         <filtered>true</filtered>
-      </file>
-      <file>
-         <source>config/log4j.properties</source>
-         <outputDirectory>config</outputDirectory>
-         <filtered>true</filtered>
-      </file>
-      <file>
-         <source>config/crosswalks/oai/description.xml</source>
-         <outputDirectory>config</outputDirectory>
-         <filtered>true</filtered>
-      </file>
-   </files>
 
    <!--
    Copy ALL JAR dependencies specified in [src]/dspace/pom.xml

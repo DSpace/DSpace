@@ -7,6 +7,10 @@
  */
 package org.dspace.app.itemupdate;
 
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+
 /**
  * 	  Base class for Bitstream actions
  * 
@@ -15,6 +19,10 @@ package org.dspace.app.itemupdate;
 public abstract class UpdateBitstreamsAction implements UpdateAction {
 
 	protected boolean alterProvenance = true;
+
+
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
 	/**
 	 *        Set variable to indicate that the dc.description.provenance field may 

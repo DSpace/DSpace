@@ -7,10 +7,10 @@
  */
 package org.dspace.rest;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -26,15 +26,18 @@ import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
 /**
- * Superclass of all resource class in REST api. It has methods for creating
- * context, write statistics, process exception, splitting key of metadata,
- * string representation of action and method for getting user from header.
+ * Superclass of all resource classes in REST API. It has methods for creating
+ * context, write statistics, processsing exceptions, splitting a key of
+ * metadata, string representation of action and method for getting the logged
+ * in user from the token in request header.
  * 
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
  * 
  */
 public class Resource
 {
+
+    @javax.ws.rs.core.Context public static ServletContext servletContext;
 
     private static Logger log = Logger.getLogger(Resource.class);
 
@@ -44,66 +47,55 @@ public class Resource
         writeStatistics = ConfigurationManager.getBooleanProperty("rest", "stats", false);
     }
 
+    static public String getServletContextPath() {
+        return servletContext.getContextPath();
+    }
     /**
      * Create context to work with DSpace database. It can create context
-     * without logged user (parameter user is null) or with. It can throws
-     * WebApplicationException caused by: SQLException, if there was problem
-     * with reading from database. AuthorizeException, if there was problem with
-     * authorization to read form database. And Exception, if there was some
-     * problem with creating context.
+     * with or without a logged in user (parameter user is null). Throws
+     * WebApplicationException caused by: SQLException if there was a problem
+     * with reading from database. Throws AuthorizeException if there was
+     * a problem with authorization to read from the database. Throws Exception
+     * if there was a problem creating context.
      * 
      * @param person
      *            User which will be logged in context.
-     * @return New created context with logged user if user was not null.
-     *         Otherwise, without logged user.
+     * @return Newly created context with the logged in user unless the specified user was null.
+     *         If user is null, create the context without a logged in user.
      * @throws ContextException
-     *             Throw if was problem to create context. It can be caused by
-     *             SQLException, error in creating context or find user to log
-     *             in. Or can be caused by AuthorizeException if was problem to
-     *             authorize to find user.
+     *             Thrown in case of a problem creating context. Can be caused by
+     *             SQLException error in creating context or finding the user to
+     *             log in. Can be caused by AuthorizeException if there was a
+     *             problem authorizing the found user.
      */
     protected static org.dspace.core.Context createContext(EPerson person) throws ContextException
     {
+        org.dspace.core.Context context = new org.dspace.core.Context();
+        //context.getDBConnection().setAutoCommit(false); // Disable autocommit.
 
-        org.dspace.core.Context context = null;
-
-        try
+        if (person != null)
         {
-            context = new org.dspace.core.Context();
-            context.getDBConnection().setAutoCommit(false); // Disable autocommit.
-
-            if (person != null)
-            {
-                context.setCurrentUser(person);
-            }
-
-            return context;
+            context.setCurrentUser(person);
         }
-        catch (SQLException e)
-        {
-            if ((context != null) && (context.isValid()))
-            {
-                context.abort();
-            }
-            throw new ContextException("Could not create context, SQLException. Message: " + e, e);
-        }
+
+        return context;
     }
 
     /**
-     * It write statistic about using REST api.
+     * Records a statistics event about an object used via REST API.
      * @param dspaceObject
-     *            Object of DSpace which is performed.
+     *            DSpace object on which a request was performed.
      * @param action
-     *            What action is performed with object.
+     *            Action that was performed.
      * @param user_ip
      * @param user_agent
-     * @param xforwarderfor
+     * @param xforwardedfor
      * @param headers
      * @param request
      * @param context
      */
     protected void writeStats(DSpaceObject dspaceObject, UsageEvent.Action action,
-                              String user_ip, String user_agent, String xforwarderfor, HttpHeaders headers, HttpServletRequest request, Context context)
+                              String user_ip, String user_agent, String xforwardedfor, HttpHeaders headers, HttpServletRequest request, Context context)
     {
         if (!writeStatistics)
         {
@@ -117,7 +109,7 @@ public class Resource
         else
         {
             new DSpace().getEventService().fireEvent(
-                    new UsageEvent(action, user_ip, user_agent, xforwarderfor, context, dspaceObject));
+                    new UsageEvent(action, user_ip, user_agent, xforwardedfor, context, dspaceObject));
         }
 
         log.debug("fired event");

@@ -31,12 +31,12 @@ import org.xml.sax.SAXException;
  */
 public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader
 {
-    private CrossRefService crossrefService = new CrossRefService();
+    protected CrossRefService crossrefService = new CrossRefService();
 
-    private boolean searchProvider = true;
+    protected boolean searchProvider = true;
 
-    private String apiKey = null;
-    private int maxResults = 10;
+    protected String apiKey = null;
+    protected int maxResults = 10;
     
     public void setSearchProvider(boolean searchProvider)
     {

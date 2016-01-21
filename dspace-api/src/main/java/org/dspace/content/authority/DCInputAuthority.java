@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.content.Collection;
 import org.dspace.core.SelfNamedPlugin;
 
 /**
@@ -117,7 +118,8 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     }
 
 
-    public Choices getMatches(String field, String query, int collection, int start, int limit, String locale)
+    @Override
+    public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale)
     {
         init();
 
@@ -134,7 +136,8 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         return new Choices(v, 0, v.length, Choices.CF_AMBIGUOUS, false, dflt);
     }
 
-    public Choices getBestMatch(String field, String text, int collection, String locale)
+    @Override
+    public Choices getBestMatch(String field, String text, Collection collection, String locale)
     {
         init();
         for (int i = 0; i < values.length; ++i)
@@ -149,6 +152,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         return new Choices(Choices.CF_NOTFOUND);
     }
 
+    @Override
     public String getLabel(String field, String key, String locale)
     {
         init();

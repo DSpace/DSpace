@@ -10,6 +10,7 @@ package org.dspace.checker;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import javax.mail.MessagingException;
@@ -21,7 +22,10 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
+import org.dspace.checker.factory.CheckerServiceFactory;
+import org.dspace.checker.service.SimpleReporterService;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.core.Email;
 
 /**
@@ -163,7 +167,7 @@ public class DailyReportEmailer
         }
 
         // create a new simple reporter
-        SimpleReporter reporter = new SimpleReporterImpl();
+        SimpleReporterService reporter = CheckerServiceFactory.getInstance().getSimpleReporterService();
 
         DailyReportEmailer emailer = new DailyReportEmailer();
 
@@ -178,9 +182,12 @@ public class DailyReportEmailer
 
         File report = null;
         FileWriter writer = null;
+        Context context = null;
 
         try
         {
+            context = new Context();
+
             // the number of bitstreams in report
             int numBitstreams = 0;
 
@@ -205,23 +212,23 @@ public class DailyReportEmailer
             {
                 writer
                         .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                numBitstreams += reporter.getDeletedBitstreamReport(yesterday,
+                numBitstreams += reporter.getDeletedBitstreamReport(context, yesterday,
                         tomorrow, writer);
                 writer
                         .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getChangedChecksumReport(yesterday,
+                numBitstreams += reporter.getChangedChecksumReport(context, yesterday,
                         tomorrow, writer);
                 writer
                         .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getBitstreamNotFoundReport(yesterday,
+                numBitstreams += reporter.getBitstreamNotFoundReport(context, yesterday,
                         tomorrow, writer);
                 writer
                         .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getNotToBeProcessedReport(yesterday,
+                numBitstreams += reporter.getNotToBeProcessedReport(context, yesterday,
                         tomorrow, writer);
                 writer
                         .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getUncheckedBitstreamsReport(writer);
+                numBitstreams += reporter.getUncheckedBitstreamsReport(context, writer);
                 writer
                         .write("\n--------------------------------- End Report ---------------------------\n\n");
                 writer.flush();
@@ -234,7 +241,7 @@ public class DailyReportEmailer
                 {
                     writer
                             .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getDeletedBitstreamReport(
+                    numBitstreams += reporter.getDeletedBitstreamReport(context,
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
@@ -245,7 +252,7 @@ public class DailyReportEmailer
                 {
                     writer
                             .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getBitstreamNotFoundReport(
+                    numBitstreams += reporter.getBitstreamNotFoundReport(context,
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
@@ -256,7 +263,7 @@ public class DailyReportEmailer
                 {
                     writer
                             .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getChangedChecksumReport(
+                    numBitstreams += reporter.getChangedChecksumReport(context,
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
@@ -267,7 +274,7 @@ public class DailyReportEmailer
                 {
                     writer
                             .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getNotToBeProcessedReport(
+                    numBitstreams += reporter.getNotToBeProcessedReport(context,
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
@@ -279,23 +286,22 @@ public class DailyReportEmailer
                     writer
                             .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
                     numBitstreams += reporter
-                            .getUncheckedBitstreamsReport(writer);
+                            .getUncheckedBitstreamsReport(context, writer);
                     writer.flush();
                     writer.close();
                     emailer.sendReport(report, numBitstreams);
                 }
             }
         }
-        catch (MessagingException e)
+        catch (MessagingException | SQLException | IOException e)
         {
             log.fatal(e);
-        }
-        catch (IOException e)
+        } finally
         {
-            log.fatal(e);
-        }
-        finally
-        {
+            if(context != null && context.isValid())
+            {
+                context.abort();
+            }
             if (writer != null)
             {
                 try

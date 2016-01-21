@@ -8,7 +8,6 @@
 
 package org.dspace.core;
 
-import java.sql.SQLException;
 import java.util.Locale;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -43,7 +42,8 @@ public class I18nUtilTest
     @Before
     public void setUp()
     {
-        new MockConfigurationManager();
+        // Initialize MockConfigurationManager and tell it to NOT load any properties
+        new MockConfigurationManager(false);
     }
 
     @After

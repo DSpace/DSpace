@@ -8,7 +8,9 @@
 package org.dspace.app.xmlui.utils;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -16,15 +18,22 @@ import javax.servlet.http.HttpSession;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.aspect.administrative.SystemwideAlerts;
-import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 
 /**
  * Methods for authenticating the user. This is DSpace platform code, as opposed
@@ -66,7 +75,12 @@ public class AuthenticationUtil
      */
     private static final String EFFECTIVE_USER_ID = "dspace.user.effective";
     private static final String AUTHENTICATED_USER_ID = "dspace.user.authenticated";
-    
+
+    protected static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected static final AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+    protected static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected static final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
     /**
      * Authenticate the current DSpace content based upon given authentication
      * credentials. The AuthenticationManager will consult the configured
@@ -92,7 +106,7 @@ public class AuthenticationUtil
                 .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
         Context context = ContextUtil.obtainContext(objectModel);
 
-        int implicitStatus = AuthenticationManager.authenticateImplicit(
+        int implicitStatus = authenticationService.authenticateImplicit(
                 context, null, null, null, request);
 
         if (implicitStatus == AuthenticationMethod.SUCCESS)
@@ -104,7 +118,7 @@ public class AuthenticationUtil
         {
             // If implicit authentication failed, fall over to explicit.
 
-            int explicitStatus = AuthenticationManager.authenticate(context,
+            int explicitStatus = authenticationService.authenticate(context,
                     email, password, realm, request);
 
             if (explicitStatus == AuthenticationMethod.SUCCESS)
@@ -145,7 +159,7 @@ public class AuthenticationUtil
                 .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
         Context context = ContextUtil.obtainContext(objectModel);
 
-        int implicitStatus = AuthenticationManager.authenticateImplicit(
+        int implicitStatus = authenticationService.authenticateImplicit(
                 context, null, null, null, request);
 
         if (implicitStatus == AuthenticationMethod.SUCCESS)
@@ -181,7 +195,7 @@ public class AuthenticationUtil
         context.setCurrentUser(eperson);
 
         // Check to see if systemwide alerts is restricting sessions
-        if (!AuthorizeManager.isAdmin(context) && !SystemwideAlerts.canUserStartSession())
+        if (!authorizeService.isAdmin(context) && !SystemwideAlerts.canUserStartSession())
         {
         	// Do not allow this user to login because sessions are being restricted by a systemwide alert.
         	context.setCurrentUser(null);
@@ -189,11 +203,11 @@ public class AuthenticationUtil
         }
         
         // Set any special groups - invoke the authentication manager.
-        int[] groupIDs = AuthenticationManager.getSpecialGroups(context,
+        List<Group> groups = authenticationService.getSpecialGroups(context,
                 request);
-        for (int groupID : groupIDs)
+        for (Group group : groups)
         {
-            context.setSpecialGroup(groupID);
+            context.setSpecialGroup(group.getID());
         }
 
         // and the remote IP address to compare against later requests
@@ -242,8 +256,8 @@ public class AuthenticationUtil
 
         if (session != null)
         {
-            Integer id = (Integer) session.getAttribute(EFFECTIVE_USER_ID);
-            Integer realid = (Integer) session.getAttribute(AUTHENTICATED_USER_ID);
+            UUID id = (UUID) session.getAttribute(EFFECTIVE_USER_ID);
+            UUID realid = (UUID) session.getAttribute(AUTHENTICATED_USER_ID);
             
             if (id != null)
             {
@@ -253,18 +267,18 @@ public class AuthenticationUtil
                 String address = (String)session.getAttribute(CURRENT_IP_ADDRESS);
                 if (!ipcheck || (address != null && address.equals(request.getRemoteAddr())))
                 {
-                    EPerson eperson = EPerson.find(context, id);
+                    EPerson eperson = ePersonService.find(context, id);
                     context.setCurrentUser(eperson);
                     
                     // Check to see if systemwide alerts is restricting sessions
-                    if (!AuthorizeManager.isAdmin(context) && !SystemwideAlerts.canUserMaintainSession())
+                    if (!authorizeService.isAdmin(context) && !SystemwideAlerts.canUserMaintainSession())
                     {
                     	// Normal users can not maintain their sessions, check to see if this is really an
                     	// administrator logging in as someone else.
                     	
-                    	EPerson realEPerson = EPerson.find(context, realid);
-                    	Group administrators = Group.find(context,1);
-                 	    if (!administrators.isMember(realEPerson))
+                    	EPerson realEPerson = ePersonService.find(context, realid);
+                    	Group administrators = groupService.findByName(context, Group.ADMIN);
+                 	    if (!groupService.isDirectMember(administrators, realEPerson))
                  	    {
                  	    	// Log this user out because sessions are being restricted by a systemwide alert.
                  	    	context.setCurrentUser(null);
@@ -274,10 +288,10 @@ public class AuthenticationUtil
                     
 
                     // Set any special groups - invoke the authentication mgr.
-                    int[] groupIDs = AuthenticationManager.getSpecialGroups(context, request);
-                    for (int groupID : groupIDs)
+                    List<Group> groups = authenticationService.getSpecialGroups(context, request);
+                    for (Group group : groups)
                     {
-                        context.setSpecialGroup(groupID);
+                        context.setSpecialGroup(group.getID());
                     }
                 }
                 else
@@ -312,7 +326,7 @@ public class AuthenticationUtil
         }
     	
     	// Only super administrators can login as someone else.
-    	if (!AuthorizeManager.isAdmin(context))
+    	if (!authorizeService.isAdmin(context))
         {
             throw new AuthorizeException("xmlui.utils.AuthenticationUtil.onlyAdmins");
         }
@@ -320,8 +334,8 @@ public class AuthenticationUtil
     	// Just to be double be sure, make sure the administrator
     	// is the one who actually authenticated himself.
 	    HttpSession session = request.getSession(false);
-	    Integer authenticatedID = (Integer) session.getAttribute(AUTHENTICATED_USER_ID); 
-	    if (context.getCurrentUser().getID() != authenticatedID)
+        UUID authenticatedID = (UUID) session.getAttribute(AUTHENTICATED_USER_ID);
+	    if (!context.getCurrentUser().getID().equals(authenticatedID))
         {
             throw new AuthorizeException("xmlui.utils.AuthenticationUtil.onlyAuthenticatedAdmins");
         }
@@ -331,8 +345,8 @@ public class AuthenticationUtil
         {
             return;
         }
-	    Group administrators = Group.find(context,1);
-	    if (administrators.isMember(loginAs))
+	    Group administrators = groupService.findByName(context, Group.ADMIN);
+	    if (groupService.isDirectMember(administrators, loginAs))
         {
             throw new AuthorizeException("xmlui.utils.AuthenticationUtil.notAnotherAdmin");
         }
@@ -341,10 +355,10 @@ public class AuthenticationUtil
 	    context.setCurrentUser(loginAs);
 	
         // Set any special groups - invoke the authentication mgr.
-        int[] groupIDs = AuthenticationManager.getSpecialGroups(context,request);
-        for (int groupID : groupIDs)
+        List<Group> groups = authenticationService.getSpecialGroups(context, request);
+        for (Group group : groups)
         {
-            context.setSpecialGroup(groupID);
+            context.setSpecialGroup(group.getID());
         }
 	    	        
         // Set both the effective and authenticated user to the same.
@@ -367,15 +381,15 @@ public class AuthenticationUtil
         if (session.getAttribute(EFFECTIVE_USER_ID) != null &&
         	session.getAttribute(AUTHENTICATED_USER_ID) != null)
         {
-    	    Integer effectiveID = (Integer) session.getAttribute(EFFECTIVE_USER_ID); 
-    	    Integer authenticatedID = (Integer) session.getAttribute(AUTHENTICATED_USER_ID); 
+    	    UUID effectiveID = (UUID) session.getAttribute(EFFECTIVE_USER_ID);
+    	    UUID authenticatedID = (UUID) session.getAttribute(AUTHENTICATED_USER_ID);
     	    
-    	    if (effectiveID.intValue() != authenticatedID.intValue())
+    	    if (!effectiveID.equals(authenticatedID))
     	    {
     	    	// The user has login in as another user, instead of logging them out, 
     	    	// revert back to their previous login name.
     	    	
-    	    	EPerson authenticatedUser = EPerson.find(context, authenticatedID);
+    	    	EPerson authenticatedUser = ePersonService.find(context, authenticatedID);
     	    	context.setCurrentUser(authenticatedUser);
     	    	session.setAttribute(EFFECTIVE_USER_ID, authenticatedID);
     	    	return;
@@ -407,7 +421,7 @@ public class AuthenticationUtil
         
         if (SystemwideAlerts.canUserStartSession())
         {
-            return AuthenticationManager.canSelfRegister(context, request, email);
+            return authenticationService.canSelfRegister(context, request, email);
         }
         else
         {
@@ -432,7 +446,7 @@ public class AuthenticationUtil
         final HttpServletRequest request = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
         Context context = ContextUtil.obtainContext(objectModel);
         
-        return AuthenticationManager.allowSetPassword(context, request, email);
+        return authenticationService.allowSetPassword(context, request, email);
     }
     
     /**
@@ -455,15 +469,15 @@ public class AuthenticationUtil
         // FIXME: TEMPORARILY need to turn off authentication, as usually
         // only site admins can create e-people
         context.setIgnoreAuthorization(true);
-        EPerson eperson = EPerson.create(context);
+        EPerson eperson = ePersonService.create(context);
         eperson.setEmail(email);
         eperson.setCanLogIn(true);
         eperson.setSelfRegistered(true);
-        eperson.update();
+        ePersonService.update(context, eperson);
         context.setIgnoreAuthorization(false);
         
         // Give site auth a chance to set/override appropriate fields
-        AuthenticationManager.initEPerson(context, request, eperson);
+        authenticationService.initEPerson(context, request, eperson);
         
         return eperson;   
     }

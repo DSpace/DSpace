@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -23,9 +24,9 @@ import org.dspace.app.bulkedit.MetadataExport;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.*;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.content.ItemIterator;
 import org.apache.log4j.Logger;
 
 /**
@@ -65,9 +66,16 @@ public class BrowserServlet extends AbstractBrowserServlet
         // all browse requests currently come to GET.
         BrowserScope scope = getBrowserScopeForRequest(context, request, response);
 
-        if (scope.getBrowseIndex() == null)
+        if (scope == null || scope.getBrowseIndex() == null)
         {
-            throw new ServletException("There is no browse index for the request");
+            String requestURL = request.getRequestURI();
+            if (request.getQueryString() != null)
+            {
+                requestURL += "?" + request.getQueryString();
+            }
+            log.warn("We were unable to parse the browse request (e.g. an unconfigured index or sort option was used). Will send a 400 Bad Request. Requested URL was: " + requestURL);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
 
         // Is this a request to export the metadata, or a normal browse request?
@@ -186,13 +194,8 @@ public class BrowserServlet extends AbstractBrowserServlet
             // Export a browse view
             BrowseEngine be = new BrowseEngine(context);
             BrowseInfo binfo = be.browse(scope);
-            List<Integer> iids = new ArrayList<Integer>();
-            for (BrowseItem bi : binfo.getBrowseItemResults())
-            {
-                iids.add(bi.getID());
-            }
-            ItemIterator ii = new ItemIterator(context, iids);
-            MetadataExport exporter = new MetadataExport(context, ii, false);
+			Iterator<Item> iterator = binfo.getBrowseItemResults().iterator();
+			MetadataExport exporter = new MetadataExport(context, iterator, false);
 
             // Perform the export
             DSpaceCSV csv = exporter.export();

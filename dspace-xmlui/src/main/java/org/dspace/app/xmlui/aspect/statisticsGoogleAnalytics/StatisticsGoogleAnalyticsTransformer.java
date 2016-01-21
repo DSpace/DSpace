@@ -66,7 +66,7 @@ public class StatisticsGoogleAnalyticsTransformer extends AbstractDSpaceTransfor
 
         if(dso != null)
         {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
+            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath, true);
         }
 
         pageMeta.addTrailLink(contextPath + "/handle" + (dso != null && dso.getHandle() != null ? "/" + dso.getHandle() : "/google-stats"), T_statisticsGoogleAnalytics_trail);

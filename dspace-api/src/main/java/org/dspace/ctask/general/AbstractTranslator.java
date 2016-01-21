@@ -8,7 +8,7 @@
 package org.dspace.ctask.general;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -29,19 +29,19 @@ import java.util.List;
 public abstract class AbstractTranslator extends AbstractCurationTask
 {
 
-    int status = Curator.CURATE_UNSET;
+    protected int status = Curator.CURATE_UNSET;
 
-    private static final String PLUGIN_PREFIX = "translator";
-    private static String authLangField = "dc.language";
-    private static String authLang = "en";
-    private static String[] toTranslate;
-    private static String[] langs;
+    protected final String PLUGIN_PREFIX = "translator";
+    protected String authLangField = "dc.language";
+    protected String authLang = "en";
+    protected String[] toTranslate;
+    protected String[] langs;
 
-    private static String apiKey = "";
+    protected String apiKey = "";
 
     private static Logger log = Logger.getLogger(AbstractTranslator.class);
 
-    private List<String> results = new ArrayList<String>();
+    protected List<String> results = new ArrayList<String>();
 
 
     @Override
@@ -89,12 +89,12 @@ public abstract class AbstractTranslator extends AbstractCurationTask
             String handle = item.getHandle();
             log.debug("Translating metadata for " + handle);
 
-            Metadatum[] authLangs = item.getMetadataByMetadataString(authLangField);
-            if(authLangs.length > 0)
+            List<MetadataValue> authLangs = itemService.getMetadataByMetadataString(item, authLangField);
+            if(authLangs.size() > 0)
             {
                 /* Assume the first... multiple
                   "authoritative" languages won't work */
-                authLang = authLangs[0].value;
+                authLang = authLangs.get(0).getValue();
                 log.debug("Authoritative language for " + handle + " is " + authLang);
             }
 
@@ -107,12 +107,12 @@ public abstract class AbstractTranslator extends AbstractCurationTask
                     boolean translated = false;
                     field = field.trim();
                     String[] fieldSegments = field.split("\\.");
-                    Metadatum[] fieldMetadata = null;
+                    List<MetadataValue> fieldMetadata = null;
                     
                     if(fieldSegments.length > 2) {
                         // First, check to see if we've already got this in the target language
-                        Metadatum[] checkMetadata = item.getMetadata(fieldSegments[0], fieldSegments[1], fieldSegments[2], lang);
-                        if(checkMetadata.length > 0)
+                        List<MetadataValue> checkMetadata = itemService.getMetadata(item, fieldSegments[0], fieldSegments[1], fieldSegments[2], lang);
+                        if(checkMetadata.size() > 0)
                         {
                             // We've already translated this, move along
                             log.debug(handle + "already has " + field + " in " + lang + ", skipping");
@@ -121,13 +121,13 @@ public abstract class AbstractTranslator extends AbstractCurationTask
                         }
 
                         // Let's carry on and get the authoritative version, then
-                        fieldMetadata = item.getMetadata(fieldSegments[0], fieldSegments[1], fieldSegments[2], authLang);
+                        fieldMetadata = itemService.getMetadata(item, fieldSegments[0], fieldSegments[1], fieldSegments[2], authLang);
 
                     }
                     else {
                         // First, check to see if we've already got this in the target language
-                        Metadatum[] checkMetadata = item.getMetadata(fieldSegments[0], fieldSegments[1], null, lang);
-                        if(checkMetadata.length > 0)
+                        List<MetadataValue> checkMetadata = itemService.getMetadata(item, fieldSegments[0], fieldSegments[1], null, lang);
+                        if(checkMetadata.size() > 0)
                         {
                             // We've already translated this, move along
                             log.debug(handle + "already has " + field + " in " + lang + ", skipping");
@@ -136,28 +136,28 @@ public abstract class AbstractTranslator extends AbstractCurationTask
                         }
 
                         // Let's carry on and get the authoritative version, then
-                        fieldMetadata = item.getMetadata(fieldSegments[0], fieldSegments[1], null, authLang);
+                        fieldMetadata = itemService.getMetadata(item, fieldSegments[0], fieldSegments[1], null, authLang);
 
 
                     }
 
-                    if(!translated && fieldMetadata.length > 0)
+                    if(!translated && fieldMetadata.size() > 0)
                     {
-                        for(Metadatum metadataValue : fieldMetadata) {
-                            String value = metadataValue.value;
+                        for(MetadataValue metadataValue : fieldMetadata) {
+                            String value = metadataValue.getValue();
                             String translatedText = translateText(authLang, lang, value);
                             if(translatedText != null && !"".equals(translatedText))
                             {
-                                // Add the new metadata
-                                if(fieldSegments.length > 2) {
-                                    item.addMetadata(fieldSegments[0], fieldSegments[1], fieldSegments[2], lang, translatedText);
-                                }
-                                else {
-                                    item.addMetadata(fieldSegments[0], fieldSegments[1], null, lang, translatedText);
-                                }
-
                                 try {
-                                    item.update();
+                                    // Add the new metadata
+                                    if(fieldSegments.length > 2) {
+                                        itemService.addMetadata(Curator.curationContext(), item, fieldSegments[0], fieldSegments[1], fieldSegments[2], lang, translatedText);
+                                    }
+                                    else {
+                                        itemService.addMetadata(Curator.curationContext(), item, fieldSegments[0], fieldSegments[1], null, lang, translatedText);
+                                    }
+
+                                    itemService.update(Curator.curationContext(), item);
                                     results.add(handle + ": Translated " + authLang + " -> " + lang + " (" + field + ")");
                                 }
                                 catch(Exception e) {

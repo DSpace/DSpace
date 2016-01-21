@@ -10,9 +10,7 @@ package org.dspace.app.xmlui.aspect.administrative;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
+import java.util.*;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
@@ -21,23 +19,19 @@ import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
-import org.dspace.handle.HandleManager;
-import org.dspace.submit.step.AccessStep;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -66,6 +60,18 @@ public class FlowItemUtils
 	private static final Message T_bitstream_delete = new Message("default","The selected bitstreams have been deleted.");
 	private static final Message T_bitstream_order = new Message("default","The bitstream order has been successfully altered.");
 
+	protected static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
+	protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	protected static final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+	protected static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+	protected static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	protected static final MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+
+	protected static final BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+
+	protected static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
 	
 	/**
 	 * Resolve the given identifier to an item. The identifier may be either an
@@ -87,7 +93,7 @@ public class FlowItemUtils
 		//		Check whether it's a handle or internal id (by check ing if it has a slash inthe string)
 		if (identifier.contains("/")) 
 		{
-			DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
+			DSpaceObject dso = handleService.resolveToObject(context, identifier);
 	
 			if (dso != null && dso.getType() == Constants.ITEM) 
 			{ 
@@ -102,7 +108,7 @@ public class FlowItemUtils
 		
 			Item item = null;
 			try {
-				item = Item.find(context, Integer.valueOf(identifier));
+				item = itemService.find(context, UUID.fromString(identifier));
 			} catch (NumberFormatException e) {
 				// ignoring the exception
 			}
@@ -141,12 +147,12 @@ public class FlowItemUtils
 	 * @param request the Cocoon request
 	 * @return A flow result
 	 */
-	public static FlowResult processEditItem(Context context, int itemID, Request request) throws SQLException, AuthorizeException, UIException, IOException
+	public static FlowResult processEditItem(Context context, UUID itemID, Request request) throws SQLException, AuthorizeException, UIException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 
-		Item item = Item.find(context, itemID);
+		Item item = itemService.find(context, itemID);
 		
 		
 		// STEP 1:
@@ -156,12 +162,12 @@ public class FlowItemUtils
 		String scope = request.getParameter("scope");
 		if ("*".equals(scope))
 		{
-			item.clearMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+			itemService.clearMetadata(context, item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 		}
 		else
 		{
 			String[] parts = parseName(scope);
-			item.clearMetadata(parts[0],parts[1],parts[2],Item.ANY);
+			itemService.clearMetadata(context, item, parts[0],parts[1],parts[2],Item.ANY);
 		}
 		
 		// STEP 2:
@@ -219,12 +225,11 @@ public class FlowItemUtils
                         {
                             iconf = Choices.CF_NOVALUE;
                         }
-                        item.addMetadata(parts[0], parts[1], parts[2], lang,
+						itemService.addMetadata(context, item, parts[0], parts[1], parts[2], lang,
                                              value, authority, iconf);
 		}
 		
-		item.update();
-		context.commit();
+		itemService.update(context, item);
 		
 		result.setContinue(true);
 		
@@ -242,26 +247,24 @@ public class FlowItemUtils
 	 * @param request the Cocoon request
 	 * @return A flow result
 	 */
-	public static FlowResult processAddMetadata(Context context, int itemID, Request request) throws SQLException, AuthorizeException, UIException, IOException
+	public static FlowResult processAddMetadata(Context context, UUID itemID, Request request) throws SQLException, AuthorizeException, UIException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 
-		Item item = Item.find(context, itemID);
+		Item item = itemService.find(context, itemID);
 		
 		
 		String fieldID = request.getParameter("field");
 		String value = request.getParameter("value");
 		String language = request.getParameter("language");
 		
-		MetadataField field = MetadataField.find(context,Integer.valueOf(fieldID));
-		MetadataSchema schema = MetadataSchema.find(context,field.getSchemaID());
+		MetadataField field = metadataFieldService.find(context,Integer.valueOf(fieldID));
+
+		itemService.addMetadata(context, item, field.getMetadataSchema().getName(), field.getElement(), field.getQualifier(), language, value);
 		
-		item.addMetadata(schema.getName(), field.getElement(), field.getQualifier(), language, value);
-		
-		item.update();
-		context.commit();
-		
+		itemService.update(context, item);
+
 		result.setContinue(true);
 		
 		result.setOutcome(true);
@@ -278,15 +281,14 @@ public class FlowItemUtils
 	 * @param itemID The id of the to-be-withdrawn item.
 	 * @return A result object
 	 */
-	public static FlowResult processWithdrawItem(Context context, int itemID) throws SQLException, AuthorizeException, IOException
+	public static FlowResult processWithdrawItem(Context context, UUID itemID) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 		
-		Item item = Item.find(context, itemID);
-		item.withdraw();
-		context.commit();
-
+		Item item = itemService.find(context, itemID);
+		itemService.withdraw(context, item);
+		
 		result.setContinue(true);
         result.setOutcome(true);
         result.setMessage(T_item_withdrawn);
@@ -302,14 +304,13 @@ public class FlowItemUtils
 	 * @param itemID The id of the to-be-reinstated item.
 	 * @return A result object
 	 */
-	public static FlowResult processReinstateItem(Context context, int itemID) throws SQLException, AuthorizeException, IOException
+	public static FlowResult processReinstateItem(Context context, UUID itemID) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 		
-		Item item = Item.find(context, itemID);
-		item.reinstate();
-		context.commit();
+		Item item = itemService.find(context, itemID);
+		itemService.reinstate(context, item);
 
 		result.setContinue(true);
         result.setOutcome(true);
@@ -326,15 +327,14 @@ public class FlowItemUtils
      * @param itemID The id of the to-be-withdrawn item.
      * @return A result object
      */
-    public static FlowResult processPrivateItem(Context context, int itemID) throws SQLException, AuthorizeException, IOException
+    public static FlowResult processPrivateItem(Context context, UUID itemID) throws SQLException, AuthorizeException, IOException
     {
         FlowResult result = new FlowResult();
         result.setContinue(false);
 
-        Item item = Item.find(context, itemID);
+        Item item = itemService.find(context, itemID);
         item.setDiscoverable(false);
-        item.update();
-        context.commit();
+        itemService.update(context, item);
 
         result.setContinue(true);
         result.setOutcome(true);
@@ -350,15 +350,14 @@ public class FlowItemUtils
      * @param itemID The id of the to-be-withdrawn item.
      * @return A result object
      */
-    public static FlowResult processPublicItem(Context context, int itemID) throws SQLException, AuthorizeException, IOException
+    public static FlowResult processPublicItem(Context context, UUID itemID) throws SQLException, AuthorizeException, IOException
     {
         FlowResult result = new FlowResult();
         result.setContinue(false);
 
-        Item item = Item.find(context, itemID);
+        Item item = itemService.find(context, itemID);
         item.setDiscoverable(true);
-        item.update();
-        context.commit();
+        itemService.update(context, item);
 
         result.setContinue(true);
         result.setOutcome(true);
@@ -377,24 +376,24 @@ public class FlowItemUtils
      * @param inherit Whether to inherit the policies of the destination collection
      * @return A result object
      */
-    public static FlowResult processMoveItem(Context context, int itemID, int collectionID, boolean inherit) throws SQLException, AuthorizeException, IOException
+    public static FlowResult processMoveItem(Context context, UUID itemID, UUID collectionID, boolean inherit) throws SQLException, AuthorizeException, IOException
     {
         FlowResult result = new FlowResult();
         result.setContinue(false);
 
-        Item item = Item.find(context, itemID);
+        Item item = itemService.find(context, itemID);
 
-        if(AuthorizeManager.isAdmin(context, item))
+        if(authorizeService.isAdmin(context, item))
         {
           //Add an action giving this user *explicit* admin permissions on the item itself.
-          //This ensures that the user will be able to call item.update() even if he/she
+          //This ensures that the user will be able to call itemService.update(context, item) even if he/she
           // moves it to a Collection that he/she doesn't administer.
-          if (item.canEdit())
+          if (itemService.canEdit(context, item))
           {
-              AuthorizeManager.authorizeAction(context, item, Constants.WRITE);
+              authorizeService.authorizeAction(context, item, Constants.WRITE);
           }
 
-          Collection destination = Collection.find(context, collectionID);
+          Collection destination = collectionService.find(context, collectionID);
           if (destination == null)
           {
               result.setOutcome(false);
@@ -431,12 +430,12 @@ public class FlowItemUtils
           // Remove item from its owning collection and add to the destination
           if (!alreadyInCollection)
           {
-              destination.addItem(item);
+			  collectionService.addItem(context, destination, item);
           }
 
           if (owningCollection != null)
           {
-              owningCollection.removeItem(item);
+              collectionService.removeItem(context, owningCollection, item);
           }
 
           item.setOwningCollection(destination);
@@ -444,11 +443,10 @@ public class FlowItemUtils
           // Inherit policies of destination collection if required
           if (inherit)
           {
-              item.inheritCollectionDefaultPolicies(destination);
+              itemService.inheritCollectionDefaultPolicies(context, item, destination);
           }
 
-          item.update();
-          context.commit();
+          itemService.update(context, item);
 
           result.setOutcome(true);
           result.setContinue(true);
@@ -467,27 +465,14 @@ public class FlowItemUtils
 	 * @param itemID The id of the to-be-deleted item.
 	 * @return A result object
 	 */
-	public static FlowResult processDeleteItem(Context context, int itemID) throws SQLException, AuthorizeException, IOException
+	public static FlowResult processDeleteItem(Context context, UUID itemID) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 		
-		Item item = Item.find(context, itemID);
-			
-        Collection[] collections = item.getCollections();
+		Item item = itemService.find(context, itemID);
+		itemService.delete(context, item);
 
-        // Remove item from all the collections it's in
-        for (Collection collection : collections)
-        {
-            collection.removeItem(item);
-        }	
-        
-        // Note: when removing an item from the last collection it will
-        // be removed from the system. So there is no need to also call
-        // an item.delete() method.        
-        
-        context.commit();
-		
         result.setContinue(true);
         
 		return result;
@@ -504,13 +489,13 @@ public class FlowItemUtils
 	 * @param request The request.
 	 * @return A flow result
 	 */
-	public static FlowResult processAddBitstream(Context context, int itemID, Request request) throws SQLException, AuthorizeException, IOException 
+	public static FlowResult processAddBitstream(Context context, UUID itemID, Request request) throws SQLException, AuthorizeException, IOException 
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 		
 		// Upload a new file
-		Item item = Item.find(context, itemID);
+		Item item = itemService.find(context, itemID);
 		
 		
 		Object object = request.get("file");
@@ -527,24 +512,24 @@ public class FlowItemUtils
 			String bundleName = request.getParameter("bundle");
 			
 			Bitstream bitstream;
-			Bundle[] bundles = item.getBundles(bundleName);
-			if (bundles.length < 1)
+			List<Bundle> bundles = itemService.getBundles(item, bundleName);
+			if (bundles.size() < 1)
 			{
 				// set bundle's name to ORIGINAL
-				bitstream = item.createSingleBitstream(is, bundleName);
+				bitstream = itemService.createSingleBitstream(context, is, item, bundleName);
 				
 				// set the permission as defined in the owning collection
 				Collection owningCollection = item.getOwningCollection();
 				if (owningCollection != null)
 				{
-				    Bundle bnd = bitstream.getBundles()[0]; 
-				    bnd.inheritCollectionDefaultPolicies(owningCollection);
+				    Bundle bnd = bitstream.getBundles().get(0);
+				    bundleService.inheritCollectionDefaultPolicies(context, bnd, owningCollection);
 				}
 			}
 			else
 			{
 				// we have a bundle already, just add bitstream
-				bitstream = bundles[0].createBitstream(is);
+				bitstream = bitstreamService.create(context, bundles.get(0), is);
 			}
 
 			// Strip all but the last filename. It would be nice
@@ -561,22 +546,21 @@ public class FlowItemUtils
 				name = name.substring(name.indexOf('\\') + 1);
 			}
 
-			bitstream.setName(name);
-			bitstream.setSource(filePart.getUploadName());
-			bitstream.setDescription(request.getParameter("description"));
+			bitstream.setName(context, name);
+			bitstream.setSource(context, filePart.getUploadName());
+			bitstream.setDescription(context, request.getParameter("description"));
 
 			// Identify the format
-			BitstreamFormat format = FormatIdentifier.guessFormat(context, bitstream);
-			bitstream.setFormat(format);
+			BitstreamFormat format = bitstreamFormatService.guessFormat(context, bitstream);
+			bitstreamService.setFormat(context, bitstream, format);
 
 			// Update to DB
-			bitstream.update();
-			item.update();
+			bitstreamService.update(context, bitstream);
+			itemService.update(context, item);
 
             processAccessFields(context, request, item.getOwningCollection(), bitstream);
 			
-			context.commit();
-			
+
 			result.setContinue(true);
 	        result.setOutcome(true);
 	        result.setMessage(T_bitstream_added); 
@@ -602,7 +586,7 @@ public class FlowItemUtils
             //Ignore, start date is already null
         }
         String reason = request.getParameter("reason");
-        AuthorizeManager.generateAutomaticPolicies(context, startDate, reason, b, collection);
+        authorizeService.generateAutomaticPolicies(context, startDate, reason, b, collection);
     }
 	
 	
@@ -617,40 +601,41 @@ public class FlowItemUtils
 	 * @param userFormat Any user supplied formats.
 	 * @return A flow result object.
 	 */
-	public static FlowResult processEditBitstream(Context context, int itemID, int bitstreamID, String bitstreamName,
+	public static FlowResult processEditBitstream(Context context, UUID itemID, UUID bitstreamID, String bitstreamName,
                                                   String primary, String description, int formatID, String userFormat, Request request) throws SQLException, AuthorizeException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 		
-		Bitstream bitstream = Bitstream.find(context, bitstreamID);
-		BitstreamFormat currentFormat = bitstream.getFormat();
+		Bitstream bitstream = bitstreamService.find(context, bitstreamID);
+		BitstreamFormat currentFormat = bitstream.getFormat(context);
 
 		//Step 1:
 		// Update the bitstream's description and name
 		if (description != null)
 		{
-			bitstream.setDescription(description);
+			bitstream.setDescription(context, description);
 		}
 
         if (bitstreamName != null)
         {
-            bitstream.setName(bitstreamName);
+            bitstream.setName(context, bitstreamName);
         }
 		
 		//Step 2:
 		// Check if the primary bitstream status has changed
-		Bundle[] bundles = bitstream.getBundles();
-		if (bundles != null && bundles.length > 0)
+		List<Bundle> bundles = bitstream.getBundles();
+		if (bundles != null && bundles.size() > 0)
 		{
-			if (bitstreamID == bundles[0].getPrimaryBitstreamID())
+			Bundle bundle = bundles.get(0);
+			if (bundle.getPrimaryBitstream() != null && bundle.getPrimaryBitstream().toString().equals(String.valueOf(bitstreamID)))
 			{
 				// currently the bitstream is primary
 				if ("no".equals(primary))
 				{
 					// However the user has removed this bitstream as a primary bitstream.
-					bundles[0].unsetPrimaryBitstreamID();
-					bundles[0].update();
+					bundle.setPrimaryBitstreamID(null);
+					bundleService.update(context, bundle);
 				}
 			}
 			else
@@ -659,8 +644,8 @@ public class FlowItemUtils
 				if ("yes".equals(primary))
 				{
 					// However the user has set this bitstream as primary.
-					bundles[0].setPrimaryBitstreamID(bitstreamID);
-					bundles[0].update();
+					bundle.setPrimaryBitstreamID(bitstream);
+					bundleService.update(context, bundle);;
 				}
 			}
 		}
@@ -672,10 +657,10 @@ public class FlowItemUtils
 		{
 			if (currentFormat == null || currentFormat.getID() != formatID)
 			{
-				BitstreamFormat newFormat = BitstreamFormat.find(context, formatID);
+				BitstreamFormat newFormat = bitstreamFormatService.find(context, formatID);
 				if (newFormat != null)
 				{
-					bitstream.setFormat(newFormat);
+					bitstreamService.setFormat(context, bitstream, newFormat);
 				}
 			}
 		}
@@ -683,16 +668,15 @@ public class FlowItemUtils
 		{
 			if (userFormat != null && userFormat.length() > 0)
 			{
-				bitstream.setUserFormatDescription(userFormat);
+				bitstreamService.setUserFormatDescription(context, bitstream, userFormat);
 			}
 		}
 		
 		//Step 3:
 		// Save our changes
-		bitstream.update();
-		context.commit();
+		bitstreamService.update(context, bitstream);
 
-        processAccessFields(context, request, ((Item)bitstream.getParentObject()).getOwningCollection(), bitstream);
+        processAccessFields(context, request, ((Item)bitstreamService.getParentObject(context,bitstream)).getOwningCollection(), bitstream);
 
 
         result.setContinue(true);
@@ -712,12 +696,12 @@ public class FlowItemUtils
 	 * @param bitstreamIDs A bundleID slash bitstreamID pair of bitstreams to be removed.
 	 * @return A flow result
 	 */
-	public static FlowResult processDeleteBitstreams(Context context, int itemID, String[] bitstreamIDs) throws SQLException, AuthorizeException, IOException, UIException
+	public static FlowResult processDeleteBitstreams(Context context, UUID itemID, String[] bitstreamIDs) throws SQLException, AuthorizeException, IOException, UIException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 		
-		Item item = Item.find(context, itemID);
+		Item item = itemService.find(context, itemID);
 		
 		for (String id : bitstreamIDs)
 		{
@@ -728,24 +712,23 @@ public class FlowItemUtils
 				throw new UIException("Unable to parse id into bundle and bitstream id: "+id);
                         }
 			
-			int bundleID = Integer.valueOf(parts[0]);
-			int bitstreamID = Integer.valueOf(parts[1]);
+			UUID bundleID = UUID.fromString(parts[0]);
+			UUID bitstreamID = UUID.fromString(parts[1]);
 			
-			Bundle bundle = Bundle.find(context, bundleID);
-			Bitstream bitstream = Bitstream.find(context,bitstreamID);
+			Bundle bundle = bundleService.find(context, bundleID);
+			Bitstream bitstream = bitstreamService.find(context,bitstreamID);
 			
-			bundle.removeBitstream(bitstream);
+			bundleService.removeBitstream(context, bundle, bitstream);
 			
-			if (bundle.getBitstreams().length == 0)
+			if (bundle.getBitstreams().size() == 0)
 			{
-				item.removeBundle(bundle);
+				itemService.removeBundle(context, item, bundle);
 			}
 		}
 		
-		item.update();
+		itemService.update(context, item);
 		
-		context.commit();
-		
+
 		result.setContinue(true);
 		result.setOutcome(true);
 		result.setMessage(T_bitstream_delete);
@@ -753,21 +736,21 @@ public class FlowItemUtils
 		return result;
 	}
 
-    public static FlowResult processReorderBitstream(Context context, int itemID, Request request) throws SQLException, AuthorizeException {
+    public static FlowResult processReorderBitstream(Context context, UUID itemID, Request request) throws SQLException, AuthorizeException {
         String submitButton = Util.getSubmitButton(request, "submit_update_order");
         FlowResult result = new FlowResult();
         result.setContinue(false);
 
-        Item item = Item.find(context, itemID);
+        Item item = itemService.find(context, itemID);
 
-        Bundle[] bundles = item.getBundles();
+        List<Bundle> bundles = item.getBundles();
         for (Bundle bundle : bundles) {
-            Bitstream[] bitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            int[] newBitstreamOrder = new int[bitstreams.length];
+            UUID[] newBitstreamOrder = new UUID[bitstreams.size()];
             if (submitButton.equals("submit_update_order")) {
                 for (Bitstream bitstream : bitstreams) {
-                    //The order is determined by javascript
+					//The order is determined by javascript
                     //For each of our bitstream retrieve the order value
                     int order = Util.getIntParameter(request, "order_" + bitstream.getID());
                     //-1 the order since the order needed to start from one
@@ -783,7 +766,7 @@ public class FlowItemUtils
                     String[] vals = request.getParameter(inputKey).split(",");
                     for (int i = 0; i < vals.length; i++) {
                         String val = vals[i];
-                        newBitstreamOrder[i] = Integer.parseInt(val);
+                        newBitstreamOrder[i] = UUID.fromString(val);
                     }
                 }else{
                     newBitstreamOrder = null;
@@ -791,12 +774,10 @@ public class FlowItemUtils
             }
             if(newBitstreamOrder != null){
                 //Set the new order in our bundle !
-                bundle.setOrder(newBitstreamOrder);
-                bundle.update();
+                bundleService.setOrder(context, bundle, newBitstreamOrder);
+                bundleService.update(context, bundle);
             }
         }
-
-        context.commit();
 
         result.setContinue(true);
         result.setOutcome(true);
@@ -816,14 +797,14 @@ public class FlowItemUtils
          * @param request
          *
          */
-        public static FlowResult processCurateItem(Context context, int itemID, Request request)
+        public static FlowResult processCurateItem(Context context, UUID itemID, Request request)
                                                                 throws AuthorizeException, IOException, SQLException, Exception
 	{
                 String task = request.getParameter("curate_task");
 		Curator curator = FlowCurationUtils.getCurator(task);
                 try
                 {
-                    Item item = Item.find(context, itemID);
+                    Item item = itemService.find(context, itemID);
                     if (item != null)
                     {
                         //Call curate(context,ID) to ensure a Task Performer (Eperson) is set in Curator
@@ -841,7 +822,7 @@ public class FlowItemUtils
       /**
        * queues curation tasks
        */
-        public static FlowResult processQueueItem(Context context, int itemID, Request request)
+        public static FlowResult processQueueItem(Context context, UUID itemID, Request request)
                                                                 throws AuthorizeException, IOException, SQLException, Exception
 	{
                 String task = request.getParameter("curate_task");
@@ -849,7 +830,7 @@ public class FlowItemUtils
                 String objId = String.valueOf(itemID);
                 String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
                 boolean status = false;
-                Item item = Item.find(context, itemID);
+                Item item = itemService.find(context, itemID);
                 if (item != null)
                 {
                     objId = item.getHandle();

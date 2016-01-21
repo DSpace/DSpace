@@ -43,8 +43,6 @@ public class SwordResponseTransformer extends AbstractDSpaceTransformer
 
       public void addBody(Body body) throws WingException, SQLException, AuthorizeException
     {
-        String handle = parameters.getParameter("handle", null);
-
         //Division main = body.addDivision("deposit-response");
         //main.setHead(T_main_head.parameterize(handle));
                

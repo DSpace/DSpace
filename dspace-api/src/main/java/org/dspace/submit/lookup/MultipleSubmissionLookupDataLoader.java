@@ -37,7 +37,7 @@ public class MultipleSubmissionLookupDataLoader implements DataLoader
     private static Logger log = Logger
             .getLogger(MultipleSubmissionLookupDataLoader.class);
 
-    private static final String NOT_FOUND_DOI = "NOT-FOUND-DOI";
+    protected final String NOT_FOUND_DOI = "NOT-FOUND-DOI";
 
     Map<String, DataLoader> dataloadersMap;
 

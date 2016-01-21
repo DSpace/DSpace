@@ -34,6 +34,7 @@ public class TestConsumer implements Consumer
     private static PrintStream out = ConfigurationManager
             .getBooleanProperty("testConsumer.verbose") ? System.out : null;
 
+    @Override
     public void initialize() throws Exception
     {
         log.info("EVENT: called TestConsumer.initialize();");
@@ -51,6 +52,7 @@ public class TestConsumer implements Consumer
      * @param event
      *            Content event
      */
+    @Override
     public void consume(Context ctx, Event event) throws Exception
     {
         EPerson ep = ctx.getCurrentUser();
@@ -92,6 +94,7 @@ public class TestConsumer implements Consumer
         }
     }
 
+    @Override
     public void end(Context ctx) throws Exception
     {
         log.info("EVENT: called TestConsumer.end();");
@@ -102,6 +105,7 @@ public class TestConsumer implements Consumer
 
     }
 
+    @Override
     public void finish(Context ctx) throws Exception
     {
         log.info("EVENT: called TestConsumer.finish();");

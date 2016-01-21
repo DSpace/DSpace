@@ -7,13 +7,17 @@
  */
 package org.dspace.app.bulkedit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authority.AuthorityValue;
-import org.dspace.app.bulkedit.DSpaceCSVLine;
-import org.dspace.app.bulkedit.MetadataImport;
-import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
-import org.dspace.content.Collection;
+import org.dspace.authority.factory.AuthorityServiceFactory;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
@@ -39,38 +43,43 @@ import java.io.*;
 public class DSpaceCSV implements Serializable
 {
     /** The headings of the CSV file */
-    private List<String> headings;
+    protected List<String> headings;
 
     /** An array list of CSV lines */
-    private List<DSpaceCSVLine> lines;
+    protected List<DSpaceCSVLine> lines;
 
     /** A counter of how many CSV lines this object holds */
-    private int counter;
+    protected int counter;
 
     /** The value separator (defaults to double pipe '||') */
-    protected static String valueSeparator;
+    protected String valueSeparator;
 
     /** The value separator in an escaped form for using in regexes */
-    protected static String escapedValueSeparator;
+    protected String escapedValueSeparator;
 
     /** The field separator (defaults to comma) */
-    protected static String fieldSeparator;
+    protected String fieldSeparator;
 
     /** The field separator in an escaped form for using in regexes */
-    protected static String escapedFieldSeparator;
+    protected String escapedFieldSeparator;
 
     /** The authority separator (defaults to double colon '::') */
-    protected static String authoritySeparator;
+    protected String authoritySeparator;
 
     /** The authority separator in an escaped form for using in regexes */
-    protected static String escapedAuthoritySeparator;
+    protected String escapedAuthoritySeparator;
+
+    protected transient final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected transient final MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    protected transient final MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+    protected transient final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
 
 
     /** Whether to export all metadata such as handles and provenance information */
-    private boolean exportAll;
+    protected boolean exportAll;
 
     /** A list of metadata elements to ignore */
-    private Map<String, String> ignore;
+    protected Map<String, String> ignore;
 
 
     /**
@@ -135,7 +144,7 @@ public class DSpaceCSV implements Serializable
                 else if (!"id".equals(element))
                 {
                     String authorityPrefix = "";
-                    AuthorityValue authorityValueType = MetadataImport.getAuthorityValueType(element);
+                    AuthorityValue authorityValueType = authorityValueService.getAuthorityValueType(element);
                     if (authorityValueType != null) {
                         String authorityType = authorityValueType.getAuthorityType();
                         authorityPrefix = element.substring(0, authorityType.length() + 1);
@@ -160,7 +169,7 @@ public class DSpaceCSV implements Serializable
                     }
 
                     // Check that the scheme exists
-                    MetadataSchema foundSchema = MetadataSchema.find(c, metadataSchema);
+                    MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
                     if (foundSchema == null) {
                         throw new MetadataImportInvalidHeadingException(clean[0],
                                                                         MetadataImportInvalidHeadingException.SCHEMA,
@@ -168,8 +177,7 @@ public class DSpaceCSV implements Serializable
                     }
 
                     // Check that the metadata element exists in the schema
-                    int schemaID = foundSchema.getSchemaID();
-                    MetadataField foundField = MetadataField.findByElement(c, schemaID, metadataElement, metadataQualifier);
+                    MetadataField foundField = metadataFieldService.findByElement(c, foundSchema, metadataElement, metadataQualifier);
                     if (foundField == null) {
                         throw new MetadataImportInvalidHeadingException(clean[0],
                                                                         MetadataImportInvalidHeadingException.ELEMENT,
@@ -185,7 +193,7 @@ public class DSpaceCSV implements Serializable
             StringBuilder lineBuilder = new StringBuilder();
             String lineRead;
 
-            while ((lineRead = input.readLine()) != null)
+            while (StringUtils.isNotBlank(lineRead = input.readLine()))
             {
                 if (lineBuilder.length() > 0) {
                     // Already have a previously read value - add this line
@@ -238,7 +246,7 @@ public class DSpaceCSV implements Serializable
     /**
      * Initialise this class with values from dspace.cfg
      */
-    private void init()
+    protected void init()
     {
         // Set the value separator
         setValueSeparator();
@@ -250,16 +258,16 @@ public class DSpaceCSV implements Serializable
         setAuthoritySeparator();
 
         // Create the headings
-        headings = new ArrayList<String>();
+        headings = new ArrayList<>();
 
         // Create the blank list of items
-        lines = new ArrayList<DSpaceCSVLine>();
+        lines = new ArrayList<>();
 
         // Initialise the counter
         counter = 0;
 
         // Set the metadata fields to ignore
-        ignore = new HashMap<String, String>();
+        ignore = new HashMap<>();
         String toIgnore = ConfigurationManager.getProperty("bulkedit", "ignore-on-export");
         if ((toIgnore == null) || ("".equals(toIgnore.trim())))
         {
@@ -412,7 +420,7 @@ public class DSpaceCSV implements Serializable
         line.add("collection", owningCollectionHandle);
 
         // Add in any mapped collections
-        Collection[] collections = i.getCollections();
+        List<Collection> collections = i.getCollections();
         for (Collection c : collections)
         {
             // Only add if it is not the owning collection
@@ -423,33 +431,35 @@ public class DSpaceCSV implements Serializable
         }
 
         // Populate it
-        Metadatum md[] = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (Metadatum value : md)
+        List<MetadataValue> md = itemService.getMetadata(i, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (MetadataValue value : md)
         {
+            MetadataField metadataField = value.getMetadataField();
+            MetadataSchema metadataSchema = metadataField.getMetadataSchema();
             // Get the key (schema.element)
-            String key = value.schema + "." + value.element;
+            String key = metadataSchema.getName() + "." + metadataField.getElement();
 
             // Add the qualifier if there is one (schema.element.qualifier)
-            if (value.qualifier != null)
+            if (metadataField.getQualifier() != null)
             {
-                key = key + "." + value.qualifier;
+                key = key + "." + metadataField.getQualifier();
             }
 
             // Add the language if there is one (schema.element.qualifier[langauge])
             //if ((value.language != null) && (!"".equals(value.language)))
-            if (value.language != null)
+            if (value.getLanguage() != null)
             {
-                key = key + "[" + value.language + "]";
+                key = key + "[" + value.getLanguage() + "]";
             }
 
             // Store the item
-            if (exportAll || okToExport(value))
+            if (exportAll || okToExport(metadataField))
             {
                 // Add authority and confidence if authority is not null
-                String mdValue = value.value;
-                if (value.authority != null && !"".equals(value.authority))
+                String mdValue = value.getValue();
+                if (value.getAuthority() != null && !"".equals(value.getAuthority()))
                 {
-                    mdValue += authoritySeparator + value.authority + authoritySeparator + value.confidence;
+                    mdValue += authoritySeparator + value.getAuthority() + authoritySeparator + (value.getConfidence() != -1 ? value.getConfidence() : Choices.CF_ACCEPTED);
                 }
                 line.add(key, mdValue);
                 if (!headings.contains(key))
@@ -481,7 +491,7 @@ public class DSpaceCSV implements Serializable
 
         // Split up on field separator
         String[] parts = line.split(escapedFieldSeparator);
-        ArrayList<String> bits = new ArrayList<String>();
+        ArrayList<String> bits = new ArrayList<>();
         bits.addAll(Arrays.asList(parts));
 
         // Merge parts with embedded separators
@@ -544,7 +554,7 @@ public class DSpaceCSV implements Serializable
         {
             try
             {
-                csvLine = new DSpaceCSVLine(Integer.parseInt(id));
+                csvLine = new DSpaceCSVLine(UUID.fromString(id));
             }
             catch (NumberFormatException nfe)
             {
@@ -610,8 +620,9 @@ public class DSpaceCSV implements Serializable
         // Create the headings line
         String[] csvLines = new String[counter + 1];
         csvLines[0] = "id" + fieldSeparator + "collection";
-        Collections.sort(headings);
-        for (String value : headings)
+        List<String> headingsCopy = new ArrayList<>(headings);
+        Collections.sort(headingsCopy);
+        for (String value : headingsCopy)
         {
             csvLines[0] = csvLines[0] + fieldSeparator + value;
         }
@@ -620,7 +631,7 @@ public class DSpaceCSV implements Serializable
         int c = 1;
         while (i.hasNext())
         {
-            csvLines[c++] = i.next().toCSV(headings);
+            csvLines[c++] = i.next().toCSV(headingsCopy, fieldSeparator);
         }
 
         return csvLines;
@@ -655,13 +666,13 @@ public class DSpaceCSV implements Serializable
      * @param md The Metadatum to examine
      * @return Whether or not it is OK to export this element
      */
-    private final boolean okToExport(Metadatum md)
+    protected boolean okToExport(MetadataField md)
     {
         // Now compare with the list to ignore
-        String key = md.schema + "." + md.element;
-        if (md.qualifier != null)
+        String key = md.getMetadataSchema().getName() + "." + md.getElement();
+        if (md.getQualifier() != null)
         {
-            key += "." + md.qualifier;
+            key += "." + md.getQualifier();
         }
         if (ignore.get(key) != null) {
             return false;
@@ -686,15 +697,24 @@ public class DSpaceCSV implements Serializable
      *
      * @return The formatted String as a csv
      */
+    @Override
     public final String toString()
     {
         // Return the csv as one long string
-        StringBuffer csvLines = new StringBuffer();
+        StringBuilder csvLines = new StringBuilder();
         String[] lines = this.getCSVLinesAsStringArray();
         for (String line : lines)
         {
             csvLines.append(line).append("\n");
         }
         return csvLines.toString();
+    }
+
+    public String getAuthoritySeparator() {
+        return authoritySeparator;
+    }
+
+    public String getEscapedAuthoritySeparator() {
+        return escapedAuthoritySeparator;
     }
 }

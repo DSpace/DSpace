@@ -19,24 +19,22 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.*;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.jdom.Element;
 
 /**
@@ -97,6 +95,15 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(AbstractMETSIngester.class);
+
+    protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected final BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    protected final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected final WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     /**
      * An instance of ZipMdrefManager holds the state needed to retrieve the
@@ -183,8 +190,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
     public DSpaceObject ingest(Context context, DSpaceObject parent,
             File pkgFile, PackageParameters params, String license)
             throws PackageValidationException, CrosswalkException,
-            AuthorizeException, SQLException, IOException
-    {
+            AuthorizeException, SQLException, IOException, WorkflowException {
         // parsed out METS Manifest from the file.
         METSManifest manifest = null;
 
@@ -371,8 +377,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             METSManifest manifest, File pkgFile, PackageParameters params,
             String license) throws IOException, SQLException,
             AuthorizeException, CrosswalkException,
-            MetadataValidationException, PackageValidationException
-    {
+            PackageValidationException, WorkflowException {
         // type of DSpace Object (one of the type constants)
         int type;
 
@@ -477,7 +482,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
             //Check if this item is still in a user's workspace.
             //It should be, as we haven't completed its install yet.
-            WorkspaceItem wsi = WorkspaceItem.findByItem(context, item);
+            WorkspaceItem wsi = workspaceItemService.findByItem(context, item);
 
             // Get collection this item is being submitted to
             Collection collection = item.getOwningCollection();
@@ -553,7 +558,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         // Finish things up!
 
         // Update the object to make sure all changes are committed
-        PackageUtils.updateDSpaceObject(dso);
+        PackageUtils.updateDSpaceObject(context, dso);
 
         return dso;
     }
@@ -617,10 +622,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
         // remove all files attached to this object
         // (For communities/collections this just removes the logo bitstream)
-        PackageUtils.removeAllBitstreams(dso);
+        PackageUtils.removeAllBitstreams(context, dso);
 
         // clear out all metadata values associated with this object
-        PackageUtils.clearAllMetadata(dso);
+        PackageUtils.clearAllMetadata(context, dso);
 
         // @TODO -- We are currently NOT clearing out the following during a
         // replace.  So, even after a replace, the following information may be
@@ -660,8 +665,20 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             addBitstreams(context, item, manifest, pkgFile, params, callback);
 
             // have subclass manage license since it may be extra package file.
-            addLicense(context, item, license, (Collection) dso
-                    .getParentObject(), params);
+            Collection owningCollection = (Collection) ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getParentObject(context, dso);
+            if(owningCollection == null)
+            {
+                //We are probably dealing with an item that isn't archived yet
+                InProgressSubmission inProgressSubmission = workspaceItemService.findByItem(context, item);
+                if(inProgressSubmission == null)
+                {
+                    inProgressSubmission = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
+                }
+                owningCollection = inProgressSubmission.getCollection();
+            }
+
+            addLicense(context, item, license, owningCollection
+                    , params);
 
             // FIXME ?
             // should set lastModifiedTime e.g. when ingesting AIP.
@@ -699,7 +716,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         finishObject(context, dso, params);
 
         // Update the object to make sure all changes are committed
-        PackageUtils.updateDSpaceObject(dso);
+        PackageUtils.updateDSpaceObject(context, dso);
 
         return dso;
     }
@@ -753,7 +770,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 .getBundleFiles();
 
         boolean setPrimaryBitstream = false;
-        BitstreamFormat unknownFormat = BitstreamFormat.findUnknown(context);
+        BitstreamFormat unknownFormat = bitstreamFormatService.findUnknown(context);
 
         for (Iterator<Element> mi = manifestContentFiles.iterator(); mi
                 .hasNext();)
@@ -780,19 +797,19 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
             // Find or create the bundle where bitstream should be attached
             Bundle bundle;
-            Bundle bns[] = item.getBundles(bundleName);
-            if (bns != null && bns.length > 0)
+            List<Bundle> bns = itemService.getBundles(item, bundleName);
+            if (CollectionUtils.isNotEmpty(bns))
             {
-                bundle = bns[0];
+                bundle = bns.get(0);
             }
             else
             {
-                bundle = item.createBundle(bundleName);
+                bundle = bundleService.create(context, item, bundleName);
             }
 
             // Create the bitstream in the bundle & initialize its name
-            Bitstream bitstream = bundle.createBitstream(fileStream);
-            bitstream.setName(path);
+            Bitstream bitstream = bitstreamService.create(context, bundle, fileStream);
+            bitstream.setName(context, path);
 
              // Set bitstream sequence id, if known
             String seqID = mfile.getAttributeValue("SEQ");
@@ -807,8 +824,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // is this the primary bitstream?
             if (primaryID != null && mfileID.equals(primaryID))
             {
-                bundle.setPrimaryBitstreamID(bitstream.getID());
-                bundle.update();
+                bundle.setPrimaryBitstreamID(bitstream);
+                bundleService.update(context, bundle);
                 setPrimaryBitstream = true;
             }
 
@@ -820,7 +837,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // set it:
             // 1. attempt to guess from MIME type
             // 2. if that fails, guess from "name" extension.
-            if (bitstream.getFormat().equals(unknownFormat))
+            if (bitstream.getFormat(context).equals(unknownFormat))
             {
                 if (log.isDebugEnabled())
                 {
@@ -829,14 +846,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 }
                 String mimeType = mfile.getAttributeValue("MIMETYPE");
                 BitstreamFormat bf = (mimeType == null) ? null
-                        : BitstreamFormat.findByMIMEType(context, mimeType);
+                        : bitstreamFormatService.findByMIMEType(context, mimeType);
                 if (bf == null)
                 {
-                    bf = FormatIdentifier.guessFormat(context, bitstream);
+                    bf = bitstreamFormatService.guessFormat(context, bitstream);
                 }
-                bitstream.setFormat(bf);
+                bitstreamService.setFormat(context, bitstream, bf);
             }
-            bitstream.update();
+            bitstreamService.update(context, bitstream);
         }// end for each manifest file
 
         for (Iterator<Element> mi = manifestBundleFiles.iterator(); mi
@@ -847,14 +864,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             String bundleName = METSManifest.getBundleName(mfile, false);
 
             Bundle bundle;
-            Bundle bns[] = item.getBundles(bundleName);
-            if (bns != null && bns.length > 0)
+            List<Bundle> bns = itemService.getBundles(item, bundleName);
+            if (CollectionUtils.isNotEmpty(bns))
             {
-                bundle = bns[0];
+                bundle = bns.get(0);
             }
             else
             {
-                bundle = item.createBundle(bundleName);
+                bundle = bundleService.create(context, item, bundleName);
             }
 
 	        String mfileGrp = mfile.getAttributeValue("ADMID");
@@ -870,7 +887,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 		        }
 	        }
 
-            bundle.update();
+            bundleService.update(context, bundle);
         }// end for each manifest file
 
         // Step 3 -- Sanity checks
@@ -902,14 +919,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             AuthorizeException, PackageValidationException
     {
         // We'll save the METS Manifest as part of the METADATA bundle.
-        Bundle mdBundle = item.createBundle(Constants.METADATA_BUNDLE_NAME);
+        Bundle mdBundle = bundleService.create(context, item, Constants.METADATA_BUNDLE_NAME);
 
         // Create a Bitstream from the METS Manifest's content
-        Bitstream manifestBitstream = mdBundle.createBitstream(manifest
+        Bitstream manifestBitstream = bitstreamService.create(context, mdBundle, manifest
                 .getMetsAsStream());
-        manifestBitstream.setName(METSManifest.MANIFEST_FILE);
-        manifestBitstream.setSource(METSManifest.MANIFEST_FILE);
-        manifestBitstream.update();
+        manifestBitstream.setName(context, METSManifest.MANIFEST_FILE);
+        manifestBitstream.setSource(context, METSManifest.MANIFEST_FILE);
+        bitstreamService.update(context, manifestBitstream);
 
         // Get magic bitstream format to identify manifest.
         String fmtName = getManifestBitstreamFormat();
@@ -922,8 +939,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         BitstreamFormat manifestFormat = PackageUtils
                 .findOrCreateBitstreamFormat(context, fmtName,
                         "application/xml", fmtName + " package manifest");
-        manifestBitstream.setFormat(manifestFormat);
-        manifestBitstream.update();
+        manifestBitstream.setFormat(context, manifestFormat);
+        bitstreamService.update(context, manifestBitstream);
     }
 
     /**
@@ -978,11 +995,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                     // Add this logo to the Community/Collection
                     if (dso.getType() == Constants.COLLECTION)
                     {
-                        ((Collection) dso).setLogo(fileStream);
+                        collectionService.setLogo(context, ((Collection) dso), fileStream);
                     }
                     else
                     {
-                        ((Community) dso).setLogo(fileStream);
+                        communityService.setLogo(context, ((Community) dso), fileStream);
                     }
 
                     break;
@@ -1057,7 +1074,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 if(templateDmdIds!=null)
                 {
                     //create our template item & get a reference to it
-                    collection.createTemplateItem();
+                    itemService.createTemplateItem(context, collection);
                     Item templateItem = collection.getTemplateItem();
 
                     //get a reference to the dmdSecs which describe the metadata for this template item
@@ -1067,7 +1084,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                     crosswalkObjectDmd(context, templateItem, manifest, callback, templateDmds, params);
 
                     // update the template item to save metadata changes
-                    PackageUtils.updateDSpaceObject(templateItem);
+                    PackageUtils.updateDSpaceObject(context, templateItem);
                 }
             }
         }
@@ -1105,8 +1122,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
     public DSpaceObject replace(Context context, DSpaceObject dsoToReplace,
             File pkgFile, PackageParameters params)
             throws PackageValidationException, CrosswalkException,
-            AuthorizeException, SQLException, IOException
-    {
+            AuthorizeException, SQLException, IOException, WorkflowException {
         // parsed out METS Manifest from the file.
         METSManifest manifest = null;
 
@@ -1144,7 +1160,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 try
                 {
                     // Attempt to resolve this handle to an existing object
-                    dsoToReplace = HandleManager.resolveToObject(context,
+                    dsoToReplace = handleService.resolveToObject(context,
                             handle);
                 }
                 catch (IllegalStateException ie)
@@ -1297,54 +1313,18 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         {
         case Constants.ITEM:
             Item item = (Item) dso;
-            Collection[] collections = item.getCollections();
 
-            // Remove item from all the collections it is in
-            for (Collection collection : collections)
-            {
-                collection.removeItem(item);
-            }
-            // Note: when removing an item from the last collection it will
-            // be removed from the system. So there is no need to also call
-            // an item.delete() method.
-
-            // Remove item from cache immediately
-            context.removeCached(item, item.getID());
-
-            // clear object
-            item = null;
+            itemService.delete(context, item);
             break;
 
         case Constants.COLLECTION:
             Collection collection = (Collection) dso;
-            Community[] communities = collection.getCommunities();
-
-            // Remove collection from all the communities it is in
-            for (Community community : communities)
-            {
-                community.removeCollection(collection);
-            }
-            // Note: when removing a collection from the last community it will
-            // be removed from the system. So there is no need to also call
-            // an collection.delete() method.
-
-            // Remove collection from cache immediately
-            context.removeCached(collection, collection.getID());
-
-            // clear object
-            collection = null;
+            collectionService.delete(context, collection);
             break;
 
         case Constants.COMMUNITY:
             // Just remove the Community entirely
-            Community community = (Community) dso;
-            community.delete();
-
-            // Remove community from cache immediately
-            context.removeCached(community, community.getID());
-
-            // clear object
-            community = null;
+            communityService.delete(context, (Community) dso);
             break;
         }
 
@@ -1379,7 +1359,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         // verify we have a valid Parent Object
         if (parentLink != null && parentLink.length() > 0)
         {
-            parent = HandleManager.resolveToObject(context, parentLink);
+            parent = handleService.resolveToObject(context, parentLink);
             if (parent == null)
             {
                 throw new UnsupportedOperationException(

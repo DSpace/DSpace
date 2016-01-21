@@ -8,9 +8,9 @@
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
@@ -20,24 +20,25 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.utils.DSpace;
 
  /**
@@ -52,6 +53,10 @@ import org.dspace.utils.DSpace;
 public class SendItemRequestAction extends AbstractAction
 {
     private static Logger log = Logger.getLogger(SendItemRequestAction.class);
+
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected RequestItemService requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
@@ -102,14 +107,8 @@ public class SendItemRequestAction extends AbstractAction
         
         Item item = (Item) dso;
         String title = "";
-        Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
-        if (titleDC == null || titleDC.length == 0) {
-            titleDC = item.getDC("title", Item.ANY, Item.ANY); // dc.title with qualifier term
-        }
-        if (titleDC != null && titleDC.length > 0) {
-            title = titleDC[0].value;
-        }
-        
+        Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamId));
+
         RequestItemAuthor requestItemAuthor = new DSpace()
                 .getServiceManager()
                 .getServiceByName(
@@ -118,19 +117,19 @@ public class SendItemRequestAction extends AbstractAction
                 )
                 .getRequestItemAuthor(context, item);
 
-        RequestItem requestItem = new RequestItem(item.getID(), Integer.parseInt(bitstreamId), requesterEmail, requesterName, message, Boolean.getBoolean(allFiles));
+        String token = requestItemService.createRequest(context, bitstream, item, Boolean.getBoolean(allFiles), requesterEmail, requesterName, message);
 
         // All data is there, send the email
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.author"));
         email.addRecipient(requestItemAuthor.getEmail());
 
         email.addArgument(requesterName);    
-        email.addArgument(requesterEmail);   
-        email.addArgument(allFiles.equals("true")?I18nUtil.getMessage("itemRequest.all"):Bitstream.find(context,Integer.parseInt(bitstreamId)).getName());      
-        email.addArgument(HandleManager.getCanonicalForm(item.getHandle()));      
+        email.addArgument(requesterEmail);
+        email.addArgument(allFiles.equals("true") ? I18nUtil.getMessage("itemRequest.all") : bitstream.getName());
+        email.addArgument(handleService.getCanonicalForm(item.getHandle()));
         email.addArgument(title);    // request item title
         email.addArgument(message);   // message
-        email.addArgument(getLinkTokenEmail(context,requestItem));
+        email.addArgument(getLinkTokenEmail(context,token));
         email.addArgument(requestItemAuthor.getFullName());    //   corresponding author name
         email.addArgument(requestItemAuthor.getEmail());    //   corresponding author email
         email.addArgument(ConfigurationManager.getProperty("dspace.name"));
@@ -150,14 +149,14 @@ public class SendItemRequestAction extends AbstractAction
      * @return
      * @throws SQLException
      */
-    protected String getLinkTokenEmail(Context context, RequestItem requestItem)
+    protected String getLinkTokenEmail(Context context, String token)
             throws SQLException
     {
         String base = ConfigurationManager.getProperty("dspace.url");
 
         String specialLink = (new StringBuffer()).append(base).append(
                 base.endsWith("/") ? "" : "/").append(
-                "itemRequestResponse/").append(requestItem.getNewToken(context))
+                "itemRequestResponse/").append(token)
                 .toString()+"/";
 
         return specialLink;

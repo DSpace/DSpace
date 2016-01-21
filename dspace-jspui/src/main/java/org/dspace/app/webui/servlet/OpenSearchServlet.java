@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.discovery.DiscoverySearchRequestProcessor;
-import org.dspace.app.webui.search.LuceneSearchRequestProcessor;
 import org.dspace.app.webui.search.SearchProcessorException;
 import org.dspace.app.webui.search.SearchRequestProcessor;
 import org.dspace.authorize.AuthorizeException;
@@ -39,13 +38,15 @@ public class OpenSearchServlet extends DSpaceServlet
 {
     private static final long serialVersionUID = 1L;
     
-    private SearchRequestProcessor internalLogic;
+    private transient SearchRequestProcessor internalLogic;
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(OpenSearchServlet.class);
+    private static final Logger log = Logger.getLogger(OpenSearchServlet.class);
 
-    public void init()
+    public OpenSearchServlet()
     {
+        super();
+
         try
         {
             internalLogic = (SearchRequestProcessor) PluginManager
@@ -63,6 +64,7 @@ public class OpenSearchServlet extends DSpaceServlet
         }
     }
 
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

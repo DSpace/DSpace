@@ -30,17 +30,16 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.handle.HandleManager" %>
-<%@ page import="org.dspace.license.CreativeCommons" %>
+<%@ page import="org.dspace.handle.HandleServiceImpl" %>
+<%@ page import="org.dspace.license.CreativeCommonsServiceImpl" %>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@page import="org.dspace.versioning.Version"%>
 <%@page import="org.dspace.core.Context"%>
 <%@page import="org.dspace.app.webui.util.VersionUtil"%>
 <%@page import="org.dspace.app.webui.util.UIUtil"%>
-<%@page import="org.dspace.authorize.AuthorizeManager"%>
+<%@page import="org.dspace.authorize.AuthorizeServiceImpl"%>
 <%@page import="java.util.List"%>
 <%@page import="org.dspace.core.Constants"%>
 <%@page import="org.dspace.eperson.EPerson"%>
@@ -52,7 +51,7 @@
     Boolean suggest = (Boolean)request.getAttribute("suggest.enable");
     boolean suggestLink = (suggest == null ? false : suggest.booleanValue());
     Item item = (Item) request.getAttribute("item");
-    Collection[] collections = (Collection[]) request.getAttribute("collections");
+    List<Collection> collections = (List<Collection>) request.getAttribute("collections");
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
     
@@ -61,10 +60,12 @@
 
     // get the handle if the item has one yet
     String handle = item.getHandle();
+    Context context = UIUtil.obtainContext(request);
 
     // CC URL & RDF
-    String cc_url = CreativeCommons.getLicenseURL(item);
-    String cc_rdf = CreativeCommons.getLicenseRDF(item);
+    CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
+    String cc_url = creativeCommonsService.getLicenseURL(context, item);
+    String cc_rdf = creativeCommonsService.getLicenseRDF(context, item);
 
     // Full title needs to be put into a string to use as tag argument
     String title = "";
@@ -74,10 +75,10 @@
 	}
 	else 
 	{
-		Metadatum[] titleValue = item.getDC("title", null, Item.ANY);
-		if (titleValue.length != 0)
+		List<MetadataValue> titleValue = ContentServiceFactory.getInstance().getItemService().getMetadata(item, "dc", "title", null, Item.ANY);
+		if (titleValue.size() != 0)
 		{
-			title = titleValue[0].value;
+			title = titleValue.get(0).getValue();
 		}
 		else
 		{
@@ -99,12 +100,20 @@
     
     String latestVersionHandle = (String)request.getAttribute("versioning.latestversionhandle");
     String latestVersionURL = (String)request.getAttribute("versioning.latestversionurl");
-    
+
+    VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
     VersionHistory history = (VersionHistory)request.getAttribute("versioning.history");
     List<Version> historyVersions = (List<Version>)request.getAttribute("versioning.historyversions");
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
+<%@ page import="org.dspace.content.MetadataValue" %>
+<%@ page import="org.dspace.license.factory.LicenseServiceFactory" %>
+<%@ page import="org.dspace.license.service.CreativeCommonsService" %>
+<%@ page import="org.dspace.handle.factory.HandleServiceFactory" %>
+<%@ page import="org.dspace.versioning.service.VersionHistoryService" %>
+<%@ page import="org.dspace.versioning.factory.VersionServiceFactory" %>
 <dspace:layout title="<%= title %>">
 <%
     if (handle != null)
@@ -137,7 +146,7 @@
                 <%-- <strong>Please use this identifier to cite or link to this item:
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
                 <div class="well"><fmt:message key="jsp.display-item.identifier"/>
-                <code><%= HandleManager.getCanonicalForm(handle) %></code></div>
+                    <code><%= HandleServiceFactory.getInstance().getHandleService().getCanonicalForm(handle) %></code></div>
 <%
         if (admin_button)  // admin edit button
         { %>
@@ -173,7 +182,7 @@
                 	<% if(hasVersionHistory) { %>			                
                 	<form method="get" action="<%= request.getContextPath() %>/tools/history">
                     	<input type="hidden" name="itemID" value="<%= item.getID() %>" />
-                    	<input type="hidden" name="versionID" value="<%= history.getVersion(item)!=null?history.getVersion(item).getVersionId():null %>" />                    
+                    	<input type="hidden" name="versionID" value="<%= versionHistoryService.getVersion(history, item)!=null?versionHistoryService.getVersion(history, item).getId():null %>" />
                     	<input class="btn btn-info col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.history.button"/>" />
                 	</form>         	         	
 					<% } %>
@@ -304,12 +313,12 @@
 		
 		<% for(Version versRow : historyVersions) {  
 		
-			EPerson versRowPerson = versRow.getEperson();
+			EPerson versRowPerson = versRow.getEPerson();
 			String[] identifierPath = VersionUtil.addItemIdentifier(item, versRow);
 		%>	
 		<tr>			
 			<td headers="tt1" class="oddRowEvenCol"><%= versRow.getVersionNumber() %></td>
-			<td headers="tt2" class="oddRowOddCol"><a href="<%= request.getContextPath() + identifierPath[0] %>"><%= identifierPath[1] %></a><%= item.getID()==versRow.getItemID()?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
+			<td headers="tt2" class="oddRowOddCol"><a href="<%= request.getContextPath() + identifierPath[0] %>"><%= identifierPath[1] %></a><%= item.getID().equals(versRow.getItem().getID())?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
 			<td headers="tt3" class="oddRowEvenCol"><% if(admin_button) { %><a
 				href="mailto:<%= versRowPerson.getEmail() %>"><%=versRowPerson.getFullName() %></a><% } else { %><%=versRowPerson.getFullName() %><% } %></td>
 			<td headers="tt4" class="oddRowOddCol"><%= versRow.getVersionDate() %></td>

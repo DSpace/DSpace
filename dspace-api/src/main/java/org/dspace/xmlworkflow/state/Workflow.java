@@ -10,8 +10,9 @@ package org.dspace.xmlworkflow.state;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.WorkflowException;
-import org.dspace.xmlworkflow.WorkflowFactory;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 import java.io.IOException;
@@ -29,6 +30,8 @@ import java.util.LinkedHashMap;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public class Workflow {
+
+    protected XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
 
     private String id;
     private Step firstStep;
@@ -57,7 +60,7 @@ public class Workflow {
         if(steps.get(id)!=null){
             return steps.get(id);
         }else{
-            Step step = WorkflowFactory.createStep(this, stepID);
+            Step step = xmlWorkflowFactory.createStep(this, stepID);
             if(step== null){
                 throw new WorkflowConfigurationException("Step definition not found for: "+stepID);
             }
