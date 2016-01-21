@@ -8,7 +8,6 @@
 package org.dspace.app.xmlui.aspect.administrative.controlpanel;
 
 import java.sql.SQLException;
-import java.util.Enumeration;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -17,11 +16,12 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.harvest.HarvestScheduler;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Control panel tab that controls the OAI harvester.
@@ -68,6 +68,8 @@ public class ControlPanelHarvestingTab extends AbstractControlPanelTab
     private static final Message T_harvest_head_harvester_settings = message("xmlui.administrative.ControlPanel.harvest_head_harvester_settings");
 
     protected HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     @Override
     public void addBody(Map objectModel, Division div) throws WingException,
@@ -165,16 +167,14 @@ public class ControlPanelHarvestingTab extends AbstractControlPanelTab
         generatorSettings.setHead(T_harvest_head_generator_settings);
 
         generatorSettings.addLabel(T_harvest_label_oai_url);
-        String oaiUrl = ConfigurationManager.getProperty("oai",
-                "dspace.oai.url");
+        String oaiUrl = configurationService.getProperty("oai.url");
         if (!StringUtils.isEmpty(oaiUrl))
         {
             generatorSettings.addItemXref(oaiUrl, oaiUrl);
         }
 
         generatorSettings.addLabel(T_harvest_label_oai_source);
-        String oaiAuthoritativeSource = ConfigurationManager.getProperty("oai",
-                "ore.authoritative.source");
+        String oaiAuthoritativeSource = configurationService.getProperty("oai.ore.authoritative.source");
         if (!StringUtils.isEmpty(oaiAuthoritativeSource))
         {
             generatorSettings.addItem(oaiAuthoritativeSource);
@@ -189,17 +189,12 @@ public class ControlPanelHarvestingTab extends AbstractControlPanelTab
         List harvesterSettings = div.addList("oai-harvester-settings");
         harvesterSettings.setHead(T_harvest_head_harvester_settings);
 
-        String metaString = "harvester.";
-        Enumeration pe = ConfigurationManager.propertyNames();
-        while (pe.hasMoreElements())
+        java.util.List<String> harvesterKeys = configurationService.getPropertyKeys("harvester");
+        for(String key : harvesterKeys)
         {
-            String key = (String) pe.nextElement();
-            if (key.startsWith(metaString))
-            {
                 harvesterSettings.addLabel(key);
-                harvesterSettings.addItem(ConfigurationManager.getProperty(key)
+                harvesterSettings.addItem(configurationService.getProperty(key)
                         + " ");
-            }
         }
     }
 

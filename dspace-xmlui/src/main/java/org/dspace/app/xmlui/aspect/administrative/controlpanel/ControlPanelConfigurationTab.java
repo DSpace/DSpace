@@ -15,8 +15,9 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Control panel tab that displays important configuration.
@@ -42,7 +43,8 @@ public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
 	private static final Message T_MAIL_ADMIN = message("xmlui.administrative.ControlPanel.mail_admin");
 
 	private static final String T_UNSET = "UNSET";
-
+        
+        protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     /**
      * Guarantee a non-null String.
      *
@@ -61,17 +63,17 @@ public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
 		dspace.addItem(Util.getSourceVersion());
 
 		dspace.addLabel(T_DSPACE_DIR);
-		dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.dir")));
+		dspace.addItem(notempty(configurationService.getProperty("dspace.dir")));
 
 		dspace.addLabel(T_DSPACE_URL);
-		String base_url = notempty(ConfigurationManager.getProperty("dspace.url"));
+		String base_url = notempty(configurationService.getProperty("dspace.url"));
 		dspace.addItemXref(base_url, base_url);
 
 		dspace.addLabel(T_DSPACE_HOST_NAME);
-		dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.hostname")));
+		dspace.addItem(notempty(configurationService.getProperty("dspace.hostname")));
 
 		dspace.addLabel(T_DSPACE_NAME);
-		dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.name")));
+		dspace.addItem(notempty(configurationService.getProperty("dspace.name")));
 
 		dspace.addLabel(T_DB_NAME);
 		dspace.addItem(notempty(context.getDbType()));
@@ -87,16 +89,16 @@ public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
 		dspace.addItem(notempty(String.valueOf(dbConfig.getMaxConnections())));
 
 		dspace.addLabel(T_MAIL_SERVER);
-		dspace.addItem(notempty(ConfigurationManager.getProperty("mail.server")));
+		dspace.addItem(notempty(configurationService.getProperty("mail.server")));
 
 		dspace.addLabel(T_MAIL_FROM_ADDRESS);
-		dspace.addItem(notempty(ConfigurationManager.getProperty("mail.from.address")));
+		dspace.addItem(notempty(configurationService.getProperty("mail.from.address")));
 
 		dspace.addLabel(T_FEEDBACK_RECIPIENT);
-		dspace.addItem(notempty(ConfigurationManager.getProperty("feedback.recipient")));
+		dspace.addItem(notempty(configurationService.getProperty("feedback.recipient")));
 
 		dspace.addLabel(T_MAIL_ADMIN);
-		dspace.addItem(notempty(ConfigurationManager.getProperty("mail.admin")));
+		dspace.addItem(notempty(configurationService.getProperty("mail.admin")));
 	}
 
 }
