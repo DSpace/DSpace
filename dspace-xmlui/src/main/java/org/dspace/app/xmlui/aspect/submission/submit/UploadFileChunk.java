@@ -38,6 +38,7 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -143,10 +144,11 @@ public class UploadFileChunk extends AbstractAction{
                 log.info(si);
                 Item item = si.getSubmissionItem().getItem();
                 log.info(item);
-                Bitstream b = this.createBitstream(completedFile, item);
+                Context context = ContextUtil.obtainContext(objectModel);
+                Bitstream b = this.createBitstream(context, completedFile, item);
                 returnValues.put("bitstream_id", String.valueOf(b.getID()));
                 
-                Context context = ContextUtil.obtainContext(objectModel);
+                
                 context.commit();
             }
             
@@ -367,7 +369,7 @@ public class UploadFileChunk extends AbstractAction{
         return destFile;
     }
     
-    private Bitstream createBitstream(File file, Item item)
+    private Bitstream createBitstream(Context context, File file, Item item)
     {
         log.info("Create from " + file);
         Bitstream b = null;
@@ -390,7 +392,12 @@ public class UploadFileChunk extends AbstractAction{
                 b = bundles[0].createBitstream(fis);
             }
 
-            //b.getN
+            b.setName(file.getName()); 
+            b.setSource(file.getAbsolutePath());
+            
+            // identify the format
+            b.setFormat(FormatIdentifier.guessFormat(context, b));
+            
             log.info("b id: " + b.getID());
             
             b.update();

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -18,6 +19,7 @@ public class ResumableUploadStep extends AbstractProcessingStep{
     
     private static Logger log = Logger.getLogger(ResumableUploadStep.class);
 
+    @SuppressWarnings("unchecked")
     @Override
     public int doProcessing(Context context, HttpServletRequest request, HttpServletResponse response,
             SubmissionInfo subInfo) throws ServletException, IOException, SQLException, AuthorizeException {
@@ -26,9 +28,22 @@ public class ResumableUploadStep extends AbstractProcessingStep{
             String key = e.nextElement().toString();
             log.info("---");
             log.info(key);
-            Object val = request.getParameter(key.toString());
-            log.info(val);
-            log.info(val.getClass());
+            
+            if(key.startsWith("description-")){
+                log.info("*");
+
+                String val = request.getParameter(key.toString());
+                if(val != null && val.length() > 0){
+                    log.info(request.getParameter(val));
+                    log.info(key.split("-")[1]);
+                    int bistreamId = Integer.parseInt(key.split("-")[1]);
+
+                    Bitstream b = Bitstream.find(context, bistreamId);
+                    b.setDescription(val);
+
+                    b.update();
+                }
+            }
         }
 
         return 0;

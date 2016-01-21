@@ -16,10 +16,8 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -39,26 +37,12 @@ public class ResumableUploadStep extends UploadStep{
         div.setHead(T_submission_head);
         addSubmissionProgressList(div);
         
-        
         Division progressDiv = div.addDivision("submit-file-upload");
         
-        
-        //Division div = body.addDivision("submit-upload-new");
         List upload = div.addList("submit-upload-new-list", List.TYPE_SIMPLE);
-        //upload.setHead(T_head);
-        //upload.setHead("jings");
-        
-        //submissionInfo.get
         submission.getID();
         
-        log.info("-------------------------------");
-        log.info(submission);
-        log.info(submissionInfo.getSubmissionItem().getID());
-        log.info(submission.getID());
-        
         SubmissionInfo si = FlowUtils.obtainSubmissionInfo(this.objectModel, 'S' + String.valueOf(submission.getID()));
-        log.info(si.getSubmissionItem().getID());
-
         div.addHidden("submit-id").setValue(submission.getID());
         
         Bundle[] bundles = item.getBundles("ORIGINAL");
@@ -73,22 +57,21 @@ public class ResumableUploadStep extends UploadStep{
 
         Row header = summary.addRow(Row.ROLE_HEADER);
         header.addCellContent(T_column0); // primary bitstream
-        header.addCellContent(T_column1); // select checkbox
         header.addCellContent(T_column2); // file name
-        header.addCellContent(T_column3); // size
         header.addCellContent(T_column4); // description
-        header.addCellContent(T_column5); // format
-        header.addCellContent(T_column6); // edit button
+        header.addCellContent("Status");
+        header.addCellContent("Info");
+        header.addCellContent("Delete");
         
         for (Bitstream bitstream : bitstreams)
         {
             int id = bitstream.getID();
             String name = bitstream.getName();
             String url = makeBitstreamLink(item, bitstream);
-            long bytes = bitstream.getSize();
-            String desc = bitstream.getDescription();
-            String algorithm = bitstream.getChecksumAlgorithm();
-            String checksum = bitstream.getChecksum();
+            //long bytes = bitstream.getSize();
+            //String desc = bitstream.getDescription();
+            //String algorithm = bitstream.getChecksumAlgorithm();
+            //String checksum = bitstream.getChecksum();
 
 
             Row row = summary.addRow("bitstream-" + id, "data", "bitstream-" + id);
@@ -103,61 +86,16 @@ public class ResumableUploadStep extends UploadStep{
                 primary.setOptionSelected(String.valueOf(id));
             }
 
-            row.addCell();
-
             row.addCell().addXref(url,name);
-            //row.addCellContent(bytes + " bytes");
-            row.addCell().addHidden("bytes").setValue(bytes + " bytes");
             
-            Text description = row.addCell().addText("description");
-            if (desc != null && desc.length() > 0)
-            {
-                //row.addCellContent(T_unknown_name);
-                //row.addCell().addText("description");
-                description.setValue(desc);
-            }
-            /*else
-            {
-                //row.addCellContent(desc);
-                row.addCell().addText(name);
-            }*/
+            // status
+            row.addCell("status-" + id, Cell.ROLE_DATA, "file-status-success").addFigure("/", null, null);
             
-
-            BitstreamFormat format = bitstream.getFormat();
-            if (format == null)
-            {
-                //row.addCellContent(T_unknown_format);
-                row.addCell().addHidden("bitstream-format").setValue(T_unknown_format);
-            }
-            else
-            {
-                int support = format.getSupportLevel();
-                Cell cell = row.addCell();
-                cell.addContent(format.getMIMEType());
-                cell.addContent(" ");
-                switch (support)
-                {
-                    case 1:
-                        cell.addContent(T_supported);
-                        break;
-                    case 2:
-                        cell.addContent(T_known);
-                        break;
-                    case 3:
-                        cell.addContent(T_unsupported);
-                        break;
-                }
-            }
-
-            //Button edit = row.addCell().addButton("submit_edit_"+id);
-            //edit.setValue(T_submit_edit);
-
-            /*Row checksumRow = summary.addRow();
-            checksumRow.addCell();
-            Cell checksumCell = checksumRow.addCell(null, null, 0, 6, null);
-            checksumCell.addHighlight("bold").addContent(T_checksum);
-            checksumCell.addContent(" ");
-            checksumCell.addContent(algorithm + ":" + checksum);*/
+            // info
+            row.addCell("info-" + id, Cell.ROLE_DATA, "file-info").addFigure("/", null, null);
+            
+            // delete
+            row.addCell("delete-" + id, Cell.ROLE_DATA, "file-delete").addFigure("/", null, null);
         }
         
         // add standard control/paging buttons

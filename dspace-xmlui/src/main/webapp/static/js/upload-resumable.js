@@ -8,7 +8,6 @@
 
 $.ajaxSetup ({
     // Disable caching of AJAX responses
-    //  ssss
     cache: false
 });
 
@@ -54,19 +53,30 @@ var html = '\
     </tr>\
   </table>\
 </div>\
+<div id="dialog-confirm" style="display: none;" title="Delete File?">\
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Are you sure you want to delete <span id="file-name"></span>?</p>\
+</div>';
+
+/*
 <div class="resumable-files">\
   <div class="panel panel-default">\
     <div class="panel-heading">Files To Upload</div>\
     <table class="table resumable-list">\
       <thead>\
-      <th>#</th>\
-      <th>Name</th>\
+      <th>Primary</th>\
+      <th>File</th>\
+      <th>Size</th>\
+      <th>Description</th>\
+      <th>Format</th>\
       <th>Status</th>\
       </thead>\
       <tbody></tbody>\
     </table>\
   </div>\
 </div>';
+*/
+
+
 
 if(r.support) {
     $('#aspect_submission_StepTransformer_div_submit-file-upload').prepend(html);
@@ -80,29 +90,39 @@ if(r.support) {
     r.assignDrop($('.resumable-drop')[0]);
     r.assignBrowse($('.resumable-browse')[0]);
 
-
     console.log(window.DSpace.theme_path);
     var themePath = window.DSpace.theme_path;
-    $('#progress-resume-link').attr('src', themePath + "images/resume.png");
-    $('#progress-pause-link').attr('src', themePath + "images/pause.png");
+    $('#progress-resume-link img').attr('src', themePath + "images/resume.png");
+    $('#progress-pause-link img').attr('src', themePath + "images/pause.png");
 
     // Handle file add event
     r.on('fileAdded', function(file){
         // Show progress pabr
-        $('.resumable-progress, .resumable-files, .resumable-list').show();
+        //$('.resumable-progress, .resumable-files, .resumable-list').show();
+        $('.resumable-progress').show();
 
         // Show pause, hide resume
         $('#progress-resume-link').hide();
         $('#progress-pause-link').show();
 
+        console.log(file);
+        var tableRow =
+            '<tr class="ds-table-row">\
+               <td class="ds-table-cell"></td>\
+               <td class="ds-table-cell">' + file.fileName + '</td>\
+               <td class="ds-table-cell">\
+                 <input id="file-description-' + file.uniqueIdentifier + '" class="ds-text-field form-control" type="text" value="" name="description" disabled="disabled"></input>\
+               </td>\
+               <td id="file-status-' +  file.uniqueIdentifier + '" class="ds-table-cell"></td>\
+               <td class="ds-table-cell"></td>\
+              </tr>';
+
         // Add the file to the list
-        $('.resumable-list tbody')
-            .append('<tr>')
-            .append('<td class="resumable-file-'+file.uniqueIdentifier+'">Uploading</td>')
-            .append('<td class="resumable-file-name"></td>')
-            .append('<td class="resumable-file-progress"></td>')
-            .append('</tr>');
-        $('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name').html(file.fileName);
+        $('#aspect_submission_StepTransformer_table_submit-upload-summary tbody').append(tableRow);
+
+            // .append('')
+            // .append('</tr>');
+        //$('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name').html(file.fileName);
 
         // Actually start the upload
         r.upload();
@@ -120,9 +140,24 @@ if(r.support) {
     });
 
     r.on('fileSuccess', function(file,message){
+        console.log(file);
+        console.log(message);
         // Reflect that the file upload has completed
-        $('.resumable-file-'+file.uniqueIdentifier).html('');
-        $('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name + .resumable-file-progress').html('<span class="glyphicon glyphicon-ok-sign"></span>');
+        //$('.resumable-file-'+file.uniqueIdentifier).html('');
+        //$('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name + .resumable-file-progress').html('<span class="glyphicon glyphicon-ok-sign"></span>');
+
+
+        var xml = $.parseXML(message);
+        console.log(xml);
+        var bId = $($(xml).find("bitstreamId")[0]).text();
+        console.log(bId);
+
+        $('#file-description-' + file.uniqueIdentifier).removeAttr('disabled');
+        $('#file-description-' + file.uniqueIdentifier).attr('name', 'description-' + bId);
+
+
+        // console.log(bId[0]);
+        // console.log($(bId[0]).text());
     });
 
     r.on('fileError', function(file, message){
@@ -134,8 +169,41 @@ if(r.support) {
 
     r.on('fileProgress', function(file){
         // Handle progress for both the file and the overall upload
-        $('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name + .resumable-file-progress').html(Math.floor(file.progress()*100) + '%');
+        //$('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name + .resumable-file-progress').html(Math.floor(file.progress()*100) + '%');
+        $('#file-status-'+file.uniqueIdentifier).html(Math.floor(file.progress()*100) + '%');
+
         $('.progress-bar').css({width:Math.floor(r.progress()*100) + '%'});
+    });
+
+    //$('header').hide();
+
+    $('.file-delete').click(function(e){
+        console.log("=>");
+        console.log($(e.target).attr('id'));
+
+        var height = 140;
+        var width = 700;
+        $("#dialog-confirm").dialog({
+            height: height,
+            width: width,
+            modal: true,
+
+            buttons: {
+                Cancel: function() {
+                    $( this ).dialog( "close" );
+                },
+                "Delete": function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+        });
+
+
+        // for some reason jquery dialog not centring, so do it manually
+        var top = ($(window).height() / 2) - (height / 2);
+        var left = ($(window).width() / 2) - (width / 2);
+        $('.ui-dialog').css('top', top + 'px');
+        $('.ui-dialog').css('left', left + 'px');
     });
 
     function resume() {
@@ -144,4 +212,5 @@ if(r.support) {
         $('#progress-pause-link').show();
         r.upload();
     }
+
 }
