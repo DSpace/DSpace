@@ -56,7 +56,9 @@ public class RemoveSubmissionsAction extends AbstractAction
         	{
         		// If they selected to remove the item then delete everything.
     			WorkspaceItem workspaceItem = WorkspaceItem.find(context, Integer.valueOf(workspaceID));
-    			workspaceItem.deleteAll();
+				if(workspaceItem != null) {
+					workspaceItem.deleteAll();
+				}
         	}
         	context.commit();
     	}
