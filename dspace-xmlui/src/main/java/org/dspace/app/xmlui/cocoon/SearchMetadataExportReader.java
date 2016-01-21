@@ -40,7 +40,9 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.aspect.discovery.AbstractSearch;
 import org.dspace.app.xmlui.aspect.discovery.SimpleSearch;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
@@ -55,8 +57,6 @@ import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -104,12 +104,10 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
     
     private SimpleSearch simpleSearch = null;
     
-       
-    @Autowired(required = true)
-    private AuthorizeService authorizeService;
     
-    @Autowired(required = true)
-    private HandleService handleService;
+    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    
+    private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     
     
     public SearchMetadataExportReader() {

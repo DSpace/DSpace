@@ -27,6 +27,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -36,8 +37,6 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.discovery.*;
 import org.xml.sax.SAXException;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import org.apache.log4j.Logger;
 
@@ -54,8 +53,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 	private static final Message T_context_head = message("xmlui.administrative.Navigation.context_head");
 	private static final Message T_export_metadata = message("xmlui.administrative.Navigation.context_search_export_metadata");
 	
-	@Autowired(required = true)
-    private AuthorizeService authorizeService;
+	private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 	
     /**
      * Generate the unique caching key.
