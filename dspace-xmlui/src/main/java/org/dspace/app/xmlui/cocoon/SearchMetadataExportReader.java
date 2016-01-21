@@ -232,7 +232,10 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
             // Get the search scope from the location parameter
         	scope = handleService.resolveToObject(context, scopeString);
         }
-                
+
+        // set the object model on the simple search object
+        simpleSearch.setObjectModel(objectModel);
+        
         // prepare query from SimpleSearch object
         qArgs = simpleSearch.prepareQuery(scope);
                 

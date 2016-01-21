@@ -110,6 +110,10 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
                 "An error was encountered while processing the '"+this.getComponentName()+"' Wing based component: "
                         + this.getClass().getName(), e);
     }
+    
+    public void setObjectModel(Map objectModel) {
+    	this.objectModel = objectModel;
+    }
 
     /** What to add at the end of the body */
     public void addBody(Body body) throws SAXException, WingException,
