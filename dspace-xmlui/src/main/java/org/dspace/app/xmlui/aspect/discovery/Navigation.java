@@ -27,7 +27,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Item;
@@ -37,8 +37,9 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.discovery.*;
 import org.xml.sax.SAXException;
 
-import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import org.apache.log4j.Logger;
 
 /**
  * Navigation that adds code needed for discovery search
@@ -52,6 +53,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 	private static final Logger log = Logger.getLogger(Navigation.class);
 	private static final Message T_context_head = message("xmlui.administrative.Navigation.context_head");
 	private static final Message T_export_metadata = message("xmlui.administrative.Navigation.context_search_export_metadata");
+	
+	@Autowired(required = true)
+    private AuthorizeService authorizeService;
 	
     /**
      * Generate the unique caching key.
@@ -189,13 +193,13 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         	if(search_export_config != null) {
         		// some logging
         		
-        			log.info("uri: " + uri);
-        			log.info("query: " + query);
-        			log.info("scope: " + scope);
-        			log.info("filters: " + filters);
+    			log.info("uri: " + uri);
+    			log.info("query: " + query);
+    			log.info("scope: " + scope);
+    			log.info("filters: " + filters);
         		        		
         		if(search_export_config.equals("admin")) {
-        			if(AuthorizeManager.isAdmin(context)) {
+        			if(authorizeService.isAdmin(context)) {
         				List results = options.addList("context");    		
                     	results.setHead(T_context_head);
                     	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + filters, T_export_metadata);

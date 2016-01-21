@@ -40,8 +40,8 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.aspect.discovery.AbstractSearch;
 import org.dspace.app.xmlui.aspect.discovery.SimpleSearch;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.handle.service.HandleService;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
@@ -50,12 +50,13 @@ import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.ItemIterator;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -100,7 +101,21 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
 
     private DSpaceCSV csv = null;
     private String filename = null;
+    
     private SimpleSearch simpleSearch = null;
+    
+       
+    @Autowired(required = true)
+    private AuthorizeService authorizeService;
+    
+    @Autowired(required = true)
+    private HandleService handleService;
+    
+    
+    public SearchMetadataExportReader() {
+    	 simpleSearch = new SimpleSearch();
+    }
+    
     
     /**
      * Set up the export reader.
@@ -124,8 +139,9 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
             
             String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export");
             
+            
             if(search_export_config.equals("admin")) {            	
-            	if(!AuthorizeManager.isAdmin(context)) {
+            	if(!authorizeService.isAdmin(context)) {
                     /*
                      * Auth should be done by MetadataExport -- pass context through
                      * we should just be catching exceptions and displaying errors here
@@ -157,7 +173,6 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
             
             csv = exportMetadata(context, objectModel, query, scope, filters);
             filename = "search-results.csv";
-            simpleSearch = new SimpleSearch();            
             
         }
         catch (RuntimeException e) {
@@ -217,22 +232,18 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         }
         else {
             // Get the search scope from the location parameter
-        	scope = HandleManager.resolveToObject(context, scopeString);
+        	scope = handleService.resolveToObject(context, scopeString);
         }
-        
-        
+                
         // prepare query from SimpleSearch object
         qArgs = simpleSearch.prepareQuery(scope);
-        
-        
+                
         // no paging required
         qArgs.setStart(0);
-        
-        
+                
         // some arbitrary value for first search
         qArgs.setMaxResults(10);
-        
-        
+                
         // search once to get total search results
         qResults = SearchUtils.getSearchService().search(context, scope, qArgs);
                 	        	
@@ -242,28 +253,18 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         // search again to return all search results
         qResults = SearchUtils.getSearchService().search(context, scope, qArgs);
         
-    	Item[] resultsItems;
-        
     	// Get a list of found items
         ArrayList<Item> items = new ArrayList<Item>();        
         for (DSpaceObject resultDSO : qResults.getDspaceObjects()) {
             if (resultDSO instanceof Item) {
                 items.add((Item) resultDSO);
             }
-        }        
-        resultsItems = new Item[items.size()];
-        resultsItems = items.toArray(resultsItems);        
+        } 
         
         // Log the attempt
         log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
         
-        // Export a search view
-        ArrayList iids = new ArrayList();
-        for (Item item : items) {
-            iids.add(item.getID());
-        }
-        ItemIterator ii = new ItemIterator(context, iids);
-        MetadataExport exporter = new MetadataExport(context, ii, false);        
+        MetadataExport exporter = new MetadataExport(context, items.iterator(), false);        
         
         // Perform the export
         DSpaceCSV csv = exporter.export();        
