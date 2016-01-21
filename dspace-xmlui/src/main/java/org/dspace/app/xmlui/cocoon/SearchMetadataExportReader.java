@@ -234,7 +234,7 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         }
 
         // set the object model on the simple search object
-        simpleSearch.setObjectModel(objectModel);
+        simpleSearch.objectModel = objectModel;
         
         // prepare query from SimpleSearch object
         qArgs = simpleSearch.prepareQuery(scope);
