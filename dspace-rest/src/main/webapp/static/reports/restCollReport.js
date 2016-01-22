@@ -98,7 +98,7 @@ var CollReport = function() {
 				self.setCollectionCounts(0);
 			},
 			error: function(xhr, status, errorThrown) {
-				alert("Error in /rest/filtered-collections "+ status+ " " + errorThrown);
+				alert("Error in /rest/hierarchy "+ status+ " " + errorThrown);
 			}
 		});
 	};
@@ -125,7 +125,7 @@ var CollReport = function() {
 		var index = tbody.find("tr").length;
 
 		var tr = self.myHtmlUtil.addTr(tbody);
-		tr.attr("cid", self.getId(coll)).attr("index",index).addClass(index % 2 == 0 ? "odd data" : "even data");
+		tr.attr("cid", coll.id).attr("index",index).addClass(index % 2 == 0 ? "odd data" : "even data");
 		self.myHtmlUtil.addTd(tr, index + 1).addClass("num");
 		var parval = self.myHtmlUtil.getAnchor(top.name, "/handle/" + top.handle); 
 		
@@ -160,7 +160,9 @@ var CollReport = function() {
 					});
 				});
 				
-				if (data.length == self.COLL_LIMIT) {
+				//cannot assume data returned is full amount in case some items are restricted
+				//if (data.length == self.COLL_LIMIT) {
+				if (data.length > 0) {
 					self.setCollectionCounts(offset + self.COLL_LIMIT);
 					return;
 				}  
