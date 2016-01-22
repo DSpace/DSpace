@@ -291,9 +291,60 @@
                                      <include>**/*.xml</include>
                                  </includes>
                              </validationSet>
-                           </validationSets>
+                            <validationSet>
+                                <dir>${agnostic.build.dir}/testing/dspace/config/spring/xmlui</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                 </includes>
+                            </validationSet>
+                            <validationSet>
+                                <dir>${agnostic.build.dir}/testing/dspace/config/pages</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                 </includes>
+                             </validationSet>
+                             </validationSets>
                         </configuration>
                     </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>xml-maven-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                          <execution>
+                            <id>QQQvalidate-i18n-xml</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                              <goal>validate</goal>
+                            </goals>
+                          </execution>
+                        </executions>
+                        <configuration>
+                          <validationSets>
+                            <validationSet>
+                                <dir>${agnostic.build.dir}/testing/dspace/config/spring/api</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                 </includes>
+                             </validationSet>
+                            <validationSet>
+                                <dir>${agnostic.build.dir}/testing/dspace/config/spring/xmlui</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                 </includes>
+                            </validationSet>
+                            <validationSet>
+                                <dir>${agnostic.build.dir}/testing/dspace/config/pages</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                 </includes>
+                             </validationSet>
+                             </validationSets>
+                        </configuration>
+                    </plugin>
+
+
 
 
                     <!-- Run Unit/Integration Testing! This plugin just kicks off the tests (when enabled). -->

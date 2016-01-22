@@ -44,13 +44,7 @@
                     <configuration>
                       <validationSets>
                         <validationSet>
-                            <dir>${basedir}/dspace/config/spring/xmlui</dir>
-                             <includes>
-                                 <include>**/*.xml</include>
-                             </includes>
-                         </validationSet>
-                        <validationSet>
-                            <dir>${basedir}/dspace/config/pages</dir>
+                            <dir>${basedir}/i18n/</dir>
                              <includes>
                                  <include>**/*.xml</include>
                              </includes>
