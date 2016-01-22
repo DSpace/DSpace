@@ -731,21 +731,16 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * 
      *  @param scope the dspace object parent
      */
-    public DiscoverQuery prepareQuery(DSpaceObject scope) throws UIException, SearchServiceException {
+    public DiscoverQuery prepareQuery(DSpaceObject scope, String query, String[] fqs) throws UIException, SearchServiceException {
     	
     	this.queryArgs = new DiscoverQuery();
     	
-    	// possibly an argument
     	int page = getParameterPage();
-    	
-    	String query = getQuery();
-    	
+    	    	
     	// Escape any special characters in this user-entered query
         query = DiscoveryUIUtils.escapeQueryChars(query);
 
     	List<String> filterQueries = new ArrayList<String>();
-
-        String[] fqs = getFilterQueries();
 
         if (fqs != null)
         {
@@ -850,7 +845,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             return;
         }
         
-        this.queryResults = SearchUtils.getSearchService().search(context, scope, prepareQuery(scope));
+        this.queryResults = SearchUtils.getSearchService().search(context, scope, prepareQuery(scope, getQuery(), getFilterQueries()));
     }
 
     /**

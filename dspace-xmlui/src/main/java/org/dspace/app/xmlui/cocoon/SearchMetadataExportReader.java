@@ -10,8 +10,6 @@ package org.dspace.app.xmlui.cocoon;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.Map;
-import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -67,9 +65,7 @@ import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
  */
 
 public class SearchMetadataExportReader extends AbstractReader implements Recyclable
-{
-	private static Logger log = Logger.getLogger(MetadataExportReader.class);
-	
+{	
      /**
      * Messages to be sent when the user is not authorized to view 
      * a particular bitstream. They will be redirected to the login
@@ -98,22 +94,17 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
 
     /** The Cocoon request */
     protected Request request;
+    
+    
+    private static Logger log = Logger.getLogger(SearchMetadataExportReader.class);
+    
+    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();    
+    private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     private DSpaceCSV csv = null;
     private String filename = null;
     
     private SimpleSearch simpleSearch = null;
-    
-    
-    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    
-    private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-    
-    
-    public SearchMetadataExportReader() {
-    	 simpleSearch = new SimpleSearch();
-    }
-    
     
     /**
      * Set up the export reader.
@@ -169,6 +160,8 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
                 }
             }
             
+            simpleSearch = new SimpleSearch();
+            
             csv = exportMetadata(context, objectModel, query, scope, filters);
             filename = "search-results.csv";
             
@@ -217,27 +210,27 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
     	
     	DiscoverQuery qArgs = new DiscoverQuery();
     	
-    	try {
-    		scopeString = scopeString.replace("~", "/");
-        }
-        catch(NullPointerException e) { }
     	
-        // Are we in a community or collection?
+    	 // Are we in a community or collection?
         DSpaceObject scope;
-        if (scopeString == null || "".equals(scopeString)) {
-            // get the search scope from the url handle
+    	
+    	if(scopeString != null && scopeString.length() > 0) {
+    		scopeString = scopeString.replace("~", "/");
+    		// Get the search scope from the location parameter
+    		scope = handleService.resolveToObject(context, scopeString);
+    	}
+    	else {
+    		// get the search scope from the url handle
         	scope = HandleUtil.obtainHandle(objectModel);
-        }
-        else {
-            // Get the search scope from the location parameter
-        	scope = handleService.resolveToObject(context, scopeString);
-        }
-
+    	}
+    	
+        
         // set the object model on the simple search object
         simpleSearch.objectModel = objectModel;
         
+        
         // prepare query from SimpleSearch object
-        qArgs = simpleSearch.prepareQuery(scope);
+        qArgs = simpleSearch.prepareQuery(scope, query, filters.split(","));
                 
         // no paging required
         qArgs.setStart(0);
@@ -265,10 +258,13 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         // Log the attempt
         log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
         
-        MetadataExport exporter = new MetadataExport(context, items.iterator(), false);        
+        Iterator<Item> toExport = items.iterator();
+        
+        MetadataExport exporter = new MetadataExport(context, toExport, false);        
         
         // Perform the export
-        DSpaceCSV csv = exporter.export();        
+        DSpaceCSV csv = exporter.export();
+
         log.info(LogManager.getHeader(context, "metadataexport", "exported_file:search-results.csv"));
         
         return csv;

@@ -20,25 +20,12 @@ import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.content.Item;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.discovery.*;
 import org.xml.sax.SAXException;
-
-import org.apache.log4j.Logger;
 
 /**
  * Navigation that adds code needed for discovery search
@@ -49,18 +36,12 @@ import org.apache.log4j.Logger;
  */
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-	private static final Logger log = Logger.getLogger(Navigation.class);
-	private static final Message T_context_head = message("xmlui.administrative.Navigation.context_head");
-	private static final Message T_export_metadata = message("xmlui.administrative.Navigation.context_search_export_metadata");
-	
-	private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-	
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {
-	 try {
+        try {
             Request request = ObjectModelHelper.getRequest(objectModel);
             String key = request.getScheme() + request.getServerName() + request.getServerPort() + request.getSitemapURI() + request.getQueryString();
             
@@ -97,24 +78,24 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
      * 
      * language FIXME: add languages
      * 
-     * context - export metadata if in discover
+     * context no context options are added.
      * 
      * action no action options are added.
      */
     public void addOptions(Options options) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-    	Context context = ContextUtil.obtainContext(objectModel);
-    	Request request = ObjectModelHelper.getRequest(objectModel);
-    	
-    	// code remnants left behind, probably can be deleted
-    	
-        //List test = options.addList("browse");
-        //List discovery = options.addList("discovery-search");
-        //discovery.setHead("Discovery");
-        //discovery.addItem().addXref(contextPath + "/discover" , "Discover");
+//        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-        /*
+//        List test = options.addList("browse");
+
+//        List discovery = options.addList("discovery-search");
+
+//        discovery.setHead("Discovery");
+//
+//        discovery.addItem().addXref(contextPath + "/discover" , "Discover");
+
+         /*
         List browse = options.addList("browse");
 
         browse.setHead(T_head_browse);
@@ -123,6 +104,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         List browseContext = browse.addList("context");
 
         browseGlobal.setHead(T_head_all_of_dspace);
+
 
         if (dso != null)
         {
@@ -136,80 +118,15 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
         browseGlobal.addItem().addXref(contextPath + "/community-list", T_head_all_of_dspace );
-        */
+    */
 
         /* regulate the ordering */
         options.addList("discovery");
         options.addList("browse");
         options.addList("account");
+        options.addList("context");
         options.addList("administrative");
-                
-        // get uri to see if using discovery and if under a specific handle
-        String uri = request.getSitemapURI();
-        
-        // check value in dspace.cfg
-        String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export"); 
-        
-        // get query
-        String query = decodeFromURL(request.getParameter("query"));
-                
-        // get scope, if not under handle returns null
-        String scope= request.getParameter("scope");
-        
-        // used to serialize all query filters together
-    	String filters = "";
-    	
-    	// get all query filters
-    	String[] fqs = DiscoveryUIUtils.getFilterQueries(ObjectModelHelper.getRequest(objectModel), context);
-        
-    	if (fqs != null)
-        {
-        	for(int i = 0; i < fqs.length; i++) {
-            	if(i < fqs.length - 1)
-            		filters += fqs[i] + ",";
-            	else
-            		filters += fqs[i];
-            }
-        }
-    	
-        if(uri.contains("discover")) {
-        	// check scope
-        	if(scope == null || "".equals(scope))
-        		scope = "/";
-        	// check query
-        	if(query == null || "".equals(query))
-        		query = "*";
-        	// check if under a handle, already in discovery
-        	if(uri.contains("handle")) {
-        		scope = uri.replace("handle/", "").replace("/discover", "");
-            }
-        	// replace forward slash to pass through sitemap
-        	try {
-            	scope = scope.replace("/", "~");
-            }
-            catch(NullPointerException e) { }
-        	if(search_export_config != null) {
-        		// some logging
-        		
-    			log.info("uri: " + uri);
-    			log.info("query: " + query);
-    			log.info("scope: " + scope);
-    			log.info("filters: " + filters);
-        		        		
-        		if(search_export_config.equals("admin")) {
-        			if(authorizeService.isAdmin(context)) {
-        				List results = options.addList("context");    		
-                    	results.setHead(T_context_head);
-                    	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + filters, T_export_metadata);
-        			}
-        		}
-        		else if(search_export_config.equals("user") || search_export_config.equals("anonymous")){
-        			List results = options.addList("context");    		
-                	results.setHead(T_context_head);
-                	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + filters, T_export_metadata);
-        		}
-        	}
-        }	
+
     }
 
     /**
@@ -219,9 +136,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
+
         // Add metadata for quick searches:
-        pageMeta.addMetadata("search", "simpleURL").addContent("/discover");
-        pageMeta.addMetadata("search", "advancedURL").addContent(contextPath + "/discover");
+        pageMeta.addMetadata("search", "simpleURL").addContent(
+                "/discover");
+        pageMeta.addMetadata("search", "advancedURL").addContent(
+                contextPath + "/discover");
         pageMeta.addMetadata("search", "queryField").addContent("query");
+        
     }
+
 }

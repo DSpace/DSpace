@@ -30,10 +30,10 @@ and searching the repository.
             <map:transformer name="SiteRecentSubmissions" src="org.dspace.app.xmlui.aspect.discovery.SiteRecentSubmissions"/>
             <map:transformer name="SidebarFacetsTransformer" src="org.dspace.app.xmlui.aspect.discovery.SidebarFacetsTransformer"/>
 
-
             <map:transformer name="CommunitySearch" src="org.dspace.app.xmlui.aspect.discovery.CommunitySearch"/>
             <map:transformer name="CommunityRecentSubmissions" src="org.dspace.app.xmlui.aspect.discovery.CommunityRecentSubmissions"/>
 
+			<map:transformer name="CSVExportDiscoveryNavigation" src="org.dspace.app.xmlui.aspect.discovery.CSVExportDiscoveryNavigation"/>
 
             <map:transformer name="CollectionSearch" src="org.dspace.app.xmlui.aspect.discovery.CollectionSearch"/>
             <map:transformer name="CollectionRecentSubmissions" src="org.dspace.app.xmlui.aspect.discovery.CollectionRecentSubmissions"/>
@@ -76,7 +76,7 @@ and searching the repository.
                     3) Metadata about the search urls.
                     -->
             <map:transform type="Navigation"/>
-
+            
             <!--
                     Display the DSpace homepage. This includes the news.xml file
                     along with a list of top level communities in DSpace.
@@ -110,6 +110,7 @@ and searching the repository.
 
 			<!-- Search -->
 			<map:match pattern="discover">
+				<map:transform type="CSVExportDiscoveryNavigation"/>
                 <map:act type="DiscoverySearchLoggerAction"/>
 				<map:transform type="SidebarFacetsTransformer"/>
                 <map:transform type="SimpleSearch"/>
@@ -147,6 +148,7 @@ and searching the repository.
 
                         <!-- Simple search -->
 						<map:match pattern="handle/*/*/discover">
+							<map:transform type="CSVExportDiscoveryNavigation"/>
                             <map:act type="DiscoverySearchLoggerAction"/>
                             <map:transform type="SidebarFacetsTransformer"/>
                             <map:transform type="SimpleSearch"/>
