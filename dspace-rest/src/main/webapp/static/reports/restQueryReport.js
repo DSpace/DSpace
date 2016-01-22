@@ -251,6 +251,9 @@ var QueryableMetadataFields = function(report) {
 		var opt = $("<option value='*'>Any Field</option>");
 		sel.append(opt);
 		$.each(self.metadataSchemas, function(index, schema){
+			if (schema.prefix == 'eperson') {
+				return;
+			}
 			$.each(schema.fields, function(findex, field) {
 				var name = field.name;
 				var parts = name.match(/^([^\.]+)\.([^\.]+)\.([^\.]+)$/);
