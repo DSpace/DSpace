@@ -429,11 +429,11 @@ public class ConfigurationManager
     {
         if ((argv.length == 2) && argv[0].equals("-property"))
         {
-            String val = getProperty(argv[1]);
+            Object val = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyValue(argv[1]);
 
             if (val != null)
             {
-                System.out.println(val);
+                System.out.println(val.toString());
             }
             else
             {
@@ -445,11 +445,11 @@ public class ConfigurationManager
         else if ((argv.length == 4) && argv[0].equals("-module") &&
                                         argv[2].equals("-property"))
         {
-            String val = getProperty(argv[1], argv[3]);
+            Object val = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyValue(argv[1] + "." + argv[3]);
 
             if (val != null)
             {
-                System.out.println(val);
+                System.out.println(val.toString());
             }
             else
             {
