@@ -1,17 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.dspace</groupId>
-	<artifactId>modules</artifactId>
-	<packaging>pom</packaging>
-	<name>DSpace Addon Modules</name>
-	<description>DSpace Addon Modules</description>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.dspace</groupId>
-		<artifactId>dspace-parent</artifactId>
-		<version>6.0-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
-	</parent>
+    <groupId>org.dspace</groupId>
+    <artifactId>modules</artifactId>
+    <packaging>pom</packaging>
+
+    <name>DSpace Addon Modules</name>
+    <description>DSpace Addon Modules</description>
+
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-parent</artifactId>
+        <version>6.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
 
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
@@ -125,6 +127,17 @@
                 <module>oai</module>
             </modules>
         </profile>
+	<profile>
+	    <id>dspace-remote-handle-resolver</id>
+	    <activation>
+	        <file>
+	            <exists>remote-handle-resolver/pom.xml</exists>
+	        </file>
+	    </activation>
+	    <modules>
+	        <module>remote-handle-resolver</module>
+	    </modules>
+	</profile>
 
         <profile>
             <!--Activates mirage2 on the presence of the property mirage2.on with any value e.g. mvn clean package -Dmirage2.on=on
