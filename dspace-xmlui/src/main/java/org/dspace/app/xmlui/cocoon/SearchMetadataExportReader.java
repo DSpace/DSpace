@@ -120,10 +120,10 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         	this.request = ObjectModelHelper.getRequest(objectModel);
         	this.response = ObjectModelHelper.getResponse(objectModel);
         	
-        	String query = par.getParameter("query");
-        	String scope = par.getParameter("scope");
-        	String filters = par.getParameter("filters");
-        	        	 
+        	String query = request.getParameter("query");
+        	String scope = request.getParameter("scope");
+        	String filters = request.getParameter("filters");
+        	       	 
             Context context = ContextUtil.obtainContext(objectModel);
             
             String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export");
@@ -209,8 +209,7 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
     	DiscoverResult qResults = new DiscoverResult();
     	
     	DiscoverQuery qArgs = new DiscoverQuery();
-    	
-    	
+    	    	
     	 // Are we in a community or collection?
         DSpaceObject scope;
     	
@@ -224,13 +223,14 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         	scope = HandleUtil.obtainHandle(objectModel);
     	}
     	
-        
+    	
         // set the object model on the simple search object
         simpleSearch.objectModel = objectModel;
         
+        String[] fqs = filters != null ? filters.split(",") : new String[0];
         
         // prepare query from SimpleSearch object
-        qArgs = simpleSearch.prepareQuery(scope, query, filters.split(","));
+        qArgs = simpleSearch.prepareQuery(scope, query, fqs);
                 
         // no paging required
         qArgs.setStart(0);

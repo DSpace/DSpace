@@ -742,8 +742,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
     	List<String> filterQueries = new ArrayList<String>();
 
-        if (fqs != null)
-        {
+        if (fqs != null) {
             filterQueries.addAll(Arrays.asList(fqs));
         }        
 

@@ -135,49 +135,55 @@ public class CSVExportDiscoveryNavigation  extends AbstractDSpaceTransformer imp
             }
         }
     	
-        	
     	// check scope
-    	if(scope == null || scope.length() == 0) {
-    		scope = "/";
-    	}
+    	if(isEmpty(scope)) scope = "/";
     	
     	// check query
-    	if(query == null || query.length() == 0) {
-    		query = "*";
-    	}
+    	if(isEmpty(query)) query = "*";
     	
     	// check if under a handle, already in discovery        	
     	if(uri.contains("handle")) {
     		scope = uri.replace("handle/", "").replace("/discover", "");
         }
     	
-    	// replace forward slash to pass through sitemap
+    	// replace forward slash to make query parameter safe
     	try {
         	scope = scope.replace("/", "~");
         }
         catch(NullPointerException e) { }
     	
     	if(search_export_config != null) {
-    		// some logging
-    		
+    		// some logging    		
 			log.info("uri: " + uri);
 			log.info("query: " + query);
 			log.info("scope: " + scope);
 			log.info("filters: " + filters);
+			
+			boolean show = false;
     		        		
     		if(search_export_config.equals("admin")) {
     			if(authorizeService.isAdmin(context)) {
-    				List results = options.addList("context");    		
-                	results.setHead(T_context_head);
-                	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + filters, T_export_metadata);
+    				show = true;
     			}
     		}
     		else if(search_export_config.equals("user") || search_export_config.equals("anonymous")){
+    			show = true;
+    		}
+    		
+    		if(show) {
     			List results = options.addList("context");    		
             	results.setHead(T_context_head);
-            	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + filters, T_export_metadata);
+            	String link = contextPath + "/discover/search/csv?query=" + query + "&scope=" + scope;
+            	if(!isEmpty(filters)) {
+            		link += "&filters=" + filters;
+            	}
+            	results.addItem().addXref(link, T_export_metadata);
     		}
     	}
+    }
+    
+    private boolean isEmpty(String str) {
+    	return str == null || str.length() == 0;
     }
 
     /**
