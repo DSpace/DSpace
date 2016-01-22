@@ -26,12 +26,12 @@ public class ItemFilterDefs implements ItemFilterList {
 	            return true;
 	        }        
 	    },
-	    is_not_withdrawn("Withdrawn Items", null, CAT_ITEM) {
+	    is_withdrawn("Withdrawn Items", null, CAT_ITEM) {
 	        public boolean testItem(Context context, Item item) {
 	            return item.isWithdrawn();
 	        }        
 	    },
-	    is_withdrawn("Available Items - Not Withdrawn", null, CAT_ITEM) {
+	    is_not_withdrawn("Available Items - Not Withdrawn", null, CAT_ITEM) {
 	        public boolean testItem(Context context, Item item) {
 	            return !item.isWithdrawn();
 	        }        
