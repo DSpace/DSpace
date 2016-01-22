@@ -269,6 +269,33 @@
                         </executions>
                     </plugin>
 
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>xml-maven-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                          <execution>
+                            <id>validate-config-xml</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                              <goal>validate</goal>
+                            </goals>
+                          </execution>
+                        </executions>
+                        <configuration>
+                          <validationSets>
+                            <validationSet>
+                                <dir>${agnostic.build.dir}/testing/dspace/config/spring/api</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                 </includes>
+                             </validationSet>
+                           </validationSets>
+                        </configuration>
+                    </plugin>
+
+
                     <!-- Run Unit/Integration Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>

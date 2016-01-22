@@ -26,6 +26,39 @@
             <filter>${filters.file}</filter>
         </filters>
         <plugins>
+
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>xml-maven-plugin</artifactId>
+                    <version>1.0.1</version>
+                    <executions>
+                      <execution>
+                        <id>validate-xmlui-xml</id>
+                        <phase>test</phase>
+                        <goals>
+                          <goal>validate</goal>
+                        </goals>
+                      </execution>
+                    </executions>
+                    <configuration>
+                      <validationSets>
+                        <validationSet>
+                            <dir>${basedir}/dspace/config/spring/xmlui</dir>
+                             <includes>
+                                 <include>**/*.xml</include>
+                             </includes>
+                         </validationSet>
+                        <validationSet>
+                            <dir>${basedir}/dspace/config/pages</dir>
+                             <includes>
+                                 <include>**/*.xml</include>
+                             </includes>
+                         </validationSet>
+                       </validationSets>
+                    </configuration>
+                </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
