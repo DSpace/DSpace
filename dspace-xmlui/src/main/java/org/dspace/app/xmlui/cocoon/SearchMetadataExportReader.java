@@ -257,10 +257,8 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         
         // Log the attempt
         log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
-        
-        Iterator<Item> toExport = items.iterator();
-        
-        MetadataExport exporter = new MetadataExport(context, toExport, false);        
+
+        MetadataExport exporter = new MetadataExport(context, items.iterator(), false);
         
         // Perform the export
         DSpaceCSV csv = exporter.export();
@@ -276,20 +274,5 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         }
         return (int) l;
     }
-        
-    /**
-     * Returns a list of the filter queries for use in rendering pages, creating page more urls, ....
-     * @return an array containing the filter queries
-     */
-    protected Map<String, String[]> getParameterFilterQueries()
-    {
-        try {
-            Map<String, String[]> result = new HashMap<String, String[]>();
-            result.put("fq", ObjectModelHelper.getRequest(objectModel).getParameterValues("fq"));
-            return result;
-        }
-        catch (Exception e) {
-            return null;
-        }
-    }
+    
 }
