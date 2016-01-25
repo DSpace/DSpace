@@ -31,7 +31,12 @@ import java.util.*;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements GroupDAO {
+public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements GroupDAO
+{
+    protected GroupDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public Group findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException

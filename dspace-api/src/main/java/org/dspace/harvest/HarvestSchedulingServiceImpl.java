@@ -34,6 +34,11 @@ public class HarvestSchedulingServiceImpl implements HarvestSchedulingService {
     @Autowired(required = true)
     protected HarvestedCollectionService harvestedCollectionService;
 
+    protected HarvestSchedulingServiceImpl()
+    {
+
+    }
+
     @Override
     public synchronized void startNewScheduler() throws SQLException, AuthorizeException {
         Context c = new Context();

@@ -34,7 +34,12 @@ import java.util.Map;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> implements CollectionDAO {
+public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> implements CollectionDAO
+{
+    protected CollectionDAOImpl()
+    {
+        super();
+    }
 
     /**
      * Get all collections in the system. These are alphabetically sorted by

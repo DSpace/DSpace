@@ -37,6 +37,11 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
     @Autowired(required = true)
     protected ChecksumResultService checksumResultService;
 
+    protected ChecksumHistoryServiceImpl()
+    {
+
+    }
+
     @Override
     public void updateMissingBitstreams(Context context) throws SQLException {
 //                "insert into checksum_history ( "

@@ -27,7 +27,13 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
+public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
+{
+    protected DOIDAOImpl()
+    {
+        super();
+    }
+
     @Override
     public DOI findByDoi(Context context, String doi) throws SQLException {
         Criteria criteria = createCriteria(context, DOI.class);

@@ -28,6 +28,11 @@ public class TaskListItemServiceImpl implements TaskListItemService {
     @Autowired(required = true)
     protected TaskListItemDAO taskListItemDAO;
 
+    protected TaskListItemServiceImpl()
+    {
+
+    }
+
     @Override
     public TaskListItem create(Context context, BasicWorkflowItem workflowItem, EPerson ePerson) throws SQLException {
         TaskListItem taskListItem = taskListItemDAO.create(context, new TaskListItem());

@@ -29,6 +29,10 @@ public class CollectionRoleServiceImpl implements CollectionRoleService {
     @Autowired(required = true)
     protected CollectionRoleDAO collectionRoleDAO;
 
+    protected CollectionRoleServiceImpl()
+    {
+
+    }
 
 
     @Override

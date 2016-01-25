@@ -69,6 +69,11 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     @Autowired(required = true)
     protected ItemService itemService;
 
+    protected CreativeCommonsServiceImpl()
+    {
+
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception
     {

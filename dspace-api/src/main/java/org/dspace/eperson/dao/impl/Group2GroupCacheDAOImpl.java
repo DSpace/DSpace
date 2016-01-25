@@ -27,7 +27,12 @@ import java.util.Set;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCache> implements Group2GroupCacheDAO {
+public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCache> implements Group2GroupCacheDAO
+{
+    protected Group2GroupCacheDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public List<Group2GroupCache> findByParent(Context context, Group group) throws SQLException {

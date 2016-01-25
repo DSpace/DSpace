@@ -31,7 +31,12 @@ import java.util.*;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements EPersonDAO {
+public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements EPersonDAO
+{
+    protected EPersonDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public EPerson findByEmail(Context context, String email) throws SQLException

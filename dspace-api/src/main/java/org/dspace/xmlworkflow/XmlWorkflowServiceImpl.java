@@ -86,6 +86,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     @Autowired(required = true)
     protected GroupService groupService;
 
+    protected XmlWorkflowServiceImpl()
+    {
+
+    }
 
 
     @Override

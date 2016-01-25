@@ -35,6 +35,10 @@ public class AuthorityValueServiceImpl implements AuthorityValueService{
     @Autowired(required = true)
     protected AuthorityTypes authorityTypes;
 
+    protected AuthorityValueServiceImpl()
+    {
+
+    }
 
     @Override
     public AuthorityValue generate(Context context, String authorityKey, String content, String field) {

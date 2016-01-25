@@ -30,7 +30,13 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> implements BitstreamDAO {
+public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> implements BitstreamDAO
+{
+
+    protected BitstreamDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException {

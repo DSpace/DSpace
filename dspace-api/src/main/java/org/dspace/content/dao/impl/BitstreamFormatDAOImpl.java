@@ -26,7 +26,13 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat> implements BitstreamFormatDAO {
+public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat> implements BitstreamFormatDAO
+{
+
+    protected BitstreamFormatDAOImpl()
+    {
+        super();
+    }
 
     /**
      * Find a bitstream format by its (unique) MIME type.

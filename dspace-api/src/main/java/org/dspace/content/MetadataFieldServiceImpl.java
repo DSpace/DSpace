@@ -40,6 +40,11 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
     @Autowired(required = true)
     protected MetadataValueService metadataValueService;
 
+    protected MetadataFieldServiceImpl()
+    {
+
+    }
+
     @Override
     public MetadataField create(Context context, MetadataSchema metadataSchema, String element, String qualifier, String scopeNote) throws AuthorizeException, SQLException, NonUniqueMetadataException {
         // Check authorisation: Only admins may create DC types

@@ -39,6 +39,11 @@ public class WebAppServiceImpl implements WebAppService {
     protected WebAppDAO webAppDAO;
 
 
+    protected WebAppServiceImpl()
+    {
+
+    }
+
     @Override
     public WebApp create(Context context, String appName, String url, Date started, int isUI) throws SQLException {
         WebApp webApp = webAppDAO.create(context, new WebApp());

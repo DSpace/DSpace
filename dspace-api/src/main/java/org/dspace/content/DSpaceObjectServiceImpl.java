@@ -51,6 +51,10 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Autowired(required = true)
     protected MetadataAuthorityService metadataAuthorityService;
 
+    public DSpaceObjectServiceImpl()
+    {
+
+    }
 
     @Override
     public String getName(T dso) {

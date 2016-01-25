@@ -45,6 +45,11 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
     protected String path = ConfigurationManager.getProperty("dspace.dir")+"/config/workflow.xml";
 //    private static String pathActions = ConfigurationManager.getProperty("dspace.dir")+"/config/workflow-actions.xml";
 
+    protected XmlWorkflowFactoryImpl()
+    {
+
+    }
+
     @Override
     public Workflow getWorkflow(Collection collection) throws IOException, WorkflowConfigurationException {
         //Initialize our cache if we have none

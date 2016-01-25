@@ -27,6 +27,11 @@ public class ChecksumResultServiceImpl implements ChecksumResultService {
     @Autowired(required = true)
     private ChecksumResultDAO checksumResultDAO;
 
+    protected ChecksumResultServiceImpl()
+    {
+
+    }
+
     /**
      * Get the result description for the given result code
      *

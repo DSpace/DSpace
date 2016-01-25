@@ -61,6 +61,11 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
 
+    protected BasicWorkflowServiceImpl()
+    {
+
+    }
+
     /** Symbolic names of workflow steps. */
     protected final String workflowText[] =
     {

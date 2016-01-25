@@ -65,6 +65,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     protected WorkspaceItemService workspaceItemService;
 
 
+    protected CollectionServiceImpl()
+    {
+        super();
+    }
+
     @Override
     public Collection create(Context context, Community community) throws SQLException, AuthorizeException {
         return create(context, community, null);

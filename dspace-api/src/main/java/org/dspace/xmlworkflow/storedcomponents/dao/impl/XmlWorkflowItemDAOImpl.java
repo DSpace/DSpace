@@ -27,7 +27,13 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem> implements XmlWorkflowItemDAO {
+public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem> implements XmlWorkflowItemDAO
+{
+
+    protected XmlWorkflowItemDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer limit, Collection collection) throws SQLException {

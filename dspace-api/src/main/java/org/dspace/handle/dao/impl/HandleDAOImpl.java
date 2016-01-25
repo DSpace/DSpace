@@ -26,7 +26,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements HandleDAO {
+public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements HandleDAO
+{
+    protected HandleDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public List<Handle> getHandlesByDSpaceObject(Context context, DSpaceObject dso) throws SQLException {

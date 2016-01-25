@@ -40,6 +40,11 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
 
+    protected MostRecentChecksumServiceImpl()
+    {
+
+    }
+
     @Override
     public MostRecentChecksum getNonPersistedObject()
     {

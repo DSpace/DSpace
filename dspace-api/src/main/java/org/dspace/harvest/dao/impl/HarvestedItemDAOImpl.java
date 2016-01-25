@@ -25,7 +25,12 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> implements HarvestedItemDAO {
+public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> implements HarvestedItemDAO
+{
+    protected HarvestedItemDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public HarvestedItem findByItem(Context context, Item item) throws SQLException {

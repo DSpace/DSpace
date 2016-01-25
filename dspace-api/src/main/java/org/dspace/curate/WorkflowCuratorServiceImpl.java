@@ -97,7 +97,12 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService
             log.fatal("Unable to load config: " + cfgFile.getAbsolutePath());
         }
     }
-    
+
+    protected WorkflowCuratorServiceImpl()
+    {
+
+    }
+
     @Override
     public boolean needsCuration(BasicWorkflowItem wfi) {
        return getFlowStep(wfi) != null; 

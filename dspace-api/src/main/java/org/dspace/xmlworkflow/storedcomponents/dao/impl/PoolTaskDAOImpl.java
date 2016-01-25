@@ -27,7 +27,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements PoolTaskDAO {
+public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements PoolTaskDAO
+{
+    protected PoolTaskDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException {

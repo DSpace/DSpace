@@ -25,6 +25,11 @@ import java.sql.SQLException;
  */
 public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implements RequestItemDAO
 {
+    protected RequestItemDAOImpl()
+    {
+        super();
+    }
+
     @Override
     public RequestItem findByToken(Context context, String token) throws SQLException {
         Criteria criteria = createCriteria(context, RequestItem.class);

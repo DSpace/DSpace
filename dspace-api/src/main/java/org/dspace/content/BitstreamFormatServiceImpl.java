@@ -38,6 +38,10 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
+    protected BitstreamFormatServiceImpl()
+    {
+
+    }
 
     /** translate support-level ID to string.  MUST keep this table in sync
      *  with support level definitions above.

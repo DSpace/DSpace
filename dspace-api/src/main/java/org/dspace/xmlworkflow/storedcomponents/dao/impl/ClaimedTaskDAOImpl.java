@@ -26,7 +26,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implements ClaimedTaskDAO {
+public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implements ClaimedTaskDAO
+{
+    protected ClaimedTaskDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public List<ClaimedTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {

@@ -35,6 +35,11 @@ public class LicenseServiceImpl implements LicenseService
     /** The default license */
     protected String license;
 
+    protected LicenseServiceImpl()
+    {
+
+    }
+
     @Override
     public void writeLicenseFile(String licenseFile,
             String newLicense)

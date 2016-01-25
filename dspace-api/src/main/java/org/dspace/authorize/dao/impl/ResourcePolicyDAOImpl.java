@@ -31,6 +31,11 @@ import java.util.List;
 public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> implements ResourcePolicyDAO
 {
 
+    protected ResourcePolicyDAOImpl()
+    {
+        super();
+    }
+
     @Override
     public List<ResourcePolicy> findByDso(Context context, DSpaceObject dso) throws SQLException {
         Criteria criteria = createCriteria(context, ResourcePolicy.class);

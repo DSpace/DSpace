@@ -25,6 +25,11 @@ import java.util.UUID;
  */
 public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
+    protected AbstractHibernateDAO()
+    {
+
+    }
+
     @Override
     public T create(Context context, T t) throws SQLException {
         getHibernateSession(context).persist(t);
