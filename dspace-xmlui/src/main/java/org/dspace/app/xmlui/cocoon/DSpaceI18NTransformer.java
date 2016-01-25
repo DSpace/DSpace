@@ -43,15 +43,15 @@ import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
  * </catalogues>
  * 
  * And there were two aspects installed:
- * <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
+ * <aspect name="Browse Artifacts" path="resource://aspects/BrowseArtifacts/" />
  * <aspect name="Administration" path="resource://aspects/Administrative/" />
  * 
  * The effective configuration would be:
  * <catalogues default="default">
  *   <catalogue id="default" name="messages" aspects="true">
  *     <location>context://i18n/</location>
- *     <location>context://i18n/aspects/ArtifactBrowser</location>
- *     <location>resource://aspects/ArtifactBrowser/i18n/</location>
+ *     <location>context://i18n/aspects/BrowseArtifacts</location>
+ *     <location>resource://aspects/BrowseArtifacts/i18n/</location>
  *     <location>context://i18n/aspects/Administrative</location>
  *     <location>resource://aspects/Administrative/i18n/</location>
  *   </catalogue>
@@ -105,7 +105,7 @@ public class DSpaceI18NTransformer extends I18nTransformer {
             	{
             		// Add a catalogue location inside the default i18n directory in the webapp
             		// this will be of the form: "context://i18n/<aspectpath>/" thus for the artifact
-            		// browser aspect it will be "context://i18n/aspects/ArtifactBrowser/"
+            		// browser aspect it will be "context://i18n/aspects/BrowseArtifacts/"
             		String baseLocationPath = aspect.getPath();
             		int idx = baseLocationPath.indexOf("://");
             		if (idx > 0)
@@ -125,7 +125,7 @@ public class DSpaceI18NTransformer extends I18nTransformer {
             		// Add a catalogue location inside the aspect's directory 
             		// (most likely in the jar's resources but if it's not that's okay)
             		// For the artifact browser this would be: 
-            		// "resource://aspects/ArtifactBrowser/i18n/"
+            		// "resource://aspects/BrowseArtifacts/i18n/"
             		String aspectLocationPath = aspect.getPath();
             		if (!aspectLocationPath.endsWith("/"))
                     {

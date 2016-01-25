@@ -146,43 +146,6 @@
         </step>
     </command>
     <command>
-        <name>index-lucene-init</name>
-        <description>Initialise the Lucene search and browse indexes</description>
-        <step passuserargs="false">
-            <class>org.dspace.browse.IndexBrowse</class>
-            <argument>-f</argument>
-            <argument>-r</argument>
-        </step>
-        <step passuserargs="false">
-            <class>org.dspace.browse.ItemCounter</class>
-        </step>
-        <step passuserargs="false">
-            <class>org.dspace.search.DSIndexer</class>
-            <argument>-b</argument>
-        </step>
-    </command>
-    <command>
-        <name>index-lucene-update</name>
-        <description>Update the Lucene search and browse indexes</description>
-        <step passuserargs="false">
-            <class>org.dspace.browse.IndexBrowse</class>
-            <argument>-i</argument>
-        </step>
-        <step passuserargs="false">
-            <class>org.dspace.browse.ItemCounter</class>
-        </step>
-        <step passuserargs="false">
-            <class>org.dspace.search.DSIndexer</class>
-        </step>
-    </command>
-    <command>
-        <name>itemcounter</name>
-        <description>Update the item strength counts in the user interface</description>
-        <step passuserargs="false">
-            <class>org.dspace.browse.ItemCounter</class>
-        </step>
-    </command>
-    <command>
         <name>itemupdate</name>
         <description>Item update tool for altering metadata and bitstream content in items</description>
         <step>

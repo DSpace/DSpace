@@ -19,7 +19,6 @@
                         <map:generator name="DSpaceMETSGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceMETSGenerator"/>
                         <map:generator name="DSpaceOREGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceOREGenerator"/>
                         <map:generator name="DescriptionOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.DescriptionOpenSearchGenerator"/>
-                        <map:generator name="StandardOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.StandardOpenSearchGenerator"/>
                         <map:generator name="DiscoveryOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.DiscoveryOpenSearchGenerator"/>
                         <map:generator name="notifying" src="org.apache.cocoon.sitemap.NotifyingGenerator"/>
                         <map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
@@ -548,8 +547,12 @@
 
                     <!-- OpenSearch results document for whole repo or community/collection -->
                     <map:match pattern="open-search/**">
+                       <!-- Prior to DSpace 6.0, "open-search/" was mapped to the StandardOpenSearchGenerator,
+                            which was removed as part of removal of the legacy Lucene search index classes.
+                            This pattern has been removed to DiscoveryOpenSearchGenerator to help ensure
+                            minimal impact from removal of the legacy Lucene search index. -->
                         <map:match pattern="open-search/">
-                            <map:generate type="StandardOpenSearchGenerator"/>
+                            <map:generate type="DiscoveryOpenSearchGenerator"/>
                         </map:match>
 
                         <map:match pattern="open-search/discover">
