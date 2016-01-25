@@ -18,6 +18,7 @@ import org.dspace.workflow.WorkflowItem;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service interface class for the WorkspaceItem object.
@@ -124,4 +125,8 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * notwithstanding.)
      */
     public void deleteAll(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException, IOException;
+
+    int countTotal(Context context) throws SQLException;
+
+    List<Map> getStageReachedCounts(Context context) throws SQLException;
 }

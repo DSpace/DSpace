@@ -8,17 +8,21 @@
 package org.dspace.health;
 
 
-import org.apache.commons.lang.StringUtils;
+import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author LINDAT/CLARIN dev team
@@ -26,11 +30,12 @@ import java.util.UUID;
 public class UserCheck extends Check {
 
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private static final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     @Override
     public String run( ReportInfo ri ) {
         Context context = new Context();
-        Core core = new Core(context);
         String ret = "";
         Map<String, Integer> info = new HashMap<String, Integer>();
         try {
@@ -81,20 +86,23 @@ public class UserCheck extends Check {
 
         try {
             // empty group
-            List<String> egs = core.getEmptyGroups();
-            ret += String.format(
-                "Empty groups: #%d\n    %s\n",
-                egs.size(), StringUtils.join(egs, ",\n    "));
+            List<Group> emptyGroups = groupService.getEmptyGroups(context);
+            ret += String.format("Empty groups: #%d\n    ", emptyGroups.size());
+            for (Group group : emptyGroups) {
+                ret += String.format("id=%s;name=%s,\n    ", group.getID(), group.getName() );
+            }
 
-            List<UUID> subs = core.getSubscribers();
+            //subscribers
+            List<EPerson> subscribers = ePersonService.findEPeopleWithSubscription(context);
             ret += String.format(
                 "Subscribers: #%d [%s]\n",
-                subs.size(), StringUtils.join(subs, ", "));
+                subscribers.size(), formatIds(subscribers));
 
-            subs = core.getSubscribedCollections();
+            //subscribed collections
+            List<Collection> subscribedCols = collectionService.findCollectionsWithSubscribers(context);
             ret += String.format(
                 "Subscribed cols.: #%d [%s]\n",
-                subs.size(), StringUtils.join(subs, ", "));
+                subscribedCols.size(), formatIds(subscribedCols));
 
             context.complete();
 
@@ -103,5 +111,14 @@ public class UserCheck extends Check {
         }
 
         return ret;
+    }
+
+    private String formatIds(List<? extends DSpaceObject> objects){
+        StringBuilder ids = new StringBuilder();
+        for(DSpaceObject o : objects){
+            ids.append(o.getID())
+                    .append(", ");
+        }
+        return ids.toString();
     }
 }

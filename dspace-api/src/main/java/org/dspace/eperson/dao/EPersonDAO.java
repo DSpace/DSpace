@@ -43,4 +43,8 @@ public interface EPersonDAO extends DSpaceObjectDAO<EPerson>, DSpaceObjectLegacy
     public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException;
 
     public List<EPerson> findAll(Context context, MetadataField metadataFieldSort, String sortColumn) throws SQLException;
+
+    public List<EPerson> findAllSubscribers(Context context) throws SQLException;
+
+    int countRows(Context context) throws SQLException;
 }

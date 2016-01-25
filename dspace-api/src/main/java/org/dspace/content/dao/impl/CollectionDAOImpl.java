@@ -20,10 +20,12 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Collection object.
@@ -158,6 +160,19 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     }
 
+    @Override
+    public List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException {
+        return list(createQuery(context, "SELECT DISTINCT col FROM Subscription s join  s.collection col"));
+    }
 
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Collection"));
+    }
 
+    @Override
+    public List<Map> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException {
+        String q = "select col as collection, sum(bit.sizeBytes) as totalBytes from Item i join i.collections col join i.bundles bun join bun.bitstreams bit group by col";
+        return createQuery(context, q).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
+    }
 }

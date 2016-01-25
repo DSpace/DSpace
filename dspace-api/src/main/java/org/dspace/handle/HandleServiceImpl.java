@@ -399,4 +399,9 @@ public class HandleServiceImpl implements HandleService
 
         return handlePrefix + (handlePrefix.endsWith("/") ? "" : "/") + id;
     }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return handleDAO.countRows(context);
+    }
 }

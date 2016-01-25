@@ -670,4 +670,9 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     public Community findByLegacyId(Context context, int id) throws SQLException {
         return communityDAO.findByLegacyId(context, id, Community.class);
     }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return communityDAO.countRows(context);
+    }
 }

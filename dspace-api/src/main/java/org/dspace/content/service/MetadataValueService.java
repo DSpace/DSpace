@@ -91,4 +91,6 @@ public interface MetadataValueService {
      */
     public MetadataValue getMinimum(Context context, int metadataFieldId)
             throws SQLException;
+
+    int countTotal(Context context) throws SQLException;
 }

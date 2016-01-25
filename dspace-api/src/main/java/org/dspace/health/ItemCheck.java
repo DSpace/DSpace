@@ -8,24 +8,50 @@
 package org.dspace.health;
 
 
+import org.apache.commons.io.FileUtils;
+import org.dspace.app.util.CollectionDropDown;
+import org.dspace.content.*;
+import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
 import org.dspace.core.Context;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
+import org.dspace.workflowbasic.service.BasicWorkflowItemService;
 
 import java.sql.SQLException;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author LINDAT/CLARIN dev team
  */
 public class ItemCheck extends Check {
 
+    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    private BundleService bundleService =  ContentServiceFactory.getInstance().getBundleService();
+    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    private BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
+    private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+
+
     @Override
     public String run( ReportInfo ri ) {
         String ret = "";
         int tot_cnt = 0;
         Context context = new Context();
-        Core core = new Core(context);
         try {
-            for (Map.Entry<String, Integer> name_count : core.getCommunities()) {
+            for (Map.Entry<String, Integer> name_count : getCommunities(context)) {
                 ret += String.format("Community [%s]: %d\n",
                     name_count.getKey(), name_count.getValue());
                 tot_cnt += name_count.getValue();
@@ -36,7 +62,7 @@ public class ItemCheck extends Check {
 
         try {
             ret += "\nCollection sizes:\n";
-            ret += core.getCollectionSizesInfo();
+            ret += getCollectionSizesInfo(context);
         } catch (SQLException e) {
             error(e);
         }
@@ -45,32 +71,119 @@ public class ItemCheck extends Check {
             "\nPublished items (archived, not withdrawn): %d\n", tot_cnt);
         try {
             ret += String.format(
-                "Withdrawn items: %d\n", core.getWithdrawnItemsCount());
+                "Withdrawn items: %d\n", itemService.countWithdrawnItems(context));
             ret += String.format(
                 "Not published items (in workspace or workflow mode): %d\n",
-                core.getNotArchivedItemsCount());
+                itemService.getNotArchivedItemsCount(context));
 
-            for (Object[] row : core.getWorkspaceItemsRows()) {
+            for (Map row : workspaceItemService.getStageReachedCounts(context)) {
                 ret += String.format("\tIn Stage %s: %s\n",
-                    row[0],// "stage_reached"),
-                    row[1]// "cnt")
+                    row.get("stage_reached"),
+                    row.get("cnt")
                 );
             }
 
             ret += String.format(
                 "\tWaiting for approval (workflow items): %d\n",
-                core.getWorkflowItemsCount());
+                basicWorkflowItemService.countTotal(context));
 
         } catch (SQLException e) {
             error(e);
         }
 
         try {
-            ret += core.getObjectSizesInfo();
+            ret += getObjectSizesInfo(context);
             context.complete();
         } catch (SQLException e) {
             error(e);
         }
         return ret;
+    }
+
+
+    public  String getObjectSizesInfo(Context context) throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Count %-14s: %s\n", "Bitstream",
+                    String.valueOf(bitstreamService.countTotal(context))));
+        sb.append(String.format("Count %-14s: %s\n", "Bundle",
+                String.valueOf(bundleService.countTotal(context))));
+        sb.append(String.format("Count %-14s: %s\n", "Collection",
+                String.valueOf(collectionService.countTotal(context))));
+        sb.append(String.format("Count %-14s: %s\n", "Community",
+                String.valueOf(communityService.countTotal(context))));
+        sb.append(String.format("Count %-14s: %s\n", "MetadataValue",
+                String.valueOf(metadataValueService.countTotal(context))));
+        sb.append(String.format("Count %-14s: %s\n", "EPerson",
+                String.valueOf(ePersonService.countTotal(context))));
+        sb.append(String.format("Count %-14s: %s\n", "Item",
+                String.valueOf(itemService.countTotal(context))));
+        sb.append(String.format("Count %-14s: %s\n", "Handle",
+                String.valueOf(handleService.countTotal(context))));
+        sb.append(String.format("Count %-14s: %s\n", "Group",
+                String.valueOf(groupService.countTotal(context))));
+        sb.append(String.format("Count %-14s: %s\n", "BasicWorkflowItem",
+                String.valueOf(basicWorkflowItemService.countTotal(context))));
+        sb.append(String.format("Count %-14s: %s\n", "WorkspaceItem",
+                String.valueOf(workspaceItemService.countTotal(context))));
+        return sb.toString();
+    }
+
+    public  String getCollectionSizesInfo(Context context) throws SQLException {
+        final StringBuffer ret = new StringBuffer();
+        List<Map> colBitSizes = collectionService.getCollectionsWithBitstreamSizesTotal(context);
+        long total_size = 0;
+
+        Collections.sort(colBitSizes, new Comparator<Map>() {
+            @Override
+            public int compare(Map o1, Map o2) {
+                try {
+                    return CollectionDropDown.collectionPath((Collection) o1.get("collection")).compareTo(
+                            CollectionDropDown.collectionPath((Collection) o2.get("collection"))
+                    );
+                } catch (Exception e) {
+                    ret.append(e.getMessage());
+                }
+                return 0;
+            }
+        });
+        for (Map row : colBitSizes) {
+            Long size = (Long) row.get("totalBytes");
+            total_size += size;
+            Collection col = (Collection) row.get("collection");
+            ret.append(String.format(
+                    "\t%s:  %s\n", CollectionDropDown.collectionPath(col), FileUtils.byteCountToDisplaySize((long) size)));
+        }
+        ret.append(String.format(
+                "Total size:              %s\n", FileUtils.byteCountToDisplaySize(total_size)));
+
+        ret.append(String.format(
+                "Resource without policy: %d\n", bitstreamService.countBitstreamsWithoutPolicy(context)));
+
+        ret.append(String.format(
+                "Deleted bitstreams:      %d\n", bitstreamService.countDeletedBitstreams(context)));
+
+        String list_str = "";
+        List<Bitstream> bitstreamOrphans = bitstreamService.getNotReferencedBitstreams(context);
+        for (Bitstream orphan : bitstreamOrphans) {
+            UUID id = orphan.getID();
+            list_str += String.format("%d, ", id);
+        }
+        ret.append(String.format(
+                "Orphan bitstreams:       %d [%s]\n", bitstreamOrphans.size(), list_str));
+
+        return ret.toString();
+    }
+
+    public  List<Map.Entry<String, Integer>> getCommunities(Context context)
+            throws SQLException {
+
+        List<Map.Entry<String, Integer>> cl = new java.util.ArrayList<>();
+        List<Community> top_communities = communityService.findAllTop(context);
+        for (Community c : top_communities) {
+            cl.add(
+                    new java.util.AbstractMap.SimpleEntry<>(c.getName(), itemService.countItems(context, c))
+            );
+        }
+        return cl;
     }
 }

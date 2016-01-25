@@ -459,4 +459,10 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @return total items
      */
     public int countItems(Context context, Community community) throws SQLException;
+
+    int countTotal(Context context) throws SQLException;
+
+    int getNotArchivedItemsCount(Context context) throws SQLException;
+
+    int countWithdrawnItems(Context context) throws SQLException;
 }

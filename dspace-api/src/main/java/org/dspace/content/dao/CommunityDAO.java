@@ -36,4 +36,6 @@ public interface CommunityDAO extends DSpaceObjectLegacySupportDAO<Community> {
     public List<Community> findAuthorized(Context context, EPerson ePerson, List<Integer> actions) throws SQLException;
 
     public List<Community> findAuthorizedByGroup(Context context, EPerson currentUser, List<Integer> actions) throws SQLException;
+
+    int countRows(Context context) throws SQLException;
 }

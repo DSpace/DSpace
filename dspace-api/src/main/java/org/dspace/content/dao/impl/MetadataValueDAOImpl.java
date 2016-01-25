@@ -66,4 +66,9 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
         query.setMaxResults(1);
         return (MetadataValue) query.uniqueResult();
     }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM MetadataValue"));
+    }
 }
