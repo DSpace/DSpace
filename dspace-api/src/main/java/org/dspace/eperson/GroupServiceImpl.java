@@ -65,6 +65,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
+    protected GroupServiceImpl()
+    {
+        super();
+    }
 
     @Override
     public Group create(Context context) throws SQLException, AuthorizeException {
