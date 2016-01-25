@@ -34,7 +34,7 @@
                     <version>1.0.1</version>
                     <executions>
                       <execution>
-                        <id>validate-xmlui-xml</id>
+                        <id>validate-ALL-xmlui-xml-and-xsl</id>
                         <phase>test</phase>
                         <goals>
                           <goal>validate</goal>
@@ -43,10 +43,12 @@
                     </executions>
                     <configuration>
                       <validationSets>
+                        <!-- validate ALL XML and XSL files -->
                         <validationSet>
-                            <dir>${basedir}/i18n/</dir>
+                            <dir>${basedir}</dir>
                              <includes>
                                  <include>**/*.xml</include>
+                                 <include>**/*.xsl</include>
                              </includes>
                          </validationSet>
                        </validationSets>
