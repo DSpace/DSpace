@@ -246,6 +246,10 @@
        <stored-value>Article</stored-value>
      </pair>
      <pair>
+       <displayed-value>Theses</displayed-value>
+       <stored-value>Theses</stored-value>
+     </pair>
+     <pair>
        <displayed-value>Author's certificate</displayed-value>
        <stored-value>authors certificate</stored-value>
      </pair>
@@ -398,11 +402,11 @@
      <!-- <pair>
        <displayed-value>Italian</displayed-value>
        <stored-value>it</stored-value>
-     </pair> 
+     </pair>
      <pair>
        <displayed-value>Japanese</displayed-value>
        <stored-value>ja</stored-value>
-     </pair> 
+     </pair>
      <pair>
        <displayed-value>Chinese</displayed-value>
        <stored-value>zh</stored-value>
