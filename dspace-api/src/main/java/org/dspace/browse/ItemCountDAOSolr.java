@@ -57,32 +57,6 @@ public class ItemCountDAOSolr implements ItemCountDAO
     SearchService searcher = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(SearchService.class.getName(), SearchService.class);
     
     /**
-     * Throw an ItemCountException as caching is not supported by ItemCountDAOSolr.
-     * 
-     * @param collection
-     * @param count
-     * @throws ItemCountException
-     */
-    @Override
-    public void collectionCount(Collection collection, int count) throws ItemCountException
-    {
-        log.error("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
-    }
-
-    /**
-     * Throw an ItemCountException as caching is not supported by ItemCountDAOSolr.
-     * 
-     * @param community
-     * @param count
-     * @throws ItemCountException
-     */
-    @Override
-    public void communityCount(Community community, int count) throws ItemCountException
-    {
-        log.error("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
-    }
-
-    /**
      * Set the dspace context to use
      * 
      * @param context
@@ -126,17 +100,6 @@ public class ItemCountDAOSolr implements ItemCountDAO
     	{
             return 0;
     	}
-    }
-
-    /**
-     * remove the cache for the given container (does nothing in the Solr backend)
-     * 
-     * @param dso
-     * @throws ItemCountException
-     */
-    @Override
-    public void remove(DSpaceObject dso) throws ItemCountException
-    {
     }
     
     /**
