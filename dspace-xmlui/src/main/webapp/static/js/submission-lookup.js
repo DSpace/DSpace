@@ -6,18 +6,22 @@
  * http://www.dspace.org/license/
  */
 (function($) {
-    DSpace.getTemplate = function(name) {
-        if (DSpace.dev_mode || localStorage.getItem(name) === null) {
+   if (DSpace === undefined) DSpace= {};
+ DSpace.getTemplate = function(name) {
+        if (DSpace.dev_mode || DSpace.templates === undefined || DSpace.templates[name] === undefined) {
                 $.ajax({
                 url : DSpace.theme_path + 'templates/' + name + '.hbs',
                 success : function(data) {
-                    localStorage.setItem(name, Handlebars.compile(data));
+                    if (DSpace.templates === undefined) {
+                        DSpace.templates = {};
+                    }
+                    DSpace.templates[name] = Handlebars.compile(data);
                 },
                 dataType :'text',
                 async : false
             });
         }
-        return localStorage.getItem(name);
+        return DSpace.templates[name];
     };
     var publication_records_template = DSpace.getTemplate('publication_records');
 
