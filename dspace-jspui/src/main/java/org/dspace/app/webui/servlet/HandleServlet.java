@@ -811,21 +811,10 @@ public class HandleServlet extends DSpaceServlet
     {
         // Find all the "parent" communities for the community
         List<Community> parents = communityService.getAllParents(context, c);
-
-        // put into an array in reverse order
-        List<Community> reversedParents = new ArrayList<>();
-        int index = parents.size() - 1;
-
-        for (int i = 0; i < parents.size(); i++)
-        {
-            reversedParents.add(parents.get(index - i));
-        }
-
         if (include)
         {
-            reversedParents.add(0, c);
+            parents.add(c);
         }
-
-        return reversedParents;
+        return parents;
     }
 }
