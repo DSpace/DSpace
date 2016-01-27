@@ -43,5 +43,5 @@ public interface CollectionDAO extends DSpaceObjectLegacySupportDAO<Collection> 
 
     int countRows(Context context) throws SQLException;
 
-    List<Map> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
+    List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
 }

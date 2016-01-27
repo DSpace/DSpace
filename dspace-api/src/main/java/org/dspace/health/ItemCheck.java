@@ -76,10 +76,10 @@ public class ItemCheck extends Check {
                 "Not published items (in workspace or workflow mode): %d\n",
                 itemService.getNotArchivedItemsCount(context));
 
-            for (Map row : workspaceItemService.getStageReachedCounts(context)) {
+            for (Map.Entry<Integer, Long> row : workspaceItemService.getStageReachedCounts(context)) {
                 ret += String.format("\tIn Stage %s: %s\n",
-                    row.get("stage_reached"),
-                    row.get("cnt")
+                    row.getKey(), //"stage_reached"
+                    row.getValue() //"cnt"
                 );
             }
 
@@ -130,15 +130,15 @@ public class ItemCheck extends Check {
 
     public  String getCollectionSizesInfo(Context context) throws SQLException {
         final StringBuffer ret = new StringBuffer();
-        List<Map> colBitSizes = collectionService.getCollectionsWithBitstreamSizesTotal(context);
+        List<Map.Entry<Collection, Long>> colBitSizes = collectionService.getCollectionsWithBitstreamSizesTotal(context);
         long total_size = 0;
 
-        Collections.sort(colBitSizes, new Comparator<Map>() {
+        Collections.sort(colBitSizes, new Comparator<Map.Entry<Collection, Long>>() {
             @Override
-            public int compare(Map o1, Map o2) {
+            public int compare(Map.Entry<Collection, Long> o1, Map.Entry<Collection, Long> o2) {
                 try {
-                    return CollectionDropDown.collectionPath((Collection) o1.get("collection")).compareTo(
-                            CollectionDropDown.collectionPath((Collection) o2.get("collection"))
+                    return CollectionDropDown.collectionPath(o1.getKey()).compareTo(
+                            CollectionDropDown.collectionPath(o2.getKey())
                     );
                 } catch (Exception e) {
                     ret.append(e.getMessage());
@@ -146,10 +146,10 @@ public class ItemCheck extends Check {
                 return 0;
             }
         });
-        for (Map row : colBitSizes) {
-            Long size = (Long) row.get("totalBytes");
+        for (Map.Entry<Collection, Long> row : colBitSizes) {
+            Long size = row.getValue();
             total_size += size;
-            Collection col = (Collection) row.get("collection");
+            Collection col = row.getKey();
             ret.append(String.format(
                     "\t%s:  %s\n", CollectionDropDown.collectionPath(col), FileUtils.byteCountToDisplaySize((long) size)));
         }

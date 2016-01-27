@@ -41,5 +41,5 @@ public interface WorkspaceItemDAO extends GenericDAO<WorkspaceItem> {
 
     int countRows(Context context) throws SQLException;
 
-    List<Map> getStageReachedCounts(Context context) throws SQLException;
+    List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException;
 }

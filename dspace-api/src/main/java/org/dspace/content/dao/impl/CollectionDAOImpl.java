@@ -20,7 +20,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.Transformers;
+import org.hibernate.transform.BasicTransformerAdapter;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -171,8 +171,16 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
     }
 
     @Override
-    public List<Map> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException {
+    @SuppressWarnings("unchecked")
+    public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException {
         String q = "select col as collection, sum(bit.sizeBytes) as totalBytes from Item i join i.collections col join i.bundles bun join bun.bitstreams bit group by col";
-        return createQuery(context, q).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
+        Query query = createQuery(context, q);
+        query.setResultTransformer(new BasicTransformerAdapter() {
+            @Override
+            public Object transformTuple(Object[] tuple, String[] aliases) {
+                return new java.util.AbstractMap.SimpleImmutableEntry<>((Collection)tuple[0], (Long)tuple[1]);
+            }
+        });
+        return ((List<Map.Entry<Collection, Long>>)query.list());
     }
 }

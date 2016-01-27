@@ -18,7 +18,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.Transformers;
+import org.hibernate.transform.BasicTransformerAdapter;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -90,10 +90,17 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     }
 
     @Override
-    public List<Map> getStageReachedCounts(Context context) throws SQLException {
-        return createQuery(context,"SELECT wi.stageReached as stage_reached, count(*) as cnt from WorkspaceItem wi" +
-                " group by wi.stageReached order by wi.stageReached").setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
-                .list();
+    @SuppressWarnings("unchecked")
+    public List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException {
+        Query query = createQuery(context,"SELECT wi.stageReached as stage_reached, count(*) as cnt from WorkspaceItem wi" +
+                " group by wi.stageReached order by wi.stageReached");
+        query.setResultTransformer(new BasicTransformerAdapter() {
+            @Override
+            public Object transformTuple(Object[] tuple, String[] aliases) {
+                return new java.util.AbstractMap.SimpleImmutableEntry((Integer) tuple[0], (Long) tuple[1]);
+            }
+        });
+        return (List<Map.Entry<Integer, Long>>)query.list();
     }
 
 }

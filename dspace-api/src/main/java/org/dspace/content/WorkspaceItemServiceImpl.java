@@ -223,7 +223,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
-    public List<Map> getStageReachedCounts(Context context) throws SQLException {
+    public List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException {
         return workspaceItemDAO.getStageReachedCounts(context);
     }
 

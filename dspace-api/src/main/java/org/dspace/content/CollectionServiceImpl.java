@@ -843,7 +843,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public List<Map> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException {
+    public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException {
         return collectionDAO.getCollectionsWithBitstreamSizesTotal(context);
     }
 }

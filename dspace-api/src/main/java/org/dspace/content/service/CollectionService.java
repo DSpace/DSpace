@@ -302,5 +302,11 @@ public interface CollectionService extends DSpaceObjectService<Collection>, DSpa
 
     int countTotal(Context context) throws SQLException;
 
-    List<Map> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
+    /**
+     * The map entry returned contains a collection as a key and sum of bitstream sizes in bytes as a value
+     * @param context
+     * @return
+     * @throws SQLException
+     */
+    List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
 }
