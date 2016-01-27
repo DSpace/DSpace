@@ -46,17 +46,20 @@ public class EmbargoCheck extends Check {
                 try {
                     date = embargoService.getEmbargoTermsAsDate(context, item);
                 } catch (Exception e) {
+                    error(e);
                 }
                 ret += String.format("%s embargoed till [%s]\n", handle,
                         date != null ? date.toString() : "null");
             }
             context.complete();
         } catch (SQLException e) {
+            error(e);
             try {
                 if ( null != context ) {
                     context.abort();
                 }
             } catch (Exception e1) {
+                error(e);
             }
         }
 
