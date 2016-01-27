@@ -1482,3 +1482,34 @@ ol.ds-ordered-list ol.ds-ordered-list {
 ol.ds-ordered-list ol.ds-ordered-list ol.ds-ordered-list {
     list-style-type: lower-roman;
 }
+.publication-records-modal, .publication-records-modal ul {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+.publication-records-import-btn {
+    margin: 5px 0px 15px 0px;
+}
+
+.imported {
+    background-color: #E2E2E2;
+}
+
+
+#aspect_submission_StepTransformer_div_StartSubmissionLookupStep #aspect_submission_StepTransformer_field_search {
+    width: 81%;
+    display: inline;
+}
+
+#aspect_submission_StepTransformer_div_StartSubmissionLookupStep #aspect_submission_StepTransformer_field_lookup {
+    width:19%
+}
+
+#aspect_submission_StepTransformer_div_StartSubmissionLookupStep .modal .modal-body {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+#aspect_submission_StepTransformer_div_StartSubmissionLookupStep #aspect_submission_StepTransformer_item_publication-title{
+    margin-bottom:5px;
+}

@@ -197,7 +197,16 @@
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
 	    <workflow-editable>true</workflow-editable>
 	  </step> -->
-      
+
+       <!-- Find publications based on ID/DOI/Title/Author to pre-fill the submission
+       <step>
+           <heading>submit.progressbar.lookup</heading>
+           <processing-class>org.dspace.submit.step.XMLUIStartSubmissionLookupStep</processing-class>
+           <jspui-binding>org.dspace.app.webui.submit.step.JSPStartSubmissionLookupStep</jspui-binding>
+           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.StartSubmissionLookupStep</xmlui-binding>
+           <workflow-editable>true</workflow-editable>
+       </step>
+        -->
       <!--Step 2 will be to Describe the item.-->
       <step>
         <heading>submit.progressbar.describe</heading>

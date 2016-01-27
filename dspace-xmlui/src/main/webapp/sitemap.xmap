@@ -445,6 +445,9 @@
                         <map:match pattern="JSON/controlled-vocabulary">
                             <map:read type="JSONControlledVocabularyReader"/>
                         </map:match>
+            <map:match pattern="json/submissionLookup">
+                <map:mount check-reload="no" src="aspects/json-lookup.xmap" uri-prefix="json/"/>
+            </map:match>
                 </map:pipeline>
 
                 <!-- new AJAX menu (choices) responses for metadata authority control -->
