@@ -127,17 +127,6 @@
                 <module>oai</module>
             </modules>
         </profile>
-	<profile>
-	    <id>dspace-remote-handle-resolver</id>
-	    <activation>
-	        <file>
-	            <exists>remote-handle-resolver/pom.xml</exists>
-	        </file>
-	    </activation>
-	    <modules>
-	        <module>remote-handle-resolver</module>
-	    </modules>
-	</profile>
 
         <profile>
             <!--Activates mirage2 on the presence of the property mirage2.on with any value e.g. mvn clean package -Dmirage2.on=on
