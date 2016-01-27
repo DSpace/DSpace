@@ -80,7 +80,9 @@
         <aspect name="Administration" path="resource://aspects/Administrative/" />
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
         <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
-        <aspect name="ScienceDirect" path="resource://aspects/ScienceDirect/" />
+
+        <!-- To enable the ScienceDirect liveimport, uncomment the following line -->
+        <!--<aspect name="ScienceDirect" path="resource://aspects/ScienceDirect/" />-->
 
         <!-- ========================
              Usage Statistics Engines

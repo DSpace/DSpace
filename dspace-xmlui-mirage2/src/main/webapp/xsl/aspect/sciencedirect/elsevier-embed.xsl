@@ -49,7 +49,7 @@
                 </xsl:choose>
             </xsl:attribute>
             <xsl:attribute name="src">
-                <xsl:text>//api.elsevier.com/content/article/pii/</xsl:text>
+                <xsl:value-of select="confman:getProperty('elsevier-sciencedirect', 'api.pii.url')"/>
                 <xsl:value-of select="descendant::dri:field[@n='pii']/dri:value"/>
                 <xsl:text>?httpAccept=application/pdf&amp;apiKey=</xsl:text>
                 <xsl:value-of select="confman:getProperty('elsevier-sciencedirect', 'api.key')"/>
