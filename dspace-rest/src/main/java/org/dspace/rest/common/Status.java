@@ -8,7 +8,6 @@
 package org.dspace.rest.common;
 
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -25,6 +24,7 @@ public class Status
     private boolean authenticated;
     private String email;
     private String fullname;
+    private String specialGroups;
 
     public String getToken() {
         return token;
@@ -101,5 +101,15 @@ public class Status
     @JsonProperty("fullname")
     public void setFullname(String fullname) {
         this.fullname = fullname;
+    }
+
+    @JsonProperty("specialGroups")
+    public String getSpecialGroups() {
+        return specialGroups;
+    }
+
+    @JsonProperty("specialGroups")
+    public void setSpecialGroups(String specialGroups) {
+        this.specialGroups = specialGroups;
     }
 }

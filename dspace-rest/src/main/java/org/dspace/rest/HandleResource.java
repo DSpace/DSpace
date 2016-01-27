@@ -21,7 +21,9 @@ import org.dspace.rest.common.DSpaceObject;
 import org.dspace.rest.common.Item;
 import org.dspace.rest.exceptions.ContextException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -44,12 +46,13 @@ public class HandleResource extends Resource {
     @GET
     @Path("/{prefix}/{suffix}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.DSpaceObject getObject(@PathParam("prefix") String prefix, @PathParam("suffix") String suffix, @QueryParam("expand") String expand, @javax.ws.rs.core.Context HttpHeaders headers) {
+    public org.dspace.rest.common.DSpaceObject getObject(@PathParam("prefix") String prefix, @PathParam("suffix") String suffix, @QueryParam("expand") String expand, 
+    		@javax.ws.rs.core.Context HttpHeaders headers, @Context HttpServletRequest request) {
         DSpaceObject dSpaceObject = new DSpaceObject();
         org.dspace.core.Context context = null;
 
         try {
-            context = createContext(getUser(headers));
+            context = createContext(getUser(headers), request);
 
             org.dspace.content.DSpaceObject dso = handleService.resolveToObject(context, prefix + "/" + suffix);
 

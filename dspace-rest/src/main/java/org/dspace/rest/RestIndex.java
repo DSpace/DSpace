@@ -7,11 +7,15 @@
  */
 package org.dspace.rest;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -23,7 +27,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.ShibAuthentication;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.rest.common.Status;
@@ -183,6 +192,46 @@ public class RestIndex {
     }
 
     /**
+     * Method to login a user into REST API.
+     * 
+     * @param user
+     *            User which will be logged in to REST API.
+     * @return Returns response code OK and a token. Otherwise returns response
+     *         code FORBIDDEN(403).
+     */
+    @GET
+    @Path("/login-shibboleth")
+    @Produces(MediaType.TEXT_HTML)
+    public String loginShibboleth(@Context HttpHeaders headers, @Context HttpServletRequest request, @Context HttpServletResponse response)
+    {
+    	String path ="...";
+        org.dspace.core.Context context = null;
+    	try {
+        	context = Resource.createContext(Resource.getUser(headers), request);
+        	AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+        	Iterator<AuthenticationMethod> methodIt = authenticationService.authenticationMethodIterator();
+        	while(methodIt.hasNext()) {
+        		AuthenticationMethod method = methodIt.next();
+        		if (method instanceof ShibAuthentication) {
+        			path = method.loginPageURL(context, request, response);
+        			if (path != null) {
+        				response.sendRedirect(path);
+        			}
+        		}
+        	}    		
+        } catch (ContextException e) {
+            Resource.processException("Error creating context: " + e.getMessage(), context);
+        } catch (SQLException e) {
+            Resource.processException("Error creating context: " + e.getMessage(), context);
+        } catch (IOException e) {
+            Resource.processException("Error creating context: " + e.getMessage(), context);
+		} finally {
+            context.abort();
+        }
+        return "<html><body>" + path + "</body></html>";
+    }
+
+    /**
      * Method to logout a user from DSpace REST API. Removes the token and user from
      * TokenHolder.
      * 
@@ -231,20 +280,29 @@ public class RestIndex {
     @GET
     @Path("/status")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Status status(@Context HttpHeaders headers) throws UnsupportedEncodingException {
+    public Status status(@Context HttpHeaders headers, @Context HttpServletRequest request) throws UnsupportedEncodingException {
         org.dspace.core.Context context = null;
 
+        Status status = new Status();
         try {
-            context = Resource.createContext(Resource.getUser(headers));
+            context = Resource.createContext(Resource.getUser(headers), request);
             EPerson ePerson = context.getCurrentUser();
 
             if(ePerson != null) {
                 //DB EPerson needed since token won't have full info, need context
                 EPerson dbEPerson = epersonService.findByEmail(context, ePerson.getEmail());
                 String token = Resource.getToken(headers);
-                Status status = new Status(dbEPerson.getEmail(), dbEPerson.getFullName(), token);
-                return status;
-            }
+                status = new Status(dbEPerson.getEmail(), dbEPerson.getFullName(), token);
+            } 
+
+        	StringBuilder groupslist = new StringBuilder();
+        	for(Group group: context.getSpecialGroups()) {
+        		if (groupslist.length() > 0) {
+        			groupslist.append(",");
+        		}
+        		groupslist.append(group.getName());
+        	}
+        	status.setSpecialGroups(groupslist.toString());
 
         } catch (ContextException e)
         {
@@ -256,8 +314,13 @@ public class RestIndex {
         }
 
         //fallback status, unauth
-        return new Status();
+        return status;
     }
 
-
+    @GET
+    @Path("/shibboleth-login")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Status confirmShibbolethLogin(@Context HttpHeaders headers, @Context HttpServletRequest request) throws UnsupportedEncodingException {
+        return status(headers, request);
+    }
 }
