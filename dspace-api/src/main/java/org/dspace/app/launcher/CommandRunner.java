@@ -84,7 +84,7 @@ public class CommandRunner {
 
         int status = 0;
         List<String> tokens = new ArrayList<String>();
-        Document commandConfigs = ScriptLauncher.getConfig();
+        List<CommandType> commandConfigs = ScriptLauncher.getConfig();
         while (StreamTokenizer.TT_EOF != tokenizer.nextToken()) {
             if (StreamTokenizer.TT_EOL == tokenizer.ttype) {
                 if (tokens.size() > 0) {

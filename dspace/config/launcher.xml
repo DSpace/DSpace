@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<commands>
+<commands xmlns="http://dspace.org/launcher" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dspace.org/launcher launcher.xsd">
     <command>
         <name>bitstore-migrate</name>
         <description>Assetstore migration tool</description>

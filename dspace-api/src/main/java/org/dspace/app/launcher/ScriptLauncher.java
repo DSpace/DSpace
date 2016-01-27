@@ -7,15 +7,23 @@
  */
 package org.dspace.app.launcher;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
+import org.dspace.utils.DSpace;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -46,12 +54,16 @@ public class ScriptLauncher {
      */
     public static void main(String[] args)
         throws FileNotFoundException, IOException {
+        // Check that there is at least one argument
+
         // Initialise the service manager kernel
         try {
             kernelImpl = DSpaceKernelInit.getKernel(null);
+
             if (!kernelImpl.isRunning()) {
                 kernelImpl.start();
             }
+
         } catch (Exception e) {
             // Failed to start so destroy it and log and throw an exception
             try {
@@ -66,7 +78,7 @@ public class ScriptLauncher {
         }
 
         // Load up the ScriptLauncher's configuration
-        Document commandConfigs = getConfig();
+        List<CommandType> commandConfigs = getConfig();
 
         // Check that there is at least one argument (if not display command options)
         if (args.length < 1) {
@@ -94,17 +106,16 @@ public class ScriptLauncher {
 
     /**
      * Recognize and execute a single command.
-     *
-     * @param commandConfigs  Document
-     * @param args the command line arguments given
+     * @param commandConfigs
+     * @param args
      */
-    public static int runOneCommand(Document commandConfigs, String[] args, DSpaceKernelImpl kernelImpl) {
+    public static int runOneCommand(List<CommandType> commandConfigs, String[] args, DSpaceKernelImpl kernelImpl) {
         String request = args[0];
-        Element root = commandConfigs.getRootElement();
-        List<Element> commands = root.getChildren("command");
-        Element command = null;
-        for (Element candidate : commands) {
-            if (request.equalsIgnoreCase(candidate.getChild("name").getValue())) {
+
+        List<CommandType> commands = commandConfigs;
+        CommandType command = null;
+        for (CommandType candidate : commands) {
+            if (request.equalsIgnoreCase(candidate.getName())) {
                 command = candidate;
                 break;
             }
@@ -118,8 +129,8 @@ public class ScriptLauncher {
         }
 
         // Run each step
-        List<Element> steps = command.getChildren("step");
-        for (Element step : steps) {
+        List<StepType> steps = command.getStep();
+        for (StepType step : steps) {
             // Instantiate the class
             Class target = null;
 
@@ -132,7 +143,7 @@ public class ScriptLauncher {
                 }
                 className = args[1];
             } else {
-                className = step.getChild("class").getValue();
+                className = step.getClassName();
             }
             try {
                 target = Class.forName(className,
@@ -148,8 +159,7 @@ public class ScriptLauncher {
             String[] useargs = args.clone();
             Class[] argTypes = {useargs.getClass()};
             boolean passargs = true;
-            if ((step.getAttribute("passuserargs") != null) &&
-                ("false".equalsIgnoreCase(step.getAttribute("passuserargs").getValue()))) {
+            if ((StringUtils.equals("false",step.getPassuserargs()))) {
                 passargs = false;
             }
             if ((args.length == 1) || (("dsrun".equals(request)) && (args.length == 2)) || (!passargs)) {
@@ -169,12 +179,12 @@ public class ScriptLauncher {
             }
 
             // Add any extra properties
-            List<Element> bits = step.getChildren("argument");
-            if (step.getChild("argument") != null) {
+            List<String> bits = step.getArgument();
+            if (bits != null) {
                 String[] argsnew = new String[useargs.length + bits.size()];
                 int i = 0;
-                for (Element arg : bits) {
-                    argsnew[i++] = arg.getValue();
+                for (String arg : bits) {
+                    argsnew[i++] = arg;
                 }
                 for (; i < bits.size() + useargs.length; i++) {
                     argsnew[i] = useargs[i - bits.size()];
@@ -232,26 +242,35 @@ public class ScriptLauncher {
      *
      * @return The XML configuration file Document
      */
-    protected static Document getConfig() {
+    protected static List<CommandType> getConfig() {
         return getConfig(kernelImpl);
     }
 
-    public static Document getConfig(DSpaceKernelImpl kernelImpl) {
+    public static List<CommandType> getConfig(DSpaceKernelImpl kernelImpl) {
         // Load the launcher configuration file
         String config = kernelImpl.getConfigurationService().getProperty("dspace.dir") +
             System.getProperty("file.separator") + "config" +
             System.getProperty("file.separator") + "launcher.xml";
-        SAXBuilder saxBuilder = new SAXBuilder();
         Document doc = null;
-        try {
-            doc = saxBuilder.build(config);
-        } catch (Exception e) {
+        try
+        {
+            JAXBContext jaxbContext = JAXBContext.newInstance(CommandsType.class.getPackage().getName());
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            CommandsType commands = ((JAXBElement<CommandsType>)unmarshaller.unmarshal(new File(config))).getValue();
+            List<CommandType> composite=new LinkedList<>();
+            composite.addAll(new DSpace().getServiceManager().getServicesByType(CommandType.class));
+            composite.addAll(commands.getCommand());
+            return composite;
+
+        }
+        catch (Exception e)
+        {
             System.err.println("Unable to load the launcher configuration file: [dspace]/config/launcher.xml");
             System.err.println(e.getMessage());
             e.printStackTrace();
             System.exit(1);
         }
-        return doc;
+        return new LinkedList<>();
     }
 
     /**
@@ -259,23 +278,23 @@ public class ScriptLauncher {
      *
      * @param commandConfigs configs as Document
      */
-    private static void display(Document commandConfigs) {
+    private static void display(List<CommandType>  commandConfigs) {
         // List all command elements
-        List<Element> commands = commandConfigs.getRootElement().getChildren("command");
+        List<CommandType> commands = commandConfigs;
 
         // Sort the commands by name.
         // We cannot just use commands.sort() because it tries to remove and
         // reinsert Elements within other Elements, and that doesn't work.
-        TreeMap<String, Element> sortedCommands = new TreeMap<>();
-        for (Element command : commands) {
-            sortedCommands.put(command.getChild("name").getValue(), command);
+        TreeMap<String, CommandType> sortedCommands = new TreeMap<>();
+        for (CommandType command : commands) {
+            sortedCommands.put(command.getName(), command);
         }
 
         // Display the sorted list
         System.out.println("Usage: dspace [command-name] {parameters}");
-        for (Element command : sortedCommands.values()) {
-            System.out.println(" - " + command.getChild("name").getValue() +
-                                   ": " + command.getChild("description").getValue());
+        for (CommandType command : sortedCommands.values()) {
+            System.out.println(" - " + command.getName() +
+                                   ": " + command.getDescription());
         }
     }
 }

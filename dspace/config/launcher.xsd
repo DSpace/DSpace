@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dspace.org/launcher">
+  <xs:element name="commands" type="commandsType"/>
+  <xs:complexType name="commandType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="name"/>
+      <xs:element type="xs:string" name="description"/>
+      <xs:element type="stepType" name="step" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="stepType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="class" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="xs:string" name="argument" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="passuserargs" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="commandsType">
+    <xs:sequence>
+      <xs:element type="commandType" name="command" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
