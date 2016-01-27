@@ -670,6 +670,18 @@
             <version>1</version>
             <type>jar</type>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-impl</artifactId>
+            <version>1.2.14</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-api</artifactId>
+            <version>1.2.14</version>
+        </dependency>
         <!-- S3 -->
         <dependency>
             <groupId>com.amazonaws</groupId>
