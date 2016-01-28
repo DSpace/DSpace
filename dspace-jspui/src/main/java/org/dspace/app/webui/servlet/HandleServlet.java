@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -811,6 +812,7 @@ public class HandleServlet extends DSpaceServlet
     {
         // Find all the "parent" communities for the community
         List<Community> parents = communityService.getAllParents(context, c);
+        parents = Lists.reverse(parents);
         if (include)
         {
             parents.add(c);
