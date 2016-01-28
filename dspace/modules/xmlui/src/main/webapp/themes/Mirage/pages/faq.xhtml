@@ -25,7 +25,7 @@
 	  <li><a href="#human-subjects">My research is on human subjects. Can I archive my data in Dryad?</a></li>
       <li><a href="#depositing-submission-formats">In what file format(s) should I submit my data?</a></li>
       <li><a href="#depositing-when-to-deposit">When should I submit my data?</a></li>
-      <li><a href="#depositing-how-modify">How can I modify files I have submitted to Dryad while my article is in review?</a></li>
+      <li><a href="#depositing-how-modify">How can I modify files I have submitted, or add more files to my existing Dryad submission?</a></li>
       <li><a href="#depositing-before-submission">What should I prepare before submission?</a></li>
       <li><a href="#depositing-accessibility-reusability">How can I make my data submission as accessible and reusable as possible?</a></li>
       <li><a href="#depositing-howto-submit">How do I submit data?</a></li>
@@ -146,12 +146,13 @@ Due to the diversity of datatypes hosted by the repository, Dryad does not requi
 </ul>
 <p><center><img src="/themes/Mirage/images/faq_graphic.png" width="579" height="703" alt="Dryad Submission Process"/></center></p>
 
-<h2 id="depositing-how-modify">How can I modify files I have submitted to Dryad while my article is in review?</h2>
 
-<p>
-Some integrated journals enable their authors to make data privately available to editors and reviewers during the article review process. (<a href="/pages/journalLookup">Look up your journal</a> to determine whether it uses data review). Dryad does not allow files to be deleted while an article is under review. We only allow additions during this time. This restriction ensures that all reviewers see the files that were originally submitted. 
-</p>
-<p>Do not create multiple Dryad submissions associated with the same publication, as this causes confusion for both reviewers and Dryad curators, who may not know which version is most recent/correct.</p>
+<h2 id="depositing-how-modify">How can I modify files I have submitted, or add more files to my existing Dryad submission?</h2>
+
+<p>This depends on the current workflow stage of your submission (see below). Please do not create multiple Dryad submissions associated with the same publication.</p>
+
+<h3>In review</h3>
+<p>Some integrated journals enable their authors to make data privately available to editors and reviewers during the article review process. (<a href="/pages/journalLookup">Look up your journal</a> to determine whether it uses data review). Dryad does not allow files to be deleted while an article is under review. We only allow additions during this time. This restriction ensures that all reviewers see the files that were originally submitted. </p>
 <p>To add new or corrected files:</p>
 <ul>
   <li>Log into your Dryad account and click on the "My Submissions" link in the menu</li>
@@ -159,13 +160,21 @@ Some integrated journals enable their authors to make data privately available t
   <li>After you have finished adding data files, please send an email to <a href="mailto:help@datadryad.org">help@datadryad.org</a> (including your Dryad DOI) to indicate which files should be retained during the final curation process.</li>
   <li>If/when your article has been accepted for publication, Dryad curators will remove any files that you have indicated are duplicate or superseded.</li>
 </ul>
-<p>If/when your publication is accepted, your Dryad submission will automatically move out of review and into our queue for curation and archiving, and will no longer be accessible for modification.
-</p>
+<p>If/when your publication is accepted, your Dryad submission will automatically move out of review and into our queue for curation and archiving, and will no longer be accessible for modification.</p>
+
+
+<h3>Approved, pending article publication</h3>
+<p>You may have received a message from Dryad that your data package was approved, but will not be available in the repository until the associated article is published. Modifying data packages during this stage requires curator assistance. Please send an email to <a href="mailto:help@datadryad.org">help@datadryad.org</a> including your Dryad DOI and detailing the changes needed.</p>
+
+
+<h3>Archived/publicly available</h3>
+<p>If any substantive changes to data packages are needed <em>after</em> archiving, a new <strong>version</strong> of the package must be created by Dryad curators. See Dryad's <a href="/pages/policies#versioning">versioning policy</a>. Please send an email to <a href="mailto:help@datadryad.org">help@datadryad.org</a> including your Dryad DOI and detailing the changes needed.</p>
+ 
 
 <h2 id="depositing-before-submission">What should I prepare before submission?</h2>
 
 <p>
-Providing well-documented data in a community-accepted format is in the interest of the submitter since it encourages others to reuse and thus cite the original work. It is the shared responsibility of the submitter, the editors, and the reviewers to ensure the data are provided according to community standards. In some cases, journals provide explicit guidelines in their instructions to authors. In the absence of such guidance, the <a href="http://biosharing.org/standards/exchange_format">BioSharing registry</a> may be helpful in identifying applicable data exchange formats where they exist.
+Providing well-documented data in a community-accepted format is in the interest of the submitter since it encourages others to reuse and thus cite the original work. It is the shared responsibility of the submitter, the editors, and the reviewers to ensure the data are provided according to community standards. In some cases, journals provide explicit guidelines in their instructions to authors. In the absence of such guidance, the <a href="http://biosharing.org/standards">BioSharing registry</a> may be helpful in identifying applicable data exchange formats where they exist.
 </p>
 
 <p>
@@ -194,6 +203,7 @@ All <strong>human subject data</strong> must be properly anonymized and prepared
 
 <h2 id="depositing-accessibility-reusability">How can I make my data submission as accessible and reusable as possible?</h2>
 <ul>
+	<li>Provide ALL files needed to replicate your results, including code. One way to help ensure completeness is to explicitly link your data files (through their titles/descriptions) to the figures and analyses in your publication.</li>
     <li>Submit your data files in non-proprietary formats from which data can be easily extracted (e.g., CSV rather than PDF).</li>
 	<li>Keep your file names short, informative, unique, and free of special characters.</li>
     <li>Consider submitting your data files in multiple formats if you think that will enhance their ability to be reanalyzed. View <a href="/pages/filetypes">additional guidance</a> and a list preferred Dryad file formats.</li>
@@ -278,11 +288,13 @@ You will receive an email confirmation and receipt when your card is charged.
 
 <h2 id="depositing-after-deposit">What happens to data after it is submitted?</h2>
 
-<p>
-Dryad performs basic checks on each submission (can the files be opened? are they free of viruses? are they free of copyright restrictions? do they appear to be free of sensitive data?). The completeness and correctness of the metadata (e.g. information about the associated publication, the date on which any embargo is to be lifted, indexing keywords) are checked and the DOI is officially registered.</p>
-<p>The data packages are discoverable and backed up for long-term preservation within the <a href="https://www.dataone.org/" target="_blank">DataONE</a> network. The information content of the original file is never intentionally modified or processed, but copies may be made in different file formats to facilitate preservation.</p>
-<p>The data package is publicly released once the online version of the associated publication is available (unless an alternative release option has been selected), and the metadata are shared with indexing services to promote discoverability.
-</p>
+<p>Dryad performs basic checks on each submission (can the files be opened? are they free of viruses? are they free of copyright restrictions? do they appear to be free of sensitive data?). The completeness and correctness of the metadata (e.g. information about the associated publication, the date on which any embargo is to be lifted, indexing keywords) are checked and the DOI is officially registered.</p>
+
+<p>The data package is publicly released once the online version of the associated publication is available (unless an alternative release option has been selected). Since paper titles, abstracts, authors etc. often change during the publication process, Dryad confirms and updates this information against the accepted/published article.</p>
+
+<p>Dryad metadata are shared with indexing services to promote discoverability. Data packages are accessible and backed up for long-term preservation within the <a href="http://www.dataone.org/" target="_blank">DataONE</a> network. The information content of the original file is never intentionally modified or processed, but copies may be made in different file formats to facilitate preservation.</p>
+
+<p>If substantive changes to data packages are needed after archiving, a new <strong>version</strong> of the package must be created (with curator assistance). Read Dryad's <a href="/pages/policies#versioning">versioning policy</a>. Please contact <a href="mailto:help@datadryad.org">help@datadryad.org</a> if you need to correct or update a data package that is already publicly available.</p>
 
 <h2 id="depositing-datapackage-stats">Can I see how often my data package is being viewed and downloaded?</h2>
 <p>
