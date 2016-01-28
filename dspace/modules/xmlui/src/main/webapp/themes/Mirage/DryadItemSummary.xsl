@@ -1952,7 +1952,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/gms_ejournal.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="German Medical Science cover"/>
                 </a>
             </xsl:when>
@@ -1970,7 +1970,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSMIBEcover.gif"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="Cover of GMS Medizinische Informatik, Biometrie und Epidemiologie"/>
                 </a>
             </xsl:when>
@@ -1988,7 +1988,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_gpras.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS German Plastic, Reconstructive and Aesthetic Surgery cover"/>
                 </a>
             </xsl:when>
@@ -2006,7 +2006,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_id.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS Infectious Diseases cover"/>
                 </a>
             </xsl:when>
@@ -2024,7 +2024,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_iprs_klein.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS Interdisciplinary Plastic and Reconstructive Surgery DGPW cover"/>
                 </a>
             </xsl:when>
@@ -2042,7 +2042,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_dgho.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS Onkologische Rehabilitation und Sozialmedizin cover"/>
                 </a>
             </xsl:when>
@@ -2060,7 +2060,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_gma_klein.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS Zeitschrift für Medizinische Ausbildung cover"/>
                 </a>
             </xsl:when>
@@ -2078,7 +2078,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_lab.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS Zeitschrift zur Förderung der Qualitätssicherung in medizinischen Laboratorien cover"/>
                 </a>
             </xsl:when>
