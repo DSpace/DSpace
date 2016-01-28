@@ -67,12 +67,14 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 EPerson currentUser = context.getCurrentUser();
                 if(currentUser != null){
                     resourceQuery.append(" OR e").append(currentUser.getID());
-                    //Retrieve all the groups the current user is a member of !
-                    Set<Integer> groupIds = Group.allMemberGroupIDs(context, currentUser);
-                    for (Integer groupId : groupIds) {
-                        resourceQuery.append(" OR g").append(groupId);
-                    }
                 }
+
+                //Retrieve all the groups the current user is a member of !
+                Set<Integer> groupIds = Group.allMemberGroupIDs(context, currentUser);
+                for (Integer groupId : groupIds) {
+                    resourceQuery.append(" OR g").append(groupId);
+                }
+
                 resourceQuery.append(")");
                 
                 solrQuery.addFilterQuery(resourceQuery.toString());

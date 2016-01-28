@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+import org.dspace.core.Context;
 import org.dspace.core.Utils;
 
 /**
@@ -93,7 +94,7 @@ public final class CheckerCommand
      * setBitstreamDispatcher before calling this method
      * </p>
      */
-    public void process()
+    public void process(Context context)
     {
         LOG.debug("Begin Checker Processing");
 
@@ -116,7 +117,7 @@ public final class CheckerCommand
         while (id != BitstreamDispatcher.SENTINEL)
         {
             LOG.debug("Processing bitstream id = " + id);
-            BitstreamInfo info = checkBitstream(id);
+            BitstreamInfo info = checkBitstream(context, id);
 
             if (reportVerbose
                     || !ChecksumCheckResults.CHECKSUM_MATCH.equals(info.getChecksumCheckResult()))
@@ -136,10 +137,10 @@ public final class CheckerCommand
      * 
      * @return the information about the bitstream and its checksum data
      */
-    private BitstreamInfo checkBitstream(final int id)
+    private BitstreamInfo checkBitstream(Context context, final int id)
     {
         // get bitstream info from bitstream table
-        BitstreamInfo info = bitstreamInfoDAO.findByBitstreamId(id);
+        BitstreamInfo info = bitstreamInfoDAO.findByBitstreamId(context, id);
 
         // requested id was not found in bitstream
         // or most_recent_checksum table

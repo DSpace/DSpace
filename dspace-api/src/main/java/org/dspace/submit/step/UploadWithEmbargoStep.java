@@ -315,7 +315,7 @@ public class UploadWithEmbargoStep extends UploadStep
      *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
-    protected int processUploadFile(Context context, HttpServletRequest request,
+    public int processUploadFile(Context context, HttpServletRequest request,
                                     HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
             AuthorizeException
@@ -352,7 +352,7 @@ public class UploadWithEmbargoStep extends UploadStep
                 String fileDescription =  (String) request.getAttribute(param + "-description");
                 if(fileDescription==null ||fileDescription.length()==0)
                 {
-                    request.getParameter("description");
+                    fileDescription = request.getParameter("description");
                 }
 
                 // if information wasn't passed by User Interface, we had a problem

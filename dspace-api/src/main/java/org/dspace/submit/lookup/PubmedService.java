@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +21,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.core.ConfigurationManager;
@@ -42,7 +47,7 @@ import org.xml.sax.SAXException;
 public class PubmedService
 {
 
-    private static Logger log = Logger.getLogger(PubmedService.class);
+    private static final Logger log = Logger.getLogger(PubmedService.class);
 
     private int timeout = 1000;
 
@@ -93,31 +98,32 @@ public class PubmedService
 
     public List<Record> search(String query) throws IOException, HttpException
     {
-        List<Record> results = null;
+        List<Record> results = new ArrayList<>();
         if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
         {
-            GetMethod method = null;
+            HttpGet method = null;
             try
             {
-                HttpClient client = new HttpClient();
-                client.setTimeout(timeout);
-                method = new GetMethod(
-                        "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi");
+                HttpClient client = new DefaultHttpClient();
+                client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
 
-                NameValuePair db = new NameValuePair("db", "pubmed");
-                NameValuePair datetype = new NameValuePair("datetype", "edat");
-                NameValuePair retmax = new NameValuePair("retmax", "10");
-                NameValuePair queryParam = new NameValuePair("term",
-                        query.toString());
-                method.setQueryString(new NameValuePair[] { db, queryParam,
-                        retmax, datetype });
+                URIBuilder uriBuilder = new URIBuilder(
+                        "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi");
+                uriBuilder.addParameter("db", "pubmed");
+                uriBuilder.addParameter("datetype", "edat");
+                uriBuilder.addParameter("retmax", "10");
+                uriBuilder.addParameter("term", query);
+                method = new HttpGet(uriBuilder.build());
+
                 // Execute the method.
-                int statusCode = client.executeMethod(method);
+                HttpResponse response = client.execute(method);
+                StatusLine statusLine = response.getStatusLine();
+                int statusCode = statusLine.getStatusCode();
 
                 if (statusCode != HttpStatus.SC_OK)
                 {
                     throw new RuntimeException("WS call failed: "
-                            + method.getStatusLine());
+                            + statusLine);
                 }
 
                 DocumentBuilderFactory factory = DocumentBuilderFactory
@@ -131,8 +137,7 @@ public class PubmedService
                 {
                     builder = factory.newDocumentBuilder();
 
-                    Document inDoc = builder.parse(method
-                            .getResponseBodyAsStream());
+                    Document inDoc = builder.parse(response.getEntity().getContent());
 
                     Element xmlRoot = inDoc.getDocumentElement();
                     Element idList = XMLUtils.getSingleElement(xmlRoot,
@@ -213,28 +218,34 @@ public class PubmedService
             SAXException
     {
     	List<Record> results = new ArrayList<Record>();
-    	GetMethod method = null;
+    	HttpGet method = null;
     	try
     	{
-    		HttpClient client = new HttpClient();
-    		client.setTimeout(5 * timeout);
-    		method = new GetMethod(
-    				"http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi");
+    		HttpClient client = new DefaultHttpClient();
+    		client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 5 * timeout);
 
-    		NameValuePair db = new NameValuePair("db", "pubmed");
-    		NameValuePair retmode = new NameValuePair("retmode", "xml");
-    		NameValuePair rettype = new NameValuePair("rettype", "full");
-    		NameValuePair id = new NameValuePair("id", StringUtils.join(
-    				pubmedIDs.iterator(), ","));
-    		method.setQueryString(new NameValuePair[] { db, retmode,
-    				rettype, id });
-    		// Execute the method.
-    		int statusCode = client.executeMethod(method);
+            try {
+                URIBuilder uriBuilder = new URIBuilder(
+                        "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi");
+                uriBuilder.addParameter("db", "pubmed");
+                uriBuilder.addParameter("retmode", "xml");
+                uriBuilder.addParameter("rettype", "full");
+                uriBuilder.addParameter("id", StringUtils.join(
+                        pubmedIDs.iterator(), ","));
+                method = new HttpGet(uriBuilder.build());
+            } catch (URISyntaxException ex)
+            {
+                throw new RuntimeException("Request not sent", ex);
+            }
+
+            // Execute the method.
+    		HttpResponse response = client.execute(method);
+            StatusLine statusLine = response.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
 
     		if (statusCode != HttpStatus.SC_OK)
     		{
-    			throw new RuntimeException("WS call failed: "
-    					+ method.getStatusLine());
+    			throw new RuntimeException("WS call failed: " + statusLine);
     		}
 
     		DocumentBuilderFactory factory = DocumentBuilderFactory
@@ -245,7 +256,7 @@ public class PubmedService
 
     		DocumentBuilder builder = factory.newDocumentBuilder();
     		Document inDoc = builder
-    				.parse(method.getResponseBodyAsStream());
+    				.parse(response.getEntity().getContent());
 
     		Element xmlRoot = inDoc.getDocumentElement();
     		List<Element> pubArticles = XMLUtils.getElementList(xmlRoot,

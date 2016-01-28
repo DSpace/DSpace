@@ -18,6 +18,11 @@ import org.dspace.content.MetadataField;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.PluginManager;
 
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Broker for ChoiceAuthority plugins, and for other information configured
  * about the choice aspect of authority control for a metadata field.
@@ -193,6 +198,19 @@ public final class ChoiceAuthorityManager
             throw new IllegalArgumentException(
                     "No choices plugin was configured for  field \"" + fieldKey
                             + "\".");
+        }
+        return ma.getMatches(fieldKey, query, collection, start, limit, locale);
+    }
+
+    public Choices getMatches(String fieldKey, String query, int collection, int start, int limit, String locale, boolean externalInput) {
+        ChoiceAuthority ma = controller.get(fieldKey);
+        if (ma == null) {
+            throw new IllegalArgumentException(
+                    "No choices plugin was configured for  field \"" + fieldKey
+                            + "\".");
+        }
+        if (externalInput && ma instanceof SolrAuthority) {
+            ((SolrAuthority)ma).addExternalResultsInNextMatches();
         }
         return ma.getMatches(fieldKey, query, collection, start, limit, locale);
     }

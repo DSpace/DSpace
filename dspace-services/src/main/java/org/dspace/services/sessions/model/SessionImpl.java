@@ -144,7 +144,7 @@ public final class SessionImpl implements Session {
      * @return true if the attribute is set
      */
     public boolean isAttributeSet(String key) {
-        return getKeyAtribute(key) != null;
+        return getKeyAttribute(key) != null;
     }
 
     /**
@@ -202,7 +202,7 @@ public final class SessionImpl implements Session {
      * @return the value OR null if not found
      * @throws IllegalArgumentException if the key is null
      */
-    protected String getKeyAtribute(String key) {
+    protected String getKeyAttribute(String key) {
         if (key == null) {
             throw new IllegalArgumentException("session attribute key cannot be null");
         }
@@ -272,7 +272,7 @@ public final class SessionImpl implements Session {
      * @see org.dspace.services.model.Session#getAttribute(java.lang.String)
      */
     public String getAttribute(String key) {
-        return getKeyAtribute(key);
+        return getKeyAttribute(key);
     }
 
     /* (non-Javadoc)
@@ -340,27 +340,27 @@ public final class SessionImpl implements Session {
     }
 
     public String getOriginatingHostIP() {
-        return getKeyAtribute(HOST_IP);
+        return getKeyAttribute(HOST_IP);
     }
 
     public String getOriginatingHostName() {
-        return getKeyAtribute(HOST_NAME);
+        return getKeyAttribute(HOST_NAME);
     }
 
     public String getServerId() {
-        return getKeyAtribute(SERVER_ID);
+        return getKeyAttribute(SERVER_ID);
     }
 
     public String getSessionId() {
-        return getKeyAtribute(SESSION_ID);
+        return getKeyAttribute(SESSION_ID);
     }
 
     public String getUserEID() {
-        return getKeyAtribute(USER_EID);
+        return getKeyAttribute(USER_EID);
     }
 
     public String getUserId() {
-        return getKeyAtribute(USER_ID);
+        return getKeyAttribute(USER_ID);
     }
 
     public boolean isActive() {
@@ -376,7 +376,7 @@ public final class SessionImpl implements Session {
     public String getId() {
         String id = null;
         if (isAttributeSet(SESSION_ID)) {
-            id = getKeyAtribute(SESSION_ID);
+            id = getKeyAttribute(SESSION_ID);
         } else {
             id = this.httpSession.getId();
         }
@@ -422,7 +422,7 @@ public final class SessionImpl implements Session {
      * @see javax.servlet.http.HttpSession#getValue(java.lang.String)
      */
     public Object getValue(String name) {
-        return getKeyAtribute(name);
+        return getKeyAttribute(name);
     }
 
     /* (non-Javadoc)

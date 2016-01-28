@@ -1,0 +1,58 @@
+@prefix fuseki:  <http://jena.apache.org/fuseki#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix tdb:     <http://jena.hpl.hp.com/2008/tdb#> .
+@prefix ja:      <http://jena.hpl.hp.com/2005/11/Assembler#> .
+@prefix :        <#> .
+
+###########################
+#### Server description ###
+###########################
+[] rdf:type fuseki:Server ;
+
+   # You can set set general query timeouts on a server-wide basis:
+   # Format 1: "1000" -- 1 second timeout
+   # Format 2: "10000,60000" -- 10s timeout to first result, then 60s timeout to for rest of query.
+   # See java doc for ARQ.queryTimeout
+   # ja:context [ ja:cxtName "arq:queryTimeout" ;  ja:cxtValue "10000" ] ;
+
+   # Load custom code (rarely needed)
+   # ja:loadClass "your.code.Class" ;
+
+   # Services available.  Only explicitly listed services are configured.
+   #  If there is a service description not linked from this list, it is ignored.
+   fuseki:services (
+     <#service1>
+   ) .
+
+################################
+### Assembler initialization ###
+################################
+# Declaration additional assembler items.
+[] ja:loadClass "com.hp.hpl.jena.tdb.TDB" .
+
+# TDB
+tdb:DatasetTDB  rdfs:subClassOf  ja:RDFDataset .
+tdb:GraphTDB    rdfs:subClassOf  ja:Model .
+
+#################
+### Service 1 ###
+#################
+<#service1> rdf:type fuseki:Service ;
+    fuseki:name                       "dspace" ;    # http://host:port/dspace
+    fuseki:serviceQuery               "sparql" ;   # SPARQL query service
+    fuseki:serviceReadWriteGraphStore "data" ;     # SPARQL Graph store protocol (read and write)
+    # A separate read-only graph store endpoint:
+    fuseki:serviceReadGraphStore      "get" ;      # SPARQL Graph store protocol (read only)
+    # Other endpoints you may add:
+#    fuseki:serviceQuery               "query" ;    # SPARQL query service
+#    fuseki:serviceUpdate              "update" ;   # SPARQL query service
+#    fuseki:serviceUpload              "upload" ;   # Non-SPARQL upload service
+    fuseki:dataset                   <#dspace-triplestore> ;
+    .
+
+<#dspace-triplestore>  rdf:type    tdb:DatasetTDB ;
+    tdb:location "${dspace.dir}/triplestore" ;
+    # Make the default graph be the union of all named graphs.
+    tdb:unionDefaultGraph true ;
+    .

@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
  * @author Ben Bosman
  * @author Roeland Dillen
  */
-public class IPMatcherTest extends AbstractUnitTest
+public class IPMatcherTest
 {
     private static final String IP6_FULL_ADDRESS1 = "2001:18e8:3:171:218:8bff:fe2a:56a4";
     private static final String IP6_FULL_ADDRESS2 = "2001:18e8:3:171:218:8bff:fe2a:56a3";

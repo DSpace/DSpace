@@ -86,6 +86,7 @@ public class ProviderStackTest {
         assertTrue(providers.getProviders().size() == 0);
 
         providers.clear();
+        providers = null;
     }
 
     /**
@@ -111,6 +112,7 @@ public class ProviderStackTest {
 
         l = null;
         providers.clear();
+        providers = null;
     }
 
     /**
@@ -173,7 +175,9 @@ public class ProviderStackTest {
         assertEquals("eee", l.get(6).getPrefix());
 
         l = null;
+        p5 = p6 = p7 = null;
         providers.clear();
+        providers = null;
     }
 
     /**
@@ -204,6 +208,7 @@ public class ProviderStackTest {
 
         l = null;
         providers.clear();
+        providers = null;
     }
 
     /**
@@ -234,6 +239,7 @@ public class ProviderStackTest {
 
         l = null;
         providers.clear();
+        providers = null;
     }
 
     /**
@@ -271,6 +277,7 @@ public class ProviderStackTest {
 
         it = null;
         providers.clear();
+        providers = null;
     }
 
     /**
@@ -299,6 +306,7 @@ public class ProviderStackTest {
         assertEquals(null, providers.getProvider(-1));
 
         providers.clear();
+        providers = null;
     }
 
     /**
@@ -318,6 +326,7 @@ public class ProviderStackTest {
         assertEquals(4, providers.size());
 
         providers.clear();
+        providers = null;
     }
 
     /**
@@ -342,6 +351,7 @@ public class ProviderStackTest {
         assertEquals(0, providers.size());
 
         providers.clear();
+        providers = null;
     }
 
     /**
@@ -377,7 +387,9 @@ public class ProviderStackTest {
         assertEquals(1, providers.size());
         assertEquals(p2, providers.getProvider(0));
 
+        p2 = null;
         providers.clear();
+        providers = null;
     }
 
 }

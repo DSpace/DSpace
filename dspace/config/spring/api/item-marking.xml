@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+    default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+	<!-- Enable this strategy in order to mark item based on the value of a metadata field -->
+	<bean class="org.dspace.app.itemmarking.ItemMarkingMetadataStrategy"
+		id="org.dspace.app.itemmarking.ItemMarkingExtractor.type">
+		<property name="metadataField" value="dc.type" />
+		<property name="mapping" ref="typeMap"/>
+	</bean>
+	
+	<!-- Enable this strategy in order to mark items based on the collection the item belongs to -->
+	<!-- <bean class="org.dspace.app.itemmarking.ItemMarkingCollectionStrategy"
+		id="org.dspace.app.itemmarking.ItemMarkingExtractor.type">
+		<property name="mapping" ref="collectionMap"/>
+	</bean> -->
+
+	<!-- Enable this strategy in order to mark items based on the availability of their bitstreams -->
+	<bean class="org.dspace.app.itemmarking.ItemMarkingAvailabilityBitstreamStrategy"
+		id="org.dspace.app.itemmarking.ItemMarkingExtractor.availability">
+		<property name="availableImageName" value="image/available.png" />
+		<property name="nonAvailableImageName" value="image/nonavailable.png" />
+	</bean>
+	
+	<bean class="java.util.HashMap" id="typeMap">
+	    <constructor-arg>
+		    <map>
+		        <!-- <entry>
+		            <key>
+		                <value>image</value>
+		            </key>
+					<ref bean="type1MarkingInfo"/>
+		        </entry>
+		        <entry>
+		            <key>
+		                <value>video</value>
+		            </key>
+					<ref bean="type2MarkingInfo"/>
+		        </entry> -->
+		    </map> 
+		</constructor-arg>
+	</bean>
+	
+	<bean class="java.util.HashMap" id="collectionMap">
+	    <constructor-arg>
+		    <map>
+		        <!-- <entry>
+		            <key>
+		                <value>123456789/2</value>
+		            </key>
+					<ref bean="type1MarkingInfo"/>
+		        </entry> -->
+		    </map> 
+		</constructor-arg>
+	</bean>
+	
+	<!-- <bean class="org.dspace.app.itemmarking.ItemMarkingInfo" id="type1MarkingInfo">
+		<property name="classInfo" value="glyphicon glyphicon-picture"/>
+		<property name="tooltip" value="itemlist.mark.type1MarkingInfo"/>
+	</bean>
+	
+	<bean class="org.dspace.app.itemmarking.ItemMarkingInfo" id="type2MarkingInfo">
+		<property name="imageName" value="image/type2.png"/>
+		<property name="tooltip" value="itemlist.mark.type2MarkingInfo"/>
+	</bean> -->
+	
+</beans>

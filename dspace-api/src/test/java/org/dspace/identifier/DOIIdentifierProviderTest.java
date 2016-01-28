@@ -13,16 +13,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
-import org.dspace.core.Context;
-import org.dspace.kernel.ServiceManager;
 import org.dspace.services.ConfigurationService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
@@ -36,10 +33,12 @@ import static org.junit.Assume.*;
 public class DOIIdentifierProviderTest
         extends AbstractUnitTest
 {
+    /** log4j category */
+    private static final Logger log = Logger.getLogger(DOIIdentifierProviderTest.class);
+    
     private static final String PREFIX = "10.5072";
     private static final String NAMESPACE_SEPARATOR = "dspaceUnitTests-";
 
-    private static ServiceManager sm = null;
     private static ConfigurationService config = null;
 
     private static Community community;
@@ -47,18 +46,87 @@ public class DOIIdentifierProviderTest
 
     private static MockDOIConnector connector;
     private DOIIdentifierProvider provider;
-    
-    /** The most recently created test Item's ID */
-    private static int itemID;
 
     public DOIIdentifierProviderTest()
     {
     }
+    
+    /**
+     * This method will be run before every test as per @Before. It will
+     * initialize resources required for the tests.
+     *
+     * Other methods can be annotated with @Before here or in subclasses
+     * but no execution order is guaranteed
+     */
+    @Before
+    @Override
+    public void init()
+    {
+        super.init();
+        
+        try
+        {
+            context.turnOffAuthorisationSystem();
+            // Create an environment for our test objects to live in.
+            community = Community.create(null, context);
+            community.setMetadata("name", "A Test Community");
+            community.update();
+            collection = community.createCollection();
+            collection.setMetadata("name", "A Test Collection");
+            collection.update();
+            //we need to commit the changes so we don't block the table for testing
+            context.restoreAuthSystemState();
+            context.commit();
+
+            config = kernelImpl.getConfigurationService();
+            // Configure the service under test.
+            config.setProperty(DOIIdentifierProvider.CFG_PREFIX, PREFIX);
+            config.setProperty(DOIIdentifierProvider.CFG_NAMESPACE_SEPARATOR, 
+                NAMESPACE_SEPARATOR);
+        
+            connector = new MockDOIConnector();
+            
+            provider = new DOIIdentifierProvider();
+            provider.setConfigurationService(config);
+            provider.setDOIConnector(connector);
+        }
+        catch (AuthorizeException ex)
+        {
+            log.error("Authorization Error in init", ex);
+            fail("Authorization Error in init: " + ex.getMessage());
+        }
+        catch (SQLException ex)
+        {
+            log.error("SQL Error in init", ex);
+            fail("SQL Error in init: " + ex.getMessage());
+        }
+        
+    }
+    
+     /**
+     * This method will be run after every test as per @After. It will
+     * clean resources initialized by the @Before methods.
+     *
+     * Other methods can be annotated with @After here or in subclasses
+     * but no execution order is guaranteed
+     */
+    @After
+    @Override
+    public void destroy()
+    {
+        community = null;
+        collection = null;
+        connector.reset();
+        connector = null;
+        provider = null;
+        super.destroy();
+    }
+
 
     private static void dumpMetadata(Item eyetem)
     {
-        DCValue[] metadata = eyetem.getMetadata("dc", Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue metadatum : metadata)
+        Metadatum[] metadata = eyetem.getMetadata("dc", Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum metadatum : metadata)
             System.out.printf("Metadata: %s.%s.%s(%s) = %s\n",
                     metadatum.schema,
                     metadatum.element,
@@ -74,18 +142,14 @@ public class DOIIdentifierProviderTest
     * @throws AuthorizeException
     * @throws IOException
     */
-    private Item newItem(Context ctx)
+    private Item newItem()
             throws SQLException, AuthorizeException, IOException
     {
-        ctx.turnOffAuthorisationSystem();
-        ctx.setCurrentUser(eperson);
+        context.turnOffAuthorisationSystem();
+        //Install a fresh item
+        WorkspaceItem wsItem = WorkspaceItem.create(context, collection, false);
+        Item item = InstallItem.installItem(context, wsItem);
 
-        WorkspaceItem wsItem = WorkspaceItem.create(ctx, collection, false);
-
-        WorkflowItem wfItem = WorkflowManager.start(ctx, wsItem);
-        WorkflowManager.advance(ctx, wfItem, ctx.getCurrentUser());
-
-        Item item = wfItem.getItem();
         item.addMetadata("dc", "contributor", "author", null, "Author, A. N.");
         item.addMetadata("dc", "title", null, null, "A Test Object");
         item.addMetadata("dc", "publisher", null, null, "DSpace Test Harness");
@@ -97,14 +161,14 @@ public class DOIIdentifierProviderTest
         String sql = "DELETE FROM Doi WHERE resource_type_id = ? AND resource_id = ?";
         DatabaseManager.updateQuery(context, sql, item.getType(), item.getID());
         
-        DCValue[] metadata = item.getMetadata(
+        Metadatum[] metadata = item.getMetadata(
                 DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         List<String> remainder = new ArrayList<String>();
 
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (!id.value.startsWith(DOI.RESOLVER))
             {
@@ -124,8 +188,9 @@ public class DOIIdentifierProviderTest
                 remainder.toArray(new String[remainder.size()]));
         
         item.update();
-        ctx.commit();
-        ctx.restoreAuthSystemState();
+        //we need to commit the changes so we don't block the table for testing
+        context.restoreAuthSystemState();
+        context.commit();
 
         return item;
     }
@@ -148,6 +213,7 @@ public class DOIIdentifierProviderTest
     public String createDOI(Item item, Integer status, boolean metadata, String doi)
             throws SQLException, IdentifierException, AuthorizeException
     {
+        context.turnOffAuthorisationSystem();
         // we need some random data. UUIDs would be bloated here
         Random random = new Random();
         if (null == doi)
@@ -181,69 +247,12 @@ public class DOIIdentifierProviderTest
             item.update();
         }
         
+        //we need to commit the changes so we don't block the table for testing
+        context.restoreAuthSystemState();
         context.commit();
         return doi;
     }
     
-    @BeforeClass
-    public static void setUpClass()
-            throws Exception
-    {
-        // Find the usual kernel services
-        sm = kernelImpl.getServiceManager();
-        Context ctx = new Context();
-
-        ctx.turnOffAuthorisationSystem();
-        ctx.setCurrentUser(eperson);
-        // Create an environment for our test objects to live in.
-        community = Community.create(null, ctx);
-        community.setMetadata("name", "A Test Community");
-        community.update();
-        collection = community.createCollection();
-        collection.setMetadata("name", "A Test Collection");
-        collection.update();
-        ctx.complete();
-
-        config = kernelImpl.getConfigurationService();
-        // Configure the service under test.
-        config.setProperty(DOIIdentifierProvider.CFG_PREFIX, PREFIX);
-        config.setProperty(DOIIdentifierProvider.CFG_NAMESPACE_SEPARATOR, 
-                NAMESPACE_SEPARATOR);
-        // Don't try to send mail.
-        config.setProperty("mail.server.disabled", "true");
-        
-        connector = new MockDOIConnector();
-    }
-
-    @AfterClass
-    public static void tearDownClass()
-            throws Exception
-    {
-        /*
-        System.out.print("Tearing down\n\n");
-        Context ctx = new Context();
-        dumpMetadata(Item.find(ctx, itemID));
-        */
-    }
-    
-    @Before
-    public void setUp()
-    {
-        context.setCurrentUser(eperson);
-        context.turnOffAuthorisationSystem();
-        
-        provider = new DOIIdentifierProvider();
-        provider.setConfigurationService(config);
-        provider.setDOIConnector(connector);
-    }
-    
-    @After
-    public void tearDown()
-    {
-        context.restoreAuthSystemState();
-        connector.reset();
-    }
-
     /**
      * Test of supports method, of class DataCiteIdentifierProvider.
      */
@@ -294,17 +303,19 @@ public class DOIIdentifierProviderTest
     public void testStore_DOI_as_item_metadata()
             throws SQLException, AuthorizeException, IOException, IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR 
                 + Long.toHexString(new Date().getTime());
+        context.turnOffAuthorisationSystem();
         provider.saveDOIToObject(context, item, doi);
+        context.restoreAuthSystemState();
         
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        Metadatum[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         boolean result = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi)))
             {
@@ -318,17 +329,18 @@ public class DOIIdentifierProviderTest
     public void testGet_DOI_out_of_item_metadata()
             throws SQLException, AuthorizeException, IOException, IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR 
                 + Long.toHexString(new Date().getTime());
 
+        context.turnOffAuthorisationSystem();
         item.addMetadata(DOIIdentifierProvider.MD_SCHEMA,
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null,
                 DOI.DOIToExternalForm(doi));
         item.update();
-        context.commit();
+        context.restoreAuthSystemState();
 
         assertTrue("Failed to recognize DOI in item metadata.", 
                 doi.equals(DOIIdentifierProvider.getDOIOutOfObject(item)));
@@ -338,26 +350,27 @@ public class DOIIdentifierProviderTest
     public void testRemove_DOI_from_item_metadata()
             throws SQLException, AuthorizeException, IOException, IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR 
                 + Long.toHexString(new Date().getTime());
 
+        context.turnOffAuthorisationSystem();
         item.addMetadata(DOIIdentifierProvider.MD_SCHEMA,
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null,
                 DOI.DOIToExternalForm(doi));
         item.update();
-        context.commit();
         
         provider.removeDOIFromObject(context, item, doi);
+        context.restoreAuthSystemState();
         
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        Metadatum[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         boolean foundDOI = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi)))
             {
@@ -372,7 +385,7 @@ public class DOIIdentifierProviderTest
             throws SQLException, AuthorizeException, IOException, 
             IllegalArgumentException, IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, false);
         
         String retrievedDOI = DOIIdentifierProvider.getDOIByObject(context, item);
@@ -386,7 +399,7 @@ public class DOIIdentifierProviderTest
             throws SQLException, AuthorizeException, IOException, 
             IllegalArgumentException, IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, false);
         
         String retrievedDOI = provider.lookup(context, (DSpaceObject) item);
@@ -400,7 +413,7 @@ public class DOIIdentifierProviderTest
             throws SQLException, AuthorizeException, IOException, 
             IllegalArgumentException, IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, false);
         
         DSpaceObject dso = DOIIdentifierProvider.getObjectByDOI(context, doi);
@@ -417,7 +430,7 @@ public class DOIIdentifierProviderTest
             throws SQLException, AuthorizeException, IOException, 
             IllegalArgumentException, IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, false);
         
         DSpaceObject dso = provider.resolve(context, doi);
@@ -438,21 +451,23 @@ public class DOIIdentifierProviderTest
             throws SQLException, AuthorizeException, IOException, IdentifierException
     {
         // add two DOIs.
-        Item item = newItem(context);
+        Item item = newItem();
         String doi1 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
         String doi2 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
         
         // remove one of it
+        context.turnOffAuthorisationSystem();
         provider.removeDOIFromObject(context, item, doi1);
+        context.restoreAuthSystemState();
 
         // assure that the right one was removed
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        Metadatum[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         boolean foundDOI1 = false;
         boolean foundDOI2 = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi1)))
             {
@@ -468,7 +483,9 @@ public class DOIIdentifierProviderTest
         assertTrue("Removed wrong DOI from item metadata.", foundDOI2);
         
         // remove the otherone as well.
+        context.turnOffAuthorisationSystem();
         provider.removeDOIFromObject(context, item, doi2);
+        context.restoreAuthSystemState();
         
         // check it
         metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
@@ -477,7 +494,7 @@ public class DOIIdentifierProviderTest
                 null);
         foundDOI1 = false;
         foundDOI2 = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi1)))
             {
@@ -496,7 +513,7 @@ public class DOIIdentifierProviderTest
     @Test
     public void testMintDOI() throws SQLException, AuthorizeException, IOException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = null;
         try
         {
@@ -527,7 +544,7 @@ public class DOIIdentifierProviderTest
     public void testMint_returns_existing_DOI()
             throws SQLException, AuthorizeException, IOException, IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = this.createDOI(item, null, true);
         
         String retrievedDOI = provider.mint(context, item);
@@ -541,7 +558,7 @@ public class DOIIdentifierProviderTest
             throws SQLException, SQLException, AuthorizeException, IOException,
             IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = this.createDOI(item, null, true);
         
         provider.reserve(context, item, doi);
@@ -551,7 +568,7 @@ public class DOIIdentifierProviderTest
         assumeNotNull(doiRow);
         
         assertTrue("Reservation of DOI did not set the corret DOI status.",
-                DOIIdentifierProvider.TO_BE_RESERVERED.intValue() == doiRow.getIntColumn("status"));
+                DOIIdentifierProvider.TO_BE_RESERVED.intValue() == doiRow.getIntColumn("status"));
     }
     
     @Test
@@ -559,7 +576,7 @@ public class DOIIdentifierProviderTest
             throws SQLException, SQLException, AuthorizeException, IOException,
             IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = this.createDOI(item, null, true);
         
         provider.register(context, item, doi);
@@ -577,7 +594,7 @@ public class DOIIdentifierProviderTest
             throws SQLException, SQLException, AuthorizeException, IOException,
             IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi = this.createDOI(item, DOIIdentifierProvider.IS_RESERVED, true);
         
         provider.register(context, item, doi);
@@ -595,7 +612,7 @@ public class DOIIdentifierProviderTest
             throws SQLException, SQLException, AuthorizeException, IOException,
             IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         
         String doi = provider.register(context, item);
         
@@ -616,21 +633,23 @@ public class DOIIdentifierProviderTest
     public void testDelete_specified_DOI()
             throws SQLException, AuthorizeException, IOException, IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi1 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
         String doi2 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
         
         // remove one of it
+        context.turnOffAuthorisationSystem();
         provider.delete(context, item, doi1);
+        context.restoreAuthSystemState();
 
         // assure that the right one was removed
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        Metadatum[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         boolean foundDOI1 = false;
         boolean foundDOI2 = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi1)))
             {
@@ -661,21 +680,23 @@ public class DOIIdentifierProviderTest
     public void testDelete_all_DOIs()
             throws SQLException, AuthorizeException, IOException, IdentifierException
     {
-        Item item = newItem(context);
+        Item item = newItem();
         String doi1 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
         String doi2 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
         
         // remove one of it
+        context.turnOffAuthorisationSystem();
         provider.delete(context, item);
+        context.restoreAuthSystemState();
 
         // assure that the right one was removed
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        Metadatum[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         boolean foundDOI1 = false;
         boolean foundDOI2 = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi1)))
             {

@@ -18,7 +18,7 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -81,7 +81,7 @@ public class RequiredMetadata extends AbstractCurationTask
                 sb.append("Item: ").append(handle);
                 for (String req : getReqList(item.getOwningCollection().getHandle()))
                 {
-                    DCValue[] vals = item.getMetadata(req);
+                    Metadatum[] vals = item.getMetadataByMetadataString(req);
                     if (vals.length == 0)
                     {
                         sb.append(" missing required field: ").append(req);

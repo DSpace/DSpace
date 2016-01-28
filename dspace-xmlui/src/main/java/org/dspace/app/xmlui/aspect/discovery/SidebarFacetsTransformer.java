@@ -157,6 +157,8 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         //If we are on a search page performing a search a query may be used
         String query = request.getParameter("query");
         if(query != null && !"".equals(query)){
+            // Do standard escaping of some characters in this user-entered query
+            query = DiscoveryUIUtils.escapeQueryChars(query);
             queryArgs.setQuery(query);
         }
 
@@ -232,7 +234,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                 String displayedValue = value.getDisplayedValue();
                                 String filterQuery = value.getAsFilterQuery();
                                 String filterType = value.getFilterType();
-                                if (fqs.contains(getSearchService().toFilterQuery(context, field.getIndexFieldName(), "equals", value.getDisplayedValue()).getFilterQuery())) {
+                                if (fqs.contains(getSearchService().toFilterQuery(context, field.getIndexFieldName(), value.getFilterType(), value.getAsFilterQuery()).getFilterQuery())) {
                                     filterValsList.addItem(Math.random() + "", "selected").addContent(displayedValue + " (" + value.getCount() + ")");
                                 } else {
                                     String paramsQuery = retrieveParameters(request);

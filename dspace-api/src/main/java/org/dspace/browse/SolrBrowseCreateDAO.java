@@ -12,11 +12,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.authority.ChoiceAuthorityManager;
@@ -28,6 +27,7 @@ import org.dspace.discovery.SolrServiceIndexPlugin;
 import org.dspace.sort.OrderFormat;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
+import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.utils.DSpace;
 
 /**
@@ -68,19 +68,13 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
     public SolrBrowseCreateDAO(Context context) throws BrowseException
     {
         // For compatibility with previous versions
-        String db = ConfigurationManager.getProperty("db.name");
-        if ("postgres".equals(db))
+        if (! DatabaseManager.isOracle())
         {
             dbCreateDAO = new BrowseCreateDAOPostgres(context);
         }
-        else if ("oracle".equals(db))
-        {
-            dbCreateDAO = new BrowseCreateDAOOracle(context);
-        }
         else
         {
-            throw new BrowseException(
-                    "The configuration for db.name is either invalid, or contains an unrecognised database");
+            dbCreateDAO = new BrowseCreateDAOOracle(context);
         }
 
         try
@@ -107,7 +101,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
         Item item = (Item) dso;
 
         // faceting for metadata browsing. It is different than search facet
-        // because if there are authority with variants support we wan't all the
+        // because if there are authority with variants support we want all the
         // variants to go in the facet... they are sorted by count so just the
         // prefered label is relevant
         for (BrowseIndex bi : bis)
@@ -126,7 +120,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                 // value for lookup when partial search (the item mapper tool use it)
                 Set<String> distValuesForAC = new HashSet<String>();
 
-                // now index the new details - but only if it's archived and not
+                // now index the new details - but only if it's archived or
                 // withdrawn
                 if (item.isArchived() || item.isWithdrawn())
                 {
@@ -134,7 +128,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                     for (int mdIdx = 0; mdIdx < bi.getMetadataCount(); mdIdx++)
                     {
                         String[] md = bi.getMdBits(mdIdx);
-                        DCValue[] values = item.getMetadata(md[0], md[1],
+                        Metadatum[] values = item.getMetadata(md[0], md[1],
                                 md[2], Item.ANY);
 
                         // if we have values to index on, then do so
@@ -336,7 +330,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
         {
             for (SortOption so : SortOption.getSortOptions())
             {
-                DCValue[] dcvalue = item.getMetadata(so.getMetadata());
+                Metadatum[] dcvalue = item.getMetadataByMetadataString(so.getMetadata());
                 if (dcvalue != null && dcvalue.length > 0)
                 {
                     String nValue = OrderFormat

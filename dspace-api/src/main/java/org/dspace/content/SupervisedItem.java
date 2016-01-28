@@ -105,8 +105,7 @@ public class SupervisedItem extends WorkspaceItem
                        "WHERE epersongroup2workspaceitem.workspace_item_id" +
                        " = ? " +
                        " AND epersongroup2workspaceitem.eperson_group_id =" +
-                       " epersongroup.eperson_group_id " +
-                       "ORDER BY epersongroup.name";
+                       " epersongroup.eperson_group_id ";
         
         TableRowIterator tri = DatabaseManager.queryTable(c,"epersongroup",query, wi);
 
@@ -151,8 +150,7 @@ public class SupervisedItem extends WorkspaceItem
                        "WHERE epersongroup2workspaceitem.workspace_item_id" +
                        " = ? " + 
                        " AND epersongroup2workspaceitem.eperson_group_id =" +
-                       " epersongroup.eperson_group_id " +
-                       "ORDER BY epersongroup.name";
+                       " epersongroup.eperson_group_id ";
         
         TableRowIterator tri = DatabaseManager.queryTable(ourContext,
                                     "epersongroup",

@@ -64,6 +64,18 @@ public class ShibbolethServlet extends DSpaceServlet {
         int status = AuthenticationManager.authenticate(context, null, null, null, request);
         
         if (status == AuthenticationMethod.SUCCESS){
+            try {
+                // the AuthenticationManager updates the last_active field of the
+                // eperson that logged in. We need to commit the context, to store
+                // the updated field in the database.
+                context.commit();
+            } catch (SQLException ex) {
+                // We can log the SQLException, but we should not interrupt the 
+                // users interaction here.
+                log.error("Failed to write an updated last_active field of an "
+                        + "EPerson into the databse.", ex);
+            }
+
             // Logged in OK.
             Authenticate.loggedIn(context, request, context.getCurrentUser());
             

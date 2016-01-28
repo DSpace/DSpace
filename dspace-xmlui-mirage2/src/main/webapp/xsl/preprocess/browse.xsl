@@ -47,7 +47,7 @@
     <xsl:template match="dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-navigation'
     or @id='aspect.administrative.PrivateItems.div.browse-navigation'
     or @id='aspect.administrative.WithdrawnItems.div.browse-navigation' or @id='aspect.discovery.SearchFacetFilter.div.filter-navigation']">
-        <div rend="browse-navigation-wrapper">
+        <div rend="browse-navigation-wrapper hidden-print">
             <div>
                 <xsl:call-template name="copy-attributes"/>
                 <xsl:choose>
@@ -104,7 +104,8 @@
 
     <xsl:template match="dri:div[@id = 'aspect.artifactbrowser.ConfigurableBrowse.div.browse-controls'
     or @id='aspect.administrative.WithdrawnItems.div.browse-controls'
-    or @id='aspect.administrative.PrivateItems.div.browse-controls']">
+    or @id='aspect.administrative.PrivateItems.div.browse-controls'
+    or @id='aspect.discovery.SearchFacetFilter.div.browse-controls']">
         <div>
             <xsl:call-template name="copy-attributes"/>
                 <xsl:attribute name="rend">

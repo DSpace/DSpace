@@ -171,7 +171,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
             {
                 continue;
             }
-            if (item.getMetadata(metadata).length == 0
+            if (item.getMetadataByMetadataString(metadata).length == 0
                     || addedMetadata.contains(metadata))
             {
                 addedMetadata.add(metadata);

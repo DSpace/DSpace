@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
+
     The contents of this file are subject to the license and copyright
     detailed in the LICENSE and NOTICE files at the root of the source
     tree and available online at
+
     http://www.dspace.org/license/
+
 -->
 
 <!-- 
+
 This stylesheet is used to transform Cocoon XML exceptions into
 valid DRI (Digital Repository Interface) XML. That way the exceptions
 can be displayed within your existing DSpace theme (e.g. Mirage).
+
 Created by Tim Donohue
+
 -->
 
 <xsl:stylesheet version="1.0"
@@ -28,7 +34,7 @@ Created by Tim Donohue
   <xsl:template match="ex:exception-report">
     <document version="1.1">
       <body>
-        <div id="exception">
+        <div id="exception" rend="exception">
           <head><xsl:value-of select="$pageTitle"/></head>
           <p>
             <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/</xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></xref>
@@ -39,7 +45,7 @@ Created by Tim Donohue
           <p>
             <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/contact</xsl:attribute><i18n:text>xmlui.error.contact</i18n:text></xref> ||  
             <!-- Create a link which lets users optionally display the error stacktrace (using JQuery) -->
-            <xref target="javascript:jQuery('#errorstack').toggleClass('hidden');"><i18n:text>xmlui.error.show_stack</i18n:text></xref>
+            <xref target="#" onclick="javascript:jQuery('#errorstack').toggleClass('hidden');"><i18n:text>xmlui.error.show_stack</i18n:text></xref>
           </p>
           <!-- Include the Java stacktrace on the page, but hide it from view by default. -->
           <p id="errorstack" rend="pre hidden">

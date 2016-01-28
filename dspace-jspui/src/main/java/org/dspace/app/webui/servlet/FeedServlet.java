@@ -326,7 +326,7 @@ public class FeedServlet extends DSpaceServlet
                 checkAccess:
                     for (Group group : AuthorizeManager.getAuthorizedGroups(context, result, Constants.READ))
                         {
-                        if ((group.getID() == 0))
+                        if ((group.getID() == Group.ANONYMOUS_ID))
                         {
                             items.add(result);
                             break checkAccess;

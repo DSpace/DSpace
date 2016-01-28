@@ -10,15 +10,10 @@ package org.dspace.eperson;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import mockit.UsingMocksAndStubs;
 import org.apache.commons.codec.DecoderException;
-import org.dspace.MockConfigurationManager;
+import org.dspace.AbstractUnitTest;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
-import org.dspace.services.ConfigurationService;
-import org.dspace.storage.rdbms.MockDatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -27,23 +22,27 @@ import static org.junit.Assert.*;
  *
  * @author mwood
  */
-@UsingMocksAndStubs(value={MockDatabaseManager.class, MockConfigurationManager.class})
-public class EPersonTest
+public class EPersonTest extends AbstractUnitTest
 {
     private static TableRow row1;
-
-    private static DSpaceKernelImpl kernel;
-
-    private static ConfigurationService config;
 
     public EPersonTest()
     {
     }
 
-    @BeforeClass
-    public static void setUpClass()
-            throws Exception
+    /**
+     * This method will be run before every test as per @Before. It will
+     * initialize resources required for the tests.
+     *
+     * Other methods can be annotated with @Before here or in subclasses
+     * but no execution order is guaranteed
+     */
+    @Before
+    @Override
+    public void init()
     {
+        super.init();
+
         // Build a TableRow for an EPerson to wrap
         final ArrayList<String> epersonColumns = new ArrayList<String>();
         epersonColumns.add("eperson_id");
@@ -51,32 +50,7 @@ public class EPersonTest
         epersonColumns.add("salt");
         epersonColumns.add("digest_algorithm");
 
-        row1 = new TableRow("EPerson", epersonColumns);
-
-        // Make certain that a default DSpaceKernel is started.
-        kernel = DSpaceKernelInit.getKernel(null);
-        kernel.start();
-
-        // Configure the kernel
-        config = kernel.getConfigurationService();
-        config.setProperty("db.name", "H2");
-        config.setProperty("db.driver", "org.h2.Driver");
-    }
-
-    @AfterClass
-    public static void tearDownClass()
-            throws Exception
-    {
-    }
-    
-    @Before
-    public void setUp()
-    {
-    }
-    
-    @After
-    public void tearDown()
-    {
+        row1 = new TableRow("EPerson", epersonColumns);   
     }
 
     /**
@@ -689,10 +663,8 @@ public class EPersonTest
     public void testCheckPassword()
             throws SQLException, DecoderException
     {
-        System.out.println("checkPassword");
         final String attempt = "secret";
-        Context ctx = new Context();
-        EPerson instance = new EPerson(ctx, row1);
+        EPerson instance = new EPerson(context, row1);
 
         // Test old unsalted MD5 hash
         final String hash = "5ebe2294ecd0e0f08eab7690d2a6ee69"; // MD5("secret");
@@ -733,7 +705,7 @@ public class EPersonTest
             throws SQLException
     {
         System.out.println("getType");
-        EPerson instance = new EPerson(new Context(), row1);
+        EPerson instance = new EPerson(context, row1);
         int expResult = Constants.EPERSON;
         int result = instance.getType();
         assertEquals("Should return Constants.EPERSON", expResult, result);

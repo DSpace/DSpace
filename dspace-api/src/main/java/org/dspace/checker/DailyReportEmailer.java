@@ -10,6 +10,7 @@ package org.dspace.checker;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import javax.mail.MessagingException;
@@ -22,6 +23,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.core.Email;
 
 /**
@@ -178,9 +180,11 @@ public class DailyReportEmailer
 
         File report = null;
         FileWriter writer = null;
+        Context context = null;
 
         try
         {
+            context = new Context();
             // the number of bitstreams in report
             int numBitstreams = 0;
 
@@ -221,7 +225,7 @@ public class DailyReportEmailer
                         tomorrow, writer);
                 writer
                         .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getUncheckedBitstreamsReport(writer);
+                numBitstreams += reporter.getUncheckedBitstreamsReport(context, writer);
                 writer
                         .write("\n--------------------------------- End Report ---------------------------\n\n");
                 writer.flush();
@@ -279,7 +283,7 @@ public class DailyReportEmailer
                     writer
                             .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
                     numBitstreams += reporter
-                            .getUncheckedBitstreamsReport(writer);
+                            .getUncheckedBitstreamsReport(context, writer);
                     writer.flush();
                     writer.close();
                     emailer.sendReport(report, numBitstreams);
@@ -293,9 +297,14 @@ public class DailyReportEmailer
         catch (IOException e)
         {
             log.fatal(e);
-        }
-        finally
+        } catch (SQLException e) {
+            log.fatal(e);
+        } finally
         {
+            if(context != null && context.isValid())
+            {
+                context.abort();
+            }
             if (writer != null)
             {
                 try

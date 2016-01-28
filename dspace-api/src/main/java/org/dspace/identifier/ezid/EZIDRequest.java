@@ -175,9 +175,7 @@ public class EZIDRequest
         request = new HttpPut(uri);
         if (null != metadata)
         {
-            try {
-                request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
-            } catch (UnsupportedEncodingException ex) { /* SNH */ }
+            request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
         }
         HttpResponse response = client.execute(request);
         return new EZIDResponse(response);

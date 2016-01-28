@@ -10,7 +10,7 @@ package org.dspace.app.requestitem;
 import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -35,14 +35,14 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
 			throws SQLException {
 		if (emailMetadata != null)
 		{
-			DCValue[] vals = item.getMetadata(emailMetadata);
+			Metadatum[] vals = item.getMetadataByMetadataString(emailMetadata);
 			if (vals.length > 0)
 			{
 				String email = vals[0].value;
 				String fullname = null;
 				if (fullNameMatadata != null)
 				{
-					DCValue[] nameVals = item.getMetadata(fullNameMatadata); 
+					Metadatum[] nameVals = item.getMetadataByMetadataString(fullNameMatadata);
 					if (nameVals.length > 0)
 					{
 						fullname = nameVals[0].value;

@@ -39,7 +39,7 @@ public class WorkflowExceptionTransformer extends AbstractDSpaceTransformer {
         }
         Division div = body.addDivision("error");
         Table table = div.addTable("table0",2,1);
-        table.addRow().addCell().addContent("An error has occured:");
+        table.addRow().addCell().addContent("An error has occurred:");
         table.addRow().addCell().addContent(error);
 
     }

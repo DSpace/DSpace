@@ -7,9 +7,7 @@
  */
 package org.dspace.app.xmlui.cocoon;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Map;
@@ -42,6 +40,7 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.disseminate.CitationDocument;
 import org.dspace.handle.HandleManager;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
@@ -156,6 +155,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
     /** True if user agent making this request was identified as spider. */
     private boolean isSpider = false;
+
+    /** TEMP file for citation PDF. We will save here, so we can delete the temp file when done.  */
+    private File tempFile;
 
     /**
      * Set up the bitstream reader.
@@ -317,11 +319,53 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 	}
                 }
             }
-                
+
             // Success, bitstream found and the user has access to read it.
             // Store these for later retrieval:
-            this.bitstreamInputStream = bitstream.retrieve();
-            this.bitstreamSize = bitstream.getSize();
+
+            // Intercepting views to the original bitstream to instead show a citation altered version of the object
+            // We need to check if this resource falls under the "show watermarked alternative" umbrella.
+            // At which time we will not return the "bitstream", but will instead on-the-fly generate the citation rendition.
+
+            // What will trigger a redirect/intercept?
+            // 1) Intercepting Enabled
+            // 2) This User is not an admin
+            // 3) This object is citation-able
+            if (CitationDocument.isCitationEnabledForBitstream(bitstream, context)) {
+                // on-the-fly citation generator
+                log.info(item.getHandle() + " - " + bitstream.getName() + " is citable.");
+
+                FileInputStream fileInputStream = null;
+                CitationDocument citationDocument = new CitationDocument();
+
+                try {
+                    //Create the cited document
+                    tempFile = citationDocument.makeCitedDocument(bitstream);
+                    if(tempFile == null) {
+                        log.error("CitedDocument was null");
+                    } else {
+                        log.info("CitedDocument was ok," + tempFile.getAbsolutePath());
+                    }
+
+
+                    fileInputStream = new FileInputStream(tempFile);
+                    if(fileInputStream == null) {
+                        log.error("Error opening fileInputStream: ");
+                    }
+
+                    this.bitstreamInputStream = fileInputStream;
+                    this.bitstreamSize = tempFile.length();
+
+                } catch (Exception e) {
+                    log.error("Caught an error with intercepting the citation document:" + e.getMessage());
+                }
+
+                //End of CitationDocument
+            } else {
+                this.bitstreamInputStream = bitstream.retrieve();
+                this.bitstreamSize = bitstream.getSize();
+            }
+
             this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
             this.bitstreamName = bitstream.getName();
             if (context.getCurrentUser() == null)
@@ -351,8 +395,17 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             }
             else
             {
-                // In case there is no bitstream name...
-                bitstreamName = "bitstream";
+                // In-case there is no bitstream name...
+                if(name != null && name.length() > 0) {
+                    bitstreamName = name;
+                    if(name.endsWith(".jpg")) {
+                        bitstreamMimeType = "image/jpeg";
+                    } else if(name.endsWith(".png")) {
+                        bitstreamMimeType = "image/png";
+                    }
+                } else {
+                    bitstreamName = "bitstream";
+                }
             }
             
             // Log that the bitstream has been viewed, this is non-cached and the complexity

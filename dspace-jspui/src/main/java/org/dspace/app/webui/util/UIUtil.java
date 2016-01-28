@@ -22,21 +22,28 @@ import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.itemmarking.ItemMarkingExtractor;
+import org.dspace.app.itemmarking.ItemMarkingInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.browse.BrowseItem;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
+import org.dspace.utils.DSpace;
 
 /**
  * Miscellaneous UI utility methods
@@ -470,4 +477,114 @@ public class UIUtil extends Util
 			response.setHeader("Content-Disposition", "attachment;filename=" + name);
 		}
 	}
+	
+	/**
+	 * Generate the (X)HTML required to show the item marking. Based on the markType it tries to find
+	 * the corresponding item marking Strategy on the iem_marking.xml Spring configuration file in order
+	 * to apply it to the item.
+	 * This method is used in BrowseListTag and ItemListTag to du the actual item marking in browse
+	 * and search results
+	 * 
+	 * @param hrq The servlet request
+	 * @param dso The DSpaceObject to mark (it can be a BrowseItem or an Item)
+	 * @param markType the type of the mark.
+	 * @return
+	 * @throws JspException
+	 */
+    public static String getMarkingMarkup(HttpServletRequest hrq, DSpaceObject dso, String markType)
+            throws JspException
+    {
+    	try
+    	{
+    		String contextPath = hrq.getContextPath();
+    		
+            Context c = UIUtil.obtainContext(hrq);
+            
+            Item item = null;
+    		if (dso instanceof BrowseItem){
+    			item = Item.find(c, dso.getID());
+    		}
+    		else if (dso instanceof Item){
+    			item = (Item)dso;
+    		}
+    		
+            String mark = markType.replace("mark_", "");
+            
+            ItemMarkingExtractor markingExtractor = new DSpace()
+				.getServiceManager()
+				.getServiceByName(
+						ItemMarkingExtractor.class.getName()+"."+mark,
+						ItemMarkingExtractor.class);
+            
+            if (markingExtractor == null){ // In case we cannot find the corresponding extractor (strategy) in xml beans
+            	return "";
+            }
+            
+            ItemMarkingInfo markInfo = markingExtractor.getItemMarkingInfo(c, item);
+            
+            if (markInfo == null){
+            	return "";
+            }
+            
+            StringBuffer markFrag = new StringBuffer();
+            
+            String localizedTooltip = null;
+            if (markInfo.getTooltip()!=null){
+            	localizedTooltip = org.dspace.core.I18nUtil.getMessage(markInfo.getTooltip(), hrq.getLocale());
+            }
+            		
+            String markLink = markInfo.getLink();
+            
+            if (markInfo.getImageName()!=null){
+            	
+            	//Link
+            	if (StringUtils.isNotEmpty(markLink)){
+            		markFrag.append("<a href=\"")
+            			.append(contextPath+"/" + markLink)
+            			.append("\">");
+            	}
+            	
+            	markFrag.append("<img class=\""+markType+"_img\" src=\""+ contextPath+"/")
+            		.append(markInfo.getImageName()).append("\"");
+            	if (StringUtils.isNotEmpty(localizedTooltip)){
+            		markFrag.append(" title=\"")
+            			.append(localizedTooltip)
+            			.append("\"");
+            	}
+            	markFrag.append("/>");
+            	
+            	//Link
+            	if (StringUtils.isNotEmpty(markLink)){
+            		markFrag.append("</a>");
+            	}
+            }
+            else  if (markInfo.getClassInfo()!=null){
+            	//Link
+            	if (StringUtils.isNotEmpty(markLink)){
+            		markFrag.append("<a href=\"")
+            			.append(contextPath+"/" + markLink)
+            			.append("\">");
+            	}
+
+            	markFrag.append("<div class=\""+markType+"_class" + " " + markInfo.getClassInfo() + "\" ");
+            	if (StringUtils.isNotEmpty(localizedTooltip)){
+            		markFrag.append(" title=\"")
+            		.append(localizedTooltip)
+            		.append("\"");
+            	}
+            	markFrag.append("/>");
+
+            	//Link
+            	if (StringUtils.isNotEmpty(markLink)){
+            		markFrag.append("</a>");
+            	}
+            }
+            
+        	return markFrag.toString();
+        }
+        catch (SQLException sqle)
+        {
+        	throw new JspException(sqle.getMessage(), sqle);
+        }
+    }
 }

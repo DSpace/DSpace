@@ -16,10 +16,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.*;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
@@ -30,9 +27,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.MissingResourceException;
+import java.util.*;
 
 /**
  * Class representing a community
@@ -47,13 +42,10 @@ import java.util.MissingResourceException;
 public class Community extends DSpaceObject
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(Community.class);
-
-    /** Our context */
-    private Context ourContext;
+    private static final Logger log = Logger.getLogger(Community.class);
 
     /** The table row corresponding to this item */
-    private TableRow communityRow;
+    private final TableRow communityRow;
 
     /** The logo bitstream */
     private Bitstream logo;
@@ -63,9 +55,6 @@ public class Community extends DSpaceObject
 
     /** Flag set when data is modified, for events */
     private boolean modified;
-
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
 
     /** The default group of administrators */
     private Group admins;
@@ -86,7 +75,12 @@ public class Community extends DSpaceObject
      */
     Community(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
+        super(context);
+
+        // Ensure that my TableRow is typed.
+        if (null == row.getTable())
+            row.setTable("community");
+
         communityRow = row;
 
         // Get the logo bitstream
@@ -107,7 +101,6 @@ public class Community extends DSpaceObject
         context.cache(this, row.getIntColumn("community_id"));
 
         modified = false;
-        modifiedMetadata = false;
 
         admins = groupFromColumn("admin");
 
@@ -232,12 +225,15 @@ public class Community extends DSpaceObject
         myPolicy.setGroup(anonymousGroup);
         myPolicy.update();
 
-        context.addEvent(new Event(Event.CREATE, Constants.COMMUNITY, c.getID(), c.handle));
+        context.addEvent(new Event(Event.CREATE, Constants.COMMUNITY, c.getID(), 
+                c.handle, c.getIdentifiers(context)));
 
         // if creating a top-level Community, simulate an ADD event at the Site.
         if (parent == null)
         {
-            context.addEvent(new Event(Event.ADD, Constants.SITE, Site.SITE_ID, Constants.COMMUNITY, c.getID(), c.handle));
+            context.addEvent(new Event(Event.ADD, Constants.SITE, Site.SITE_ID, 
+                    Constants.COMMUNITY, c.getID(), c.handle, 
+                    c.getIdentifiers(context)));
         }
 
         log.info(LogManager.getHeader(context, "create_community",
@@ -258,8 +254,25 @@ public class Community extends DSpaceObject
      */
     public static Community[] findAll(Context context) throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.queryTable(context, "community",
-                "SELECT * FROM community ORDER BY name");
+        TableRowIterator tri = null;
+        try {
+            String query = "SELECT c.* FROM community c " +
+                    "LEFT JOIN metadatavalue m on (m.resource_id = c.community_id and m.resource_type_id = ? and m.metadata_field_id = ?) ";
+            if(DatabaseManager.isOracle()){
+                query += " ORDER BY cast(m.text_value as varchar2(128))";
+            }else{
+                query += " ORDER BY m.text_value";
+            }
+
+            tri = DatabaseManager.query(context,
+                    query,
+                    Constants.COMMUNITY,
+                    MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID()
+            );
+        } catch (SQLException e) {
+            log.error("Find all Communities - ",e);
+            throw e;
+        }
 
         List<Community> communities = new ArrayList<Community>();
 
@@ -311,10 +324,25 @@ public class Community extends DSpaceObject
     public static Community[] findAllTop(Context context) throws SQLException
     {
         // get all communities that are not children
-        TableRowIterator tri = DatabaseManager.queryTable(context, "community",
-                "SELECT * FROM community WHERE NOT community_id IN "
-                        + "(SELECT child_comm_id FROM community2community) "
-                        + "ORDER BY name");
+        TableRowIterator tri = null;
+        try {
+            String query = "SELECT c.* FROM community c  "
+                    + "LEFT JOIN metadatavalue m on (m.resource_id = c.community_id and m.resource_type_id = ? and m.metadata_field_id = ?) "
+                    + "WHERE NOT c.community_id IN (SELECT child_comm_id FROM community2community) ";
+            if(DatabaseManager.isOracle()){
+                query += " ORDER BY cast(m.text_value as varchar2(128))";
+            }else{
+                query += " ORDER BY m.text_value";
+            }
+            tri = DatabaseManager.query(context,
+                    query,
+                    Constants.COMMUNITY,
+                    MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID()
+            );
+        } catch (SQLException e) {
+            log.error("Find all Top Communities - ",e);
+            throw e;
+        }
 
         List<Community> topCommunities = new ArrayList<Community>();
 
@@ -390,10 +418,12 @@ public class Community extends DSpaceObject
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
+    @Deprecated
     public String getMetadata(String field)
     {
-    	String metadata = communityRow.getStringColumn(field);
-    	return (metadata == null) ? "" : metadata;
+        String[] MDValue = getMDValueByLegacyField(field);
+        String value = getMetadataFirstValue(MDValue[0], MDValue[1], MDValue[2], Item.ANY);
+        return value == null ? "" : value;
     }
 
     /**
@@ -408,9 +438,9 @@ public class Community extends DSpaceObject
      *                if the requested metadata field doesn't exist
      * @exception MissingResourceException
      */
-    public void setMetadata(String field, String value)throws MissingResourceException
-    {
-        if ((field.trim()).equals("name") 
+    @Deprecated
+    public void setMetadata(String field, String value) throws MissingResourceException {
+        if ((field.trim()).equals("name")
                 && (value == null || value.trim().equals("")))
         {
             try
@@ -422,28 +452,31 @@ public class Community extends DSpaceObject
                 value = "Untitled";
             }
         }
-        
-        /* 
-         * Set metadata field to null if null 
+
+        String[] MDValue = getMDValueByLegacyField(field);
+
+        /*
+         * Set metadata field to null if null
          * and trim strings to eliminate excess
          * whitespace.
          */
         if(value == null)
         {
-            communityRow.setColumnNull(field);
+            clearMetadata(MDValue[0], MDValue[1], MDValue[2], Item.ANY);
+            modifiedMetadata = true;
         }
         else
         {
-            communityRow.setColumn(field, value.trim());
+            setMetadataSingleValue(MDValue[0], MDValue[1], MDValue[2], null, value);
         }
-        
-        modifiedMetadata = true;
+
         addDetails(field);
     }
 
     public String getName()
     {
-        return getMetadata("name");
+        String value = getMetadataFirstValue(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        return value == null ? "" : value;
     }
 
     /**
@@ -527,13 +560,13 @@ public class Community extends DSpaceObject
 
         if (modified)
         {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, 
+                    getID(), null, getIdentifiers(ourContext)));
             modified = false;
         }
         if (modifiedMetadata)
         {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.COMMUNITY, getID(), getDetails()));
-            modifiedMetadata = false;
+            updateMetadata();
             clearDetails();
         }
     }
@@ -623,12 +656,27 @@ public class Community extends DSpaceObject
         List<Collection> collections = new ArrayList<Collection>();
 
         // Get the table rows
-        TableRowIterator tri = DatabaseManager.queryTable(
-        	ourContext,"collection",
-            "SELECT collection.* FROM collection, community2collection WHERE " +
-            "community2collection.collection_id=collection.collection_id " +
-            "AND community2collection.community_id= ? ORDER BY collection.name",
-            getID());
+        TableRowIterator tri = null;
+        try {
+            String query = "SELECT c.* FROM community2collection c2c, collection c "
+                    + "LEFT JOIN metadatavalue m on (m.resource_id = c.collection_id and m.resource_type_id = ? and m.metadata_field_id = ?) "
+                    + "WHERE c2c.collection_id=c.collection_id AND c2c.community_id=? ";
+            if(DatabaseManager.isOracle()){
+                query += " ORDER BY cast(m.text_value as varchar2(128))";
+            }else{
+                query += " ORDER BY m.text_value";
+            }
+            tri = DatabaseManager.query(
+                    ourContext,
+                    query,
+                    Constants.COLLECTION,
+                    MetadataField.findByElement(ourContext, MetadataSchema.find(ourContext, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID(),
+                    getID()
+            );
+        } catch (SQLException e) {
+            log.error("Find all Collections for this community - ",e);
+            throw e;
+        }
 
         // Make Collection objects
         try
@@ -679,13 +727,30 @@ public class Community extends DSpaceObject
         List<Community> subcommunities = new ArrayList<Community>();
 
         // Get the table rows
-        TableRowIterator tri = DatabaseManager.queryTable(
-                ourContext,"community",
-                "SELECT community.* FROM community, community2community WHERE " +
-                "community2community.child_comm_id=community.community_id " + 
-                "AND community2community.parent_comm_id= ? ORDER BY community.name",
-                getID());
-        
+        TableRowIterator tri = null;
+        try {
+            String query = "SELECT c.* FROM community2community c2c, community c " +
+                    "LEFT JOIN metadatavalue m on (m.resource_id = c.community_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
+                    "WHERE c2c.child_comm_id=c.community_id " +
+                    "AND c2c.parent_comm_id= ? ";
+            if(DatabaseManager.isOracle()){
+                query += " ORDER BY cast(m.text_value as varchar2(128))";
+            }else{
+                query += " ORDER BY m.text_value";
+            }
+
+            tri = DatabaseManager.query(
+                    ourContext,
+                    query,
+                    Constants.COMMUNITY,
+                    MetadataField.findByElement(ourContext, MetadataSchema.find(ourContext, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID(),
+                    getID()
+            );
+        } catch (SQLException e) {
+            log.error("Find all Sub Communities - ",e);
+            throw e;
+        }
+
 
         // Make Community objects
         try
@@ -903,7 +968,9 @@ public class Community extends DSpaceObject
                 mappingRow.setColumn("community_id", getID());
                 mappingRow.setColumn("collection_id", c.getID());
 
-                ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COLLECTION, c.getID(), c.getHandle()));
+                ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, 
+                        getID(), Constants.COLLECTION, c.getID(), c.getHandle(),
+                        getIdentifiers(ourContext)));
 
                 DatabaseManager.insert(ourContext, mappingRow);
             }
@@ -978,7 +1045,9 @@ public class Community extends DSpaceObject
                 mappingRow.setColumn("parent_comm_id", getID());
                 mappingRow.setColumn("child_comm_id", c.getID());
 
-                ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COMMUNITY, c.getID(), c.getHandle()));
+                ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, 
+                        getID(), Constants.COMMUNITY, c.getID(), c.getHandle(),
+                        getIdentifiers(ourContext)));
 
                 DatabaseManager.insert(ourContext, mappingRow);
             }
@@ -994,10 +1063,15 @@ public class Community extends DSpaceObject
     }
 
     /**
-     * Remove a collection. Any items then orphaned are deleted.
+     * Remove a collection. If it only belongs to one parent community,
+     * then it is permanently deleted. If it has more than one parent community,
+     * it is simply unmapped from the current community.
      * 
      * @param c
      *            collection to remove
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     public void removeCollection(Collection c) throws SQLException,
             AuthorizeException, IOException
@@ -1005,143 +1079,193 @@ public class Community extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        // will be the collection an orphan?
-        TableRow trow = DatabaseManager.querySingle(ourContext,
-                "SELECT COUNT(DISTINCT community_id) AS num FROM community2collection WHERE collection_id= ? ",
-                c.getID());
-        DatabaseManager.setConstraintDeferred(ourContext, "comm2coll_collection_fk");
-        
-        if (trow.getLongColumn("num") == 1)
+        // Do the removal in a try/catch, so that we can rollback on error
+        try
         {
-            // Orphan; delete it            
-            c.delete();
-        }
-        
-        log.info(LogManager.getHeader(ourContext, "remove_collection",
-                "community_id=" + getID() + ",collection_id=" + c.getID()));
-        
-        // Remove any mappings
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM community2collection WHERE community_id= ? "+
-                "AND collection_id= ? ", getID(), c.getID());
+            // Capture ID & Handle of Collection we are removing, so we can trigger events later
+            int removedId = c.getID();
+            String removedHandle = c.getHandle();
+            String[] removedIdentifiers = c.getIdentifiers(ourContext);
 
-        DatabaseManager.setConstraintImmediate(ourContext, "comm2coll_collection_fk");
+            // How many parent(s) does this collection have?
+            TableRow trow = DatabaseManager.querySingle(ourContext,
+                    "SELECT COUNT(DISTINCT community_id) AS num FROM community2collection WHERE collection_id= ? ",
+                    c.getID());
+            long numParents = trow.getLongColumn("num");
+
+            // Remove the parent/child mapping with this collection
+            // We do this before deletion, so that the deletion doesn't throw database integrity violations
+            DatabaseManager.updateQuery(ourContext,
+                    "DELETE FROM community2collection WHERE community_id= ? "+
+                    "AND collection_id= ? ", getID(), c.getID());
+
+            // As long as this Collection only had one parent, delete it
+            // NOTE: if it had multiple parents, we will keep it around,
+            // and just remove that single parent/child mapping
+            if (numParents == 1)
+            {
+                c.delete();
+            }
         
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COLLECTION, c.getID(), c.getHandle()));
+            // log the removal & trigger any associated event(s)
+            log.info(LogManager.getHeader(ourContext, "remove_collection",
+                    "community_id=" + getID() + ",collection_id=" + removedId));
+        
+            ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), 
+                    Constants.COLLECTION, removedId, removedHandle, removedIdentifiers));
+        }
+        catch(SQLException|IOException e)
+        {
+            // Immediately abort the deletion, rolling back the transaction
+            ourContext.abort();
+            // Pass exception upwards for additional reporting/handling as needed
+            throw e;
+        }
     }
 
     /**
-     * Remove a subcommunity. Any substructure then orphaned is deleted.
+     * Remove a subcommunity. If it only belongs to one parent community,
+     * then it is permanently deleted. If it has more than one parent community,
+     * it is simply unmapped from the current community.
      * 
      * @param c
      *            subcommunity to remove
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     public void removeSubcommunity(Community c) throws SQLException,
             AuthorizeException, IOException
     {
-        // Check authorisation
+        // Check authorisation.
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        // will be the subcommunity an orphan?
-        TableRow trow = DatabaseManager.querySingle(ourContext,
-                "SELECT COUNT(DISTINCT parent_comm_id) AS num FROM community2community WHERE child_comm_id= ? ",
-                c.getID());
-
-        DatabaseManager.setConstraintDeferred(ourContext, "com2com_child_fk");
-        if (trow.getLongColumn("num") == 1)
+        // Do the removal in a try/catch, so that we can rollback on error
+        try
         {
-            // Orphan; delete it
-            c.rawDelete();
+            // Capture ID & Handle of Community we are removing, so we can trigger events later
+            int removedId = c.getID();
+            String removedHandle = c.getHandle();
+            String[] removedIdentifiers = c.getIdentifiers(ourContext);
+        
+            // How many parent(s) does this subcommunity have?
+            TableRow trow = DatabaseManager.querySingle(ourContext,
+                    "SELECT COUNT(DISTINCT parent_comm_id) AS num FROM community2community WHERE child_comm_id= ? ",
+                    c.getID());
+            long numParents = trow.getLongColumn("num");
+
+            // Remove the parent/child mapping with this subcommunity
+            // We do this before deletion, so that the deletion doesn't throw database integrity violations
+            DatabaseManager.updateQuery(ourContext,
+                    "DELETE FROM community2community WHERE parent_comm_id= ? " +
+                    " AND child_comm_id= ? ", getID(),c.getID());
+
+            // As long as this Community only had one parent, delete it
+            // NOTE: if it had multiple parents, we will keep it around,
+            // and just remove that single parent/child mapping
+            if (numParents == 1)
+            {
+                c.rawDelete();
+            }
+
+            // log the removal & trigger any related event(s)
+            log.info(LogManager.getHeader(ourContext, "remove_subcommunity",
+                    "parent_comm_id=" + getID() + ",child_comm_id=" + removedId));
+
+            ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COMMUNITY, removedId, removedHandle, removedIdentifiers));
         }
-
-        log.info(LogManager.getHeader(ourContext, "remove_subcommunity",
-                "parent_comm_id=" + getID() + ",child_comm_id=" + c.getID()));
-        
-        // Remove any mappings
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM community2community WHERE parent_comm_id= ? " +
-                " AND child_comm_id= ? ", getID(),c.getID());
-
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COMMUNITY, c.getID(), c.getHandle()));
-        
-        DatabaseManager.setConstraintImmediate(ourContext, "com2com_child_fk");
+        catch(SQLException|IOException e)
+        {
+            // Immediately abort the deletion, rolling back the transaction
+            ourContext.abort();
+            // Pass exception upwards for additional reporting/handling as needed
+            throw e;
+        }
     }
 
     /**
-     * Delete the community, including the metadata and logo. Collections and
-     * subcommunities that are then orphans are deleted.
+     * Delete the community, including the metadata and logo. Any children
+     * (subcommunities or collections) are also deleted.
+     * 
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     public void delete() throws SQLException, AuthorizeException, IOException
     {
-        // Check authorisation
-        // FIXME: If this was a subcommunity, it is first removed from it's
-        // parent.
-        // This means the parentCommunity == null
-        // But since this is also the case for top-level communities, we would
-        // give everyone rights to remove the top-level communities.
-        // The same problem occurs in removing the logo
-        if (!AuthorizeManager.authorizeActionBoolean(ourContext,
-                getParentCommunity(), Constants.REMOVE))
+        // Check for a parent Community
+        Community parent = getParentCommunity();
+
+        // Check authorisation.
+        // MUST have either REMOVE permissions on parent community (if exists)
+        // OR have DELETE permissions on current community
+        if (parent!= null && !AuthorizeManager.authorizeActionBoolean(ourContext,
+                parent, Constants.REMOVE))
         {
+            // If we don't have Parent Community REMOVE permissions, then
+            // we MUST at least have current Community DELETE permissions
             AuthorizeManager
                     .authorizeAction(ourContext, this, Constants.DELETE);
         }
 
-        // If not a top-level community, have parent remove me; this
-        // will call rawDelete() before removing the linkage
-        Community parent = getParentCommunity();
-
-        if (parent != null)
+        // Check if this is a top-level Community or not
+        if (parent == null)
         {
-            // remove the subcommunities first
-            Community[] subcommunities = getSubcommunities();
-            for (int i = 0; i < subcommunities.length; i++)
-            {
-                subcommunities[i].delete();
-            }
-            // now let the parent remove the community
+            // Call rawDelete to clean up all sub-communities & collections
+            // under this Community, then delete the Community itself
+            rawDelete();
+
+            // Since this is a top level Community, simulate a REMOVE event at the Site.
+            ourContext.addEvent(new Event(Event.REMOVE, Constants.SITE, Site.SITE_ID,
+                    Constants.COMMUNITY, getID(), getHandle(), getIdentifiers(ourContext)));
+        } else {
+            // This is a subcommunity, so let the parent remove it
+            // NOTE: this essentially just logs event and calls "rawDelete()"
             parent.removeSubcommunity(this);
-
-            return;
         }
-
-        rawDelete();        
     }
     
     /**
-     * Internal method to remove the community and all its childs from the database without aware of eventually parent  
+     * Internal method to remove the community and all its children from the
+     * database, and perform any pre/post-cleanup
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     private void rawDelete() throws SQLException, AuthorizeException, IOException
     {
         log.info(LogManager.getHeader(ourContext, "delete_community",
                 "community_id=" + getID()));
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, getID(), getHandle()));
+        // Capture ID & Handle of object we are removing, so we can trigger events later
+        int deletedId = getID();
+        String deletedHandle = getHandle();
+        String[] deletedIdentifiers = getIdentifiers(ourContext);
 
-        // Remove from cache
+        // Remove Community object from cache
         ourContext.removeCached(this, getID());
 
-        // Remove collections
-        Collection[] cols = getCollections();
-
-        for (int i = 0; i < cols.length; i++)
+        // Remove any collections directly under this Community
+        for (Collection collection : getCollections())
         {
-            removeCollection(cols[i]);
+            removeCollection(collection);
         }
 
-        // delete subcommunities
-        Community[] comms = getSubcommunities();
-
-        for (int j = 0; j < comms.length; j++)
+        // Remove any SubCommunities under this Community
+        for (Community community : getSubcommunities())
         {
-            comms[j].delete();
+            removeSubcommunity(community);
         }
 
-        // Remove the logo
+        // Remove the Community logo
         setLogo(null);
 
-        // Remove all authorization policies
+        // Remove all associated authorization policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
+
+        // Delete the Dublin Core
+        removeMetadataFromDatabase();
 
         // get rid of the content count cache if it exists
         try
@@ -1156,19 +1280,22 @@ public class Community extends DSpaceObject
             throw new IllegalStateException(e.getMessage(),e);
         }
 
-        // Remove any Handle
+        // Unbind any handle associated with this Community
         HandleManager.unbindHandle(ourContext, this);
 
-        // Delete community row
+        // Delete community row (which actually removes the Community)
         DatabaseManager.delete(ourContext, communityRow);
 
-        // Remove administrators group - must happen after deleting community
+        // Remove Community administrators group (if exists)
+        // NOTE: this must happen AFTER deleting community
         Group g = getAdministrators();
-
         if (g != null)
         {
             g.delete();
         }
+
+        // If everything above worked, then trigger any associated events
+        ourContext.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, deletedId, deletedHandle, deletedIdentifiers));
     }
 
     /**
@@ -1335,6 +1462,7 @@ public class Community extends DSpaceObject
     public void updateLastModified()
     {
         //Also fire a modified event since the community HAS been modified
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, getID(), null));
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, 
+                getID(), null, getIdentifiers(ourContext)));
     }
 }

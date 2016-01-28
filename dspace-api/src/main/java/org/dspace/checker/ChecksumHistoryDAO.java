@@ -111,7 +111,7 @@ public class ChecksumHistoryDAO extends DAOSupport
         try
         {
             conn = DatabaseManager.getConnection();
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            if (DatabaseManager.isOracle())
             {
                 stmt = conn.prepareStatement(INSERT_HISTORY_ORACLE);
             }
@@ -183,7 +183,7 @@ public class ChecksumHistoryDAO extends DAOSupport
         PreparedStatement stmt = null;
         try
         {
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            if (DatabaseManager.isOracle())
             {
                 stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS_ORACLE);
             }
