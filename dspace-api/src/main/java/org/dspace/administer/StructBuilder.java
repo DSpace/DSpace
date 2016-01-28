@@ -68,21 +68,24 @@ public class StructBuilder {
      * the output xml document which will contain updated information about the
      * imported structure
      */
-    private static org.jdom.Document xmlOutput = new org.jdom.Document(new Element("imported_structure"));
+    private static final org.jdom.Document xmlOutput = new org.jdom.Document(new Element("imported_structure"));
 
     /**
      * a hashtable to hold metadata for the collection being worked on
      */
-    private static Map<String, String> collectionMap = new HashMap<String, String>();
+    private static final Map<String, String> collectionMap = new HashMap<String, String>();
 
     /**
      * a hashtable to hold metadata for the community being worked on
      */
-    private static Map<String, String> communityMap = new HashMap<String, String>();
+    private static final Map<String, String> communityMap = new HashMap<String, String>();
 
-    protected static CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    protected static CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    protected static EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected static CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
+    protected static CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    protected static EPersonService ePersonService
+            = EPersonServiceFactory.getInstance().getEPersonService();
 
     /**
      * Default constructor
@@ -172,15 +175,13 @@ public class StructBuilder {
 
         // generate the output
         Element root = xmlOutput.getRootElement();
-        for (int i = 0; i < elements.length; i++) {
-            root.addContent(elements[i]);
+        for (Element element : elements) {
+            root.addContent(element);
         }
 
         // finally write the string into the output file
-        try {
-            BufferedWriter out = new BufferedWriter(new FileWriter(output));
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(output))) {
             out.write(new XMLOutputter().outputString(xmlOutput));
-            out.close();
         } catch (IOException e) {
             System.out.println("Unable to write to output file " + output);
             System.exit(0);
@@ -209,7 +210,7 @@ public class StructBuilder {
      */
     private static void validate(org.w3c.dom.Document document)
         throws TransformerException {
-        StringBuffer err = new StringBuffer();
+        StringBuilder err = new StringBuilder();
         boolean trip = false;
 
         err.append("The following errors were encountered parsing the source XML\n");
@@ -246,7 +247,7 @@ public class StructBuilder {
      */
     private static String validateCommunities(NodeList communities, int level)
         throws TransformerException {
-        StringBuffer err = new StringBuffer();
+        StringBuilder err = new StringBuilder();
         boolean trip = false;
         String errs = null;
 
@@ -255,8 +256,11 @@ public class StructBuilder {
             NodeList name = XPathAPI.selectNodeList(n, "name");
             if (name.getLength() != 1) {
                 String pos = Integer.toString(i + 1);
-                err.append("-The level " + level + " community in position " + pos);
-                err.append(" does not contain exactly one name field\n");
+                err.append("-The level ")
+                        .append(level)
+                        .append(" community in position ")
+                        .append(pos)
+                        .append(" does not contain exactly one name field\n");
                 trip = true;
             }
 
@@ -294,7 +298,7 @@ public class StructBuilder {
      */
     private static String validateCollections(NodeList collections, int level)
         throws TransformerException {
-        StringBuffer err = new StringBuffer();
+        StringBuilder err = new StringBuilder();
         boolean trip = false;
         String errs = null;
 
@@ -303,8 +307,11 @@ public class StructBuilder {
             NodeList name = XPathAPI.selectNodeList(n, "name");
             if (name.getLength() != 1) {
                 String pos = Integer.toString(i + 1);
-                err.append("-The level " + level + " collection in position " + pos);
-                err.append(" does not contain exactly one name field\n");
+                err.append("-The level ")
+                        .append(level)
+                        .append(" collection in position ")
+                        .append(pos)
+                        .append(" does not contain exactly one name field\n");
                 trip = true;
             }
         }
