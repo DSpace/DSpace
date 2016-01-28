@@ -17,7 +17,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.util.AbstractMap;
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -39,6 +42,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * Command-line utility for generating HTML and Sitemaps.org protocol Sitemaps.
@@ -54,6 +59,7 @@ public class GenerateSitemaps
     private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     public static void main(String[] args) throws Exception
     {
@@ -74,6 +80,8 @@ public class GenerateSitemaps
         options
                 .addOption("p", "ping", true,
                         "ping specified search engine URL");
+        options.addOption("x", "exclude", true,
+                "exclude items from list of communities, collections, and items, given as comma separated list of handles");
 
         CommandLine line = null;
 
@@ -114,10 +122,35 @@ public class GenerateSitemaps
             System.exit(1);
         }
 
+        Context c = new Context();
+
         // Note the negation (CLI options indicate NOT to generate a sitemap)
         if (!line.hasOption('b') || !line.hasOption('s'))
         {
-            generateSitemaps(!line.hasOption('b'), !line.hasOption('s'));
+            ArrayList<DSpaceObject> excludeObjs = new ArrayList<DSpaceObject>();
+
+            String excludes = line.getOptionValue('x');
+            if (null != excludes) {
+                String[] excludeIds = excludes.split(",");
+                if (excludeIds.length == 0) {
+                    System.err.println("must provide id list to exclude");
+                    hf.printHelp(usage, options);
+                    System.exit(1);
+                }
+
+                for (String id : excludeIds) {
+                    DSpaceObject obj = handleService.resolveToObject(c, id);
+                    if (obj == null) {
+                        hf.printHelp(usage, options);
+                        System.exit(1);
+                    } else {
+                        System.out.println("Will exclude " + obj.toString() + " " + obj.getHandle());
+                        excludeObjs.add(obj);
+                    }
+                }
+            }
+
+            generateSitemaps(c, !line.hasOption('b'), !line.hasOption('s'), excludeObjs);
         }
 
         if (line.hasOption('a'))
@@ -154,8 +187,8 @@ public class GenerateSitemaps
      * @throws IOException
      *             if IO error occurs.
      */
-    public static void generateSitemaps(boolean makeHTMLMap,
-            boolean makeSitemapOrg) throws SQLException, IOException
+    public static void generateSitemaps(Context c, boolean makeHTMLMap,
+            boolean makeSitemapOrg, ArrayList<DSpaceObject> excludeObjs) throws SQLException, IOException
     {
         String sitemapStem = ConfigurationManager.getProperty("dspace.url")
                 + "/sitemap";
@@ -185,82 +218,91 @@ public class GenerateSitemaps
                     + "?map=", null);
         }
 
-        Context c = new Context();
+        ArrayList<AbstractMap.SimpleEntry<String, Date>> handleDateList = new java.util.ArrayList<>();
 
-        List<Community> comms = communityService.findAll(c);
-
-        for (Community comm : comms) {
-            String url = handleURLStem + comm.getHandle();
-
-            if (makeHTMLMap) {
-                html.addURL(url, null);
-            }
-            if (makeSitemapOrg) {
-                sitemapsOrg.addURL(url, null);
-            }
+        ArrayList<String> handelList = new ArrayList<String>();
+        List<Community> comms = communityService.findAllTop(c);
+        for (Community com: comms) {
+            addCommunityHandles(c, com, excludeObjs, handleDateList);
         }
 
-        List<Collection> colls = collectionService.findAll(c);
-
-        for (Collection coll : colls) {
-            String url = handleURLStem + coll.getHandle();
-
+        int nurl = 0;
+        for (AbstractMap.SimpleEntry<String, Date> handleDate: handleDateList) {
+            String hdl = handleDate.getKey();
+            Date date = handleDate.getValue();
+            String url = handleURLStem + hdl;
             if (makeHTMLMap) {
-                html.addURL(url, null);
+                html.addURL(url, date);
             }
             if (makeSitemapOrg) {
-                sitemapsOrg.addURL(url, null);
+                sitemapsOrg.addURL(url, date);
             }
-        }
-
-        Iterator<Item> allItems = itemService.findAll(c);
-        int itemCount = 0;
-
-        while (allItems.hasNext())
-        {
-            Item i = allItems.next();
-            String url = handleURLStem + i.getHandle();
-            Date lastMod = i.getLastModified();
-
-            if (makeHTMLMap)
-            {
-                html.addURL(url, lastMod);
-            }
-            if (makeSitemapOrg)
-            {
-                sitemapsOrg.addURL(url, lastMod);
-            }
-
-            itemCount++;
+            nurl++;
         }
 
         if (makeHTMLMap)
         {
             int files = html.finish();
             log.info(LogManager.getHeader(c, "write_sitemap",
-                    "type=html,num_files=" + files + ",communities="
-                            + comms.size() + ",collections=" + colls.size()
-                            + ",items=" + itemCount));
+                    "type=html,num_files=" + files + ", number of urls=" + nurl));
         }
 
         if (makeSitemapOrg)
         {
             int files = sitemapsOrg.finish();
             log.info(LogManager.getHeader(c, "write_sitemap",
-                    "type=html,num_files=" + files + ",communities="
-                            + comms.size() + ",collections=" + colls.size()
-                            + ",items=" + itemCount));
+                    "type=xml,num_files=" + files + ", number of urls=" + nurl));
         }
 
         c.abort();
     }
 
-    /**
-     * Ping all search engines configured in {@code dspace.cfg}.
-     * 
-     * @throws UnsupportedEncodingException
-     *             theoretically should never happen
-     */
+
+    public static void addCommunityHandles(Context c, Community obj, ArrayList<DSpaceObject> excludes,
+                                           ArrayList<AbstractMap.SimpleEntry<String, Date>> handleList) throws SQLException {
+        if (excludes.contains(obj)) {
+            log.info("Skipping " + obj.getHandle()  + " '" + obj.getName() + "'");
+            return;
+        }
+        handleList.add(new java.util.AbstractMap.SimpleEntry<String, Date>(obj.getHandle(),null));
+        List<Community> comms = obj.getSubcommunities();
+        for (Community com : comms) {
+            addCommunityHandles(c, com, excludes, handleList);
+        }
+
+        List<Collection> colls = obj.getCollections();
+        for (Collection col : colls) {
+            addCollectionHandles(c, col, excludes, handleList);
+        }
+    }
+
+    public static void addCollectionHandles(Context c, Collection obj,
+                                            ArrayList<DSpaceObject> excludes,
+                                            ArrayList<AbstractMap.SimpleEntry<String, Date>> handleList) throws SQLException {
+        if (excludes.contains(obj)) {
+            log.info("Skipping " + obj.getHandle()  + "  '" + obj.getName() + "'");
+            return;
+        }
+        handleList.add(new java.util.AbstractMap.SimpleEntry<String, Date>(obj.getHandle(),null));
+
+        Iterator<Item> iter = itemService.findAllByCollection(c, obj);
+        while (iter.hasNext()) {
+            Item i = iter.next();
+            if (excludes.contains(i)) {
+                log.info("Skipping " + i.getHandle() + "  '" + i.getName() + "'");
+            } else {
+                Date lastMod = i.getLastModified();
+                handleList.add(new java.util.AbstractMap.SimpleEntry<String, Date>(obj.getHandle(),lastMod));
+            }
+        }
+    }
+
+        /**
+         * Ping all search engines configured in {@code dspace.cfg}.
+         *
+         * @throws UnsupportedEncodingException
+         *             theoretically should never happen
+         */
     public static void pingConfiguredSearchEngines()
             throws UnsupportedEncodingException
     {
