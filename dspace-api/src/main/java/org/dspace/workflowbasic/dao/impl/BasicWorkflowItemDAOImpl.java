@@ -74,4 +74,9 @@ public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflow
         criteria.add(Restrictions.eq("owner", ePerson));
         return list(criteria);
     }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM BasicWorkflowItem"));
+    }
 }

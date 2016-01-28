@@ -70,4 +70,10 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
     public Iterator<Item> findAll(Context context, boolean archived,
             boolean withdrawn, boolean discoverable, Date lastModified)
             throws SQLException;
+
+    int countRows(Context context) throws SQLException;
+
+    int countNotArchived(Context context) throws SQLException;
+
+    int countWithdrawn(Context context) throws SQLException;
 }

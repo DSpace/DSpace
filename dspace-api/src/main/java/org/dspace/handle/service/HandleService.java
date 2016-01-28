@@ -184,4 +184,6 @@ public interface HandleService {
     public int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException;
 
     public void modifyHandleDSpaceObject(Context context, String handle, DSpaceObject newOwner) throws SQLException;
+
+    int countTotal(Context context) throws SQLException;
 }

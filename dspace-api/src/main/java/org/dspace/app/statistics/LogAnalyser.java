@@ -71,6 +71,9 @@ public class LogAnalyser
     
     /** warning counter */
     private static int warnCount = 0;
+
+    /** exception counter */
+    private static int excCount = 0;
     
     /** log line counter */
     private static int lineCount = 0;
@@ -148,7 +151,10 @@ public class LogAnalyser
    
    /** a pattern to match a valid version 1.3 log file line */
    private static Pattern valid13 = null;
-   
+
+  /** basic log line */
+   private static Pattern validBase = null;
+
    /** a pattern to match a valid version 1.4 log file line */
    private static Pattern valid14 = null;
    
@@ -289,7 +295,7 @@ public class LogAnalyser
      * @param   myEndDate       the desired end of the analysis.  Goes to the end otherwise
      * @param   myLookUp        force a lookup of the database
      */
-    public static void processLogs(Context context, String myLogDir, 
+    public static String processLogs(Context context, String myLogDir, 
                                     String myFileTemplate, String myConfigFile, 
                                     String myOutFile, Date myStartDate, 
                                     Date myEndDate, boolean myLookUp)
@@ -369,7 +375,7 @@ public class LogAnalyser
                 {
                     // get the log line object
                     LogLine logLine = getLogLine(line);
-                    
+
                     // if there are line segments get on with the analysis
                     if (logLine != null)
                     {
@@ -420,13 +426,22 @@ public class LogAnalyser
                                 logEndDate = logLine.getDate();
                             }
                         }
-                        
+
                         // count the warnings
                         if (logLine.isLevel("WARN"))
                         {
                             // FIXME: really, this ought to be some kind of level
                             // aggregator
                             warnCount++;
+                        }
+                        // count the exceptions
+                        if (logLine.isLevel("ERROR"))
+                        {
+                            excCount++;
+                        }
+
+                        if ( null == logLine.getAction() ) {
+                            continue;
                         }
 
                         // is the action a search?
@@ -513,9 +528,7 @@ public class LogAnalyser
         }
         
         // finally, write the output
-        createOutput();
-
-        return;
+        return createOutput();
     }
    
     
@@ -575,7 +588,7 @@ public class LogAnalyser
     /**
      * generate the analyser's output to the specified out file
      */
-    public static void createOutput()
+    public static String createOutput()
     {
         // start a string buffer to hold the final output
         StringBuffer summary = new StringBuffer();
@@ -588,6 +601,7 @@ public class LogAnalyser
         
         // output the number of warnings encountered
         summary.append("warnings=" + Integer.toString(warnCount) + "\n");
+        summary.append("exceptions=" + Integer.toString(excCount) + "\n");
         
         // set the general summary config up in the aggregator file
         for (int i = 0; i < generalSummary.size(); i++)
@@ -725,7 +739,7 @@ public class LogAnalyser
             System.exit(0);
         }
         
-        return;
+        return summary.toString();
     }
     
     
@@ -796,10 +810,12 @@ public class LogAnalyser
         singleRX = Pattern.compile("( . |^. | .$)");
         
         // set up the standard log file line regular expression
+        String logLineBase = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ (.*)"; //date time LEVEL class @ whatever
         String logLine13 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:([^:]+):(.*)";
         String logLine14 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:[^:]+:([^:]+):(.*)";
         valid13 = Pattern.compile(logLine13);
         valid14 = Pattern.compile(logLine14);
+        validBase = Pattern.compile(logLineBase);
         
         // set up the pattern for validating log file names
         logRegex = Pattern.compile(fileTemplate);
@@ -1126,6 +1142,16 @@ public class LogAnalyser
         }
         else
         {
+            match = validBase.matcher(line);
+            if ( match.matches() ) {
+                LogLine logLine = new LogLine(parseDate(match.group(1).trim()),
+                    LogManager.unescapeLogField(match.group(2)).trim(),
+                    null,
+                    null,
+                    null
+                );
+                return logLine;
+            }
             return null;
         }
     }
@@ -1173,11 +1199,12 @@ public class LogAnalyser
         {
             accessionedQuery.append("*");
         }
+        accessionedQuery.append("]");
         discoverQuery.addFilterQueries(accessionedQuery.toString());
         discoverQuery.addFilterQueries("withdrawn: false");
         discoverQuery.addFilterQueries("archived: true");
 
-        return SearchUtils.getSearchService().search(context, discoverQuery).getMaxResults();
+        return (int)SearchUtils.getSearchService().search(context, discoverQuery).getTotalSearchResults();
     }
     
     

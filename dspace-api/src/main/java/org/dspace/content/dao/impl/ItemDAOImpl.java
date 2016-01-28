@@ -246,4 +246,19 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setTimestamp("last_modified", since);
         return iterate(query);
     }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Item"));
+    }
+
+    @Override
+    public int countNotArchived(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Item i WHERE i.inArchive=false AND i.withdrawn=false"));
+    }
+
+    @Override
+    public int countWithdrawn(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Item i WHERE i.withdrawn=true"));
+    }
 }

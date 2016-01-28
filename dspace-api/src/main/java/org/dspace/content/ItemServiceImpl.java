@@ -1152,4 +1152,19 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     {
         return itemDAO.findByLastModifiedSince(context, last);
     }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return itemDAO.countRows(context);
+    }
+
+    @Override
+    public int getNotArchivedItemsCount(Context context) throws SQLException {
+        return itemDAO.countNotArchived(context);
+    }
+
+    @Override
+    public int countWithdrawnItems(Context context) throws SQLException {
+        return itemDAO.countWithdrawn(context);
+    }
 }

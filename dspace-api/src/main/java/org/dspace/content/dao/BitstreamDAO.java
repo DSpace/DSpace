@@ -41,4 +41,12 @@ public interface BitstreamDAO extends DSpaceObjectLegacySupportDAO<Bitstream> {
     public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException;
 
     public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException;
+
+    int countRows(Context context) throws SQLException;
+
+    int countDeleted(Context context) throws SQLException;
+
+    int countWithNoPolicy(Context context) throws SQLException;
+
+    List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
 }

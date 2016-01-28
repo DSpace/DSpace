@@ -32,4 +32,6 @@ public interface MetadataValueDAO extends GenericDAO<MetadataValue> {
 
     public MetadataValue getMinimum(Context context, int metadataFieldId)
             throws SQLException;
+
+    int countRows(Context context) throws SQLException;
 }

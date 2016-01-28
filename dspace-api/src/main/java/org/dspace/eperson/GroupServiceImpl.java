@@ -377,6 +377,11 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
     }
 
+    @Override
+    public List<Group> getEmptyGroups(Context context) throws SQLException {
+        return groupDAO.getEmptyGroups(context);
+    }
+
     /**
      * Update the group - writing out group object and EPerson list if necessary
      */
@@ -606,5 +611,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     public Group findByLegacyId(Context context, int id) throws SQLException {
         return groupDAO.findByLegacyId(context, id, Group.class);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return groupDAO.countRows(context);
     }
 }

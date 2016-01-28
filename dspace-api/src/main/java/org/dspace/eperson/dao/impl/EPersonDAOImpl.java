@@ -145,4 +145,14 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
 
         return query;
     }
+
+    @Override
+    public List<EPerson> findAllSubscribers(Context context) throws SQLException {
+        return list(createQuery(context, "SELECT DISTINCT e from Subscription s join s.ePerson e"));
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM EPerson"));
+    }
 }

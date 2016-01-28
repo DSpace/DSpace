@@ -428,4 +428,9 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     public Bundle findByLegacyId(Context context, int id) throws SQLException {
         return bundleDAO.findByLegacyId(context, id, Bundle.class);
     }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return bundleDAO.countRows(context);
+    }
 }
