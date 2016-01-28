@@ -4,7 +4,9 @@
 # Note: If you want to change this file, copy it to project/config
 # 
 
-# lindat settings
+# lindat-common settings
+DIR_LINDAT_COMMON_THEME :=/opt/lindat-common
+URL_LINDAT_COMMON_GIT   :=https://github.com/ufal/lindat-common.git
 LINDAT_COMMON_THEME_FETCH=git fetch && git checkout -f releases && git pull
 
 # tomcat

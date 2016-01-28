@@ -205,11 +205,6 @@ selenium.test.admin.name =
 
 ############################################
 
-# Location for common lindat theme
-# This location will be used to create a symlink in xmlui webapp to always point the latest common header and footer
-lr.common.theme = /opt/lindat-common
-
-
 # Metadata quality ########################
 
 # you should map the solr (if it is not public which it should not)
