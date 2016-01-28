@@ -1363,7 +1363,24 @@
                          alt="Basic and Applied Ecology cover"/>
                 </a>
             </xsl:when>
-            
+            <xsl:when test='$journal-name = "Behavioral Ecology"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://beheco.oxfordjournals.org/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/BEHECOCover.png"
+                         alt="Behavioral Ecology cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "Biodiversity Data Journal"'>
             	<a target="_blank">
                 	<xsl:attribute name="href">
@@ -1454,7 +1471,24 @@
                          alt="BioRisk cover"/>
                 </a>
             </xsl:when>
-
+            <xsl:when test='$journal-name = "Bioscience"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://bioscience.oxfordjournals.org/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/BIOSCICover.png"
+                         alt="Bioscience cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "Biotropica"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
@@ -1473,7 +1507,6 @@
                          alt="Biotropica cover"/>
                 </a>
             </xsl:when>
-            
             <xsl:when test='$journal-name = "BMC Ecology"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
@@ -1796,6 +1829,25 @@
                          alt="eLife logo"/>
                 </a>
             </xsl:when>
+
+            <xsl:when test='$journal-name = "Environmental Epigenetics"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://eep.oxfordjournals.org/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ENVEPICover.png"
+                         alt="Environmental Epigenetics cover"/>
+                </a>
+            </xsl:when>
             
 			<xsl:when test='$journal-name = "Evidence-based Preclinical Medicine"'>
 				<a target="_blank">
@@ -1900,7 +1952,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/gms_ejournal.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="German Medical Science cover"/>
                 </a>
             </xsl:when>
@@ -1918,7 +1970,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSMIBEcover.gif"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="Cover of GMS Medizinische Informatik, Biometrie und Epidemiologie"/>
                 </a>
             </xsl:when>
@@ -1936,7 +1988,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_gpras.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS German Plastic, Reconstructive and Aesthetic Surgery cover"/>
                 </a>
             </xsl:when>
@@ -1954,7 +2006,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_id.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS Infectious Diseases cover"/>
                 </a>
             </xsl:when>
@@ -1972,7 +2024,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_iprs_klein.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS Interdisciplinary Plastic and Reconstructive Surgery DGPW cover"/>
                 </a>
             </xsl:when>
@@ -1990,7 +2042,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_dgho.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS Onkologische Rehabilitation und Sozialmedizin cover"/>
                 </a>
             </xsl:when>
@@ -2008,7 +2060,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_gma_klein.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS Zeitschrift für Medizinische Ausbildung cover"/>
                 </a>
             </xsl:when>
@@ -2026,7 +2078,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_lab.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/GMSCover.png"
                          alt="GMS Zeitschrift zur Förderung der Qualitätssicherung in medizinischen Laboratorien cover"/>
                 </a>
             </xsl:when>
@@ -2272,6 +2324,26 @@
                          alt="Journal of Paleontology cover"/>
                 </a>
             </xsl:when>
+
+            <xsl:when test='$journal-name = "Journal of Urban Ecology"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://jue.oxfordjournals.org/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/JUECOLCover.png"
+                         alt="Journal of Urban Ecology cover"/>
+                </a>
+            </xsl:when>
+
             <xsl:when test='$journal-name = "Methods in Ecology and Evolution"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
@@ -2816,6 +2888,64 @@
                          alt="Systematic Botany cover"/>
                 </a>
             </xsl:when>
+
+            <xsl:when test='$journal-name = "Toxicological Sciences"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://toxsci.oxfordjournals.org/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/TOXSCICover.png"
+                         alt="Toxicological Sciences cover"/>
+                </a>
+            </xsl:when>
+
+            <xsl:when test='$journal-name = "Virus Evolution"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://ve.oxfordjournals.org/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/VEVOLUCover.png"
+                         alt="Virus Evolution cover"/>
+                </a>
+            </xsl:when>
+
+            <xsl:when test='$journal-name = "Work, Aging and Retirement"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://workar.oxfordjournals.org/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/WORKARCover.png"
+                         alt="Work, Aging and Retirement cover"/>
+                </a>
+            </xsl:when>
+
             <xsl:when test='$journal-name = "ZooKeys"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
