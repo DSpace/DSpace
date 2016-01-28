@@ -128,7 +128,7 @@ public class EmbargoManager
         throws SQLException, AuthorizeException, IOException
     {
         init();
-        DCValue terms[] = item.getMetadata(terms_schema, terms_element,
+        Metadatum terms[] = item.getMetadata(terms_schema, terms_element,
                 terms_qualifier, Item.ANY);
 
         DCDate result = null;
@@ -338,7 +338,7 @@ public class EmbargoManager
         throws Exception
     {
         boolean status = false;
-        DCValue lift[] = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
+        Metadatum lift[] = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
 
         if (lift.length > 0)
         {
@@ -448,7 +448,7 @@ public class EmbargoManager
     // it was never under embargo, or the lift date has passed.
     private static DCDate recoverEmbargoDate(Item item) {
         DCDate liftDate = null;
-        DCValue lift[] = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
+        Metadatum lift[] = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
         if (lift.length > 0)
         {
             liftDate = new DCDate(lift[0].value);

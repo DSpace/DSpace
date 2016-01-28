@@ -38,8 +38,7 @@ public class Community extends DSpaceObject{
     private String copyrightText, introductoryText, shortDescription, sidebarText;
     private Integer countItems;
 
-    @XmlElement(name = "subcommunities", required = true)
-    private List<Community> subCommunities = new ArrayList<Community>();
+    private List<Community> subcommunities = new ArrayList<Community>();
 
     private List<Collection> collections = new ArrayList<Collection>();
 
@@ -87,10 +86,10 @@ public class Community extends DSpaceObject{
 
         if(expandFields.contains("subCommunities") || expandFields.contains("all")) {
             org.dspace.content.Community[] communityArray = community.getSubcommunities();
-            subCommunities = new ArrayList<Community>();
+            subcommunities = new ArrayList<Community>();
             for(org.dspace.content.Community subCommunity : communityArray) {
                 if(AuthorizeManager.authorizeActionBoolean(context, subCommunity, org.dspace.core.Constants.READ)) {
-                    subCommunities.add(new Community(subCommunity, null, context));
+                	subcommunities.add(new Community(subCommunity, null, context));
                 } else {
                     log.info("Omitted restricted subCommunity: " + subCommunity.getID() + " _ " + subCommunity.getName());
                 }
@@ -171,4 +170,19 @@ public class Community extends DSpaceObject{
     public Bitstream getLogo() {
         return logo;
     }
+
+    public void setLogo(Bitstream logo) {
+        this.logo = logo;
+    }
+
+    // Renamed because of xml annotation exception with this attribute and getSubCommunities.
+    @XmlElement(name = "subcommunities", required = true)
+	public List<Community> getSubcommunities() {
+		return subcommunities;
+	}
+	
+	public void setSubcommunities(List<Community> subcommunities) {
+		this.subcommunities = subcommunities;
+	}
+    
 }

@@ -54,7 +54,7 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
 
 		// the item title is the sword collection title, or "untitled" otherwise
 		String title = "Untitled";
-		DCValue[] dcv = item.getMetadata("dc.title");
+		Metadatum[] dcv = item.getMetadataByMetadataString("dc.title");
 		if (dcv.length > 0)
 		{
 			title = dcv[0].value;
@@ -67,7 +67,7 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
 
 		// abstract is the short description of the item, if it exists
 		String dcAbstract = "";
-		DCValue[] dcva = item.getMetadata("dc.description.abstract");
+		Metadatum[] dcva = item.getMetadataByMetadataString("dc.description.abstract");
 		if (dcva.length > 0)
 		{
 			dcAbstract = dcva[0].value;

@@ -36,23 +36,23 @@
          -->
         <load-on-startup>1</load-on-startup>
     </servlet>
+
     <servlet-mapping>
         <servlet-name>DSpace REST API</servlet-name>
-        <!--
-        The url-pattern can be used to define your URL.
-        Example, running local host with a context of "hello" and path annotation of "world"
-        on the HelloWorld class:
-
-         <url-pattern>/*</url-pattern>
-          The web service will be available at: http://localhost:8080/hello/world
-
-
-         <url-pattern>/jersey/*</url-pattern>
-        The web service will be available at http://localhost:8080/hello/jersey/world
-        -->
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
-
+    
+    <!-- Security settings and mapping -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>DSpace REST API</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+    
     <!-- DSpace Configuration Information -->
     <context-param>
         <param-name>dspace-config</param-name>
@@ -79,25 +79,23 @@
         -->
     </context-param>
 
-    <listener>
-        <listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
-    </listener>
-
-    <!-- kernel start listener (from impl)
-    	The following listener can be used instead of the filter below, it is simpler, cleaner
-    	and eliminates the need for a DSpaceKernelServletFilter filter to be involved with the
-    	request cycle.
+    <!-- 
+       DSpace Kernel startup listener. This listener is in charge of initializing/starting the
+       DSpace Kernel. It MUST be listed BEFORE any other DSpace listeners, as DSpace services
+       will not function until the Kernel is initialized.
     -->
     <listener>
         <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
     </listener>
+
+    <listener>
+        <listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
+    </listener>
     
     <listener>
-		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-	</listener>
-
-
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
 
 </web-app>

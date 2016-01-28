@@ -9,13 +9,14 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>dspace-parent</artifactId>
-		<version>4.1-6-SNAPSHOT</version>
+		<version>5.4</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../..</root.basedir>
+        <license.skip>true</license.skip>
     </properties>
 
 
@@ -73,6 +74,8 @@
                 <module>xmlui</module>
             </modules>
         </profile>
+        <!-- Note:- The LNI module is not built by default and is considered deprecated.
+            To build it activate the profile with '-Pdspace-lni'. -->
         <profile>
             <id>dspace-lni</id>
             <modules>
@@ -83,6 +86,17 @@
             <id>dspace-jspui</id>
             <modules>
                 <module>jspui</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-rdf</id>
+            <activation>
+                <file>
+                    <exists>rdf/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>rdf</module>
             </modules>
         </profile>
         <profile>
@@ -121,6 +135,5 @@
                 <module>xmlui-mirage2</module>
             </modules>
         </profile>
-        
     </profiles>
 </project>

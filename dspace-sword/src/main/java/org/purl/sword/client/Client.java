@@ -13,15 +13,19 @@ import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 
 import java.util.Properties;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.FileRequestEntity;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpParams;
 import org.apache.log4j.Logger;
 import org.purl.sword.base.ChecksumUtils;
 import org.purl.sword.base.DepositResponse;
@@ -76,7 +80,7 @@ public class Client implements SWORDClient {
 	/**
 	 * The client that is used to send data to the specified server.
 	 */
-	private HttpClient client;
+	private final DefaultHttpClient client;
 
 	/**
 	 * The default connection timeout. This can be modified by using the
@@ -87,17 +91,19 @@ public class Client implements SWORDClient {
 	/**
 	 * Logger.
 	 */
-	private static Logger log = Logger.getLogger(Client.class);
+	private static final Logger log = Logger.getLogger(Client.class);
 
 	/**
 	 * Create a new Client. The client will not use authentication by default.
 	 */
 	public Client() {
-		client = new HttpClient();
-		client.getParams().setParameter("http.socket.timeout",
+		client = new DefaultHttpClient();
+        HttpParams params = client.getParams();
+		params.setParameter("http.socket.timeout",
 				Integer.valueOf(DEFAULT_TIMEOUT));
-		log.debug("proxy host: " + client.getHostConfiguration().getProxyHost());
-		log.debug("proxy port: " + client.getHostConfiguration().getProxyPort());
+        HttpHost proxyHost = (HttpHost) params.getParameter(ConnRoutePNames.DEFAULT_PROXY); // XXX does this really work?
+		log.debug("proxy host: " + proxyHost.getHostName());
+		log.debug("proxy port: " + proxyHost.getPort());
         doAuthentication = false;
 	}
 
@@ -137,7 +143,7 @@ public class Client implements SWORDClient {
 	private void setBasicCredentials(String username, String password) {
 		log.debug("server: " + server + " port: " + port + " u: '" + username
 				+ "' p '" + password + "'");
-		client.getState().setCredentials(new AuthScope(server, port),
+		client.getCredentialsProvider().setCredentials(new AuthScope(server, port),
 				new UsernamePasswordCredentials(username, password));
 	}
 
@@ -164,21 +170,22 @@ public class Client implements SWORDClient {
 	 *            The port.
 	 */
 	public void setProxy(String host, int port) {
-		client.getHostConfiguration().setProxy(host, port);
+        client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
+                new HttpHost(host, port)); // XXX does this really work?
 	}
 
 	/**
 	 * Clear the proxy setting.
 	 */
 	public void clearProxy() {
-		client.getHostConfiguration().setProxyHost(null);
+        client.getParams().removeParameter(ConnRoutePNames.DEFAULT_PROXY); // XXX does this really work?
 	}
 
 	/**
 	 * Clear any user credentials that have been set for this client.
 	 */
 	public void clearCredentials() {
-		client.getState().clearProxyCredentials();
+		client.getCredentialsProvider().clear();
 		doAuthentication = false;
 	}
 
@@ -245,40 +252,38 @@ public class Client implements SWORDClient {
 			}
 		}
 		
-		GetMethod httpget = new GetMethod(serviceDocURL.toExternalForm());
+		HttpGet httpget = new HttpGet(serviceDocURL.toExternalForm());
 		if (doAuthentication) {
 			// this does not perform any check on the username password. It
 			// relies on the server to determine if the values are correct.
 			setBasicCredentials(username, password);
-			httpget.setDoAuthentication(true);
 		}
 
         Properties properties = new Properties();
 
 		if (containsValue(onBehalfOf)) {
-			log.debug("Setting on-behalf-of: " + onBehalfOf);
-			httpget.addRequestHeader(new Header(HttpHeaders.X_ON_BEHALF_OF,
-					onBehalfOf));
+			log.debug("Setting on-behalf-of: " + onBehalfOf);httpget.addHeader(url, url);
+			httpget.addHeader(HttpHeaders.X_ON_BEHALF_OF, onBehalfOf);
             properties.put(HttpHeaders.X_ON_BEHALF_OF, onBehalfOf);
 		}
 
 		if (containsValue(userAgent)) {
 			log.debug("Setting userAgent: " + userAgent);
-			httpget.addRequestHeader(new Header(HttpHeaders.USER_AGENT,
-					userAgent));
+			httpget.addHeader(HttpHeaders.USER_AGENT, userAgent);
             properties.put(HttpHeaders.USER_AGENT, userAgent);
 		}
 
 		ServiceDocument doc = null;
 
 		try {
-			client.executeMethod(httpget);
+			HttpResponse response = client.execute(httpget);
+            StatusLine statusLine = response.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
 			// store the status code
-			status = new Status(httpget.getStatusCode(), httpget
-					.getStatusText());
+			status = new Status(statusCode, statusLine.getReasonPhrase());
 
 			if (status.getCode() == HttpStatus.SC_OK) {
-				String message = readResponse(httpget.getResponseBodyAsStream());
+				String message = readResponse(response.getEntity().getContent());
 				log.debug("returned message is: " + message);
 				doc = new ServiceDocument();
 				lastUnmarshallInfo = doc.unmarshall(message, properties);
@@ -287,8 +292,6 @@ public class Client implements SWORDClient {
 						"Received error from service document request: "
 								+ status);
 			}
-		} catch (HttpException ex) {
-			throw new SWORDClientException(ex.getMessage(), ex);
 		} catch (IOException ioex) {
 			throw new SWORDClientException(ioex.getMessage(), ioex);
 		} catch (UnmarshallException uex) {
@@ -326,11 +329,10 @@ public class Client implements SWORDClient {
 			throw new SWORDClientException("Message cannot be null.");
 		}
 
-		PostMethod httppost = new PostMethod(message.getDestination());
+		HttpPost httppost = new HttpPost(message.getDestination());
 
 		if (doAuthentication) {
 			setBasicCredentials(username, password);
-			httppost.setDoAuthentication(true);
 		}
 
 		DepositResponse response = null;
@@ -345,75 +347,69 @@ public class Client implements SWORDClient {
 				}
 				log.debug("checksum error is: " + md5);
 				if (md5 != null) {
-					httppost.addRequestHeader(new Header(
-							HttpHeaders.CONTENT_MD5, md5));
+					httppost.addHeader(HttpHeaders.CONTENT_MD5, md5);
 				}
 			}
 
 			String filename = message.getFilename();
 			if (! "".equals(filename)) {
-				httppost.addRequestHeader(new Header(
-						HttpHeaders.CONTENT_DISPOSITION, " filename="
-								+ filename));
+				httppost.addHeader(HttpHeaders.CONTENT_DISPOSITION,
+                        " filename=" + filename);
 			}
 
 			if (containsValue(message.getSlug())) {
-				httppost.addRequestHeader(new Header(HttpHeaders.SLUG, message
-						.getSlug()));
+				httppost.addHeader(HttpHeaders.SLUG, message.getSlug());
 			}
 
             if(message.getCorruptRequest())
             {
                 // insert a header with an invalid boolean value
-                httppost.addRequestHeader(new Header(HttpHeaders.X_NO_OP, "Wibble"));
+                httppost.addHeader(HttpHeaders.X_NO_OP, "Wibble");
             }else{
-                httppost.addRequestHeader(new Header(HttpHeaders.X_NO_OP, Boolean
-					.toString(message.isNoOp())));
+                httppost.addHeader(HttpHeaders.X_NO_OP, Boolean
+					.toString(message.isNoOp()));
             }
-			httppost.addRequestHeader(new Header(HttpHeaders.X_VERBOSE, Boolean
-					.toString(message.isVerbose())));
+			httppost.addHeader(HttpHeaders.X_VERBOSE, Boolean
+					.toString(message.isVerbose()));
 
 			String packaging = message.getPackaging();
 			if (packaging != null && packaging.length() > 0) {
-				httppost.addRequestHeader(new Header(
-						HttpHeaders.X_PACKAGING, packaging));
+				httppost.addHeader(HttpHeaders.X_PACKAGING, packaging);
 			}
 
 			String onBehalfOf = message.getOnBehalfOf();
 			if (containsValue(onBehalfOf)) {
-				httppost.addRequestHeader(new Header(
-						HttpHeaders.X_ON_BEHALF_OF, onBehalfOf));
+				httppost.addHeader(HttpHeaders.X_ON_BEHALF_OF, onBehalfOf);
 			}
 			
 			String userAgent = message.getUserAgent();
 			if (containsValue(userAgent)) {
-				httppost.addRequestHeader(new Header(
-						HttpHeaders.USER_AGENT, userAgent));
+				httppost.addHeader(HttpHeaders.USER_AGENT, userAgent);
 			}
-			
-			
-			FileRequestEntity requestEntity = new FileRequestEntity(
-			   new File(message.getFilepath()), message.getFiletype());
-			httppost.setRequestEntity(requestEntity);
 
-			client.executeMethod(httppost);
-			status = new Status(httppost.getStatusCode(), httppost
-					.getStatusText());
+
+			FileEntity requestEntity = new FileEntity(
+                    new File(message.getFilepath()),
+                    ContentType.create(message.getFiletype()));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse httpResponse = client.execute(httppost);
+            StatusLine statusLine = httpResponse.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
+			status = new Status(statusCode, statusLine.getReasonPhrase());
 
 			log.info("Checking the status code: " + status.getCode());
 
 			if (status.getCode() == HttpStatus.SC_ACCEPTED
 					|| status.getCode() == HttpStatus.SC_CREATED) {
-				messageBody = readResponse(httppost
-						.getResponseBodyAsStream());
+				messageBody = readResponse(httpResponse.getEntity().getContent());
 				response = new DepositResponse(status.getCode()); 
-				response.setLocation(httppost.getResponseHeader("Location").getValue());
+				response.setLocation(httpResponse.getFirstHeader("Location").getValue());
 				// added call for the status code.
 				lastUnmarshallInfo = response.unmarshall(messageBody, new Properties());
 			}
 			else {
-				messageBody = readResponse(httppost
-						.getResponseBodyAsStream());
+				messageBody = readResponse(httpResponse.getEntity().getContent());
 				response = new DepositResponse(status.getCode());
 				response.unmarshallErrorDocument(messageBody);
 			}
@@ -422,8 +418,6 @@ public class Client implements SWORDClient {
 		} catch (NoSuchAlgorithmException nex) {
 			throw new SWORDClientException("Unable to use MD5. "
 					+ nex.getMessage(), nex);
-		} catch (HttpException ex) {
-			throw new SWORDClientException(ex.getMessage(), ex);
 		} catch (IOException ioex) {
 			throw new SWORDClientException(ioex.getMessage(), ioex);
 		} catch (UnmarshallException uex) {

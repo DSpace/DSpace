@@ -15,7 +15,6 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import org.apache.avalon.framework.activity.Disposable;
 import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
@@ -42,10 +41,11 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.harvest.HarvestedCollection;
-import org.dspace.harvest.OAIHarvester.HarvestScheduler;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.OAIHarvester.HarvestScheduler;
+import org.dspace.storage.rdbms.DatabaseManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -473,63 +473,73 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
             }
         }
     }
-	
+
+    private static final String T_UNSET = "UNSET";
+
+    /**
+     * Guarantee a non-null String.
+     *
+     * @param value candidate string.
+     * @return {@code value} or a constant indicating an unset value.
+     */
+    private static String notempty(String value) { return (null == value || "".equals(value)) ? T_UNSET : value; }
+
     /**
      * List important DSpace configuration parameters.
      */
     private void addDSpaceConfiguration(Division div) throws WingException 
     {
+
         // LIST: DSpace
         List dspace = div.addList("dspace");
         dspace.setHead(T_DSPACE_HEAD);
-        
+
         dspace.addLabel(T_DSPACE_VERSION);
         dspace.addItem(Util.getSourceVersion());
-        
+
         dspace.addLabel(T_DSPACE_DIR);
-    	dspace.addItem(ConfigurationManager.getProperty("dspace.dir"));
-    
+        dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.dir")));
+
         dspace.addLabel(T_DSPACE_URL);
-    	dspace.addItem(ConfigurationManager.getProperty("dspace.url"));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.url")));
 
         dspace.addLabel(T_DSPACE_HOST_NAME);
-    	dspace.addItem(ConfigurationManager.getProperty("dspace.hostname"));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.hostname")));
 
         dspace.addLabel(T_DSPACE_NAME);
-    	dspace.addItem(ConfigurationManager.getProperty("dspace.name"));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.name")));
 
         dspace.addLabel(T_DB_NAME);
-    	dspace.addItem(ConfigurationManager.getProperty("db.name"));
+        dspace.addItem(notempty(DatabaseManager.getDbName()));
 
-    	dspace.addLabel(T_DB_URL);
-    	dspace.addItem(ConfigurationManager.getProperty("db.url"));
+        dspace.addLabel(T_DB_URL);
+        dspace.addItem(notempty(ConfigurationManager.getProperty("db.url")));
 
         dspace.addLabel(T_DB_DRIVER);
-    	dspace.addItem(ConfigurationManager.getProperty("db.driver"));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("db.driver")));
 
-    	dspace.addLabel(T_DB_MAX_CONN);
-    	dspace.addItem(ConfigurationManager.getProperty("db.maxconnections"));
-
+        dspace.addLabel(T_DB_MAX_CONN);
+        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxconnections")));
 
         dspace.addLabel(T_DB_MAX_WAIT);
-    	dspace.addItem(ConfigurationManager.getProperty("db.maxwait"));
-    	
+        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxwait")));
+
         dspace.addLabel(T_DB_MAX_IDLE);
-    	dspace.addItem(ConfigurationManager.getProperty("db.maxidle"));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxidle")));
 
        	dspace.addLabel(T_MAIL_SERVER);
-    	dspace.addItem(ConfigurationManager.getProperty("mail.server"));
- 
+        dspace.addItem(notempty(ConfigurationManager.getProperty("mail.server")));
+
         dspace.addLabel(T_MAIL_FROM_ADDRESS);
-    	dspace.addItem(ConfigurationManager.getProperty("mail.from.address"));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("mail.from.address")));
 
         dspace.addLabel(T_FEEDBACK_RECIPIENT);
-    	dspace.addItem(ConfigurationManager.getProperty("feedback.recipient"));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("feedback.recipient")));
 
         dspace.addLabel(T_MAIL_ADMIN);
-    	dspace.addItem(ConfigurationManager.getProperty("mail.admin"));        
+        dspace.addItem(notempty(ConfigurationManager.getProperty("mail.admin")));
     }
-	
+
     /**
      * Add a section that allows administrators to activate or deactivate system-wide alerts.
      */

@@ -18,6 +18,41 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
-
+    <bean name='org.dspace.util.MultiFormatDateParser'
+          class='org.dspace.util.MultiFormatDateParser'>
+        <property name='patterns'>
+            <map>
+                <entry key='\d{8}' value='yyyyMMdd'/>
+                <entry key='\d{1,2}-\d{1,2}-\d{4}' value='dd-MM-yyyy'/>
+                <entry key='\d{4}-\d{1,2}-\d{1,2}' value='yyyy-MM-dd'/>
+                <entry key='\d{4}-\d{1,2}' value='yyyy-MM'/>
+                <entry key='\d{1,2}/\d{1,2}/\d{4}' value='MM/dd/yyyy'/>
+                <entry key='\d{4}/\d{1,2}/\d{1,2}' value='yyyy/MM/dd'/>
+                <entry key='\d{1,2}\s[a-z]{3}\s\d{4}' value='dd MMM yyyy'/>
+                <entry key='\d{1,2}\s[a-z]{4,}\s\d{4}' value='dd MMMM yyyy'/>
+                <entry key='\d{12}' value='yyyyMMddHHmm'/>
+                <entry key='\d{8}\s\d{4}' value='yyyyMMdd HHmm'/>
+                <entry key='\d{1,2}-\d{1,2}-\d{4}\s\d{1,2}:\d{2}' value='dd-MM-yyyy HH:mm'/>
+                <entry key='\d{4}-\d{1,2}-\d{1,2}\s\d{1,2}:\d{2}' value='yyyy-MM-dd HH:mm'/>
+                <entry key='\d{1,2}/\d{1,2}/\d{4}\s\d{1,2}:\d{2}' value='MM/dd/yyyy HH:mm'/>
+                <entry key='\d{4}/\d{1,2}/\d{1,2}\s\d{1,2}:\d{2}' value='yyyy/MM/dd HH:mm'/>
+                <entry key='\d{1,2}\s[a-z]{3}\s\d{4}\s\d{1,2}:\d{2}' value='dd MMM yyyy HH:mm'/>
+                <entry key='\d{1,2}\s[a-z]{4,}\s\d{4}\s\d{1,2}:\d{2}' value='dd MMMM yyyy HH:mm'/>
+                <entry key='\d{4}\s[a-z]{3}\s\d{1,2}' value='yyyy MMM dd'/>
+                <entry key='\d{14}' value='yyyyMMddHHmmss'/>
+                <entry key='\d{6}' value='yyyyMM'/>
+                <entry key='\d{4}' value='yyyy'/>
+                <entry key='\d{8}\s\d{6}' value='yyyyMMdd HHmmss'/>
+                <entry key='\d{1,2}-\d{1,2}-\d{4}\s\d{1,2}:\d{2}:\d{2}' value='dd-MM-yyyy HH:mm:ss'/>
+                <entry key='\d{4}-\d{1,2}-\d{1,2}\s\d{1,2}:\d{2}:\d{2}' value='yyyy-MM-dd HH:mm:ss'/>
+                <entry key='\d{1,2}/\d{1,2}/\d{4}\s\d{1,2}:\d{2}:\d{2}' value='MM/dd/yyyy HH:mm:ss'/>
+                <entry key='\d{4}/\d{1,2}/\d{1,2}\s\d{1,2}:\d{2}:\d{2}' value='yyyy/MM/dd HH:mm:ss'/>
+                <entry key='\d{1,2}\s[a-z]{3}\s\d{4}\s\d{1,2}:\d{2}:\d{2}' value='dd MMM yyyy HH:mm:ss'/>
+                <entry key='\d{1,2}\s[a-z]{4,}\s\d{4}\s\d{1,2}:\d{2}:\d{2}' value='dd MMMM yyyy HH:mm:ss'/>
+                <entry key='\d{4}-\d{1,2}-\d{1,2}T\d{1,2}:\d{2}:\d{2}Z' value="yyyy-MM-dd'T'HH:mm:ss'Z'"/>
+                <entry key='\d{4}-\d{1,2}-\d{1,2}T\d{1,2}:\d{2}:\d{2}\.\d{3}Z' value="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"/>
+            </map>
+        </property>
+    </bean>
 
 </beans>

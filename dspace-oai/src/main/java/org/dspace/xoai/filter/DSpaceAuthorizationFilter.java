@@ -14,14 +14,14 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.filter.results.DatabaseFilterResult;
+import org.dspace.xoai.filter.results.SolrFilterResult;
 
 /**
  * 
@@ -29,11 +29,10 @@ import org.dspace.xoai.data.DSpaceItem;
  */
 public class DSpaceAuthorizationFilter extends DSpaceFilter
 {
-    private static Logger log = LogManager
-            .getLogger(DSpaceAuthorizationFilter.class);
+    private static Logger log = LogManager.getLogger(DSpaceAuthorizationFilter.class);
 
     @Override
-    public DatabaseFilterResult getWhere(Context context)
+    public DatabaseFilterResult buildDatabaseQuery(Context context)
     {
         List<Object> params = new ArrayList<Object>();
         return new DatabaseFilterResult("EXISTS (SELECT p.action_id FROM "
@@ -48,34 +47,29 @@ public class DSpaceAuthorizationFilter extends DSpaceFilter
     @Override
     public boolean isShown(DSpaceItem item)
     {
+        boolean pub = false;
         try
         {
-            Context ctx = super.getContext();
+            // If Handle or Item are not found, return false
             String handle = DSpaceItem.parseHandle(item.getIdentifier());
-            if (handle == null) return false;
-            Item dsitem = (Item) HandleManager.resolveToObject(ctx, handle);
-            AuthorizeManager.authorizeAction(ctx, dsitem, Constants.READ);
-            for (Bundle b : dsitem.getBundles())
-                AuthorizeManager.authorizeAction(ctx, b, Constants.READ);
-            return true;
-        }
-        catch (AuthorizeException ex)
-        {
-            log.debug(ex.getMessage());
+            if (handle == null)
+                return false;
+            Item dspaceItem = (Item) HandleManager.resolveToObject(context, handle);
+            if (dspaceItem == null)
+                return false;
+
+            // Check if READ access allowed on Item
+            pub = AuthorizeManager.authorizeActionBoolean(context, dspaceItem, Constants.READ);
         }
         catch (SQLException ex)
         {
-            log.error(ex.getMessage());
+            log.error(ex.getMessage(), ex);
         }
-        catch (Exception ex)
-        {
-            log.error(ex.getMessage());
-        }
-        return false;
+        return pub;
     }
 
     @Override
-    public SolrFilterResult getQuery()
+    public SolrFilterResult buildSolrQuery()
     {
         return new SolrFilterResult("item.public:true");
     }

@@ -7,53 +7,93 @@
  */
 package org.dspace.xoai.filter;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import com.lyncode.xoai.dataprovider.data.Filter;
+import com.lyncode.xoai.dataprovider.data.ItemIdentifier;
+import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterMap;
+
 import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceItem;
-
-import com.lyncode.xoai.dataprovider.data.AbstractItemIdentifier;
-import com.lyncode.xoai.dataprovider.filter.AbstractFilter;
+import org.dspace.xoai.filter.results.DatabaseFilterResult;
+import org.dspace.xoai.filter.results.SolrFilterResult;
+import org.dspace.xoai.services.api.database.FieldResolver;
 
 /**
  * 
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
-public abstract class DSpaceFilter extends AbstractFilter
+public abstract class DSpaceFilter implements Filter
 {
-    private static Logger log = LogManager.getLogger(DSpaceFilter.class);
-    private Context _ctx = null;
+    /** The configuration from xoai.xml file */
+    protected ParameterMap configuration;
 
-    public void initialize(Context ctx)
-    {
-        _ctx = ctx;
-    }
+    /** The configuration from xoai.xml file */
+    protected FieldResolver fieldResolver;
 
-    public Context getContext()
-    {
-        return _ctx;
-    }
+    /** The oai context */
+    protected Context context;
 
-    /**
-     * Returns null if no where given. Or non empty if some where is given.
-     * 
-     * @param context
-     */
-    public abstract DatabaseFilterResult getWhere(Context context);
-
-    public abstract SolrFilterResult getQuery();
-
+    public abstract DatabaseFilterResult buildDatabaseQuery(Context context);
+    public abstract SolrFilterResult buildSolrQuery();
     public abstract boolean isShown(DSpaceItem item);
 
     @Override
-    public boolean isItemShown(AbstractItemIdentifier item)
+    public boolean isItemShown(ItemIdentifier item)
     {
         if (item instanceof DSpaceItem)
         {
-            boolean value = this.isShown((DSpaceItem) item);
-            if (!value) log.debug("Item "+item.getIdentifier()+" not shown because of filter "+this.getClass().getName());
-            return value;
+            return isShown((DSpaceItem) item);
         }
         return false;
+    }
+
+    /**
+     * @return the configuration map if defined in xoai.xml, otherwise null.
+     */
+    public ParameterMap getConfiguration()
+    {
+        return configuration;
+    }
+
+    /**
+     * @param configuration
+     *            the configuration map to set
+     */
+    public void setConfiguration(ParameterMap configuration)
+    {
+        this.configuration = configuration;
+    }
+
+    /**
+     * @return the fieldResolver
+     */
+    public FieldResolver getFieldResolver()
+    {
+        return fieldResolver;
+    }
+
+    /**
+     * @param fieldResolver
+     *            the fieldResolver to set
+     */
+    public void setFieldResolver(FieldResolver fieldResolver)
+    {
+        this.fieldResolver = fieldResolver;
+    }
+
+    /**
+     * @return the context
+     */
+    public Context getContext()
+    {
+        return context;
+    }
+
+    /**
+     * @param context
+     *            the context to set
+     */
+    public void setContext(Context context)
+    {
+        this.context = context;
     }
 }

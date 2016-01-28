@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -53,16 +53,25 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * <p>Then there are properties injected using Spring:</p>
  * <ul>
- *  <li>There is a Map (with the property name "crosswalk") from EZID
- *  metadata field names into DSpace field names, injected by Spring.  Specify
- *  the fully-qualified names of all metadata fields to be looked up on a DSpace
- *  object and their values set on mapped fully-qualified names in the object's
- *  DataCite metadata.</li>
- *
- *  <li>A second map ("crosswalkTransform") provides Transform instances
- *  mapped from EZID metadata field names.  This allows the crosswalk to rewrite
- *  field values where the form maintained by DSpace is not directly usable in
- *  EZID metadata.</li>
+ * <li>There is a Map (with the property name "crosswalk") from EZID metadata
+ * field names into DSpace field names, injected by Spring. Specify the
+ * fully-qualified names of all metadata fields to be looked up on a DSpace
+ * object and their values set on mapped fully-qualified names in the object's
+ * DataCite metadata.</li>
+ * 
+ * <li>A second map ("crosswalkTransform") provides Transform instances mapped
+ * from EZID metadata field names. This allows the crosswalk to rewrite field
+ * values where the form maintained by DSpace is not directly usable in EZID
+ * metadata.</li>
+ * 
+ * <li>Optional: A boolean property ("generateDataciteXML") that controls the
+ * creation and inclusion of DataCite xml schema during the metadata
+ * crosswalking. The default "DataCite" dissemination plugin uses
+ * DIM2DataCite.xsl for crosswalking. Default value: false.</li>
+ * 
+ * <li>Optional: A string property ("disseminationCrosswalkName") that can be
+ * used to set the name of the dissemination crosswalk plugin for metadata
+ * crosswalking. Default value: "DataCite".</li>
  * </ul>
  *
  * @author mwood
@@ -90,11 +99,15 @@ public class EZIDIdentifierProvider
 
     private static final String DOI_SCHEME = "doi:";
 
+    protected boolean GENERATE_DATACITE_XML = false;
+
+    protected String DATACITE_XML_CROSSWALK = "DataCite";
+
     /** Map DataCite metadata into local metadata. */
-    private static Map<String, String> crosswalk = new HashMap<String, String>();
+    private static Map<String, String> crosswalk = new HashMap<>();
 
     /** Converters to be applied to specific fields. */
-    private static Map<String, Transform> transforms = new HashMap<String, Transform>();
+    private static Map<String, Transform> transforms = new HashMap<>();
 
     /** Factory for EZID requests. */
     private static EZIDRequestFactory requestFactory;
@@ -124,14 +137,8 @@ public class EZIDIdentifierProvider
     {
         log.debug("register {}", dso);
 
-        if (!(dso instanceof Item))
-        {
-            throw new IdentifierException("Unsupported object type " + dso.getTypeText());
-        }
-
-        Item item = (Item)dso;
-        DCValue[] identifiers = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        for (DCValue identifier : identifiers)
+        Metadatum[] identifiers = dso.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        for (Metadatum identifier : identifiers)
         {
             if ((null != identifier.value) && (identifier.value.startsWith(DOI_SCHEME)))
             {
@@ -139,14 +146,12 @@ public class EZIDIdentifierProvider
             }
         }
 
-        String id = mint(context, item);
-        item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, id);
+        String id = mint(context, dso);
+        dso.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, id);
         try {
-            item.update();
+            dso.update();
             context.commit();
-        } catch (SQLException ex) {
-            throw new IdentifierException("New identifier not stored", ex);
-        } catch (AuthorizeException ex) {
+        } catch (SQLException | AuthorizeException ex) {
             throw new IdentifierException("New identifier not stored", ex);
         }
         log.info("Registered {}", id);
@@ -158,45 +163,26 @@ public class EZIDIdentifierProvider
     {
         log.debug("register {} as {}", object, identifier);
 
-        if (!(object instanceof Item))
-        {
-            // TODO throw new IdentifierException("Unsupported object type " + object.getTypeText());
-            log.error("Unsupported object type " + object.getTypeText());
-            return;
-        }
-
         EZIDResponse response;
         try {
             EZIDRequest request = requestFactory.getInstance(loadAuthority(),
                     loadUser(), loadPassword());
             response = request.create(identifier, crosswalkMetadata(object));
-        } catch (IdentifierException e) {
-            log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
-            return;
-        } catch (IOException e) {
-            log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
-            return;
-        } catch (URISyntaxException e) {
+        } catch (IdentifierException | IOException | URISyntaxException e) {
             log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
             return;
         }
 
         if (response.isSuccess())
         {
-            Item item = (Item)object;
             try {
-                item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+                object.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
                         idToDOI(identifier));
-                item.update();
+                object.update();
                 context.commit();
                 log.info("registered {}", identifier);
-            } catch (SQLException ex) {
+            } catch (SQLException | AuthorizeException | IdentifierException ex) {
                 // TODO throw new IdentifierException("New identifier not stored", ex);
-                log.error("New identifier not stored", ex);
-            } catch (AuthorizeException ex) {
-                // TODO throw new IdentifierException("New identifier not stored", ex);
-                log.error("New identifier not stored", ex);
-            } catch (IdentifierException ex) {
                 log.error("New identifier not stored", ex);
             }
         }
@@ -220,25 +206,19 @@ public class EZIDIdentifierProvider
             Map<String, String> metadata = crosswalkMetadata(dso);
             metadata.put("_status", "reserved");
             response = request.create(identifier, metadata);
-        } catch (IOException e) {
-            log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
-            return;
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
             return;
         }
 
         if (response.isSuccess())
         {
-            Item item = (Item)dso;
-            item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, idToDOI(identifier));
+            dso.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, idToDOI(identifier));
             try {
-                item.update();
+                dso.update();
                 context.commit();
                 log.info("reserved {}", identifier);
-            } catch (SQLException ex) {
-                throw new IdentifierException("New identifier not stored", ex);
-            } catch (AuthorizeException ex) {
+            } catch (SQLException | AuthorizeException ex) {
                 throw new IdentifierException("New identifier not stored", ex);
             }
         }
@@ -269,10 +249,7 @@ public class EZIDIdentifierProvider
         try
         {
             response = request.mint(crosswalkMetadata(dso));
-        } catch (IOException ex) {
-            log.error("Failed to send EZID request:  {}", ex.getMessage());
-            throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
-        } catch (URISyntaxException ex) {
+        } catch (IOException | URISyntaxException ex) {
             log.error("Failed to send EZID request:  {}", ex.getMessage());
             throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
         }
@@ -324,16 +301,7 @@ public class EZIDIdentifierProvider
             found = Item.findByMetadataField(context,
                     MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER,
                     idToDOI(identifier));
-        } catch (IdentifierException ex) {
-            log.error(ex.getMessage());
-            throw new IdentifierNotResolvableException(ex);
-        } catch (SQLException ex) {
-            log.error(ex.getMessage());
-            throw new IdentifierNotResolvableException(ex);
-        } catch (AuthorizeException ex) {
-            log.error(ex.getMessage());
-            throw new IdentifierNotResolvableException(ex);
-        } catch (IOException ex) {
+        } catch (IdentifierException | SQLException | AuthorizeException | IOException ex) {
             log.error(ex.getMessage());
             throw new IdentifierNotResolvableException(ex);
         }
@@ -361,14 +329,8 @@ public class EZIDIdentifierProvider
     {
         log.debug("lookup {}", object);
 
-        if (!(object instanceof Item))
-        {
-            throw new IllegalArgumentException("Unsupported type " + object.getTypeText());
-        }
-
-        Item item = (Item)object;
-        DCValue found = null;
-        for (DCValue candidate : item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null))
+        Metadatum found = null;
+        for (Metadatum candidate : object.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null))
         {
             if (candidate.value.startsWith(DOI_SCHEME))
             {
@@ -394,18 +356,11 @@ public class EZIDIdentifierProvider
     {
         log.debug("delete {}", dso);
 
-        if (!(dso instanceof Item))
-        {
-            throw new IllegalArgumentException("Unsupported type " + dso.getTypeText());
-        }
-
-        Item item = (Item)dso;
-
         // delete from EZID
-        DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        List<String> remainder = new ArrayList<String>();
+        Metadatum[] metadata = dso.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<String> remainder = new ArrayList<>();
         int skipped = 0;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (!id.value.startsWith(DOI_SCHEME))
             {
@@ -441,15 +396,13 @@ public class EZIDIdentifierProvider
         }
 
         // delete from item
-        item.clearMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+        dso.clearMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        dso.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
                 remainder.toArray(new String[remainder.size()]));
         try {
-            item.update();
+            dso.update();
             context.commit();
-        } catch (SQLException e) {
-            log.error("Failed to re-add identifiers:  {}", e.getMessage());
-        } catch (AuthorizeException e) {
+        } catch (SQLException | AuthorizeException e) {
             log.error("Failed to re-add identifiers:  {}", e.getMessage());
         }
 
@@ -465,17 +418,10 @@ public class EZIDIdentifierProvider
     {
         log.debug("delete {} from {}", identifier, dso);
 
-        if (!(dso instanceof Item))
-        {
-            throw new IllegalArgumentException("Unsupported type " + dso.getTypeText());
-        }
-
-        Item item = (Item)dso;
-
-        DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        List<String> remainder = new ArrayList<String>();
+        Metadatum[] metadata = dso.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<String> remainder = new ArrayList<>();
         int skipped = 0;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (!id.value.equals(idToDOI(identifier)))
             {
@@ -512,15 +458,13 @@ public class EZIDIdentifierProvider
         }
 
         // delete from item
-        item.clearMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        item.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+        dso.clearMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        dso.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
                 remainder.toArray(new String[remainder.size()]));
         try {
-            item.update();
+            dso.update();
             context.commit();
-        } catch (SQLException e) {
-            log.error("Failed to re-add identifiers:  {}", e.getMessage());
-        } catch (AuthorizeException e) {
+        } catch (SQLException | AuthorizeException e) {
             log.error("Failed to re-add identifiers:  {}", e.getMessage());
         }
 
@@ -617,7 +561,7 @@ public class EZIDIdentifierProvider
     /**
      * Map selected DSpace metadata to fields recognized by DataCite.
      */
-    private Map<String, String> crosswalkMetadata(DSpaceObject dso)
+    Map<String, String> crosswalkMetadata(DSpaceObject dso)
     {
         if ((null == dso) || !(dso instanceof Item))
         {
@@ -625,14 +569,14 @@ public class EZIDIdentifierProvider
         }
         Item item = (Item) dso; // TODO generalize to DSO when all DSOs have metadata.
 
-        Map<String, String> mapped = new HashMap<String, String>();
+        Map<String, String> mapped = new HashMap<>();
 
         for (Entry<String, String> datum : crosswalk.entrySet())
         {
-            DCValue[] values = item.getMetadata(datum.getValue());
+            Metadatum[] values = item.getMetadataByMetadataString(datum.getValue());
             if (null != values)
             {
-                for (DCValue value : values)
+                for (Metadatum value : values)
                 {
                     String key = datum.getKey();
                     String mappedValue;
@@ -661,8 +605,18 @@ public class EZIDIdentifierProvider
             }
         }
 
+        if (GENERATE_DATACITE_XML == true)
+        {
+            DataCiteXMLCreator xmlGen = new DataCiteXMLCreator();
+            xmlGen.setDisseminationCrosswalkName(DATACITE_XML_CROSSWALK);
+            String xmlString = xmlGen.getXMLString(dso);
+            log.debug("Generated DataCite XML:  {}", xmlString);
+            mapped.put("datacite", xmlString);
+        }
+
         // Supply a default publisher, if the Item has none.
-        if (!mapped.containsKey(DATACITE_PUBLISHER))
+        if (!mapped.containsKey(DATACITE_PUBLISHER)
+                && !mapped.containsKey("datacite"))
         {
             String publisher = configurationService.getPropertyAsType(CFG_PUBLISHER, "unknown");
             log.info("Supplying default publisher:  {}", publisher);
@@ -670,28 +624,63 @@ public class EZIDIdentifierProvider
         }
 
         // Supply current year as year of publication, if the Item has none.
-        if (!mapped.containsKey(DATACITE_PUBLICATION_YEAR))
+        if (!mapped.containsKey(DATACITE_PUBLICATION_YEAR)
+                && !mapped.containsKey("datacite"))
         {
             String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
             log.info("Supplying default publication year:  {}", year);
             mapped.put(DATACITE_PUBLICATION_YEAR, year);
         }
 
-        // TODO find a way to get a current direct URL to the object and set _target
-        // mapped.put("_target", url);
+        // Supply _target link back to this object
+        String handle = dso.getHandle();
+        if (null == handle)
+        {
+            log.warn("{} #{} has no handle -- location not set.",
+                    dso.getTypeText(), dso.getID());
+        }
+        else
+        {
+            String url = configurationService.getProperty("dspace.url")
+                    + "/handle/" + item.getHandle();
+            log.info("Supplying location:  {}", url);
+            mapped.put("_target", url);
+        }
 
         return mapped;
     }
 
+    /**
+     * Provide a map from DSO metadata keys to EZID keys.  This will drive the
+     * generation of EZID metadata for the minting of new identifiers.
+     *
+     * @param aCrosswalk
+     */
     @Required
     public void setCrosswalk(Map<String, String> aCrosswalk)
     {
         crosswalk = aCrosswalk;
     }
 
+    /**
+     * Provide a map from DSO metadata keys to classes which can transform their
+     * values to something acceptable to EZID.
+     *
+     * @param transformMap
+     */
     public void setCrosswalkTransform(Map<String, Transform> transformMap)
     {
         transforms = transformMap;
+    }
+
+    public void setGenerateDataciteXML(boolean GENERATE_DATACITE_XML)
+    {
+        this.GENERATE_DATACITE_XML = GENERATE_DATACITE_XML;
+    }
+
+    public void setDisseminationCrosswalkName(String DATACITE_XML_CROSSWALK)
+    {
+        this.DATACITE_XML_CROSSWALK = DATACITE_XML_CROSSWALK;
     }
 
     @Required

@@ -38,8 +38,11 @@ public class MetadataValue
     /** The primary key for the metadata value */
     private int valueId = 0;
 
-    /** The reference to the DSpace item */
-    private int itemId;
+    /** The reference to the DSpace resource */
+    private int resourceId;
+
+    /** The reference to the DSpace resource type*/
+    private int resourceTypeId;
 
     /** The value of the field */
     public String value;
@@ -73,7 +76,8 @@ public class MetadataValue
         {
             fieldId = row.getIntColumn("metadata_field_id");
             valueId = row.getIntColumn("metadata_value_id");
-            itemId = row.getIntColumn("item_id");
+            resourceId = row.getIntColumn("resource_id");
+            resourceTypeId = row.getIntColumn("resource_type_id");
             value = row.getStringColumn("text_value");
             language = row.getStringColumn("text_lang");
             place = row.getIntColumn("place");
@@ -121,23 +125,39 @@ public class MetadataValue
     }
 
     /**
-     * Get the item ID.
+     * Get the resource type ID.
      *
-     * @return item ID
+     * @return resource type ID
      */
-    public int getItemId()
-    {
-        return itemId;
+    public int getResourceTypeId() {
+        return resourceTypeId;
     }
 
     /**
-     * Set the item ID.
+     * Set the resource type ID.
      *
-     * @param itemId new item ID
+     * @param resourceTypeId new resource type ID
      */
-    public void setItemId(int itemId)
-    {
-        this.itemId = itemId;
+    public void setResourceTypeId(int resourceTypeId) {
+        this.resourceTypeId = resourceTypeId;
+    }
+
+    /**
+     * Get the resource id
+     *
+     * @return resource ID
+     */
+    public int getResourceId() {
+        return resourceId;
+    }
+
+    /**
+     * Set the resource type ID.
+     *
+     * @param resourceId new resource ID
+     */
+    public void setResourceId(int resourceId) {
+        this.resourceId = resourceId;
     }
 
     /**
@@ -262,7 +282,8 @@ public class MetadataValue
     {
         // Create a table row and update it with the values
         row = DatabaseManager.row("MetadataValue");
-        row.setColumn("item_id", itemId);
+        row.setColumn("resource_id", resourceId);
+        row.setColumn("resource_type_id", resourceTypeId);
         row.setColumn("metadata_field_id", fieldId);
         row.setColumn("text_value", value);
         row.setColumn("text_lang", language);
@@ -372,7 +393,8 @@ public class MetadataValue
      */
     public void update(Context context) throws SQLException, AuthorizeException
     {
-        row.setColumn("item_id", itemId);
+        row.setColumn("resource_id", resourceId);
+        row.setColumn("resource_type_id", resourceTypeId);
         row.setColumn("metadata_field_id", fieldId);
         row.setColumn("text_value", value);
         row.setColumn("text_lang", language);
@@ -429,7 +451,11 @@ public class MetadataValue
         {
             return false;
         }
-        if (this.itemId != other.itemId)
+        if (this.resourceId != other.resourceId)
+        {
+            return false;
+        }
+        if (this.resourceTypeId != other.resourceTypeId)
         {
             return false;
         }
@@ -442,7 +468,8 @@ public class MetadataValue
         int hash = 7;
         hash = 47 * hash + this.fieldId;
         hash = 47 * hash + this.valueId;
-        hash = 47 * hash + this.itemId;
+        hash = 47 * hash + this.resourceId;
+        hash = 47 * hash + this.resourceTypeId;
         return hash;
     }
 }

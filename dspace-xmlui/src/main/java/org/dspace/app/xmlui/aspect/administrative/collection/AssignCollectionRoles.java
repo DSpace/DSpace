@@ -228,7 +228,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    	// authorizations manager.
 	    	tableRow.addCell(1,2).addContent(T_default_read_custom);
 	    }
-	    else if (defaultRead.getID() == 0) {
+	    else if (defaultRead.getID() == Group.ANONYMOUS_ID) {
 	    	// Anonymous reading
 	    	tableRow.addCell().addContent(T_default_read_anonymous);
 	    	addAdministratorOnlyButton(tableRow.addCell(),"submit_create_default_read",T_restrict);

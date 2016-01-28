@@ -11,12 +11,13 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.MetadataExposure;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
 
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import java.util.List;
  * Time: 4:50 PM
  * To change this template use File | Settings | File Templates.
  */
+@SuppressWarnings("deprecation")
 @XmlRootElement(name = "item")
 public class Item extends DSpaceObject {
     Logger log = Logger.getLogger(Item.class);
@@ -39,11 +41,8 @@ public class Item extends DSpaceObject {
 
     Collection parentCollection;
     List<Collection> parentCollectionList;
-
     List<Community> parentCommunityList;
-
     List<MetadataEntry> metadata;
-
     List<Bitstream> bitstreams;
 
     public Item(){}
@@ -61,10 +60,10 @@ public class Item extends DSpaceObject {
 
         if(expandFields.contains("metadata") || expandFields.contains("all")) {
             metadata = new ArrayList<MetadataEntry>();
-            DCValue[] dcvs = item.getMetadata(org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
-            for (DCValue dcv : dcvs) {
+            Metadatum[] dcvs = item.getMetadata(org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
+            for (Metadatum dcv : dcvs) {
                 if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier)) {
-                    metadata.add(new MetadataEntry(dcv.getField(), dcv.value));
+                    metadata.add(new MetadataEntry(dcv.getField(), dcv.value, dcv.language));
                 }
             }
         } else {

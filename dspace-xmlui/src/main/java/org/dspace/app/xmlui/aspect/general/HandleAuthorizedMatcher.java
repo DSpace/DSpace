@@ -28,6 +28,7 @@ import org.dspace.core.Context;
  * possible values are listed in the DSpace Constant class.
  * 
  * @author Scott Phillips
+ * @author Tim Van den Langenbergh
  */
 
 public class HandleAuthorizedMatcher extends AbstractLogEnabled implements Matcher
@@ -66,7 +67,7 @@ public class HandleAuthorizedMatcher extends AbstractLogEnabled implements Match
     	}
     	
     	// Is it a valid action?
-    	if (action > 0 || action >= Constants.actionText.length)
+    	if (action < 0 || action >= Constants.actionText.length)
     	{
     		getLogger().warn("Invalid action: '"+pattern+"'");
     		return null;

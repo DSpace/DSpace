@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
@@ -50,7 +50,7 @@ public class SubmissionLookupUtils
         {
             LookupProvidersCheck check = new LookupProvidersCheck();
             MetadataSchema[] schemas = MetadataSchema.findAll(context);
-            DCValue[] values = item.getMetadata(dcSchema, dcElement,
+            Metadatum[] values = item.getMetadata(dcSchema, dcElement,
                     dcQualifier, Item.ANY);
 
             for (MetadataSchema schema : schemas)
@@ -59,7 +59,7 @@ public class SubmissionLookupUtils
                 if (schema.getNamespace().startsWith(
                         SubmissionLookupService.SL_NAMESPACE_PREFIX))
                 {
-                    DCValue[] slCache = item.getMetadata(schema.getName(),
+                    Metadatum[] slCache = item.getMetadata(schema.getName(),
                             dcElement, dcQualifier, Item.ANY);
                     if (slCache.length == 0)
                         continue;
@@ -72,8 +72,8 @@ public class SubmissionLookupUtils
                     {
                         for (int idx = 0; idx < values.length; idx++)
                         {
-                            DCValue v = values[idx];
-                            DCValue sl = slCache[idx];
+                            Metadatum v = values[idx];
+                            Metadatum sl = slCache[idx];
                             // FIXME gestire authority e possibilita' multiple:
                             // match non sicuri, affiliation, etc.
                             if (!v.value.equals(sl.value))

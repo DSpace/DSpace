@@ -15,9 +15,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
@@ -30,15 +33,12 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
-import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
@@ -95,6 +95,8 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
 
     private static final Message T_order = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.order");
 
+    private static final Message T_no_results= message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.no_results");
+
     private static final Message T_rpp = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp");
 
     private static final Message T_order_asc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc");
@@ -114,6 +116,9 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
 
     private static final int TEN_YEAR_LIMIT = 100;
 
+    /** The options for results per page */
+    private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
+
     /** Cached validity object */
     private SourceValidity validity;
 
@@ -124,6 +129,20 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
 
     private Message titleMessage = null;
     private Message trailMessage = null;
+
+    @Override
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
+        super.setup(resolver, objectModel, src, parameters);
+
+        //Verify if we have received valid parameters
+        try {
+            getUserParams();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (UIException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public Serializable getKey()
     {
@@ -171,26 +190,16 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
                 }
 
                 BrowseInfo info = getBrowseInfo();
+                newValidity.add("total:"+info.getTotal());
+                newValidity.add("start:"+info.getStart());
 
-                // Are we browsing items, or unique metadata?
-                if (isItemBrowse(info))
-                {
                     // Add the browse items to the validity
                     for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
                     {
                         newValidity.add(item);
-                    }
-                }
-                else
-                {
-                    // Add the metadata to the validity
-                    for (String[] singleEntry : browseInfo.getStringResults())
-                    {
-                        newValidity.add(singleEntry[0]+"#"+singleEntry[1]);
-                    }
                 }
 
-                validity = newValidity;
+                validity = newValidity.complete();
             }
             catch (SQLException e)
             {
@@ -219,10 +228,6 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        if (dso != null)
-        {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
-        }
 
         pageMeta.addTrail().addContent(getTrailMessage(info));
     }
@@ -233,7 +238,10 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException,
             IOException, AuthorizeException
     {
-        BrowseParams params = getUserParams();
+        BrowseParams params = null;
+
+	    params = getUserParams();
+
         BrowseInfo info = getBrowseInfo();
 
         String type = "private";
@@ -252,62 +260,26 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         // This div will hold the browsing results
         Division results = div.addDivision("browse-by-" + type + "-results", "primary");
 
-        // Add the pagination
-        if (info.getTotal() <= 0)
+        // If there are items to browse, add the pagination
+        int itemsTotal = info.getTotal();
+        if (itemsTotal > 0)
         {
-            results.setSimplePagination(0, 0, 0, null, null);
-
-        }
-        else
-        {
-            results.setSimplePagination(info.getTotal(), browseInfo.getOverallPosition() + 1,
+	        results.setSimplePagination(itemsTotal, browseInfo.getOverallPosition() + 1,
                     browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
                     params, info), getNextPageURL(params, info));
-        }
 
-        // Reference all the browsed items
-        ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type,
-                ReferenceSet.TYPE_SUMMARY_LIST, type, null);
+            // Reference all the browsed items
+	        ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type, ReferenceSet.TYPE_SUMMARY_LIST, type, null);
 
-        // Are we browsing items, or unique metadata?
-        if (isItemBrowse(info))
-        {
             // Add the items to the browse results
             for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
             {
                 referenceSet.addReference(item);
             }
         }
-        else    // browsing a list of unique metadata entries
+        else
         {
-            // Create a table for the results
-            Table singleTable = results.addTable("browse-by-" + type + "-results",
-                    browseInfo.getResultCount() + 1, 1);
-
-            // Add the column heading
-            singleTable.addRow(Row.ROLE_HEADER).addCell().addContent(
-                    message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));
-
-            // Iterate each result
-            for (String[] singleEntry : browseInfo.getStringResults())
-            {
-                // Create a Map of the query parameters for the link
-                Map<String, String> queryParams = new HashMap<String, String>();
-                queryParams.put(BrowseParams.TYPE, encodeForURL(type));
-                if (singleEntry[1] != null)
-                {
-                    queryParams.put(BrowseParams.FILTER_VALUE[1], encodeForURL(
-                            singleEntry[1]));
-                }
-                else
-                {
-                    queryParams.put(BrowseParams.FILTER_VALUE[0], encodeForURL(
-                            singleEntry[0]));
-                }
-                // Create an entry in the table, and a linked entry
-                Cell cell = singleTable.addRow().addCell();
-                cell.addXref(super.generateURL(PRIVATE_URL_BASE, queryParams), singleEntry[0]);
-            }
+            results.addPara(T_no_results);
         }
     }
 
@@ -336,16 +308,20 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
             throws WingException
     {
         // Prepare a Map of query parameters required for all links
-        Map<String, String> queryParams = new HashMap<String, String>();
-        queryParams.putAll(params.getCommonParameters());
-        queryParams.putAll(params.getControlParameters());
+        Map<String, String> queryParamsGET = new HashMap<String, String>();
+        queryParamsGET.putAll(params.getCommonParametersEncoded());
+        queryParamsGET.putAll(params.getControlParameters());
+
+        Map<String, String> queryParamsPOST = new HashMap<String, String>();
+        queryParamsPOST.putAll(params.getCommonParameters());
+        queryParamsPOST.putAll(params.getControlParameters());
 
         // Navigation aid (really this is a poor version of pagination)
         Division jump = div.addInteractiveDivision("browse-navigation", PRIVATE_URL_BASE,
                 Division.METHOD_POST, "secondary navigation");
 
         // Add all the query parameters as hidden fields on the form
-        for (Map.Entry<String, String> param : queryParams.entrySet())
+        for (Map.Entry<String, String> param : queryParamsPOST.entrySet())
         {
             jump.addHidden(param.getKey()).setValue(param.getValue());
         }
@@ -405,11 +381,21 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         {
             // Create a clickable list of the alphabet
             List jumpList = jump.addList("jump-list", List.TYPE_SIMPLE, "alphabet");
+            
+            // browse params for each letter are all the query params
+            // WITHOUT the second-stage browse value, and add STARTS_WITH.
+            Map<String, String> letterQuery = new HashMap<String, String>(queryParamsGET);
+            for (String valueKey : BrowseParams.FILTER_VALUE)
+            {
+                letterQuery.remove(valueKey);
+            }
+            letterQuery.put(BrowseParams.STARTS_WITH, "0");
+            jumpList.addItemXref(super.generateURL(PRIVATE_URL_BASE, letterQuery), "0-9");
+            
             for (char c = 'A'; c <= 'Z'; c++)
             {
-                Map<String, String> cQuery = new HashMap<String, String>(queryParams);
-                cQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
-                jumpList.addItemXref(super.generateURL(PRIVATE_URL_BASE, cQuery), Character
+                letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
+                jumpList.addItemXref(super.generateURL(PRIVATE_URL_BASE, letterQuery), Character
                         .toString(c));
             }
 
@@ -449,34 +435,30 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
 
         Para controlsForm = controls.addPara();
 
-        // If we are browsing a list of items
-        if (isItemBrowse(info)) //  && info.isSecondLevel()
-        {
-            try
-            {
-                // Create a drop down of the different sort columns available
-                Set<SortOption> sortOptions = SortOption.getSortOptions();
+        try
+	    {
+	        // Create a drop down of the different sort columns available
+	        Set<SortOption> sortOptions = SortOption.getSortOptions();
 
-                // Only generate the list if we have multiple columns
-                if (sortOptions.size() > 1)
-                {
-                    controlsForm.addContent(T_sort_by);
-                    Select sortSelect = controlsForm.addSelect(BrowseParams.SORT_BY);
+	        // Only generate the list if we have multiple columns
+	        if (sortOptions.size() > 1)
+	        {
+	            controlsForm.addContent(T_sort_by);
+	            Select sortSelect = controlsForm.addSelect(BrowseParams.SORT_BY);
 
-                    for (SortOption so : sortOptions)
-                    {
-                        sortSelect.addOption(so.equals(info.getSortOption()), so.getNumber(),
-                                message("xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by." + so.getName()));
-                    }
-                }
-            }
-            catch (SortException se)
-            {
-                throw new WingException("Unable to get sort options", se);
-            }
-        }
+	            for (SortOption so : sortOptions)
+	            {
+	                sortSelect.addOption(so.equals(info.getSortOption()), so.getNumber(),
+	                        message("xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by." + so.getName()));
+	            }
+	        }
+	    }
+	    catch (SortException se)
+	    {
+	        throw new WingException("Unable to get sort options", se);
+	    }
 
-        // Create a control to changing ascending / descending order
+	    // Create a control to changing ascending / descending order
         controlsForm.addContent(T_order);
         Select orderSelect = controlsForm.addSelect(BrowseParams.ORDER);
         orderSelect.addOption("ASC".equals(params.scope.getOrder()), "ASC", T_order_asc);
@@ -485,7 +467,8 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         // Create a control for the number of records to display
         controlsForm.addContent(T_rpp);
         Select rppSelect = controlsForm.addSelect(BrowseParams.RESULTS_PER_PAGE);
-        for (int i = 5; i <= 100; i += 5)
+        
+        for (int i : RESULTS_PER_PAGE_PROGRESSION)
         {
             rppSelect.addOption((i == info.getResultsPerPage()), i, Integer.toString(i));
         }
@@ -526,7 +509,7 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         }
 
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.putAll(params.getCommonParameters());
+        parameters.putAll(params.getCommonParametersEncoded());
         parameters.putAll(params.getControlParameters());
 
         if (info.hasPrevPage())
@@ -554,7 +537,7 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         }
 
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.putAll(params.getCommonParameters());
+        parameters.putAll(params.getCommonParametersEncoded());
         parameters.putAll(params.getControlParameters());
 
         if (info.hasNextPage())
@@ -627,7 +610,7 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
             params.scope.setOffset(offset > 0 ? offset : 0);
             params.scope.setResultsPerPage(RequestUtils.getIntParameter(request,
                     BrowseParams.RESULTS_PER_PAGE));
-            params.scope.setStartsWith(request.getParameter(BrowseParams.STARTS_WITH));
+            params.scope.setStartsWith(decodeFromURL(request.getParameter(BrowseParams.STARTS_WITH)));
             String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
             if (filterValue == null)
             {
@@ -638,9 +621,9 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
                 params.scope.setAuthorityValue(filterValue);
             }
             params.scope.setFilterValue(filterValue);
-            params.scope.setJumpToValue(request.getParameter(BrowseParams.JUMPTO_VALUE));
-            params.scope.setJumpToValueLang(request.getParameter(BrowseParams.JUMPTO_VALUE_LANG));
-            params.scope.setFilterValueLang(request.getParameter(BrowseParams.FILTER_VALUE_LANG));
+            params.scope.setJumpToValue(decodeFromURL(request.getParameter(BrowseParams.JUMPTO_VALUE)));
+            params.scope.setJumpToValueLang(decodeFromURL(request.getParameter(BrowseParams.JUMPTO_VALUE_LANG)));
+            params.scope.setFilterValueLang(decodeFromURL(request.getParameter(BrowseParams.FILTER_VALUE_LANG)));
 
             // Filtering to a value implies this is a second level browse
             if (params.scope.getFilterValue() != null)
@@ -748,18 +731,7 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         return this.browseInfo;
     }
 
-    /**
-     * Is this a browse on a list of items, or unique metadata values?
-     *
-     * @param info
-     * @return
-     */
-    private boolean isItemBrowse(BrowseInfo info)
-    {
-        return info.getBrowseIndex().isItemIndex() || info.isSecondLevel();
-    }
-
-    /**
+	/**
      * Is this browse sorted by date?
      * @param info
      * @return
@@ -776,37 +748,17 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         {
             BrowseIndex bix = info.getBrowseIndex();
 
-            // For a second level browse (ie. items for author),
-            // get the value we are focussing on (ie. author).
-            // (empty string if none).
-            String value = (info.hasValue() ? "\"" + info.getValue() + "\"" : "");
-
-            // Get the name of any scoping element (collection / community)
-            String scopeName = "";
-
-            if (info.getBrowseContainer() != null)
-            {
-                scopeName = info.getBrowseContainer().getName();
-            }
-            else
-            {
-                scopeName = "";
-            }
-
             if (bix.isMetadataIndex())
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata." + bix.getName())
-                        .parameterize(scopeName, value);
+                titleMessage = message("xmlui.Administrative.PrivateItems.title.metadata." + bix.getName());
             }
             else if (info.getSortOption() != null)
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.title.item." + info.getSortOption().getName())
-                        .parameterize(scopeName, value);
+                titleMessage = message("xmlui.Administrative.PrivateItems.title.item." + info.getSortOption().getName());
             }
             else
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.title.item." + bix.getSortOption().getName())
-                        .parameterize(scopeName, value);
+                titleMessage = message("xmlui.Administrative.PrivateItems.title.item." + bix.getSortOption().getName());
             }
         }
 
@@ -819,32 +771,17 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         {
             BrowseIndex bix = info.getBrowseIndex();
 
-            // Get the name of any scoping element (collection / community)
-            String scopeName = "";
-
-            if (info.getBrowseContainer() != null)
-            {
-                scopeName = info.getBrowseContainer().getName();
-            }
-            else
-            {
-                scopeName = "";
-            }
-
             if (bix.isMetadataIndex())
             {
-                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata." + bix.getName())
-                        .parameterize(scopeName);
+                trailMessage = message("xmlui.Administrative.PrivateItems.trail.metadata." + bix.getName());
             }
             else if (info.getSortOption() != null)
             {
-                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + info.getSortOption().getName())
-                        .parameterize(scopeName);
+                trailMessage = message("xmlui.Administrative.PrivateItems.trail.item." + info.getSortOption().getName());
             }
             else
             {
-                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + bix.getSortOption().getName())
-                        .parameterize(scopeName);
+                trailMessage = message("xmlui.Administrative.PrivateItems.trail.item." + bix.getSortOption().getName());
             }
         }
 

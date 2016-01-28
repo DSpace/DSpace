@@ -24,7 +24,7 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.Constants;
@@ -107,14 +107,14 @@ public class BrowseItemForm extends AbstractDSpaceTransformer {
 			Collection owningCollection = item.getOwningCollection();
 			String owning = owningCollection.getMetadata("name");
 			String author = "unknown";
-			DCValue[] dcAuthors = item.getDC("contributor",Item.ANY,Item.ANY);
+			Metadatum[] dcAuthors = item.getDC("contributor",Item.ANY,Item.ANY);
 			if (dcAuthors != null && dcAuthors.length >= 1)
             {
                 author = dcAuthors[0].value;
             }
 			
 			String title = "untitled";
-			DCValue[] dcTitles = item.getDC("title",null,Item.ANY);
+			Metadatum[] dcTitles = item.getDC("title",null,Item.ANY);
 			if (dcTitles != null && dcTitles.length >= 1)
             {
                 title = dcTitles[0].value;

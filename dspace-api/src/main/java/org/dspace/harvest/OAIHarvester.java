@@ -38,7 +38,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
@@ -375,8 +375,8 @@ public class OAIHarvester {
 			}
 		}
 		catch (HarvestingException hex) {
-			log.error("Harvesting error occured while processing an OAI record: " + hex.getMessage());
-			harvestRow.setHarvestMessage("Error occured while processing an OAI record");
+			log.error("Harvesting error occurred while processing an OAI record: " + hex.getMessage());
+			harvestRow.setHarvestMessage("Error occurred while processing an OAI record");
 
 			// if the last status is also an error, alert the admin
 			if (harvestRow.getHarvestMessage().contains("Error")) {
@@ -386,10 +386,10 @@ public class OAIHarvester {
 			return;
 		}
 		catch (Exception ex) {
-			harvestRow.setHarvestMessage("Unknown error occured while generating an OAI response");
+			harvestRow.setHarvestMessage("Unknown error occurred while generating an OAI response");
 			harvestRow.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
 			alertAdmin(HarvestedCollection.STATUS_UNKNOWN_ERROR, ex);
-			log.error("Error occured while generating an OAI response: " + ex.getMessage() + " " + ex.getCause());
+			log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause());
 			ex.printStackTrace();
 			return;
 		}
@@ -557,13 +557,25 @@ public class OAIHarvester {
     	// Now create the special ORE bundle and drop the ORE document in it
 		if (harvestRow.getHarvestType() == 2 || harvestRow.getHarvestType() == 3)
 		{
-			Bundle OREBundle = item.createBundle("ORE");
+			Bundle OREBundle = null;
+            Bundle[] OREBundles = item.getBundles("ORE");
+			Bitstream OREBitstream = null;
+
+            if ( OREBundles.length > 0 )
+                OREBundle = OREBundles[0];
+            else
+                OREBundle = item.createBundle("ORE");
 
 			XMLOutputter outputter = new XMLOutputter();
 			String OREString = outputter.outputString(oreREM);
 			ByteArrayInputStream OREStream = new ByteArrayInputStream(OREString.getBytes());
 
-			Bitstream OREBitstream = OREBundle.createBitstream(OREStream);
+            OREBitstream = OREBundle.getBitstreamByName("ORE.xml");
+
+            if ( OREBitstream != null )
+                OREBundle.removeBitstream(OREBitstream);
+
+            OREBitstream = OREBundle.createBitstream(OREStream);
 			OREBitstream.setName("ORE.xml");
 
 			BitstreamFormat bf = FormatIdentifier.guessFormat(ourContext, OREBitstream);
@@ -615,14 +627,14 @@ public class OAIHarvester {
             rejectedHandlePrefixString = "123456789";
         }
 
-    	DCValue[] values = item.getMetadata("dc", "identifier", Item.ANY, Item.ANY);
+    	Metadatum[] values = item.getMetadata("dc", "identifier", Item.ANY, Item.ANY);
 
     	if (values.length > 0 && !acceptedHandleServersString.equals(""))
     	{
     		String[] acceptedHandleServers = acceptedHandleServersString.split(",");
     		String[] rejectedHandlePrefixes = rejectedHandlePrefixString.split(",");
 
-    		for (DCValue value : values)
+    		for (Metadatum value : values)
     		{
     			//     0   1       2         3   4
     			//   http://hdl.handle.net/1234/12
@@ -672,8 +684,8 @@ public class OAIHarvester {
 
     	List<String> clearList = new ArrayList<String>();
 
-    	DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-    	for (DCValue value : values)
+    	Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+    	for (Metadatum value : values)
     	{
     		// Verify that the schema exists
     		MetadataSchema mdSchema = MetadataSchema.find(ourContext, value.schema);
@@ -1188,22 +1200,22 @@ public class OAIHarvester {
                 try
                 {
                     synchronized (HarvestScheduler.class) {
-                        switch (interrupt)
-                        {
-                        case HARVESTER_INTERRUPT_NONE:
-                            break;
-                        case HARVESTER_INTERRUPT_INSERT_THREAD:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            addThread(interruptValue);
-                            interruptValue = 0;
-                            break;
-                        case HARVESTER_INTERRUPT_PAUSE:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            status = HARVESTER_STATUS_PAUSED;
-                        case HARVESTER_INTERRUPT_STOP:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            status = HARVESTER_STATUS_STOPPED;
-                            return;
+                        switch (interrupt) {
+                            case HARVESTER_INTERRUPT_NONE:
+                                break;
+                            case HARVESTER_INTERRUPT_INSERT_THREAD:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                addThread(interruptValue);
+                                interruptValue = 0;
+                                break;
+                            case HARVESTER_INTERRUPT_PAUSE:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                status = HARVESTER_STATUS_PAUSED;
+                                break;
+                            case HARVESTER_INTERRUPT_STOP:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                status = HARVESTER_STATUS_STOPPED;
+                                return;
                         }
                     }
 
@@ -1211,8 +1223,8 @@ public class OAIHarvester {
                         while(interrupt != HARVESTER_INTERRUPT_RESUME && interrupt != HARVESTER_INTERRUPT_STOP) {
                             Thread.sleep(1000);
                         }
-                        if (interrupt != HARVESTER_INTERRUPT_STOP)
-                        {
+
+                        if (interrupt != HARVESTER_INTERRUPT_STOP) {
                             break;
                         }
                     }
@@ -1370,13 +1382,13 @@ public class OAIHarvester {
             catch (RuntimeException e) {
                 log.error("Runtime exception in thread: " + this.toString());
                 log.error(e.getMessage() + " " + e.getCause());
-                hc.setHarvestMessage("Runtime error occured while generating an OAI response");
+                hc.setHarvestMessage("Runtime error occurred while generating an OAI response");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
             }
             catch (Exception ex) {
                 log.error("General exception in thread: " + this.toString());
                 log.error(ex.getMessage() + " " + ex.getCause());
-                hc.setHarvestMessage("Error occured while generating an OAI response");
+                hc.setHarvestMessage("Error occurred while generating an OAI response");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
             }
             finally

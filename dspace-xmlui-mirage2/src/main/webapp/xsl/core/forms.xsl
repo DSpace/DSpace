@@ -216,6 +216,13 @@
                     <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
                 </xsl:call-template>
             </xsl:when>
+
+            <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
+                <xsl:call-template name="addLookupButtonAuthor">
+                    <xsl:with-param name="isName" select="'true'"/>
+                    <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                </xsl:call-template>
+            </xsl:when>
         </xsl:choose>
         <br/>
         <xsl:if test="dri:instance or dri:field/dri:instance">
@@ -424,7 +431,7 @@
     </xsl:template>
 
 
-    <!-- Help elementns are turning into tooltips. There might be a better way tot do this -->
+    <!-- Help elements are turning into tooltips. There might be a better way to do this -->
     <xsl:template match="dri:help">
         <xsl:attribute name="title"><xsl:value-of select="."/></xsl:attribute>
         <xsl:if test="i18n:text">
@@ -486,7 +493,7 @@
                     <xsl:call-template name="standardAttributes">
                         <xsl:with-param name="class">
                             <xsl:text>ds-form-item row </xsl:text>
-                            <xsl:if test="contains('aspect.submission.StepTransformer',@id)">
+                            <xsl:if test="contains(@id, 'aspect.submission.StepTransformer')">
                                 <xsl:text>table </xsl:text>
                             </xsl:if>
                         </xsl:with-param>
@@ -505,7 +512,7 @@
                     <xsl:call-template name="standardAttributes">
                         <xsl:with-param name="class">
                             <xsl:text>ds-form-item row </xsl:text>
-                            <xsl:if test="contains('aspect.submission.StepTransformer',@id)">
+                            <xsl:if test="contains(@id, 'aspect.submission.StepTransformer')">
                                 <xsl:text>table </xsl:text>
                             </xsl:if>
                         </xsl:with-param>
@@ -516,7 +523,7 @@
                     <xsl:call-template name="standardAttributes">
                         <xsl:with-param name="class">
                             <xsl:text>ds-form-item row </xsl:text>
-                            <xsl:if test="contains('aspect.submission.StepTransformer',@id)">
+                            <xsl:if test="contains(@id, 'aspect.submission.StepTransformer')">
                                 <xsl:text>table </xsl:text>
                             </xsl:if>
                         </xsl:with-param>
@@ -625,6 +632,13 @@
                             <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
                         </xsl:call-template>
                     </xsl:when>
+
+                    <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
+                        <xsl:call-template name="addLookupButtonAuthor">
+                            <xsl:with-param name="isName" select="'true'"/>
+                            <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                        </xsl:call-template>
+                    </xsl:when>
                 </xsl:choose>
             </xsl:when>
 
@@ -724,6 +738,13 @@
                             <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
                         </xsl:call-template>
                     </xsl:when>
+
+                    <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
+                        <xsl:call-template name="addLookupButtonAuthor">
+                            <xsl:with-param name="isName" select="'true'"/>
+                            <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                        </xsl:call-template>
+                    </xsl:when>
                 </xsl:choose>
             </xsl:otherwise>
         </xsl:choose>
@@ -772,7 +793,7 @@
                 <xsl:apply-templates select="dri:field" mode="compositeComponent"/>
 
 
-                <xsl:if test="dri:params/@choicesPresentation = 'lookup' or contains(dri:params/@operations,'add') or dri:params/@choicesPresentation = 'suggest'">
+                <xsl:if test="dri:params/@choicesPresentation = 'lookup' or contains(dri:params/@operations,'add') or dri:params/@choicesPresentation = 'suggest' or dri:params/@choicesPresentation = 'authorLookup'">
                   <div class="col-xs-2">
                       <xsl:attribute name="class">
                       <xsl:choose>
@@ -816,6 +837,12 @@
                     <!-- lookup popup includes its own Add button if necessary. -->
                     <xsl:when test="dri:params/@choicesPresentation = 'lookup'">
                         <xsl:call-template name="addLookupButton">
+                            <xsl:with-param name="isName" select="'true'"/>
+                            <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
+                        <xsl:call-template name="addLookupButtonAuthor">
                             <xsl:with-param name="isName" select="'true'"/>
                             <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
                         </xsl:call-template>
@@ -945,6 +972,12 @@
                     <!-- lookup popup includes its own Add button if necessary. -->
                     <xsl:when test="dri:params/@choicesPresentation = 'lookup'">
                         <xsl:call-template name="addLookupButton">
+                            <xsl:with-param name="isName" select="'true'"/>
+                            <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
+                        <xsl:call-template name="addLookupButtonAuthor">
                             <xsl:with-param name="isName" select="'true'"/>
                             <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
                         </xsl:call-template>
@@ -1179,7 +1212,7 @@
         </div>
     </xsl:template>
 
-    <xsl:template match="dri:*[count(dri:field) > 1 and dri:field[@type='button'] and count(dri:field[not(@type='button' or @type='')]) = 0]" priority="4">
+    <xsl:template match="dri:*[count(dri:field) > 1 and dri:field[@type='button'] and count(dri:field[not(@type='button' or @type='')]) = 0 and not(preceding-sibling::*[1][local-name()='label'])]" priority="4">
         <div>
             <xsl:call-template name="standardAttributes">
             </xsl:call-template>
@@ -1288,9 +1321,9 @@
                         <xsl:text> btn-default</xsl:text>
                     </xsl:if>
                 </xsl:when>
-                <xsl:otherwise>
+                <xsl:when test="not(@type='file')">
                     <xsl:text>form-control </xsl:text>
-                </xsl:otherwise>
+                </xsl:when>
             </xsl:choose>
 
                 <xsl:if test="@rend">

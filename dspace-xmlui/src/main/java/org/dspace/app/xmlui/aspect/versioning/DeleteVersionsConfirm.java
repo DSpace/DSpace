@@ -14,7 +14,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.MetadataSchema;
 import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
@@ -126,7 +126,7 @@ public class DeleteVersionsConfirm extends AbstractDSpaceTransformer {
     private void addItemIdentifier(Cell cell, org.dspace.content.Item item) throws WingException {
         String itemHandle = item.getHandle();
 
-        DCValue[] identifiers = item.getMetadata(MetadataSchema.DC_SCHEMA, "identifier", null, org.dspace.content.Item.ANY);
+        Metadatum[] identifiers = item.getMetadata(MetadataSchema.DC_SCHEMA, "identifier", null, org.dspace.content.Item.ANY);
         String itemIdentifier=null;
         if(identifiers!=null && identifiers.length > 0)
         {

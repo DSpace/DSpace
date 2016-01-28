@@ -70,8 +70,8 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
     /** results per page */
     protected int rpp = 0;
 
-    /** first result index */
-    protected int start = 0;
+    /** first result index is 1 because OpenSearch starts counting at 1 */
+    protected int start = 1;
 
     /** the results document (cached) */
     protected Document resultsDoc = null;
@@ -122,8 +122,8 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
     {
         if (this.validity == null)
         {
-                long expiry = System.currentTimeMillis() +
-                    ConfigurationManager.getLongProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
+            long expiry = ConfigurationManager
+                    .getLongProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
                 this.validity = new ExpiresValidity(expiry);
         }
         return this.validity;
@@ -209,17 +209,17 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
                     SortOption.ASCENDING : SortOption.DESCENDING;
         }
 
-        // Start index param
+        // Start index param (has to be >= 1)
         String st = request.getParameter("start");
         try
         {
             this.start = (st == null || st.length() == 0) ? 0 : Integer.valueOf(st);
-            if(this.start < 0)
-                this.start = 0;
+            if (this.start < 1)
+                this.start = 1;
         }
         catch (NumberFormatException e)
         {
-            this.start = 0;
+            this.start = 1;
         }
 
 
@@ -248,7 +248,7 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
         this.scope = null;
         this.sort = null;
         this.rpp = 0;
-        this.start = 0;
+        this.start = 1;
         this.sortOrder = null;
         this.resultsDoc = null;
         this.validity = null;

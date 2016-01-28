@@ -17,6 +17,7 @@ import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
 import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.test.DSpaceAbstractKernelTest;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,6 +41,14 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
         cache = cachingService.getCache(cacheName, new CacheConfig(CacheScope.INSTANCE));
     }
 
+    @AfterClass
+    public static void tearDownClass() {
+        if(cacheManager!=null)
+            cacheManager.shutdown();
+        cacheManager = null;
+        cache = null;
+    }
+    
     @Before
     public void init() {
         cache.clear();
@@ -65,6 +74,10 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
 
         EhcacheCache cache = new EhcacheCache(ehcache, new CacheConfig(CacheScope.INSTANCE));
         assertEquals("org.dspace.ehcache", cache.getName());
+        
+        //trash the references
+        ehcache = null;
+        cache = null;
     }
 
     /**
@@ -74,6 +87,8 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
     public void testGetConfig() {
         CacheConfig cacheConfig = cache.getConfig();
         assertNotNull(cacheConfig);
+        
+        cacheConfig = null;
     }
 
     /**

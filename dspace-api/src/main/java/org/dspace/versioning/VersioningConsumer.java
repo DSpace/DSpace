@@ -53,8 +53,11 @@ public class VersioningConsumer implements Consumer {
                             previousItem.setArchived(false);
                             itemsToProcess.add(previousItem);
                             //Fire a new modify event for our previous item
-                            //Due to the need to reindex the item in the search & browse index we need to fire a new event
-                            ctx.addEvent(new Event(Event.MODIFY, previousItem.getType(), previousItem.getID(), null));
+                            //Due to the need to reindex the item in the search 
+                            //and browse index we need to fire a new event
+                            ctx.addEvent(new Event(Event.MODIFY, 
+                                    previousItem.getType(), previousItem.getID(),
+                                    null, previousItem.getIdentifiers(ctx)));
                         }
                     }
                 }

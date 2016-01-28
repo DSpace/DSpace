@@ -1,0 +1,7 @@
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<> foaf:homepage <http://localhost:8080/jspui> ;
+    void:sparqlEndpoint <http://localhost/fuseki/dspace/sparql> ;
+    .
+
