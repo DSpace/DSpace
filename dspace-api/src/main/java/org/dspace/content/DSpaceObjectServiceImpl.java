@@ -242,6 +242,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         // until update() is called.
         for (int i = 0; i < values.size(); i++)
         {
+            if(StringUtils.isBlank(values.get(i))) {
+                continue;
+            }
 
             MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
             metadataValue.setLanguage(lang == null ? null : lang.trim());
