@@ -64,13 +64,11 @@ endif
 # LINDAT/CLARIN specific
 
 LOCAL_CONF              :=$(DIR_SOURCE)/local.properties
-URL_LINDAT_COMMON_GIT   :=https://github.com/ufal/lindat-common.git
 
 DATABASE_NAME           :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.database" --from="$(LOCAL_CONF)")
 UTILITIES_DATABASE_NAME :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.utilities.database" --from="$(LOCAL_CONF)")
 DB_PORT			:=$(shell cd $(BASE) && python setup.lindat.py --get="lr.database.port" --from="$(LOCAL_CONF)")
 DIR_INSTALLATION        :=$(shell cd $(BASE) && python setup.lindat.py --get="dspace.install.dir" --from="$(LOCAL_CONF)")
-DIR_LINDAT_COMMON_THEME :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.common.theme" --from="$(LOCAL_CONF)")
 
 DIR_LINDAT_THEME_IN_WEBAPPS :=$(DIR_INSTALLATION)/webapps/xmlui/themes/UFAL/lib/lindat
 DIR_DATABASE_BACKUP         :=$(DIR_INSTALLATION)/../database_backup
@@ -201,13 +199,12 @@ install_dspace:
 	@$(MAKE) clean_installation
 	@echo "INSTALLATION SUCCESSFUL ..."
 
-postinstall: update_lindat_common
-	rm -rf $(DIR_LINDAT_THEME_IN_WEBAPPS)
-	ln -s $(DIR_LINDAT_COMMON_THEME) $(DIR_LINDAT_THEME_IN_WEBAPPS)
+postinstall: 
+	@$(MAKE) update_lindat_common
 	@$(MAKE) grant_rights
 	@echo "DEPLOYMENT (INSTALL + POSTINSTALL) SUCCESSFUL"
 
-fresh_install: update_lindat_common
+fresh_install:
 	@echo "INSTALLING FRESH LINDAT/CLARIN DSpace ..."
 	@cd $(DIR_BUILD) && $(ANT_WITH_CONF) fresh_install 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log 
 
@@ -294,13 +291,16 @@ update_config:
 # lindat theme related
 #
 
-check_lindat_common:
-	@echo "Checking lindat common theme into $(DIR_LINDAT_COMMON_THEME)... "
-	@test -d $(DIR_LINDAT_COMMON_THEME)/.git || git clone $(URL_LINDAT_COMMON_GIT) --branch releases $(DIR_LINDAT_COMMON_THEME)
-
-update_lindat_common: check_lindat_common
-	cd $(DIR_LINDAT_COMMON_THEME) && $(LINDAT_COMMON_THEME_FETCH)
-
+update_lindat_common:
+	@if [[ -z "$(URL_LINDAT_COMMON_GIT)" ]]; then \
+        echo -e "$(RED)URL_LINDAT_COMMON_GIT not set carrying on$(NORMAL)"; \
+    else \
+	    echo "Checking lindat common theme into $(DIR_LINDAT_COMMON_THEME)... "; \
+	    test -d $(DIR_LINDAT_COMMON_THEME)/.git || git clone $(URL_LINDAT_COMMON_GIT) --branch releases $(DIR_LINDAT_COMMON_THEME); \
+	    cd $(DIR_LINDAT_COMMON_THEME) && $(LINDAT_COMMON_THEME_FETCH); \
+	    rm -rf $(DIR_LINDAT_THEME_IN_WEBAPPS); \
+	    ln -s $(DIR_LINDAT_COMMON_THEME) $(DIR_LINDAT_THEME_IN_WEBAPPS); \
+    fi
 
 #======================================================
 # webserver&co. related
