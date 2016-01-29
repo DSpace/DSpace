@@ -361,6 +361,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         log.info(LogManager.getHeader(context, "update_bundle", "bundle_id="
                 + bundle.getID()));
 
+        super.update(context, bundle);
         bundleDAO.save(context, bundle);
 
         if (bundle.isModified() || bundle.isMetadataModified())

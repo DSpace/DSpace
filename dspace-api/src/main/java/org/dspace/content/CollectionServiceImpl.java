@@ -566,6 +566,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         log.info(LogManager.getHeader(context, "update_collection",
                 "collection_id=" + collection.getID()));
 
+        super.update(context, collection);
         collectionDAO.save(context, collection);
 
         if (collection.isModified())

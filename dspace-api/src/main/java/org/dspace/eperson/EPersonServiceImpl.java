@@ -318,6 +318,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             authorizeService.authorizeAction(context, ePerson, Constants.WRITE);
         }
 
+        super.update(context, ePerson);
+
         ePersonDAO.save(context, ePerson);
 
         log.info(LogManager.getHeader(context, "update_eperson",
