@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,6 +28,9 @@ import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -68,7 +72,8 @@ public class StructBuilder {
      * the output xml document which will contain updated information about the
      * imported structure
      */
-    private static final org.jdom.Document xmlOutput = new org.jdom.Document(new Element("imported_structure"));
+    private static final org.jdom.Document xmlOutput
+            = new org.jdom.Document(new Element("imported_structure"));
 
     /**
      * a hashtable to hold metadata for the collection being worked on
@@ -115,8 +120,9 @@ public class StructBuilder {
         options.addOption("f", "file", true, "file");
         options.addOption("e", "eperson", true, "eperson");
         options.addOption("o", "output", true, "output");
+        options.addOption("x", "export", false, "export the current structure as XML");
 
-        CommandLine line = parser.parse(options, argv);
+        CommandLine line = parser.parse( options, argv );
 
         String file = null;
         String eperson = null;
@@ -134,9 +140,9 @@ public class StructBuilder {
             output = line.getOptionValue('o');
         }
 
-        if (output == null || eperson == null || file == null) {
+        if (output == null || eperson == null) {
             usage();
-            System.exit(0);
+            System.exit(1);
         }
 
         // create a context
@@ -144,6 +150,16 @@ public class StructBuilder {
 
         // set the context
         context.setCurrentUser(ePersonService.findByEmail(context, eperson));
+
+        if (line.hasOption('x')) {
+            exportStructure(context, output);
+            System.exit(0);
+        }
+
+        if (file == null) {
+            usage();
+            System.exit(1);
+        }
 
         // load the XML
         Document document = loadXML(file);
@@ -184,10 +200,112 @@ public class StructBuilder {
             out.write(new XMLOutputter().outputString(xmlOutput));
         } catch (IOException e) {
             System.out.println("Unable to write to output file " + output);
-            System.exit(0);
+            System.exit(1);
         }
 
         context.complete();
+    }
+
+    /**
+     * Write out the existing Community/Collection structure.
+     */
+    private static void exportStructure(Context context, String output) {
+        // Build a document from the Community/Collection hierarchy.
+        List<Community> communities = null;
+        try {
+            communities = communityService.findAllTop(context);
+        } catch (SQLException ex) {
+            System.out.printf("Unable to get the list of top-level communities:  %s%n",
+                    ex.getMessage());
+            System.exit(1);
+        }
+
+        for (Community community : communities) {
+            xmlOutput.addContent(exportACommunity(community));
+        }
+
+        // Now write the structure out.
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(output))) {
+            out.write(new XMLOutputter().outputString(xmlOutput));
+        }
+        catch (IOException e) {
+            System.out.printf("Unable to write to output file %s:  %s%n",
+                    output, e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Add a single community, and its children, to the Document.
+     *
+     * @param community
+     * @return a fragment representing this Community.
+     */
+    private static Element exportACommunity(Community community) {
+        // Export this Community.
+        Element element = new Element("community");
+        element.setAttribute("identifier", community.getID().toString());
+        element.addContent(new Element("name").setText(community.getName()));
+        element.addContent(new Element("description")
+                .setText(communityService.getMetadataFirstValue(community,
+                        MetadataSchema.DC_SCHEMA, "description", "abstract", Item.ANY)));
+        element.addContent(new Element("intro")
+                .setText(communityService.getMetadataFirstValue(community,
+                        MetadataSchema.DC_SCHEMA, "description", null, Item.ANY)));
+        element.addContent(new Element("copyright")
+                .setText(communityService.getMetadataFirstValue(community,
+                        MetadataSchema.DC_SCHEMA, "rights", null, Item.ANY)));
+        element.addContent(new Element("sidebar")
+                .setText(communityService.getMetadataFirstValue(community,
+                        MetadataSchema.DC_SCHEMA, "description", "tableofcontents", Item.ANY)));
+
+        // Export this Community's Community children.
+        for (Community subCommunity : community.getSubcommunities()) {
+            element.addContent(exportACommunity(subCommunity));
+        }
+
+        // Export this Community's Collection children.
+        for (Collection collection : community.getCollections()) {
+            element.addContent(exportACollection(collection));
+        }
+
+        return element;
+    }
+
+    /**
+     * Add a single Collection to the Document.
+     *
+     * @param collection
+     * @return a fragment representing this Collection.
+     */
+    private static Element exportACollection(Collection collection) {
+        // Export this Collection.
+        Element element = new Element("collection");
+        element.setAttribute("identifier", collection.getID().toString());
+        element.addContent(new Element("name").setText(collection.getName()));
+        element.addContent(new Element("description")
+                .setText(collectionService.getMetadataFirstValue(collection,
+                        MetadataSchema.DC_SCHEMA, "description", "abstract", Item.ANY)));
+        element.addContent(new Element("intro")
+                .setText(collectionService.getMetadataFirstValue(collection,
+                        MetadataSchema.DC_SCHEMA, "description", null, Item.ANY)));
+        element.addContent(new Element("copyright")
+                .setText(collectionService.getMetadataFirstValue(collection,
+                        MetadataSchema.DC_SCHEMA, "rights", null, Item.ANY)));
+        element.addContent(new Element("sidebar")
+                .setText(collectionService.getMetadataFirstValue(collection,
+                        MetadataSchema.DC_SCHEMA, "description", "tableofcontents", Item.ANY)));
+        element.addContent(new Element("license")
+                .setText(collectionService.getMetadataFirstValue(collection,
+                        MetadataSchema.DC_SCHEMA, "rights", "license", Item.ANY)));
+        // Provenance is special:  multivalued
+        for (MetadataValue value : collectionService.getMetadata(collection,
+                MetadataSchema.DC_SCHEMA, "provenance", null, Item.ANY)) {
+            element.addContent(new Element("provenance")
+                    .setText(value.getValue()));
+        }
+
+        return element;
     }
 
     /**
@@ -220,7 +338,7 @@ public class StructBuilder {
         if (first.getLength() == 0) {
             err.append("-There are no top level communities in the source document");
             System.out.println(err.toString());
-            System.exit(0);
+            System.exit(1);
         }
 
         String errs = validateCommunities(first, 1);
@@ -231,7 +349,7 @@ public class StructBuilder {
 
         if (trip) {
             System.out.println(err.toString());
-            System.exit(0);
+            System.exit(1);
         }
     }
 
