@@ -9,7 +9,7 @@ package org.dspace.rest;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Properties;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
@@ -23,8 +23,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.rest.common.Report;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 
 /**
@@ -39,7 +40,9 @@ public class RestReports {
     private static Logger log = Logger.getLogger(RestReports.class);
 
     @javax.ws.rs.core.Context public static ServletContext servletContext;
-    public static final String REST_RPT_URL = "rest-report-url.";
+    
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    public static final String REST_RPT_URL = "rest.report-url.";
 
     /**
      * Return html page with information about REST api. It contains methods all
@@ -52,12 +55,11 @@ public class RestReports {
     public Report[] reportIndex()
     throws WebApplicationException {
     	ArrayList<Report> reports = new ArrayList<Report>();
-    	Properties props = ConfigurationManager.getProperties("rest");
-    	for(Object prop: props.keySet()) {
-    		String sprop = prop.toString();
-    		if (sprop.startsWith(REST_RPT_URL)) {
-    			String nickname = sprop.substring(REST_RPT_URL.length());
-    			String url = props.getProperty(sprop);
+    	List<String> propNames = configurationService.getPropertyKeys("rest");
+    	for(String propName: propNames) {
+    		if (propName.startsWith(REST_RPT_URL)) {
+    			String nickname = propName.substring(REST_RPT_URL.length());
+    			String url = configurationService.getProperty(propName);
     			reports.add(new Report(nickname, url));
     		}
     	}
@@ -71,7 +73,7 @@ public class RestReports {
     	URI uri  = null;
     	if (!report_nickname.isEmpty()){
     		log.info(String.format("Seeking report %s", report_nickname));
-        	String url = ConfigurationManager.getProperty("rest", REST_RPT_URL + report_nickname);
+        	String url = configurationService.getProperty(REST_RPT_URL + report_nickname);
         	
     		log.info(String.format("URL for report %s found: [%s]", report_nickname, url));
         	if (!url.isEmpty()) {

@@ -16,7 +16,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.LegacyPluginServiceImpl;
 import org.jaxen.function.FalseFunction;
 import org.swordapp.server.SwordConfiguration;
 import org.swordapp.server.SwordError;

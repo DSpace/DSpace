@@ -30,7 +30,7 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -287,7 +287,7 @@ public class XSLTIngestionCrosswalk
             ++i;
             list = true;
         }
-        IngestionCrosswalk xwalk = (IngestionCrosswalk)PluginManager.getNamedPlugin(
+        IngestionCrosswalk xwalk = (IngestionCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
                 IngestionCrosswalk.class, argv[i]);
         if (xwalk == null)
         {

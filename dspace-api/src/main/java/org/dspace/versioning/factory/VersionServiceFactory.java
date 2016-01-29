@@ -7,7 +7,7 @@
  */
 package org.dspace.versioning.factory;
 
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
 
@@ -24,6 +24,6 @@ public abstract class VersionServiceFactory {
 
     public static VersionServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("versionServiceFactory", VersionServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("versionServiceFactory", VersionServiceFactory.class);
     }
 }

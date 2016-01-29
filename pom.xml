@@ -98,7 +98,7 @@
                 <version>2.4</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <!-- Filter the web.xml -->
+                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <archive>
                         <manifest>
@@ -194,37 +194,6 @@
       <!-- These plugin settings only apply to this single POM and are not inherited
            to any submodules. -->
       <plugins>
-         <!-- Ensure that any *.properties files have UTF-8 chars encoded (e.g. "\u00e9") *before* using them to filter dspace.cfg and other configs -->
-         <plugin>
-           <artifactId>maven-antrun-plugin</artifactId>
-           <executions>
-             <execution>
-               <id>native2ascii-utf8</id>
-               <phase>generate-resources</phase>
-               <configuration>
-                 <target name="Encode any UTF-8 chars in properties">
-                   <!-- Run 'native2ascii' to encode UTF-8 characters in properties files. Place the resulting file(s) in /target -->
-                   <native2ascii encoding="UTF8" src="${root.basedir}" dest="${root.basedir}/target" includes="*.properties" />
-                 </target>
-               </configuration>
-               <goals>
-                 <goal>run</goal>
-               </goals>
-             </execution>
-           </executions>
-           <!-- Required dependencies for native2ascii to function -->
-           <dependencies>
-             <dependency>
-               <groupId>com.sun</groupId>
-               <artifactId>tools</artifactId>
-               <version>${java.version}</version>
-               <scope>system</scope>
-               <!-- Path to tools.jar (containing native2ascii tool) is determined by a profile (see below) -->
-               <systemPath>${toolsjar}</systemPath>
-             </dependency>
-           </dependencies>
-         </plugin>
-
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
             <version>2.5</version>
@@ -257,7 +226,7 @@
                         <exclude>**/src/test/resources/**</exclude>
                         <exclude>**/src/test/data/**</exclude>
                         <exclude>**/src/main/license/**</exclude>
-                        <exclude>**/testEnvironment.properties</exclude>
+                        <exclude>**/test.cfg</exclude>
                         <exclude>**/META-INF/**</exclude>
                         <exclude>**/robots.txt</exclude>
                         <exclude>**/*.LICENSE</exclude>
@@ -265,7 +234,6 @@
                         <exclude>**/README*</exclude>
                         <exclude>**/readme*</exclude>
                         <exclude>**/.gitignore</exclude>
-                        <exclude>**/build.properties*</exclude>
                     </excludes>
                     <mapping> 
                         <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin: 
@@ -295,42 +263,6 @@
    </build>
    
    <profiles>
-
-       <!-- By default the main dspace.cfg file will be filtered during the build
-            using the "build.properties" file. This profile takes effect, unless
-            "-Denv" is passed in (see 'environment' profile below for more info). -->
-       <profile>
-           <id>default</id>
-           <activation>
-               <property>
-                    <name>!env</name>
-                </property>
-           </activation>
-           <properties>
-               <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
-               <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
-               <filters.file>${root.basedir}/target/build.properties</filters.file>
-           </properties>
-       </profile>
-
-       <!-- Users can pass in an environment flag "-Denv" to tell DSpace to use
-            a different properties file during its build process. 
-            For example: "mvn package -Denv=test" would build DSpace using the
-            settings in "test.properties" instead of those in "build.properties" -->
-       <profile>
-           <id>environment</id>
-           <activation>
-                <property>
-                    <name>env</name>
-                </property>
-           </activation>
-           <properties>
-                <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
-                <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
-                <filters.file>${root.basedir}/target/${env}.properties</filters.file>
-           </properties>
-       </profile>
-
        <!-- Skip Unit Tests by default, but allow override on command line
            by setting property "-Dmaven.test.skip=false" -->
        <profile>
@@ -414,9 +346,6 @@
                                     <descriptors>
                                         <descriptor>src/main/assembly/testEnvironment.xml</descriptor>
                                     </descriptors>
-                                    <filters>
-                                        <filter>src/main/filters/testEnvironment.properties</filter>
-                                    </filters>
                                 </configuration>
                             </execution>
                         </executions>
@@ -506,34 +435,6 @@
                 </plugins>
             </build>
         </profile>
-
-        <!-- Determine path to Java Tools JAR. This JAR contains the 'native2ascii' tool (required above by maven-antrun-plugin)-->
-        <!-- In most platforms Unix/Windows it's named tools.jar. But, on Mac it's classes.jar (see next profile) -->
-        <profile>
-          <id>default-java-tools</id>
-          <activation>
-            <activeByDefault>true</activeByDefault>
-            <file>
-                <exists>${java.home}/../lib/tools.jar</exists>
-            </file>
-          </activation>
-          <properties>
-            <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
-          </properties>
-        </profile>
-        <profile>
-          <id>mac-java-tools</id>
-          <activation>
-            <activeByDefault>false</activeByDefault>
-            <file>
-                <exists>${java.home}/../Classes/classes.jar</exists>
-            </file>
-          </activation>
-          <properties>
-            <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
-          </properties>
-        </profile>
-
 
         <!--
            These profiles activate the inclusion of various modules into
@@ -991,6 +892,12 @@
             <artifactId>dspace-tm-extractors</artifactId>
             <version>1.0.1</version>
          </dependency>
+         <!-- Required by Commons Configuration -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.2</version>
+        </dependency>
          <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
@@ -1006,6 +913,11 @@
             <artifactId>commons-collections</artifactId>
             <version>3.2</version>
             <!-- <version>3.1</version> xmlui - wing -->
+         </dependency>
+         <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.10</version>
          </dependency>
          <dependency>
              <groupId>org.apache.commons</groupId>

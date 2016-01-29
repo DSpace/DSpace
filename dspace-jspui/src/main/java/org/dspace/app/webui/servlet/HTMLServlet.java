@@ -33,8 +33,8 @@ import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 
 /**
  * Servlet for HTML bitstream support.
@@ -226,11 +226,11 @@ public class HTMLServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context, "view_html", "handle="
                     + handle + ",bitstream_id=" + bitstream.getID()));
             
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
             		new UsageEvent(
             				UsageEvent.Action.VIEW,
-            				request, 
-            				context, 
+            				request,
+            				context,
             				bitstream));
             
             //new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,

@@ -32,7 +32,7 @@ import org.apache.jena.web.DatasetGraphAccessorHTTP;
 import org.apache.log4j.Logger;
 import org.dspace.rdf.RDFConfiguration;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  *
@@ -54,7 +54,7 @@ implements RDFStorage
     
     public RDFStorageImpl()
     {
-        this.configurationService = new DSpace().getConfigurationService();
+        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         
         this.GRAPHSTORE_ENDPOINT = this.configurationService
                 .getProperty(RDFConfiguration.STORAGE_GRAPHSTORE_ENDPOINT_KEY);

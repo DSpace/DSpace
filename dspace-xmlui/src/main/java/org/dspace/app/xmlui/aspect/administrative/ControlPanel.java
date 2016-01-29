@@ -34,8 +34,9 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -58,6 +59,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     private static final Message T_select_panel		= message("xmlui.administrative.ControlPanel.select_panel");
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * The service manager allows us to access the continuation's 
@@ -146,7 +148,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         // LIST: options
         List options = div.addList("options", List.TYPE_SIMPLE, "horizontal");
         
-        String tabs[] = ConfigurationManager.getProperty("controlpanel", "controlpanel.tabs").split(",");
+        String tabs[] = configurationService.getArrayProperty("controlpanel.tabs");
         
         for(String tab : tabs) {
         	tab = tab.trim();
@@ -161,7 +163,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         if(selected_tab.equals("")) {
         	div.addPara(T_select_panel);
         } else {
-        	ControlPanelTab cpTab = (ControlPanelTab)PluginManager.getNamedPlugin("controlpanel", ControlPanelTab.class, selected_tab);
+        	ControlPanelTab cpTab = (ControlPanelTab)CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(ControlPanelTab.class, selected_tab);
         	if(cpTab instanceof AbstractControlPanelTab) {
         		try {
         			((AbstractControlPanelTab) cpTab).setup(null, objectModel, null, parameters);

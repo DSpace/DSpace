@@ -14,7 +14,7 @@ import org.dspace.authority.orcid.xml.XMLtoBio;
 import org.dspace.authority.orcid.xml.XMLtoWork;
 import org.dspace.authority.rest.RestSource;
 import org.apache.log4j.Logger;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
 
 import java.net.URLEncoder;
@@ -39,7 +39,7 @@ public class Orcid extends RestSource {
 
     public static Orcid getOrcid() {
         if (orcid == null) {
-            orcid = new DSpace().getServiceManager().getServiceByName("OrcidSource", Orcid.class);
+            orcid = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("OrcidSource", Orcid.class);
         }
         return orcid;
     }

@@ -25,8 +25,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageWorkflowEvent;
-import org.dspace.utils.DSpace;
 import org.dspace.workflowbasic.service.BasicWorkflowItemService;
 import org.dspace.workflowbasic.service.BasicWorkflowService;
 import org.dspace.workflowbasic.service.TaskListItemService;
@@ -602,7 +602,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         if(newOwnerGroup != null){
             usageWorkflowEvent.setGroupOwners(newOwnerGroup);
         }
-        new DSpace().getEventService().fireEvent(usageWorkflowEvent);
+        DSpaceServicesFactory.getInstance().getEventService().fireEvent(usageWorkflowEvent);
     }
 
     @Override

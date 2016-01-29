@@ -7,9 +7,9 @@
  */
 package org.dspace.statistics.factory;
 
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.service.ElasticSearchLoggerService;
 import org.dspace.statistics.service.SolrLoggerService;
-import org.dspace.utils.DSpace;
 
 /**
  * Factory implementation to get services for the statistics package, use StatisticsServiceFactory.getInstance() to retrieve an implementation
@@ -21,12 +21,12 @@ public class StatisticsServiceFactoryImpl extends StatisticsServiceFactory {
     @Override
     public SolrLoggerService getSolrLoggerService() {
         // In order to lazy load, we cannot autowire it and instead load it by name
-        return new DSpace().getServiceManager().getServiceByName("solrLoggerService", SolrLoggerService.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("solrLoggerService", SolrLoggerService.class);
     }
 
     @Override
     public ElasticSearchLoggerService getElasticSearchLoggerService() {
         // In order to lazy load, we cannot autowire it and instead load it by name
-        return new DSpace().getServiceManager().getServiceByName("elasticSearchLoggerService", ElasticSearchLoggerService.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("elasticSearchLoggerService", ElasticSearchLoggerService.class);
     }
 }

@@ -42,8 +42,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.harvest.factory.HarvestServiceFactory;
@@ -88,7 +89,7 @@ public class OAIHarvester {
 	protected HandleService handleService;
 	protected HarvestedItemService harvestedItemService;
 	protected WorkspaceItemService workspaceItemService;
-
+    protected PluginService pluginService;
 
     //  The collection this harvester instance is dealing with
 	Collection targetCollection;
@@ -98,12 +99,12 @@ public class OAIHarvester {
 	Context ourContext;
 
     // Namespace used by the ORE serialization format
-    // Set in dspace.cfg as harvester.oai.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}
+    // Set in dspace.cfg as oai.harvester.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}
     private Namespace ORESerialNS;
     private String ORESerialKey;
 
     // Namespace of the descriptive metadata that should be harvested in addition to the ORE
-    // Set in dspace.cfg as harvester.oai.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}
+    // Set in dspace.cfg as oai.harvester.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}
     private Namespace metadataNS;
     private String metadataKey;
 
@@ -126,6 +127,7 @@ public class OAIHarvester {
 		installItemService = ContentServiceFactory.getInstance().getInstallItemService();
 
 		workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+        pluginService = CoreServiceFactory.getInstance().getPluginService();
 
 		if (dso.getType() != Constants.COLLECTION)
         {
@@ -153,7 +155,7 @@ public class OAIHarvester {
         metadataNS = OAIHarvester.getDMDNamespace(metadataKey);
 
         if (metadataNS == null) {
-        	log.error("No matching metadata namespace found for \"" + metadataKey + "\", see oai.cfg option \"harvester.oai.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}\"");
+        	log.error("No matching metadata namespace found for \"" + metadataKey + "\", see oai.cfg option \"oai.harvester.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}\"");
         	throw new HarvestingException("Metadata declaration not found");
         }
 	}
@@ -166,7 +168,7 @@ public class OAIHarvester {
 	private static Namespace getORENamespace() {
 		String ORESerializationString = null;
 		String ORESeialKey = null;
-		String oreString = "harvester.oai.oreSerializationFormat.";
+		String oreString = "oai.harvester.oreSerializationFormat.";
 
         Enumeration pe = ConfigurationManager.propertyNames("oai");
 
@@ -193,7 +195,7 @@ public class OAIHarvester {
 	 */
 	private static Namespace getDMDNamespace(String metadataKey) {
 		String metadataString = null;
-        String metaString = "harvester.oai.metadataformats.";
+        String metaString = "oai.harvester.metadataformats.";
 
         Enumeration pe = ConfigurationManager.propertyNames("oai");
 
@@ -451,14 +453,14 @@ public class OAIHarvester {
 
 		// If we are only harvesting descriptive metadata, the record should already contain all we need
     	List<Element> descMD = record.getChild("metadata", OAI_NS).getChildren();
-    	IngestionCrosswalk MDxwalk = (IngestionCrosswalk)PluginManager.getNamedPlugin(IngestionCrosswalk.class, this.metadataKey);
+    	IngestionCrosswalk MDxwalk = (IngestionCrosswalk)pluginService.getNamedPlugin(IngestionCrosswalk.class, this.metadataKey);
 
     	// Otherwise, obtain the ORE ReM and initiate the ORE crosswalk
     	IngestionCrosswalk ORExwalk = null;
     	Element oreREM = null;
     	if (harvestRow.getHarvestType() > 1) {
     		oreREM = getMDrecord(harvestRow.getOaiSource(), itemOaiID, OREPrefix).get(0);
-    		ORExwalk = (IngestionCrosswalk)PluginManager.getNamedPlugin(IngestionCrosswalk.class, this.ORESerialKey);
+    		ORExwalk = (IngestionCrosswalk)pluginService.getNamedPlugin(IngestionCrosswalk.class, this.ORESerialKey);
 		}
 
     	// Ignore authorization

@@ -52,8 +52,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
+import org.dspace.core.factory.CoreServiceFactory;
 
 /**
  * <P>
@@ -212,7 +212,7 @@ public class ItemTag extends TagSupport
     private static final Logger log = Logger.getLogger(ItemTag.class);
 
     private final transient StyleSelection styleSelection
-            = (StyleSelection) PluginManager.getSinglePlugin(StyleSelection.class);
+            = (StyleSelection) CoreServiceFactory.getInstance().getPluginService().getSinglePlugin(StyleSelection.class);
     
     /** Hashmap of linked metadata to browse, from dspace.cfg */
     private static final Map<String,String> linkedMetadata;

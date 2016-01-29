@@ -19,7 +19,7 @@ package org.dspace.core;
  *
  * @author Larry Stone
  * @version $Revision$
- * @see PluginManager
+ * @see PluginService
  */
 
 public class PluginInstantiationException extends RuntimeException

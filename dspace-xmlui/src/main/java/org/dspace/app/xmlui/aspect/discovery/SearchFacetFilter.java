@@ -31,10 +31,9 @@ import org.dspace.core.Constants;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -88,8 +87,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
     public SearchFacetFilter() {
 
-        DSpace dspace = new DSpace();
-        searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
+        searchService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
 
     }
 

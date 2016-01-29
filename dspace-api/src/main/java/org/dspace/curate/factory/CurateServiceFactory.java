@@ -8,7 +8,7 @@
 package org.dspace.curate.factory;
 
 import org.dspace.curate.service.WorkflowCuratorService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the curate package, use CurateServiceFactory.getInstance() to retrieve an implementation
@@ -21,6 +21,6 @@ public abstract class CurateServiceFactory {
 
     public static CurateServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("curateServiceFactory", CurateServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("curateServiceFactory", CurateServiceFactory.class);
     }
 }

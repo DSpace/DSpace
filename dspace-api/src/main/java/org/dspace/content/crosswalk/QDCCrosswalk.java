@@ -62,7 +62,7 @@ import org.jdom.input.SAXBuilder;
  * Since there is significant overhead in reading the properties file to
  * configure the crosswalk, and a crosswalk instance may be used any number
  * of times, we recommend caching one instance of the crosswalk for each
- * alias and simply reusing those instances. The PluginManager does
+ * alias and simply reusing those instances. The PluginService does
  * this by default.
  * <p>
  * Each named crosswalk has two other types of configuration lines:
@@ -219,7 +219,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
         if (myName == null)
         {
             throw new CrosswalkInternalException("Cannot determine plugin name, " +
-                    "You must use PluginManager to instantiate QDCCrosswalk so the instance knows its name.");
+                    "You must use PluginService to instantiate QDCCrosswalk so the instance knows its name.");
         }
 
         // grovel DSpace configuration for namespaces

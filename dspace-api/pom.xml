@@ -219,81 +219,14 @@
                         </executions>
                     </plugin>
                     
-                    <!-- FileWeaver plugin is in charge of initializing & "weaving" together
-                         the dspace.cfg file to be used by the Unit Testing environment.
-                         It weaves two files, the default 'dspace.cfg' and 'dspace.cfg.more',
-                         both of which are included in the testEnvironment.zip. -->
-                    <plugin>
-                        <groupId>edu.iu.ul.maven.plugins</groupId>
-                        <artifactId>fileweaver</artifactId>
-                        <version>1.0</version>
-                        <configuration>
-                            <outputs>
-                                <output>
-                                    <outputPath>${agnostic.build.dir}/testing</outputPath>
-                                    <name>dspace.cfg.woven</name>
-                                    <parts>
-                                        <part>
-                                            <path>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</path>
-                                        </part>
-                                        <part>
-                                            <path>${agnostic.build.dir}/testing/dspace.cfg.more</path>
-                                        </part>
-                                    </parts>
-                                    <properties>
-                                        <dspace.install.dir>${agnostic.build.dir}/testing/dspace</dspace.install.dir>
-                                    </properties>
-                                </output>
-                            </outputs>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>edit-dspace-cfg</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>weave</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!-- The ant plugin below ensures that the final "woven" dspace.cfg
-                         ends up in the /target/testing/dspace/ directory. This becomes
-                         our final dspace.cfg for the Unit Testing environment. The dspace
-                         service manager needs this "woven" configuration file when it starts.-->
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>process-test-resources</phase>
-                                <configuration>
-                                    <target>
-                                        <!-- Ant task to copy dspace.cfg.woven to location of test dspace.cfg file -->
-                                        <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg" />
-                                        <!-- Now, do one final filter of our Test configs, replacing any remaining "${dspace.dir}"
-                                             placeholders, with the full path of our Unit Test directory -->
-                                        <!-- NOTE: This final filtering is necessary, because dspace.dir doesn't get filled out
-                                             in our test dspace.cfg until Fileweaver runs above. -->
-                                        <replace dir="${agnostic.build.dir}/testing/dspace/config/" value="${agnostic.build.dir}/testing/dspace">
-                                            <include name="**/*"/>
-                                            <replacetoken>${dspace.dir}</replacetoken>
-                                        </replace>
-                                    </target>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
                     <!-- Run Unit Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
-                                <!-- Specify the dspace.cfg file to use for test environment -->
-                                <dspace.configuration>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</dspace.configuration>
+                                <!-- Specify the dspace.dir to use for test environment -->
+                                <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
                             </systemPropertyVariables>
@@ -305,8 +238,8 @@
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
-                                <!-- Specify the dspace.cfg file to use for test environment -->
-                                <dspace.configuration>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</dspace.configuration>
+                                <!-- Specify the dspace.dir to use for test environment -->
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
                             </systemPropertyVariables>
@@ -556,7 +489,6 @@
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
-            <version>1.8</version>
         </dependency>
         <dependency>
             <groupId>com.maxmind.geoip</groupId>

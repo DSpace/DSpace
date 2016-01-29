@@ -33,7 +33,7 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.DOI;
@@ -198,7 +198,7 @@ implements DOIConnector
         if (null != this.xwalk)
             return;
         
-        this.xwalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(
+        this.xwalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
                 DisseminationCrosswalk.class, this.CROSSWALK_NAME);
         
         if (this.xwalk == null)

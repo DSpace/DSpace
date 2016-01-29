@@ -28,7 +28,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -110,8 +110,8 @@ public class XSLTDisseminationCrosswalk
         String myAlias = getPluginInstanceName();
         if (myAlias == null)
         {
-            log.error("Must use PluginManager to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
-            throw new CrosswalkInternalException("Must use PluginManager to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
+            log.error("Must use PluginService to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
+            throw new CrosswalkInternalException("Must use PluginService to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
         }
 
         // all configs for this plugin instance start with this:
@@ -525,7 +525,7 @@ public class XSLTDisseminationCrosswalk
             }
         }
         
-        DisseminationCrosswalk xwalk = (DisseminationCrosswalk)PluginManager.getNamedPlugin(
+        DisseminationCrosswalk xwalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
                 DisseminationCrosswalk.class, xwalkname);
         if (xwalk == null)
         {

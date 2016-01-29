@@ -15,6 +15,7 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
+import org.jdom.Document;
 
 /**
  *
@@ -82,13 +83,14 @@ public class CommandRunner
 
         int status = 0;
         List<String> tokens = new ArrayList<String>();
+        Document commandConfigs = ScriptLauncher.getConfig();
         while (StreamTokenizer.TT_EOF != tokenizer.nextToken())
         {
             if (StreamTokenizer.TT_EOL == tokenizer.ttype)
             {
                 if (tokens.size() > 0)
                 {
-                    status = ScriptLauncher.runOneCommand(tokens.toArray(new String[tokens.size()]));
+                    status = ScriptLauncher.runOneCommand(commandConfigs, tokens.toArray(new String[tokens.size()]));
                     if (status > 0)
                     {
                         break;

@@ -7,7 +7,7 @@
  */
 package org.dspace.app.xmlui.aspect.xmlworkflow;
 
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.state.actions.ActionInterface;
 
 /**
@@ -29,7 +29,7 @@ public class WorkflowXMLUIFactory {
      * @return the action interface
      */
     public static ActionInterface getActionInterface(String id){
-       return new DSpace().getServiceManager().getServiceByName(id + UI_IDENTIFIER_SUFFIX, ActionInterface.class);
+       return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(id + UI_IDENTIFIER_SUFFIX, ActionInterface.class);
     }
 
 }

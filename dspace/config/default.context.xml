@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <Context debug="0" reloadable="true" crossContext="true">
 	<WatchedResource>WEB-INF/web.xml</WatchedResource>
-	<Parameter name="dspace-config" override="false"
-		value="${dspace.dir}/config/dspace.cfg"
-		description="Path to the DSpace configuration file." />
+	<Parameter name="dspace.dir" override="false"
+		value="${dspace.dir}"
+		description="Path to the DSpace home directory." />
 </Context>

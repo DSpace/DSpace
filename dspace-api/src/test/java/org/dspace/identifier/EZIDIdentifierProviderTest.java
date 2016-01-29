@@ -27,7 +27,7 @@ import org.dspace.core.Context;
 import org.dspace.identifier.ezid.DateToYear;
 import org.dspace.identifier.ezid.Transform;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -126,8 +126,8 @@ public class EZIDIdentifierProviderTest
     public static void setUpClass()
             throws Exception
     {
-        // Find the usual kernel services
-        config = kernelImpl.getConfigurationService();
+        // Find the configuration service
+        config = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         // Configure the service under test.
         config.setProperty(EZIDIdentifierProvider.CFG_SHOULDER, TEST_SHOULDER);
@@ -141,15 +141,15 @@ public class EZIDIdentifierProviderTest
         instance.setCrosswalk(aCrosswalk);
         instance.setCrosswalkTransform(crosswalkTransforms);
         instance.setItemService(ContentServiceFactory.getInstance().getItemService());
-        new DSpace().getServiceManager().registerServiceNoAutowire(EZIDIdentifierProvider.class.getName(), instance);
-        assertNotNull(new DSpace().getServiceManager().getServiceByName(EZIDIdentifierProvider.class.getName(), EZIDIdentifierProvider.class));
+        DSpaceServicesFactory.getInstance().getServiceManager().registerServiceNoAutowire(EZIDIdentifierProvider.class.getName(), instance);
+        assertNotNull(DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(EZIDIdentifierProvider.class.getName(), EZIDIdentifierProvider.class));
     }
 
     @AfterClass
     public static void tearDownClass()
             throws Exception
     {
-        new DSpace().getServiceManager().unregisterService(EZIDIdentifierProvider.class.getName());
+        DSpaceServicesFactory.getInstance().getServiceManager().unregisterService(EZIDIdentifierProvider.class.getName());
         System.out.print("Tearing down\n\n");
     }
 
@@ -186,7 +186,7 @@ public class EZIDIdentifierProviderTest
     {
         System.out.println("supports Class");
 
-        EZIDIdentifierProvider instance = new DSpace().getServiceManager().getServiceByName(EZIDIdentifierProvider.class.getName(), EZIDIdentifierProvider.class);
+        EZIDIdentifierProvider instance = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(EZIDIdentifierProvider.class.getName(), EZIDIdentifierProvider.class);
 
         Class<? extends Identifier> identifier = DOI.class;
         boolean result = instance.supports(identifier);
@@ -201,7 +201,7 @@ public class EZIDIdentifierProviderTest
     {
         System.out.println("supports String");
 
-        EZIDIdentifierProvider instance = new DSpace().getServiceManager().getServiceByName(EZIDIdentifierProvider.class.getName(), EZIDIdentifierProvider.class);
+        EZIDIdentifierProvider instance = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(EZIDIdentifierProvider.class.getName(), EZIDIdentifierProvider.class);
 
         String identifier = "doi:" + TEST_SHOULDER;
         boolean result = instance.supports(identifier);
@@ -412,7 +412,7 @@ public class EZIDIdentifierProviderTest
         System.out.println("crosswalkMetadata");
 
         // Set up the instance to be tested
-        EZIDIdentifierProvider instance = new DSpace().getServiceManager().getServiceByName(EZIDIdentifierProvider.class.getName(), EZIDIdentifierProvider.class);
+        EZIDIdentifierProvider instance = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(EZIDIdentifierProvider.class.getName(), EZIDIdentifierProvider.class);
 //        instance.setConfigurationService(config);
 //        instance.setCrosswalk(aCrosswalk);
 //        instance.setCrosswalkTransform(crosswalkTransforms);

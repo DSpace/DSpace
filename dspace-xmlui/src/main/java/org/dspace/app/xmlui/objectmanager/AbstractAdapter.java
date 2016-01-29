@@ -25,7 +25,7 @@ import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
@@ -562,7 +562,7 @@ public abstract class AbstractAdapter
     public final DisseminationCrosswalk getDisseminationCrosswalk(String crosswalkName) throws WingException 
     {
     	// FIXME add some caching here
-    	DisseminationCrosswalk crosswalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class, crosswalkName);
+    	DisseminationCrosswalk crosswalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(DisseminationCrosswalk.class, crosswalkName);
 
 	    if (crosswalk == null)
         {

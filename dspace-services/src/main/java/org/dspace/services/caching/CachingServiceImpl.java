@@ -141,11 +141,12 @@ public final class CachingServiceImpl implements CachingService, InitializedServ
      * Reloads the config settings from the configuration service.
      */
     protected void reloadConfig() {
-        useClustering = configurationService.getPropertyAsType(knownConfigNames[0], boolean.class);
-        useDiskStore = configurationService.getPropertyAsType(knownConfigNames[1], boolean.class);
-        maxElementsInMemory = configurationService.getPropertyAsType(knownConfigNames[2], int.class);
-        timeToLiveSecs = configurationService.getPropertyAsType(knownConfigNames[3], int.class);
-        timeToIdleSecs = configurationService.getPropertyAsType(knownConfigNames[4], int.class);
+        // Reload caching configurations, but have sane default values if unspecified in configs
+        useClustering = configurationService.getPropertyAsType(knownConfigNames[0], false);
+        useDiskStore = configurationService.getPropertyAsType(knownConfigNames[1], true);
+        maxElementsInMemory = configurationService.getPropertyAsType(knownConfigNames[2], 2000);
+        timeToLiveSecs = configurationService.getPropertyAsType(knownConfigNames[3], 3600);
+        timeToIdleSecs = configurationService.getPropertyAsType(knownConfigNames[4], 600);
     }
 
     /**

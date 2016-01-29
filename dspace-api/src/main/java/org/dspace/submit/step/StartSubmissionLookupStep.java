@@ -34,6 +34,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator;
 import org.dspace.submit.lookup.SubmissionItemDataLoader;
@@ -41,7 +42,6 @@ import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupPublication;
-import org.dspace.utils.DSpace;
 
 /**
  * StartSubmissionLookupStep is used when you want enabled the user to auto fill
@@ -81,8 +81,8 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
 
     public static final int STATUS_SUBMISSION_EXPIRED = 4;
 
-    private SubmissionLookupService slService = new DSpace()
-            .getServiceManager().getServiceByName(
+    private SubmissionLookupService slService = DSpaceServicesFactory.getInstance().getServiceManager()
+            .getServiceByName(
                     SubmissionLookupService.class.getCanonicalName(),
                     SubmissionLookupService.class);
 

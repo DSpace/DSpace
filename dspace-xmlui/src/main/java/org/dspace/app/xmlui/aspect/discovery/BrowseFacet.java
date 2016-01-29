@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.discovery.*;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.Serializable;
@@ -78,9 +78,8 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
 
     public BrowseFacet() {
 
-        DSpace dspace = new DSpace();
-        config = dspace.getConfigurationService();
-        searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
+        config = DSpaceServicesFactory.getInstance().getConfigurationService();
+        searchService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
 
     }
 

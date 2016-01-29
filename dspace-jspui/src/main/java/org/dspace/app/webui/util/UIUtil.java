@@ -48,7 +48,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Miscellaneous UI utility methods
@@ -543,8 +543,7 @@ public class UIUtil extends Util
 
             String mark = markType.replace("mark_", "");
             
-            ItemMarkingExtractor markingExtractor = new DSpace()
-				.getServiceManager()
+            ItemMarkingExtractor markingExtractor = DSpaceServicesFactory.getInstance().getServiceManager()
 				.getServiceByName(
 						ItemMarkingExtractor.class.getName()+"."+mark,
 						ItemMarkingExtractor.class);

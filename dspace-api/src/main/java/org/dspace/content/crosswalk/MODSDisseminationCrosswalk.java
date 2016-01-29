@@ -71,7 +71,7 @@ import org.jdom.xpath.XPath;
  * Since there is significant overhead in reading the properties file to
  * configure the crosswalk, and a crosswalk instance may be used any number
  * of times, we recommend caching one instance of the crosswalk for each
- * name and simply reusing those instances.  The PluginManager does this
+ * name and simply reusing those instances.  The PluginService does this
  * by default.
  *
  * @author Larry Stone
@@ -222,7 +222,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         String myAlias = getPluginInstanceName();
         if (myAlias == null)
         {
-            log.error("Must use PluginManager to instantiate MODSDisseminationCrosswalk so the class knows its name.");
+            log.error("Must use PluginService to instantiate MODSDisseminationCrosswalk so the class knows its name.");
             return;
         }
         String cmPropName = CONFIG_PREFIX+myAlias;

@@ -9,7 +9,7 @@ package org.dspace.content.authority.factory;
 
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the content.authority package, use ContentAuthorityServiceFactory.getInstance() to retrieve an implementation
@@ -23,6 +23,6 @@ public abstract class ContentAuthorityServiceFactory {
     public abstract MetadataAuthorityService getMetadataAuthorityService();
 
     public static ContentAuthorityServiceFactory getInstance(){
-        return new DSpace().getServiceManager().getServiceByName("contentAuthorityServiceFactory", ContentAuthorityServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("contentAuthorityServiceFactory", ContentAuthorityServiceFactory.class);
     }
 }

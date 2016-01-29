@@ -53,14 +53,18 @@
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
 
+    <!-- Ensure PluginService is initialized properly via init() method -->
+    <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>
     <bean class="org.dspace.core.LicenseServiceImpl"/>
     <bean class="org.dspace.core.NewsServiceImpl"/>
 
-    <bean class="org.dspace.curate.WorkflowCuratorServiceImpl"/>
+    <!-- Ensure WorkflowCuratorService is initialized properly via init() method -->
+    <bean class="org.dspace.curate.WorkflowCuratorServiceImpl" init-method="init"/>
 
     <bean class="org.dspace.disseminate.CitationDocumentServiceImpl"/>
 
-    <bean class="org.dspace.embargo.EmbargoServiceImpl"/>
+    <!-- Ensure EmbargoService is initialized properly via init() method -->
+    <bean class="org.dspace.embargo.EmbargoServiceImpl" init-method="init"/>
 
     <bean class="org.dspace.eperson.AccountServiceImpl"/>
     <bean class="org.dspace.eperson.EPersonServiceImpl"/>

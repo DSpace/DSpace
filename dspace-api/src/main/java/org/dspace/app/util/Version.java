@@ -15,7 +15,7 @@ import java.util.Properties;
 
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Display information about this DSpace, its environment, and how it was built.
@@ -61,7 +61,7 @@ public class Version
         }
 
         // Is Discovery available?
-        ConfigurationService config = new DSpace().getConfigurationService();
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         String consumers = config.getPropertyAsType("event.dispatcher.default.consumers", ""); // Avoid null pointer
         List<String> consumerList = Arrays.asList(consumers.split("\\s*,\\s*"));
         if (consumerList.contains("discovery"))

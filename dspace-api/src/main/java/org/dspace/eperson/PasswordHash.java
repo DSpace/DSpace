@@ -16,7 +16,7 @@ import java.util.Arrays;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class PasswordHash
 {
     private static final Logger log = LoggerFactory.getLogger(PasswordHash.class);
     private static final ConfigurationService config
-            = new DSpace().getConfigurationService();
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
     private static final Charset UTF_8 = Charset.forName("UTF-8"); // Should always succeed:  UTF-8 is required
 
     private static final String DEFAULT_DIGEST_ALGORITHM = "SHA-512"; // XXX magic

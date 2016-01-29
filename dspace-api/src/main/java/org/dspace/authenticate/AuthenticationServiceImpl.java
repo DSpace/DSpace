@@ -18,7 +18,7 @@ import java.util.List;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
@@ -68,7 +68,7 @@ public class AuthenticationServiceImpl implements AuthenticationService, Initial
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        methodStack = Arrays.asList((AuthenticationMethod[])PluginManager.getPluginSequence("authentication", AuthenticationMethod.class));
+        methodStack = Arrays.asList((AuthenticationMethod[])CoreServiceFactory.getInstance().getPluginService().getPluginSequence(AuthenticationMethod.class));
     }
 
     @Override

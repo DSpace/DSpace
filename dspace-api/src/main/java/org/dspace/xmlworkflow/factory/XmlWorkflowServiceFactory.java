@@ -7,7 +7,7 @@
  */
 package org.dspace.xmlworkflow.factory;
 
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
@@ -40,6 +40,6 @@ public abstract class XmlWorkflowServiceFactory extends WorkflowServiceFactory {
 
     public static XmlWorkflowServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("workflowServiceFactory", XmlWorkflowServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("workflowServiceFactory", XmlWorkflowServiceFactory.class);
     }
 }
