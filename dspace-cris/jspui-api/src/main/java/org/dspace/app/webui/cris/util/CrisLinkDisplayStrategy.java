@@ -8,28 +8,17 @@
 package org.dspace.app.webui.cris.util;
 
 
-import java.util.List;
-
-import it.cilea.osd.jdyna.model.Property;
-import it.cilea.osd.jdyna.value.EmbeddedLinkValue;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
-import org.dspace.app.cris.model.ACrisObject;
-import org.dspace.app.cris.model.jdyna.RPProperty;
-import org.dspace.app.cris.util.ResearcherPageUtils;
-import org.dspace.app.webui.util.ADiscoveryDisplayStrategy;
 import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
-import org.dspace.browse.BrowseDSpaceObject;
 import org.dspace.browse.BrowseItem;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
-import org.dspace.core.Utils;
+import org.dspace.content.Metadatum;
 import org.dspace.discovery.IGlobalSearchResult;
 
-public class CrisLinkDisplayStrategy extends ADiscoveryDisplayStrategy implements IDisplayMetadataValueStrategy
+public class CrisLinkDisplayStrategy implements IDisplayMetadataValueStrategy
 {
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
@@ -38,7 +27,13 @@ public class CrisLinkDisplayStrategy extends ADiscoveryDisplayStrategy implement
             boolean disableCrossLinks, boolean emph, PageContext pageContext)
     {
         String metadata = "";
-        if (metadataArray.length > 0)
+        metadata = internalDisplay(metadataArray, metadata);
+        return metadata;
+    }
+
+    private String internalDisplay(Metadatum[] metadataArray, String metadata)
+    {
+        if (metadataArray!=null && metadataArray.length > 0)
         {
         	String[] splitted = metadataArray[0].value.split("\\|\\|\\|");
 		    if (splitted.length > 2)
@@ -80,19 +75,10 @@ public class CrisLinkDisplayStrategy extends ADiscoveryDisplayStrategy implement
     
 	@Override
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
-			int colIdx, String field, List<String> metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
+			int colIdx, String field, Metadatum[] metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
 			boolean emph, PageContext pageContext) throws JspException {
         String metadata = "";
-        if (metadataArray.size() > 0)
-        {
-        	String[] splitted = metadataArray.get(0).split("\\|\\|\\|");
-		    if (splitted.length > 2)
-		    {
-		        throw new IllegalArgumentException("Invalid text string for link: "+ metadataArray.get(0));
-		    }
-		    
-		    metadata = (splitted.length == 2?"<a href=\""+splitted[1]+"\">"+splitted[1]+"</a>":splitted[0]);
-        }
+        metadata = internalDisplay(metadataArray, metadata);
         return metadata;
 	}
 }

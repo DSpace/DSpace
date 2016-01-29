@@ -622,8 +622,11 @@
 		<ul>
 					<c:forEach items="${tabList}" var="area" varStatus="rowCounter">
 			<li id="bar-tab-${area.id}">
-				<a href="#tab-${area.id}"><img style="width: 16px;vertical-align: middle;" border="0" 
-					src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}" alt="icon">
+				<a href="#tab-${area.id}">
+				<c:if test="${!empty area.ext}">
+				<img style="width: 16px;vertical-align: middle;" border="0" 
+					src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}" alt="icon" />
+				</c:if>	
 				${area.title}</a>
 			</li>
 					</c:forEach>

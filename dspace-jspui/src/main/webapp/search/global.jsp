@@ -113,6 +113,21 @@
     // Admin user or not
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+    
+    DiscoverResult qResults = (DiscoverResult)request.getAttribute("queryresults");
+	DiscoverySearchFilterFacet facetGlobalConf = (DiscoverySearchFilterFacet) request.getAttribute("facetGlobalConfig");
+	String fGlobal = facetGlobalConf.getIndexFieldName();
+	List<FacetResult> facetGlobal = null;
+    Map<String, Long> numResultsByType = new HashMap<String, Long>();
+	String fkeyGlobal = null;
+	if(qResults!=null) {
+	    facetGlobal = qResults.getFacetResult(fGlobal);
+	    fkeyGlobal = "jsp.search.facet.refine."+fGlobal;
+	    for (FacetResult fg : facetGlobal) {
+	    	numResultsByType.put(fg.getAuthorityKey(), fg.getCount());
+	    }
+	}
+
 %>
 
 <c:set var="dspace.layout.head.last" scope="request">
@@ -166,9 +181,9 @@
 
 <h2><fmt:message key="jsp.search.title"/></h2>
 
-<div class="discovery-search-form panel panel-default">
+<div class="discovery-search-formt">
     <%-- Controls for a repeat search --%>
-	<div class="discovery-query panel-heading">
+	<div class="discovery-query">
      <form id="update-form" action="global-search" method="get">
 	 
                                 <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
@@ -228,7 +243,7 @@
 		</form>
 		</div>
 <% if (availableFilters.size() > 0) { %>
-		<div class="discovery-search-filters panel-body">
+		<div class="discovery-search-filters">
 		<h5><fmt:message key="jsp.search.filter.heading" /></h5>
 		<p class="discovery-search-filters-hint"><fmt:message key="jsp.search.filter.hint" /></p>
 		<form action="global-search" method="get">
@@ -269,50 +284,9 @@
 		</form>
 		</div>        
 <% } %>
-        <%-- Include a component for modifying sort by, order, results per page, and et-al limit --%>
-   <div class="discovery-pagination-controls panel-footer">
-   <form action="global-search" method="get">   
-   <input type="hidden" value="<%= Utils.addEntities(searchScope) %>" name="location" />
-   <input type="hidden" value="<%= Utils.addEntities(query) %>" name="query" />
-	<% if (appliedFilterQueries.size() > 0 ) { 
-				int idx = 1;
-				for (String[] filter : appliedFilters)
-				{
-				    boolean found = false;
-				    %>
-				    <input type="hidden" id="filter_field_<%=idx %>" name="filter_field_<%=idx %>" value="<%= Utils.addEntities(filter[0]) %>" />
-					<input type="hidden" id="filter_type_<%=idx %>" name="filter_type_<%=idx %>" value="<%= Utils.addEntities(filter[1]) %>" />
-					<input type="hidden" id="filter_value_<%=idx %>" name="filter_value_<%=idx %>" value="<%= Utils.addEntities(filter[2]) %>" />
-					<%
-					idx++;
-				}
-	} %>
-	
-	<%
-           if (sortOptions.size() > 0)
-           {
-%>
-               <label for="sort_by"><fmt:message key="search.results.sort-by"/></label>
-               <select name="sort_by">
-                   <option value="score"><fmt:message key="search.sort-by.relevance"/></option>
-<%
-               for (String sortBy : sortOptions)
-               {
-                   String selected = (sortBy.equals(sortedBy) ? "selected=\"selected\"" : "");
-                   String mKey = "search.sort-by." + sortBy;
-                   %> <option value="<%= sortBy %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
-               }
-%>
-               </select>
-<%
-           }
-%>	
-</form>
-   </div>
 </div>   
 <% 
 
-DiscoverResult qResults = (DiscoverResult)request.getAttribute("queryresults");
 Map<String, List<IGlobalSearchResult>> collapsedResults = (Map<String, List<IGlobalSearchResult>>) request.getAttribute("results");
 Map<String,DiscoveryViewConfiguration> mapViewMetadata = (Map<String,DiscoveryViewConfiguration>) request.getAttribute("viewMetadata");
 String selectorViewMetadata = (String)request.getAttribute("selectorViewMetadata");
@@ -363,14 +337,18 @@ else if( qResults != null && collapsedResults != null)
 				String messageAllGlobalType = "jsp.search.global.all." + otypeSensitive;
 				%>					
 			</div>
+		<% if (collapsedResults.get(otypeSensitive).size() < numResultsByType.get(otypeSensitive)) { %>
 			<div class="panel-footer text-right">	
 				<a class="btn btn-link text-primary" role="button" href="<%= request.getContextPath()
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
                 + httpFilters                
                 + "&amp;location="+URLEncoder.encode(otypeSensitive,"UTF-8") %>">
-                <fmt:message><%= messageAllGlobalType %></fmt:message></a>                
+                <fmt:message key="<%= messageAllGlobalType %>">
+                	<fmt:param><%= numResultsByType.get(otypeSensitive) %></fmt:param>
+                </fmt:message></a>                
 			</div>
+		<% } %>
 		</div>
 		<%
 			}
@@ -384,8 +362,6 @@ else if( qResults != null && collapsedResults != null)
 <dspace:sidebar>
 <%
 
-
-DiscoverySearchFilterFacet facetGlobalConf = (DiscoverySearchFilterFacet) request.getAttribute("facetGlobalConfig");
 
 boolean brefine = false;
 List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig");
@@ -419,13 +395,6 @@ for (DiscoverySearchFilterFacet facetConf : facetsConf)
 	}
 }
 
-
-		String fGlobal = facetGlobalConf.getIndexFieldName();
-		if(qResults!=null) {
-	    List<FacetResult> facetGlobal = qResults.getFacetResult(fGlobal);
-	    
-	    String fkeyGlobal = "jsp.search.facet.refine."+fGlobal;
-	    
 	    if (facetGlobal != null && facetGlobal.size() > 0) { %>
 	    <h3 class="facets"><fmt:message key="jsp.search.facet.refine" /></h3>
 
@@ -444,9 +413,7 @@ for (DiscoverySearchFilterFacet facetConf : facetsConf)
                 <%= StringUtils.abbreviate(fvalue.getDisplayedValue(),36) %></a></li><%
 	    }
 	    %></ul></div>
-	    </div><%
-	    } %>
-			
+	    </div>			
 <% }
 	if (brefine) {
 %>

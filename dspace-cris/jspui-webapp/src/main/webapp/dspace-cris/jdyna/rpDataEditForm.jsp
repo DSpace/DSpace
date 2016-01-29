@@ -654,9 +654,9 @@
 		<fmt:message key="jsp.cris.detail.info.sourceid.none" var="i18nnone" />
 		
 	<div class="panel panel-default">
-	<div class="container">
+		<div class="row">
 		<c:if test="${admin}">
-		<div class="col-md-4">
+		<div class="col-md-6">
 			<div class="cris-edit-eperson">
 				<spring:bind path="epersonID">
 			<c:set var="inputValue">
@@ -670,20 +670,19 @@
 				key="jsp.layout.hku.label.eperson" /></b>				
 			 <input id="eperson" /></span>
 			 <div id="epersonDIV" class="jdyna-pointer-value">
-			 		<input name="epersonID" id="epersonID" type="hidden" value="${inputValue}"/>			 		
+			 		<input name="epersonID" id="epersonID" type="hidden" value="${inputValue}" size="60"/>			 		
 			 		<c:if test="${!empty inputValue}">
 					<script type="text/javascript">
 						activeEperson('${inputValue}');
 					</script>
 					</c:if>				
 			</div>
-			</div>
-			
 		</spring:bind>
+		</div>
 		</div>
 		</c:if>
 		<% if(!changeStatusAdmin) { %>
-		<div class="col-md-4">	
+		<div class="col-md-6">	
 		<div class="cris-edit-status">
 		<spring:bind path="status">
 			<c:set var="inputValue">
@@ -716,9 +715,10 @@
 		</div>
 		</div>
 		<% } %>
-		<div class="col-md-4">
-		<div class="cris-edit-record-info">
+		</div>
+		<div class="row">
 		<c:set var="disabled" value=" readonly='readonly'"/>
+		<div class="col-md-6">
 		<c:choose>
 		<c:when test="${admin}">
 			<dyna:text labelKey="jsp.cris.detail.info.sourceid" propertyPath="anagraficadto.sourceID" visibility="false"/>
@@ -731,9 +731,11 @@
 			<span class="cris-record-info-sourceref"><b><fmt:message key="jsp.cris.detail.info.sourceref" /></b> ${!empty anagraficadto.sourceRef?anagraficadto.sourceRef:i18nnone}</span>
 		</c:otherwise>
 		</c:choose>
-			<span class="cris-record-info-created"><b><fmt:message key="jsp.cris.detail.info.created" /></b> ${anagraficadto.timeStampCreated}</span>
-			<span class="cris-record-info-updated"><b><fmt:message key="jsp.cris.detail.info.updated" /></b> ${anagraficadto.timeStampModified}</span>
 		</div>
+		<div class="col-md-6">
+			<span class="cris-record-info-created"><b><fmt:message key="jsp.cris.detail.info.created" /></b> ${anagraficadto.timeStampCreated}</span>
+			<div class="dynaClear">&nbsp;</div>
+			<span class="cris-record-info-updated"><b><fmt:message key="jsp.cris.detail.info.updated" /></b> ${anagraficadto.timeStampModified}</span>
 		</div>
 	</div>
 </div>
@@ -743,15 +745,17 @@
 	<input type="hidden" id="newTabId" name="newTabId" />
 	
 	
-	<p style="color: red; text-decoration: underline; font-weight: bold; text-align: center;"><fmt:message key='jsp.rp.edit-tips'/></p>
-	<p style="color: red; text-decoration: underline; font-weight: bold; text-align: center;"><fmt:message key='jsp.rp.values.from.registry'/></p>
+	<p class="alert alert-info"><fmt:message key='jsp.rp.edit-tips'/></p>
 
 				<div id="tabs">
 		<ul>
 					<c:forEach items="${tabList}" var="area" varStatus="rowCounter">
 			<li id="bar-tab-${area.id}">
-				<a href="#tab-${area.id}"><img style="width: 16px;vertical-align: middle;" border="0" 
-					src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}" alt="icon">
+				<a href="#tab-${area.id}">
+				<c:if test="${!empty area.ext}">
+				<img style="width: 16px;vertical-align: middle;" border="0" 
+					src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}" alt="icon" />
+				</c:if>	
 				${area.title}</a>
 			</li>
 					</c:forEach>
@@ -804,6 +808,7 @@
 				
 				
 						<c:set var="holder" value="${holder}" scope="request"/>
+						<c:set var="extra" value="${extra}" scope="request"/>
 						<c:set var="isThereMetadataNoEditable" value="${isThereMetadataNoEditable}" scope="request"/>												
 						<c:import url="${urljspcustom}" />
 					
@@ -891,7 +896,7 @@
 				
 <% } %>
 				</c:forEach>
-<br/>
+<div class="dynaClear">&nbsp;</div>
 <div class="jdyna-form-button">
 				<input id="submit_save" class="btn btn-primary" type="submit"
 					value="<fmt:message key="jsp.layout.hku.researcher.button.save"/>" />
@@ -902,7 +907,6 @@
 </div>				
 				
 </form:form>
-</div>
 <div id="alert_eperson_dialog"></div>
 <div id="nested_edit_dialog">&nbsp;</div>
 <div id="classificationtree_modal" class="modal fade">

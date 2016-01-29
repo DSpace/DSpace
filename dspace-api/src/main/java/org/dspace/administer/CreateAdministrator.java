@@ -7,7 +7,10 @@
  */
 package org.dspace.administer;
 
+import java.io.BufferedReader;
 import java.io.Console;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -121,7 +124,25 @@ public final class CreateAdministrator
     		System.out.print("E-mail address: ");
     		System.out.flush();
     		
+            if (console == null)
+            {
+                try
+                {
+                    InputStreamReader streamReader = new InputStreamReader(
+                            System.in);
+                    BufferedReader bufferedReader = new BufferedReader(
+                            streamReader);
+                    email = bufferedReader.readLine();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
     		email = console.readLine();
+            }
             if (!StringUtils.isBlank(email))
             {
                 email = email.trim();
@@ -135,8 +156,25 @@ public final class CreateAdministrator
     		System.out.print("First name: ");
     		System.out.flush();
     		
+            if (console == null)
+            {
+                try
+                {
+                    InputStreamReader streamReader = new InputStreamReader(
+                            System.in);
+                    BufferedReader bufferedReader = new BufferedReader(
+                            streamReader);
+                    firstName = bufferedReader.readLine();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
     		firstName = console.readLine();
-
+            }
             if (firstName != null)
             {
                 firstName = firstName.trim();
@@ -145,25 +183,65 @@ public final class CreateAdministrator
     		System.out.print("Last name: ");
     		System.out.flush();
     		
+            if (console == null)
+            {
+                try
+                {
+                    InputStreamReader streamReader = new InputStreamReader(
+                            System.in);
+                    BufferedReader bufferedReader = new BufferedReader(
+                            streamReader);
+                    lastName = bufferedReader.readLine();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
     		lastName = console.readLine();
+            }
 
             if (lastName != null)
             {
                 lastName = lastName.trim();
             }
    		
-            if (ConfigurationManager.getProperty("webui.supported.locales") != null)
+            if (ConfigurationManager
+                    .getProperty("webui.supported.locales") != null)
             {
-                System.out.println("Select one of the following languages: " + ConfigurationManager.getProperty("webui.supported.locales"));
+                System.out.println("Select one of the following languages: "
+                        + ConfigurationManager
+                                .getProperty("webui.supported.locales"));
                 System.out.print("Language: ");
                 System.out.flush();
             
+                if (console == null)
+                {
+                    try
+                    {
+                        InputStreamReader streamReader = new InputStreamReader(
+                                System.in);
+                        BufferedReader bufferedReader = new BufferedReader(
+                                streamReader);
+                        language = bufferedReader.readLine();
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
     		    language = console.readLine();
+                }
 
                 if (language != null)
                 {
                     language = language.trim();
-                    language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
+                    language = I18nUtil.getSupportedLocale(new Locale(language))
+                            .getLanguage();
                 }
             }
             
@@ -171,21 +249,72 @@ public final class CreateAdministrator
     		System.out.print("Password: ");
     		System.out.flush();
 
+            if (console == null)
+            {
+                try
+                {
+                    InputStreamReader streamReader = new InputStreamReader(
+                            System.in);
+                    BufferedReader bufferedReader = new BufferedReader(
+                            streamReader);
+                    password1 = bufferedReader.readLine().toCharArray();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
     		password1 = console.readPassword();
-    		
+            }
     		System.out.print("Again to confirm: ");
     		System.out.flush();
     		
+            if (console == null)
+            {
+                try
+                {
+                    InputStreamReader streamReader = new InputStreamReader(
+                            System.in);
+                    BufferedReader bufferedReader = new BufferedReader(
+                            streamReader);
+                    password2 = bufferedReader.readLine().toCharArray();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
     		password2 = console.readPassword();
-
+            }
             //TODO real password validation
             if (password1.length > 1 && Arrays.equals(password1, password2))
     		{
     			// password OK
     			System.out.print("Is the above data correct? (y or n): ");
     			System.out.flush();
-    			
-    			String s = console.readLine();
+                String s = "";
+                if (console == null)
+                {
+                    try
+                    {
+                        InputStreamReader streamReader = new InputStreamReader(
+                                System.in);
+                        BufferedReader bufferedReader = new BufferedReader(
+                                streamReader);
+                        s = bufferedReader.readLine();
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    s = console.readLine();
+                }
 
                 if (s != null)
                 {

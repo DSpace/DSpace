@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Required;
 
 public class RelationConfiguration
 {
+    private String type;
+    
     private String relationName;
 
     private String query;
@@ -48,6 +50,16 @@ public class RelationConfiguration
     public void setRelationName(String name)
     {
         this.relationName = name; 
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
     }
  
 }

@@ -232,6 +232,12 @@ public class StatSubscribeService
                 dateStart = "-" + (num - i);
                 dateEnd = "-" + (num - 1 - i);
                 break;
+            
+            case StatSubscription.FREQUENCY_YEAR:
+                dateType = "YEAR";
+                dateStart = "-" + (num - i);
+                dateEnd = "-" + (num - 1 - i);
+                break; 
             default:
                 throw new IllegalArgumentException("Unknow frequency " + freq);
             }
@@ -277,6 +283,7 @@ public class StatSubscribeService
                     statsComponentsService = researcher.getOUStatsComponents();
                     break;
                 default:
+                    statsComponentsService = researcher.getDOStatsComponents();
                     break;
                 }
                 selectedObject.put(AStatComponentService._SELECTED_OBJECT, statsComponentsService.getSelectedObjectComponent().getStatsViewComponent().queryFacetDate(statsLogger, object, dateType, dateStart, dateEnd, gap));
@@ -429,6 +436,11 @@ public class StatSubscribeService
         case StatSubscription.FREQUENCY_MONTHLY:
             dateformatString = "MMMM yyyy";
             break;
+
+        case StatSubscription.FREQUENCY_YEAR:
+            dateformatString = "yyyy";
+            break;
+            
         }
 
         // no so good, but we need to retrieve the date object from its string

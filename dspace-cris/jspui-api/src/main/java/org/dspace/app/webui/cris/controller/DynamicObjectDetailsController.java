@@ -12,6 +12,7 @@ import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.model.OrganizationUnit;
+import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.BoxDynamicObject;
 import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
@@ -30,6 +33,7 @@ import org.dspace.app.cris.model.jdyna.TabDynamicObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
+import org.dspace.app.cris.util.ICrisHomeProcessor;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
@@ -56,6 +60,8 @@ public class DynamicObjectDetailsController
         SimpleDynaController<DynamicProperty, DynamicPropertiesDefinition, BoxDynamicObject, TabDynamicObject>
 {
     private CrisSubscribeService subscribeService;
+    
+    private List<ICrisHomeProcessor<ResearchObject>> processors;
 
     public DynamicObjectDetailsController(Class<ResearchObject> anagraficaObjectClass,
             Class<DynamicPropertiesDefinition> classTP,
@@ -132,6 +138,15 @@ public class DynamicObjectDetailsController
             boolean subscribed = subscribeService.isSubscribed(currentUser,
                     dyn);
             model.put("subscribed", subscribed);            
+        }
+        
+        List<ICrisHomeProcessor<ResearchObject>> resultProcessors = new ArrayList<ICrisHomeProcessor<ResearchObject>>();
+        for (ICrisHomeProcessor processor : processors)
+        {
+            if (ResearchObject.class.isAssignableFrom(processor.getClazz()))
+            {
+                processor.process(context, request, response, dyn);
+            }
         }
         
         request.setAttribute("sectionid", StatsConfig.DETAILS_SECTION);
@@ -249,4 +264,8 @@ public class DynamicObjectDetailsController
     {
         this.subscribeService = rpSubscribeService;
     }
+    
+    public void setProcessors(List<ICrisHomeProcessor<ResearchObject>> processors) {
+		this.processors = processors;
+	}
 }

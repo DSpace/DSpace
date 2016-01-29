@@ -59,6 +59,7 @@ import org.dspace.app.cris.model.orcid.OrcidHistory;
 import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.model.ws.User;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.services.ConfigurationService;
 import org.hibernate.Session;
@@ -643,6 +644,21 @@ public class ApplicationService extends ExtendedTabService
 		return object;
     }
   
+    public <T extends ACrisObject> T getEntityByCrisId(String crisID)
+    {        
+        T dso = (T)getEntityByCrisId(crisID, ResearcherPage.class);
+        if (dso == null) {
+            dso = (T)getEntityByCrisId(crisID, OrganizationUnit.class);
+            if (dso == null) {
+                dso = (T)getEntityByCrisId(crisID, Project.class);
+                if (dso == null) {
+                    dso = (T)getEntityByCrisId(crisID, ResearchObject.class);
+                }
+            }
+        }
+        return dso;
+    }
+    
     public <T extends ACrisObject> T getEntityBySourceId(String sourceRef, String sourceID,
             Class<T> className)
     {

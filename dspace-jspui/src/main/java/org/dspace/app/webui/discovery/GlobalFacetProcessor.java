@@ -73,6 +73,11 @@ public class GlobalFacetProcessor implements SiteHomeProcessor
     	}
         DiscoverQuery queryArgs = DiscoverUtility.getDiscoverQuery(context,
                 request, null, DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME, true);
+        
+        for(String keyMapSecondLevel : mapsSecondLevel.keySet()) {
+			queryArgs.addFacetField(new DiscoverFacetField(keyMapSecondLevel,
+					DiscoveryConfigurationParameters.TYPE_TEXT, -1, SORT.COUNT, false));
+        }
         queryArgs.setMaxResults(0);
         DiscoverResult qResults;
         try
@@ -88,6 +93,11 @@ public class GlobalFacetProcessor implements SiteHomeProcessor
         	facet.setIndexFieldName(globalConfiguration.getCollapsingConfiguration().getGroupIndexFieldName());
             List<DiscoverySearchFilterFacet> availableFacet = new ArrayList<DiscoverySearchFilterFacet>();            
             availableFacet.addAll(globalConfiguration.getSidebarFacets());
+            for(String keyMapSecondLevel : mapsSecondLevel.keySet()) {
+            	DiscoverySearchFilterFacet facet2 = new DiscoverySearchFilterFacet();
+            	facet2.setIndexFieldName(keyMapSecondLevel);
+            	availableFacet.add(facet2);
+            }
             availableFacet.add(facet);
             request.setAttribute("processorGlobal","global");
             request.setAttribute("facetGlobalName", globalConfiguration.getCollapsingConfiguration().getGroupIndexFieldName());

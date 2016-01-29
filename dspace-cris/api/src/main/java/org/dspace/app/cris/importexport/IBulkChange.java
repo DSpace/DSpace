@@ -27,5 +27,11 @@ public interface IBulkChange {
 
 	IBulkChangeField getFieldChanges(String field);
 
+	IBulkChangeFieldFile getFieldFileChanges(String shortName);
+	   
 	IBulkChangeFieldLink getFieldLinkChanges(String shortName);
+	
+	IBulkChangeFieldPointer getFieldPointerChanges(String field);
+	
+	boolean isANestedBulkChange();
 }

@@ -228,14 +228,14 @@ public class ScriptCrisSubscribe
                     "eperson.subscription.onlynew", false))
             {
                 // get only the items archived yesterday
-                query.setQuery("dateaccessioned:(NOW/DAY-1DAY)");
+				query.setQuery("dateaccessioned_dt:[NOW/DAY-1DAY TO NOW/DAY]");
             }
             else
             {
                 // get all item modified yesterday but not published the day
                 // before
                 // and all the item modified today and archived yesterday
-                query.setQuery("(item.lastmodified:(NOW/DAY-1DAY) AND dateaccessioned:(NOW/DAY-1DAY)) OR ((item.lastmodified:(NOW/DAY) AND dateaccessioned:(NOW/DAY-1DAY)))");
+				query.setQuery("(itemLastModified_dt:[NOW/DAY-1DAY TO NOW/DAY] AND dateaccessioned_dt:[NOW/DAY-1DAY TO NOW/DAY]) OR ((itemLastModified_dt:[NOW/DAY TO NOW] AND dateaccessioned_dt:[NOW/DAY-1DAY TO NOW/DAY]))");
             }
 
             QueryResponse qResponse = searchService.search(query);

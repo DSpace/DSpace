@@ -39,7 +39,7 @@
 %>
 	
 <c:set var="info" value="<%= info %>" scope="request" />
-<div class="panel-group" id="${holder.shortName}">
+<div class="panel-group ${extraCSS}" id="${holder.shortName}">
 	<div class="panel panel-default">
     	<div class="panel-heading">
     		<h4 class="panel-title">
@@ -109,6 +109,7 @@ sb.append("</ul></div>");
 	<p align="center"><fmt:message key="jsp.search.results.results">
         <fmt:param><%=info.getStart()+1%></fmt:param>
         <fmt:param><%=info.getStart()+info.getItems().length%></fmt:param>
+        <fmt:param><%=info.getTotal()%></fmt:param>
         <fmt:param><%=(float)info.getSearchTime() / 1000%></fmt:param>
     </fmt:message></p>
 
@@ -127,8 +128,11 @@ if (info.getPagetotal() > 1)
        <input id="order<%= info.getType() %>" type="hidden" name="order<%= info.getType() %>" value="<%= info.getOrder() %>" />
 	   <input type="hidden" name="open" value="<%= info.getType() %>" />
 </form>	
-<dspace:browselist items="<%= (BrowseItem[])info.getItems() %>" config="crisrp" sortBy="<%= new Integer(info.getSo().getNumber()).toString() %>" order="<%= info.getOrder() %>"/>
-
+<div class="row">
+<div class="table-responsive">
+<dspace:browselist items="<%= (BrowseItem[])info.getItems() %>" config="crisrp.${info[holder.shortName].type}" sortBy="<%= new Integer(info.getSo().getNumber()).toString() %>" order="<%= info.getOrder() %>"/>
+</div>
+</div>
 <script type="text/javascript"><!--
 	var j = jQuery;
     function sortBy(sort_by, order) {

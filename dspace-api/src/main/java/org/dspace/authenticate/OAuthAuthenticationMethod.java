@@ -18,6 +18,7 @@ import org.dspace.authority.orcid.OrcidService;
 import org.dspace.authority.orcid.jaxb.OrcidBio;
 import org.dspace.authority.orcid.jaxb.OrcidProfile;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -152,19 +153,20 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
 	        // auto create user if needed
 	        if (eperson == null
 	                && ConfigurationManager
-	                .getBooleanProperty("authentication-oauth", "autoregister") && email!=null)
+	                .getBooleanProperty("authentication-oauth", "autoregister"))
 	        {
 	            log.info(LogManager.getHeader(context, "autoregister", "orcid="
 	                    + orcid));
             
                 eperson = EPerson.create(context);
-                eperson.setEmail(email);
+                eperson.setEmail(email!=null?email:orcid);
                 eperson.setFirstName(fname);
                 eperson.setLastName(lname);
                 eperson.setCanLogIn(true);
                 AuthenticationManager.initEPerson(context, request, eperson);
                 eperson.setNetid(orcid);
-//                eperson.setMetadata("access_token",token);
+                eperson.addMetadata("eperson", "orcid", null, null, orcid);
+                eperson.addMetadata("eperson", "orcid", "accesstoken", null, token);
                 eperson.update();
                 context.commit();
                 context.setCurrentUser(eperson);
@@ -172,18 +174,32 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
 	        else if(eperson!=null)
 	        {
 	            //found the eperson , update the eperson record with orcid id
-                eperson.setNetid(orcid);
+                //eperson.setNetid(orcid);
                 if (eperson.getEmail() == null) {
-                	eperson.setEmail(email);
+                	eperson.setEmail(email!=null?email:orcid);
                 } 
                 //eperson.setMetadata("access_token",token);
+                Metadatum[] md = eperson.getMetadata("eperson", "orcid", null, null);
+                boolean found = false;
+                if (md != null && md.length > 0) {
+                	for (Metadatum m : md) {
+                		if (StringUtils.equals(m.value, orcid)) {
+                			found = true;
+                			break;
+                		}
+                	}
+                }
+                if (!found) {
+                	eperson.addMetadata("eperson", "orcid", null, null, orcid);
+                }
+                eperson.addMetadata("eperson", "orcid", "accesstoken", null, token);
                 eperson.update();
                 context.commit();
 	        }
         }
         catch (AuthorizeException e)
         {
-            log.warn("Fail to authorize user with email:" + email, e);
+            log.warn("Fail to authorize user with orcid: "+orcid + " email:" + email, e);
             eperson = null;
         }
         finally

@@ -27,9 +27,10 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
-
+<%@page import="org.dspace.discovery.IGlobalSearchResult"%>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
@@ -369,19 +370,12 @@
 %>
 	<h3><fmt:message key="jsp.collection-home.recentsub"/></h3>
 <%
-		Item[] items = rs.getRecentSubmissions();
-		for (int i = 0; i < items.length; i++)
-		{
-			Metadatum[] dcv = items[i].getMetadata("dc", "title", null, Item.ANY);
-			String displayTitle = "Untitled";
-			if (dcv != null)
-			{
-				if (dcv.length > 0)
-				{
-					displayTitle = Utils.addEntities(dcv[0].value);
-				}
-			}
-			%><p class="recentItem"><a href="<%= request.getContextPath() %>/handle/<%= items[i].getHandle() %>"><%= displayTitle %></a></p><%
+		for (IGlobalSearchResult obj : rs.getRecentSubmissions()) {
+		%>
+		
+				<dspace:discovery-artifact style="global" artifact="<%= obj %>" view="<%= rs.getConfiguration() %>"/>
+		
+		<%
 		}
 %>
     <p>&nbsp;</p>

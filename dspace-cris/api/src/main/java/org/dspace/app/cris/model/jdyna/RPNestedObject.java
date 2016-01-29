@@ -46,7 +46,9 @@ import org.hibernate.annotations.OrderBy;
         @NamedQuery(name = "RPNestedObject.findNestedObjectsByTypoID", query = "from RPNestedObject where typo.id = ?"),
         @NamedQuery(name = "RPNestedObject.findNestedObjectsByParentIDAndTypoShortname",  query = "from RPNestedObject where parent.id = ? and typo.shortName = ?"),
         @NamedQuery(name = "RPNestedObject.deleteNestedObjectsByTypoID", query = "delete from RPNestedObject where typo.id = ?"),
-        @NamedQuery(name = "RPNestedObject.maxPositionNestedObjectsByTypoID", query = "select max(positionDef) as max from RPNestedObject where typo.id = ?")
+        @NamedQuery(name = "RPNestedObject.maxPositionNestedObjectsByTypoID", query = "select max(positionDef) as max from RPNestedObject where typo.id = ?"),
+        @NamedQuery(name = "RPNestedObject.uniqueNestedObjectsByParentIdAndTypoIDAndSourceReference", query = "from RPNestedObject where parent.id = ? and typo.id = ? and sourceReference.sourceRef = ? and sourceReference.sourceID = ?"),
+        @NamedQuery(name = "RPNestedObject.uniqueByUUID", query = "from RPNestedObject where uuid = ?")
 })
 public class RPNestedObject
         extends
@@ -127,5 +129,12 @@ public class RPNestedObject
     public String getPublicPath()
     {
         return parent.getPublicPath();
+    }
+
+    public RPNestedObject clone() throws CloneNotSupportedException
+    {
+        RPNestedObject clone = (RPNestedObject) super.clone();
+        clone.duplicaAnagrafica(this);        
+        return clone;
     }
 }

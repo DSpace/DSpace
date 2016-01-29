@@ -21,6 +21,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.jdyna.BoxDynamicObject;
@@ -85,7 +86,11 @@ import it.cilea.osd.jdyna.model.ADecoratorTypeDefinition;
 import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
 import it.cilea.osd.jdyna.model.ATypeNestedObject;
 import it.cilea.osd.jdyna.model.AccessLevelConstants;
+import it.cilea.osd.jdyna.model.Containable;
 import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.web.Box;
+import it.cilea.osd.jdyna.web.IPropertyHolder;
+import it.cilea.osd.jdyna.web.Tab;
 import it.cilea.osd.jdyna.widget.WidgetBoolean;
 import it.cilea.osd.jdyna.widget.WidgetCheckRadio;
 import it.cilea.osd.jdyna.widget.WidgetDate;
@@ -97,35 +102,50 @@ import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.read.biff.BiffException;
 
-public class StartupMetadataConfiguratorTool {
-	private static Logger log = Logger.getLogger(StartupMetadataConfiguratorTool.class);
+public class StartupMetadataConfiguratorTool
+{
+    private static Logger log = Logger
+            .getLogger(StartupMetadataConfiguratorTool.class);
 
-	public static void main(String[] args) throws ParseException, SQLException, BiffException, IOException {
+    private static boolean append = false;
+
+    public static void main(String[] args)
+            throws ParseException, SQLException, BiffException, IOException,
+            InstantiationException, IllegalAccessException
+    {
 		String fileExcel = null;
 		CommandLineParser parser = new PosixParser();
 		Options options = new Options();
 		options.addOption("f", "excel", true,
 				"Excel file that you can use to create/update DSpace-CRIS properties definitions (metadata for all CRIS software entities; NOTE the script doesn't delete anything but works only in append mode so you can use this option many times)");
-		options.addOption("t", "tabs", true,
-				"Build the base configuration for CRIS entities; Run this only one time to create a Tab that contain one Box with title/name metadata; If runs this script with \"-t advanced\" only for Researcher profile and Journals entity will create the box with the related publications and the \"Details\" box show other metadata e.g. fullName, preferredName, variants, academicName for RP and journalname, journalissn, journaleissn, journalpublisher for Journal entity");
-		options.addOption("o", "orcid", false,
-				"Build tabs to show the ORCID information on token authorization and settings preference, also build the edit tab to fill the settings preferences");
+        options.addOption("a", "append", false,
+                "Append mode (TODO manage the clean of all tab and map, now clean only metadata in box and box in tab)");
 
 		CommandLine line = parser.parse(options, args);
-		if (line.hasOption('h')) {
+        if (line.hasOption('h'))
+        {
 			HelpFormatter myhelp = new HelpFormatter();
-			myhelp.printHelp("StartupMetadataConfiguratorTool (BETA version use with caution!!!)\n", options);
+            myhelp.printHelp(
+                    "StartupMetadataConfiguratorTool (BETA version use with caution!!!)\n",
+                    options);
 			System.exit(0);
 		}
 
-		if (line.hasOption('f')) {
+        if (line.hasOption('f'))
+        {
 			fileExcel = line.getOptionValue('f');
 		}
+
+        if (line.hasOption('a'))
+        {
+            append = true;
+        }
 
 		Context dspaceContext = new Context();
 		dspaceContext.setIgnoreAuthorization(true);
 		DSpace dspace = new DSpace();
-		ApplicationService applicationService = dspace.getServiceManager().getServiceByName("applicationService",
+        ApplicationService applicationService = dspace.getServiceManager()
+                .getServiceByName("applicationService",
 				ApplicationService.class);
 
 		// leggo tutte le righe e mi creo una struttura dati ad hoc per
@@ -139,566 +159,524 @@ public class StartupMetadataConfiguratorTool {
 		// target , lista altri metadati
 		Map<String, List<List<String>>> widgetMap = new HashMap<String, List<List<String>>>();
 		Map<String, List<List<String>>> nestedMap = new HashMap<String, List<List<String>>>();
+        Map<String, List<List<String>>> tabMap = new HashMap<String, List<List<String>>>();
+        Map<String, List<List<String>>> etabMap = new HashMap<String, List<List<String>>>();
+        Map<String, List<List<String>>> boxMap = new HashMap<String, List<List<String>>>();
+        Map<String, List<List<String>>> tab2boxMap = new HashMap<String, List<List<String>>>();
+        Map<String, List<List<String>>> etab2boxMap = new HashMap<String, List<List<String>>>();
+        Map<String, List<List<String>>> box2metadataMap = new HashMap<String, List<List<String>>>();
+
 		Map<String, List<String>> controlledListMap = new HashMap<String, List<String>>();
 
-		PlatformTransactionManager transactionManager = (PlatformTransactionManager) dspace.getServiceManager()
-				.getServiceByName("transactionManager", HibernateTransactionManager.class);
+        PlatformTransactionManager transactionManager = (PlatformTransactionManager) dspace
+                .getServiceManager().getServiceByName("transactionManager",
+                        HibernateTransactionManager.class);
 		DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute(
 				TransactionDefinition.PROPAGATION_REQUIRED);
 		//
 		// transactionAttribute
 		// .setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
-		TransactionStatus status = transactionManager.getTransaction(transactionAttribute);
+        TransactionStatus status = transactionManager
+                .getTransaction(transactionAttribute);
 		boolean success = false;
-		try {
+        try
+        {
 			buildMap(workbook, "propertiesdefinition", widgetMap, 0);
 			buildMap(workbook, "nesteddefinition", nestedMap, 10);
+            buildMap(workbook, "tab", tabMap, 0);
+            buildMap(workbook, "etab", etabMap, 0);
+            buildMap(workbook, "box", boxMap, 0);
+            buildMap(workbook, "tab2box", tab2boxMap, 0);
+            buildMap(workbook, "etab2box", etab2boxMap, 0);
+            buildMap(workbook, "box2metadata", box2metadataMap, 0);
 			buildControlledList(workbook, "controlledlist", controlledListMap);
 
-			buildResearchObject(workbook, "utilsdata", applicationService);
-
+			buildResearchObject(workbook, "utilsdata", applicationService, transactionManager, status);
+			
 			// per ogni target chiama il metodo con i corretti parametri
-			for (String key : widgetMap.keySet()) {
+            for (String key : widgetMap.keySet())
+            {
 				List<List<String>> meta = widgetMap.get(key);
-				if (key.equals("rp")) {
-					build(applicationService, meta, nestedMap, RPPropertiesDefinition.class,
-							DecoratorRPPropertiesDefinition.class, RPNestedPropertiesDefinition.class,
-							DecoratorRPNestedPropertiesDefinition.class, RPTypeNestedObject.class,
+                if (key.equals("rp"))
+                {
+                    build(applicationService, meta, nestedMap,
+                            RPPropertiesDefinition.class,
+                            DecoratorRPPropertiesDefinition.class,
+                            RPNestedPropertiesDefinition.class,
+                            DecoratorRPNestedPropertiesDefinition.class,
+                            RPTypeNestedObject.class,
 							DecoratorRPTypeNested.class, controlledListMap);
-				} else if (key.equals("pj")) {
-					build(applicationService, meta, nestedMap, ProjectPropertiesDefinition.class,
-							DecoratorProjectPropertiesDefinition.class, ProjectNestedPropertiesDefinition.class,
-							DecoratorProjectNestedPropertiesDefinition.class, ProjectTypeNestedObject.class,
-							DecoratorProjectTypeNested.class, controlledListMap);
-				} else if (key.equals("ou")) {
-					build(applicationService, meta, nestedMap, OUPropertiesDefinition.class,
-							DecoratorOUPropertiesDefinition.class, OUNestedPropertiesDefinition.class,
-							DecoratorOUNestedPropertiesDefinition.class, OUTypeNestedObject.class,
+                }
+                else if (key.equals("pj"))
+                {
+                    build(applicationService, meta, nestedMap,
+                            ProjectPropertiesDefinition.class,
+                            DecoratorProjectPropertiesDefinition.class,
+                            ProjectNestedPropertiesDefinition.class,
+                            DecoratorProjectNestedPropertiesDefinition.class,
+                            ProjectTypeNestedObject.class,
+                            DecoratorProjectTypeNested.class,
+                            controlledListMap);
+                }
+                else if (key.equals("ou"))
+                {
+                    build(applicationService, meta, nestedMap,
+                            OUPropertiesDefinition.class,
+                            DecoratorOUPropertiesDefinition.class,
+                            OUNestedPropertiesDefinition.class,
+                            DecoratorOUNestedPropertiesDefinition.class,
+                            OUTypeNestedObject.class,
 							DecoratorOUTypeNested.class, controlledListMap);
-				} else {
+                }
+                else
+                {
 					ResultObject<DynamicPropertiesDefinition, DynamicNestedPropertiesDefinition, DynamicTypeNestedObject> result = build(
-							applicationService, meta, nestedMap, DynamicPropertiesDefinition.class,
-							DecoratorDynamicPropertiesDefinition.class, DynamicNestedPropertiesDefinition.class,
-							DecoratorDynamicNestedPropertiesDefinition.class, DynamicTypeNestedObject.class,
-							DecoratorDynamicTypeNested.class, controlledListMap);
-					DynamicObjectType dtp = applicationService.findTypoByShortName(DynamicObjectType.class, key);
-					if (dtp == null) {
-						throw new RuntimeException("DynamicObjectType with shortname:" + key + " not found");
+                            applicationService, meta, nestedMap,
+                            DynamicPropertiesDefinition.class,
+                            DecoratorDynamicPropertiesDefinition.class,
+                            DynamicNestedPropertiesDefinition.class,
+                            DecoratorDynamicNestedPropertiesDefinition.class,
+                            DynamicTypeNestedObject.class,
+                            DecoratorDynamicTypeNested.class,
+                            controlledListMap);
+                    DynamicObjectType dtp = applicationService
+                            .findTypoByShortName(DynamicObjectType.class, key);
+                    if (dtp == null)
+                    {
+                        throw new RuntimeException(
+                                "DynamicObjectType with shortname:" + key
+                                        + " not found");
 					}
 
-					if (result.getTPtoPDEF() != null && !result.getTPtoPDEF().isEmpty()) {
-						if (dtp.getMask() != null && !dtp.getMask().isEmpty()) {
+                    if (result.getTPtoPDEF() != null
+                            && !result.getTPtoPDEF().isEmpty())
+                    {
+                        if (dtp.getMask() != null && !dtp.getMask().isEmpty())
+                        {
 							result.getTPtoPDEF().addAll(dtp.getMask());
 						}
 						dtp.setMask(result.getTPtoPDEF());
 
 					}
 
-					if (result.getTPtoNOTP() != null && !result.getTPtoNOTP().isEmpty()) {
-						if (dtp.getTypeNestedDefinitionMask() != null && !dtp.getTypeNestedDefinitionMask().isEmpty()) {
-							result.getTPtoNOTP().addAll(dtp.getTypeNestedDefinitionMask());
+                    if (result.getTPtoNOTP() != null
+                            && !result.getTPtoNOTP().isEmpty())
+                    {
+                        if (dtp.getTypeNestedDefinitionMask() != null
+                                && !dtp.getTypeNestedDefinitionMask().isEmpty())
+                        {
+                            result.getTPtoNOTP()
+                                    .addAll(dtp.getTypeNestedDefinitionMask());
 						}
 						dtp.setTypeNestedDefinitionMask(result.getTPtoNOTP());
 					}
 
-					applicationService.saveOrUpdate(DynamicObjectType.class, dtp);
+                    applicationService.saveOrUpdate(DynamicObjectType.class,
+                            dtp);
 				}
 			}
 
-			if (line.hasOption('t')) {
-				boolean advanced = line.getOptionValue("t").equals("advanced");
+            for (String key : tabMap.keySet())
+            {
+                List<List<String>> rows = tabMap.get(key);
+                if (key.equals("rp"))
+                {
+                    buildTab(applicationService, rows, TabResearcherPage.class);
+                }
+                else if (key.equals("pj"))
+                {
+                    buildTab(applicationService, rows, TabProject.class);
+                }
+                else if (key.equals("ou"))
+                {
+                    buildTab(applicationService, rows,
+                            TabOrganizationUnit.class);
+                }
+                else
+                {
+                    buildTab(applicationService, rows, TabDynamicObject.class);
+                }
+            }
+            for (String key : etabMap.keySet())
+            {
+                List<List<String>> rows = etabMap.get(key);
+                if (key.equals("rp"))
+                {
+                    buildTab(applicationService, rows,
+                            EditTabResearcherPage.class);
+                }
+                else if (key.equals("pj"))
+                {
+                    buildTab(applicationService, rows, EditTabProject.class);
+                }
+                else if (key.equals("ou"))
+                {
+                    buildTab(applicationService, rows,
+                            EditTabOrganizationUnit.class);
+                }
+                else
+                {
+                    buildTab(applicationService, rows,
+                            EditTabDynamicObject.class);
+                }
+            }
 
-				boolean alreadyConfiguredRP = false;
-				TabResearcherPage tabRP = applicationService.getTabByShortName(TabResearcherPage.class, "info");
+            for (String key : boxMap.keySet())
+            {
+                List<List<String>> rows = boxMap.get(key);
+                if (key.equals("rp"))
+                {
+                    buildBox(applicationService, rows, BoxResearcherPage.class);
+                }
+                else if (key.equals("pj"))
+                {
+                    buildBox(applicationService, rows, BoxProject.class);
+                }
+                else if (key.equals("ou"))
+                {
+                    buildBox(applicationService, rows,
+                            BoxOrganizationUnit.class);
+                }
+                else
+                {
+                    buildBox(applicationService, rows, BoxDynamicObject.class);
+                }
+            }
 
-				BoxResearcherPage boxRP = applicationService.getBoxByShortName(BoxResearcherPage.class, "record");
-				BoxResearcherPage boxRPPublications = applicationService.getBoxByShortName(BoxResearcherPage.class,
-						"publications");
-				if (tabRP != null) {
-					alreadyConfiguredRP = true;
-				}
+            for (String key : box2metadataMap.keySet())
+            {
+                List<List<String>> rows = box2metadataMap.get(key);
+                if (key.equals("rp"))
+                {
+                    buildBoxToMetadata(applicationService, rows,
+                            BoxResearcherPage.class,
+                            DecoratorRPPropertiesDefinition.class,
+                            DecoratorRPTypeNested.class,
+                            RPPropertiesDefinition.class);
+                }
+                else if (key.equals("pj"))
+                {
+                    buildBoxToMetadata(applicationService, rows,
+                            BoxProject.class,
+                            DecoratorProjectPropertiesDefinition.class,
+                            DecoratorProjectTypeNested.class,
+                            ProjectPropertiesDefinition.class);
+                }
+                else if (key.equals("ou"))
+                {
+                    buildBoxToMetadata(applicationService, rows,
+                            BoxOrganizationUnit.class,
+                            DecoratorOUPropertiesDefinition.class,
+                            DecoratorOUTypeNested.class,
+                            OUPropertiesDefinition.class);
+                }
+                else
+                {
+                    buildBoxToMetadata(applicationService, rows,
+                            BoxDynamicObject.class,
+                            DecoratorDynamicPropertiesDefinition.class,
+                            DecoratorDynamicTypeNested.class,
+                            DynamicPropertiesDefinition.class);
+                }
+            }
 
-				// TODO this configuration could be read from excel
-				if (!alreadyConfiguredRP) {
-					RPPropertiesDefinition pdef = applicationService
-							.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, "fullName");
+            for (String key : tab2boxMap.keySet())
+            {
+                List<List<String>> rows = tab2boxMap.get(key);
+                if (key.equals("rp"))
+                {
+                    buildTabToBox(applicationService, rows,
+                            TabResearcherPage.class, BoxResearcherPage.class);
+                }
+                else if (key.equals("pj"))
+                {
+                    buildTabToBox(applicationService, rows, TabProject.class,
+                            BoxProject.class);
+                }
+                else if (key.equals("ou"))
+                {
+                    buildTabToBox(applicationService, rows,
+                            TabOrganizationUnit.class,
+                            BoxOrganizationUnit.class);
+                }
+                else
+                {
+                    buildTabToBox(applicationService, rows,
+                            TabDynamicObject.class, BoxDynamicObject.class);
+                }
+            }
 
-					if (pdef != null) {
-						DecoratorRPPropertiesDefinition containable = (DecoratorRPPropertiesDefinition) applicationService
-								.findContainableByDecorable(DecoratorRPPropertiesDefinition.class, pdef.getId());
+            for (String key : etab2boxMap.keySet())
+            {
+                List<List<String>> rows = etab2boxMap.get(key);
+                if (key.equals("rp"))
+                {
+                    buildTabToBox(applicationService, rows,
+                            EditTabResearcherPage.class,
+                            BoxResearcherPage.class);
+                }
+                else if (key.equals("pj"))
+                {
+                    buildTabToBox(applicationService, rows,
+                            EditTabProject.class, BoxProject.class);
+                }
+                else if (key.equals("ou"))
+                {
+                    buildTabToBox(applicationService, rows,
+                            EditTabOrganizationUnit.class,
+                            BoxOrganizationUnit.class);
+                }
+                else
+                {
+                    buildTabToBox(applicationService, rows,
+                            EditTabDynamicObject.class, BoxDynamicObject.class);
+                }
+            }
+            success = true;
+        }
+        finally
+        {
+            if (success)
+            {
+                transactionManager.commit(status);
+            }
+            else
+            {
+                transactionManager.rollback(status);
+            }
+        }
 
-						tabRP = new TabResearcherPage();
-						tabRP.setVisibility(VisibilityTabConstant.HIGH);
-						tabRP.setTitle("Info");
-						tabRP.setShortName("info");
-						EditTabResearcherPage etab = new EditTabResearcherPage();
-						etab.setVisibility(VisibilityTabConstant.HIGH);
-						etab.setTitle("EInfo");
-						etab.setShortName("einfo");
+    }
 
-						boxRP = new BoxResearcherPage();
-						boxRP.setVisibility(VisibilityTabConstant.HIGH);
-						boxRP.setTitle("Details");
-						boxRP.setShortName("record");
-						boxRP.getMask().add(containable);
+    private static <H extends IPropertyHolder<Containable>, T extends Tab<H>> void buildTabToBox(
+            ApplicationService applicationService, List<List<String>> rows,
+            Class<T> tabClazz, Class<H> boxClazz)
+    {
 
-						boxRPPublications = new BoxResearcherPage();
-						boxRPPublications.setVisibility(VisibilityTabConstant.HIGH);
-						boxRPPublications.setTitle("Publications");
-						boxRPPublications.setShortName("publications");
-						boxRPPublications.setExternalJSP("dspaceitems");
-						applicationService.saveOrUpdate(BoxResearcherPage.class, boxRP);
-						applicationService.saveOrUpdate(BoxResearcherPage.class, boxRPPublications);
+        List<String> tabCache = new ArrayList<String>();
+        for (List<String> row : rows)
+        {
 
-						tabRP.getMask().add(boxRP);
-						applicationService.saveOrUpdate(TabResearcherPage.class, tabRP);
+            String tabShortname = row.get(1);
+            String boxShortname = row.get(2);
 
-						etab.setDisplayTab(tabRP);
-						applicationService.saveOrUpdate(EditTabResearcherPage.class, etab);
-					}
-				}
+            T tab = applicationService.getTabByShortName(tabClazz,
+                    tabShortname);
+            H box = applicationService.getBoxByShortName(boxClazz,
+                    boxShortname);
 
-				boolean alreadyConfiguredOU = false;
-				TabOrganizationUnit tabOrg = applicationService.getTabByShortName(TabOrganizationUnit.class, "info");
-				if (tabOrg != null) {
-					alreadyConfiguredOU = true;
-				}
-
-				if (!alreadyConfiguredOU) {
-
-					OUPropertiesDefinition pdef = applicationService
-							.findPropertiesDefinitionByShortName(OUPropertiesDefinition.class, "name");
-					if (pdef != null) {
-						DecoratorOUPropertiesDefinition containable = (DecoratorOUPropertiesDefinition) applicationService
-								.findContainableByDecorable(DecoratorOUPropertiesDefinition.class, pdef.getId());
-
-						tabOrg = new TabOrganizationUnit();
-						tabOrg.setVisibility(VisibilityTabConstant.HIGH);
-						tabOrg.setTitle("Info");
-						tabOrg.setShortName("info");
-
-						EditTabOrganizationUnit etab = new EditTabOrganizationUnit();
-						etab.setVisibility(VisibilityTabConstant.HIGH);
-						etab.setTitle("EInfo");
-						etab.setShortName("einfo");
-
-						BoxOrganizationUnit box = new BoxOrganizationUnit();
-						box.setVisibility(VisibilityTabConstant.HIGH);
-						box.setTitle("Details");
-						box.setShortName("record");
-						box.getMask().add(containable);
-
-						applicationService.saveOrUpdate(BoxOrganizationUnit.class, box);
-
-						tabOrg.getMask().add(box);
-						applicationService.saveOrUpdate(TabOrganizationUnit.class, tabOrg);
-
-						etab.setDisplayTab(tabOrg);
-						applicationService.saveOrUpdate(EditTabOrganizationUnit.class, etab);
-					}
-				}
-
-				boolean alreadyConfiguredPJ = false;
-				TabProject tabPJ = applicationService.getTabByShortName(TabProject.class, "info");
-				if (tabPJ != null) {
-					alreadyConfiguredPJ = true;
-				}
-
-				if (!alreadyConfiguredPJ) {
-
-					ProjectPropertiesDefinition pdef = applicationService
-							.findPropertiesDefinitionByShortName(ProjectPropertiesDefinition.class, "title");
-					if (pdef != null) {
-						DecoratorProjectPropertiesDefinition containable = (DecoratorProjectPropertiesDefinition) applicationService
-								.findContainableByDecorable(DecoratorProjectPropertiesDefinition.class, pdef.getId());
-
-						tabPJ = new TabProject();
-						tabPJ.setVisibility(VisibilityTabConstant.HIGH);
-						tabPJ.setTitle("Info");
-						tabPJ.setShortName("info");
-
-						EditTabProject etab = new EditTabProject();
-						etab.setVisibility(VisibilityTabConstant.HIGH);
-						etab.setTitle("EInfo");
-						etab.setShortName("einfo");
-
-						BoxProject box = new BoxProject();
-						box.setVisibility(VisibilityTabConstant.HIGH);
-						box.setTitle("Details");
-						box.setShortName("record");
-						box.getMask().add(containable);
-
-						applicationService.saveOrUpdate(BoxProject.class, box);
-
-						tabPJ.getMask().add(box);
-						applicationService.saveOrUpdate(TabProject.class, tabPJ);
-
-						etab.setDisplayTab(tabPJ);
-						applicationService.saveOrUpdate(EditTabProject.class, etab);
-					}
-				}
-
-				List<DynamicObjectType> listTP = applicationService.getList(DynamicObjectType.class);
-				TabDynamicObject tabDO = null;
-				BoxDynamicObject boxDO = null;
-
-				TabDynamicObject tabJournal = null;
-				BoxDynamicObject boxJournal = null;
-				BoxDynamicObject boxJournalPublications = null;
-				for (DynamicObjectType tp : listTP) {
-					boolean alreadyConfiguredDO = false;
-					String shortName = tp.getShortName();
-					tabDO = applicationService.getTabByShortName(TabDynamicObject.class, shortName + "info");
-					boxDO = applicationService.getBoxByShortName(BoxDynamicObject.class, shortName + "record");
-
-					boolean isJournal = shortName.equals("journal");
-					if (isJournal) {
-						tabJournal = tabDO;
-						boxJournal = boxDO;
-						boxJournalPublications = applicationService.getBoxByShortName(BoxDynamicObject.class,
-								shortName + "publications");
-
-						if (boxJournalPublications == null) {
-							boxJournalPublications = new BoxDynamicObject();
-							boxJournalPublications.setVisibility(VisibilityTabConstant.HIGH);
-							boxJournalPublications.setTitle("Publications");
-							boxJournalPublications.setShortName(shortName + "publications");
-							boxJournalPublications.setTypeDef(tp);
-							applicationService.saveOrUpdate(BoxDynamicObject.class, boxJournalPublications);
-						}
-					}
-
-					if (tabDO != null) {
-						alreadyConfiguredDO = true;
-					}
-					if (!alreadyConfiguredDO) {
-						DynamicPropertiesDefinition pdef = applicationService.findPropertiesDefinitionByShortName(
-								DynamicPropertiesDefinition.class, shortName + "name");
-						if (pdef != null) {
-							DecoratorDynamicPropertiesDefinition containable = (DecoratorDynamicPropertiesDefinition) applicationService
-									.findContainableByDecorable(DecoratorDynamicPropertiesDefinition.class,
-											pdef.getId());
-
-							tabDO = new TabDynamicObject();
-							tabDO.setVisibility(VisibilityTabConstant.HIGH);
-							tabDO.setTitle("Info");
-							tabDO.setShortName(shortName + "info");
-							tabDO.setTypeDef(tp);
-
-							EditTabDynamicObject etab = new EditTabDynamicObject();
-							etab.setVisibility(VisibilityTabConstant.HIGH);
-							etab.setTitle("EInfo");
-							etab.setShortName(shortName + "einfo");
-							etab.setTypeDef(tp);
-
-							boxDO = new BoxDynamicObject();
-							boxDO.setVisibility(VisibilityTabConstant.HIGH);
-							boxDO.setTitle("Details");
-							boxDO.setShortName(shortName + "record");
-							boxDO.setTypeDef(tp);
-
-							boxDO.getMask().add(containable);
-
-							applicationService.saveOrUpdate(BoxDynamicObject.class, boxDO);
-
-							tabDO.getMask().add(boxDO);
-							applicationService.saveOrUpdate(TabDynamicObject.class, tabDO);
-
-							etab.setDisplayTab(tabDO);
-							applicationService.saveOrUpdate(EditTabDynamicObject.class, etab);
-						}
-					}
-				}
-
-				if (advanced) {
-					boolean saveTab = false;
-					// basic configuration for RP box
-					if (boxRP != null) {
-						String[] rpProps = { "fullName", "preferredName", "translatedName", "variants" };
-
-						boxRP.getMask().clear();
-						boxRP.setMask(null);
-
-						for (String prop : rpProps) {
-							RPPropertiesDefinition pdef = applicationService
-									.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, prop);
-							if (pdef != null) {
-								DecoratorRPPropertiesDefinition containable = (DecoratorRPPropertiesDefinition) applicationService
-										.findContainableByDecorable(DecoratorRPPropertiesDefinition.class,
-												pdef.getId());
-
-								boxRP.getMask().add(containable);
-							}
-						}
-						applicationService.saveOrUpdate(BoxResearcherPage.class, boxRP);
-
-						if (!(tabRP.getMask().contains(boxRP))) {
-							tabRP.getMask().add(boxRP);
-							saveTab = true;
-						}
-
-					} else {
-						log.warn(
-								"No box configured for RP, run this script with -t option to create basic configuration first");
-					}
-
-					if (boxRPPublications != null) {
-						if (!(tabRP.getMask().contains(boxRPPublications))) {
-							tabRP.getMask().add(boxRPPublications);
-							saveTab = true;
-						}
-
-					} else {
-						log.warn(
-								"No box configured for RP, run this script with -t option to create basic configuration first");
-					}
-
-					if (saveTab) {
-						applicationService.saveOrUpdate(TabResearcherPage.class, tabRP);
-					}
-
-					// basic configuration for JOURNALS box
-					saveTab = false;
-					if (boxJournal != null) {
-
-						String[] journalProps = { "journalname", "journalissn", "journaleissn", "journalpublisher" };
-
-						boxJournal.getMask().clear();
-						boxJournal.setMask(null);
-						for (String prop : journalProps) {
-							DynamicPropertiesDefinition pdef = applicationService
-									.findPropertiesDefinitionByShortName(DynamicPropertiesDefinition.class, prop);
-							if (pdef != null) {
-								DecoratorDynamicPropertiesDefinition containable = (DecoratorDynamicPropertiesDefinition) applicationService
-										.findContainableByDecorable(DecoratorDynamicPropertiesDefinition.class,
-												pdef.getId());
-
-								boxJournal.getMask().add(containable);
-							}
-						}
-						applicationService.saveOrUpdate(BoxDynamicObject.class, boxJournal);
-					} else {
-						log.warn(
-								"No box configured for JOURNALS, run this script with -t option to create basic configuration first");
-					}
-					if (tabJournal != null && boxJournalPublications != null) {
-						if (!(tabJournal.getMask().contains(boxJournalPublications))) {
-							tabJournal.getMask().add(boxJournalPublications);
-							saveTab = true;
-						}
-					} else {
-						log.warn(
-								"No box configured for JOURNALS, run this script with -t option to create basic configuration first");
-					}
-					if (saveTab) {
-						applicationService.saveOrUpdate(TabDynamicObject.class, tabJournal);
-					}
-
-				}
-
+            if (box != null && tab != null)
+            {
+                if (!append)
+                {
+                    if (!tabCache.contains(tabShortname))
+                    {
+                        tabCache.add(tabShortname);
+                        tab.getMask().clear();
+                        tab.setMask(null);
 			}
+                }
 
-			if (line.hasOption("o")) {
-				boolean saveTab = false;
+                tab.getMask().add(box);
+                applicationService.saveOrUpdate(tabClazz, tab);
+            }
+        }
+    }
 
-				TabResearcherPage tabORCID = applicationService.getTabByShortName(TabResearcherPage.class, "orcid");
-				EditTabResearcherPage editTabORCID = applicationService.getTabByShortName(EditTabResearcherPage.class,
-						"eorcid");
+    private static <D extends ADecoratorPropertiesDefinition<TP>, TP extends PropertiesDefinition, NPD extends ANestedPropertiesDefinition, DNPD extends ADecoratorPropertiesDefinition<NPD>, ATNO extends ATypeNestedObject<NPD>, DATNO extends ADecoratorTypeDefinition<ATNO, NPD>, H extends IPropertyHolder<Containable>> void buildBoxToMetadata(
+            ApplicationService applicationService, List<List<String>> rows,
+            Class<H> boxClazz, Class<D> decoratorClazz,
+            Class<DATNO> ndecoratorClazz, Class<TP> pdefClazz)
+    {
 
-				BoxResearcherPage boxAuthorizationORCID = applicationService.getBoxByShortName(BoxResearcherPage.class,
-						"orcidauthorizations");
-				BoxResearcherPage boxSettingsORCID = applicationService.getBoxByShortName(BoxResearcherPage.class,
-						"orcidsyncsettings");
-				BoxResearcherPage boxQueueORCID = applicationService.getBoxByShortName(BoxResearcherPage.class,
-						"orcidsyncqueue");
+        List<String> boxCache = new ArrayList<String>();
+        for (List<String> row : rows)
+        {
 
-				if (tabORCID == null) {
-					tabORCID = new TabResearcherPage();
-					tabORCID.setVisibility(VisibilityTabConstant.LOW);
-					tabORCID.setTitle("ORCID");
-					tabORCID.setShortName("orcid");
+            String boxShortname = row.get(1);
+            String pdefShortname = row.get(2);
 
-					editTabORCID = new EditTabResearcherPage();
-					editTabORCID.setVisibility(VisibilityTabConstant.LOW);
-					editTabORCID.setTitle("ORCID");
-					editTabORCID.setShortName("eorcid");
+            H box = applicationService.getBoxByShortName(boxClazz,
+                    boxShortname);
 
-					boxAuthorizationORCID = new BoxResearcherPage();
-					boxAuthorizationORCID.setVisibility(VisibilityTabConstant.LOW);
-					boxAuthorizationORCID.setTitle("ORCID Authorizations");
-					boxAuthorizationORCID.setShortName("orcidauthorizations");
-					boxAuthorizationORCID.setExternalJSP("orcidauthorizations");
-					boxAuthorizationORCID.setPriority(10000);
+            if (box != null)
+            {
 
-					boxSettingsORCID = new BoxResearcherPage();
-					boxSettingsORCID.setVisibility(VisibilityTabConstant.LOW);
-					boxSettingsORCID.setTitle("ORCID Synchronization settings");
-					boxSettingsORCID.setShortName("orcidsyncsettings");
-					boxSettingsORCID.setExternalJSP("orcidsyncsettings");
-					boxSettingsORCID.setPriority(1000);
+                if (!append)
+                {
+                    if (!boxCache.contains(boxShortname))
+                    {
+                        boxCache.add(boxShortname);
+                        box.getMask().clear();
+                        box.setMask(null);
+                    }
+                }
 
-					boxQueueORCID = new BoxResearcherPage();
-					boxQueueORCID.setVisibility(VisibilityTabConstant.LOW);
-					boxQueueORCID.setTitle("ORCID Registry Queue");
-					boxQueueORCID.setShortName("orcidsyncqueue");
-					boxQueueORCID.setExternalJSP("orcidsyncqueue");
-					boxQueueORCID.setPriority(100);
-					
-					applicationService.saveOrUpdate(BoxResearcherPage.class, boxAuthorizationORCID);
-					applicationService.saveOrUpdate(BoxResearcherPage.class, boxSettingsORCID);
-					applicationService.saveOrUpdate(BoxResearcherPage.class, boxQueueORCID);
-
-					tabORCID.getMask().add(boxAuthorizationORCID);
-					tabORCID.getMask().add(boxSettingsORCID);
-					tabORCID.getMask().add(boxQueueORCID);
-					applicationService.saveOrUpdate(TabResearcherPage.class, tabORCID);
-
-					editTabORCID.getMask().add(boxSettingsORCID);
-					applicationService.saveOrUpdate(EditTabResearcherPage.class, editTabORCID);
-
-				}
-
-				// orcid configuration for RP box
-				if (boxAuthorizationORCID != null) {
-					String[] rpProps = { "fullName", "email", "orcid", "system-orcid-token-authenticate",
-							"system-orcid-token-orcid-profile-read-limited", "system-orcid-token-orcid-bio-update",
-							"system-orcid-token-orcid-works-create", "system-orcid-token-orcid-works-update",
-							"system-orcid-token-funding-create", "system-orcid-token-funding-update" };
-
-					boxAuthorizationORCID.getMask().clear();
-					boxAuthorizationORCID.setMask(null);
-
-					for (String prop : rpProps) {
-						RPPropertiesDefinition pdef = applicationService
-								.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, prop);
-						if (pdef != null) {
-							DecoratorRPPropertiesDefinition containable = (DecoratorRPPropertiesDefinition) applicationService
-									.findContainableByDecorable(DecoratorRPPropertiesDefinition.class, pdef.getId());
-
-							boxAuthorizationORCID.getMask().add(containable);
-						}
-					}
-					applicationService.saveOrUpdate(BoxResearcherPage.class, boxAuthorizationORCID);
-
-					if (!(tabORCID.getMask().contains(boxAuthorizationORCID))) {
-						tabORCID.getMask().add(boxAuthorizationORCID);
-						saveTab = true;
-					}
-
-				} else {
-					log.warn("No box configured for RP - orcidauthorizations");
-				}
-
-				if (boxSettingsORCID != null) {
-					String[] rpProps = { "fullName", "email", "orcid", "orcid-push-manual", "orcid-publications-prefs", "orcid-projects-prefs", "orcid-profile-pref-email",
-							"orcid-profile-pref-fullName", "orcid-profile-pref-preferredName", "orcid-profile-pref-other-emails", "orcid-profile-pref-iso-3166-country", "orcid-profile-pref-keywords", "orcid-profile-pref-biography", "orcid-profile-pref-credit-name" };
-
-					boxSettingsORCID.getMask().clear();
-					boxSettingsORCID.setMask(null);
-
-					for (String prop : rpProps) {
-						RPPropertiesDefinition pdef = applicationService
-								.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, prop);
-						if (pdef != null) {
-							DecoratorRPPropertiesDefinition containable = (DecoratorRPPropertiesDefinition) applicationService
-									.findContainableByDecorable(DecoratorRPPropertiesDefinition.class, pdef.getId());
-
-							boxSettingsORCID.getMask().add(containable);
-						}
-					}
-					applicationService.saveOrUpdate(BoxResearcherPage.class, boxSettingsORCID);
-
-					if (!(tabORCID.getMask().contains(boxSettingsORCID))) {
-						tabORCID.getMask().add(boxSettingsORCID);
-						editTabORCID.getMask().add(boxSettingsORCID);
-						saveTab = true;
-					}
-
-				} else {
-					log.warn("No box configured for RP - orcidsyncsettings");
-				}
-
-				if (boxQueueORCID != null) {
-					String[] rpProps = { "fullName", "email", "orcid", "orcid-push-manual", "orcid-push-item-activate-put", "orcid-push-pj-activate-put", "orcid-push-rp-activate-put"};
-
-					boxQueueORCID.getMask().clear();
-					boxQueueORCID.setMask(null);
-
-					for (String prop : rpProps) {
-						RPPropertiesDefinition pdef = applicationService
-								.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, prop);
-						if (pdef != null) {
-							DecoratorRPPropertiesDefinition containable = (DecoratorRPPropertiesDefinition) applicationService
-									.findContainableByDecorable(DecoratorRPPropertiesDefinition.class, pdef.getId());
-
-							boxQueueORCID.getMask().add(containable);
-						}
-					}
-					applicationService.saveOrUpdate(BoxResearcherPage.class, boxQueueORCID);
-
-					if (!(tabORCID.getMask().contains(boxQueueORCID))) {
-						tabORCID.getMask().add(boxQueueORCID);
-						saveTab = true;
-					}
-
-				} else {
-					log.warn("No box configured for RP - orcidsyncsettings");
-				}
-				
-				if (saveTab) {
-					applicationService.saveOrUpdate(TabResearcherPage.class, tabORCID);
-					applicationService.saveOrUpdate(EditTabResearcherPage.class, editTabORCID);
-				}
-
-			}
-			success = true;
-		} finally {
-			if (success) {
-				transactionManager.commit(status);
-			} else {
-				transactionManager.rollback(status);
+                Containable containable = (Containable) applicationService
+                        .findContainableByDecorable(decoratorClazz,
+                                pdefShortname);
+                if (containable == null)
+                {
+                    containable = (Containable) applicationService
+                            .findContainableByDecorable(ndecoratorClazz,
+                                    pdefShortname);
+                }
+                box.getMask().add(containable);
+                applicationService.saveOrUpdate(boxClazz, box);
 			}
 		}
 
 	}
 
+    private static <H extends IPropertyHolder<Containable>, T extends Tab<H>> void buildTab(
+            ApplicationService applicationService, List<List<String>> rows,
+            Class<T> clazzTab)
+                    throws InstantiationException, IllegalAccessException
+    {
+        for (List<String> row : rows)
+        {
+            String shortName = row.get(1);
+            String label = row.get(2);
+            boolean mandatory = row.get(3).equals("y") ? true : false;
+            String priority = row.get(4);
+            Integer accessLevel = AccessLevelConstants.ADMIN_ACCESS;
+            String tmpAccessLevel = row.get(5);
+            if (tmpAccessLevel.equals("STANDARD_ACCESS"))
+            {
+                accessLevel = AccessLevelConstants.STANDARD_ACCESS;
+            }
+            else if (tmpAccessLevel.equals("HIGH_ACCESS"))
+            {
+                accessLevel = AccessLevelConstants.HIGH_ACCESS;
+            }
+            else if (tmpAccessLevel.equals("LOW_ACCESS"))
+            {
+                accessLevel = AccessLevelConstants.LOW_ACCESS;
+            }
+            String ext = row.get(6);
+            String mime = row.get(7);
+
+            T tabRP = applicationService.getTabByShortName(clazzTab, shortName);
+
+            if (tabRP == null)
+            {
+                tabRP = clazzTab.newInstance();
+                tabRP.setShortName(shortName);
+                tabRP.setExt(ext);
+                tabRP.setMime(mime);
+                tabRP.setMandatory(mandatory);
+                tabRP.setPriority(Integer.parseInt(priority));
+                tabRP.setTitle(label);
+                tabRP.setVisibility(accessLevel);
+                applicationService.saveOrUpdate(clazzTab, tabRP);
+            }
+        }
+    }
+
+    private static <H extends Box<Containable>> void buildBox(
+            ApplicationService applicationService, List<List<String>> rows,
+            Class<H> clazzBox)
+                    throws InstantiationException, IllegalAccessException
+    {
+        for (List<String> row : rows)
+        {
+            boolean collapse = row.get(1).equals("y") ? true : false;
+            String externaljsp = row.get(2);
+            String priority = row.get(3);
+
+            String shortname = row.get(4);
+            String label = row.get(5);
+
+            boolean unrelevant = row.get(6).equals("y") ? true : false;
+            Integer accessLevel = AccessLevelConstants.ADMIN_ACCESS;
+            String tmpAccessLevel = row.get(7);
+            if (tmpAccessLevel.equals("STANDARD_ACCESS"))
+            {
+                accessLevel = AccessLevelConstants.STANDARD_ACCESS;
+            }
+            else if (tmpAccessLevel.equals("HIGH_ACCESS"))
+            {
+                accessLevel = AccessLevelConstants.HIGH_ACCESS;
+            }
+            else if (tmpAccessLevel.equals("LOW_ACCESS"))
+            {
+                accessLevel = AccessLevelConstants.LOW_ACCESS;
+            }
+
+            H box = applicationService.getBoxByShortName(clazzBox, shortname);
+
+            if (box == null)
+            {
+                box = clazzBox.newInstance();
+                box.setCollapsed(collapse);
+                box.setExternalJSP(externaljsp);
+                box.setPriority(Integer.parseInt(priority));
+                box.setShortName(shortname);
+                box.setTitle(label);
+                box.setUnrelevant(unrelevant);
+                box.setVisibility(accessLevel);
+                applicationService.saveOrUpdate(clazzBox, box);
+            }
+        }
+    }
+
 	private static void buildResearchObject(Workbook workbook, String sheetName,
-			ApplicationService applicationService) {
+            ApplicationService applicationService, PlatformTransactionManager transactionManager, TransactionStatus status)
+    {
 		Cell[] riga;
 		Sheet sheet = workbook.getSheet(sheetName);
 		int indexRiga = 1;
 		int rows = sheet.getColumn(2).length;
-		while (indexRiga < rows) {
+		
+		boolean commitTransaction = false;
+        while (indexRiga < rows)
+        {
 			riga = sheet.getRow(indexRiga);
 			String key = riga[2].getContents().trim();
-			if (key.equals("rp") || key.equals("pj") || key.equals("ou") || key.equals("n")) {
+            if (key.equals("rp") || key.equals("pj") || key.equals("ou")
+                    || key.equals("###"))
+            {
 				indexRiga++;
 				continue;
 			}
-			DynamicObjectType dtp = applicationService.findTypoByShortName(DynamicObjectType.class, key);
-			if (dtp == null) {
+            DynamicObjectType dtp = applicationService
+                    .findTypoByShortName(DynamicObjectType.class, key);
+            if (dtp == null)
+            {
 				dtp = new DynamicObjectType();
 				dtp.setShortName(key);
 				dtp.setLabel(key);
 				System.out.println("Build research object - " + key);
 				applicationService.saveOrUpdate(DynamicObjectType.class, dtp);
-			} else {
-				System.out.println("Research object already founded- skip " + key);
+				commitTransaction = true;
+            }
+            else
+            {
+                System.out.println(
+                        "Research object already founded- skip " + key);
 			}
 
 			indexRiga++;
 
 		}
-
+        if(commitTransaction) {
+            transactionManager.commit(status);
+            System.out.println("Please relaunch the script... founded a transaction commit operation to save Research Object type... now you can continue");
+            System.exit(1);
+        }
 	}
 
 	private static <PD extends PropertiesDefinition, DPD extends ADecoratorPropertiesDefinition<PD>, NPD extends ANestedPropertiesDefinition, DNPD extends ADecoratorPropertiesDefinition<NPD>, ATNO extends ATypeNestedObject<NPD>, DATNO extends ADecoratorTypeDefinition<ATNO, NPD>> ResultObject build(
-			ApplicationService applicationService, List<List<String>> meta, Map<String, List<List<String>>> nestedMap,
-			Class<PD> classPD, Class<DPD> classDPD, Class<NPD> classNPD, Class<DNPD> classDNPD, Class<ATNO> classATNO,
-			Class<DATNO> classDATNO, Map<String, List<String>> controlledListMap) {
+            ApplicationService applicationService, List<List<String>> meta,
+            Map<String, List<List<String>>> nestedMap, Class<PD> classPD,
+            Class<DPD> classDPD, Class<NPD> classNPD, Class<DNPD> classDNPD,
+            Class<ATNO> classATNO, Class<DATNO> classDATNO,
+            Map<String, List<String>> controlledListMap)
+    {
 
 		ResultObject<PD, NPD, ATNO> result = new ResultObject<PD, NPD, ATNO>();
-		for (List<String> list : meta) {
+        for (List<String> list : meta)
+        {
 			String target = list.get(0);
 			String shortName = list.get(1);
 			String label = list.get(2);
@@ -707,47 +685,101 @@ public class StartupMetadataConfiguratorTool {
 			String help = list.get(5);
 			Integer accessLevel = AccessLevelConstants.ADMIN_ACCESS;
 			String tmpAccessLevel = list.get(6);
-			if (tmpAccessLevel.equals("STANDARD_ACCESS")) {
+            if (tmpAccessLevel.equals("STANDARD_ACCESS"))
+            {
 				accessLevel = AccessLevelConstants.STANDARD_ACCESS;
-			} else if (tmpAccessLevel.equals("HIGH_ACCESS")) {
+            }
+            else if (tmpAccessLevel.equals("HIGH_ACCESS"))
+            {
 				accessLevel = AccessLevelConstants.HIGH_ACCESS;
-			} else if (tmpAccessLevel.equals("LOW_ACCESS")) {
+            }
+            else if (tmpAccessLevel.equals("LOW_ACCESS"))
+            {
 				accessLevel = AccessLevelConstants.LOW_ACCESS;
 			}
 			boolean mandatory = list.get(7).equals("y") ? true : false;
 			String widget = list.get(8);
 
-			if (widget.equals("nested")) {
+            if (widget.equals("nested"))
+            {
 				String tmpSN = shortName;
-				if (DynamicTypeNestedObject.class.isAssignableFrom(classATNO)) {
+                if (DynamicTypeNestedObject.class.isAssignableFrom(classATNO))
+                {
 					tmpSN = target + shortName;
 				}
-				ATNO atno = applicationService.findTypoByShortName(classATNO, tmpSN);
-				if (atno != null) {
-					System.out.println("Nested definition already founded - skip " + target + "/" + tmpSN);
+                ATNO atno = applicationService.findTypoByShortName(classATNO,
+                        tmpSN);
+                if (atno != null)
+                {
+                    System.out
+                            .println("Nested definition already founded - skip "
+                                    + target + "/" + tmpSN);
 					continue;
 				}
-			} else {
+            }
+            else
+            {
 				String tmpSN = shortName;
-				if (DynamicPropertiesDefinition.class.isAssignableFrom(classPD)) {
+                if (DynamicPropertiesDefinition.class.isAssignableFrom(classPD))
+                {
 					tmpSN = target + shortName;
 				}
-				PD pdef = applicationService.findPropertiesDefinitionByShortName(classPD, tmpSN);
-				if (pdef != null) {
-					System.out.println("Metadata definition already founded - skip " + target + "/" + tmpSN);
+                PD pdef = applicationService
+                        .findPropertiesDefinitionByShortName(classPD, tmpSN);
+                if (pdef != null)
+                {
+                    System.out.println(
+                            "Metadata definition already founded - skip "
+                                    + target + "/" + tmpSN);
 					continue;
 				}
 			}
 
+            int fieldIndex;
+            if (widget.equals("nested"))  fieldIndex=11; else fieldIndex=10;
+            
+            
+            String displayFormat = list.get(fieldIndex++);
+
+            String labelSize = list.get(fieldIndex++);
+            Integer ilabelSize = null;
+            if (StringUtils.isNotBlank(labelSize))
+            {
+                ilabelSize = Integer.parseInt(labelSize);
+            }
+
+            String fieldWidth = list.get(fieldIndex++);
+            Integer ifieldWidth = null;
+            if (StringUtils.isNotBlank(fieldWidth))
+            {
+                ifieldWidth = Integer.parseInt(fieldWidth);
+            }
+
+            String fieldHeight = list.get(fieldIndex++);
+            Integer ifieldHeight = null;
+            if (StringUtils.isNotBlank(fieldHeight))
+            {
+                ifieldHeight = Integer.parseInt(fieldHeight);
+            }
+
+            String newLine = list.get(fieldIndex++);
+            Boolean bnewLine = false;
+            if (StringUtils.isNotBlank(newLine))
+            {
+                bnewLine = bnewLine.equals("y") ? true : false;
+            }
 			System.out.println("Writing  " + target + "/" + shortName);
 
 			GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
 
-			if (widget.equals("nested")) {
+            if (widget.equals("nested"))
+            {
 
-				BeanDefinitionBuilder builderNTP = BeanDefinitionBuilder.genericBeanDefinition(classATNO);
+                BeanDefinitionBuilder builderNTP = BeanDefinitionBuilder
+                        .genericBeanDefinition(classATNO);
 				builderNTP.getBeanDefinition().setAttribute("id", shortName);
-				if (DynamicPropertiesDefinition.class.isAssignableFrom(classPD)) {
+                if (DynamicPropertiesDefinition.class.isAssignableFrom(classPD))
+                {
 					shortName = target + shortName;
 				}
 				builderNTP.addPropertyValue("shortName", shortName);
@@ -757,26 +789,53 @@ public class StartupMetadataConfiguratorTool {
 				builderNTP.addPropertyValue("priority", priority);
 				builderNTP.addPropertyValue("help", help);
 				builderNTP.addPropertyValue("accessLevel", accessLevel);
+                if (ilabelSize != null)
+                {
+                    builderNTP.addPropertyValue("labelMinSize", ilabelSize);
+                }
+                if (ifieldWidth != null)
+                {
+                    builderNTP.addPropertyValue("fieldMinSize.col",
+                            ifieldWidth);
+                }
+                if (ifieldHeight != null)
+                {
+                    builderNTP.addPropertyValue("fieldMinSize.row",
+                            ifieldHeight);
+                }
+                builderNTP.addPropertyValue("newline", bnewLine);
 
-				ctx.registerBeanDefinition(shortName, builderNTP.getBeanDefinition());
+                ctx.registerBeanDefinition(shortName,
+                        builderNTP.getBeanDefinition());
 
-				BeanDefinitionBuilder builderDNTP = BeanDefinitionBuilder.genericBeanDefinition(classDATNO);
+                BeanDefinitionBuilder builderDNTP = BeanDefinitionBuilder
+                        .genericBeanDefinition(classDATNO);
 				builderDNTP.addPropertyReference("real", shortName);
 				String decoratorShortName = "decorator" + shortName;
-				ctx.registerBeanDefinition(decoratorShortName, builderDNTP.getBeanDefinition());
+                ctx.registerBeanDefinition(decoratorShortName,
+                        builderDNTP.getBeanDefinition());
 
 				DATNO dntp = ctx.getBean(classDATNO);
 				applicationService.saveOrUpdate(classDATNO, dntp);
 
-				List<List<String>> nestedPropertiesDefinition = nestedMap.get(shortName);
-				for (List<String> nestedSingleRow : nestedPropertiesDefinition) {
-					DNPD decorator = createDecorator(applicationService, nestedSingleRow, ctx, classNPD, classDNPD,
-							controlledListMap);
+                List<List<String>> nestedPropertiesDefinition = nestedMap
+                        .get(shortName);
+                if (nestedPropertiesDefinition != null)
+                {
+                    for (List<String> nestedSingleRow : nestedPropertiesDefinition)
+                    {
+                        DNPD decorator = createDecorator(applicationService,
+                                nestedSingleRow, ctx, classNPD, classDNPD,
+                                controlledListMap, true);
 					dntp.getReal().getMask().add(decorator.getReal());
 					result.getTPtoNOTP().add(dntp.getReal());
 				}
-			} else {
-				DPD decorator = createDecorator(applicationService, list, ctx, classPD, classDPD, controlledListMap);
+                }
+            }
+            else
+            {
+                DPD decorator = createDecorator(applicationService, list, ctx,
+                        classPD, classDPD, controlledListMap, false);
 				result.getTPtoPDEF().add(decorator.getReal());
 			}
 			System.out.println("End write  " + target + "/" + shortName);
@@ -787,8 +846,11 @@ public class StartupMetadataConfiguratorTool {
 	}
 
 	private static <PD extends PropertiesDefinition, DPD extends ADecoratorPropertiesDefinition<PD>> DPD createDecorator(
-			ApplicationService applicationService, List<String> metadata, GenericXmlApplicationContext ctx,
-			Class<PD> classPD, Class<DPD> classDPD, Map<String, List<String>> controlledListMap) {
+            ApplicationService applicationService, List<String> metadata,
+            GenericXmlApplicationContext ctx, Class<PD> classPD,
+            Class<DPD> classDPD, Map<String, List<String>> controlledListMap,
+            boolean reserved)
+    {
 		String target = metadata.get(0);
 		String shortName = metadata.get(1);
 		String label = metadata.get(2);
@@ -797,95 +859,226 @@ public class StartupMetadataConfiguratorTool {
 		String help = metadata.get(5);
 		Integer accessLevel = AccessLevelConstants.ADMIN_ACCESS;
 		String tmpAccessLevel = metadata.get(6);
-		if (tmpAccessLevel.equals("STANDARD_ACCESS")) {
+        if (tmpAccessLevel.equals("STANDARD_ACCESS"))
+        {
 			accessLevel = AccessLevelConstants.STANDARD_ACCESS;
-		} else if (tmpAccessLevel.equals("HIGH_ACCESS")) {
+        }
+        else if (tmpAccessLevel.equals("HIGH_ACCESS"))
+        {
 			accessLevel = AccessLevelConstants.HIGH_ACCESS;
-		} else if (tmpAccessLevel.equals("LOW_ACCESS")) {
+        }
+        else if (tmpAccessLevel.equals("LOW_ACCESS"))
+        {
 			accessLevel = AccessLevelConstants.LOW_ACCESS;
 		}
 
 		boolean mandatory = metadata.get(7).equals("y") ? true : false;
 		String widget = metadata.get(8);
 		String pointer = metadata.get(9);
-		if (DynamicPropertiesDefinition.class.isAssignableFrom(classPD)) {
+        if (DynamicPropertiesDefinition.class.isAssignableFrom(classPD))
+        {
 			shortName = target + shortName;
 		}
 
+        String labelSize = "";
+        Integer ilabelSize = null;
+        String renderingText = "";
+        Integer ifieldWidth = null;
+        Integer ifieldHeight = null;
+        Boolean bnewLine = false;
+        if (reserved)
+        {
+            String reservedCell = metadata.get(10);
+            
+            renderingText = metadata.get(11);
+            
+            labelSize = metadata.get(12);
+            if (StringUtils.isNotBlank(labelSize))
+            {
+                ilabelSize = Integer.parseInt(labelSize);
+            }
+
+            String fieldWidth = metadata.get(13);
+            if (StringUtils.isNotBlank(fieldWidth))
+            {
+                ifieldWidth = Integer.parseInt(fieldWidth);
+            }
+
+            String fieldHeight = metadata.get(14);
+
+            if (StringUtils.isNotBlank(fieldHeight))
+            {
+                ifieldHeight = Integer.parseInt(fieldHeight);
+            }
+
+            String newLine = metadata.get(15);
+            
+            if (StringUtils.isNotBlank(newLine))
+            {
+                bnewLine = newLine.equals("y") ? true : false;
+            }
+        }
+        else {
+            renderingText = metadata.get(10);
+            
+            labelSize = metadata.get(11);
+            if (StringUtils.isNotBlank(labelSize))
+            {
+                ilabelSize = Integer.parseInt(labelSize);
+            }
+
+            String fieldWidth = metadata.get(12);
+            if (StringUtils.isNotBlank(fieldWidth))
+            {
+                ifieldWidth = Integer.parseInt(fieldWidth);
+            }
+
+            String fieldHeight = metadata.get(13);
+            if (StringUtils.isNotBlank(fieldHeight))
+            {
+                ifieldHeight = Integer.parseInt(fieldHeight);
+            }
+
+            String newLine = metadata.get(14);
+            if (StringUtils.isNotBlank(newLine))
+            {
+                bnewLine = newLine.equals("y") ? true : false;
+            }            
+        }
 		BeanDefinitionBuilder builderW = null;
 
-		if (widget.equals("text")) {
-			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetTesto.class);
-		} else if (widget.equals("boolean")) {
-			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetBoolean.class);
-		} else if (widget.equals("radio") || widget.equals("checkbox") || widget.equals("dropdown")) {
-			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetCheckRadio.class);
+        if (widget.equals("text"))
+        {
+            builderW = BeanDefinitionBuilder
+                    .genericBeanDefinition(WidgetTesto.class);
+            if (StringUtils.isNotBlank(renderingText)) {
+                builderW.addPropertyValue("displayFormat", renderingText);
+            }
+        }
+        else if (widget.equals("boolean"))
+        {
+            builderW = BeanDefinitionBuilder
+                    .genericBeanDefinition(WidgetBoolean.class);
+        }
+        else if (widget.equals("radio") || widget.equals("checkbox")
+                || widget.equals("dropdown"))
+        {
+            builderW = BeanDefinitionBuilder
+                    .genericBeanDefinition(WidgetCheckRadio.class);
 			String staticValues = "";
-			if(!controlledListMap.containsKey(shortName)) {
+            if (!controlledListMap.containsKey(shortName))
+            {
 				log.error("controlledlist not defined: "+shortName);
 			}
-			for(String ss : controlledListMap.get(shortName)) {
+            for (String ss : controlledListMap.get(shortName))
+            {
 				staticValues += ss+"|||";
 			}
-			builderW.addPropertyValue("staticValues", staticValues.substring(0, staticValues.length()-3));
-			if (widget.equals("radio") || widget.equals("checkbox")) {
+            builderW.addPropertyValue("staticValues",
+                    staticValues.substring(0, staticValues.length() - 3));
+            if (widget.equals("radio") || widget.equals("checkbox"))
+            {
 				builderW.addPropertyValue("option4row", 1);
-				if(widget.equals("checkbox")) {
+                if (widget.equals("checkbox"))
+                {
 					repeatable = true;
 				}
-				else {
+                else
+                {
 					repeatable = false;
 				}
 			}
-			if (widget.equals("dropdown")) {
+            if (widget.equals("dropdown"))
+            {
 				builderW.addPropertyValue("dropdown", true);
 			}
-		} else if (widget.equals("link")) {
-			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetLink.class);
-		} else if (widget.equals("date")) {
-			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetDate.class);
-		} else if (widget.equals("image") || widget.equals("file")) {
-			if (target.equals("rp")) {
-				builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetFileRP.class);
-			} else if (target.equals("ou")) {
-				builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetFileOU.class);
-			} else if (target.equals("pj")) {
-				builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetFileProject.class);
-			} else {
-				builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetFileDO.class);
+        }
+        else if (widget.equals("link"))
+        {
+            builderW = BeanDefinitionBuilder
+                    .genericBeanDefinition(WidgetLink.class);
+        }
+        else if (widget.equals("date"))
+        {
+            builderW = BeanDefinitionBuilder
+                    .genericBeanDefinition(WidgetDate.class);
+        }
+        else if (widget.equals("image") || widget.equals("file"))
+        {
+            if (target.equals("rp"))
+            {
+                builderW = BeanDefinitionBuilder
+                        .genericBeanDefinition(WidgetFileRP.class);
+            }
+            else if (target.equals("ou"))
+            {
+                builderW = BeanDefinitionBuilder
+                        .genericBeanDefinition(WidgetFileOU.class);
+            }
+            else if (target.equals("pj"))
+            {
+                builderW = BeanDefinitionBuilder
+                        .genericBeanDefinition(WidgetFileProject.class);
+            }
+            else
+            {
+                builderW = BeanDefinitionBuilder
+                        .genericBeanDefinition(WidgetFileDO.class);
 			}
 
-			if (widget.equals("image")) {
+            if (widget.equals("image"))
+            {
 				builderW.addPropertyValue("showPreview", true);
 			}
-		} else if (widget.equals("pointer")) {
+        }
+        else if (widget.equals("pointer"))
+        {
 
-			if (pointer.equals("rp")) {
-				builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetPointerRP.class);
-				builderW.addPropertyValue("target", "org.dspace.app.cris.model.jdyna.value.RPPointer");
-			} else if (pointer.equals("ou")) {
-				builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetPointerOU.class);
-				builderW.addPropertyValue("target", "org.dspace.app.cris.model.jdyna.value.OUPointer");
-			} else if (pointer.equals("pj")) {
-				builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetPointerPJ.class);
-				builderW.addPropertyValue("target", "org.dspace.app.cris.model.jdyna.value.ProjectPointer");
-			} else {
-				builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetPointerDO.class);
-				builderW.addPropertyValue("target", "org.dspace.app.cris.model.jdyna.value.DOPointer");
+            if (pointer.equals("rp"))
+            {
+                builderW = BeanDefinitionBuilder
+                        .genericBeanDefinition(WidgetPointerRP.class);
+                builderW.addPropertyValue("target",
+                        "org.dspace.app.cris.model.jdyna.value.RPPointer");
+            }
+            else if (pointer.equals("ou"))
+            {
+                builderW = BeanDefinitionBuilder
+                        .genericBeanDefinition(WidgetPointerOU.class);
+                builderW.addPropertyValue("target",
+                        "org.dspace.app.cris.model.jdyna.value.OUPointer");
+            }
+            else if (pointer.equals("pj"))
+            {
+                builderW = BeanDefinitionBuilder
+                        .genericBeanDefinition(WidgetPointerPJ.class);
+                builderW.addPropertyValue("target",
+                        "org.dspace.app.cris.model.jdyna.value.ProjectPointer");
+            }
+            else
+            {
+                builderW = BeanDefinitionBuilder
+                        .genericBeanDefinition(WidgetPointerDO.class);
+                builderW.addPropertyValue("target",
+                        "org.dspace.app.cris.model.jdyna.value.DOPointer");
 				Integer tmpTP = CrisConstants.CRIS_DYNAMIC_TYPE_ID_START
-						+ applicationService.findTypoByShortName(DynamicObjectType.class, pointer).getId();
-				builderW.addPropertyValue("filterExtended", "search.resourcetype:" + tmpTP);
+                        + applicationService.findTypoByShortName(
+                                DynamicObjectType.class, pointer).getId();
+                builderW.addPropertyValue("filterExtended",
+                        "search.resourcetype:" + tmpTP);
 			}
 
 			builderW.addPropertyValue("display", "${displayObject.name}");
-			builderW.addPropertyValue("urlPath", "cris/uuid/${displayObject.uuid}");
+            builderW.addPropertyValue("urlPath",
+                    "cris/uuid/${displayObject.uuid}");
 		}
 
 		builderW.getBeanDefinition().setAttribute("id", widget);
 		String widgetName = "widget" + widget;
 		ctx.registerBeanDefinition(widgetName, builderW.getBeanDefinition());
 
-		BeanDefinitionBuilder builderPD = BeanDefinitionBuilder.genericBeanDefinition(classPD);
+        BeanDefinitionBuilder builderPD = BeanDefinitionBuilder
+                .genericBeanDefinition(classPD);
 		builderPD.addPropertyReference("rendering", widgetName);
 		builderPD.addPropertyValue("shortName", shortName);
 		builderPD.addPropertyValue("label", label);
@@ -894,45 +1087,53 @@ public class StartupMetadataConfiguratorTool {
 		builderPD.addPropertyValue("priority", priority);
 		builderPD.addPropertyValue("help", help);
 		builderPD.addPropertyValue("accessLevel", accessLevel);
+        if (ilabelSize != null)
+        {
+            builderPD.addPropertyValue("labelMinSize", ilabelSize);
+        }
+        if (ifieldWidth != null)
+        {
+            builderPD.addPropertyValue("fieldMinSize.col", ifieldWidth);
+        }
+        if (ifieldHeight != null)
+        {
+            builderPD.addPropertyValue("fieldMinSize.row", ifieldHeight);
+        }
+        builderPD.addPropertyValue("newline", bnewLine);
 		builderPD.getBeanDefinition().setAttribute("id", shortName);
 		ctx.registerBeanDefinition(shortName, builderPD.getBeanDefinition());
 
-		BeanDefinitionBuilder builderDecorator = BeanDefinitionBuilder.genericBeanDefinition(classDPD);
+        BeanDefinitionBuilder builderDecorator = BeanDefinitionBuilder
+                .genericBeanDefinition(classDPD);
 		builderDecorator.addPropertyReference("real", shortName);
 		String decoratorShortName = "decorator" + shortName;
 		builderPD.getBeanDefinition().setAttribute("id", decoratorShortName);
-		ctx.registerBeanDefinition(decoratorShortName, builderDecorator.getBeanDefinition());
+        ctx.registerBeanDefinition(decoratorShortName,
+                builderDecorator.getBeanDefinition());
 
 		DPD dtp = ctx.getBean(decoratorShortName, classDPD);
 		applicationService.saveOrUpdate(classDPD, dtp);
 		return dtp;
 	}
 
-	private static void buildMap(Workbook workbook, String sheetName, Map<String, List<List<String>>> widgetMap,
-			int indexKey) {
+    private static void buildMap(Workbook workbook, String sheetName,
+            Map<String, List<List<String>>> widgetMap, int indexKey)
+    {
 		Cell[] riga;
 		Sheet sheet = workbook.getSheet(sheetName);
 		int indexRiga = 1;
 		int rows = sheet.getColumn(0).length;
 
-		while (indexRiga < rows) {
+        while (indexRiga < rows)
+        {
 			riga = sheet.getRow(indexRiga);
 			String key = riga[indexKey].getContents().trim();
 
 			List<String> metadata = new ArrayList<String>();
-
-			metadata.add(riga[0].getContents().trim());
-			metadata.add(riga[1].getContents().trim());
-			metadata.add(riga[2].getContents().trim());
-			metadata.add(riga[3].getContents().trim());
-			metadata.add(riga[4].getContents().trim());
-			metadata.add(riga[5].getContents().trim());
-			metadata.add(riga[6].getContents().trim());
-			metadata.add(riga[7].getContents().trim());
-			metadata.add(riga[8].getContents().trim());
-			metadata.add(riga[9].getContents().trim());
-			metadata.add(riga[10].getContents().trim());
-
+			
+			for(int i = 0; i<sheet.getColumns(); i++) {
+                metadata.add(riga[i].getContents().trim());
+			}
 			insertInMap(widgetMap, key, metadata);
 
 			indexRiga++;
@@ -941,38 +1142,52 @@ public class StartupMetadataConfiguratorTool {
 	}
 
 	private static void buildControlledList(Workbook workbook, String sheetName,
-			Map<String, List<String>> controlledListMap) {
+            Map<String, List<String>> controlledListMap)
+    {
 		Cell row;
 		Sheet sheet = workbook.getSheet(sheetName);		
 		int indexColumn = 0;		
 		int columns = sheet.getRow(0).length;
-		while (indexColumn < columns) {
+        while (indexColumn < columns)
+        {
 			int rows = sheet.getColumn(indexColumn).length;
 			int indexRiga = 1;
 			String header = sheet.getRow(0)[indexColumn].getContents().trim();
-			while (indexRiga < rows) {
+            while (indexRiga < rows)
+            {
 				row = sheet.getRow(indexRiga)[indexColumn];				
-				insertInList(controlledListMap, header, row.getContents().trim());
+                insertInList(controlledListMap, header,
+                        row.getContents().trim());
 				indexRiga++;
 			}
 			indexColumn++;
 		}
 	}
 
-	private static void insertInMap(Map<String, List<List<String>>> map, String target, List<String> metadata) {
-		if (map.containsKey(target)) {
+    private static void insertInMap(Map<String, List<List<String>>> map,
+            String target, List<String> metadata)
+    {
+        if (map.containsKey(target))
+        {
 			map.get(target).add(metadata);
-		} else {
+        }
+        else
+        {
 			List<List<String>> singleRows = new ArrayList<List<String>>();
 			singleRows.add(metadata);
 			map.put(target, singleRows);
 		}
 	}
 
-	private static void insertInList(Map<String, List<String>> map, String target, String metadata) {
-		if (map.containsKey(target)) {
+    private static void insertInList(Map<String, List<String>> map,
+            String target, String metadata)
+    {
+        if (map.containsKey(target))
+        {
 			map.get(target).add(metadata);
-		} else {
+        }
+        else
+        {
 			List<String> singleRows = new ArrayList<String>();
 			singleRows.add(metadata);
 			map.put(target, singleRows);
@@ -980,24 +1195,29 @@ public class StartupMetadataConfiguratorTool {
 	}
 }
 
-class ResultObject<PD extends PropertiesDefinition, NPD extends ANestedPropertiesDefinition, ATNO extends ATypeNestedObject<NPD>> {
+class ResultObject<PD extends PropertiesDefinition, NPD extends ANestedPropertiesDefinition, ATNO extends ATypeNestedObject<NPD>>
+{
 	List<ATNO> TPtoNOTP = new ArrayList<ATNO>();
 
 	List<PD> TPtoPDEF = new ArrayList<PD>();
 
-	public List<ATNO> getTPtoNOTP() {
+    public List<ATNO> getTPtoNOTP()
+    {
 		return TPtoNOTP;
 	}
 
-	public void setTPtoNOTP(List<ATNO> tPtoNOTP) {
+    public void setTPtoNOTP(List<ATNO> tPtoNOTP)
+    {
 		TPtoNOTP = tPtoNOTP;
 	}
 
-	public List<PD> getTPtoPDEF() {
+    public List<PD> getTPtoPDEF()
+    {
 		return TPtoPDEF;
 	}
 
-	public void setTPtoPDEF(List<PD> tPtoPDEF) {
+    public void setTPtoPDEF(List<PD> tPtoPDEF)
+    {
 		TPtoPDEF = tPtoPDEF;
 	}
 

@@ -52,7 +52,11 @@ import org.hibernate.annotations.OrderBy;
         @NamedQuery(name = "DynamicNestedObject.findNestedObjectsByTypoID", query = "from DynamicNestedObject where typo.id = ?"),
         @NamedQuery(name = "DynamicNestedObject.findNestedObjectsByParentIDAndTypoShortname", query = "from DynamicNestedObject where parent.id = ? and typo.shortName = ?"),
         @NamedQuery(name = "DynamicNestedObject.deleteNestedObjectsByTypoID", query = "delete from DynamicNestedObject where typo.id = ?"),
-        @NamedQuery(name = "DynamicNestedObject.maxPositionNestedObjectsByTypoID", query = "select max(positionDef) as max from DynamicNestedObject where typo.id = ?") })
+        @NamedQuery(name = "DynamicNestedObject.maxPositionNestedObjectsByTypoID", query = "select max(positionDef) as max from DynamicNestedObject where typo.id = ?"),
+        @NamedQuery(name = "DynamicNestedObject.uniqueNestedObjectsByParentIdAndTypoIDAndSourceReference", query = "from DynamicNestedObject where parent.id = ? and typo.id = ? and sourceReference.sourceRef = ? and sourceReference.sourceID = ?"),
+        @NamedQuery(name = "DynamicNestedObject.uniqueByUUID", query = "from DynamicNestedObject where uuid = ?")        
+})
+
 public class DynamicNestedObject
         extends
         ACrisNestedObject<DynamicNestedProperty, DynamicNestedPropertiesDefinition, DynamicProperty, DynamicPropertiesDefinition>
@@ -133,4 +137,10 @@ public class DynamicNestedObject
         return getTypo().getId() + CrisConstants.CRIS_NDYNAMIC_TYPE_ID_START;
     }
 
+    public DynamicNestedObject clone() throws CloneNotSupportedException
+    {
+        DynamicNestedObject clone = (DynamicNestedObject) super.clone();
+        clone.duplicaAnagrafica(this);        
+        return clone;
+    }
 }

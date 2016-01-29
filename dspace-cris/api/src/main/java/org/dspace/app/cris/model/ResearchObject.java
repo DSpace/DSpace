@@ -294,4 +294,10 @@ public class ResearchObject extends ACrisObjectWithTypeSupport<DynamicProperty, 
         clone.setDynamicField(additionalTemp);
         return clone;
 	}
+	
+    @Override
+    public Class<ResearchObject> getCRISTargetClass()
+    {
+        return ResearchObject.class;
+    }
 }

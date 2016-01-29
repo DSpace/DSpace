@@ -12,6 +12,7 @@ import it.cilea.osd.jdyna.components.IComponent;
 import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
+import org.dspace.app.cris.util.ICrisHomeProcessor;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
@@ -78,7 +80,9 @@ public class ResearcherPageDetailsController
             .getLogger(ResearcherPageDetailsController.class);
 
     private CrisSubscribeService subscribeService;
-
+    
+    private List<ICrisHomeProcessor<ResearcherPage>> processors;
+    
     public void setSubscribeService(CrisSubscribeService rpSubscribeService)
     {
         this.subscribeService = rpSubscribeService;
@@ -190,6 +194,15 @@ public class ResearcherPageDetailsController
         }
 
         mvc.getModel().putAll(model);
+        
+        List<ICrisHomeProcessor<ResearcherPage>> resultProcessors = new ArrayList<ICrisHomeProcessor<ResearcherPage>>();
+        for (ICrisHomeProcessor processor : processors)
+        {
+            if (ResearcherPage.class.isAssignableFrom(processor.getClazz()))
+            {
+                processor.process(context, request, response, researcher);
+            }
+        }
         mvc.getModel().put("researcher", researcher);
         mvc.getModel().put("exportscitations",
                 ConfigurationManager.getProperty("exportcitation.options"));
@@ -346,6 +359,11 @@ public class ResearcherPageDetailsController
     protected Integer getRealPersistentIdentifier(String persistentIdentifier)
     {
         return ResearcherPageUtils.getRealPersistentIdentifier(persistentIdentifier, ResearcherPage.class);
+    }
+
+    public void setProcessors(List<ICrisHomeProcessor<ResearcherPage>> processors)
+    {
+        this.processors = processors;
     }
 
 }

@@ -10,8 +10,10 @@ package org.dspace.app.cris.network;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -19,6 +21,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.discovery.SolrServiceImpl;
 
 public abstract class AVisualizationGraphModeOne extends AVisualizationGraph
 {
@@ -92,7 +95,7 @@ public abstract class AVisualizationGraphModeOne extends AVisualizationGraph
                     Object obj = publication.getFieldValue("dc.title");
                     String handle = (String) publication
                             .getFieldValue("handle");
-                    Object auth = publication.getFieldValue("author_filter");
+                    Object authList = publication.getFieldValue("author_filter");
 
                     List<String> values = new ArrayList<String>();
                     if (obj instanceof ArrayList)
@@ -108,14 +111,20 @@ public abstract class AVisualizationGraphModeOne extends AVisualizationGraph
                         values.add(value);
                     }
 
-                    if (auth instanceof ArrayList)
-                    {
+                    if (authList instanceof ArrayList)
+                    {                        
+                        List<String> authListArrays = (List<String>) authList;
+                        
                         int i = 0;
-                        List<String> authArrays = (List<String>) auth;
+                        Set<String> authArrays = new HashSet<String>();
+                        for(String elementInListAuth : authListArrays) {
+                            authArrays.add(elementInListAuth);
+                        }
+                        
                         for (String aaa : authArrays)
                         {
 
-                            String[] split = aaa.split("\\|\\|\\|");
+                            String[] split = aaa.split(SolrServiceImpl.ESCAPED_FILTER_SEPARATOR);
                             
                             String a = aaa;
                             String a_authority = null;
@@ -139,13 +148,12 @@ public abstract class AVisualizationGraphModeOne extends AVisualizationGraph
                                 
                                 
                             }
-
-                            for (int j = i; j < authArrays.size(); j++)
-                            {
-                                String bbb = authArrays.get(j);
+                            int j = i;
+                            for (String bbb : authArrays)
+                            {                                
                                 String extra = handle;
 
-                                split = bbb.split("\\|\\|\\|");
+                                split = bbb.split(SolrServiceImpl.ESCAPED_FILTER_SEPARATOR);
 
                                 String b = bbb;
                                 String b_authority = null;
@@ -193,6 +201,7 @@ public abstract class AVisualizationGraphModeOne extends AVisualizationGraph
                                             a_dept, b_dept,
                                             ConstantNetwork.ENTITY_RP);
                                 }
+                                j++;
                             }
                             i++;
                         }
@@ -229,28 +238,25 @@ public abstract class AVisualizationGraphModeOne extends AVisualizationGraph
     private Integer indexNode(List<String[]> discardedNode,
             Integer importedNodes, List<VisualizationGraphNode> result)
     {
-        for (VisualizationGraphNode node : result)
+        try
         {
-            try
-            {
-                getIndexer().index(node); // index node
-                importedNodes++;
-            }
-            catch (SolrServerException e)
-            {
-                log.error(e.getMessage(), e);
-                discardedNode.add(new String[] { getConnectionName() });
-            }
-            catch (IOException e)
-            {
-                log.error(e.getMessage(), e);
-                discardedNode.add(new String[] { getConnectionName() });
-            }
-            catch (NoSuchAlgorithmException e)
-            {
-                log.error(e.getMessage(), e);
-                discardedNode.add(new String[] { getConnectionName() });
-            }
+            getIndexer().index(result); // index node
+            importedNodes = result.size();
+        }
+        catch (SolrServerException e)
+        {
+            log.error(e.getMessage(), e);
+            discardedNode.add(new String[] { getConnectionName() });
+        }
+        catch (IOException e)
+        {
+            log.error(e.getMessage(), e);
+            discardedNode.add(new String[] { getConnectionName() });
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            log.error(e.getMessage(), e);
+            discardedNode.add(new String[] { getConnectionName() });
         }
         return importedNodes;
     }

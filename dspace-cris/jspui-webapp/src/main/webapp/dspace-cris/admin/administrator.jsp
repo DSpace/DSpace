@@ -27,7 +27,7 @@
 		<span id="errorMessage" class="alert alert-danger"><fmt:message key="jsp.layout.hku.prefix-error-code"/> <fmt:message key="${error}"/></span>
 	</c:if>
 
-	<ul>
+	<ul class="blank-page">
 		<li>
 			<a href="<%=request.getContextPath()%>/cris/administrator/rp/index.htm"><fmt:message
 				key="jsp.dspace-admin.cris.researcherpage.index" /></a>		
@@ -58,19 +58,18 @@
 		
 		</li>
 				
-	<%-- 		
+	 		
 	<li>
 		<a
-			href="<%=request.getContextPath()%>/cris/rp/administrator/export.htm"><fmt:message
+			href="<%=request.getContextPath()%>/cris/administrator/export.htm"><fmt:message
 			key="jsp.layout.navbar-hku.export.researcher" /></a>
 		</li>
 	
 		<li>
 		<a
-			href="<%=request.getContextPath()%>/rp/administrator/import.htm"><fmt:message
+			href="<%=request.getContextPath()%>/cris/administrator/import.htm"><fmt:message
 			key="jsp.layout.navbar-hku.import.researcher" /></a>
 		</li>
-	--%>
 	
 	<li>
 		<a href="<%=request.getContextPath()%>/cris/administrator/webservices/authorizations.htm"><fmt:message

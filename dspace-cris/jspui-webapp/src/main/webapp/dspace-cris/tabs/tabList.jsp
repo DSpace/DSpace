@@ -35,7 +35,7 @@
 	</c:if>
 
 	<fieldset>
-	<ul>
+	<ul class="blank-page">
 		<c:forEach items="${listTab}" var="tab">
 			<li>
 			${tab.title} <c:if
@@ -54,11 +54,12 @@
 
 			</li>
 		</c:forEach>
+		<a class="btn btn-primary pull-right"
+		href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createTabs.htm">
+	<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.newtab" />
+	</a>
 	</ul>
 	</fieldset>
 
-	<div style="padding: 0; margin: 0 10px;"><a
-		href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createTabs.htm">
-	<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.newtab" />
-	</a></div>
+	
 </dspace:layout>

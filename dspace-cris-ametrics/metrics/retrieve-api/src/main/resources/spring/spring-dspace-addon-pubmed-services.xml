@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    https://github.com/CILEA/dspace-cris/wiki/License
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:webflow="http://www.springframework.org/schema/webflow-config"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+    
+	<bean id="org.dspace.app.cris.metrics.common.services.MetricsPersistenceService" parent="txProxyTemplateMetrics">
+		<property name="target">
+			<bean class="org.dspace.app.cris.metrics.common.services.MetricsPersistenceService"
+				init-method="init">
+			<property name="applicationDao" ref="metricsApplicationDao" />
+			<property name="modelDaos">
+				<map>
+					<entry key="org.dspace.app.cris.metrics.pmc.model.PMCCitation">
+						<ref bean="PMCCitationDao" />
+					</entry>
+					<entry key="org.dspace.app.cris.metrics.pmc.model.PMCRecord">
+						<ref bean="PMCRecordDao" />
+					</entry>
+					<entry key="org.dspace.app.cris.metrics.common.model.CrisMetrics">
+						<ref bean="crisMetricsDao" />
+					</entry>
+				</map>
+			</property>		
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="PMCCitationDao" parent="abstractDaoMetrics">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.metrics.pmc.dao.PMCCitationDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTargetMetrics">
+				<constructor-arg>
+					<value>org.dspace.app.cris.metrics.pmc.model.PMCCitation</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="PMCRecordDao" parent="abstractDaoMetrics">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.metrics.pmc.dao.PMCRecordDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTargetMetrics">
+				<constructor-arg>
+					<value>org.dspace.app.cris.metrics.pmc.model.PMCRecord</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="crisMetricsDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.metrics.common.dao.CrisMetricsDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.metrics.common.model.CrisMetrics</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>	
+		
+	<bean id="txProxyTemplateMetrics" abstract="true"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager" ref="transactionManagerMetrics" />
+		<property name="proxyTargetClass" value="true" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>								
+				<prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="transactionManagerMetrics"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManagerMetrics"/>
+	
+	<bean id="namedQueryIntroductionAdvisorMetrics"
+		class="it.cilea.osd.common.dao.impl.NamedQueryIntroductionAdvisor" />
+
+	<bean id="abstractDaoTargetMetrics" class="it.cilea.osd.common.dao.impl.GenericDaoHibernateImpl"
+		abstract="true">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="abstractDaoMetrics" class="org.springframework.aop.framework.ProxyFactoryBean"
+		abstract="true">
+		<property name="interceptorNames">
+			<list>
+				<value>namedQueryIntroductionAdvisorMetrics</value>
+			</list>
+		</property>
+	</bean>	
+	
+	<bean id="metricsApplicationDao" class="org.dspace.app.cris.metrics.common.dao.MetricsApplicationDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<bean class="org.dspace.app.cris.metrics.scopus.services.ScopusService" id="org.dspace.app.cris.metrics.scopus.services.ScopusService">
+        <property name="maxNumberOfTries" value="3" />
+        <property name="sleepBetweenTimeouts" value="3000" />
+        <property name="sleepBetweenEachCall" value="1000" />        
+        <property name="timeout" value="5000" />
+    </bean>
+
+	<bean class="org.dspace.app.cris.metrics.wos.services.WosService" id="org.dspace.app.cris.metrics.wos.services.WosService">
+        <property name="maxNumberOfTries" value="3" />
+        <property name="sleepBetweenTimeouts" value="3000" />
+        <property name="sleepBetweenEachCall" value="1000" />        
+        <property name="timeout" value="5000" />
+    </bean>    
+</beans>

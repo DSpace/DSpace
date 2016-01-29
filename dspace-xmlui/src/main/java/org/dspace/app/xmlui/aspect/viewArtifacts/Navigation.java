@@ -60,6 +60,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
                 key += "-" + dso.getHandle();
             }
 
+            if (context.getCurrentLocale() != null) {
+                key += "-" + context.getCurrentLocale().toString();
+            }
+
             return HashUtil.hash(key);
         }
         catch (SQLException sqle)

@@ -23,6 +23,7 @@
   -                  display any collections.
   -    admin_button - Boolean, show admin 'edit' button
   --%>
+<%@page import="org.apache.commons.lang.StringUtils"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -84,7 +85,13 @@
 			title = "Item " + handle;
 		}
 	}
-    Boolean pmcEnabled = ConfigurationManager.getBooleanProperty("cris","pmc.enabled",false);
+    boolean pmcEnabled = ConfigurationManager.getBooleanProperty("cris","pmc.enabled",false);
+    boolean scopusEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.elsevier.scopus.enabled",false);
+    boolean wosEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.thomsonreuters.wos.enabled",false);
+    String doi = item.getMetadata("dc.identifier.doi");
+    boolean scholarEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.google.scholar.enabled",false) && StringUtils.isNotBlank(doi);
+    boolean altMetricEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.altmetric.enabled",false) && StringUtils.isNotBlank(doi);
+    
     Boolean versioningEnabledBool = (Boolean)request.getAttribute("versioning.enabled");
     boolean versioningEnabled = (versioningEnabledBool!=null && versioningEnabledBool.booleanValue());
     Boolean hasVersionButtonBool = (Boolean)request.getAttribute("versioning.hasversionbutton");
@@ -106,33 +113,62 @@
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 
-<% if(pmcEnabled) { %>
+<% if(pmcEnabled || scopusEnabled || wosEnabled || scholarEnabled || altMetricEnabled) { %>
 <c:set var="dspace.layout.head.last" scope="request">
+<% if(altMetricEnabled) { %> 
+<script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
+<% } %>
 <script type="text/javascript"><!--
 var j = jQuery.noConflict();
 
-ajaxPMCCitedBy = function(args) {
-        new j.ajax({
-                url: "<%= request.getContextPath() %>/pmcCitedBy",
-                data: { item_id: encodeURIComponent(args)}
-        }).done(function(transport) {
-               var respPmc = jQuery.trim(String(transport.textContent));
-               if(respPmc=="null") {
-                       j('#pmcCitedResult').html("No data found");
-               }
-               else {
-                       j('#pmcCitedResult').html(transport);
-                       j('.citedCount').show();
-               }
-               j('#pmcCitedCount').show();
-
-
+	ajaxGoogleCitedBy = function(args) {
+	var dataFromServer;  //
+	var googleScholarCallback = function(data){
+		try {
+	        var item = data.data[0].scholarData[0];
+	        //console.log(item);
+	        if (item.hasOwnProperty('numCitations')) {	        	
+	        	j('#googleCitedResult > .metric-counter').html(
+						'<a target="_blank" href="'+item.citedByUrl+'">' + item.numCitations
+								+ ' <i class="fa fa-info-circle" data-toggle="tooltip" title="Get updated citations from database"></i></a>');	        	
+	        } else {
+	        	j('#googleCitedResult > .metric-counter').html(
+						'<a target="_blank" href="'+item.citedByUrl+'">0 <i class="fa fa-info-circle" data-toggle="tooltip" title="Get updated citations from database"></i></a>');
+	        }
+	    }
+	    catch (e) {
+			j('#googleCitedResult > .metric-counter').html(
+				'N/A');
+	    }
+	    jQuery('[data-toggle="tooltip"]').tooltip();
+	}
+	var ajaxurlgs =  "https://www.googleapis.com/scribe/v1/research?query="+encodeURIComponent(args);
+		j.ajax({
+			url : ajaxurlgs,
+			crossDomain : true,
+			data: {
+				key: 'AIzaSyDqVYORLCUXxSv7zneerIgC2UYMnxvPeqQ',
+				submit: 'fetch'	
+			},
+			dataType: 'jsonp',
+			jsonpCallback: "googleScholarCallback",
+			success: googleScholarCallback ,		
+		    error: function(jqXHR, textStatus, errorThrown) { 
+		    	console.log(errorThrown); console.log(textStatus); 
+		    },
+		    beforeSend: function (request)
+            {
+                request.setRequestHeader("Access-Control-Allow-Origin", "*");
+                request.overrideMimeType( "application/html; charset=UTF-8" );
+            },
         });
 
 }
 
 j(document).ready(function() {
-        ajaxPMCCitedBy('<%= item.getID()%>');
+    <% if(scholarEnabled) { %>
+    	ajaxGoogleCitedBy('<%= doi %>');
+<% } %>
 });
 --></script>
 </c:set>
@@ -143,7 +179,8 @@ j(document).ready(function() {
     if (handle != null)
     {
 %>
-
+	<div class="row">
+		<div class="col-sm-<%= admin_button?"7":"12" %> col-md-<%= admin_button?"8":"12" %> col-lg-<%= admin_button?"9":"12" %>">
 		<%		
 		if (newVersionAvailable)
 		   {
@@ -171,10 +208,11 @@ j(document).ready(function() {
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
                 <div class="well"><fmt:message key="jsp.display-item.identifier"/>
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></div>
+       </div>         
 <%
         if (admin_button)  // admin edit button
         { %>
-        <dspace:sidebar>
+        <div class="col-sm-5 col-md-4 col-lg-3">
             <div class="panel panel-warning">
             	<div class="panel-heading"><fmt:message key="jsp.admintools"/></div>
             	<div class="panel-body">
@@ -212,7 +250,7 @@ j(document).ready(function() {
 					<% } %>
              </div>
           </div>
-        </dspace:sidebar>
+        </div>
 <%      } %>
 
 <%
@@ -220,9 +258,26 @@ j(document).ready(function() {
 
     String displayStyle = (displayAll ? "full" : "");
 %>
+</div>
+<div class="row">
+<div id="wrapperDisplayItem" class="col-lg-9">
     <dspace:item-preview item="<%= item %>" />
     <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" />
-<div class="container row">
+    <%-- SFX Link --%>
+<%
+    if (ConfigurationManager.getProperty("sfx.server.url") != null)
+    {
+        String sfximage = ConfigurationManager.getProperty("sfx.server.image_url");
+        if (sfximage == null)
+        {
+            sfximage = request.getContextPath() + "/image/sfx-link.gif";
+        }
+%>
+        <a class="btn btn-default" href="<dspace:sfxlink item="<%= item %>"/>" /><img src="<%= sfximage %>" border="0" alt="SFX Query" /></a>
+<%
+    }
+%>
+
 <%
     String locationLink = request.getContextPath() + "/handle/" + handle;
 
@@ -247,13 +302,9 @@ j(document).ready(function() {
     </a>
 <%
         }
-%>
-<%
     }
     else
     {
-%>
-<%
         if (workspace_id != null)
         {
 %>
@@ -286,43 +337,126 @@ j(document).ready(function() {
 		if (suggestLink)
         {
 %>
-    <a class="btn btn-success" href="<%= request.getContextPath() %>/suggest?handle=<%= handle %>" target="new_window">
-       <fmt:message key="jsp.display-item.suggest"/></a>
+    <a class="btn btn-success" href="<%= request.getContextPath() %>/suggest?handle=<%= handle %>" target="_blank">
+       <fmt:message key="jsp.display-item.suggest"/>
+    </a>
 <%
         }
 %>
-
-<% if(pmcEnabled) { %>
-<div>&nbsp;</div>
-<div class="panel panel-info">
-<div class="panel-heading">Citations:</div>
-<ul class="panel-body">
-       <li id="pmcCitedCount" style="display: none;"><div id="pmcCitedResult" class="citedByDiv"></div></li>
-</ul>
 </div>
-
+<div class="col-lg-3">
+<div class="row">
+<c:forEach var="metricType" items="${metricTypes}">
+<c:set var="metricNameKey">
+	jsp.display-item.citation.${metricType}
+</c:set>
+<c:set var="metricIconKey">
+	jsp.display-item.citation.${metricType}.icon
+</c:set>
+<c:if test="${not empty metrics[metricType].counter and metrics[metricType].counter gt 0}">
+	<c:if test="${!empty metrics[metricType].moreLink}">
+		<script type="text/javascript">
+		j(document).ready(function() {
+			var obj = JSON.parse('${metrics[metricType].moreLink}');
+			j( "div" ).data( "moreLink", obj );
+			j( "#metric-counter-${metricType}" ).wrap(function() {
+				  return "<a target='_blank' href='" + j( "div" ).data( "moreLink" ).link + "'></a>";
+			}).append(" <i class='fa fa-info-circle' data-toggle='tooltip' title='Get updated citations from database'></i>");
+			
+			jQuery('[data-toggle="tooltip"]').tooltip();
+		});
+		</script>
+	</c:if>
+<div class="col-lg-12 col-md-4 col-sm-6 col-xs-12 box-${metricType}">
+<div class="media ${metricType}">
+	<div class="media-left">
+		<fmt:message key="${metricIconKey}"/>
+	</div>
+	<div class="media-body text-center">
+		<h4 class="media-heading"><fmt:message key="${metricNameKey}"/>
+		<c:if test="${not empty metrics[metricType].rankingLev}">
+		<span class="pull-right">
+		<fmt:message key="jsp.display-item.citation.top"/>		
+		<span class="metric-ranking arc">
+			<span class="circle" data-toggle="tooltip" data-placement="bottom" 
+				title="<fmt:message key="jsp.display-item.citation.${metricType}.ranking.tooltip"><fmt:param><fmt:formatNumber value="${metrics[metricType].rankingLev}" type="NUMBER" maxFractionDigits="0" /></fmt:param></fmt:message>">
+				<fmt:formatNumber value="${metrics[metricType].rankingLev}" 
+					type="NUMBER" maxFractionDigits="0" />
+			</span>
+		</span>
+		</span>
+		</c:if>
+		</h4>
+		<span id="metric-counter-${metricType}" class="metric-counter"><fmt:formatNumber value="${metrics[metricType].counter}" type="NUMBER" maxFractionDigits="0" /></span>
+	</div>
+	<c:if test="${not empty metrics[metricType].last1}">
+	<div class="row">
+		<div class="col-xs-6 text-left">
+			<fmt:message key="jsp.display-item.citation.last1" />
+			<br/><fmt:formatNumber value="${metrics[metricType].last1}" type="NUMBER" maxFractionDigits="0" /></div>
+		<div class="col-xs-6 text-right">
+			<fmt:message key="jsp.display-item.citation.last2" />
+			<br/><fmt:formatNumber value="${metrics[metricType].last2}" type="NUMBER" maxFractionDigits="0" /></div>
+	</div>
+	</c:if>
+	<div class="row">
+		<div class="col-lg-12 text-center small">
+			<fmt:message
+				key="jsp.display-item.citation.time">
+				<fmt:param value="${metrics[metricType].time}" />
+			</fmt:message>
+		</div>
+	</div>
+	</div>
+</div>
+</c:if>
+</c:forEach>
+    <%
+	   if(scholarEnabled) { %>
+<div class="col-lg-12 col-md-4 col-sm-6">
+<div class="media google">
+	<div class="media-left">
+		<fmt:message key="jsp.display-item.citation.google.icon"/>
+	</div>
+	<div id="googleCitedResult" class="media-body text-center">
+		<h4 class="media-heading"><fmt:message key="jsp.display-item.citation.google"/></h4>
+			<span class="metric-counter"><fmt:message key="jsp.display-item.citation.google.loading"/></span>
+	</div>
+</div>	
+</div>
+<br class="visible-lg" />
+    <% }
+	   if(altMetricEnabled) { %>
+<div class="col-lg-12 col-md-4 col-sm-6">
+<div class="media altmetric">
+	<div class="media-left">
+      		<div class='altmetric-embed' data-badge-popover="right" data-badge-type="donut" data-link-target='_blank' data-doi="<%= doi %>"></div>
+	</div>
+	<div class="media-body media-middle text-center">
+		<h4 class="media-heading"><fmt:message key="jsp.display-item.citation.altmetric"/></h4>
+	</div>
+</div>
+</div>
 <% } %>
+    </div>
+</div>
+<% if(pmcEnabled) { %>
+<div class="modal fade" id="dialogPMC" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
 
+    </div>
+  </div>
+</div>
+<% }%>
+</div>
 
-    <a class="statisticsLink  btn btn-primary" href="<%= request.getContextPath() %>/cris/stats/item.html?handle=<%=handle %>"><fmt:message key="jsp.display-item.display-statistics"/></a>
-
-    <%-- SFX Link --%>
 <%
-    if (ConfigurationManager.getProperty("sfx.server.url") != null)
-    {
-        String sfximage = ConfigurationManager.getProperty("sfx.server.image_url");
-        if (sfximage == null)
-        {
-            sfximage = request.getContextPath() + "/image/sfx-link.gif";
-        }
-%>
-        <a class="btn btn-default" href="<dspace:sfxlink item="<%= item %>"/>" /><img src="<%= sfximage %>" border="0" alt="SFX Query" /></a>
-<%
-    }
     }
 %>
 </div>
-<br/>
+
+<div class="container">
     <%-- Versioning table --%>
 <%
     if (versioningEnabled && hasVersionHistory)
@@ -375,7 +509,7 @@ j(document).ready(function() {
     if (cc_url != null)
     {
 %>
-    <p class="submitFormHelp alert alert-info"><fmt:message key="jsp.display-item.text3"/> <a href="<%= cc_url %>"><fmt:message key="jsp.display-item.license"/></a>
+    <p class="text-center alert alert-info"><fmt:message key="jsp.display-item.text3"/> <a href="<%= cc_url %>"><fmt:message key="jsp.display-item.license"/></a>
     <a href="<%= cc_url %>"><img src="<%= request.getContextPath() %>/image/cc-somerights.gif" border="0" alt="Creative Commons" style="margin-top: -5px;" class="pull-right"/></a>
     </p>
     <!--
@@ -384,8 +518,9 @@ j(document).ready(function() {
 <%
     } else {
 %>
-    <p class="submitFormHelp alert alert-info"><fmt:message key="jsp.display-item.copyright"/></p>
+    <p class="text-center alert alert-info"><fmt:message key="jsp.display-item.copyright"/></p>
 <%
     } 
-%>    
+%>
+	</div>    
 </dspace:layout>

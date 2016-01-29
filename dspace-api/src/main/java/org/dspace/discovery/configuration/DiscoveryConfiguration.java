@@ -31,9 +31,12 @@ public class DiscoveryConfiguration implements InitializingBean{
     /** The default filter queries which will be applied to any search & the recent submissions **/
     private List<String> defaultFilterQueries;
 
+    //TODO refactoring name in plugin processor configuration
     /** Configuration object for the recent submissions **/
     private DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration;
 
+    private DiscoveryMostViewedConfiguration mostViewConfiguration;
+    
     /** The search filters which can be selected on the search page**/
     private List<DiscoverySearchFilter> searchFilters = new ArrayList<DiscoverySearchFilter>();
 
@@ -199,4 +202,16 @@ public class DiscoveryConfiguration implements InitializingBean{
 	public void setGlobalConfigurationEnabled(boolean globalConfigurationEnabled) {
 		this.globalConfigurationEnabled = globalConfigurationEnabled;
 	}
+
+    public DiscoveryMostViewedConfiguration getMostViewConfiguration()
+    {
+        return mostViewConfiguration;
+    }
+
+    public void setMostViewConfiguration(
+            DiscoveryMostViewedConfiguration mostViewConfiguration)
+    {
+        this.mostViewConfiguration = mostViewConfiguration;
+    }
+
 }

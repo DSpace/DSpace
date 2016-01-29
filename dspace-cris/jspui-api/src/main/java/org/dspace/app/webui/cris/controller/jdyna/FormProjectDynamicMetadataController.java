@@ -278,25 +278,22 @@ public class FormProjectDynamicMetadataController
         
         EditTabProject editT = getApplicationService().get(
                 EditTabProject.class, anagraficaObjectDTO.getTabId());
+
+        Project grant = getApplicationService().get(Project.class,
+                anagraficaObjectDTO.getParentId());
         if (anagraficaObjectDTO.getNewTabId() != null)
         {
             exitPage += "&tabId=" + anagraficaObjectDTO.getNewTabId();
         }
         else
         {
-            exitPage = "redirect:/cris/project/"
-                    + ResearcherPageUtils.getPersistentIdentifier(anagraficaObjectDTO
-                                    .getParentId(), Project.class) + "/"
-                    + editT.getShortName().substring(4) + ".html";
+            exitPage = "redirect:/cris/project/"+ grant.getCrisID();
         }
         if (request.getParameter("cancel") != null)
         {
             return new ModelAndView(exitPage);
         }
         
-        
-        Project grant = getApplicationService().get(Project.class,
-                anagraficaObjectDTO.getParentId());
         ProjectAdditionalFieldStorage myObject = grant.getDynamicField();
         
         List<BoxProject> propertyHolders = new LinkedList<BoxProject>();

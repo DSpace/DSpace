@@ -101,7 +101,10 @@
 <%--fmt:message key="view.${data.jspKey}.data.${statType}.${objectName}.${pieType}.description" /--%>
 </c:when>	
 	<c:otherwise>
+	<div class="text-center">
+		<br/><br/><br/><br/><br/><br/>
 		<fmt:message key="view.${data.jspKey}.data.${statType}.${objectName}.${pieType}.empty" />
+	</div>	
 	</c:otherwise>
 </c:choose>
 <c:set var="useFmt">false</c:set>

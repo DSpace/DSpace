@@ -7,13 +7,13 @@
  */
 package org.dspace.app.webui.cris.dto;
 
-import java.io.InputStream;
-
+import org.dspace.app.cris.model.OrganizationUnit;
+import org.dspace.app.cris.model.Project;
+import org.dspace.app.cris.model.ResearchObject;
+import org.dspace.app.cris.model.ResearcherPage;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ImportDTO {
-	
-	private String targetEntity;
 	
 	private MultipartFile file;
 	
@@ -32,11 +32,17 @@ public class ImportDTO {
 	}
 
 	public String getTargetEntity() {
-		return targetEntity;
-	}
-
-	public void setTargetEntity(String targetEntity) {
-		this.targetEntity = targetEntity;
+	    switch (type)
+        {
+        case "researcher":
+            return ResearcherPage.class.getName();
+        case "project":
+            return Project.class.getName();
+        case "orgunit":
+            return OrganizationUnit.class.getName();
+        default:
+            return ResearchObject.class.getName();
+        }
 	}
 
 	public boolean isTemplate() {

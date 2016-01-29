@@ -131,12 +131,12 @@
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
     <body class="undernavigation">
 <a class="sr-only" href="#content">Skip navigation</a>
-<header class="navbar navbar-inverse navbar-fixed-top">    
+<header class="navbar navbar-inverse navbar-square">    
     <%
     if (!navbar.equals("off"))
     {
 %>
-            <div class="container">
+            <div class="container-fluid">
                 <dspace:include page="<%= navbar %>" />
             </div>
 <%
@@ -144,7 +144,7 @@
     else
     {
     	%>
-        <div class="container">
+        <div class="container-fluid">
             <dspace:include page="/layout/navbar-minimal.jsp" />
         </div>
 <%    	

@@ -125,6 +125,7 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
                 resourcePolicy.update();
             }
             context.complete();
+            cris.setOldEpersonID(cris.getEpersonID());
         }
         catch (Exception e)
         {
@@ -181,7 +182,7 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
                 {
                     delete(cris.getOldEpersonID(), cris.getId(), context);
                 }
-                
+                cris.setOldEpersonID(cris.getEpersonID());
             }
             context.complete();
         }

@@ -11,6 +11,7 @@
   - Display the results of browsing a full hit list
   --%>
 
+<%@page import="org.apache.commons.lang3.StringUtils"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -67,6 +68,7 @@ function sortBy(idx, ord)
 	String scope = "";
 	String type = "";
 	String value = "";
+	String humanValue = "";
 	
 	Community community = null;
 	Collection collection = null;
@@ -110,11 +112,13 @@ function sortBy(idx, ord)
 	if (bi.hasAuthority())
     {
         value = bi.getAuthority();
+        humanValue = (String) request.getAttribute("humanValue");
         argument = "authority";
     }
 	else if (bi.hasValue())
 	{
 		value = bi.getValue();
+		humanValue = value;
 	    argument = "value";
 	}
 
@@ -168,13 +172,24 @@ function sortBy(idx, ord)
 	
 	// the message key for the type
 	String typeKey;
+	String startWithKey;
+	String jumpKey;
 
-	if (bix.isMetadataIndex())
+	if (bix.isMetadataIndex()) {
 		typeKey = "browse.type.metadata." + bix.getName();
-	else if (bi.getSortOption() != null)
+		startWithKey = "browse.nav.enter." + bix.getName();
+		jumpKey = "browse.nav.jump." + bix.getName();
+	}
+	else if (bi.getSortOption() != null) {
 		typeKey = "browse.type.item." + bi.getSortOption().getName();
-	else
+		startWithKey = "browse.nav.enter." + bi.getSortOption().getName();
+		jumpKey = "browse.nav.jump." + bi.getSortOption().getName();
+	}
+	else {
 		typeKey = "browse.type.item." + bix.getSortOption().getName();
+		startWithKey = "browse.nav.enter." + bix.getSortOption().getName();
+		jumpKey = "browse.nav.jump." + bix.getSortOption().getName();
+	}
 
     // Admin user or not
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
@@ -188,13 +203,17 @@ function sortBy(idx, ord)
 
 	<%-- Build the header (careful use of spacing) --%>
 	<h2>
-		<fmt:message key="browse.full.header"><fmt:param value="<%= scope %>"/></fmt:message> <fmt:message key="<%= typeKey %>"/> <%= value %>
+		<fmt:message key="browse.full.header"><fmt:param value="<%= scope %>"/></fmt:message> <fmt:message key="<%= typeKey %>"/> 
+			<% if (StringUtils.isNotBlank(humanValue)) { %><i class="fa fa-chevron-right"></i> <%= humanValue %> <% } %>
 	</h2>
 
+<% if (!bi.hasPrevPage() && !bi.hasNextPage()) { %>
+<div class="hidden">
+<% } %>
 	<%-- Include the main navigation for all the browse pages --%>
 	<%-- This first part is where we render the standard bits required by both possibly navigations --%>
 	<div id="browse_navigation" class="well text-center">
-	<form id="sortform" method="get" action="<%= formaction %>">
+	<form id="sortform" class="form-inline" method="get" action="<%= formaction %>">
 <input type="hidden" name="type" value="<%= bix.getName() %>"/>
 <%
                 if (bi.hasAuthority())
@@ -229,7 +248,7 @@ function sortBy(idx, ord)
                 <input type="hidden" id="sorder" name="order" value="<%= direction %>" />
 </form>
 
-	<form method="get" action="<%= formaction %>">
+	<form class="form-inline" method="get" action="<%= formaction %>">
 			<input type="hidden" name="type" value="<%= bix.getName() %>"/>
 			<input type="hidden" name="sort_by" value="<%= so.getNumber() %>"/>
 			<input type="hidden" name="order" value="<%= direction %>"/>
@@ -292,7 +311,16 @@ function sortBy(idx, ord)
 	else
 	{
 %>	
-		<span><fmt:message key="browse.nav.jump"/></span>
+	
+	<label for="starts_with" class="sr-only">
+		<fmt:message key="<%= startWithKey %>"/>
+	</label>
+	<input class="form-control" type="text" name="starts_with" size="60" 
+		placeholder="<fmt:message key="<%= startWithKey %>"/>" />
+	<input type="submit" class="btn btn-default" value="<fmt:message key="browse.nav.go"/>" />
+	<br/>	    					
+		<span><fmt:message key="<%= jumpKey %>"/></span>
+	<br/>
 	                        <a class="label label-default" href="<%= sharedLink %>&amp;starts_with=0">0-9</a>
 <%
 	    for (char c = 'A'; c <= 'Z'; c++)
@@ -301,19 +329,17 @@ function sortBy(idx, ord)
 	                        <a class="label label-default" href="<%= sharedLink %>&amp;starts_with=<%= c %>"><%= c %></a>
 <%
 	    }
-%><br/>
-	    					<span><fmt:message key="browse.nav.enter"/></span>
-	    					<input type="text" name="starts_with"/>&nbsp;<input type="submit" class="btn btn-default" value="<fmt:message key="browse.nav.go"/>" />
-<%
 	}
 %>
 	</form>
 	</div>
 	<%-- End of Navigation Headers --%>
-
+<% if (!bi.hasPrevPage() && !bi.hasNextPage()) { %>
+</div>
+<% } %>
 	<%-- Include a component for modifying sort by, order, results per page, and et-al limit --%>
 	<div id="browse_controls" class="well text-center">
-	<form method="get" action="<%= formaction %>">
+	<form class="form-inline" method="get" action="<%= formaction %>">
 		<input type="hidden" name="type" value="<%= bix.getName() %>"/>
 <%
 		if (bi.hasAuthority())
@@ -346,7 +372,7 @@ function sortBy(idx, ord)
 	{
 %>
 		<label for="sort_by"><fmt:message key="browse.full.sort-by"/></label>
-		<select name="sort_by">
+		<select class="form-control" name="sort_by">
 <%
 		for (SortOption sortBy : sortOptions)
 		{
@@ -360,16 +386,23 @@ function sortBy(idx, ord)
 %>
 		</select>
 <%
+	} else if (sortOptions.size() == 1) {
+		for (SortOption sortBy : sortOptions)
+		{
+		%>
+		<input type="hidden" name="sort_by" value="<%= sortBy.getNumber() %>" />
+		<%
+		}
 	}
 %>
 		<label for="order"><fmt:message key="browse.full.order"/></label>
-		<select name="order">
+		<select class="form-control" name="order">
 			<option value="ASC" <%= ascSelected %>><fmt:message key="browse.order.asc" /></option>
 			<option value="DESC" <%= descSelected %>><fmt:message key="browse.order.desc" /></option>
 		</select>
 
 		<label for="rpp"><fmt:message key="browse.full.rpp"/></label>
-		<select name="rpp">
+		<select class="form-control" name="rpp">
 <%
 	for (int i = 5; i <= 100 ; i += 5)
 	{

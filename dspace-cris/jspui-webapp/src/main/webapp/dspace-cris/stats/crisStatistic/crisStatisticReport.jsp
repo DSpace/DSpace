@@ -53,13 +53,9 @@
 
 <div id="content">
 
-	<div class="col-lg-12">
-		<div class="form-inline">
-	         <div class="form-group">
-			 	<h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param>${data.target.simpleName}</fmt:param><fmt:param><a href="${contextPath}/cris/${data.object.publicPath}/${data.object.crisID}">${data.title}</a></fmt:param></fmt:message></h1>
-			 </div>
-		</div>
-	</div>			 
+ 	<h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param><h1><fmt:message key="statistics.type.${data.target.simpleName}" /></fmt:param><fmt:param><a href="${contextPath}/cris/${data.object.publicPath}/${data.object.crisID}">${data.title}</a></fmt:param></fmt:message></h1>
+
+	<div class="row">			 
 	 <c:set var="type"><%=request.getParameter("type") %></c:set>
 	<%@ include file="/dspace-cris/stats/crisStatistic/_crisStatisticReport-right.jsp" %>
 

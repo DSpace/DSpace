@@ -640,12 +640,6 @@ public class ItemTag extends TagSupport
         HttpServletRequest request = (HttpServletRequest) pageContext
                 .getRequest();
 
-		out.print("<div class=\"panel panel-default\">");
-		out.println("<div class=\"panel-heading\"><h6 class=\"panel-title\">"
-                + LocaleSupport.getLocalizedMessage(pageContext,
-                        "org.dspace.app.webui.jsptag.ItemTag.files")
-				+ "</h6></div>");
-
         try
         {
         	Bundle[] bundles = item.getBundles("ORIGINAL");
@@ -662,15 +656,14 @@ public class ItemTag extends TagSupport
             }
             
             // if user already has uploaded at least one file
-        	if (!filesExist)
+        	if (filesExist)
         	{
-        		out.println("<div class=\"panel-body\">"
+        		out.print("<div class=\"panel panel-default\">");
+        		out.println("<div class=\"panel-heading\"><h6 class=\"panel-title\">"
         				+ LocaleSupport.getLocalizedMessage(pageContext,
-                            "org.dspace.app.webui.jsptag.ItemTag.files.no")
-                            + "</div>");
-        	}
-        	else
-        	{
+                                "org.dspace.app.webui.jsptag.ItemTag.files")
+        				+ "</h6></div>");
+
         		boolean html = false;
         		String handle = item.getHandle();
         		Bitstream primaryBitstream = null;
@@ -916,14 +909,13 @@ public class ItemTag extends TagSupport
             	}
 
             	out.println("</table>");
+                out.println("</div>");
         	}
         }
         catch(SQLException sqle)
         {
         	throw new IOException(sqle.getMessage(), sqle);
         }
-
-        out.println("</div>");
     }
 
     private void getThumbSettings()

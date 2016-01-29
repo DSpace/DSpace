@@ -30,15 +30,17 @@ import org.xml.sax.SAXException;
 public interface IBulkChangesService {
 	public <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, 
 	ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> IBulkChanges getBulkChanges(InputStream input, File dir,
-    		Class<ACO> crisObjectClazz, Class<TP> pDefClazz, List<IContainable> metadataALL) throws IOException,
+    		Class<ACO> crisObjectClazz, Class<TP> pDefClazz, List<IContainable> metadataALL, List<IContainable> metadataNested) throws IOException,
 			FileNotFoundException, NoSuchFieldException,
 			InstantiationException, IllegalAccessException, SAXException,
 			ParserConfigurationException;
 	
     public File generateTemplate(Writer writer, File dir,
-            List<IContainable> metadata, File filexsd, String[] elementsRoot,
+            List<IContainable> metadata, List<IContainable> metadataNested, File filexsd, String[] elementsRoot,
             String namespace, String namespaceValue, String namespaceTarget,
             String[] attributeMainRow, boolean[] attributeMainRowRequired)
             throws IOException, NoSuchFieldException, SecurityException,
             InstantiationException, IllegalAccessException;
+    
+    public String getFormat();
 }

@@ -23,51 +23,13 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
-public class ResearcherClaimOrcidProfile implements PostLoggedInAction, ExtraLoggedInAction {
+public class ResearcherClaimOrcidProfile implements ExtraLoggedInAction {
 
 	private ApplicationService applicationService;
 
 	private String netidSourceRef;
 
-	@Override
-	public void loggedIn(Context context, HttpServletRequest request, EPerson eperson) {
-		try {
-			String orcid = (String) request.getAttribute("orcid");
-			String scope = (String) request.getAttribute("scope");
-			
-			if (StringUtils.isNotBlank(orcid)) {
-				ResearcherPage rp = applicationService.getResearcherPageByEPersonId(eperson.getID());
-
-				// check Researcher Profile existence
-				if (rp == null && eperson.getNetid() != null) {
-					rp = applicationService.getEntityBySourceId(netidSourceRef, eperson.getNetid(),
-							ResearcherPage.class);
-					if (rp == null) {
-						// build a simple RP
-						rp = new ResearcherPage();
-
-						// NOTE: usually the netid is the orcid
-						rp.setSourceID(eperson.getNetid());
-						rp.setSourceRef(netidSourceRef);
-
-						ResearcherPageUtils.buildTextValue(rp, eperson.getFullName(), "fullName");
-						ResearcherPageUtils.buildTextValue(rp, eperson.getEmail(), "email");
-
-					}
-				}
-				
-				if(rp!=null) {
-					fromOrcidToResearcherPage(request, orcid, scope, rp);	
-				}
-				
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-
-	}
-
-	public void extraLoggedIn(Context context, HttpServletRequest request,
+	public void loggedIn(Context context, HttpServletRequest request,
 			EPerson eperson) {
 		String orcid = (String) request.getAttribute("orcid");
 		String scope = (String) request.getAttribute("scope");
@@ -77,6 +39,7 @@ public class ResearcherClaimOrcidProfile implements PostLoggedInAction, ExtraLog
 	}
 	
 	public void fromOrcidToResearcherPage(HttpServletRequest request, String orcid, String scope, ResearcherPage rp) {
+		if (rp == null) return;
 		// delete orcid from researcher profile
 		List<RPProperty> rpp = rp.getAnagrafica4view().get("orcid");
 		if (rpp != null && !rpp.isEmpty()) {

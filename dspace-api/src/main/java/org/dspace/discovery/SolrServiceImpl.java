@@ -130,8 +130,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     private static final Logger log = Logger.getLogger(SolrServiceImpl.class);
 
     protected static final String LAST_INDEXED_FIELD = "SolrIndexer.lastIndexed";
+    protected static final String HANDLE_FIELD = "handle";
+    protected static final String RESOURCE_TYPE_FIELD = "search.resourcetype";
+    protected static final String RESOURCE_ID_FIELD = "search.resourceid";
 
     public static final String FILTER_SEPARATOR = "\n|||\n";
+    public static final String ESCAPED_FILTER_SEPARATOR = "\n\\|\\|\\|\n";
 
     public static final String AUTHORITY_SEPARATOR = "###";
 
@@ -160,9 +164,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                     solr.setBaseURL(solrService);
                     solr.setUseMultiPartPost(true);
+                    // Dummy/test query to search for Item (type=2) of ID=1
                     SolrQuery solrQuery = new SolrQuery()
-                            .setQuery("search.resourcetype:2 AND search.resourceid:1");
-
+                            .setQuery(RESOURCE_TYPE_FIELD + ":2 AND " + RESOURCE_ID_FIELD + ":1");
+                    // Only return obj identifier fields in result doc
+                    solrQuery.setFields(RESOURCE_TYPE_FIELD, RESOURCE_ID_FIELD);
                     solr.query(solrQuery);
 
                     // As long as Solr initialized, check with DatabaseUtils to see
@@ -335,7 +341,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         try {
             if(getSolr() != null){
-                getSolr().deleteByQuery("handle:\"" + handle + "\"");
+                getSolr().deleteByQuery(HANDLE_FIELD + ":\"" + handle + "\"");
                 if(commit)
                 {
                     getSolr().commit();
@@ -553,6 +559,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             else
             {
                 SolrQuery query = new SolrQuery();
+				query.setFields(HANDLE_FIELD);
                 query.setQuery("search.resourcetype:" + type);
                 QueryResponse rsp = getSolr().query(query);
                 SolrDocumentList docs = rsp.getResults();
@@ -563,7 +570,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                     SolrDocument doc = (SolrDocument) iter.next();
 
-                    String handle = (String) doc.getFieldValue("handle");
+                    String handle = (String) doc.getFieldValue(HANDLE_FIELD);
                     
                     DSpaceObject o = findDSpaceObject(context, doc);
 
@@ -704,7 +711,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         boolean inIndex = false;
 
         SolrQuery query = new SolrQuery();
-        query.setQuery("handle:\"" + handle + "\"");
+        query.setQuery(HANDLE_FIELD + ":" + handle);
+        // Specify that we ONLY want the LAST_INDEXED_FIELD returned in the field list (fl)
+        query.setFields(LAST_INDEXED_FIELD);
         QueryResponse rsp;
 
         try {
@@ -1587,9 +1596,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         // New fields to weaken the dependence on handles, and allow for faster
         // list display
 		doc.addField("search.uniqueid", type+"-"+id);
-        doc.addField("search.resourcetype", Integer.toString(type));
+        doc.addField(RESOURCE_TYPE_FIELD, Integer.toString(type));
 
-        doc.addField("search.resourceid", Integer.toString(id));
+        doc.addField(RESOURCE_ID_FIELD, Integer.toString(id));
 
         // want to be able to search for handle, so use keyword
         // (not tokenized, but it is indexed)
@@ -1597,7 +1606,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             // want to be able to search for handle, so use keyword
             // (not tokenized, but it is indexed)
-            doc.addField("handle", handle);
+            doc.addField(HANDLE_FIELD, handle);
         }
 
         if (locations != null)
@@ -1727,7 +1736,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 discoveryQuery.addFilterQueries("location:l" + dso.getID());
             } else if (dso instanceof Item)
             {
-                discoveryQuery.addFilterQueries("handle:" + dso.getHandle());
+                discoveryQuery.addFilterQueries(HANDLE_FIELD + ":" + dso.getHandle());
             }
         }
         return search(context, discoveryQuery, includeUnDiscoverable);
@@ -1756,6 +1765,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
         SolrQuery solrQuery = new SolrQuery();
 
+        if (discoveryQuery.getSearchFields() != null)
+        for (String f : discoveryQuery.getSearchFields()) {
+        	solrQuery.addField(f);
+        }
         String query = "*:*";
         if(discoveryQuery.getQuery() != null)
         {
@@ -1763,6 +1776,18 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 		}
 
         solrQuery.setQuery(query);
+
+        // Add any search fields to our query. This is the limited list
+        // of fields that will be returned in the solr result
+        for(String fieldName : discoveryQuery.getSearchFields())
+        {
+            solrQuery.addField(fieldName);
+        }
+        // Also ensure a few key obj identifier fields are returned with every query
+        solrQuery.addField(HANDLE_FIELD);
+        solrQuery.addField(RESOURCE_TYPE_FIELD);
+        solrQuery.addField(RESOURCE_ID_FIELD);
+
         if(discoveryQuery.isSpellCheck())
         {
             solrQuery.setParam(SpellingParams.SPELLCHECK_Q, query);
@@ -1783,7 +1808,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
         if(discoveryQuery.getDSpaceObjectFilter() != -1)
         {
-            solrQuery.addFilterQuery("search.resourcetype:" + discoveryQuery.getDSpaceObjectFilter());
+            solrQuery.addFilterQuery(RESOURCE_TYPE_FIELD + ":" + discoveryQuery.getDSpaceObjectFilter());
         }
 
         for (int i = 0; i < discoveryQuery.getFieldPresentQueries().size(); i++)
@@ -1838,7 +1863,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
 
                 // Setting the facet limit in this fashion ensures that each facet can have its own max
-                solrQuery.add("f." + field + "." + FacetParams.FACET_LIMIT, String.valueOf(facetFieldConfig.getLimit()));
+				if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)
+						&& facetFieldConfig.getSortOrder().equals(DiscoveryConfigurationParameters.SORT.VALUE)) {
+					solrQuery.add("f." + field + "." + FacetParams.FACET_LIMIT, "-1");
+				} else {
+					solrQuery.add("f." + field + "." + FacetParams.FACET_LIMIT,
+							String.valueOf(facetFieldConfig.getLimit()));
+				}
                 String facetSort;
                 if(DiscoveryConfigurationParameters.SORT.COUNT.equals(facetFieldConfig.getSortOrder()))
                 {
@@ -1849,9 +1880,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 solrQuery.add("f." + field + "." + FacetParams.FACET_SORT, facetSort);
                 if (facetFieldConfig.getOffset() != -1)
                 {
+					if (!(facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE) && facetFieldConfig
+							.getSortOrder().equals(DiscoveryConfigurationParameters.SORT.VALUE))) {
                     solrQuery.setParam("f." + field + "."
                             + FacetParams.FACET_OFFSET,
                             String.valueOf(facetFieldConfig.getOffset()));
+                }
                 }
                 if(facetFieldConfig.getPrefix() != null)
                 {
@@ -1901,7 +1935,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 query.addFilterQueries("location:l" + dso.getID());
             } else if (dso instanceof Item)
             {
-                query.addFilterQueries("handle:\"" + dso.getHandle() + "\"");
+                query.addFilterQueries(HANDLE_FIELD + ":" + dso.getHandle());
             }
         }
         return searchJSON(context, query, jsonIdentifier);
@@ -1977,7 +2011,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 {
                     result.addDSpaceObject(dso);
                 } else {
-                    log.error(LogManager.getHeader(context, "Error while retrieving DSpace object from discovery index", "Handle: " + doc.getFirstValue("handle")));
+                    log.error(LogManager.getHeader(context, "Error while retrieving DSpace object from discovery index", "Handle: " + doc.getFirstValue(HANDLE_FIELD)));
                     continue;
                 }
 
@@ -1986,11 +2020,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 for (String field : searchFields)
                 {
                     List<String> valuesAsString = new ArrayList<String>();
-                    for (Object o : doc.getFieldValues(field))
-                    {
+                    if(doc.containsKey(field)) {
+						for (Object o : doc.getFieldValues(field)) {
                         valuesAsString.add(String.valueOf(o));
                     }
                     resultDoc.addSearchField(field, valuesAsString.toArray(new String[valuesAsString.size()]));
+                }
                 }
                 result.addSearchDocument(dso, resultDoc);
 
@@ -2117,19 +2152,25 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     protected DSpaceObject findDSpaceObject(Context context, SolrDocument doc) throws SQLException {
 
-        Integer type = (Integer) doc.getFirstValue("search.resourcetype");
-        Integer id = (Integer) doc.getFirstValue("search.resourceid");
-        String handle = (String) doc.getFirstValue("handle");
-
+        Integer type = (Integer) doc.getFirstValue(RESOURCE_TYPE_FIELD);
+        Integer id = (Integer) doc.getFirstValue(RESOURCE_ID_FIELD);
+        String handle = (String) doc.getFirstValue(HANDLE_FIELD);
+        DSpaceObject o = null;
         if (type != null && id != null)
         {
-            return DSpaceObject.find(context, type, id);
+            o = DSpaceObject.find(context, type, id);
         } else if (handle != null)
         {
-            return HandleManager.resolveToObject(context, handle);
+            o = HandleManager.resolveToObject(context, handle);
         }
 
-        return null;
+        if (o != null)
+        {
+        	for (String f : doc.getFieldNames()) {
+        		o.extraInfo.put(f, doc.getFirstValue(f));
+        	}
+        }
+        return o;
     }
 
 
@@ -2172,7 +2213,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             SolrQuery solrQuery = new SolrQuery();
             solrQuery.setQuery(query);
-            solrQuery.setFields("search.resourceid", "search.resourcetype");
+            //Only return obj identifier fields in result doc
+            solrQuery.setFields(RESOURCE_ID_FIELD, RESOURCE_TYPE_FIELD);
             solrQuery.setStart(offset);
             solrQuery.setRows(max);
             if (orderfield != null)
@@ -2280,7 +2322,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         try{
             SolrQuery solrQuery = new SolrQuery();
             //Set the query to handle since this is unique
-            solrQuery.setQuery("handle:\"" + item.getHandle() + "\"");
+            solrQuery.setQuery(HANDLE_FIELD + ": " + item.getHandle());
+            //Only return obj identifier fields in result doc
+            solrQuery.setFields(HANDLE_FIELD, RESOURCE_TYPE_FIELD, RESOURCE_ID_FIELD);
             //Add the more like this parameters !
             solrQuery.setParam(MoreLikeThisParams.MLT, true);
             //Add a comma separated list of the similar fields

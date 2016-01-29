@@ -28,12 +28,31 @@ import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.RelationPreference;
 import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.VisibilityConstants;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
+import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authority.orcid.OrcidService;
+import org.dspace.authority.orcid.jaxb.Address;
+import org.dspace.authority.orcid.jaxb.Biography;
+import org.dspace.authority.orcid.jaxb.ContactDetails;
+import org.dspace.authority.orcid.jaxb.Country;
+import org.dspace.authority.orcid.jaxb.CreditName;
+import org.dspace.authority.orcid.jaxb.Email;
+import org.dspace.authority.orcid.jaxb.ExternalIdentifier;
+import org.dspace.authority.orcid.jaxb.ExternalIdentifiers;
+import org.dspace.authority.orcid.jaxb.Keyword;
+import org.dspace.authority.orcid.jaxb.Keywords;
+import org.dspace.authority.orcid.jaxb.OrcidBio;
+import org.dspace.authority.orcid.jaxb.OrcidProfile;
+import org.dspace.authority.orcid.jaxb.OtherNames;
+import org.dspace.authority.orcid.jaxb.PersonalDetails;
+import org.dspace.authority.orcid.jaxb.ResearcherUrl;
+import org.dspace.authority.orcid.jaxb.ResearcherUrls;
+import org.dspace.authority.orcid.jaxb.Visibility;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -44,7 +63,9 @@ import org.dspace.utils.DSpace;
 import it.cilea.osd.jdyna.value.BooleanValue;
 
 public class OrcidPreferencesUtils {
-
+	public static final String[] ORCID_RESEARCHER_ATTRIBUTES = new String[] { "primary-email", "name", "other-names", "other-emails",
+			"iso-3166-country", "keywords", "biography", "credit-name" };
+	
 	public static final String ORCID_PUBLICATIONS_PREFS = "orcid-publications-prefs";
 	public static final String ORCID_PROJECTS_PREFS = "orcid-projects-prefs";
 
@@ -636,6 +657,143 @@ public class OrcidPreferencesUtils {
 
 	public List<OrcidHistory> getOrcidHistoryInSuccessByOwnerAndTypeId(String crisID, int type) {
 		return getApplicationService().findOrcidHistoryInSuccessByOwnerAndType(crisID, type);
+	}
+
+	public static boolean populateRP(ResearcherPage crisObject, String ORCID) {
+		return populateRP(crisObject, ORCID, null);
+	}
+	public static boolean populateRP(ResearcherPage crisObject, String ORCID, String token) {
+		List<RPPropertiesDefinition> metadataDefinitions = new Researcher().getApplicationService()
+				.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, OrcidPreferencesUtils.PREFIX_ORCID_PROFILE_PREF);
+		Map<String, String> mapMetadata = new HashMap<String, String>();
+		for (RPPropertiesDefinition rppd : metadataDefinitions) {
+			String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst(OrcidPreferencesUtils.PREFIX_ORCID_PROFILE_PREF, "");
+			String metadataShortnameORCID = rppd.getLabel();
+			mapMetadata.put(metadataShortnameORCID, metadataShortnameINTERNAL);
+		}
+		
+		OrcidService orcidService = OrcidService.getOrcid();
+		OrcidProfile orcidProfile = orcidService.getProfile(ORCID, token);
+		if (orcidProfile != null) {
+			ResearcherPageUtils.buildTextValue(crisObject, ORCID, "orcid");
+			
+			OrcidBio orcidBio = orcidProfile.getOrcidBio();
+			
+			if (orcidBio != null) {
+				if (mapMetadata.containsKey("biography")) {
+					Biography biography = orcidBio.getBiography();
+					if (biography != null) {
+						ResearcherPageUtils.buildTextValue(crisObject, biography.getValue(), mapMetadata.get("biography"), 
+								biography.getVisibility() == Visibility.PUBLIC?VisibilityConstants.PUBLIC:VisibilityConstants.HIDE);
+					}
+				}
+				
+				ContactDetails contactDetails = orcidBio.getContactDetails();
+				if (contactDetails != null) {
+					if (mapMetadata.containsKey("other-emails") 
+							|| mapMetadata.containsKey("primary-email")) {
+						List<Email> emails = contactDetails.getEmail();
+						if (emails != null) {
+							for (Email email : emails) {
+								if (email.isPrimary()) {
+									ResearcherPageUtils.buildTextValue(crisObject, email.getValue(), mapMetadata.get("primary-email"), 
+											email.getVisibility() == Visibility.PUBLIC?VisibilityConstants.PUBLIC:VisibilityConstants.HIDE);
+								}
+								else {
+									ResearcherPageUtils.buildTextValue(crisObject, email.getValue(), mapMetadata.get("other-emails"), 
+											email.getVisibility() == Visibility.PUBLIC?VisibilityConstants.PUBLIC:VisibilityConstants.HIDE);
+								}
+							}
+						}
+					}
+					
+					if (mapMetadata.containsKey("iso-3166-country")) {
+						Address address = contactDetails.getAddress();
+						if (address != null) {
+							Country country = address.getCountry();
+							if (country != null) {
+								ResearcherPageUtils.buildTextValue(crisObject,
+										country.getValue(),
+										mapMetadata.get("iso-3166-country"),
+										country
+												.getVisibility() == Visibility.PUBLIC ? VisibilityConstants.PUBLIC
+														: VisibilityConstants.HIDE);
+							}
+						}
+					}
+				}
+				
+				PersonalDetails personalDetails = orcidBio.getPersonalDetails();
+				if (personalDetails != null) {
+					if (mapMetadata.containsKey("credit-name")) {
+						CreditName creditName = personalDetails.getCreditName();
+						if (creditName != null) {
+							ResearcherPageUtils.buildTextValue(crisObject, creditName.getValue(), mapMetadata.get("credit-name"), 
+									creditName.getVisibility() == Visibility.PUBLIC?VisibilityConstants.PUBLIC:VisibilityConstants.HIDE);
+						}
+					}
+					
+					if (mapMetadata.containsKey("other-names")) {
+						OtherNames otherNames = personalDetails.getOtherNames();
+						if (otherNames != null) {
+							for (String name : otherNames.getOtherName()) {
+								ResearcherPageUtils.buildTextValue(crisObject, name, mapMetadata.get("other-names"), 
+										otherNames.getVisibility() == Visibility.PUBLIC?VisibilityConstants.PUBLIC:VisibilityConstants.HIDE);
+							}
+						}
+					}
+				}
+				
+				if (mapMetadata.containsKey("keywords")) {
+					Keywords keywords = orcidBio.getKeywords();
+					if (keywords != null) {
+						for (Keyword key : keywords.getKeyword()) {
+							ResearcherPageUtils.buildTextValue(crisObject, key.getContent(), mapMetadata.get("keywords"), 
+									keywords.getVisibility() == Visibility.PUBLIC?VisibilityConstants.PUBLIC:VisibilityConstants.HIDE);
+						}
+					}
+				}
+				
+				if (mapMetadata.containsKey("researcher-urls")) {
+					ResearcherUrls urls = orcidBio.getResearcherUrls();
+					if (urls != null) {
+						for (ResearcherUrl url : urls.getResearcherUrl()) {
+							ResearcherPageUtils.buildLinkValue(crisObject, url.getUrlName(), url.getUrl().getValue(),
+									mapMetadata.get("researcher-urls"), urls.getVisibility() == Visibility.PUBLIC
+											? VisibilityConstants.PUBLIC : VisibilityConstants.HIDE);
+						}
+					}
+				}
+				
+				ExternalIdentifiers eids = orcidBio.getExternalIdentifiers();
+				if (eids != null) {
+					for (ExternalIdentifier eid : eids.getExternalIdentifier()) {
+						if (mapMetadata.containsKey("external-identifier-" + eid.getExternalIdCommonName().getContent())) {
+							ResearcherPageUtils.buildTextValue(crisObject, eid.getExternalIdReference().getContent(),
+									mapMetadata.get("external-identifier-" + eid.getExternalIdCommonName().getContent()),
+									eids.getVisibility() == Visibility.PUBLIC ? VisibilityConstants.PUBLIC
+											: VisibilityConstants.HIDE);
+						}
+					}
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	public static void printXML(Object jaxbSerializableObject) {
+		try {
+			if (log.isDebugEnabled()) {
+	            javax.xml.bind.JAXBContext jaxbCtx = javax.xml.bind.JAXBContext.newInstance(jaxbSerializableObject.getClass().getPackage().getName());
+	            javax.xml.bind.Marshaller marshaller = jaxbCtx.createMarshaller();
+	            marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_ENCODING, "UTF-8"); //NOI18N
+	            marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+	            marshaller.marshal(jaxbSerializableObject, System.out);
+			}
+        } catch (javax.xml.bind.JAXBException ex) {
+            java.util.logging.Logger.getLogger("global").log(java.util.logging.Level.SEVERE, null, ex); //NOI18N
+        }
 	}
 
 }

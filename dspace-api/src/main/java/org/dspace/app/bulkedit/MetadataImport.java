@@ -883,7 +883,15 @@ public class MetadataImport
         } else if (value == null || !value.contains(DSpaceCSV.authoritySeparator)) {
             simplyCopyValue(value, dcv);
         } else {
-            String[] parts = value.split(DSpaceCSV.escapedAuthoritySeparator);
+            
+        	String[] parts = value.split(DSpaceCSV.escapedAuthoritySeparator);
+        	if (parts.length>3) {
+        		String conf = parts[parts.length-1];
+        		for (int idx = 2; idx <= parts.length-2; idx++) {
+        			parts[1] += "::"+parts[idx];
+        		}
+        		parts[2] = conf;
+        	}
             dcv.value = parts[0];
             dcv.authority = parts[1];
             dcv.confidence = (parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED);
@@ -1169,7 +1177,7 @@ public class MetadataImport
      */
     private static boolean isAuthorityControlledField(String md)
     {
-        String mdf = StringUtils.substringAfter(md, ":");
+		String mdf = StringUtils.contains(md, ":") ? StringUtils.substringAfter(md, ":") : md;
         mdf = StringUtils.substringBefore(mdf, "[");
         return authorityControlled.contains(mdf);
     }

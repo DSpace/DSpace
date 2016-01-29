@@ -23,6 +23,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.app.cris.integration.CrisEnhancer;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.browse.BrowseException;
@@ -64,6 +65,10 @@ public class CrisBrowseSolrIndexPlugin implements CrisServiceIndexPlugin
         {
             return;
         }
+        
+        List<CrisEnhancer> crisEnhancers = new DSpace().getServiceManager()
+                .getServicesByType(CrisEnhancer.class);
+        
         ACrisObject<P, TP, NP, NTP, ACNO, ATNO> item = dso;
 
         // faceting for metadata browsing. It is different than search facet
@@ -115,6 +120,24 @@ public class CrisBrowseSolrIndexPlugin implements CrisServiceIndexPlugin
 
                         List<P> proprieties = item.getAnagrafica4view().get(
                                 md[1]);
+                        
+                        // add support for enhanced property in the browse
+                        if ((proprieties == null || proprieties.size() == 0) 
+                        		&& StringUtils.isNotEmpty(md[2])) {
+                        	// check if it is an enhanced property
+                            for (CrisEnhancer cEnh : crisEnhancers)
+                            {
+                                if (cEnh.getClazz().isAssignableFrom(dso.getClass()))
+                                {
+                                	if (StringUtils.equals(cEnh.getAlias(), md[1])) {
+                                		proprieties = cEnh.getProperties(dso, md[2]);
+                                		// clean the md[2] as we have already found the final value
+                                		md[2] = "";
+                                	}
+                                }
+                            }
+                        }
+                        
                         List<AValue> values = new ArrayList<AValue>();
                         if (proprieties != null)
                         {

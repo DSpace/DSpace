@@ -7,12 +7,18 @@
  */
 package org.dspace.app.webui.components;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.configuration.DiscoveryViewAndHighlightConfiguration;
+import org.dspace.discovery.configuration.DiscoveryViewConfiguration;
 import org.dspace.plugin.SiteHomeProcessor;
 import org.dspace.plugin.PluginException;
 
@@ -45,6 +51,8 @@ public class RecentSiteSubmissions implements SiteHomeProcessor
         {
             RecentSubmissionsManager rsm = new RecentSubmissionsManager(context);
             RecentSubmissions recent = rsm.getRecentSubmissions(null);
+            recent.setConfiguration(SearchUtils.getRecentSubmissionConfiguration("site").getMetadataFields());
+            
             request.setAttribute("recent.submissions", recent);
 
         }

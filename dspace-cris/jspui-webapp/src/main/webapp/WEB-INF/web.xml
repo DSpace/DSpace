@@ -91,6 +91,11 @@
       <filter-class>org.dspace.rdf.negotiation.NegotiationFilter</filter-class>
     </filter>
 
+	<filter>
+		<filter-name>ExploreLocationFilter</filter-name>
+		<filter-class>org.dspace.app.webui.cris.filter.ExploreLocationFilter</filter-class>
+	</filter>
+	
 	<!-- Filter mappings -->
 	<filter-mapping>
 		<filter-name>dspace.request</filter-name>
@@ -166,11 +171,19 @@
 	</filter-mapping>
 
 	<filter-mapping>
+	    <filter-name>ExploreLocationFilter</filter-name>
+	    <url-pattern>/browse</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+	    <filter-name>ExploreLocationFilter</filter-name>
+	    <url-pattern>/simple-search</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
 	    <filter-name>DSpaceCleanupFilter</filter-name>
 	    <url-pattern>/cris/*</url-pattern>
 	</filter-mapping>
-
-
 
 	<!-- kernel start listener (from impl), starts up the kernel for standalone 
 		webapps -->
@@ -990,7 +1003,7 @@
 	<!-- Pubmed retrieval -->
 	<servlet>
 		<servlet-name>PMCGetCitedByCount</servlet-name>
-		<servlet-class>org.dspace.app.cris.pmc.servlet.PMCServlet</servlet-class>
+		<servlet-class>org.dspace.app.webui.cris.metrics.servlet.PMCServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>

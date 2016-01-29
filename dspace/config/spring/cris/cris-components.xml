@@ -40,6 +40,7 @@
 				<entry key="conference" value-ref="conferenceComponent" />
 				<entry key="book" value-ref="bookComponent" />
 				<entry key="patent" value-ref="patentComponent" />
+				<entry key="dataset" value-ref="datasetComponent" />
 				<entry key="other" value-ref="otherComponent" />
 			</map>
 		</property>
@@ -66,7 +67,7 @@
 	<bean id="conferenceComponent"
 		class="org.dspace.app.webui.cris.components.BeanFacetComponent">
 		<property name="componentIdentifier" value="conference" />
-		<property name="facetQuery"><value>dc.type:Conference_Paper OR dc.type:Presentation -relationpreferences.crisrp.publications.selected:{1}</value></property>
+		<property name="facetQuery"><value>resourcetype_authority:conferencematerials -relationpreferences.crisrp.publications.selected:{1}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>			
@@ -76,6 +77,15 @@
 		class="org.dspace.app.webui.cris.components.BeanFacetComponent">
 		<property name="componentIdentifier" value="book" />
 		<property name="facetQuery"><value>dc.type:Book -relationpreferences.crisrp.publications.selected:{1}</value></property>
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>20</value></property>
+		<property name="sortby"><value>1</value></property>		
+	</bean>
+	
+	<bean id="datasetComponent"
+		class="org.dspace.app.webui.cris.components.BeanFacetComponent">
+		<property name="componentIdentifier" value="dataset" />
+		<property name="facetQuery"><value>dc.type:Dataset -relationpreferences.crisrp.publications.selected:{1}</value></property>
 		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>
 		<property name="sortby"><value>1</value></property>		

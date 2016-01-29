@@ -382,6 +382,37 @@ public class ConfigurationManager
     }
 
     /**
+     * Get a module configuration property as a boolean. True is indicated if
+     * the value of the property is <code>TRUE</code> or <code>YES</code> (case
+     * insensitive.)
+     *
+     * @param module the module, or <code>null</code> for regular property
+     *
+     * @param property
+     *            the name of the property
+     *
+     * @param defaultProperty
+     *            the name of the property for default
+     *            
+     * @return the value of the property. <code>false</code> is returned if
+     *         both the property than the property parent does not exist. 
+     *         To differentiate between this case and when the property actually is false, 
+     *         use <code>getProperty</code>.
+     */ 
+    public static boolean getBooleanProperty(String module, String property, String defaultProperty)
+    {
+        String stringValue = getProperty(module, property);
+
+        if (stringValue != null)
+        {
+            stringValue = stringValue.trim();
+            return  stringValue.equalsIgnoreCase("true") ||
+                    stringValue.equalsIgnoreCase("yes");
+        }
+        return getBooleanProperty(module, defaultProperty, false);
+    }
+    
+    /**
      * Get a configuration property as a boolean. True is indicated if the value
      * of the property is <code>TRUE</code> or <code>YES</code> (case
      * insensitive.)

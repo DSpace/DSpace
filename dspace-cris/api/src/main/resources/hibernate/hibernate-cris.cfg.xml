@@ -193,9 +193,11 @@
 		<mapping class="it.cilea.osd.jdyna.model.ScopeDefinition" />
 		
 		<!-- PMC -->
-		<mapping class="org.dspace.app.cris.pmc.model.PMCRecord" />
-		<mapping class="org.dspace.app.cris.pmc.model.PMCCitation" />
-
+		<mapping class="org.dspace.app.cris.metrics.pmc.model.PMCRecord" />
+		<mapping class="org.dspace.app.cris.metrics.pmc.model.PMCCitation" />
+		
+		<!-- STATS METRICS -->
+		<mapping class="org.dspace.app.cris.metrics.common.model.CrisMetrics" />		
 	</session-factory>
 
 </hibernate-configuration>

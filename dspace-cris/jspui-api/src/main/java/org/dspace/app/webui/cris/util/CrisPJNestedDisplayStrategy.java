@@ -7,38 +7,25 @@
  */
 package org.dspace.app.webui.cris.util;
 
-import it.cilea.osd.jdyna.model.Containable;
-import it.cilea.osd.jdyna.model.IContainable;
-
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
-import javax.swing.text.TabExpander;
 
-import org.apache.commons.lang.StringUtils;
-import org.dspace.app.cris.dao.RPBoxDao;
-import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.jdyna.BoxProject;
-import org.dspace.app.cris.model.jdyna.BoxResearcherPage;
-import org.dspace.app.cris.model.jdyna.RPNestedObject;
-import org.dspace.app.cris.model.jdyna.RPNestedProperty;
 import org.dspace.app.cris.model.jdyna.TabProject;
-import org.dspace.app.cris.model.jdyna.TabResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
-import org.dspace.app.webui.util.ADiscoveryDisplayStrategy;
 import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
-import org.dspace.browse.BrowseDSpaceObject;
 import org.dspace.browse.BrowseItem;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.utils.DSpace;
 
-public class CrisPJNestedDisplayStrategy extends ADiscoveryDisplayStrategy implements
+public class CrisPJNestedDisplayStrategy implements
         IDisplayMetadataValueStrategy
 {
 
@@ -81,7 +68,7 @@ public class CrisPJNestedDisplayStrategy extends ADiscoveryDisplayStrategy imple
 
 	@Override
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
-			int colIdx, String field, List<String> metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
+			int colIdx, String field, Metadatum[] metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
 			boolean emph, PageContext pageContext) throws JspException {
         Project crisObject = (Project)item;
         String[] splitted = field.split("\\.");
@@ -102,12 +89,12 @@ public class CrisPJNestedDisplayStrategy extends ADiscoveryDisplayStrategy imple
         			if(prefix==null) {
         				prefix = "#";
         			}
-        			return "<a href=\"cris/"+ crisObject.getPublicPath() +"/"+ crisObject.getCrisID() +"/"+tab.getShortName()+".html" + prefix + ano.getShortName() + "\">" + metadataArray.get(0) +"</a>";		
+        			return "<a href=\"cris/"+ crisObject.getPublicPath() +"/"+ crisObject.getCrisID() +"/"+tab.getShortName()+".html" + prefix + ano.getShortName() + "\">" + metadataArray[0].value +"</a>";		
         		}
         	}
             
         }
-        return metadataArray.get(0);
+        return metadataArray[0].value;
 	}
 }
 

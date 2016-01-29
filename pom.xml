@@ -4,7 +4,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>CRIS-5.3.1-SNAPSHOT</version>
+   <version>CRIS-5.4.0-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <url>https://github.com/Cineca/DSpace</url>
    <description>
@@ -872,12 +872,12 @@
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>pubmed-lookup</artifactId>
+            <artifactId>metrics-lookup</artifactId>
             <version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>pubmed-lookup-web</artifactId>
+            <artifactId>metrics-lookup-web</artifactId>
             <version>${project.version}</version>
             <type>war</type>
          </dependency>         
@@ -1388,7 +1388,7 @@
 		</dependency>
 		 <dependency>
              <groupId>org.dspace</groupId>
-			 <artifactId>pubmed-retrieve</artifactId>
+			 <artifactId>metrics-retrieve</artifactId>
 			 <version>${project.version}</version>
          </dependency>
 		<dependency>
@@ -1410,13 +1410,23 @@
               <version>v3-rev103-1.19.0</version>
           </dependency>
           <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>1.19.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client</artifactId>
+            <version>1.19.0</version>
+        </dependency>
+        <dependency>
               <groupId>com.google.http-client</groupId>
               <artifactId>google-http-client-jackson2</artifactId>
               <version>1.19.0</version>
           </dependency>
           <dependency>
               <groupId>com.google.oauth-client</groupId>
-              <artifactId>google-oauth-client-jetty</artifactId>
+              <artifactId>google-oauth-client</artifactId>
               <version>1.19.0</version>
           </dependency>
           <!-- Findbugs annotations -->

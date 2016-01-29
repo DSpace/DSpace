@@ -168,7 +168,7 @@
 %>
             <tr>
 		<td headers="t1" class="<%= row %>RowEvenCol" align="center">
-		    <input class="form-control" type="radio" name="primary_bitstream_id" value="<%= bitstreams[i].getID() %>"
+		    <input type="radio" name="primary_bitstream_id" value="<%= bitstreams[i].getID() %>"
 			   <% if (bundles[0] != null) {
 				if (bundles[0].getPrimaryBitstreamID() == bitstreams[i].getID()) { %>
 			       	  <%="checked='checked'" %>

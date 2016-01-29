@@ -17,16 +17,22 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+import org.dspace.app.bulkedit.DSpaceCSV;
+import org.dspace.app.bulkedit.MetadataExport;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.app.bulkedit.MetadataExport;
-import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.*;
+import org.dspace.browse.BrowseEngine;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseInfo;
+import org.dspace.browse.BrowseItem;
+import org.dspace.browse.BrowserScope;
+import org.dspace.content.ItemIterator;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.content.ItemIterator;
-import org.apache.log4j.Logger;
 
 /**
  * Servlet for browsing through indices, as they are defined in 
@@ -163,7 +169,25 @@ public class BrowserServlet extends AbstractBrowserServlet
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        
+    	BrowseInfo bInfo = (BrowseInfo) request.getAttribute("browse.info");
+
+		if (bInfo != null) {
+			if (bInfo.hasAuthority()) {
+				String humanValue = bInfo.getAuthority();
+				ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+				MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
+				List<String> authorities = mam.getAuthorityMetadata();
+				String[] browseMetadata = bInfo.getBrowseIndex().getMetadata().split(",");
+				for (String auth : authorities) {
+					if (match(auth, browseMetadata)) {
+						humanValue = cam.getLabel(auth.replaceAll("\\.", "_"), bInfo.getAuthority(), null);
+						break;
+					}
+				}
+				request.setAttribute("humanValue", humanValue);
+			}
+		}
+		
         JSPManager.showJSP(request, response, "/browse/full.jsp");
     }
 
@@ -220,4 +244,18 @@ public class BrowserServlet extends AbstractBrowserServlet
             JSPManager.showIntegrityError(request, response);
         }
     }
+    
+    private boolean match(String auth, String[] browseMetadata) {
+		for (String md : browseMetadata) {
+			if (md.endsWith("*")) {
+				if (auth.startsWith(md.substring(0, md.length() - 2)))
+					return true;
+			} else {
+				if (md.equals(auth))
+					return true;
+			}
+		}
+		return false;
+	}
+
 }

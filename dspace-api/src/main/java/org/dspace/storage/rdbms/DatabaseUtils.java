@@ -17,6 +17,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 
 import javax.sql.DataSource;
@@ -569,14 +570,29 @@ public class DatabaseUtils
             return null;
         }
 
+        if(tableColumnExists(connection, "cris_metrics", "last", null, null)) {
+            return "5.4.0.1";
+        }
+        
+        if(tableColumnExists(connection, "jdyna_widget_text", "displayformat", Types.VARCHAR, 4000)) {
+            return "5.4.0.0";
+        }
+        
+        if(tableExists(connection, "cris_metrics")) {
+            if(!tableColumnExists(connection, "cris_pmc_citation", "numcitations", null, null)) {
+                return "5.3.1.1";
+            }
+            return "5.3.1.0";
+        }
+        
         if(tableExists(connection, "cris_orcid_queue")) {
-        	if(tableColumnExists(connection, "cris_orcid_queue", "itemid")) {
+        	if(tableColumnExists(connection, "cris_orcid_queue", "itemid", null, null)) {
         		return "5.3.0.0";
-        	} else if(tableColumnExists(connection, "cris_orcid_history", "owner")) {
+        	} else if(tableColumnExists(connection, "cris_orcid_history", "owner", null, null)) {
         		return "5.3.0.4";
-        	} else if(tableColumnExists(connection, "cris_orcid_queue", "fastlookupobjectname")) {
+        	} else if(tableColumnExists(connection, "cris_orcid_queue", "fastlookupobjectname", null, null)) {
         		return "5.3.0.3";
-        	} else if(tableColumnExists(connection, "cris_orcid_history", "entityuuid")) {
+        	} else if(tableColumnExists(connection, "cris_orcid_history", "entityuuid", null, null)) {
         		return "5.3.0.5";
         	} else {
         		return "5.3.0.2";
@@ -591,13 +607,13 @@ public class DatabaseUtils
         	//WARNING!!! DOUBLE CHECK BECAUSE JDYNA_WIDGET_BOOLEAN COMES ALSO WITH DSPACECRIS_4.3.1 (no flyway in version prior the 5_x_x)  
         	        	
             // Is this pre-DSpace 5.0 (with Metadata 4 All changes)? Look for the "resource_id" column in the "metadatavalue" table
-            if(tableColumnExists(connection, "metadatavalue", "resource_id"))
+            if(tableColumnExists(connection, "metadatavalue", "resource_id", null, null))
             {
                 return "5.0.2014.09.26"; // This version matches the version in the SQL migration for this feature
             }
 
             // Is this pre-DSpace 5.0 (with Helpdesk plugin)? Look for the "request_message" column in the "requestitem" table
-            if(tableColumnExists(connection, "requestitem", "request_message"))
+            if(tableColumnExists(connection, "requestitem", "request_message", null, null))
             {
                 return "5.0.2014.08.08"; // This version matches the version in the SQL migration for this feature
             }        	
@@ -605,13 +621,13 @@ public class DatabaseUtils
         }
         
         // Is this pre-DSpace 5.0 (with Metadata 4 All changes)? Look for the "resource_id" column in the "metadatavalue" table
-        if(tableColumnExists(connection, "metadatavalue", "resource_id"))
+        if(tableColumnExists(connection, "metadatavalue", "resource_id", null, null))
         {
             return "5.0.2014.09.26"; // This version matches the version in the SQL migration for this feature
         }
 
         // Is this pre-DSpace 5.0 (with Helpdesk plugin)? Look for the "request_message" column in the "requestitem" table
-        if(tableColumnExists(connection, "requestitem", "request_message"))
+        if(tableColumnExists(connection, "requestitem", "request_message", null, null))
         {
             return "5.0.2014.08.08"; // This version matches the version in the SQL migration for this feature
         }
@@ -619,11 +635,11 @@ public class DatabaseUtils
         // Is this DSpace 4.x? Look for the "Webapp" table created in that version.
         if(tableExists(connection, "Webapp"))
         {
-            if(tableColumnExists(connection, "jdyna_widget_text", "displayFormat"))
+            if(tableColumnExists(connection, "jdyna_widget_text", "displayFormat", null, null))
             {
                 return "4.3.0.0";
             }
-            if(tableColumnExists(connection, "cris_rpage", "sourceRef"))
+            if(tableColumnExists(connection, "cris_rpage", "sourceRef", null, null))
             {
                 return "4.1.0.0";
             }
@@ -633,7 +649,7 @@ public class DatabaseUtils
         // Is this DSpace 3.x? Look for the "versionitem" table created in that version.
         if(tableExists(connection, "versionitem"))
         {
-            if(tableColumnExists(connection, "cris_rp_wpointer", "urlPath"))
+            if(tableColumnExists(connection, "cris_rp_wpointer", "urlPath", null, null))
             {
                 return "3.2.1.0";
             }
@@ -641,7 +657,7 @@ public class DatabaseUtils
         }
 
         // Is this DSpace 1.8.x? Look for the "bitstream_order" column in the "bundle2bitstream" table
-        if(tableColumnExists(connection, "bundle2bitstream", "bitstream_order"))
+        if(tableColumnExists(connection, "bundle2bitstream", "bitstream_order", null, null))
         {
             if(tableExists(connection, "cris_rpage"))
             {
@@ -783,9 +799,12 @@ public class DatabaseUtils
      *          The name of the table
      * @param columnName
      *          The name of the column in the table
+     * @param type 
+     *          The type of the column
+     * @param precision TODO
      * @return true if column of that name exists, false otherwise
      */
-    public static boolean tableColumnExists(Connection connection, String tableName, String columnName)
+    public static boolean tableColumnExists(Connection connection, String tableName, String columnName, Integer type, Integer length)
     {
         boolean exists = false;
         ResultSet results = null;
@@ -809,6 +828,20 @@ public class DatabaseUtils
             if (results!=null && results.next())
             {
                 exists = true;
+                if(type!=null) {
+                    if(type.equals(results.getMetaData().getColumnType(1))) {
+                        if(length!=null) {
+                            if(length.equals(results.getMetaData().getPrecision(1))) {
+                                 return true;
+                            }
+                            else {
+                                return false;
+                            }
+                        }
+                    } else {
+                        return false;
+                    }
+                }
             }
         }
         catch(SQLException e)

@@ -37,6 +37,12 @@ import org.dspace.utils.DSpace;
  */
 public abstract class DSpaceObject implements IGlobalSearchResult
 {
+	public transient Map<String, Object> extraInfo = new HashMap<String, Object>();
+	
+	public Map<String, Object> getExtraInfo() {
+		return extraInfo;
+	}
+	
     /** Our context */
     protected Context ourContext;
 

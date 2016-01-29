@@ -42,7 +42,7 @@
 %>
 	
 <c:set var="info" value="<%= info %>" scope="request" />
-<div class="panel-group" id="${holder.shortName}">
+<div class="panel-group ${extraCSS}" id="${holder.shortName}">
 	<div class="panel panel-default">
     	<div class="panel-heading">
     		<h4 class="panel-title">
@@ -130,9 +130,11 @@ if (info.getPagetotal() > 1)
        <input id="order<%= info.getType() %>" type="hidden" name="order<%= info.getType() %>" value="<%= info.getOrder() %>" />
 	   <input type="hidden" name="open" value="<%= info.getType() %>" />
 </form>
-			
-<dspace:browselist items="<%= (BrowseItem[])info.getItems() %>" config="crisou" />
-
+<div class="row">
+<div class="table-responsive">		
+<dspace:browselist items="<%= (BrowseItem[])info.getItems() %>" config="crisou.${info[holder.shortName].type}" sortBy="<%= new Integer(info.getSo().getNumber()).toString() %>" order="<%= info.getOrder() %>"/>
+</div>
+</div>
 <script type="text/javascript"><!--
     function sortBy(sort_by, order) {
         j('#sort_by<%= info.getType() %>').val(sort_by);

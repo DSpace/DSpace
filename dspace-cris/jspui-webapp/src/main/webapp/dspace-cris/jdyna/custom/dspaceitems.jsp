@@ -37,7 +37,7 @@
 	if (info.getItems().length > 0) {
 %>
 <c:set var="info" value="<%= info %>" scope="request" />
-<div class="panel-group" id="${holder.shortName}">
+<div class="panel-group ${extraCSS}" id="${holder.shortName}">
 	<div class="panel panel-default">
     	<div class="panel-heading">
     		<h4 class="panel-title">
@@ -125,9 +125,11 @@ if (info.getPagetotal() > 1)
        <input id="order<%= info.getType() %>" type="hidden" name="order<%= info.getType() %>" value="<%= info.getOrder() %>" />
 	   <input type="hidden" name="open" value="<%= info.getType() %>" />
 </form>
-
-<dspace:itemlist itemStart="<%=info.getStart()+1%>" items="<%= (Item[])info.getItems() %>" sortOption="<%= info.getSo() %>" authorLimit="<%= info.getEtAl() %>" order="<%= info.getOrder() %>"/>
-
+<div class="row">
+<div class="table-responsive">
+<dspace:itemlist itemStart="<%=info.getStart()+1%>" items="<%= (Item[])info.getItems() %>" sortOption="<%= info.getSo() %>" authorLimit="<%= info.getEtAl() %>" order="<%= info.getOrder() %>" config="${info[holder.shortName].type}" />
+</div>
+</div>
 <script type="text/javascript"><!--
     function sortBy(sort_by, order) {
         j('#sort_by<%= info.getType() %>').val(sort_by);

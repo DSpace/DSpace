@@ -98,6 +98,10 @@
 		var $ = jQuery.noConflict();
 		var JQ = j;
 		dspaceContextPath = "<%=request.getContextPath()%>";
+		jQuery(document).ready(function ($) {
+			  $('span[data-toggle="tooltip"]').tooltip();
+			  $('i[data-toggle="tooltip"]').tooltip();
+		});
 	</script>
     <%--Gooogle Analytics recording.--%>
     <%
@@ -136,12 +140,12 @@
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
     <body class="undernavigation">
 <a class="sr-only" href="#content">Skip navigation</a>
-<header class="navbar navbar-inverse navbar-fixed-top">    
+<header class="navbar navbar-inverse navbar-square">    
     <%
     if (!navbar.equals("off"))
     {
 %>
-            <div class="container">
+            <div class="container-fluid">
                 <dspace:include page="<%= navbar %>" />
             </div>
 <%
@@ -149,7 +153,7 @@
     else
     {
     	%>
-        <div class="container">
+        <div class="container-fluid">
             <dspace:include page="/layout/navbar-minimal.jsp" />
         </div>
 <%    	
@@ -160,11 +164,11 @@
 <main id="content" role="main">
 <div class="container banner">
 	<div class="row">
-		<div class="col-md-9 brand">
+		<div class="col-sm-9 brand">
 		<h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
         <fmt:message key="jsp.layout.header-default.brand.description" /> 
         </div>
-        <div class="col-md-3"><img class="pull-right" src="<%= request.getContextPath() %>/image/logo.gif" alt="DSpace logo" />
+        <div class="col-sm-3 hidden-xs"><img class="pull-right" src="<%= request.getContextPath() %>/image/logo.gif" alt="DSpace logo" />
         </div>
 	</div>
 </div>	

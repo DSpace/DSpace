@@ -194,6 +194,9 @@ submissionLookupShowDetails = function(info){
 		}
 	});
 	modalfooter.append(start);
+	j('#loading-details').on('hide.bs.modal', function (e) {
+		j('#hidden-area').append(j('#select-collection-div'));
+	});
 	j('#loading-details').modal('show');
 };
 

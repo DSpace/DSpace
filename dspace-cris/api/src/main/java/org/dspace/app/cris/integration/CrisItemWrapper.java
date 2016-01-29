@@ -197,6 +197,7 @@ public final class CrisItemWrapper implements MethodInterceptor, ItemWrapperInte
         pf.setProxyTargetClass(true);
         pf.addAdvice(new CrisItemWrapper());
         Item proxy = (Item)(pf.getProxy());
+        proxy.extraInfo = item.getExtraInfo();
         return proxy;
     }
 }

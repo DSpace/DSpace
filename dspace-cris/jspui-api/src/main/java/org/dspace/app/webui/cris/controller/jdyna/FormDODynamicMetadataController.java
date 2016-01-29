@@ -297,9 +297,7 @@ public class FormDODynamicMetadataController
         else
         {
             exitPage = "redirect:/cris/"+ getSpecificPartPath() +"/"
-                    + ResearcherPageUtils.getPersistentIdentifier(
-                            entity) + "/"
-                    + editT.getShortName().substring(4) + ".html";
+                    + entity.getCrisID();
         }
         if (request.getParameter("cancel") != null)
         {

@@ -7,21 +7,21 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
-import it.cilea.osd.jdyna.model.ANestedObjectWithTypeSupport;
-import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
-import it.cilea.osd.jdyna.model.ANestedProperty;
-import it.cilea.osd.jdyna.model.PropertiesDefinition;
-import it.cilea.osd.jdyna.model.Property;
-
 import javax.persistence.Embedded;
 import javax.persistence.MappedSuperclass;
 
 import org.dspace.app.cris.model.ICrisObject;
 import org.dspace.app.cris.model.SourceReference;
 
+import it.cilea.osd.jdyna.model.ANestedObjectWithTypeSupport;
+import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ANestedProperty;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.model.Property;
+
 @MappedSuperclass
 public abstract class ACrisNestedObject<P extends ANestedProperty<TP>, TP extends ANestedPropertiesDefinition, PP extends Property<PTP>, PTP extends PropertiesDefinition>
-        extends ANestedObjectWithTypeSupport<P, TP, PP, PTP> implements ICrisObject<P, TP>
+        extends ANestedObjectWithTypeSupport<P, TP, PP, PTP> implements ICrisObject<P, TP>, Cloneable
 {
     
     @Embedded    
@@ -50,4 +50,9 @@ public abstract class ACrisNestedObject<P extends ANestedProperty<TP>, TP extend
         this.sourceReference = sourceReference;
     }  
 
+    @Override
+    public ACrisNestedObject<P, TP, PP, PTP> clone() throws CloneNotSupportedException
+    {
+        return (ACrisNestedObject<P, TP, PP, PTP>)super.clone();
+    }
 }

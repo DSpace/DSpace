@@ -163,6 +163,7 @@
 		</property>
 		<property name="validator" ref="searchPJValidator" />
 	</bean>
+	
 	<bean id="exportFormController"
 		class="org.dspace.app.webui.cris.controller.ExportFormController">
 		<property name="applicationService">
@@ -227,7 +228,7 @@
 			<ref bean="applicationService" />
 		</property>
 		<property name="successView">
-			<value>redirect:/cris/rp/administrator/import.htm</value>
+			<value>redirect:/cris/administrator/import.htm</value>
 		</property>
 		<property name="formView">
 			<value>import</value>
@@ -345,6 +346,14 @@
 	</bean>	
 		
 	
+	<!-- Explore controller configuration -->
+	<bean id="exploreController"
+		class="org.dspace.app.webui.cris.controller.ExploreController">
+		<property name="detailsView">
+			<value>explore</value>
+		</property>		
+	</bean>
+	
 	
 	<!-- Start Researcher controller configurations -->
 	<bean id="detailsResearcherController"
@@ -352,6 +361,7 @@
 		<property name="applicationService">
 			<ref bean="applicationService" />
 		</property>
+		<property name="processors" ref="processorService" />
 		<property name="subscribeService" ref="CrisSubscribeService" />
 		<constructor-arg index="0">
 			<value>org.dspace.app.cris.model.ResearcherPage</value>
@@ -1794,6 +1804,7 @@
 		<property name="applicationService">
 			<ref bean="applicationService" />
 		</property>
+		<property name="processors" ref="processorService" />
 		<property name="subscribeService" ref="CrisSubscribeService" />		
 		<constructor-arg index="0">
 			<value>org.dspace.app.cris.model.Project</value>
@@ -3264,6 +3275,7 @@
 		<property name="applicationService">
 			<ref bean="applicationService" />
 		</property>		
+		<property name="processors" ref="processorService" />
 		<property name="subscribeService" ref="CrisSubscribeService" />
 		<constructor-arg index="0">
 			<value>org.dspace.app.cris.model.OrganizationUnit</value>
@@ -6414,6 +6426,7 @@
 		<property name="applicationService">
 			<ref bean="applicationService" />
 		</property>		
+		<property name="processors" ref="processorService" />	
 		<property name="subscribeService" ref="CrisSubscribeService" />
 		<constructor-arg index="0">
 			<value>org.dspace.app.cris.model.ResearchObject</value>
@@ -6484,6 +6497,8 @@
 				<prop key="/stats/ou.html">ouStatisticsController</prop>
 				<prop key="/stats/do.html">doStatisticsController</prop>
 				<prop key="/stats/*.html">doStatisticsController</prop>
+				<!-- explore -->
+				<prop key="/explore/*">exploreController</prop>
 				
 				<!-- Search -->
 				<prop key="/rp/search.htm">searchRPFormController</prop>
@@ -6560,6 +6575,8 @@
 				<prop key="/administrator/rp/index.htm">adminRPController</prop>
 				<prop key="/administrator/project/index.htm">adminProjectController</prop>
 				<prop key="/administrator/ou/index.htm">adminOUController</prop>				
+				<prop key="/administrator/import.htm">importFormController</prop>
+				<prop key="/administrator/export.htm">exportFormController</prop>
 				
 				<!-- Administration RP list and add functionality -->							
 				<prop key="/administrator/rp/list.htm">adminListResearcherPageController</prop>								

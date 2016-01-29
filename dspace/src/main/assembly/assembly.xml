@@ -91,6 +91,11 @@
          <outputDirectory>config</outputDirectory>
          <filtered>true</filtered>
       </file>
+	  <file>
+         <source>solr/search/conf/database.properties</source>
+         <outputDirectory>solr/search/conf</outputDirectory>
+         <filtered>true</filtered>
+      </file>
    </files>
 
    <!--

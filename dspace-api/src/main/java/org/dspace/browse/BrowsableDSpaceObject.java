@@ -7,11 +7,14 @@
  */
 package org.dspace.browse;
 
+import java.util.Map;
+
 import org.dspace.content.Metadatum;
 import org.dspace.discovery.IGlobalSearchResult;
 
 public interface BrowsableDSpaceObject extends IGlobalSearchResult
 {
+	public Map<String, Object> getExtraInfo();
 
     public boolean isArchived();
 

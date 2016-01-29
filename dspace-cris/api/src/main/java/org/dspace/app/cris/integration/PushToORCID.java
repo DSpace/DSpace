@@ -113,7 +113,9 @@ import org.dspace.utils.DSpace;
 
 import it.cilea.osd.common.core.SingleTimeStampInfo;
 import it.cilea.osd.jdyna.value.BooleanValue;
+import it.cilea.osd.jdyna.value.EmbeddedLinkValue;
 import it.cilea.osd.jdyna.value.TextValue;
+import it.cilea.osd.jdyna.widget.WidgetLink;
 
 public class PushToORCID {
 
@@ -527,7 +529,13 @@ public class PushToORCID {
 				if (force || (researcher.getProprietaDellaTipologia(rppd) != null
 						&& !researcher.getProprietaDellaTipologia(rppd).isEmpty()
 						&& (Boolean) researcher.getProprietaDellaTipologia(rppd).get(0).getObject())) {
-					listMetadata.add(metadata.toString());
+					if (metadata.getTypo().getRendering() instanceof WidgetLink) {
+						EmbeddedLinkValue link = (EmbeddedLinkValue) metadata.getObject();
+						listMetadata.add(link.getDescriptionLink()+"###"+link.getValueLink());
+					}
+					else {
+						listMetadata.add(metadata.toString());
+					}
 				}
 			}
 
@@ -964,6 +972,20 @@ public class PushToORCID {
 		ExternalIdentifiers externalIdentifiers = new ExternalIdentifiers();
 		boolean buildResearcherUrls = false;
 		boolean buildExternalIdentifier = false;
+		
+		if (metadata.containsKey("researcher-urls")) {
+			List<String> links = metadata.get("researcher-urls");
+			for (String l : links) {
+				ResearcherUrl researcherUrl = new ResearcherUrl();
+				researcherUrl.setUrlName(l.split("###")[0]);
+				Url url = new Url();
+				url.setValue(l.split("###")[1]);
+				researcherUrl.setUrl(url);
+				researcherUrls.getResearcherUrl().add(researcherUrl);
+				buildResearcherUrls = true;
+			}
+		}
+		
 		for (String key : metadata.keySet()) {
 			if (key.startsWith("researcher-url-") || key.startsWith("external-identifier-")) {
 				RPPropertiesDefinition rpPD = applicationService.findPropertiesDefinitionByShortName(
@@ -976,7 +998,7 @@ public class PushToORCID {
 							researcherUrl.setUrlName(rpPD.getLabel());
 							Url url = new Url();
 							url.setValue(value);
-							researcherUrl.getUrl();
+							researcherUrl.setUrl(url);
 							researcherUrls.getResearcherUrl().add(researcherUrl);
 							buildResearcherUrls = true;
 						}
@@ -1243,6 +1265,7 @@ public class PushToORCID {
 								mapResearcherMetadataToSend, orcidConfigurationMapping);
 						if (profile != null) {
 							try {
+								OrcidPreferencesUtils.printXML(profile);
 								OrcidMessage message = orcidService.updateBio(orcid, tokenUpdateBio, profile);
 								if (message.getErrorDesc() != null) {
 									throw new RuntimeException(message.getErrorDesc().getContent());
@@ -1503,7 +1526,7 @@ public class PushToORCID {
 						mapPublicationsToSend.put(owner, items);
 						OrcidWorks works = PushToORCID.buildOrcidWorks(context, owner, mapPublicationsToSend);
 						String error = null;
-
+						OrcidPreferencesUtils.printXML(works);
 						if (works != null) {
 							try {
 								orcidService.putWorks(orcid, tokenCreateWork, works);

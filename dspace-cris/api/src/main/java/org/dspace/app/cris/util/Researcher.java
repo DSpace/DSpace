@@ -191,5 +191,8 @@ public class Researcher implements EPersonCRISIntegration
         return dspace.getServiceManager().getServiceByName(
                 "orcidPreferencesUtils", OrcidPreferencesUtils.class);
     }
-    
+
+    public List<ICrisHomeProcessor> getCrisProcessorService() {
+        return dspace.getServiceManager().getServicesByType(ICrisHomeProcessor.class);
+    }
 }

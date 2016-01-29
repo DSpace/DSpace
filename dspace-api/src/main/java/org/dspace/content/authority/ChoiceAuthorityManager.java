@@ -73,6 +73,46 @@ public final class ChoiceAuthorityManager
         final String choicesPlugin = "choices.plugin.";
         final String choicesPresentation = "choices.presentation.";
         final String choicesClosed = "choices.closed.";
+        Context context = null;
+        try 
+        {
+	        context = new Context();
+	        String defaultKey =  makeFieldKey(MetadataSchema.DC_SCHEMA, "authority", "default");
+	        String defaultfKey = ConfigurationManager.getProperty(choicesPlugin+MetadataSchema.DC_SCHEMA+".authority.default");
+	        ChoiceAuthority maDefault = (ChoiceAuthority) PluginManager
+                    .getNamedPlugin(ChoiceAuthority.class,
+                            ConfigurationManager
+                                    .getProperty(defaultKey));
+	        MetadataField[] tmp = MetadataField.findAllByElement(
+	                context, MetadataSchema.DC_SCHEMA_ID, "authority", Item.ANY);
+	        for(MetadataField mf : tmp) {
+	            String tmpKey = makeFieldKey(MetadataSchema.DC_SCHEMA, mf.getElement(), mf.getQualifier());
+	            String tmpfKey = ConfigurationManager.getProperty(choicesPlugin+MetadataSchema.DC_SCHEMA+"."+mf.getElement()+"."+mf.getQualifier());
+	            ChoiceAuthority ma = (ChoiceAuthority) PluginManager
+                        .getNamedPlugin(ChoiceAuthority.class,
+                                ConfigurationManager
+                                        .getProperty(tmpKey));
+	            if (ma == null)
+	            {
+	                ma = maDefault;
+	                tmpfKey = defaultfKey;
+	            }
+
+	            md2authorityname.put(tmpKey,
+	                        ConfigurationManager.getProperty(tmpfKey));
+                controller.put(tmpKey, ma);
+	        }
+        }
+        catch (Exception e) {
+        	log.error(e.getMessage(), e);
+        }
+        finally
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+        }
         property: while (pn.hasMoreElements())
         {
             String key = (String) pn.nextElement();
@@ -90,50 +130,9 @@ public final class ChoiceAuthorityManager
                         continue property;
                     }
                     
-                    Context context = null;
+
                     try {
-                        String[] metadata = fkey.split("\\_");
-                        context = new Context();
-                        int schemaID = MetadataSchema.find(context,
-                                metadata[0]).getSchemaID();
-                        ChoiceAuthority ma = null;
-                        if (fkey.equals("dc_authority_default"))
-                        {
-
-                            ma = (ChoiceAuthority) PluginManager
-                                    .getNamedPlugin(ChoiceAuthority.class,
-                                            ConfigurationManager
-                                                    .getProperty(key));
-                            if (ma == null)
-                            {
-                                log.warn("Skipping invalid configuration for "
-                                        + key
-                                        + " because named plugin not found: "
-                                        + ConfigurationManager.getProperty(key));
-                                continue property;
-                            }
-                            
-                            MetadataField[] tmp = MetadataField.findAllByElement(
-                                    context, schemaID, "authority", Item.ANY);
-                            for(MetadataField mf : tmp) {
-                                String tmpKey = makeFieldKey(metadata[0], mf.getElement(), mf.getQualifier());
-                                String tmpfKey = ConfigurationManager.getProperty(choicesPlugin+metadata[0]+"."+mf.getElement()+"."+mf.getQualifier());
-                                if (tmpfKey == null)
-                                {
-                                    md2authorityname.put(tmpKey,
-                                            ConfigurationManager.getProperty(key));
-                                    controller.put(tmpKey, ma);
-                                }                                
-                            }                            
-                        }
-                        else
-                        {
-
-                            MetadataField.findByElement(context, schemaID,
-                                    metadata[1],
-                                    metadata.length > 2 ? metadata[2] : null)
-                                    .getFieldID();
-                            ma = (ChoiceAuthority) PluginManager
+                        ChoiceAuthority ma = (ChoiceAuthority) PluginManager
                                     .getNamedPlugin(ChoiceAuthority.class,
                                             ConfigurationManager
                                                     .getProperty(key));
@@ -148,7 +147,7 @@ public final class ChoiceAuthorityManager
 
                         md2authorityname.put(fkey,
                                 ConfigurationManager.getProperty(key));
-                        }
+
                         log.debug("Choice Control: For field=" + fkey
                                 + ", Plugin=" + ma);
                     }
@@ -158,15 +157,6 @@ public final class ChoiceAuthorityManager
                                 + key
                                 + ": sanity check failure, it's not a real field - note that could be an item enhancer tips");
                     }
-                    finally
-                    {
-                        if (context != null && context.isValid())
-                        {
-                            context.abort();
-                        }
-                    }
-                  
-                    
                 }
                 else if (key.startsWith(choicesPresentation))
                 {

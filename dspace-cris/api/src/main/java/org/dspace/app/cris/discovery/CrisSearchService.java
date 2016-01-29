@@ -109,7 +109,8 @@ public class CrisSearchService extends SolrServiceImpl
     public void indexContent(Context context, DSpaceObject dso, boolean force)
             throws SQLException
     {
-        if (dso != null && dso.getType() >= CrisConstants.CRIS_TYPE_ID_START)
+    	if (dso == null) return;
+        if (dso.getType() >= CrisConstants.CRIS_TYPE_ID_START)
         {
             indexCrisObject((ACrisObject) dso, force);
         }
@@ -176,10 +177,10 @@ public class CrisSearchService extends SolrServiceImpl
         if (type != null && type >= CrisConstants.CRIS_TYPE_ID_START)
         {
             Integer id = (Integer) doc.getFirstValue("search.resourceid");
-
+            ACrisObject o = null;
             if (type > CrisConstants.CRIS_DYNAMIC_TYPE_ID_START)
             {
-                return getApplicationService()
+                o = getApplicationService()
                 .get(ResearchObject.class, id);
             }
             else
@@ -187,20 +188,31 @@ public class CrisSearchService extends SolrServiceImpl
                 switch (type)
                 {
                 case CrisConstants.RP_TYPE_ID:
-                    return getApplicationService()
+                	o = getApplicationService()
                             .get(ResearcherPage.class, id);
+                	break;
 
                 case CrisConstants.PROJECT_TYPE_ID:
-                    return getApplicationService().get(Project.class, id);
+                	o = getApplicationService().get(Project.class, id);
+                	break;
 
                 case CrisConstants.OU_TYPE_ID:
-                    return getApplicationService().get(OrganizationUnit.class,
+                	o = getApplicationService().get(OrganizationUnit.class,
                             id);
+                	break;
 
                 default:
-                    return null;
+                	o = null;
                 }
             }
+            
+            if (o != null)
+            {
+            	for (String f : doc.getFieldNames()) {
+            		o.extraInfo.put(f, doc.getFirstValue(f));
+                }
+            }
+            return o;
         }
         else
         {

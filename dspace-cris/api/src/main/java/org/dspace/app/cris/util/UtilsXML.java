@@ -67,6 +67,9 @@ public class UtilsXML
 
     public static final String ELEMENT_RESEARCHER = "researcher";
 
+    public static final String NAMEATTRIBUTE_LOCAL_FILE = "local";
+    public static final String NAMEATTRIBUTE_DELETE_FILE = "delete";
+    
     public static final String NAMEATTRIBUTE_SRC_LINK = "src";
 
     public static final String NAMEATTRIBUTE_VISIBILITY = "visibility";

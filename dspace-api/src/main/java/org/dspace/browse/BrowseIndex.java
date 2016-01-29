@@ -62,9 +62,9 @@ public final class BrowseIndex
     private boolean displayFrequencies = true;
 
     /** additional 'internal' tables that are always defined */
-    private static BrowseIndex itemIndex      = new BrowseIndex("bi_item");
-    private static BrowseIndex withdrawnIndex = new BrowseIndex("bi_withdrawn");
-    private static BrowseIndex privateIndex = new BrowseIndex("bi_private");
+    private static BrowseIndex itemIndex      = new BrowseIndex("bi_item", "item");
+    private static BrowseIndex withdrawnIndex = new BrowseIndex("bi_withdrawn", "item");
+    private static BrowseIndex privateIndex = new BrowseIndex("bi_private", "item");
 
 
     /**
@@ -78,13 +78,17 @@ public final class BrowseIndex
      * Constructor for creating generic / internal index objects
      * @param baseName The base of the table name
      */
-    private BrowseIndex(String baseName)
+    private BrowseIndex(String baseName) {
+    	this(baseName, "item");
+    }
+    
+    private BrowseIndex(String baseName, String type)
     {
         try
         {
             number = -1;
             tableBaseName = baseName;
-            displayType = "item";
+            displayType = type;
             sortOption = SortOption.getDefaultSortOption();
         }
         catch (SortException se)
@@ -751,7 +755,7 @@ public final class BrowseIndex
         }
         else
         {
-            return new BrowseIndex("bi_"+displayType);
+            return new BrowseIndex("bi_"+displayType, displayType);
         }       
     }
     

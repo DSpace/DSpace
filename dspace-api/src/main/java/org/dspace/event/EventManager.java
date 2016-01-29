@@ -284,6 +284,8 @@ public class EventManager
         {
             Context ctx = new Context();
 
+            try {
+
             for (Iterator ci = ((Dispatcher) dispatcher).getConsumers()
                     .iterator(); ci.hasNext();)
             {
@@ -292,6 +294,13 @@ public class EventManager
                 {
                     cp.getConsumer().finish(ctx);
                 }
+                }
+
+                ctx.complete();
+
+            } catch (Exception e) {
+                ctx.abort();
+                throw e;
             }
             return;
 

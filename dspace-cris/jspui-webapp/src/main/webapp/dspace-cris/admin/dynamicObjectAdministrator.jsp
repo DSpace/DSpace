@@ -43,7 +43,7 @@
 		<span id="errorMessage" class="alert alert-danger"><fmt:message key="jsp.layout.hku.prefix-error-code"/> <fmt:message key="${error}"/></span>
 	</c:if>
 
-	<ul>
+	<ul class="blank-page">
 		<li>
 			<a href="<%=request.getContextPath()%>/cris/administrator/${path}/listTabs.htm"><fmt:message
 			key="jsp.dspace-admin.hku.jdyna-configuration.listtabs" /></a>

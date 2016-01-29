@@ -6,14 +6,26 @@
  * http://www.dspace.org/license/
  */
 .banner img {background-color: #FFFFFF;padding:15px;margin:20px;}
-.brand {padding-top: 30px;}
 .brand h4 {color: #999999}
+#communitylist-top-menu a, #userloggedin-top-menu a {padding-top:0.3em;padding-bottom:0.3em;}
+#user-top-menu, #userloggedin-top-menu {margin-right: 15px;}
+footer {padding-top: 1em;}
+footer.navbar-inverse *:not(.panel > *) {color: white;}
+footer .extra-footer{background-color: black;}
+#designedby img {margin-right: 5px;}
+#formsearch-top-menu {width: 310px;}
+div.panel.panel-primary ul.list-group li.list-group-item.active {border-left: 3px solid #428bca; background: white;}
+div.panel.panel-primary ul.list-group li.list-group-item.active .badge {background-color: #428bca;}
 ol.breadcrumb li {color: white; font-style: italic;}
 ol.breadcrumb li a {color: white; font-weight: bold; font-style: normal;}
-body.undernavigation {overflow-x: hidden; padding-top: 65px;}
+body.undernavigation {overflow-x: hidden;
+// padding-top: 65px;
+}
+.navbar-square {border-radius: 0px;}
 #content {padding-bottom:60px;}
-#designedby {padding: 5px;}
+#designedby {padding-top: 5px; padding-bottom:5px;}
 #footer_feedback {padding-top: 12px;}
+#footer_feedback > a {margin-left:5px;}
 input[type="file"] {display: block;height: auto;}
 div.panel-primary div.panel-heading a {color: white;}
 /* This magic gets the 16x16 icon to show up.. setting height/width didn't
@@ -116,3 +128,94 @@ span.batchimport-error-tab {
 span.batchimport-error-caused {
 	font-weight:bold;
 }
+
+div.carousel-inner div.item div.list-group-item {
+	background-color: inherit;
+}
+
+div.carousel-inner div.item div.list-group-item div.list-group-item-heading h4.text-primary {
+	color: inherit;
+}
+
+
+.metric-ranking > span {
+    display: block;
+    height: 1.7em;
+    width: 1.7em;
+    line-height: 1.7em;
+    -moz-border-radius: 0.85em;
+    border-radius: 0.85em;
+    background-color: #f0ad4e;
+    color: white;
+    text-align: center;
+    font-size: 0.75em;
+}
+.metric-ranking {
+    display: block;
+    height: 1.7em;
+    width: 1.7em;
+    padding: 0.2em;
+    line-height: 1.7em;
+    -moz-border-radius: 0.85em;
+    border-radius: 0.85em;
+    background-color: white;
+    color: white;
+    text-align: center;
+}
+.metric-counter {
+	font-size: 1.5em;
+	font-family: sans-serif;
+	font-weight: bolder;
+}
+.media > .media-heading {
+	text-transform: uppercase;
+}
+.media > .media-body > .row {
+	text-transform: uppercase;
+}
+
+.media {
+	padding: 1em;
+	border-radius: 0.4em; 
+}
+
+.media.download, .media.download_aggregate, .media.download_count,
+.media.download a, .media.download_aggregate a, .media.download_count a {
+	color: white;
+	background: #c0392b;
+}
+.media.view, .media.view_aggregate, .media.view_count,
+.media.view a, .media.view_aggregate a, .media.view_count a {
+	color: white;
+	background: #72c02c;
+}
+.media.scopus, .media.scopus_aggregate, .media.scopus_count,
+.media.scopus a, .media.scopus_aggregate a, .media.scopus_count a {
+	color: white;
+	background: #ff7800;
+}
+.media.pubmed, .media.pubmed_aggregate, .media.pubmed_count,
+.media.pubmed a, .media.pubmed_aggregate a, .media.pubmed_count a {
+	color: white;
+	background: #141927;
+}
+.media.wos, .media.wos_aggregate, .media.wos_count,
+.media.wos a, .media.wos_aggregate a, .media.wos_count a {
+	color: white;
+	background: #505050;
+}
+.media.google, .media.google a {
+	color: white;
+	background: #4285f4;
+}
+.media.altmetric {
+	background: white;
+	color: #c7254e;
+	border: 3px solid #c7254e;
+}
+.media > .media-left > i.fa {
+	font-size: 3em;
+}
+
+.col-lg-12 > .media, .col-xs-12 > .media  {margin-bottom: 1em; width: 100%;}
+.media-left {float:left;}

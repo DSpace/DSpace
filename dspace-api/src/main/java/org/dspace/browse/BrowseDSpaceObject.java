@@ -21,6 +21,7 @@ public class BrowseDSpaceObject extends BrowseItem
     {
         super(context, browseObject.getID(), browseObject.isArchived(), browseObject.isWithdrawn(), browseObject.isDiscoverable());
         this.browseObject = browseObject;
+        this.extraInfo = browseObject.getExtraInfo();
     }
     
     @Override

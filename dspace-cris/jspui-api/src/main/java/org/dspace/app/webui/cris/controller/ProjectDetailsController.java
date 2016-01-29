@@ -11,6 +11,7 @@ import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.model.OrganizationUnit;
 import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.jdyna.BoxProject;
 import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
@@ -29,6 +31,7 @@ import org.dspace.app.cris.model.jdyna.TabProject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
+import org.dspace.app.cris.util.ICrisHomeProcessor;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
@@ -57,7 +60,7 @@ public class ProjectDetailsController
 
     private CrisSubscribeService subscribeService;
 
-    
+    private List<ICrisHomeProcessor<Project>> processors;
     
     public ProjectDetailsController(Class<Project> anagraficaObjectClass,
             Class<ProjectPropertiesDefinition> classTP,
@@ -136,6 +139,15 @@ public class ProjectDetailsController
                     grant);
             model.put("subscribed", subscribed);
            
+        }
+        
+        List<ICrisHomeProcessor<Project>> resultProcessors = new ArrayList<ICrisHomeProcessor<Project>>();
+        for (ICrisHomeProcessor processor : processors)
+        {
+            if (Project.class.isAssignableFrom(processor.getClazz()))
+            {
+                processor.process(context, request, response, grant);
+            }
         }
         
         request.setAttribute("sectionid", StatsConfig.DETAILS_SECTION);
@@ -253,4 +265,8 @@ public class ProjectDetailsController
     {
         this.subscribeService = rpSubscribeService;
     }
+
+	public void setProcessors(List<ICrisHomeProcessor<Project>> processors) {
+		this.processors = processors;
+	}
 }

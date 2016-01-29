@@ -42,6 +42,8 @@ public class BeanComponent implements ICrisBeanComponent
         
     Map<String, String> subQueries = new HashMap<String,String>();
     
+    private List<String> extraFields;
+    
     public String getComponentIdentifier()
     {
         return componentIdentifier;
@@ -161,6 +163,17 @@ public class BeanComponent implements ICrisBeanComponent
     public void setSubQueries(Map<String, String> subQueries)
     {
         this.subQueries = subQueries;
+    }
+
+    @Override
+    public List<String> getExtraFields()
+    {
+        return extraFields;
+    }
+
+    public void setExtraFields(List<String> extraFields)
+    {
+        this.extraFields = extraFields;
     }
 
            

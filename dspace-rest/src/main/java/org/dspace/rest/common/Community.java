@@ -171,6 +171,10 @@ public class Community extends DSpaceObject{
         return logo;
     }
 
+    public void setLogo(Bitstream logo) {
+        this.logo = logo;
+    }
+
     // Renamed because of xml annotation exception with this attribute and getSubCommunities.
     @XmlElement(name = "subcommunities", required = true)
 	public List<Community> getSubcommunities() {

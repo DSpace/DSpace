@@ -36,8 +36,6 @@ public class DateDisplayStrategy extends ASimpleDisplayStrategy
                     metadata = UIUtil.displayDate(dd, false, false, hrq);
                 }
             }         	
-            DCDate dd = new DCDate(metadataArray[0].value);
-            metadata = UIUtil.displayDate(dd, false, false, hrq);
         }
         metadata = (emph ? "<strong>" : "") + metadata
                 + (emph ? "</strong>" : "");

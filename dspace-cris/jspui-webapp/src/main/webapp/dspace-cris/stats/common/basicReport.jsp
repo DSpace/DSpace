@@ -38,25 +38,25 @@
 </ul>
 </div>
 <div id="statstab-content">
-	<div id="statstab-content-continent" class="statstab-content-item statstab-show">
+	<div id="statstab-content-continent" class="statstab-content-item statstab-show blank-page">
 				<c:set var="pieType" >continent</c:set>
 				<stats:piewithtable data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}" useFmt="true"/>
 	</div>
-	<div id="statstab-content-countryCode" class="statstab-content-item">
+	<div id="statstab-content-countryCode" class="statstab-content-item blank-page">
 				<c:set var="pieType" >countryCode</c:set>
 				<stats:piewithtable data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}" useFmt="true"/>
 	</div>
-	<div id="statstab-content-city" class="statstab-content-item">
+	<div id="statstab-content-city" class="statstab-content-item blank-page">
 				<c:set var="pieType" >city</c:set>
 				<stats:piewithtable data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}"/>
 	</div>
 	<c:if test="${mode == 'download'}">	
-	<div id="statstab-content-id" class="statstab-content-item">	 
+	<div id="statstab-content-id" class="statstab-content-item blank-page">	 
 		<c:set var="pieType" >sectionid</c:set>
 		<stats:piewithtable data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}" useLocalMap="true"/>
 	</div>
 	</c:if>
-	<div id="statstab-content-time" class="statstab-content-item">
+	<div id="statstab-content-time" class="statstab-content-item blank-page">
 				<c:set var="objectName">time</c:set>				
 				<%@include file="time.jsp"%>
 	</div>

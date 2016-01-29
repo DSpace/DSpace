@@ -1,0 +1,19 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>  
+  <groupId>org.dspace</groupId>
+  <artifactId>metrics-lookup-web</artifactId>  
+  <packaging>war</packaging>
+  <parent>
+    <artifactId>article-metrics-all</artifactId>
+    <groupId>org.dspace</groupId>
+    <version>CRIS-5.4.0-SNAPSHOT</version>
+  </parent>
+  
+  <name>Article Metrics :: PubMed :: Lookup JSP Web</name>
+  
+   <!--Force UTF-8 encoding during build on all platforms-->
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <root.basedir>${basedir}/../..</root.basedir>
+   </properties>
+</project>

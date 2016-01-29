@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                  http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                  http://www.springframework.org/schema/context
+                  http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+    <bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="ItemStatsViewIndicatorsPlugin">
+   		<property name="name" value="ItemStatsViewIndicatorsPlugin"/>
+   		<property name="resourceTypeId" value="2"/>
+   	</bean>
+   
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="RPStatsViewIndicatorsPlugin">
+   		<property name="name" value="RPStatsViewIndicatorsPlugin"/>
+   		<property name="resourceTypeId" value="9"/>
+   	</bean>
+
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="OUStatsViewIndicatorsPlugin">
+   		<property name="name" value="OUStatsViewIndicatorsPlugin"/>
+   		<property name="resourceTypeId" value="11"/>
+   	</bean>   
+   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsViewIndicatorsPlugin" name="PJStatsViewIndicatorsPlugin">
+   		<property name="name" value="PJStatsViewIndicatorsPlugin"/>
+   		<property name="resourceTypeId" value="10"/>
+   	</bean>
+   	
+   	
+   	<!-- <bean class="org.dspace.app.cris.statistics.plugin.StatsAggregateIndicatorsPlugin" name="RPStatsAggregatorScopusIndicatorsPlugin">
+   		<property name="name" value="RPStatsAggregatorScopusIndicatorsPlugin"/>
+   		<property name="type" value="scopus"/>
+   		<property name="crisEntityClazz" value="org.dspace.app.cris.model.ResearcherPage"/>
+   		<property name="crisEntityTypeId" value="9"/>
+   	</bean>
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsAggregateIndicatorsPlugin" name="RPStatsAggregatorWOSIndicatorsPlugin">
+   		<property name="name" value="RPStatsAggregatorWOSIndicatorsPlugin"/>
+   		<property name="type" value="wos"/>
+   		<property name="crisEntityClazz" value="org.dspace.app.cris.model.ResearcherPage"/>
+   		<property name="crisEntityTypeId" value="9"/>
+   	</bean>
+   	 -->
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsAggregateIndicatorsPlugin" name="RPStatsAggregatorPUBMEDIndicatorsPlugin">
+   		<property name="name" value="RPStatsAggregatorPUBMEDIndicatorsPlugin"/>
+   		<property name="type" value="pubmed"/>
+   		<property name="crisEntityClazz" value="org.dspace.app.cris.model.ResearcherPage"/>
+   		<property name="crisEntityTypeId" value="9"/>
+   	</bean>
+   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPeriodIndicatorsPlugin" name="ItemStatsPeriodWeekPUBMEDIndicatorsPlugin">
+   		<property name="name" value="ItemStatsPeriodWeekPUBMEDIndicatorsPlugin"/>
+   		<property name="type" value="pubmed"/>
+   		<property name="frequency" value="_last1"/>
+   	</bean>
+   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPeriodIndicatorsPlugin" name="ItemStatsPeriodMonthPUBMEDIndicatorsPlugin">
+   		<property name="name" value="ItemStatsPeriodMonthPUBMEDIndicatorsPlugin"/>
+   		<property name="type" value="pubmed"/>
+   		<property name="frequency" value="_last2"/>
+   	</bean>
+
+<!--   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPeriodIndicatorsPlugin" name="ItemStatsPeriodWeekSCOPUSIndicatorsPlugin">
+   		<property name="name" value="ItemStatsPeriodWeekSCOPUSIndicatorsPlugin"/>
+   		<property name="type" value="scopus"/>
+   		<property name="frequency" value="_last1"/>
+   	</bean>
+   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPeriodIndicatorsPlugin" name="ItemStatsPeriodMonthSCOPUSIndicatorsPlugin">
+   		<property name="name" value="ItemStatsPeriodMonthSCOPUSIndicatorsPlugin"/>
+   		<property name="type" value="scopus"/>
+   		<property name="frequency" value="_last2"/>
+   	</bean>
+   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPeriodIndicatorsPlugin" name="ItemStatsPeriodWeekWOSIndicatorsPlugin">
+   		<property name="name" value="ItemStatsPeriodWeekWOSIndicatorsPlugin"/>
+   		<property name="type" value="wos"/>
+   		<property name="frequency" value="_last1"/>
+   	</bean>
+   	
+   <bean class="org.dspace.app.cris.statistics.plugin.StatsPeriodIndicatorsPlugin" name="ItemStatsPeriodMonthWOSIndicatorsPlugin">
+   		<property name="name" value="ItemStatsPeriodMonthWOSIndicatorsPlugin"/>
+   		<property name="type" value="wos"/>
+   		<property name="frequency" value="_last2"/>
+   	</bean>
+ -->   	
+ 
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPeriodIndicatorsPlugin" name="ViewStatsPeriodWeekIndicatorsPlugin">
+   		<property name="name" value="ViewStatsPeriodWeekIndicatorsPlugin"/>
+   		<property name="type" value="view"/>
+   		<property name="frequency" value="_last1"/>
+   	</bean>
+   	
+   <bean class="org.dspace.app.cris.statistics.plugin.StatsPeriodIndicatorsPlugin" name="ViewStatsPeriodMonthIndicatorsPlugin">
+   		<property name="name" value="ViewStatsPeriodMonthIndicatorsPlugin"/>
+   		<property name="type" value="view"/>
+   		<property name="frequency" value="_last2"/>
+   	</bean>
+
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentileViewIndicatorsPlugin">
+   		<property name="name" value="PercentileViewIndicatorsPlugin"/>
+   		<property name="metrics" value="view"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:2</value>
+   			</list>
+   		</property>
+   	</bean>
+
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentileDownloadIndicatorsPlugin">
+   		<property name="name" value="PercentileDownloadIndicatorsPlugin"/>
+   		<property name="metrics" value="download"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:2</value>
+   			</list>
+   		</property>
+   	</bean>
+   	
+<!--    	   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentileScopusIndicatorsPlugin">
+   		<property name="name" value="PercentileScopusIndicatorsPlugin"/>
+   		<property name="metrics" value="scopus"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:2</value>
+   			</list>
+   		</property>
+   	</bean>
+   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentileWOSIndicatorsPlugin">
+   		<property name="name" value="PercentileWOSIndicatorsPlugin"/>
+   		<property name="metrics" value="wos"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:2</value>
+   			</list>
+   		</property>
+   	</bean>
+ -->   	
+   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentilePubmedIndicatorsPlugin">
+   		<property name="name" value="PercentilePubmedIndicatorsPlugin"/>
+   		<property name="metrics" value="pubmed"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:2</value>
+   			</list>
+   		</property>
+   	</bean>
+   	
+<!--    	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentileScopusAggregateIndicatorsPlugin">
+   		<property name="name" value="PercentileScopusAggregateIndicatorsPlugin"/>
+   		<property name="metrics" value="scopus_aggregate"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:9</value>
+   			</list>
+   		</property>
+   	</bean>
+   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentileWOSAggregateIndicatorsPlugin">
+   		<property name="name" value="PercentileWOSAggregateIndicatorsPlugin"/>
+   		<property name="metrics" value="wos_aggregate"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:9</value>
+   			</list>
+   		</property>
+   	</bean>
+ -->
+    	   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentilePubmedAggregateIndicatorsPlugin">
+   		<property name="name" value="PercentilePubmedAggregateIndicatorsPlugin"/>
+   		<property name="metrics" value="pubmed_aggregate"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:9</value>
+   			</list>
+   		</property>
+   	</bean>
+   	
+<!--    	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentileScopusCountIndicatorsPlugin">
+   		<property name="name" value="PercentileScopusCountIndicatorsPlugin"/>
+   		<property name="metrics" value="scopus_count"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:9</value>
+   			</list>
+   		</property>
+   	</bean>
+   	
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentileWOSCountIndicatorsPlugin">
+   		<property name="name" value="PercentileWOSCountIndicatorsPlugin"/>
+   		<property name="metrics" value="wos_count"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:9</value>
+   			</list>
+   		</property>
+   	</bean>
+ -->
+ 
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentilePubmedCountIndicatorsPlugin">
+   		<property name="name" value="PercentilePubmedCountIndicatorsPlugin"/>
+   		<property name="metrics" value="pubmed_count"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:9</value>
+   			</list>
+   		</property>
+   	</bean>
+   	
+ 	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentileViewAggregateIndicatorsPlugin">
+   		<property name="name" value="PercentileViewAggregateIndicatorsPlugin"/>
+   		<property name="metrics" value="view_aggregate"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:9</value>
+   			</list>
+   		</property>
+   	</bean>
+
+   	<bean class="org.dspace.app.cris.statistics.plugin.StatsPercentileIndicatorsPlugin" name="PercentileDownloadAggregateIndicatorsPlugin">
+   		<property name="name" value="PercentileDownloadAggregateIndicatorsPlugin"/>
+   		<property name="metrics" value="download_aggregate"/>
+   		<property name="fq">
+   			<list>
+   				<value>search.resourcetype:9</value>
+   			</list>
+   		</property>
+   	</bean>
+</beans>

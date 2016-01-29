@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>CRIS-5.3.1-SNAPSHOT</version>
+      <version>CRIS-5.4.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -76,10 +76,10 @@
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api</artifactId>
       </dependency>
-      <dependency>
+      <!-- <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api-lang</artifactId>
-      </dependency>
+      </dependency> -->
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>

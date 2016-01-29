@@ -11,6 +11,7 @@ import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.OrganizationUnit;
+import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUProperty;
@@ -29,6 +31,7 @@ import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
+import org.dspace.app.cris.util.ICrisHomeProcessor;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
@@ -55,6 +58,8 @@ public class OUDetailsController
         SimpleDynaController<OUProperty, OUPropertiesDefinition, BoxOrganizationUnit, TabOrganizationUnit>
 {
     private CrisSubscribeService subscribeService;
+    
+    private List<ICrisHomeProcessor<OrganizationUnit>> processors;
 
     public OUDetailsController(Class<OrganizationUnit> anagraficaObjectClass,
             Class<OUPropertiesDefinition> classTP,
@@ -124,12 +129,20 @@ public class OUDetailsController
             return null;
         }
         
-        
         if (subscribeService != null)
         {
             boolean subscribed = subscribeService.isSubscribed(currentUser,
                     ou);
             model.put("subscribed", subscribed);            
+        }
+        
+        List<ICrisHomeProcessor<OrganizationUnit>> resultProcessors = new ArrayList<ICrisHomeProcessor<OrganizationUnit>>();
+        for (ICrisHomeProcessor processor : processors)
+        {
+            if (OrganizationUnit.class.isAssignableFrom(processor.getClazz()))
+            {
+                processor.process(context, request, response, ou);
+            }
         }
         
         request.setAttribute("sectionid", StatsConfig.DETAILS_SECTION);
@@ -247,4 +260,8 @@ public class OUDetailsController
     {
         this.subscribeService = rpSubscribeService;
     }
+
+	public void setProcessors(List<ICrisHomeProcessor<OrganizationUnit>> processors) {
+		this.processors = processors;
+	}
 }

@@ -98,8 +98,8 @@ public class OrcidFundingMetadata extends MappingMetadata {
 		// ABSTRACT
 		addSingleField(ABSTRACT);
 
-		// TITLE
-		addSingleField(TITLE);
+		// TYPE
+		addSingleField(TYPE);
 
 		// AUTHORS (multi)
 		addMultipleWithAuthorityValues(CONTRIBUTORSLEAD);

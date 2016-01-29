@@ -7,17 +7,23 @@
  */
 package org.dspace.discovery;
 
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.configuration.DiscoveryMostViewedConfiguration;
+import org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration;
 import org.dspace.discovery.configuration.DiscoveryViewAndHighlightConfiguration;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.utils.DSpace;
-
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Util methods used by discovery
@@ -111,6 +117,19 @@ public class SearchUtils {
             result.put(configurationExtra.getId(), configurationExtra);
         }
 
+        DiscoveryConfiguration configurationDSpaceObject = null;
+        if("item".equals(item.getTypeText())) {
+        	configurationDSpaceObject = getDiscoveryConfigurationByName("dspaceitem");	
+        }
+        else {
+        	configurationDSpaceObject = getDiscoveryConfigurationByName("dspace"+item.getTypeText());
+        }
+        if(configurationDSpaceObject!=null) {
+            if(!result.containsKey(configurationDSpaceObject.getId())){
+                result.put(configurationDSpaceObject.getId(), configurationDSpaceObject);
+            }        	
+        }
+        
         //Add special global discoveryConfiguration
         configurationExtra = getDiscoveryConfigurationByName(DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME);
         if(!result.containsKey(configurationExtra.getId())){
@@ -142,4 +161,15 @@ public class SearchUtils {
 		return StringUtils.equals(configuration.getId(), DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME);
 	}
 
+    public static DiscoveryRecentSubmissionsConfiguration getRecentSubmissionConfiguration(
+            String configurationName)
+    {
+        return getDiscoveryConfigurationByName(configurationName).getRecentSubmissionConfiguration();
+    }
+
+    public static DiscoveryMostViewedConfiguration getMostViewedConfiguration(
+            String configurationName)
+    {
+        return getDiscoveryConfigurationByName(configurationName).getMostViewConfiguration();
+    }
 }

@@ -98,18 +98,15 @@ public class DiscoveryUIUtils {
     }
 
     /**
-     * Escape special characters in a user-entered query, based on the
-     * underlying search service.
-     * <P>
-     * WARNING: This likely shouldn't be used in field-based queries
-     * (e.g. search/browse by title) as it may unintentionally escape the
-     * special characters used to denote fields (e.g. ":").
+     * Escape colon-space sequence in a user-entered query, based on the
+     * underlying search service. This is intended to let end users paste in a
+     * title containing colon-space without requiring them to escape the colon.
      *
-     * @param query
-     * @return query with special characters escaped
+     * @param query user-entered query string
+     * @return query with colon in colon-space sequence escaped
      */
     public static String escapeQueryChars(String query)
     {
-        return searchService.escapeQueryChars(query);
+        return StringUtils.replace(query, ": ", "\\: ");
     }
 }

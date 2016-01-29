@@ -20,6 +20,8 @@ public class DiscoveryRecentSubmissionsConfiguration {
     private int max = 5;
     private boolean useAsHomePage;
 
+    private DiscoveryViewConfiguration metadataFields; 
+    
     public String getMetadataSortField() {
         return metadataSortField;
     }
@@ -52,5 +54,15 @@ public class DiscoveryRecentSubmissionsConfiguration {
 
     public boolean getUseAsHomePage() {
         return useAsHomePage;
+    }
+
+    public DiscoveryViewConfiguration getMetadataFields()
+    {
+        return metadataFields;
+    }
+
+    public void setMetadataFields(DiscoveryViewConfiguration metadataFields)
+    {
+        this.metadataFields = metadataFields;
     }
 }

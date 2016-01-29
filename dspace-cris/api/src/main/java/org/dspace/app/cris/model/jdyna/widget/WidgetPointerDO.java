@@ -7,11 +7,16 @@
  */
 package org.dspace.app.cris.model.jdyna.widget;
 
+import it.cilea.osd.jdyna.editor.ModelPropertyEditor;
+import it.cilea.osd.jdyna.service.IPersistenceDynaService;
 import it.cilea.osd.jdyna.widget.WidgetPointer;
+
+import java.beans.PropertyEditor;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.dspace.app.cris.model.jdyna.editor.PointerPropertyEditor;
 import org.dspace.app.cris.model.jdyna.value.DOPointer;
 import org.hibernate.annotations.Type;
 
@@ -31,6 +36,15 @@ public class WidgetPointerDO extends WidgetPointer<DOPointer>
     public String getFilterExtended()
     {
         return filterExtended;
+    }
+
+    @Override
+    public PropertyEditor getImportPropertyEditor(
+            IPersistenceDynaService applicationService, String service)
+    {
+        PointerPropertyEditor propertyEditor = new PointerPropertyEditor(getTargetValoreClass(), service);
+        propertyEditor.setApplicationService(applicationService);
+        return propertyEditor;
     }
     
     

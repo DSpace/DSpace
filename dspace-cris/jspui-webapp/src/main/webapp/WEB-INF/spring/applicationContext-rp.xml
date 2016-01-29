@@ -48,6 +48,7 @@
 		<constructor-arg ref="applicationService" />
 	</bean>
 
+	<bean id="processorService" factory-bean="researcher" factory-method="getCrisProcessorService" />
 	
 	<bean id="CrisSubscribeService" factory-bean="researcher" factory-method="getCrisSubscribeService" />
     <bean id="statSubscribeService" factory-bean="researcher" factory-method="getStatSubscribeService" />

@@ -25,35 +25,53 @@
 				<entry key="group-left">
 					<list>
 						<bean class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
-							<property name="name" value="crisrp"/>							
+							<property name="name" value="researcherprofiles"/>							
 						</bean>		
 					</list>				
 				</entry>
 				<entry key="group-center">
 					<list>
 						<bean class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
-							<property name="name" value="crisou"/>							
+							<property name="name" value="orgunits"/>							
 						</bean>
 						<bean class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
-							<property name="name" value="crisevents"/>							
+							<property name="name" value="fundings"/>							
 						</bean>
 						<bean class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
-							<property name="name" value="crisproject"/>							
+							<property name="name" value="journal"/>							
+						</bean>
+						<bean class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
+							<property name="name" value="events"/>							
 						</bean>
 					</list>				
 				</entry>
 				<entry key="group-right">
 					<list>
-						<bean class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
-							<property name="name" value="dspacepublication"/>
-<!-- 							<property name="secondLevelFacet">
-								<list>
-									<value>itemtype</value>
-								</list>
-							</property> -->							
+						<bean
+							class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
+							<property name="name" value="publications" />
+							<!-- <property name="secondLevelFacet"> <list> <value>itemtype</value> 
+								</list> </property> -->
 						</bean>
-						<bean class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
-							<property name="name" value="dspaceconferencepaper"/>							
+						<bean
+							class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
+							<property name="name" value="conferencematerials" />
+						</bean>
+						<bean
+							class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
+							<property name="name" value="datasets" />
+						</bean>
+						<bean
+							class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
+							<property name="name" value="patents" />
+						</bean>
+						<bean
+							class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
+							<property name="name" value="theses" />
+						</bean>
+						<bean
+							class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
+							<property name="name" value="others" />
 						</bean>
 					</list>			
 				</entry>

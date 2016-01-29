@@ -596,9 +596,8 @@ public abstract class AVisualizationGraph implements NetworkPlugin
     protected String getDepartmentFromSOLR(String a_authority) throws SearchServiceException
     {
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setQuery("search.resourceid:" +ResearcherPageUtils
-                .getRealPersistentIdentifier(a_authority, ResearcherPage.class) + " AND search.resourcetype:" + CrisConstants.RP_TYPE_ID);
-        solrQuery.setFields("rp_dept");        
+        solrQuery.setQuery("crisrp.this_authority:" + a_authority);
+        solrQuery.setFields("dept_authority");        
         solrQuery.setRows(1);
         QueryResponse rsp = getService().getSearcher().search(solrQuery);
         SolrDocumentList publications = rsp.getResults();
@@ -611,7 +610,7 @@ public abstract class AVisualizationGraph implements NetworkPlugin
             SolrDocument publication = iter.next();
 
             rp_dept = (String) publication
-                    .getFirstValue("rp_dept");
+                    .getFirstValue("dept_authority");
             break;
         }
         
@@ -621,9 +620,8 @@ public abstract class AVisualizationGraph implements NetworkPlugin
     protected String getStatusFromSOLR(String a_authority) throws SearchServiceException
     {
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setQuery("search.resourceid:" +ResearcherPageUtils
-                .getRealPersistentIdentifier(a_authority, ResearcherPage.class) + " AND search.resourcetype:" + CrisConstants.RP_TYPE_ID);
-        solrQuery.setFields("rp_boolean_status");        
+        solrQuery.setQuery("crisrp.this_authority:" + a_authority);
+        solrQuery.setFields("disabled");        
         solrQuery.setRows(1);
         QueryResponse rsp = getService().getSearcher().search(solrQuery);
         SolrDocumentList publications = rsp.getResults();
@@ -636,7 +634,7 @@ public abstract class AVisualizationGraph implements NetworkPlugin
             SolrDocument publication = iter.next();
 
             rp_status = (String) publication
-                    .getFirstValue("rp_boolean_status");
+                    .getFirstValue("disabled");
             break;
         }
         

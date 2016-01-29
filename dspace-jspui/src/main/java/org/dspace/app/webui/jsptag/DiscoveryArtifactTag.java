@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
+import javax.servlet.jsp.tagext.BodyContent;
+import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -48,7 +50,7 @@ import com.coverity.security.Escape;
 /**
  * 
  */
-public class DiscoveryArtifactTag extends TagSupport {
+public class DiscoveryArtifactTag extends BodyTagSupport {
 	/** Artifact to display */
 	private transient IGlobalSearchResult artifact;
 	private transient DSpaceObjectHighlightResult hlt;
@@ -62,15 +64,33 @@ public class DiscoveryArtifactTag extends TagSupport {
 
 	public int doStartTag() throws JspException {
 		try {
-			showPreview();
+			JspWriter out = pageContext.getOut();
+			out.println("<div class=\"list-group-item\">");			
 		} catch (IOException ie) {
 			throw new JspException(ie);
-		} catch (JspException se) {
-			throw new JspException(se);
-		} catch (SQLException e) {
+		}
+		return EVAL_BODY_BUFFERED;
+	}
+
+	@Override
+	public int doEndTag() throws JspException {
+		try {
+			JspWriter out = pageContext.getOut();
+			BodyContent bodyContent = getBodyContent();
+			if (bodyContent != null) {
+				String body = bodyContent.getString();
+				out.print(StringUtils.substringBefore(body, "##artifact-item##"));
+				showPreview();
+				out.print(StringUtils.substringAfter(body, "##artifact-item##"));
+			}
+			else {
+				showPreview();
+			}
+			out.println("</div>");			
+		} catch (IOException | SQLException e) {
 			throw new JspException(e);
 		}
-		return SKIP_BODY;
+		return EVAL_PAGE;
 	}
 
 	private void showPreview() throws JspException, IOException, SQLException {
@@ -81,12 +101,8 @@ public class DiscoveryArtifactTag extends TagSupport {
 		String browseIndex = null;
 		boolean viewFull = false;
 
-
+		out.println("<div class=\"list-group-item-heading\">");
 		if (view != null) {
-
-			out.println("<div class=\"list-group-item\">");
-			out.println("<div class=\"list-group-item-heading\">");
-			
 			if (view.getThumbnail() != null) {
 
 				out.println("<div class=\"media\">");
@@ -126,11 +142,8 @@ public class DiscoveryArtifactTag extends TagSupport {
 				out.println("</div>");				
 			}
 
-			out.println("</div>");
 
 		} else {
-			out.println("<div class=\"list-group-item\">");
-			out.println("<div class=\"list-group-item-heading\">");
 			if (artifact.getType() == 2) {
 				printDefault(out, request, context, browseIndex, viewFull, "title", "dc.title");
 			}
@@ -150,7 +163,6 @@ public class DiscoveryArtifactTag extends TagSupport {
 					printDefault(out, request, context, browseIndex, viewFull, "cristitle", meta);
 				}
 			}
-			out.println("</div>");
 			out.println("</div>");
 		}
 	}
@@ -206,7 +218,7 @@ public class DiscoveryArtifactTag extends TagSupport {
 			}
 		}
 		boolean unescapeHtml = false;
-		List<String> metadataValue = new ArrayList<String>();
+		List<String> metadataValue = new ArrayList<String>();		
 		List<Metadatum> dcMetadataValue = new ArrayList<Metadatum>();
 		String metadata = "";
 		if (hls != null) {
@@ -230,10 +242,8 @@ public class DiscoveryArtifactTag extends TagSupport {
 			}
 		}
 		if ((!founded && dvfc.isMandatory()) || (founded && dvfc.getDecorator() != null)) {
-
-			if (!founded) {
-				metadataValue = artifact.getMetadataValue(field);
-			}
+            Metadatum[] arrayDcMetadataValue = artifact
+                    .getMetadataValueInDCFormat(field);            
 			if (StringUtils.isNotBlank(displayStrategyName)) {
 				IDisplayMetadataValueStrategy strategy = (IDisplayMetadataValueStrategy) PluginManager
 						.getNamedPlugin(IDisplayMetadataValueStrategy.class, displayStrategyName);
@@ -250,28 +260,24 @@ public class DiscoveryArtifactTag extends TagSupport {
 					}
 				}
 
-				if (!founded) {
-					metadataValue = artifact.getMetadataValue(field);
-					metadata = strategy.getMetadataDisplay(request, -1, viewFull, browseIndex, 0, field,
-							metadataValue, artifact, false, false, pageContext);
-				} else {
-					Metadatum[] arrayDcMetadataValue = new Metadatum[dcMetadataValue.size() - 1];
-					metadata = strategy.getMetadataDisplay(request, -1, viewFull, browseIndex, 0, field,
-							dcMetadataValue.toArray(arrayDcMetadataValue), artifact, false, false, pageContext);
-				}
+                metadata = strategy.getMetadataDisplay(request, -1, viewFull,
+                        browseIndex, 0, field,
+                        arrayDcMetadataValue, artifact,
+                        false, false, pageContext);
 
 			} else {
 				if (!founded) {
+                    metadataValue = artifact.getMetadataValue(field);
 					for (String vl : metadataValue) {
 						metadata += vl;
-						if (metadataValue.size() > 1) {
+						if (arrayDcMetadataValue.length > 1) {
 							metadata += dvfc.getSeparator();
 						}
 					}
 				} else {
 					for (Metadatum vl : dcMetadataValue) {
 						metadata += vl.value;
-						if (dcMetadataValue.size() > 1) {
+						if (arrayDcMetadataValue.length > 1) {
 							metadata +=  dvfc.getSeparator();
 						}
 					}
@@ -333,7 +339,7 @@ public class DiscoveryArtifactTag extends TagSupport {
 		}
 
 		String metadata = strategy.getMetadataDisplay(request, -1, viewFull, browseIndex, 0, field,
-				artifact.getMetadataValue(field), artifact, false, false, pageContext);
+				artifact.getMetadataValueInDCFormat(field), artifact, false, false, pageContext);
 
 		String label = null;
 		try {

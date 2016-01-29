@@ -1629,6 +1629,10 @@ public class DatabaseManager
                         statement.setLong(count, row.getLongColumn(column));
                         break;
 
+                    case Types.DOUBLE:
+                        statement.setDouble(count, row.getDoubleColumn(column));
+                        break;
+                        
                     case Types.CLOB:
                         if (isOracle)
                         {

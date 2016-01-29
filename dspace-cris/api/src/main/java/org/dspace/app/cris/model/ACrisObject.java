@@ -17,7 +17,9 @@ import it.cilea.osd.jdyna.model.Property;
 import java.beans.PropertyEditor;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -152,10 +154,15 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
 
 	@Override
 	public Metadatum[] getMetadata(String schema, String element, String qualifier, String lang) {
-		List values = new ArrayList();
-		String authority = null;
+		Map<Integer, Object> mapResultsVal = new HashMap<Integer, Object>();
+		Map<Integer, String> mapResultsAuth = new HashMap<Integer, String>();
+	    String authority = null;
 		if ("crisdo".equals(schema) && "name".equals(element)) {
-			values.add(getName());
+		    String val = getName();
+		    if(StringUtils.isBlank(val)) {
+		        val = "";
+		    }
+		    mapResultsVal.put(mapResultsVal.hashCode(), val);
 		} else if (!schema.equalsIgnoreCase("cris" + this.getPublicPath())) {
 			//perhaps is a nested
 			boolean buildMetadata = false;
@@ -169,31 +176,68 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
 						for (NP prop : nProprieties) {
 							Object val = prop.getObject();
 							if (StringUtils.isNotEmpty(qualifier) && val instanceof ACrisObject) {
-								authority = ResearcherPageUtils.getPersistentIdentifier((ACrisObject) val);
+								authority = ResearcherPageUtils.getPersistentIdentifier((ACrisObject) val);								
 								qualifier = getCompatibleJDynAShortName((ACrisObject) val, qualifier);
 								List pointProps = (List) ((ACrisObject) val).getAnagrafica4view().get(qualifier);
 								if (pointProps != null && pointProps.size() > 0) {
 									for (Object pprop : pointProps) {
-										values.add(((Property) pprop).getObject());
+									    mapResultsVal.put(pprop.hashCode(), ((Property) pprop).getObject());
+									    mapResultsAuth.put(pprop.hashCode(), authority);
 										buildMetadata = true;
 									}
 								}
 							}
 							else if (val instanceof ACrisObject) {
 								authority = ResearcherPageUtils.getPersistentIdentifier((ACrisObject) val);
-								values.add(((ACrisObject) val).getName());
+								mapResultsVal.put(val.hashCode(), ((ACrisObject) val).getName());
+								mapResultsAuth.put(val.hashCode(), authority);
 								buildMetadata = true;
 							} else {
 								PropertyEditor propertyEditor = prop.getTypo().getRendering()
 										.getPropertyEditor(null);
 								propertyEditor.setValue(val);
-								values.add(propertyEditor.getAsText());
+								mapResultsVal.put(val.hashCode(), propertyEditor.getAsText());
 								buildMetadata = true;
 							}
 						}
 					}
 
 				}				
+			}
+			else {
+			    schema = getCompatibleJDynAShortName(this, schema);
+
+	            List<P> proprieties = this.getAnagrafica4view().get(schema);
+
+	            if (proprieties != null && !proprieties.isEmpty()) {
+	                for (P prop : proprieties) {
+	                    Object val = prop.getObject();
+	                    if (StringUtils.isNotEmpty(element) && val instanceof ACrisObject) {
+	                        
+	                        authority = ResearcherPageUtils.getPersistentIdentifier((ACrisObject) val);
+	                        mapResultsAuth.put(prop.getId(), authority);
+	                        element = getCompatibleJDynAShortName((ACrisObject) val, element);
+	                        List pointProps = (List) ((ACrisObject) val).getAnagrafica4view().get(element);
+	                        if (pointProps != null && pointProps.size() > 0) {
+	                            for (Object pprop : pointProps) {
+	                                mapResultsVal.put(pprop.hashCode(), ((Property) pprop).getObject());
+	                                mapResultsAuth.put(pprop.hashCode(), authority);
+	                                buildMetadata = true;
+	                            }
+	                        }
+	                    } else if (val instanceof ACrisObject) {
+	                        authority = ResearcherPageUtils.getPersistentIdentifier((ACrisObject) val);
+	                        mapResultsVal.put(val.hashCode(), ((ACrisObject) val).getName());
+	                        mapResultsAuth.put(val.hashCode(), authority);
+	                        buildMetadata = true;
+	                    } else {
+	                        PropertyEditor propertyEditor = prop.getTypo().getRendering().getPropertyEditor(null);
+	                        propertyEditor.setValue(val);
+	                        mapResultsVal.put(val.hashCode(), propertyEditor.getAsText());
+	                        buildMetadata = true;
+	                    }
+	                }
+	            }
 			}
 			if(!buildMetadata) {
 				return new Metadatum[0];
@@ -207,34 +251,50 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
 				for (P prop : proprieties) {
 					Object val = prop.getObject();
 					if (StringUtils.isNotEmpty(qualifier) && val instanceof ACrisObject) {
+					    
 						authority = ResearcherPageUtils.getPersistentIdentifier((ACrisObject) val);
+						mapResultsAuth.put(prop.getId(), authority);
 						qualifier = getCompatibleJDynAShortName((ACrisObject) val, qualifier);
 						List pointProps = (List) ((ACrisObject) val).getAnagrafica4view().get(qualifier);
 						if (pointProps != null && pointProps.size() > 0) {
 							for (Object pprop : pointProps) {
-								values.add(((Property) pprop).getObject());
+                                mapResultsVal.put(pprop.hashCode(), ((Property) pprop).getObject());
+                                mapResultsAuth.put(pprop.hashCode(), authority);
 							}
 						}
 					} else if (val instanceof ACrisObject) {
 						authority = ResearcherPageUtils.getPersistentIdentifier((ACrisObject) val);
-						values.add(((ACrisObject) val).getName());
+                        mapResultsVal.put(val.hashCode(), ((ACrisObject) val).getName());
+                        mapResultsAuth.put(val.hashCode(), authority);
 					} else {
 						PropertyEditor propertyEditor = prop.getTypo().getRendering().getPropertyEditor(null);
 						propertyEditor.setValue(val);
-						values.add(propertyEditor.getAsText());
+						mapResultsVal.put(val.hashCode(), propertyEditor.getAsText());
 					}
 				}
 			}
 		}
-		Metadatum[] result = new Metadatum[values.size()];
-		for (int idx = 0; idx < values.size(); idx++) {
+		Metadatum[] result = new Metadatum[mapResultsVal.keySet().size()];
+		int idx = 0;
+		for (Integer key : mapResultsVal.keySet()) {
 			result[idx] = new Metadatum();
 			result[idx].schema = schema;
 			result[idx].element = element;
 			result[idx].qualifier = qualifier;
-			result[idx].authority = authority;
+			if(mapResultsAuth.containsKey(key)) {
+			    result[idx].authority = mapResultsAuth.get(key);
+			} 
+			else {
+			    result[idx].authority = null;   
+			}
 			result[idx].confidence = StringUtils.isNotEmpty(authority) ? Choices.CF_ACCEPTED : Choices.CF_UNSET;
-			result[idx].value = values.get(idx).toString();
+			if(mapResultsVal.containsKey(key)) {
+			    result[idx].value = mapResultsVal.get(key).toString();
+			}
+			else {
+			    result[idx].value = "";
+			}
+			idx++;
 		}
 		return result;
 	}
@@ -314,6 +374,8 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
 
 	public abstract Class<ATNO> getClassTypeNested();
 
+	public abstract <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>> Class<ACO> getCRISTargetClass();
+	
 	@Override
 	public void update() throws SQLException, AuthorizeException {
 		// TODO Auto-generated method stub

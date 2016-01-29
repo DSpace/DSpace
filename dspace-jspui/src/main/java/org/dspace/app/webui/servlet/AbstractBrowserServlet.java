@@ -115,6 +115,9 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             int focus = UIUtil.getIntParameter(request, "focus");
             int offset = UIUtil.getIntParameter(request, "offset");
             int resultsperpage = UIUtil.getIntParameter(request, "rpp");
+            if (resultsperpage == -1) {
+            	resultsperpage = ConfigurationManager.getIntProperty("browse."+type+".rpp", -1);
+            }
             int sortBy = UIUtil.getIntParameter(request, "sort_by");
             int etAl = UIUtil.getIntParameter(request, "etal");
 

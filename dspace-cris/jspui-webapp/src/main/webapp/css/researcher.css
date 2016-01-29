@@ -1157,3 +1157,17 @@ div.subscription-current {
 #picture {
 	width: 120px; 
 }
+
+.exstaff {
+    color: goldenrod;
+}
+
+.externalstaff {
+    color: black;
+}
+
+.undefinedstaff {
+	   color: gray;
+}
+	
+}

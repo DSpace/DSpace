@@ -7,15 +7,21 @@
  */
 package org.dspace.discovery;
 
-import org.apache.log4j.Logger;
-import org.apache.commons.cli.*;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
-import org.dspace.utils.DSpace;
-
 import java.io.IOException;
 import java.sql.SQLException;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
+import org.apache.log4j.Logger;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.core.ExternalService;
+import org.dspace.handle.HandleManager;
+import org.dspace.utils.DSpace;
 
 /**
  * Class used to reindex dspace communities/collections/items into discovery
@@ -145,8 +151,17 @@ public class IndexClient {
             indexer.updateIndex(context, true, Integer.valueOf(optionValue));
         } else if (line.hasOption("u")) {         	
         	String optionValue = line.getOptionValue("u");
-        	DSpaceObject dso = HandleManager.resolveToObject(context, optionValue);
-            indexer.indexContent(context, dso);
+			String[] identifiers = optionValue.split("\\s*,\\s*");
+			for (String id : identifiers) {
+				DSpaceObject dso;
+				if (id.startsWith(ConfigurationManager.getProperty("handle.prefix")) || id.startsWith("123456789/")) {
+					dso = HandleManager.resolveToObject(context, id);
+				} else {
+
+					dso = dspace.getSingletonService(ExternalService.class).getObject(id);
+				}
+				indexer.indexContent(context, dso, line.hasOption("f"));
+			}
         } else {
             log.info("Updating and Cleaning Index");
             indexer.cleanIndex(line.hasOption("f"));

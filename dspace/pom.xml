@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>CRIS-5.3.1-SNAPSHOT</version>
+        <version>CRIS-5.4.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -171,7 +171,7 @@
         </dependency>
          <dependency>
              <groupId>org.dspace</groupId>
-			 <artifactId>pubmed-retrieve</artifactId>		
+			 <artifactId>metrics-retrieve</artifactId>		
          </dependency>
          <dependency>
              <groupId>org.dspace</groupId>

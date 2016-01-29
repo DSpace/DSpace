@@ -8,6 +8,7 @@
 package org.dspace.app.webui.cris.components;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.dspace.utils.DSpace;
 
@@ -120,7 +122,8 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
 
         if (types.keySet().contains(type))
         {
-            start = UIUtil.getIntParameter(request,
+            List<String> extraFields = getExtraFields(type);
+        	start = UIUtil.getIntParameter(request,
                     "start" + getTypes().get(type).getComponentIdentifier());
             // can't start earlier than 0 in the results!
             if (start < 0)
@@ -131,13 +134,13 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
             order = getOrder(request, type);
             rpp = getRPP(request, type);
             etAl = getEtAl(request, type);
-            orderfield = sortBy != -1 ? "bi_sort_" + sortBy + "_sort" : null;
+            orderfield = getOrderField(sortBy);
             ascending = SortOption.ASCENDING.equalsIgnoreCase(order);
 
             // Perform the search
 
             docs = search(context, type, cris, start, rpp, orderfield,
-                    ascending);
+                    ascending, extraFields);
             if (docs != null)
             {
                 docsNumFound = docs.getTotalSearchResults();
@@ -147,15 +150,16 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
 
         if ((docs == null || docsNumFound == 0) && activeTypes.size() > 0)
         {
+        	List<String> extraFields = getExtraFields(type);
             type = activeTypes.get(0)[0];
             sortBy = getSortBy(request, type);
             order = getOrder(request, type);
             rpp = getRPP(request, type);
             etAl = getEtAl(request, type);
-            orderfield = sortBy != -1 ? "bi_sort_" + sortBy + "_sort" : null;
+            orderfield = getOrderField(sortBy);
             ascending = SortOption.ASCENDING.equalsIgnoreCase(order);
             docs = search(context, type, cris, start, rpp, orderfield,
-                    ascending);
+                    ascending, extraFields);
             if (docs != null)
             {
                 docsNumFound = docs.getTotalSearchResults();
@@ -218,6 +222,15 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         }
     }
 
+	private String getOrderField(int sortBy) throws SortException {
+		String orderfield;
+		orderfield = sortBy != -1 ? "bi_sort_" + sortBy + "_sort" : null;
+		if (orderfield != null && "extra".equalsIgnoreCase(SortOption.getSortOption(sortBy).getType())) {
+			orderfield = SortOption.getSortOption(sortBy).getMetadata().substring("extra.".length());
+		}
+		return orderfield;
+	}
+
     protected abstract List<String[]> addActiveTypeInRequest(
             HttpServletRequest request) throws Exception;
 
@@ -247,6 +260,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         componentInfo.setTotal(docsNumFound);
         componentInfo.setType(type);
 		componentInfo.setSearchTime(searchTime);
+		componentInfo.setBrowseType(getRelationConfiguration().getType());
         return componentInfo;
     }
 
@@ -255,7 +269,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
 
     public DiscoverResult search(Context context, String type,
             ACrisObject cris, int start, int rpp, String orderfield,
-            boolean ascending) throws SearchServiceException
+            boolean ascending, List<String> extraFields) throws SearchServiceException
     {
         // can't start earlier than 0 in the results!
         if (start < 0)
@@ -285,6 +299,11 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         solrQuery.setQuery(query);
         solrQuery.addSearchField("search.resourceid");
         solrQuery.addSearchField("search.resourcetype");
+        if (extraFields != null) {
+        	for (String f : extraFields) {
+        		solrQuery.addSearchField(f);
+        	}
+        }
         solrQuery.setStart(start);
         solrQuery.setMaxResults(rpp);
         if (orderfield == null)
@@ -345,6 +364,11 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
             order = getTypes().get(type).getOrder();
         }
         return order;
+    }
+    
+    private List<String> getExtraFields(String type)
+    {
+        return getTypes().get(type).getExtraFields();
     }
 
     private int getSortBy(HttpServletRequest request, String type)

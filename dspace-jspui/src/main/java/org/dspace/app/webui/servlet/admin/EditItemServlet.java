@@ -839,11 +839,15 @@ public class EditItemServlet extends DSpaceServlet
                 }
             }
 
+        	// commit now to make available in the edit form changes made by optional consumers
+            context.commit();
             // Show edit page again
             showEditForm(context, request, response, item);
         }
         else
         {
+        	// commit now to make available in the edit form changes made by optional consumers
+        	context.commit();
             // Show edit page again
             showEditForm(context, request, response, item);
         }

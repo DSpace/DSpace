@@ -45,8 +45,8 @@ public abstract class AStatComponentService<T extends IStatsGenericComponent> im
     public Map getCommonsParams()
     {
         Map params = new HashMap();
-        params.put(TOP_CONTINENT_LENGTH, topCountryLength);
-        params.put(TOP_COUNTRY_LENGTH, topContinentLength);
+        params.put(TOP_CONTINENT_LENGTH, topContinentLength);
+        params.put(TOP_COUNTRY_LENGTH, topCountryLength);
         params.put(TOP_CITY_LENGTH, topCityLength);
         params.put(SHOW_MORE_LENGTH, showMoreLength);
         return params;

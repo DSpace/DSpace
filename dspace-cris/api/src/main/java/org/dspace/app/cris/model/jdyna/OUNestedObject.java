@@ -50,7 +50,9 @@ import org.hibernate.annotations.OrderBy;
         @NamedQuery(name = "OUNestedObject.findNestedObjectsByTypoID", query = "from OUNestedObject where typo.id = ?"),
         @NamedQuery(name = "OUNestedObject.findNestedObjectsByParentIDAndTypoShortname",  query = "from OUNestedObject where parent.id = ? and typo.shortName = ?"),
         @NamedQuery(name = "OUNestedObject.deleteNestedObjectsByTypoID", query = "delete from OUNestedObject where typo.id = ?"),
-        @NamedQuery(name = "OUNestedObject.maxPositionNestedObjectsByTypoID", query = "select max(positionDef) from OUNestedObject where typo.id = ?")
+        @NamedQuery(name = "OUNestedObject.maxPositionNestedObjectsByTypoID", query = "select max(positionDef) from OUNestedObject where typo.id = ?"),
+        @NamedQuery(name = "OUNestedObject.uniqueNestedObjectsByParentIdAndTypoIDAndSourceReference", query = "from OUNestedObject where parent.id = ? and typo.id = ? and sourceReference.sourceRef = ? and sourceReference.sourceID = ?"),
+        @NamedQuery(name = "OUNestedObject.uniqueByUUID", query = "from OUNestedObject where uuid = ?")
         })
 public class OUNestedObject extends ACrisNestedObject<OUNestedProperty, OUNestedPropertiesDefinition, OUProperty, OUPropertiesDefinition> 
 {
@@ -132,5 +134,12 @@ public class OUNestedObject extends ACrisNestedObject<OUNestedProperty, OUNested
     public String getPublicPath()
     {
         return parent.getPublicPath();
+    }
+    
+    public OUNestedObject clone() throws CloneNotSupportedException
+    {
+        OUNestedObject clone = (OUNestedObject) super.clone();
+        clone.duplicaAnagrafica(this);        
+        return clone;
     }
 }

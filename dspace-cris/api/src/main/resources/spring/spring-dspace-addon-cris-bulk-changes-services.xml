@@ -18,7 +18,7 @@
     <bean id="XMLBulkChangesService" 
     	class="org.dspace.app.cris.importexport.XMLBulkChangesService">
     </bean>
-    <bean id="CSVBulkChangesService" 
-    	class="org.dspace.app.cris.importexport.CSVBulkChangesService">
+    <bean id="ExcelBulkChangesService" 
+    	class="org.dspace.app.cris.importexport.ExcelBulkChangesService">
     </bean>        
 </beans>

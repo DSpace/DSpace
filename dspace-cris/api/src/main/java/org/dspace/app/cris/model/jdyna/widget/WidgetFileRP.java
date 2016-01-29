@@ -21,30 +21,43 @@ import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.core.ConfigurationManager;
 
 @Entity
-@Table(name="cris_rp_wfile")
-public class WidgetFileRP extends AWidgetFileCris {
+@Table(name = "cris_rp_wfile")
+public class WidgetFileRP extends AWidgetFileCris
+{
 
+    @Override
+    public PropertyEditor getPropertyEditor(
+            IPersistenceDynaService applicationService)
+    {
+        return new FilePropertyEditor<WidgetFileRP>(this);
+    }
 
+    @Override
+    public PropertyEditor getImportPropertyEditor(
+            IPersistenceDynaService applicationService, String service)
+    {
+        return new FilePropertyEditor<WidgetFileRP>(this, service);
+    }
 
-	@Override
-	public PropertyEditor getPropertyEditor(
-			IPersistenceDynaService applicationService) {
-		return new FilePropertyEditor<WidgetFileRP>(this);
-	}
+    @Override
+    public String getBasePath()
+    {
+        return ConfigurationManager.getProperty(CrisConstants.CFG_MODULE,
+                "researcherpage.file.path");
+    }
 
-	
-	@Override
-	public String getBasePath() {
-		return ConfigurationManager.getProperty(CrisConstants.CFG_MODULE,"researcherpage.file.path");
-	}
-	
-	@Override
-	public String getServletPath() {
-		return ConfigurationManager.getProperty(CrisConstants.CFG_MODULE,"researcherpage.jdynafile.servlet.name");
-	}
-	
-	@Override
-	public String getCustomFolderByAuthority(String intAuth, String extAuth) {
-		return ResearcherPageUtils.getPersistentIdentifier(Integer.parseInt(intAuth), ResearcherPage.class) + "/" + extAuth;
-	}
+    @Override
+    public String getServletPath()
+    {
+        return ConfigurationManager.getProperty(CrisConstants.CFG_MODULE,
+                "researcherpage.jdynafile.servlet.name");
+    }
+
+    @Override
+    public String getCustomFolderByAuthority(String intAuth, String extAuth)
+    {
+        return ResearcherPageUtils.getPersistentIdentifier(
+                Integer.parseInt(intAuth), ResearcherPage.class) + "/"
+                + extAuth;
+    }
 }

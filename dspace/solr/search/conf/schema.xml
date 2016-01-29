@@ -44,8 +44,7 @@
   - Remember to run the JVM in server mode, and use a higher logging level
     that avoids logging every request
 -->
-
-<schema name="Discovery Search DSpace 4 + CRIS" version="1.5">
+<schema name="Discovery Search DSpace 5 + CRIS" version="1.5">
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        Applications should change this to reflect the nature of the search collection.
        version="1.4" is Solr's version number for the schema syntax and semantics.  It should
@@ -480,6 +479,8 @@
               <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
       </fieldType>
+      
+      <fieldType name="crismetrics_t" class="org.dspace.solr.schema.CrisMetricsFieldType"/>
  </types>
 
 
@@ -648,6 +649,8 @@
    <dynamicField name="attr_*" type="textgen" indexed="true" stored="true" multiValued="true"/>
 
    <dynamicField name="random_*" type="random" />
+   
+   <dynamicField name="crismetrics_*" type="crismetrics_t" indexed="true" stored="true"/>
  </fields>
 
  <!-- Field to use to determine and enforce document uniqueness.

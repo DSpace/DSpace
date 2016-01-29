@@ -27,14 +27,21 @@
 			<li id="bar-tab-${area.id}">
 						<c:choose>
 							<c:when test="${area.id == tabId}">
-								<a href="#tab-${area.id}"><img style="width: 16px;vertical-align: middle;" border="0" 
-									src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}" alt="icon">
+								<a href="#tab-${area.id}">
+								<c:if test="${!empty area.ext}">
+								<img style="width: 16px;vertical-align: middle;" border="0" 
+									src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}" alt="icon" />
+								</c:if>	
 								${area.title}</a>
 							</c:when>
 							<c:otherwise>
-									<a href="${tablink}"><img style="width: 16px;vertical-align: middle;" border="0"
+									<a href="${tablink}">
+									<c:if test="${!empty area.ext}">
+									<img style="width: 16px;vertical-align: middle;" border="0"
 										src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}"
-			    						alt="icon" />${area.title}</a>
+			    						alt="icon" />
+			    					</c:if>	
+			    					${area.title}</a>
 							</c:otherwise>
 						</c:choose></li>
 

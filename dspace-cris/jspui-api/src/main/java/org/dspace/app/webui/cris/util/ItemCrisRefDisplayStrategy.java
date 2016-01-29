@@ -9,6 +9,7 @@ package org.dspace.app.webui.cris.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.MissingResourceException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,21 +18,35 @@ import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dspace.app.cris.integration.CRISAuthority;
+import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.webui.util.ASimpleDisplayStrategy;
-import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueGenerator;
 import org.dspace.content.Metadatum;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
+import org.dspace.utils.DSpace;
 
 public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
 {
+	
+    /**
+     * log4j category
+     */
+    public static final Log log = LogFactory
+            .getLog(ItemCrisRefDisplayStrategy.class);
+
+    private ApplicationService applicationService = new DSpace().getServiceManager()
+            .getServiceByName("applicationService",
+                    ApplicationService.class);
 
 	@Override
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit,
@@ -48,7 +63,10 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
 				CRISAuthority crisAuthority = (CRISAuthority) ca;
 				publicPath = crisAuthority.getPublicPath();
 				if (publicPath == null) {
-					publicPath = metadataArray[0].qualifier;
+					publicPath = ConfigurationManager.getProperty("ItemCrisRefDisplayStrategy.publicpath."+field);
+					if (publicPath == null) {
+						publicPath = metadataArray[0].qualifier;
+					}
 				}
 			}
 		}
@@ -190,31 +208,65 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
 			if (authority.startsWith(AuthorityValueGenerator.GENERATE)) {
 				String[] split = StringUtils.split(authority, AuthorityValueGenerator.SPLIT);
 				String type = null, info = null;
-				if (split.length > 0) {
+				if (split.length == 3) {
 					type = split[1];
-					if (split.length > 1) {
-						info = split[2];
-					}
+					info = split[2];
+					String externalContextPath = ConfigurationManager.getProperty("cris","external.domainname.authority.service."+type);
+					startLink = "<a target=\"_blank\" href=\"" + externalContextPath + info;
+					startLink += "\" class=\"authority\">&nbsp;<img style=\"width: 16px; height: 16px;\" src=\""+ hrq.getContextPath() +"/images/mini-icon-orcid.png\" alt=\"\">";
+					endLink = "</a>";
+					sb.append(startLink);
+					sb.append(endLink);
 				}
-				String externalContextPath = ConfigurationManager.getProperty("cris","external.domainname.authority.service."+type);
-				startLink = "<a target=\"_blank\" href=\"" + externalContextPath + info;
-				startLink += "\" class=\"authority\">&nbsp;<img style=\"width: 16px; height: 16px;\" src=\""+ hrq.getContextPath() +"/images/mini-icon-orcid.png\" alt=\"\">";
-				endLink = "</a>";
-				sb.append(startLink);
-				sb.append(endLink);
 			}
 			else {
 		        startLink = "&nbsp;<a href=\"" + hrq.getContextPath() + "/cris/"+publicPath+ "/"
 		                + authority;
 		        startLink += "\" class=\"authority\">";
-		        endLink = "</a>";
-		        sb.append(startLink);
+		        endLink = "</a>";		        
 		        String icon = "";
 				try {
-					icon = I18nUtil.getMessage("ItemCrisRefDisplayStrategy."+publicPath+".icon");
-				} catch (MissingResourceException e) {
-					icon = I18nUtil.getMessage("ItemCrisRefDisplayStrategy.default.icon");
+					ACrisObject rp = applicationService.getEntityByCrisId(authority);
+					String type = rp.getMetadata(ConfigurationManager.getProperty("cris", "researcher.cris."+publicPath+".ref.display.strategy.metadata.icon"));					
+					String status = "";
+					if(rp == null || !rp.getStatus()) {
+			             startLink = "&nbsp;";
+			             endLink = "";
+			             status = "private.";
+					}
+
+					String title;
+					try {
+						title = I18nUtil
+								.getMessage("ItemCrisRefDisplayStrategy." + publicPath + "." + status + type + ".title", true);
+					}
+					catch (MissingResourceException e2)
+                    {
+						title = I18nUtil
+								.getMessage("ItemCrisRefDisplayStrategy." + publicPath + "." + type + ".title");
+                    }
+					
+					try {
+						icon = MessageFormat.format(
+								I18nUtil.getMessage("ItemCrisRefDisplayStrategy." + publicPath + "." + status + type + ".icon", true),
+								title);
+					}
+					catch (MissingResourceException e2)
+                    {
+						icon = MessageFormat.format(
+								I18nUtil.getMessage("ItemCrisRefDisplayStrategy." + publicPath + "." + type + ".icon"),
+								title);
+                    }
+				} catch (Exception e) {
+					log.debug("Error when build icon (perhaps missing this configuration: on cris module key:researcher.cris.rp.ref.display.strategy.metadata.icon)", e);
+					try {
+						icon = I18nUtil.getMessage("ItemCrisRefDisplayStrategy."+publicPath+".icon",true);
+					} catch (MissingResourceException e2) {
+						log.debug("Error when build icon (perhaps missing this configuration: on cris module key:researcher.cris.rp.ref.display.strategy.metadata.icon)", e2);
+						icon = I18nUtil.getMessage("ItemCrisRefDisplayStrategy.default.icon");
+					}
 				}
+				sb.append(startLink);
 				sb.append(icon);
 		        sb.append(endLink);
 			}

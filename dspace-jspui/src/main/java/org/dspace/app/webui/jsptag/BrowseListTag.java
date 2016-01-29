@@ -9,6 +9,7 @@ package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -328,10 +329,24 @@ public class BrowseListTag extends TagSupport
         {
             if (config!=null && config.startsWith("cris"))
             {
-                browseListLine = ConfigurationManager
-                        .getProperty("webui.itemlist.crisdo.columns");
-                browseWidthLine = ConfigurationManager
-                        .getProperty("webui.itemlist.crisdo.widths");
+                String[] configSplitted = config.split("\\.");
+                if (configSplitted.length > 1)
+                {
+                    browseListLine = ConfigurationManager.getProperty(
+                            "webui.itemlist." + configSplitted[0] + ".columns");
+                    browseWidthLine = ConfigurationManager.getProperty(
+                            "webui.itemlist." + configSplitted[0] + ".widths");
+                }
+                if (browseListLine == null)
+                {
+                    browseListLine = ConfigurationManager
+                            .getProperty("webui.itemlist.crisdo.columns");
+                }
+                if (browseWidthLine == null)
+                {
+                    browseWidthLine = ConfigurationManager
+                            .getProperty("webui.itemlist.crisdo.widths");
+                }
             }
             else 
             {
@@ -381,12 +396,12 @@ public class BrowseListTag extends TagSupport
                 {
                     out.println("<table style=\"width: "
                             + tablewidth
-                            + "; table-layout: fixed;\" align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
+                            + "; table-layout: fixed;\" align=\"center\" class=\"table table-hover\" summary=\"This table browses all dspace content\">");
                 }
                 else
                 {
                     // Otherwise, don't constrain the width
-                    out.println("<table align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
+                    out.println("<table align=\"center\" class=\"table table-hover\" summary=\"This table browses all dspace content\">");
                 }
 
                 // Output the known column widths
@@ -418,11 +433,11 @@ public class BrowseListTag extends TagSupport
             {
                 out.println("<table width=\""
                         + tablewidth
-                        + "\" align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
+                        + "\" align=\"center\" class=\"table table-hover\" summary=\"This table browses all dspace content\">");
             }
             else
             {
-                out.println("<table align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
+                out.println("<table align=\"center\" class=\"table table-hover\" summary=\"This table browses all dspace content\">");
             }
 
             // Output the table headers
@@ -497,12 +512,22 @@ public class BrowseListTag extends TagSupport
                 // prepare the strings for the header
                 String id = "t" + Integer.toString(colIdx + 1);
                 String css = "oddRow" + cOddOrEven[colIdx] + "Col";
+                String csssort = ""; 
                 String thJs = null;
                 String message = "itemlist." + field;
                 try
                 {
-                    for (SortOption tmpSo : SortOption.getSortOptions())
+                	Set<SortOption> sortOptions;
+                	if (browseInfo != null) {
+                		sortOptions = SortOption.getSortOptions(browseInfo.getBrowseIndex().getName());
+                	}
+                	else {
+                		sortOptions = SortOption.getSortOptions();
+                	}
+					
+					for (SortOption tmpSo : sortOptions)
                     {
+                    	
                         if (field.equalsIgnoreCase(tmpSo.getMetadata()))
                         {
                             css += " sortable sort_" + tmpSo.getNumber();
@@ -517,11 +542,13 @@ public class BrowseListTag extends TagSupport
                                 {
                                     thJs += " 'ASC'";
                                     css += " sorted_desc";
+                                    csssort += "fa fa-sort-desc pull-right";
                                 }
                                 else
                                 {
                                     thJs += " 'DESC'";
                                     css += " sorted_asc";
+                                    csssort += "fa fa-sort-asc pull-right";
                                 }
                             }
                             else if (sortBy != null
@@ -532,17 +559,20 @@ public class BrowseListTag extends TagSupport
                                 {
                                     thJs += " 'ASC'";
                                     css += " sorted_desc";
+                                    csssort += "fa fa-sort-desc pull-right";
                                 }
                                 else
                                 {
                                     thJs += " 'DESC'";
                                     css += " sorted_asc";
+                                    csssort += "fa fa-sort-asc pull-right";
                                 }
                             }
                             else
                             {
                                 thJs += " 'ASC'";
                                 css += " sortable";
+                                csssort += "fa fa-sort pull-right";
                             }
                             thJs += ")\"";
 
@@ -557,6 +587,18 @@ public class BrowseListTag extends TagSupport
                 }
 
                 // output the header
+
+                boolean messagefounded = false;
+                String localizedMessage = "";                
+                if(config!=null && config.startsWith("cris")) {
+                    String newmessage = message + "." + config;
+                    localizedMessage = LocaleSupport.getLocalizedMessage(pageContext, newmessage);
+                    messagefounded = StringUtils.isNotBlank(localizedMessage) && !((localizedMessage.startsWith("???") && localizedMessage.endsWith("???")));
+                }
+                if(!messagefounded) {
+                    localizedMessage = LocaleSupport.getLocalizedMessage(pageContext,
+                        message);
+                }
                 out.print("<th id=\""
                         + id
                         + "\" class=\""
@@ -564,8 +606,7 @@ public class BrowseListTag extends TagSupport
                         + "\">"
                         + (emph[colIdx] ? "<strong>" : "")
                         + (thJs != null ? "<a " + thJs + " href=\"#\">" : "")
-                        + LocaleSupport.getLocalizedMessage(pageContext,
-                                message) + (thJs != null ? "</a>" : "")
+						+ localizedMessage + (thJs != null ? "<i class=\""+ csssort +"\"></i></a>" : "")
                         + (emph[colIdx] ? "</strong>" : "") + "</th>");
             }
 
@@ -623,23 +664,41 @@ public class BrowseListTag extends TagSupport
                     String qualifier = tokens[2];
 
                     // first get hold of the relevant metadata for this column
-                    Metadatum[] metadataArray;
-                    if (qualifier.equals("*"))
-                    {
-                        metadataArray = items[i].getMetadata(schema, element,
-                                Item.ANY, Item.ANY);
+                    Metadatum[] metadataArray = null;
+                    
+                    if (schema.equalsIgnoreCase("extra")) {
+                    	
+                    	String val = null;
+                    	Object obj = items[i].extraInfo.get(element);
+						if (obj != null) {
+							val = String.valueOf(obj);
+						}
+                    	if (StringUtils.isNotBlank(val)) {
+                    		metadataArray = new Metadatum[1];
+                    		metadataArray[0] = new Metadatum();
+                    		metadataArray[0].value = val;
+                    		metadataArray[0].schema = "extra";
+                    		metadataArray[0].element = element;
+                    	}
                     }
-                    else if (qualifier.equals(""))
-                    {
-                        metadataArray = items[i].getMetadata(schema, element,
-                                null, Item.ANY);
+                    else {
+	                    if (qualifier.equals("*"))
+	                    {
+	                        metadataArray = items[i].getMetadata(schema, element,
+	                                Item.ANY, Item.ANY);
+	                    }
+	                    else if (qualifier.equals(""))
+	                    {
+	                        metadataArray = items[i].getMetadata(schema, element,
+	                                null, Item.ANY);
+	                    }
+	                    else
+	                    {
+	                        metadataArray = items[i].getMetadata(schema, element,
+	                                qualifier, Item.ANY);
+	                    }
                     }
-                    else
-                    {
-                        metadataArray = items[i].getMetadata(schema, element,
-                                qualifier, Item.ANY);
-                    }
-
+                    
                     // save on a null check which would make the code untidy
                     if (metadataArray == null)
                     {

@@ -7,14 +7,10 @@
  */
 package org.dspace.app.webui.cris.controller;
 
-import it.cilea.osd.common.controller.BaseFormController;
-import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
-import it.cilea.osd.jdyna.model.ANestedProperty;
-import it.cilea.osd.jdyna.model.ATypeNestedObject;
-import it.cilea.osd.jdyna.model.PropertiesDefinition;
-import it.cilea.osd.jdyna.model.Property;
-
 import java.io.File;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +21,7 @@ import org.dspace.app.cris.importexport.XMLBulkChangesService;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearchObject;
+import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.export.ExportConstants;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.model.jdyna.DynamicObjectType;
@@ -41,6 +38,14 @@ import org.springframework.validation.BindException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import it.cilea.osd.common.controller.BaseFormController;
+import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ANestedProperty;
+import it.cilea.osd.jdyna.model.ATypeNestedObject;
+import it.cilea.osd.jdyna.model.IContainable;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.model.Property;
+
 /**
  * This SpringMVC controller is responsible to handle the import by webui
  * 
@@ -49,17 +54,19 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class ImportFormController  <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> extends BaseFormController {
 
-	private Map<String, Class<? extends PropertiesDefinition>> objectType2PD;
-	private Map<String, Class<? extends ACrisObject>> objectType2Object;
-	private Map<String, Class<? extends ATypeNestedObject>> objectType2ATNO;
-	private Map<String, Class<? extends ACrisNestedObject>> objectType2ACNO;
-	
 	private ApplicationService applicationService;
 
 	public void setApplicationService(ApplicationService applicationService) {
 		this.applicationService = applicationService;
 	}
 
+	@Override
+	protected Map referenceData(HttpServletRequest request) throws Exception
+	{
+        Map<String, Object> map = new HashMap<String, Object>(); 
+	    map.put("dynamicobjects", applicationService.getList(DynamicObjectType.class));
+	    return map;
+	}
 	@Override
 	protected ModelAndView onSubmit(HttpServletRequest request,
 			HttpServletResponse response, Object command, BindException errors)
@@ -75,10 +82,15 @@ public class ImportFormController  <ACO extends ACrisObject<P, TP, NP, NTP, ACNO
 		File dir = new File(path);
 		dir.mkdir();
 		try {
-			Class<TP> clazz = (Class<TP>) objectType2PD.get(object.getTargetEntity());
-			Class<ACO> objectClazz = (Class<ACO>) objectType2Object.get(object.getTargetEntity());
-			Class<ATNO> objectATNOClazz = (Class<ATNO>) objectType2ATNO.get(object.getTargetEntity());
-			Class<ACNO> objectACNOClazz = (Class<ACNO>) objectType2ACNO.get(object.getTargetEntity());
+		    ACrisObject<P, TP, NP, NTP, ACNO, ATNO> obj = null; 
+		    if(object.getTargetEntity()!=null) {
+		        obj = (ACrisObject<P, TP, NP, NTP, ACNO, ATNO>)(Class.forName(object.getTargetEntity()).newInstance());
+		    } else {
+		        obj = (ACrisObject<P, TP, NP, NTP, ACNO, ATNO>)(new ResearcherPage());
+		    }		    
+		    
+			Class<TP> clazz = obj.getClassPropertiesDefinition();
+			Class<ACO> objectClass = (Class<ACO>)obj.getClass();
 			if (object.isTemplate()) {
 				response.setContentType("application/xml;charset=UTF-8");
 				response.addHeader("Content-Disposition",
@@ -88,10 +100,20 @@ public class ImportFormController  <ACO extends ACrisObject<P, TP, NP, NTP, ACNO
 				filexsd.createNewFile();
 				
 				String[] namespace = UtilsXSD.getNamespace(clazz);
+				
+		        List<ATNO> ttps = applicationService.getList(obj.getClassTypeNested());
+		        List<IContainable> metadataNestedLevel = new LinkedList<IContainable>();
+		        for (ATNO ttp : ttps) {
+		            IContainable ic = applicationService.findContainableByDecorable(ttp.getDecoratorClass(), ttp.getId());
+		            if (ic != null) {
+		                metadataNestedLevel.add(ic);
+		            }
+		        }
+
 	        	DSpace dspace = new DSpace();
 	            IBulkChangesService importer = dspace.getServiceManager().getServiceByName(XMLBulkChangesService.SERVICE_NAME, IBulkChangesService.class);
 				importer.generateTemplate(response.getWriter(), dir, applicationService
-						.findAllContainables(clazz), filexsd, 
+						.findAllContainables(clazz), metadataNestedLevel, filexsd, 
 						UtilsXSD.getElementRoot(clazz),
 						namespace[0]+":",
                         namespace[1],
@@ -113,13 +135,12 @@ public class ImportFormController  <ACO extends ACrisObject<P, TP, NP, NTP, ACNO
 					if (AuthorizeManager.isAdmin(dspaceContext)) {
 						dspaceContext.turnOffAuthorisationSystem();
 					}
-					ACO cris = objectClazz.newInstance();
+					ACO cris = (ACO)obj.getClass().newInstance();
 					if (cris instanceof ResearchObject) {
-						ResearchObject tmp = (ResearchObject) cris;
-						tmp.setTypo(applicationService.findTypoByShortName(DynamicObjectType.class, object.getType()));
+						((ResearchObject) cris).setTypo(applicationService.findTypoByShortName(DynamicObjectType.class, object.getType()));						
 					}
 					ImportExportUtils.process(object.getFormat(), fileDTO.getInputStream(), dir,
-							applicationService, dspaceContext, defaultStatus, clazz, objectClazz, cris, objectACNOClazz, objectATNOClazz);
+							applicationService, dspaceContext, defaultStatus, clazz, objectClass, cris, cris.getClassNested(), cris.getClassTypeNested(), cris.getClassNested().newInstance().getClassPropertiesDefinition());
 					saveMessage(
 							request,
 							getText("action.import.with.success",

@@ -32,7 +32,9 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "cris_ou_no_tp")
 @NamedQueries ({
     @NamedQuery(name="OUTypeNestedObject.findAll", query = "from OUTypeNestedObject order by id" ),
-    @NamedQuery(name="OUTypeNestedObject.uniqueByShortName", query = "from OUTypeNestedObject where shortName = ?" )              
+    @NamedQuery(name="OUTypeNestedObject.uniqueByShortName", query = "from OUTypeNestedObject where shortName = ?" ),
+    @NamedQuery(name="OUTypeNestedObject.findMaskByShortName", query = "select dot.mask from OUTypeNestedObject dot where dot.shortName = ?" ),
+    @NamedQuery(name="OUTypeNestedObject.findMaskById", query = "select dot.mask from OUTypeNestedObject dot where dot.id = ?" )
 })
 public class OUTypeNestedObject extends ATypeNestedObject<OUNestedPropertiesDefinition>
 {

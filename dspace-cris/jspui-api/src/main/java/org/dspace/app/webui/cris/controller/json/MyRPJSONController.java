@@ -9,6 +9,7 @@ package org.dspace.app.webui.cris.controller.json;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import flexjson.JSONSerializer;
 import it.cilea.osd.jdyna.model.AccessLevelConstants;
@@ -18,15 +19,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
 import org.dspace.app.cris.model.VisibilityConstants;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
+import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.web.servlet.ModelAndView;
@@ -60,25 +64,53 @@ public class MyRPJSONController extends MultiActionController
         if (rp == null)
         {
             rp = new ResearcherPage();
-            rp.setEpersonID(getCurrentUser(request).getID());
+            EPerson currentUser = getCurrentUser(request);
+			rp.setEpersonID(currentUser.getID());
+            
+            Metadatum[] md = currentUser.getMetadata("eperson", "orcid", null, null);
+            if (md != null && md.length > 0) {
+            	Metadatum[] mdToken = currentUser.getMetadata("eperson", "orcid", "accesstoken", null);
+            	String token = null;
+            	if (mdToken != null && mdToken.length > 0) {
+            		token = mdToken[0].value;
+            	}
+            	String orcid = md[0].value;
+				boolean orcidPopulated = OrcidPreferencesUtils.populateRP(rp, orcid, token);
+            	if (!orcidPopulated && token != null) {
+            		orcidPopulated = OrcidPreferencesUtils.populateRP(rp, orcid);
+            	};
+            	
+            	if (orcidPopulated) {
+            		rp.setSourceRef("orcid");
+            		rp.setSourceID(orcid);
+            	}
+            }
+            
             RPPropertiesDefinition fN = applicationService
                     .findPropertiesDefinitionByShortName(
                             RPPropertiesDefinition.class, "fullName");
-            TextValue val = new TextValue();
-            val.setOggetto(getCurrentUser(request).getFullName());
-            RPProperty prop = rp.createProprieta(fN);
-            prop.setValue(val);
-            prop.setVisibility(VisibilityConstants.PUBLIC);
+            
+            List<RPProperty> proprietaDellaTipologia = rp.getProprietaDellaTipologia(fN);
+			if (proprietaDellaTipologia == null || proprietaDellaTipologia.size() == 0) {
+	            TextValue val = new TextValue();
+	            val.setOggetto(currentUser.getFullName());
+	            RPProperty prop = rp.createProprieta(fN);
+	            prop.setValue(val);
+	            prop.setVisibility(VisibilityConstants.PUBLIC);
+			}
             
             RPPropertiesDefinition email = applicationService
                     .findPropertiesDefinitionByShortName(
                             RPPropertiesDefinition.class, "email");
-            TextValue valE = new TextValue();
-            valE.setOggetto(getCurrentUser(request).getEmail());
-            RPProperty propE = rp.createProprieta(email);
-            propE.setValue(valE);
-            propE.setVisibility(VisibilityConstants.HIDE);
             
+            proprietaDellaTipologia = rp.getProprietaDellaTipologia(email);
+			if (proprietaDellaTipologia == null || proprietaDellaTipologia.size() == 0) {
+	            TextValue valE = new TextValue();
+	            valE.setOggetto(currentUser.getEmail());
+	            RPProperty propE = rp.createProprieta(email);
+	            propE.setValue(valE);
+	            propE.setVisibility(VisibilityConstants.HIDE);
+			}
             applicationService.saveOrUpdate(ResearcherPage.class, rp);
         }
         returnStatusJSON(response, rp);

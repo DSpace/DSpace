@@ -575,9 +575,10 @@ public class ResearcherPage extends
         for (RPProperty property : this.getDynamicField().getAnagrafica4view()
                 .get(pdef_dept))
         {
+
             OUPointer pointer = (OUPointer) property.getValue();
             RestrictedFieldWithLock result = new RestrictedFieldWithLock();
-            result.setValue(pointer.getObject().getDisplayValue());
+            result.setValue(pointer.getObject().getName());
             result.setVisibility(property.getVisibility());
             result.setLock(property.getLockDef());
             result.setAuthority(pointer.getObject().getCrisID());
@@ -694,5 +695,11 @@ public class ResearcherPage extends
 	public void setOldMapOrcidProfilePreference(Map<String, List<String>> oldMapOrcidProfilePreference) {
 		this.oldMapOrcidProfilePreference = oldMapOrcidProfilePreference;
 	}
+
+    @Override
+    public Class<ResearcherPage> getCRISTargetClass()
+    {
+        return ResearcherPage.class;
+    }
 
 }

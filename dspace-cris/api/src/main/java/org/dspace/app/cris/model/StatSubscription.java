@@ -73,7 +73,9 @@ public class StatSubscription extends IdentifiableObject {
 	public static final int FREQUENCY_WEEKLY = 7;
 	@Transient
 	public static final int FREQUENCY_MONTHLY = 30;
-	
+    @Transient
+    public static final int FREQUENCY_YEAR = 365;
+    
     public Integer getId()
     {
         return id;

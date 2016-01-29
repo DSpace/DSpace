@@ -47,7 +47,7 @@
     <h1><fmt:message key="jsp.dspace-admin.index.heading"/></h1>
     
     <%-- <p>Please select an operation from the main menu bar.</p> --%>
-    <p><fmt:message key="jsp.dspace-admin.index.text"/></p>
+    <p class="blank-page"><fmt:message key="jsp.dspace-admin.index.text"/></p>
 </dspace:layout>
 <%
     }

@@ -7,11 +7,11 @@
  */
 package org.dspace.app.webui.cris.controller;
 
-import it.cilea.osd.jdyna.model.IContainable;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,11 +20,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.discovery.CrisSearchService;
+import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.model.OrganizationUnit;
+import org.dspace.app.cris.model.Project;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.ResearcherPage;
-import org.dspace.app.cris.model.jdyna.BoxResearcherPage;
-import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.DynamicNestedPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.DynamicObjectType;
+import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.DynamicTypeNestedObject;
 import org.dspace.app.cris.model.jdyna.TabResearcherPage;
 import org.dspace.app.cris.util.ImportExportUtils;
 import org.dspace.app.webui.cris.dto.ExportParametersDTO;
@@ -32,8 +43,12 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
+
+import it.cilea.osd.jdyna.model.ATypeNestedObject;
+import it.cilea.osd.jdyna.model.IContainable;
 
 /**
  * This SpringMVC controller is responsible to handle request of export
@@ -41,123 +56,195 @@ import org.springframework.web.servlet.ModelAndView;
  * @author cilea
  * 
  */
-public class ExportFormController extends BaseFormController {
+public class ExportFormController extends BaseFormController
+{
 
-	private static final DateFormat dateFormat = new SimpleDateFormat(
-			"dd-MM-yyyy HH:mm");
+    private static final DateFormat dateFormat = new SimpleDateFormat(
+            "dd-MM-yyyy HH:mm");
 
-	private CrisSearchService searchService;
-	
-	@Override
-	protected Map referenceData(HttpServletRequest request) throws Exception {
-		
-		Map<String, Object> map =  new HashMap<String, Object>();
-		map.put("tabs", applicationService.getList(TabResearcherPage.class));
-		return map;
-	}
-	
-	@Override
-	protected Object formBackingObject(HttpServletRequest request)
-			throws Exception {
-		Context context = UIUtil.obtainContext(request);
-		if (!AuthorizeManager.isAdmin(context)) {
-			throw new AuthorizeException(
-					"Only system administrator can access to the export functionality");
-		}
-		return super.formBackingObject(request);
-	}
+    private CrisSearchService searchService;
 
-	@Override
-	protected ModelAndView onSubmit(HttpServletRequest request,
-			HttpServletResponse response, Object command, BindException errors)
-			throws Exception {
-		ExportParametersDTO exportParameters = (ExportParametersDTO) command;
+    @Override
+    protected Map referenceData(HttpServletRequest request) throws Exception
+    {
 
-		List<String> f = new LinkedList<String>();
-		List<String> q = new LinkedList<String>();
-		addToTempQuery("names", exportParameters.getNames(), f, q,
-				!exportParameters.getAdvancedSyntax());
+        Map<String, Object> map = new HashMap<String, Object>();
 
-		addToTempQuery("dept", exportParameters.getDept(), f, q,
-				!exportParameters.getAdvancedSyntax());
+        map.put("tabs", applicationService.getList(TabResearcherPage.class));
+        map.put("dynamicobjects",
+                applicationService.getList(DynamicObjectType.class));
+        return map;
+    }
 
-		addToTempQuery("interests", exportParameters.getInterests(), f, q,
-				!exportParameters.getAdvancedSyntax());
+    @Override
+    protected Object formBackingObject(HttpServletRequest request)
+            throws Exception
+    {
+        Context context = UIUtil.obtainContext(request);
+        if (!AuthorizeManager.isAdmin(context))
+        {
+            throw new AuthorizeException(
+                    "Only system administrator can access to the export functionality");
+        }
+        return super.formBackingObject(request);
+    }
 
-		addToTempQuery("media", exportParameters.getMedia(), f, q,
-				!exportParameters.getAdvancedSyntax());
+    @Override
+    protected ModelAndView onSubmit(HttpServletRequest request,
+            HttpServletResponse response, Object command, BindException errors)
+                    throws Exception
+    {
+        ExportParametersDTO exportParameters = (ExportParametersDTO) command;
+        ACrisObject object = null;
+        List<ACrisObject> list = new ArrayList<ACrisObject>();
+        try
+        {
+            try
+            {
+                SolrQuery query = new SolrQuery(exportParameters.getQuery());
+                if (exportParameters.getFilter() != null)
+                {
+                    int parseInt = Integer
+                            .parseInt(exportParameters.getFilter());
+                    if (parseInt > CrisConstants.CRIS_DYNAMIC_TYPE_ID_START)
+                    {
+                        object = new ResearchObject();                        
+                    }
+                    else
+                    {
+                        if (parseInt == CrisConstants.RP_TYPE_ID)
+                        {
+                            object = new ResearcherPage();
+                        }
+                        else
+                        {
+                            if (parseInt == CrisConstants.PROJECT_TYPE_ID)
+                            {
+                                object = new Project();
+                            }
+                            else
+                            {
+                                object = new OrganizationUnit();
+                            }
+                        }
+                    }
+                    query.addFilterQuery("{!field f=search.resourcetype}"
+                            + exportParameters.getFilter());
+                }
+                query.setFields("search.resourceid", "search.resourcetype",
+                        "cris-uuid");
+                query.setRows(Integer.MAX_VALUE);
+                QueryResponse qresponse = searchService.search(query);
+                SolrDocumentList docList = qresponse.getResults();
+                Iterator<SolrDocument> solrDoc = docList.iterator();
+                while (solrDoc.hasNext())
+                {
+                    SolrDocument doc = solrDoc.next();
+                    String uuid = (String) doc.getFirstValue("cris-uuid");
+                    list.add(applicationService.getEntityByUUID(uuid));
+                }
+            }
+            catch (SearchServiceException e)
+            {
+                log.error("Error retrieving documents", e);
+            }
+        }
+        catch (Exception e)
+        {
+            errors.reject("jsp.layout.hku.export.validation.notvalid.query");
+            return showForm(request, errors, getFormView());
 
-		String[] temp_query = new String[] {};
-		temp_query = q.toArray(temp_query);
-		String[] temp_fields = new String[] {};
-		temp_fields = f.toArray(temp_fields);
-		List<ResearcherPage> list = null;
-		try {
-			//TODO
-//			list = searchService.search(temp_fields, temp_query,
-//					exportParameters.getStatus(),
-//					exportParameters.getCreationStart(),
-//					exportParameters.getCreationEnd(),
-//					exportParameters.getStaffNoStart(),
-//					exportParameters.getStaffNoEnd(),
-//					exportParameters.getRpIdStart(),
-//					exportParameters.getRpIdEnd(),
-//					exportParameters.getDefaultOperator(), ResearcherPage.class);
-		} catch (Exception e) {
-			errors.reject("jsp.layout.hku.export.validation.notvalid.query");
-			return showForm(request, errors, getFormView());
+        }
 
-		}
+        List<IContainable> metadataFirstLevel = new ArrayList<IContainable>();
+        List<IContainable> metadataNestedLevel = new LinkedList<IContainable>();
+        
+        int parseInt = Integer
+                .parseInt(exportParameters.getFilter());
+        if (parseInt > CrisConstants.CRIS_DYNAMIC_TYPE_ID_START)
+        {
+            DynamicObjectType type = applicationService.get(DynamicObjectType.class, (parseInt-CrisConstants.CRIS_DYNAMIC_TYPE_ID_START));
+            List<DynamicPropertiesDefinition> tps = type.getMask();            
+            for (DynamicPropertiesDefinition tp : tps)
+            {
+                IContainable ic = applicationService.findContainableByDecorable(
+                        tp.getDecoratorClass(), tp.getId());
+                if (ic != null)
+                {
+                    metadataFirstLevel.add(ic);
+                }
+            }
+            List<DynamicTypeNestedObject> ttps = type.getTypeNestedDefinitionMask();
+            for (DynamicTypeNestedObject ttp : ttps)
+            {
+                IContainable ic = applicationService.findContainableByDecorable(
+                        ttp.getDecoratorClass(), ttp.getId());
+                if (ic != null)
+                {
+                    metadataNestedLevel.add(ic);
+                }
+            }
+        }
+        else
+        {
+            metadataFirstLevel = applicationService
+                    .findAllContainables(object.getClassPropertiesDefinition());
+            List<ATypeNestedObject> ttps = applicationService
+                    .getList(object.getClassTypeNested());
+            
+            for (ATypeNestedObject ttp : ttps)
+            {
+                IContainable ic = applicationService.findContainableByDecorable(
+                        ttp.getDecoratorClass(), ttp.getId());
+                if (ic != null)
+                {
+                    metadataNestedLevel.add(ic);
+                }
+            }
+        }
 
-		// export all tab
-		List<IContainable> containables = new LinkedList<IContainable>();
-		if (exportParameters.getTabToExport() == null || exportParameters.getTabToExport().isEmpty()) {
-			containables = applicationService
-			.findAllContainables(RPPropertiesDefinition.class);
-		} else {
-			for(Integer tab : exportParameters.getTabToExport()) {
-				for(BoxResearcherPage box : applicationService.<BoxResearcherPage, TabResearcherPage>findPropertyHolderInTab(TabResearcherPage.class, tab)) {
-					containables.addAll(box.getMask());
-					applicationService.findOtherContainablesInBoxByConfiguration(box.getShortName(), containables);
-				}
-			}
-		}
 
-		if (exportParameters.getMainMode() == null) {
-			response.setContentType("application/excel");
-			response.addHeader("Content-Disposition",
-					"attachment; filename=rpdata.xls");
-			ImportExportUtils.exportData(list, applicationService,
-					response.getOutputStream(), containables);
-			response.getOutputStream().flush();
-			response.getOutputStream().close();
-		} else {
-			response.setContentType("application/xml;charset=UTF-8");
-			response.addHeader("Content-Disposition",
-					"attachment; filename=rpdata.xml");
-	        ImportExportUtils.exportXML(response.getWriter(),
-	                    applicationService, containables,
-	                    list);
-			response.getWriter().flush();
-			response.getWriter().close();
-		}
 
-		return null;
-	}
+        // if (exportParameters.getMainMode() == null) {
+        response.setContentType("application/excel");
+        response.addHeader("Content-Disposition",
+                "attachment; filename=dspace-cris-exportdata.xls");
+        ImportExportUtils.exportCSV(list, applicationService,
+                response.getOutputStream(), metadataFirstLevel,
+                metadataNestedLevel);
+        response.getOutputStream().flush();
+        response.getOutputStream().close();
+        // } else {
+        // response.setContentType("application/xml;charset=UTF-8");
+        // response.addHeader("Content-Disposition",
+        // "attachment; filename=dspace-cris-exportdata.xml");
+        // ImportExportUtils.exportXML(response.getWriter(),
+        // applicationService, metadataFirstLevel, metadataNestedLevel,
+        // list);
+        // response.getWriter().flush();
+        // response.getWriter().close();
+        // }
 
-	private void addToTempQuery(String fieldName, String value, List<String> f,
-			List<String> q, boolean escape) {
-		if (StringUtils.isNotBlank(value)) {
-			q.add(escape ? ClientUtils.escapeQueryChars(value) : value);
-			f.add(fieldName);
-		}
-	}
+        return null;
+    }
 
-	public CrisSearchService getSearchService() {
-		return searchService;
-	}
+    private void addToTempQuery(String fieldName, String value, List<String> f,
+            List<String> q, boolean escape)
+    {
+        if (StringUtils.isNotBlank(value))
+        {
+            q.add(escape ? ClientUtils.escapeQueryChars(value) : value);
+            f.add(fieldName);
+        }
+    }
 
-	public void setSearchService(CrisSearchService searchService) {
-		this.searchService = searchService;
-	}
+    public CrisSearchService getSearchService()
+    {
+        return searchService;
+    }
+
+    public void setSearchService(CrisSearchService searchService)
+    {
+        this.searchService = searchService;
+    }
 }

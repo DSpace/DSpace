@@ -113,6 +113,9 @@ public class ItemListTag extends TagSupport {
 
     private static final long serialVersionUID = 348762897199116432L;
 
+    /** Config to use a specific configuration */
+    private String config = null;
+    
 	static {
 
         showThumbs = ConfigurationManager
@@ -186,7 +189,15 @@ public class ItemListTag extends TagSupport {
 						+ sortOption.getName() + ".widths");
             }
         }
-
+        
+		if (config != null)
+        {
+		    configLine = ConfigurationManager.getProperty("webui.itemlist."
+                    + config + ".columns");
+		    widthLine = ConfigurationManager
+                    .getProperty("webui.itemlist." + config + ".widths");
+        }
+        
 		if (configLine == null) {
 			configLine = ConfigurationManager
 					.getProperty("webui.itemlist.columns");
@@ -278,10 +289,10 @@ public class ItemListTag extends TagSupport {
 				if (!StringUtils.isEmpty(tablewidth)) {
 					out.println("<table border=\"0\" style=\"width: "
 							+ tablewidth
-							+ "; table-layout: fixed;\" align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
+							+ "; table-layout: fixed;\" align=\"center\" class=\"table table-hover\" summary=\"This table browses all dspace content\">");
 				} else {
                     // Otherwise, don't constrain the width
-					out.println("<table border=\"0\" align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
+					out.println("<table border=\"0\" align=\"center\" class=\"table table-hover\" summary=\"This table browses all dspace content\">");
                 }
 
                 // Output the known column widths
@@ -309,9 +320,9 @@ public class ItemListTag extends TagSupport {
 			} else if (!StringUtils.isEmpty(tablewidth)) {
 				out.println("<table width=\""
 						+ tablewidth
-						+ "\" align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
+						+ "\" align=\"center\" class=\"table table-hover\" summary=\"This table browses all dspace content\">");
 			} else {
-                out.println("<table align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
+                out.println("<table align=\"center\" class=\"table table-hover\" summary=\"This table browses all dspace content\">");
             }
 
             // Output the table headers
@@ -398,11 +409,11 @@ public class ItemListTag extends TagSupport {
 							if (isDesc) {
 								thJs += " 'ASC'";
 								css += " sorted_desc";
-								csssort += "fa fa-sort-asc pull-right";
+								csssort += "fa fa-sort-desc pull-right";
 							} else {
 								thJs += " 'DESC'";
 								css += " sorted_asc";								
-								csssort += "fa fa-sort-desc pull-right";
+								csssort += "fa fa-sort-asc pull-right";
 							}
 						} else {
 							thJs += " 'ASC'";
@@ -484,20 +495,38 @@ public class ItemListTag extends TagSupport {
                     String schema = tokens[0];
                     String element = tokens[1];
                     String qualifier = tokens[2];
-
+                    
                     // first get hold of the relevant metadata for this column
-                    Metadatum[] metadataArray;
-					if (qualifier.equals("*")) {
-						metadataArray = items[i].getMetadata(schema, element,
-								Item.ANY, Item.ANY);
-					} else if (qualifier.equals("")) {
-						metadataArray = items[i].getMetadata(schema, element,
-								null, Item.ANY);
-					} else {
-						metadataArray = items[i].getMetadata(schema, element,
-								qualifier, Item.ANY);
+                    Metadatum[] metadataArray = null;
+                    
+                    if (schema.equalsIgnoreCase("extra")) {
+                    	
+                    	String val = null;
+                    	Object obj = items[i].extraInfo.get(element);
+						if (obj != null) {
+							val = String.valueOf(obj);
+						}
+                    	if (StringUtils.isNotBlank(val)) {
+                    		metadataArray = new Metadatum[1];
+                    		metadataArray[0] = new Metadatum();
+                    		metadataArray[0].value = val;
+                    		metadataArray[0].schema = "extra";
+                    		metadataArray[0].element = element;
+                    	}
                     }
-
+                    else {
+	                    
+						if (qualifier.equals("*")) {
+							metadataArray = items[i].getMetadata(schema, element,
+									Item.ANY, Item.ANY);
+						} else if (qualifier.equals("")) {
+							metadataArray = items[i].getMetadata(schema, element,
+									null, Item.ANY);
+						} else {
+							metadataArray = items[i].getMetadata(schema, element,
+									qualifier, Item.ANY);
+	                    }
+                    }
                     // save on a null check which would make the code untidy
 					if (metadataArray == null) {
                         metadataArray = new Metadatum[0];
@@ -763,4 +792,9 @@ public class ItemListTag extends TagSupport {
 		else
 			isDesc = false;
 	}
+
+    public void setConfig(String config)
+    {
+        this.config = config;
+    }
 }

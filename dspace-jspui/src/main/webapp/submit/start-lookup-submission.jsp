@@ -66,6 +66,7 @@
 	.sl-result-authors {font-style: italic;}
 	.sl-result-date {margin-bottom: 10px;}
 	.invalid-value {border: 1px solid #FF6600;}
+	.img-thumbnail {height: 35px !important;}
 	</style>	
 	<script type='text/javascript'>var dspaceContextPath = "<%=request.getContextPath()%>";</script>		
 </c:set>
@@ -115,23 +116,57 @@
 %>            
 
 <div id="tabs">
-	<ul class="nav nav-tabs">
-		<li class="active"><a href="#tabs-search"><fmt:message key="jsp.submit.start-lookup-submission.tabs.search" /></a></li>
+	<ul>
+		<li><a href="#tabs-search"><fmt:message key="jsp.submit.start-lookup-submission.tabs.search" /></a></li>
 		<li><a href="#tabs-result"><fmt:message key="jsp.submit.start-lookup-submission.tabs.result" /></a></li>
 	</ul>
-	<div class="tab-content">
-	<div class="tab-pane" id="tabs-search">
-
-		
-	<div id="tabs-search-accordion">
-	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.manual-submission"/></a></h3>
-		<div id="manual-accordion">&nbsp;</div>
+	<div id="tabs-search">
+	<!-- da qui -->
+	<div class="panel-group" id="accordion">
+	  <div class="panel panel-default">
+	    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+	      <h4 class="panel-title">
+	        <a>
+	          <i span class="fa fa-chevron-down"></i> <fmt:message key="jsp.submit.start-lookup-submission.manual-submission"/>
+	        </a>
+	      </h4>
+	    </div>
+	    <div id="collapseOne" class="panel-collapse collapse in">
+	      <div class="panel-body">
+	      	<div id="manual-submission">
+				<form class="form-horizontal" id="form-submission" action="" method="post">
+					<div class="form-group">
+						<label for="select-collection-manual" class="col-sm-2 control-label"><fmt:message key="jsp.submit.start-lookup-submission.select.collection.label"/></label>
+						<div class="col-sm-7">
+								<dspace:selectcollection klass="form-control" id="select-collection-manual" collection="<%= collection_id %>"/>
+						</div>
+						<button class="btn btn-success" id="manual-submission-button" type="button"><fmt:message key="jsp.submit.start-lookup-submission.button.manual-submission"/> </button>
+					</div>
+					<input type="hidden" id="iuuid" name="iuuid" value=""/>
+					<input type="hidden" id="fuuid" name="fuuid" value=""/>
+					<input type="hidden" id="suuid" name="suuid" value="<%= uuid %>"/>
+					<input type="hidden" id="collectionid" name="collectionid" value=""/>
+					<input type="hidden" id="iuuid_batch" name="iuuid_batch" value=""/>
+					<input type="hidden" id="colid_batch" name="colid_batch" value=""/>					
+				</form>
+			</div>
+	      </div>
+	    </div>
+	  </div>
 <%		
 	if (searchProviders != null && searchProviders.size() > 0) {
 	%>
-		<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.search"/></a></h3>
-		<div id="search-accordion">
-		<form class="form-horizontal" id="form-submission-search" action="" method="post">
+	  <div class="panel panel-default">	
+	    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+	      <h4 class="panel-title">
+	        <a>
+	          <i span class="fa fa-chevron-right"></i> <fmt:message key="jsp.submit.start-lookup-submission.search"/>
+	        </a>
+	      </h4>
+	    </div>
+	    <div id="collapseTwo" class="panel-collapse collapse">
+	      <div class="panel-body">
+	      	<form id="form-submission-search" action="" method="post">
 		<input type="hidden" id="suuid-search" name="suuid" value="<%= uuid %>"/>
 		<input type="hidden" id="iuuid-search" name="iuuid" value=""/>
 		<input type="hidden" id="fuuid-search" name="fuuid" value=""/>
@@ -161,14 +196,21 @@
 		
 		<div class="row">			
 			<button type="button" class="btn btn-primary col-md-2 pull-right" id="search_go"><fmt:message key="jsp.submit.start-lookup-submission.search-go"/></button>
-		</div>
 		</form>
 	</div>
+	    </div>
+	  </div>
 <% } %>	
-	
-
-	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.identifiers"/></a></h3>
-	<div id="identifier-accordion">
+	<div class="panel panel-default">
+	    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+	      <h4 class="panel-title">
+	        <a>
+	          <i span class="fa fa-chevron-right"></i> <fmt:message key="jsp.submit.start-lookup-submission.identifiers"/>
+	        </a>
+	      </h4>
+	    </div>
+	    <div id="collapseThree" class="panel-collapse collapse">
+	      <div class="panel-body">
 		<form class="form-horizontal" id="form-submission-identifier" action="" method="post">
 		<input type="hidden" id="suuid-identifier" name="suuid" value="<%= uuid %>"/>
 		<input type="hidden" id="iuuid-identifier" name="iuuid" value=""/>
@@ -184,37 +226,47 @@
 %>
 <c:set var="identifier"><%= identifier %></c:set>
 	<div class="form-group">
-		<label class="col-md-3" for="identifier_<%= identifier%>"><span class="submission-lookup-label"><fmt:message key="jsp.submit.start-lookup-submission.identifier-${identifier}"/>:</span> 
-		<span class="help-block submission-lookup-hint"><fmt:message key="jsp.submit.start-lookup-submission.identifier-${identifier}.hint"/></span></label>
-		<div class="col-md-9">
-		<div class="col-md-4">
-		<input class="form-control  submission-lookup-identifier" type="text" name="identifier_<%= identifier%>" id="identifier_<%= identifier%>" />
-		</div>
-		<div class="col-md-7">
+		<span class="col-md-3">
+			<label for="identifier_<%= identifier%>"><span class="submission-lookup-label"><fmt:message key="jsp.submit.start-lookup-submission.identifier-${identifier}"/>:</span>
+			</label>
+		</span>
+		<span class="col-md-9">		
 <%	
 			for (String provider : identifiers2providers.get(identifier))
 			{			
 %>
-		
 			<img class="img-thumbnail" src="<%= request.getContextPath() %>/image/submission-lookup-small-<%= provider %>.jpg" />
-		
 <% 
 			}
-%></div></div></div><%
-		} %>				
-	<div class="row">	
-		&nbsp;<button class="btn btn-primary col-md-2 pull-right" type="button" id="lookup_idenfifiers"><fmt:message key="jsp.submit.start-lookup-submission.identifier.lookup"/></button>
+%>
+		</span>	 
+		<span class="clearfix"></span>
+		<span class="col-md-3 help-block submission-lookup-hint"><fmt:message key="jsp.submit.start-lookup-submission.identifier-${identifier}.hint"/></span></label>
+		<div class="col-md-9">
+		<input type="text" class="form-control  submission-lookup-identifier" name="identifier_<%= identifier%>" id="identifier_<%= identifier%>" />
 	</div>
+		</div><%
+		} %>				
+		<button class="btn btn-primary col-md-2 pull-right" type="button" id="lookup_idenfifiers"><fmt:message key="jsp.submit.start-lookup-submission.identifier.lookup"/></button>
 	</form>
 	</div>
+</div>
+</div>
 <% 
 		
 	} %>
-
 	<% if (fileLoaders != null && fileLoaders.size()>0) {
 	%>
-	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.byfile"/></a></h3>
-	<div id="file-accordion" class="container">	
+	  <div class="panel panel-default">
+	    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
+	      <h4 class="panel-title">
+	        <a>
+	          <i span class="fa fa-chevron-right"></i> <fmt:message key="jsp.submit.start-lookup-submission.byfile"/>
+	        </a>
+	      </h4>
+	    </div>
+	    <div id="collapseFour" class="panel-collapse collapse">
+	      <div class="panel-body">
 	<form class="form-horizontal" id="form-submission-loader" action="" method="post">
 		<input type="hidden" id="suuid-loader" name="suuid" value="<%= uuid %>"/>
 		<input type="hidden" id="iuuid-loader" name="iuuid" value=""/>
@@ -223,15 +275,15 @@
 	<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.byfile.hints"/></p>
 	
 	<div class="form-group">
-	<label class="col-md-3" for="provider_loader"><span class="submission-lookup-label"><fmt:message key="jsp.submit.start-lookup-submission.byfile.chooseprovider"/>:</span></label>
+			<label class="col-md-3" for="provider_loader"><fmt:message key="jsp.submit.start-lookup-submission.byfile.chooseprovider"/>:</label>
 	<div class="col-md-6">
 	<select class="form-control submission-file-loader" name="provider_loader" id="provider_loader">
-	<option value="-1"><fmt:message key="jsp.submit.start-lookup-submission.select.collection.defaultoption"/></option>
+			<option value="-1"><fmt:message key="jsp.submit.start-lookup-submission.select.fileformat.defaultoption"/></option>
 	<%	
-	for (String dataLoader : fileLoaders)
-		{			
+			for (String dataLoader : fileLoaders){			
+				String fileLoaderKey = "jsp.submit.start-lookup-submission.select.fileformat." + dataLoader;
 	%>
-				<option value="<%= dataLoader %>"><%= dataLoader %></option>
+				<option value="<%= dataLoader %>"><fmt:message key="<%= fileLoaderKey %>"/></option>
 	<% 
 		}
 	%>
@@ -240,13 +292,18 @@
 	</div>
 	<div class="form-group">
 			<label class="col-md-3" for="file_upload"><fmt:message key="jsp.submit.start-lookup-submission.byfile.file"/>:</label>
-			<div class="col-md-7"> 
-			<input class="form-control submission-file-loader" type="file" name="file_upload" id="file_upload" />
+				<div class="col-md-6"> 
+					<input class="submission-file-loader" type="file" name="file_upload" id="file_upload" />
+				</div>
+		</div>
+		<div class="form-group">
+		    <div class="col-md-offset-3 col-md-6">
+		      <div class="checkbox">
+		        <label>
+		          <input class="submission-file-loader submission-preview-loader" type="checkbox" name="preview_loader" id="preview_loader" value="<%= Boolean.TRUE%>"/><fmt:message key="jsp.submit.start-lookup-submission.byfile.filepreview"/>
+		        </label>
 			</div>
 	</div>
-	
-	<div class="container checkbox">
-      <input class="submission-file-loader submission-preview-loader" type="checkbox" name="preview_loader" id="preview_loader" value="<%= Boolean.TRUE%>"/><span class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.byfile.filepreview"/></span>
   	</div>
   
 	<div class="form-group" id="select-collection-file-div">
@@ -254,48 +311,28 @@
 				<div class="col-md-6">
                                   <dspace:selectcollection klass="form-control submission-file-loader" name="select-collection-file" id="select-collection-file" collection="<%= collection_id %>"/>
 				</div>
-				<button class="btn btn-primary col-md-2 pull-right" type="button" id="loadfile_go"><fmt:message key="jsp.submit.start-lookup-submission.byfile.process"/></button>
 	</div>
+		<button class="btn btn-primary col-md-2 pull-right" type="button" id="loadfile_go"><fmt:message key="jsp.submit.start-lookup-submission.byfile.process"/></button>
 		</form>
 	</div>
+	    </div>
+	  </div>
+  </div>
 <% 
 		
 	} %>
-
-	</div>
-
 </div>
-
-<div class="tab-pane" id="tabs-result">
+	<div id="tabs-result">
 		<div id="empty-result">
 			<p class="alert alert-warning"><fmt:message key="jsp.submit.start-lookup-submission.noresult"/></p>
+			<div id="no_result_manual_submission"></div>
 		</div>
 		<div id="result-list"></div>
-		<div id="manual-submission">
-			<div class="form-group">
-			<div class="col-md-3">
-			<label for="select-collection-manual"><fmt:message key="jsp.submit.start-lookup-submission.select.collection.label"/></label>
-			</div>
-			<div class="col-md-7">
-                          <dspace:selectcollection klass="form-control" id="select-collection-manual" collection="<%= collection_id %>"/>
-			</div>
-			</div>
-			<form class="form-horizontal" id="form-submission" action="" method="post">
-			<input type="hidden" id="iuuid" name="iuuid" value=""/>
-			<input type="hidden" id="fuuid" name="fuuid" value=""/>
-			<input type="hidden" id="suuid" name="suuid" value="<%= uuid %>"/>
-			<input type="hidden" id="collectionid" name="collectionid" value=""/>
-			<div class="btn-group">
-				<button class="btn btn-success col-md-offset-5" id="manual-submission-button" type="button"><fmt:message key="jsp.submit.start-lookup-submission.button.manual-submission"/> </button>
-			</div>
-			</form>
-		</div>	
 	</div>
-	<div class="row container">
+
+		<div class="clearFix">&nbsp;</div>
         <button type="button" class="btn btn-default col-md-2 pull-right exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button>
     </div>
-</div>
-</div>
 		<div id="hidden-area" style="display: none;">
 			<div id="select-collection-div">
                           <dspace:selectcollection klass="form-control" id="select-collection" collection="<%= collection_id %>"/>
@@ -310,11 +347,28 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title"><fmt:message key="jsp.submit.start-lookup-submission.no-collection-warn.title" /></h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body with-padding">
        		<p class="alert alert-warning"><fmt:message key="jsp.submit.start-lookup-submission.no-collection-warn.hint" /></p>
       </div>
       <div class="modal-footer">
       		<button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="jsp.submit.start-lookup-submission.no-collection.dialog.return" /></button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="no-record-warn" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><fmt:message key="jsp.submit.start-lookup-submission.no-record-warn.title" /></h4>
+      </div>
+      <div class="modal-body with-padding">
+       		<p class="alert alert-warning"><fmt:message key="jsp.submit.start-lookup-submission.no-record-warn.hint" /></p>
+      </div>
+      <div class="modal-footer">
+      		<button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="jsp.submit.start-lookup-submission.no-record.dialog.return" /></button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -327,7 +381,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title"><fmt:message key="jsp.submit.start-lookup-submission.search-loading.title" /></h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body with-padding">
        		<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.search-loading.hint" /></p>
       </div>
       <div class="modal-footer">
@@ -344,7 +398,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title"><fmt:message key="jsp.submit.start-lookup-submission.search-loading.title" /></h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body with-padding">
        		<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.search-loading.hint" /></p>
       </div>
       <div class="modal-footer">
@@ -361,7 +415,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title"><fmt:message key="jsp.submit.start-lookup-submission.js.titlepopupmessage" /></h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body with-padding">
        		
       </div>
       <div class="modal-footer">
@@ -371,39 +425,48 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
       
+<div id="error-file-result" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><fmt:message key="jsp.submit.start-lookup-submission.error.title" /></h4>
+      </div>
+      <div class="modal-body with-padding">
+       		<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.error.hint" /></p>
+       		<p id="error-file-exception" style="display:none;"></p>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+      
 <%  } else { %>
 	<p class="submitFormWarn"><fmt:message key="jsp.submit.select-collection.none-authorized"/></p>
 <%  } %>
-	<br/>
-	   <p><fmt:message key="jsp.general.goto"/><br />
-	   <a href="<%= request.getContextPath() %>"><fmt:message key="jsp.general.home"/></a><br />
-	   <a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.general.mydspace" /></a>
-	   </p>
 	<script type="text/javascript"><!--
-    	var j = jQuery.noConflict();
     	j("#tabs").tabs({
     		beforeActivate: function( event, ui ) {
-    			if ('tabs-result' == j(ui.newPanel).attr('id'))
+    			 j("li.active").toggleClass("active");
+    		},
+    		create: function( event, ui ) {
+            j("div.ui-tabs").toggleClass("ui-tabs ui-widget ui-widget-content ui-corner-all tabbable");
+            j("ul.ui-tabs-nav").toggleClass("ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all nav nav-tabs");
+            j("li.ui-tabs-active").toggleClass("ui-state-default ui-corner-top ui-tabs-active ui-state-active active");
+            j("li.ui-state-default").toggleClass("ui-state-default ui-corner-top");
+            j("div.ui-tabs-panel").toggleClass("ui-tabs-panel ui-widget-content ui-corner-bottom tab-content with-padding");
+            },
+        activate: function( event, ui ) {
+            j("li.ui-tabs-active").toggleClass("ui-tabs-active ui-state-active active");
+            if ('tabs-result' == ui.newPanel.attr('id'))
    				{
-    				j('#manual-submission').appendTo(j(ui.newPanel)); 
-    			}
-    			else
-   				{
-    				j('#manual-submission').appendTo(j('#manual-accordion'));
-   				}
+				j('#manual-submission>form').appendTo("#no_result_manual_submission");	
     		}
-    	});
-    	j('#tabs-search-accordion').accordion({
-    			heightStyle: "content",
-    			collapsible: true,
-    			active: false,
-    			beforeActivate: function( event, ui ) {
-    				if ('manual-accordion' == ui.newPanel.attr('id'))
-   					{
-    					j('#manual-submission').appendTo(ui.newPanel);	
+            else{
+            	j('#no_result_manual_submission>form').appendTo("#manual-submission");	
    					}
     			}
     	});
+   	
     	j('#link-ricerca-identificatore').click(function(){
     		j('#tabs-search-accordion').accordion({'active': 2});
     	});
@@ -438,7 +501,7 @@
     		j(this).data('ajaxCall').abort();
     	});
     	j('#loading-details').on('hidden.bs.modal', function () {
-  			 j('#hidden-area').append(j('#select-collection-div'));
+  			 
   			 j('#loading-details .modal-body').empty();
   			 j('#loading-details .modal-footer').empty();
    		});
@@ -450,7 +513,13 @@
     			j("#select-collection-file-div").show();
     		}
     	});
-    	j('#tabs-search-accordion').accordion({'active': 0});
+    	
+    	j('#accordion').on('show.bs.collapse', function(a) {
+    		j('i.fa-chevron-down').toggleClass('fa-chevron-down').toggleClass('fa-chevron-right');
+    		j(a.target).prev().find('a>i').toggleClass('fa-chevron-down').toggleClass('fa-chevron-right');
+    		//j('#accordion div.panel div.panel-heading h4.panel-title a i').toggleClass('fa-chevron-down');
+    	});
+    	
     --></script>
 	   
 </dspace:layout>

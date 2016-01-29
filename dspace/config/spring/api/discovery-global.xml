@@ -27,7 +27,7 @@
 		class="org.dspace.discovery.configuration.DiscoveryViewAndHighlightConfiguration">
 		<property name="viewConfiguration">						
 			<map>
-				<entry key="dspacecommunity">
+				<entry key="community">
 				<bean
 				class="org.dspace.discovery.configuration.DiscoveryViewConfiguration">								
 				
@@ -55,7 +55,7 @@
 				</property>
 				</bean>
 				</entry>
-				<entry key="dspacecollection">
+				<entry key="collection">
 				<bean
 				class="org.dspace.discovery.configuration.DiscoveryViewConfiguration">								
 				
@@ -83,101 +83,9 @@
 				</property>
 				</bean>
 				</entry>														
-				<entry key="dspacepublication">
-				<bean
-				class="org.dspace.discovery.configuration.DiscoveryViewConfiguration">								
-				
-				<property name="metadataHeadingFields">								
-					<list>
-						<bean
-							class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
-							<property name="mandatory" value="true"/>
-							<property name="preHtml" value="&lt;h4 class='text-primary'&gt;" />
-							<property name="field" value="dc.title" />
-							<property name="decorator" value="title" />
-						</bean>
-						<bean
-							class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
-							<property name="mandatory" value="true"/>
-							<property name="preHtml" value="&amp;nbsp; [" />
-							<property name="postHtml" value="]&lt;/h4&gt;" />
-							<property name="field" value="dc.date.issued" />
-							<property name="decorator" value="date" />
-						</bean>
-						<bean
-							class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
-							<property name="mandatory" value="true"/>
-							<property name="preHtml" value="&lt;span class='text-muted'&gt;" />
-							<property name="postHtml" value="&lt;/span&gt;" />
-							<property name="field" value="dc.contributor.author" />
-							<property name="decorator" value="crisref" />
-						</bean>
-					</list>
-				</property>
-				<property name="metadataDescriptionFields">
-					<list>
-						<bean
-							class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
-							<property name="field" value="dc.subject" />
-							<property name="postHtml" value="&lt;br /&gt;" />
-						</bean>
-						<bean
-							class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
-							<property name="field" value="dc.description.abstract" />
-							<property name="postHtml" value="&lt;br /&gt;" />
-						</bean>
-					</list>
-				</property>
-				</bean>
-				</entry>
-				<entry key="dspaceconferencepaper">
-				<bean
-				class="org.dspace.discovery.configuration.DiscoveryViewConfiguration">								
-				
-				<property name="metadataHeadingFields">								
-					<list>
-						<bean
-							class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
-							<property name="mandatory" value="true"/>
-							<property name="preHtml" value="&lt;h4 class='text-primary'&gt;" />
-							<property name="field" value="dc.title" />
-							<property name="decorator" value="title" />
-						</bean>
-						<bean
-							class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
-							<property name="mandatory" value="true"/>
-							<property name="preHtml" value="&amp;nbsp; [" />
-							<property name="postHtml" value="]&lt;/h4&gt;" />
-							<property name="field" value="dc.date.issued" />
-							<property name="decorator" value="date" />
-						</bean>
-						<bean
-							class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
-							<property name="mandatory" value="true"/>
-							<property name="preHtml" value="&lt;span class='text-muted'&gt;" />
-							<property name="postHtml" value="&lt;/span&gt;" />
-							<property name="field" value="dc.contributor.author" />
-							<property name="decorator" value="crisref" />
-						</bean>
-					</list>
-				</property>
-				<property name="metadataDescriptionFields">
-					<list>
-						<bean
-							class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
-							<property name="field" value="dc.subject" />
-							<property name="postHtml" value="&lt;br /&gt;" />
-						</bean>
-						<bean
-							class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
-							<property name="field" value="dc.description.abstract" />
-							<property name="postHtml" value="&lt;br /&gt;" />
-						</bean>
-					</list>
-				</property>
-				</bean>
-				</entry>
-				<entry key="crisrp">
+				<entry key="publications" value-ref="configurationItemViewLayout" />
+				<entry key="conferencematerials" value-ref="configurationItemViewLayout" />
+				<entry key="researcherprofiles">
 				<bean
 				class="org.dspace.discovery.configuration.DiscoveryViewConfiguration">
 				
@@ -202,7 +110,7 @@
 				</property>
 				</bean>
 				</entry>
-				<entry key="crispj">
+				<entry key="fundings">
 				<bean
 				class="org.dspace.discovery.configuration.DiscoveryViewConfiguration">
 				<property name="metadataHeadingFields">								
@@ -217,7 +125,7 @@
 				</property>
 				</bean>
 				</entry>
-				<entry key="crisou">
+				<entry key="orgunits">
 				<bean
 				class="org.dspace.discovery.configuration.DiscoveryViewConfiguration">
 				<property name="metadataHeadingFields">								
@@ -232,23 +140,54 @@
 				</property>
 				</bean>
 				</entry>
-				<entry key="dspacethesis">
-				<bean
-				class="org.dspace.discovery.configuration.DiscoveryViewConfiguration">
-								
-				<property name="metadataHeadingFields">								
-					<list>
-						<bean
-							class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
-							<property name="mandatory" value="true"/>
-							<property name="field" value="dc.title" />
-							<property name="decorator" value="title" />
-						</bean>						
-					</list>
-				</property>
-				</bean>
-				</entry>
+				<entry key="theses" value-ref="configurationItemViewLayout" />
+				<entry key="patents" value-ref="configurationItemViewLayout" />
+				<entry key="datasets" value-ref="configurationItemViewLayout" />
 			</map>
+		</property>
+	</bean>
+
+	<bean id="configurationItemViewLayout" class="org.dspace.discovery.configuration.DiscoveryViewConfiguration">								
+		<property name="metadataHeadingFields">								
+			<list>
+				<bean
+					class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
+					<property name="mandatory" value="true"/>
+					<property name="preHtml" value="&lt;h4 class='text-primary'&gt;" />
+					<property name="field" value="dc.title" />
+					<property name="decorator" value="title" />
+				</bean>
+				<bean
+					class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
+					<property name="mandatory" value="true"/>
+					<property name="preHtml" value="&amp;nbsp; [" />
+					<property name="postHtml" value="]&lt;/h4&gt;" />
+					<property name="field" value="dc.date.issued" />
+					<property name="decorator" value="date" />
+				</bean>
+				<bean
+					class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
+					<property name="mandatory" value="true"/>
+					<property name="preHtml" value="&lt;span class='text-muted'&gt;" />
+					<property name="postHtml" value="&lt;/span&gt;" />
+					<property name="field" value="dc.contributor.author" />
+					<property name="decorator" value="itemcrisref" />
+				</bean>
+			</list>
+		</property>
+		<property name="metadataDescriptionFields">
+			<list>
+				<bean
+					class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
+					<property name="field" value="dc.subject" />
+					<property name="postHtml" value="&lt;br /&gt;" />
+				</bean>
+				<bean
+					class="org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration">
+					<property name="field" value="dc.description.abstract" />
+					<property name="postHtml" value="&lt;br /&gt;" />
+				</bean>
+			</list>
 		</property>
 	</bean>
 

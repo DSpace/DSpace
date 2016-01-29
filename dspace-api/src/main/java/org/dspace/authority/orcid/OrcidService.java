@@ -39,6 +39,12 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
@@ -129,28 +135,24 @@ public class OrcidService extends RestSource {
 	/**
 	 * Returns the fields and "works" research activities that are set as
 	 * "Public" in the ORCID Record for the scholar represented by the specified
-	 * orcid_id. When used with an access token and the Member API,
-	 * limited-access data is also returned.
+	 * orcid_id. When used with  the Member API,
+	 * limited-access data is also returned if permissions were grant by the user.
 	 * 
 	 * Public API
 	 * 
 	 * @param id
-	 * @param token
 	 * @return
 	 */
 	public OrcidProfile getProfile(String id) {
 
-		WebTarget target = restConnector.getClientRest(id + READ_PROFILE_ENDPOINT);
-		String response = target.request().accept(MediaType.APPLICATION_XML).acceptEncoding("UTF-8").get(String.class);
-
-		OrcidMessage message = null;
+		OrcidAccessToken token;
 		try {
-			StringReader sr = new StringReader(response);
-			message = (OrcidMessage) orcidMessageContext.createUnmarshaller().unmarshal(sr);
-		} catch (JAXBException e) {
-			log.error(e);
+			token = getMemberSearchToken();
+		} catch (IOException e) {
+			throw new IllegalStateException(e.getMessage(), e);
 		}
-		return message.getOrcidProfile();
+		
+		return getProfile(id, token.getAccess_token());
 	}
 
 	/**
@@ -166,7 +168,16 @@ public class OrcidService extends RestSource {
 	 * @return
 	 */
 	public OrcidProfile getProfile(String id, String token) {
-
+		if (token == null) {
+			OrcidAccessToken atoken;
+			try {
+				atoken = getMemberSearchToken();
+			} catch (IOException e) {
+				throw new IllegalStateException(e.getMessage(), e);
+			}
+			token = atoken.getAccess_token();
+		}
+		
 		WebTarget target = restConnector.getClientRest(id + READ_PROFILE_ENDPOINT);
 		String response = target.request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
 				.accept(MediaType.APPLICATION_XML).acceptEncoding("UTF-8").get(String.class);
@@ -224,14 +235,16 @@ public class OrcidService extends RestSource {
 
 		String query = "";
 		if (StringUtils.isNotBlank(tmpPersonName.getLastName())) {
-			query += "family-name:" + tmpPersonName.getLastName().trim()
-					+ (StringUtils.isNotBlank(tmpPersonName.getFirstNames()) ? "" : "*");
+			query += "family-name:(" + tmpPersonName.getLastName().trim()
+					+ (StringUtils.isNotBlank(tmpPersonName.getFirstNames()) ? "" : "*")+")";
 		}
 
 		if (StringUtils.isNotBlank(tmpPersonName.getFirstNames())) {
-			query += (query.length() > 0 ? " AND given-names:" : "given-names:") + tmpPersonName.getFirstNames().trim()
-					+ "*";
+			query += (query.length() > 0 ? " AND given-names:(" : "given-names:(") + tmpPersonName.getFirstNames().trim()
+					+ "*)";
 		}
+
+		query += " OR other-names:(" + text + ")";
 
 		OrcidSearchResults results = search(query, start, max);
 
@@ -817,4 +830,53 @@ public class OrcidService extends RestSource {
 		this.baseURL = baseURL;
 	}
 	
+	public static void main(String[] args) throws JAXBException, IOException, ParseException
+    {
+        CommandLineParser parser = new PosixParser();
+
+        Options options = new Options();
+        options.addOption("h", "help", false, "help");
+        options.addOption("i", "clientid", true, "Client iD");
+        options.addOption("s", "clientsecret", true, "Client Secret");
+
+        CommandLine line = parser.parse(options, args);
+
+        if (line.hasOption('h')) {
+            HelpFormatter myhelp = new HelpFormatter();
+            myhelp.printHelp("OrcidService \n", options);
+            System.out.println(
+                    "\n\nUSAGE:\n OrcidService -i <yourclientid> -s <yourclientsecret>\n");
+            System.out.println(
+                    "\n\nEXAMPLE:\n OrcidService -i XACASCASCSACASAC -s d0adf2-3232-3223-3232\n");
+            System.exit(0);
+        }
+
+        if (line.hasOption('i') && line.hasOption('s')) {
+            String clientid = line.getOptionValue("i");
+            String secretid = line.getOptionValue("s");
+            System.out.println("Try to validate against ORCID MEMBER API 'http://api.orcid.org/v1.2' and ORCID MEMBER TOKEN URL 'https://api.orcid.org/oauth/token'");
+            System.out.println("Your Production Credentials:");
+            System.out.println("Client iD:'" + clientid + "'");
+            System.out.println("Client Secret:'" + secretid +"'");
+            
+            OrcidService orcidService = new OrcidService("http://api.orcid.org/v1.2", clientid, secretid, "https://api.orcid.org/oauth/token");
+            try {
+                orcidService.search("test", 1, 1);
+                System.out.println("OK!");
+            }
+            catch(Exception ex) {                
+                System.out.println("ERROR MESSAGE:" + ex.getMessage());                
+                System.out.println("FAILED!");
+            }
+        }
+        else {
+            System.out.println(
+                    "\n\nUSAGE:\n OrcidService -i <yourclientid> -s <yourclientsecret>\n");
+            System.out.println("Insert i and s parameters");
+            System.out.println("use -h for help");
+            System.exit(1);
+        }
+
+	    
+    }
 }

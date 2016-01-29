@@ -47,9 +47,9 @@ public class RPAdditionalFieldStorage extends
     @JoinColumn(name = "id")    
     private ResearcherPage researcherPage;    
     
-	@OneToMany(mappedBy = "parent")
+	@OneToMany(mappedBy = "parent", orphanRemoval=true)
     @LazyCollection(LazyCollectionOption.FALSE)
-    @Cascade(value = { CascadeType.ALL, CascadeType.DELETE_ORPHAN })    
+    @Cascade(value = { CascadeType.ALL })    
 	@OrderBy(clause = "positionDef asc")
     private List<RPProperty> anagrafica;
     

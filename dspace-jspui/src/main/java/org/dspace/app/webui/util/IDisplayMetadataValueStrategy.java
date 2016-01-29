@@ -7,15 +7,13 @@
  */
 package org.dspace.app.webui.util;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
 import org.dspace.browse.BrowseItem;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.discovery.IGlobalSearchResult;
 
 public interface IDisplayMetadataValueStrategy
@@ -41,12 +39,6 @@ public interface IDisplayMetadataValueStrategy
             boolean b, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
             boolean emph, PageContext pageContext) throws JspException;
-    
-    public String getMetadataDisplay(HttpServletRequest hrq, int limit,
-            boolean viewFull, String browseType, int colIdx, String field,
-            List<String> metadataArray, IGlobalSearchResult item,
-            boolean disableCrossLinks, boolean emph, PageContext pageContext)
-            throws JspException;
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,

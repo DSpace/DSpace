@@ -204,7 +204,7 @@ public class ScriptStatSubscribe
 
                 if (changedType)
                 {
-                    sheet = workbook.createSheet(I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.sheet." + statdetails.getType()),
+                    sheet = workbook.createSheet(I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.sheet." + statdetails.getType()),
                             sheetNumber);
                     WritableFont labelFont = new WritableFont(
                             WritableFont.ARIAL, 10, WritableFont.BOLD);
@@ -212,25 +212,25 @@ public class ScriptStatSubscribe
                     sheet.addCell(new Label(
                             0,
                             0,
-                            I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.type"),
+                            I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.type"),
                             cfobj));
                     sheet.addCell(new Label(
                             1,
                             0,
-                            I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.name"),
+                            I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.name"),
                             cfobj));
                     sheet.addCell(new Label(
                             2,
                             0,
-                            I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.url"),
+                            I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.url"),
                             cfobj));
                     sheet.addCell(new Label(
                             3,
                             0,
-                            I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.totalView"),
+                            I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.totalView"),
                             cfobj));
                     sheet.addCell(new Label(4, 0, I18nUtil
-                            .getMessage("it.cilea.hku.statistics.Subscribe."
+                            .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe."
                                     + sfreq + "View"), cfobj));
 
                     int headerCell = 4;
@@ -239,10 +239,10 @@ public class ScriptStatSubscribe
                         sheet.addCell(new Label(
                                 ++headerCell,
                                 0,
-                                I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.totalDownload"),
+                                I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.totalDownload"),
                                 cfobj));
                         sheet.addCell(new Label(++headerCell, 0, I18nUtil
-                                .getMessage("it.cilea.hku.statistics.Subscribe."
+                                .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe."
                                         + sfreq + "Download"), cfobj));
                     }
                     for (String topKey : statDataBean
@@ -254,12 +254,12 @@ public class ScriptStatSubscribe
                             sheet.addCell(new Label(
                                     ++headerCell,
                                     0,
-                                    I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.total"
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.total"
                                             + topKey + "View"), cfobj));
                             sheet.addCell(new Label(
                                     ++headerCell,
                                     0,
-                                    I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe."
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe."
                                             + sfreq + topKey + "View"), cfobj));
                         }
                     }
@@ -272,12 +272,12 @@ public class ScriptStatSubscribe
                             sheet.addCell(new Label(
                                     ++headerCell,
                                     0,
-                                    I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.total"
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.total"
                                             + topKey + "Download"), cfobj));
                             sheet.addCell(new Label(
                                     ++headerCell,
                                     0,
-                                    I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe."
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe."
                                             + sfreq + topKey + "Download"), cfobj));
                         }
                     }
@@ -290,14 +290,14 @@ public class ScriptStatSubscribe
                     sheetNumber++;
                 }
                 sheet.addCell(new Label(0, r, I18nUtil
-                        .getMessage("it.cilea.hku.statistics.Subscribe.type."
+                        .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.type."
                                 + statdetails.getType())));
                 sheet.addCell(new Label(1, r, statdetails.getObjectName()));
                 sheet.addCell(new Label(2, r, statdetails.getObjectURL()));
                 if (statDataBean.getTotalSelectedView() == -1)
                 {
                     sheet.addCell(new Label(3, r, I18nUtil
-                            .getMessage("it.cilea.hku.statistics.Subscribe.na")));
+                            .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
                 }
                 else
                 {
@@ -308,7 +308,7 @@ public class ScriptStatSubscribe
                 if (statDataBean.getPeriodSelectedView() == -1)
                 {
                     sheet.addCell(new Label(4, r, I18nUtil
-                            .getMessage("it.cilea.hku.statistics.Subscribe.na")));
+                            .getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
                 }
                 else
                 {
@@ -324,7 +324,7 @@ public class ScriptStatSubscribe
                         sheet.addCell(new Label(
                                 ++countTopCell,
                                 r,
-                                I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.na")));
+                                I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
                     }
                     else
                     {
@@ -337,7 +337,7 @@ public class ScriptStatSubscribe
                         sheet.addCell(new Label(
                                 ++countTopCell,
                                 r,
-                                I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.na")));
+                                I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
                     }
                     else
                     {
@@ -359,7 +359,7 @@ public class ScriptStatSubscribe
                             sheet.addCell(new Label(
                                     ++countTopCell,
                                     r,
-                                    I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.na")));
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
                         }
                         else
                         {
@@ -374,7 +374,7 @@ public class ScriptStatSubscribe
                             sheet.addCell(new Label(
                                     ++countTopCell,
                                     r,
-                                    I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.na")));
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
                         }
                         else
                         {
@@ -395,7 +395,7 @@ public class ScriptStatSubscribe
                             sheet.addCell(new Label(
                                     ++countTopCell,
                                     r,
-                                    I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.na")));
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
                         }
                         else
                         {
@@ -410,7 +410,7 @@ public class ScriptStatSubscribe
                             sheet.addCell(new Label(
                                     ++countTopCell,
                                     r,
-                                    I18nUtil.getMessage("it.cilea.hku.statistics.Subscribe.na")));
+                                    I18nUtil.getMessage("org.dspace.app.cris.batch.ScriptStatSubscribe.na")));
                         }
                         else
                         {
@@ -450,9 +450,9 @@ public class ScriptStatSubscribe
                             + sfreq));
             email.addRecipient(eperson.getEmail());
             email.addArgument(ConfigurationManager.getProperty("dspace.url")
-                    + "/rp/tools/stats/subscription/unsubscribe?clear=all");
+                    + "/cris/tools/stats/subscription/unsubscribe?clear=all");
             email.addArgument(ConfigurationManager.getProperty("dspace.url")
-                    + "/rp/tools/stats/subscription/list.htm");
+                    + "/cris/tools/stats/subscription/list.htm");
             email.addAttachment(file, "stat-" + sfreq + "-update.xls");
             email.send();
             file.delete();

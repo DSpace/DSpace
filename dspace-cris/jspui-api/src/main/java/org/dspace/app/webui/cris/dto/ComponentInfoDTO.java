@@ -39,6 +39,8 @@ public class ComponentInfoDTO<T extends DSpaceObject>
 	private int searchTime;
 
 	private String relationName;
+	
+	private String browseType;
 
     private String buildCommonURL()
     {
@@ -222,4 +224,14 @@ public class ComponentInfoDTO<T extends DSpaceObject>
 	public String getRelationName() {
 		return relationName;
 	}
+
+    public String getBrowseType()
+    {
+        return browseType;
+    }
+
+    public void setBrowseType(String browseType)
+    {
+        this.browseType = browseType;
+    }
 }

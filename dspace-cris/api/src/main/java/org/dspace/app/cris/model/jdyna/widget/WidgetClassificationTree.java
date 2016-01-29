@@ -7,14 +7,18 @@
  */
 package org.dspace.app.cris.model.jdyna.widget;
 
+import java.beans.PropertyEditor;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.editor.PointerPropertyEditor;
 import org.dspace.app.cris.model.jdyna.value.Classification;
 
+import it.cilea.osd.jdyna.service.IPersistenceDynaService;
 import it.cilea.osd.jdyna.widget.AWidgetClassificationTree;
 
 @Entity
@@ -57,5 +61,15 @@ public class WidgetClassificationTree extends AWidgetClassificationTree<Classifi
 	public void setMetadataBuilderTree(DynamicPropertiesDefinition metadataBuilderTree) {
 		this.metadataBuilderTree = metadataBuilderTree;
 	}
+	
+    @Override
+    public PropertyEditor getImportPropertyEditor(
+            IPersistenceDynaService applicationService, String service)
+    {
+        PointerPropertyEditor propertyEditor = new PointerPropertyEditor(getTargetValoreClass(), service);
+        propertyEditor.setApplicationService(applicationService);
+        return propertyEditor;
+    }
+
 
 }

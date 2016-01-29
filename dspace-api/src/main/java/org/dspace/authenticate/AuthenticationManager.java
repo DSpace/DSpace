@@ -167,18 +167,18 @@ public class AuthenticationManager
                 }
                 if (ret == AuthenticationMethod.SUCCESS)
                 {
-                    EPerson me = context.getCurrentUser();
-                    me.setLastActive(new Date());
-                    try
-                    {
-                        me.update();
-                    } catch (SQLException ex)
-                    {
-                        log.error("Could not update last-active stamp", ex);
-                    } catch (AuthorizeException ex)
-                    {
-                        log.error("Could not update last-active stamp", ex);
-                    }
+//                    EPerson me = context.getCurrentUser();
+//                    me.setLastActive(new Date());
+//                    try
+//                    {
+//                        me.update();
+//                    } catch (SQLException ex)
+//                    {
+//                        log.error("Could not update last-active stamp", ex);
+//                    } catch (AuthorizeException ex)
+//                    {
+//                        log.error("Could not update last-active stamp", ex);
+//                    }
                     return ret;
                 }
                 if (ret < bestRet)

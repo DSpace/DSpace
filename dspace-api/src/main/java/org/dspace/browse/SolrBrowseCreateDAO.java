@@ -336,7 +336,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
             for (SortOption so : SortOption.getSortOptions())
             {
                 Metadatum[] Metadatum = item.getMetadataByMetadataString(so.getMetadata());
-                if (Metadatum != null && Metadatum.length > 0)
+                if (Metadatum != null && Metadatum.length > 0 && !"extra".equalsIgnoreCase(so.getType()))
                 {
                     String nValue = OrderFormat
                             .makeSortString(Metadatum[0].value,

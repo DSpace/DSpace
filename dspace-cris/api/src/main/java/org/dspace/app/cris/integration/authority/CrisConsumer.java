@@ -9,6 +9,7 @@ package org.dspace.app.cris.integration.authority;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +21,10 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.integration.CRISAuthority;
+import org.dspace.app.cris.integration.DOAuthority;
 import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.ResearchObject;
+import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authority.AuthorityValueGenerator;
@@ -30,6 +34,7 @@ import org.dspace.content.Metadatum;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
@@ -53,21 +58,30 @@ public class CrisConsumer implements Consumer {
 	private ApplicationService applicationService = new DSpace().getServiceManager().getServiceByName(
 			"applicationService", ApplicationService.class);
 
-	private boolean activateNewObject = false;
+	private transient Set<String> processedHandles = new HashSet<String>();
+	
 	public void initialize() throws Exception {
-		activateNewObject = ConfigurationManager.getBooleanProperty("cris.activate.import.in.submission", false);
 	}
 
 	public void consume(Context ctx, Event event) throws Exception {
 		DSpaceObject dso = event.getSubject(ctx);
 		if (dso instanceof Item) {
 			Item item = (Item) dso;
+	    	if (item == null || !item.isArchived()) return;
+	    	if (processedHandles.contains(item.getHandle())) {
+	    		return;
+	    	}
+	    	else {
+	    		processedHandles.add(item.getHandle());
+	    	}
 
+	    	ctx.turnOffAuthorisationSystem();
 			Set<String> listAuthoritiesManager = ChoiceAuthorityManager.getManager().getAuthorities();
 
 			Map<String, List<Metadatum>> toBuild = new HashMap<String, List<Metadatum>>();
 			Map<String, String> toBuildType = new HashMap<String, String>();
 			Map<String, CRISAuthority> toBuildChoice = new HashMap<String, CRISAuthority>();
+			Map<String, String> toBuildMetadata = new HashMap<String, String>();
 			
 			for (String crisAuthority : listAuthoritiesManager) {
 				List<String> listMetadata = ChoiceAuthorityManager.getManager().getAuthorityMetadataForAuthority(
@@ -76,8 +90,7 @@ public class CrisConsumer implements Consumer {
 				for (String metadata : listMetadata) {
 					Metadatum[] Metadatums = item.getMetadataByMetadataString(metadata);
 					ChoiceAuthority choiceAuthority = ChoiceAuthorityManager.getManager().getChoiceAuthority(metadata);
-					if (CRISAuthority.class.isAssignableFrom(choiceAuthority.getClass())) {
-
+					if (CRISAuthority.class.isAssignableFrom(choiceAuthority.getClass())) {					    
 						for (Metadatum dcval : Metadatums) {
 							String authority = dcval.authority;
 							if (StringUtils.isNotBlank(authority)) {
@@ -103,20 +116,26 @@ public class CrisConsumer implements Consumer {
 									}
 									toBuild.put(info, list);							
 									toBuildChoice.put(info, (CRISAuthority)choiceAuthority);
+									toBuildMetadata.put(info, metadata);
 								}								
 							}
 							else {
-								String valueHashed = HashUtil.hashMD5(dcval.value);
-								List<Metadatum> list = new ArrayList<Metadatum>();
-								if (toBuild.containsKey(valueHashed)) {
-									list = toBuild.get(valueHashed);
-									list.add(dcval);
-								} else {
-									list.add(dcval);
-								}
-								toBuild.put(valueHashed, list);
-								toBuildType.put(valueHashed, SOURCE_INTERNAL);
-								toBuildChoice.put(valueHashed, (CRISAuthority)choiceAuthority);
+							    boolean activateImportInSubmission = ConfigurationManager.getBooleanProperty("cris",
+						                        "import.submission." + metadata, "import.submission");
+							    if(activateImportInSubmission) {
+    								String valueHashed = HashUtil.hashMD5(dcval.value);
+    								List<Metadatum> list = new ArrayList<Metadatum>();
+    								if (toBuild.containsKey(valueHashed)) {
+    									list = toBuild.get(valueHashed);
+    									list.add(dcval);
+    								} else {
+    									list.add(dcval);
+    								}
+    								toBuild.put(valueHashed, list);
+    								toBuildType.put(valueHashed, SOURCE_INTERNAL);
+    								toBuildChoice.put(valueHashed, (CRISAuthority)choiceAuthority);
+    								toBuildMetadata.put(valueHashed, metadata);
+							    }
 							}
 							
 						}
@@ -177,17 +196,39 @@ public class CrisConsumer implements Consumer {
 						rp.setSourceRef(typeAuthority);
 						
 						List<Metadatum> MetadatumAuthority = toBuild.get(authorityKey);
+						String prefix = "";
+						if (choiceAuthorityObject instanceof DOAuthority) {
+							prefix = ConfigurationManager.getProperty("cris",
+									"DOAuthority." + toBuildMetadata.get(authorityKey) + ".new-instances");
+							if (StringUtils.isNotBlank(prefix)) {
+								DynamicObjectType dType = applicationService.findTypoByShortName(DynamicObjectType.class
+										, prefix);
+								if (dType != null) {
+									((ResearchObject) rp).setTypo(dType);
+								}
+								else {
+									continue;
+								}
+							}
+							else {
+								continue;
+							}
+						}
 						
-						ResearcherPageUtils.buildTextValue(rp, MetadatumAuthority.get(0).value, rp.getMetadataFieldTitle());
-						// ResearcherPageUtils.buildTextValue(rp, email,
-						// "email");
-						if(!(typeAuthority.equalsIgnoreCase(SOURCE_INTERNAL))) {
-							ResearcherPageUtils.buildTextValue(rp, authorityKey, typeAuthority);	
-						}						
+						ResearcherPageUtils.buildTextValue(rp, MetadatumAuthority.get(0).value, prefix+rp.getMetadataFieldTitle());
+						
+						ImportAuthorityFiller filler = new DSpace().getSingletonService(AuthoritiesFillerConfig.class).getFiller(typeAuthority);
+						if (filler != null) {
+							filler.fillRecord(authorityKey, rp);
+						}
 
+						boolean activateNewObject = ConfigurationManager.getBooleanProperty("cris",
+                                 "import.submission.enabled.entity." + toBuildMetadata.get(authorityKey), "import.submission.enabled.entity");
 						if(activateNewObject) {
 							rp.setStatus(true);
 						}
+						
+						
 						try {
 							applicationService.saveOrUpdate(crisTargetClass, rp);
 							log.info("Build new ResearcherProfile sourceId/sourceRef:" + authorityKey+"/"+typeAuthority);
@@ -210,17 +251,18 @@ public class CrisConsumer implements Consumer {
 					Metadatum newValue = Metadatum.copy();
 					newValue.authority = toBuildAuthority.get(orcid);
 					newValue.confidence = Choices.CF_ACCEPTED;
-					ctx.turnOffAuthorisationSystem();
 					item.replaceMetadataValue(Metadatum, newValue);
-					item.update();
-					ctx.restoreAuthSystemState();
 				}
 			}
+			item.update();
+			ctx.getDBConnection().commit();
+			ctx.restoreAuthSystemState();
 		}
 	}
 
 	public void end(Context ctx) throws Exception {
 		// nothing to do
+		processedHandles.clear();
 	}
 
 	public void finish(Context ctx) throws Exception {

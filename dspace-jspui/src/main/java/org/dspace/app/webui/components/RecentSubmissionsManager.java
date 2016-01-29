@@ -7,19 +7,18 @@
  */
 package org.dspace.app.webui.components;
 
-import org.dspace.core.Context;
-import org.dspace.content.DSpaceObject;
+import org.apache.log4j.Logger;
 import org.dspace.browse.BrowseEngine;
-import org.dspace.browse.BrowserScope;
+import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowseException;
-import org.dspace.sort.SortOption;
-import org.dspace.sort.SortException;
+import org.dspace.browse.BrowserScope;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.content.Item;
-
-import org.apache.log4j.Logger;
+import org.dspace.core.Context;
+import org.dspace.discovery.IGlobalSearchResult;
+import org.dspace.sort.SortException;
+import org.dspace.sort.SortOption;
 
 /**
  * Class that obtains recent submissions to DSpace containers.
@@ -33,6 +32,8 @@ public class RecentSubmissionsManager
 	
 	/** DSpace context */
 	private Context context;
+	
+	private String indexName = "bi_item";
 	
 	/**
 	 * Construct a new RecentSubmissionsManager with the given DSpace context
@@ -68,7 +69,13 @@ public class RecentSubmissionsManager
 			// prep our engine and scope
 			BrowseEngine be = new BrowseEngine(context);
 			BrowserScope bs = new BrowserScope(context);
-			BrowseIndex bi = BrowseIndex.getItemBrowseIndex();
+			BrowseIndex bi = null; 
+			if("bi_item".equals(this.indexName)) {        
+			    bi = BrowseIndex.getItemBrowseIndex();
+			}
+			else {
+			    bi = BrowseIndex.getBrowseIndex(indexName);
+			}
 			
 			// fill in the scope with the relevant gubbins
 			bs.setBrowseIndex(bi);
@@ -88,7 +95,7 @@ public class RecentSubmissionsManager
 			
 			BrowseInfo results = be.browseMini(bs);
 			
-			Item[] items = results.getItemResults(context);
+			IGlobalSearchResult[] items = results.getItemResults(context);
 			
 			RecentSubmissions rs = new RecentSubmissions(items);
 			
@@ -105,5 +112,15 @@ public class RecentSubmissionsManager
 			throw new RecentSubmissionsException(e);
 		}
 	}
+
+    public String getIndexName()
+    {
+        return indexName;
+    }
+
+    public void setIndexName(String indexName)
+    {
+        this.indexName = indexName;
+    }
 	
 }

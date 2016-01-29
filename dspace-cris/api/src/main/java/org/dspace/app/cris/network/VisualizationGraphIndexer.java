@@ -10,6 +10,7 @@ package org.dspace.app.cris.network;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -70,38 +71,47 @@ public class VisualizationGraphIndexer {
 	 * @throws NoSuchAlgorithmException 
 	 * @throws SearchServiceException
 	 */
-	public void index(VisualizationGraphNode node) throws SolrServerException,
+	public void index(List<VisualizationGraphNode> nodes) throws SolrServerException,
 			IOException, NoSuchAlgorithmException {
 
-		SolrInputDocument doc1 = new SolrInputDocument();
-		// Save our basic info that we already have
-	
-		doc1.addField("type", node.getType());
+		List<SolrInputDocument> solrDocs = new ArrayList<SolrInputDocument>(nodes.size());
 		
-		doc1.addField("a", node.getA());
-		doc1.addField("b", node.getB());
+		for (VisualizationGraphNode node : nodes) {
+			SolrInputDocument doc1 = new SolrInputDocument();
+			// Save our basic info that we already have
 		
-		doc1.addField("a_auth", node.getA_auth());		
-		doc1.addField("b_auth", node.getB_auth());
-		
-		doc1.addField("a_dept", node.getA_dept());        
-        doc1.addField("b_dept", node.getB_dept());
-        doc1.addField("focus_dept", node.getA_dept()+"|||"+node.getB_dept());
-        
-		doc1.addField("a_val", node.getFavalue());		
-		doc1.addField("b_val", node.getFbvalue());
-		
-		doc1.addField("value", node.getValue());
-		doc1.addField("entity", node.getEntity());
-		doc1.addField("extra", node.getExtra());
+			doc1.addField("type", node.getType());
+			
+			doc1.addField("a", node.getA());
+			doc1.addField("b", node.getB());
+			
+			doc1.addField("a_auth", node.getA_auth());		
+			doc1.addField("b_auth", node.getB_auth());
+			
+			doc1.addField("a_dept", node.getA_dept());        
+	        doc1.addField("b_dept", node.getB_dept());
+	        doc1.addField("focus_dept", node.getA_dept()+"|||"+node.getB_dept());
+	        
+			doc1.addField("a_val", node.getFavalue());		
+			doc1.addField("b_val", node.getFbvalue());
+			
+			doc1.addField("value", node.getValue());
+			doc1.addField("entity", node.getEntity());
+			doc1.addField("extra", node.getExtra());
+			
+			log.debug("add document on solr index " + node.getA() + "|||" + node.getB());
+			solrDocs.add(doc1);
+			if (solrDocs.size() % 500 == 0) {
+				getSolr().add(solrDocs);
+				solrDocs.clear();
+			}
+		}
 		try {
-		    log.debug("add document on solr index " + node.getA() + "|||" + node.getB()); 
-			getSolr().add(doc1);
+			getSolr().add(solrDocs);
 		}
 		catch(Exception e) {
 			log.error(e.getMessage(), e);
 		}
-
 	}
 
 	public void removeIndex(VisualizationGraphNode node) throws IOException,
@@ -155,15 +165,7 @@ public class VisualizationGraphIndexer {
 	 */
 	public void updateIndex(List<VisualizationGraphNode> nodes) {
 		try {
-			int i = 0;
-			for (VisualizationGraphNode node : nodes) {
-				try {
-					index(node);
-					System.out.println("Indexed Visualization Network #" + i++);
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
-				}
-			}
+				index(nodes);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

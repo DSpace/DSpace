@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.network.ConstantNetwork;
 import org.dspace.app.cris.network.VisualizationGraphSolrService;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.Researcher;
@@ -136,28 +137,29 @@ public class RelationsResearcherNetworkServlet extends DSpaceServlet
 
         if (matcher.find())
         {
-            field1 = "focus_auth";
+            field1 = "a_auth";
         }
         else
         {
-            field1 = "focus_val";
+            field1 = "a_val";
         }
 
         matcher = patternRP.matcher(to);
 
         if (matcher.find())
         {
-            field2 = "focus_auth";
+            field2 = "b_auth";
         }
         else
         {
-            field2 = "focus_val";
+            field2 = "b_val";
         }
 
         solrQuery.setQuery(field1 + ":\"" + from
                 + "\" AND " + field2 + ":\"" + to + "\"");
 
-        solrQuery.addFilterQuery("type:" + type);        
+        solrQuery.addFilterQuery("type:" + type);
+        solrQuery.addFilterQuery("entity:" + ConstantNetwork.ENTITY_RP);
         solrQuery.setRows(Integer.MAX_VALUE);
         QueryResponse rsp = service.search(solrQuery);
 

@@ -598,4 +598,68 @@
         <qualifier>license</qualifier>
         <scope_note></scope_note>
     </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>conference</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>dataset</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>publication</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+	<dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>doi</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+	<dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>pmid</qualifier>
+        <scope_note></scope_note>
+    </dc-type>    
+
+	<dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>arxiv</qualifier>
+        <scope_note></scope_note>
+    </dc-type>    
+    
+	<dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>scopus</qualifier>
+        <scope_note></scope_note>
+    </dc-type>    
+
+	<dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>isi</qualifier>
+        <scope_note></scope_note>
+    </dc-type>    
+
+	<dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>ark</qualifier>
+        <scope_note></scope_note>
+    </dc-type>    
+        
 </dspace-dc-types>

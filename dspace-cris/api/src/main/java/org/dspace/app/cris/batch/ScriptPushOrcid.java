@@ -38,6 +38,7 @@ import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
+import org.dspace.authority.orcid.OrcidService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -78,6 +79,7 @@ public class ScriptPushOrcid {
 
 			Options options = new Options();
 			options.addOption("h", "help", false, "help");
+			options.addOption("c", "check_credentials", false, "Check client credentials");
 			options.addOption("a", "all_researcher", false, "Work on all researchers pages (ADMIN MODE)");
 			options.addOption("s", "single_researcher", true, "Work on single researcher (ADMIN MODE)");
 			options.addOption("d", "MODE_DATE", true,
@@ -96,6 +98,19 @@ public class ScriptPushOrcid {
 				System.exit(0);
 			}
 
+			if(line.hasOption('c')) {
+			    OrcidService orcidService = OrcidService.getOrcid();
+			    try {
+	                orcidService.search("test", 1, 1);
+	                System.out.println("OK!");
+	            }
+	            catch(Exception ex) {                
+	                System.out.println("ERROR MESSAGE:" + ex.getMessage());                
+	                System.out.println("FAILED!");
+	            }
+			    System.exit(0);
+			}
+			
 			if (line.hasOption('a') && line.hasOption('s')) {
 				System.out.println(
 						"\n\nUSAGE:\n ScriptPushOrcid [-a (-d|-D <date>)|-s <researcher_identifier>] - run with no option will works on cris_queue table\n");

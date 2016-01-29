@@ -142,28 +142,22 @@ public class DepartmentNetworkPlugin
     private Integer importNode(List<String[]> discardedNode,
             Integer importedNodes, List<VisualizationGraphNode> result)
     {
-        for (VisualizationGraphNode node : result)
+        try
         {
-            try
-            {
-                indexer.index(node); // index node
-                importedNodes++;
-            }
-            catch (SolrServerException e)
-            {
-                log.error(e.getMessage(), e);
-                discardedNode.add(new String[] { node.getType() });
-            }
-            catch (IOException e)
-            {
-                log.error(e.getMessage(), e);
-                discardedNode.add(new String[] { node.getType() });
-            }
-            catch (NoSuchAlgorithmException e)
-            {
-                log.error(e.getMessage(), e);
-                discardedNode.add(new String[] { node.getType() });
-            }
+            indexer.index(result); // index node
+            importedNodes = result.size();
+        }
+        catch (SolrServerException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        catch (IOException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            log.error(e.getMessage(), e);
         }
         return importedNodes;
     }

@@ -158,28 +158,25 @@ public abstract class AVisualizationGraphModeFour extends AVisualizationGraph
     private Integer indexNode(List<String[]> discardedNode,
             Integer importedNodes, List<VisualizationGraphNode> result)
     {
-        for (VisualizationGraphNode node : result)
+        try
         {
-            try
-            {
-                getIndexer().index(node); // index node
-                importedNodes++;
-            }
-            catch (SolrServerException e)
-            {
-                log.error(e.getMessage(), e);
-                discardedNode.add(new String[] { getConnectionName() });
-            }
-            catch (IOException e)
-            {
-                log.error(e.getMessage(), e);
-                discardedNode.add(new String[] { getConnectionName() });
-            }
-            catch (NoSuchAlgorithmException e)
-            {
-                log.error(e.getMessage(), e);
-                discardedNode.add(new String[] { getConnectionName() });
-            }
+            getIndexer().index(result); // index node
+            importedNodes = result.size();
+        }
+        catch (SolrServerException e)
+        {
+            log.error(e.getMessage(), e);
+            discardedNode.add(new String[] { getConnectionName() });
+        }
+        catch (IOException e)
+        {
+            log.error(e.getMessage(), e);
+            discardedNode.add(new String[] { getConnectionName() });
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            log.error(e.getMessage(), e);
+            discardedNode.add(new String[] { getConnectionName() });
         }
         return importedNodes;
     }

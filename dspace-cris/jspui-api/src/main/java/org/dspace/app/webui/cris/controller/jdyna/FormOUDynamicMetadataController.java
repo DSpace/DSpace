@@ -279,6 +279,8 @@ public class FormOUDynamicMetadataController
         
         EditTabOrganizationUnit editT = getApplicationService().get(
                 EditTabOrganizationUnit.class, anagraficaObjectDTO.getTabId());
+        OrganizationUnit grant = getApplicationService().get(OrganizationUnit.class,
+                anagraficaObjectDTO.getParentId());
         if (anagraficaObjectDTO.getNewTabId() != null)
         {
             exitPage += "&tabId=" + anagraficaObjectDTO.getNewTabId();
@@ -286,18 +288,13 @@ public class FormOUDynamicMetadataController
         else
         {
             exitPage = "redirect:/cris/ou/"
-                    + ResearcherPageUtils.getPersistentIdentifier(anagraficaObjectDTO
-                                    .getParentId(), OrganizationUnit.class) + "/"
-                    + editT.getShortName().substring(4) + ".html";
+                    + grant.getCrisID();
         }
         if (request.getParameter("cancel") != null)
         {
             return new ModelAndView(exitPage);
         }
         
-        
-        OrganizationUnit grant = getApplicationService().get(OrganizationUnit.class,
-                anagraficaObjectDTO.getParentId());
         OUAdditionalFieldStorage myObject = grant.getDynamicField();
         
         List<BoxOrganizationUnit> propertyHolders = new LinkedList<BoxOrganizationUnit>();

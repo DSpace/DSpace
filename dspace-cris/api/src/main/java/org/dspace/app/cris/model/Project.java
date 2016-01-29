@@ -276,4 +276,10 @@ public class Project extends ACrisObject<ProjectProperty, ProjectPropertiesDefin
 		return NAME;
 	}
 
+    @Override
+    public Class<Project> getCRISTargetClass()
+    {
+        return Project.class;
+    }
+    
 }

@@ -253,6 +253,11 @@ public class I18nUtil
         return getMessage(key.trim(), DEFAULTLOCALE);
     }
     
+    public static String getMessage(String key, boolean throwExcIfNotFound)
+    {
+        return getMessage(key.trim(), DEFAULTLOCALE, throwExcIfNotFound);
+    }
+    
     /**
      * Get the i18n message string for a given key and locale
      *
@@ -265,6 +270,11 @@ public class I18nUtil
      *         String of the message
      */
     public static String getMessage(String key, Locale locale)
+    {
+    	return getMessage(key, locale, false);
+    }
+    
+    public static String getMessage(String key, Locale locale, boolean throwExcIfNotFound)
     {
         if (locale == null)
         {
@@ -279,7 +289,10 @@ public class I18nUtil
             String message = messages.getString(key.trim());
             return message;
         } catch (MissingResourceException e) {
-            log.error("'" + key + "' translation undefined in locale '"
+            if (throwExcIfNotFound) {
+            	throw e;
+            }
+        	log.error("'" + key + "' translation undefined in locale '"
                     + locale.toString() + "'");
             return key;
         }

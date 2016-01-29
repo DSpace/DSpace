@@ -119,8 +119,6 @@
 			<div class="target-separator"><fmt:message key="network.profilefragment.targetseparator.share"/></div>
 
 			<div id="target-common">
-
-				
 					<c:choose>
 						<c:when test="${depthOld==1 && typo=='dept'}">
 						
@@ -129,7 +127,7 @@
 							<div style="font-size: 1.2em;" class="rp-label"><fmt:message key="network.profilefragment.title.targetcommon"/></div>
 <c:choose>
 	<c:when test="${fn:length(relations) == 0}">
-		<div style="text-align: center;">Nothing in Common Yet!</div>
+								<div style="text-align: center;"><fmt:message key="network.nothing.in.common.yet" /></div>
 	</c:when>
 	<c:otherwise>
 										<c:forEach var="relation" items="${relations}">
@@ -146,7 +144,6 @@
 </c:choose>
 						</c:otherwise>
 					</c:choose>
-				
 			</div>
 
 		</c:otherwise>

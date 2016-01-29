@@ -20,4 +20,14 @@
 
 	<bean class="org.dspace.app.cris.integration.CrisRetrievePotentialMatchPlugin" id="org.dspace.app.cris.integration.IRetrievePotentialMatchPlugin"/>
 	<bean id="org.dspace.app.cris.util.IResearcherPageLabelDecorator" class="org.dspace.app.cris.util.BasicResearcherPageLabelDecorator"/>
+	
+	<bean id="org.dspace.app.cris.integration.authority.AuthoritiesFillerConfig" class="org.dspace.app.cris.integration.authority.AuthoritiesFillerConfig">
+		<property name="fillers">
+			<map>
+				<entry key="orcid">
+					<bean class="org.dspace.app.cris.integration.authority.ORCIDImportFiller" />
+				</entry>
+			</map>
+		</property>
+	</bean>
 </beans>

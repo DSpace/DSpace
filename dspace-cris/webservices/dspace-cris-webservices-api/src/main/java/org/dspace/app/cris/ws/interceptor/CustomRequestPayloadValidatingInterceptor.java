@@ -7,21 +7,30 @@
  */
 package org.dspace.app.cris.ws.interceptor;
 
-import it.cilea.osd.jdyna.model.IContainable;
-import it.cilea.osd.jdyna.model.PropertiesDefinition;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.importexport.IBulkChangesService;
+import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.model.OrganizationUnit;
+import org.dspace.app.cris.model.Project;
+import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.export.ExportConstants;
+import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
+import org.dspace.app.cris.model.jdyna.OUNestedPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.OUTypeNestedObject;
+import org.dspace.app.cris.model.jdyna.ProjectNestedPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.ProjectTypeNestedObject;
+import org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.RPTypeNestedObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ImportExportUtils;
 import org.dspace.app.cris.util.UtilsXSD;
@@ -29,6 +38,13 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.utils.DSpace;
 import org.springframework.core.io.Resource;
 import org.springframework.ws.soap.server.endpoint.interceptor.PayloadValidatingInterceptor;
+
+import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ANestedProperty;
+import it.cilea.osd.jdyna.model.ATypeNestedObject;
+import it.cilea.osd.jdyna.model.IContainable;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.model.Property;
 
 public class CustomRequestPayloadValidatingInterceptor extends
         PayloadValidatingInterceptor
@@ -48,27 +64,27 @@ public class CustomRequestPayloadValidatingInterceptor extends
     @Override
     public void setSchema(Resource schema)
     {
-        buildXML("requestresearcherpage.xsd", RPPropertiesDefinition.class,
+        buildXML("requestresearcherpage.xsd", ResearcherPage.class, RPPropertiesDefinition.class, RPNestedPropertiesDefinition.class, RPTypeNestedObject.class,
                 UtilsXSD.RP_DEFAULT_ELEMENT, false);
-        buildXML("requestresearchergrants.xsd", ProjectPropertiesDefinition.class,
+        buildXML("requestresearchergrants.xsd", Project.class, ProjectPropertiesDefinition.class, ProjectNestedPropertiesDefinition.class, ProjectTypeNestedObject.class,
                 UtilsXSD.GRANT_DEFAULT_ELEMENT, false);
-        buildXML("requestorgunits.xsd", OUPropertiesDefinition.class,
+        buildXML("requestorgunits.xsd", OrganizationUnit.class, OUPropertiesDefinition.class, OUNestedPropertiesDefinition.class, OUTypeNestedObject.class,
                 UtilsXSD.OU_DEFAULT_ELEMENT, false); 
-        buildXML("responseresearcherpage.xsd", RPPropertiesDefinition.class,
+        buildXML("responseresearcherpage.xsd", ResearcherPage.class, RPPropertiesDefinition.class, RPNestedPropertiesDefinition.class, RPTypeNestedObject.class,
                 new String[] { "crisobjects","crisobject" }, true);
-        buildXML("responseresearchergrants.xsd",
-        		ProjectPropertiesDefinition.class,
+        buildXML("responseresearchergrants.xsd", Project.class,
+        		ProjectPropertiesDefinition.class, ProjectNestedPropertiesDefinition.class, ProjectTypeNestedObject.class,
                 new String[] { "crisobjects","crisobject" }, true);
-        buildXML("responseorgunits.xsd",
-                OUPropertiesDefinition.class,
+        buildXML("responseorgunits.xsd", OrganizationUnit.class,
+                OUPropertiesDefinition.class, OUNestedPropertiesDefinition.class, OUTypeNestedObject.class,
                 new String[] { "crisobjects","crisobject" }, true);
         // buildXML("responserepublications.xsd", null,
         // new String[] { "crisobjects","item" }, true);
         super.setSchema(schema);
     }
 
-    private <T extends PropertiesDefinition> void buildXML(String name,
-            Class<T> clazz, String[] elementsRoot, boolean response)
+    private <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void buildXML(String name,
+            Class<ACO> clazzACO, Class<TP> clazz, Class<NTP> clazzNTP, Class<ATNO> clazzTypeNested, String[] elementsRoot, boolean response)
     {
         File dir = new File(PATH_DIR);
         File filexsd = null;
@@ -98,9 +114,19 @@ public class CustomRequestPayloadValidatingInterceptor extends
 
         }
         List<IContainable> metadataALL = null;
+        List<IContainable> metadataNestedLevel = null;
         try
         {
             metadataALL = applicationService.newFindAllContainables(clazz);
+            List<ATNO> ttps = applicationService.getList(clazzTypeNested);
+            metadataNestedLevel = new LinkedList<IContainable>();
+            for (ATNO ttp : ttps) {
+                IContainable ic = applicationService.findContainableByDecorable(ttp.getDecoratorClass(), ttp.getId());
+                if (ic != null) {
+                    metadataNestedLevel.add(ic);
+                }
+            }
+
         }
         catch (InstantiationException e)
         {
@@ -125,7 +151,7 @@ public class CustomRequestPayloadValidatingInterceptor extends
                     filexsd = importer.generateTemplate(
                             writer,
                             dir,
-                            metadataALL,
+                            metadataALL, metadataNestedLevel,
                             filexsd,
                             elementsRoot,
                             namespace[0]+":",

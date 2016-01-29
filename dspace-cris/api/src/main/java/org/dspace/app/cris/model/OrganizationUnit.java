@@ -259,4 +259,9 @@ public class OrganizationUnit extends
 		return NAME;
 	}
 
+    @Override
+    public Class<OrganizationUnit> getCRISTargetClass()
+    {
+        return OrganizationUnit.class;
+    }
 }

@@ -8,7 +8,8 @@
 package org.dspace.app.webui.components;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.dspace.content.Item;
+import org.dspace.discovery.IGlobalSearchResult;
+import org.dspace.discovery.configuration.DiscoveryViewConfiguration;
 
 
 /**
@@ -21,17 +22,17 @@ import org.dspace.content.Item;
 public class RecentSubmissions
 {
 	/** The set of items being represented */
-	private Item[] items;
-	
+	private IGlobalSearchResult[] items;
+	private DiscoveryViewConfiguration configuration;
 	/**
 	 * Construct a new RecentSubmissions object to represent the passed
 	 * array of items
 	 * 
 	 * @param items
 	 */
-	public RecentSubmissions(Item[] items)
+	public RecentSubmissions(IGlobalSearchResult[] items)
 	{
-		this.items = (Item[]) ArrayUtils.clone(items);
+		this.items = (IGlobalSearchResult[]) ArrayUtils.clone(items);
 	}
 
 	/**
@@ -49,9 +50,9 @@ public class RecentSubmissions
 	 * 
 	 * @return	an array of items
 	 */
-	public Item[] getRecentSubmissions()
+	public IGlobalSearchResult[] getRecentSubmissions()
 	{
-		return (Item[])ArrayUtils.clone(items);
+		return (IGlobalSearchResult[])ArrayUtils.clone(items);
 	}
 	
 	/**
@@ -62,7 +63,7 @@ public class RecentSubmissions
 	 * @param i		the position of the item to retrieve
 	 * @return		the Item
 	 */
-	public Item getRecentSubmission(int i)
+	public IGlobalSearchResult getRecentSubmission(int i)
 	{
 		if (i < items.length)
 		{
@@ -73,4 +74,14 @@ public class RecentSubmissions
 			return null;
 		}
 	}
+
+    public DiscoveryViewConfiguration getConfiguration()
+    {
+        return configuration;
+    }
+
+    public void setConfiguration(DiscoveryViewConfiguration configuration)
+    {
+        this.configuration = configuration;
+    }
 }

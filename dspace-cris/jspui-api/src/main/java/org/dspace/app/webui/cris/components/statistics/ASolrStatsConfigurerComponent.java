@@ -216,7 +216,7 @@ public abstract class ASolrStatsConfigurerComponent<T extends DSpaceObject>
                         if (StringUtils.isEmpty(name))
                             name = "Unknown";
                         // if (i<limit && (Integer)result.getVal(i)>0){
-                        if (i < limit && !name.equals("Unknown"))
+                        if (i < limit && !(name.startsWith("Unknown") || (key3.equals(_COUNTRY_CODE) && name.equals("O1"))))
                         {
                             limitedData.add(new StatisticDatasBeanRow(name,
                                     result.getVal(i)));
@@ -238,7 +238,7 @@ public abstract class ASolrStatsConfigurerComponent<T extends DSpaceObject>
                     e.printStackTrace();
                 }
             }
-            if (result.size() > limit && other > 0)
+            if (other > 0)
             {
                 limitedData.add(new StatisticDatasBeanRow(_OTHER, other));
             }

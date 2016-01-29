@@ -306,6 +306,9 @@ public class FormRPDynamicMetadataController
         EditTabResearcherPage editT = getApplicationService().get(
                 EditTabResearcherPage.class,
                 anagraficaObjectDTO.getTabId());
+        ResearcherPage researcher = getApplicationService().get(
+                ResearcherPage.class, anagraficaObjectDTO.getParentId());
+        
         if (anagraficaObjectDTO.getNewTabId() != null)
         {
             exitPage += "&tabId=" + anagraficaObjectDTO.getNewTabId();
@@ -313,18 +316,13 @@ public class FormRPDynamicMetadataController
         else
         {
             exitPage = "redirect:/cris/rp/"
-                    + ResearcherPageUtils
-                            .getPersistentIdentifier(anagraficaObjectDTO
-                                    .getParentId(), ResearcherPage.class) + "/"
-                    + editT.getShortName().substring(4) + ".html";
+                    + researcher.getCrisID();
         }
         if (request.getParameter("cancel") != null)
         {
             return new ModelAndView(exitPage);
         }
-
-        ResearcherPage researcher = getApplicationService().get(
-                ResearcherPage.class, anagraficaObjectDTO.getParentId());
+        
         RPAdditionalFieldStorage myObject = researcher.getDynamicField();
 
         List<BoxResearcherPage> propertyHolders = new LinkedList<BoxResearcherPage>();

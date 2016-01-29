@@ -7,7 +7,12 @@
  */
 package org.dspace.app.cris.util;
 
+import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ANestedProperty;
 import it.cilea.osd.jdyna.model.AWidget;
+import it.cilea.osd.jdyna.model.IContainable;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.model.Property;
 
 import java.beans.PropertyEditor;
 import java.io.IOException;
@@ -21,13 +26,19 @@ import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
 import org.apache.commons.lang.StringUtils;
+import org.dspace.app.cris.importexport.ExcelBulkChangesService;
+import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
 import org.dspace.app.cris.model.RestrictedFieldFile;
 import org.dspace.app.cris.model.RestrictedFieldLocalOrRemoteFile;
 import org.dspace.app.cris.model.VisibilityConstants;
+import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
+import org.dspace.app.cris.model.jdyna.DecoratorRPNestedPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DecoratorRestrictedField;
+import org.dspace.app.cris.model.jdyna.RPNestedObject;
+import org.dspace.app.cris.model.jdyna.RPNestedProperty;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.service.ApplicationService;
@@ -46,20 +57,21 @@ public class UtilsXLS {
 	public static final String STOPFIELDS_EXCEL = "|||";
 
 	public static int createCell(ApplicationService applicationService, int y,
-			int i, DecoratorRPPropertiesDefinition decorator,
-			ResearcherPage researcher, WritableSheet sheet) throws IOException,
+			int i, ADecoratorPropertiesDefinition decorator,
+			ACrisObject researcher, WritableSheet sheet) throws IOException,
 			RowsExceededException, WriteException {
 		return createElement(applicationService, y, i, decorator.getReal(),
 				decorator.getRendering(), researcher, sheet);
 	}
 
 	private static int createElement(ApplicationService applicationService,
-			int y, int i, RPPropertiesDefinition real, AWidget rendering,
-			ResearcherPage researcher, WritableSheet sheet) throws IOException,
+			int y, int i, Object preal, AWidget rendering,
+			ACrisObject researcher, WritableSheet sheet) throws IOException,
 			RowsExceededException, WriteException {
 		
+	        PropertiesDefinition real = (PropertiesDefinition)preal;
 			return createSimpleElement(applicationService, y, i,
-					real.getShortName(), researcher.getDynamicField()
+					real.getShortName(), researcher
 							.getProprietaDellaTipologia(real), sheet);
 		
 	}
@@ -67,25 +79,26 @@ public class UtilsXLS {
 	
 	private static int createSimpleElement(
 			ApplicationService applicationService, int y, int i,
-			String shortName, List<RPProperty> proprietaDellaTipologia,
+			String shortName, List<Property> proprietaDellaTipologia,
 			WritableSheet sheet) throws RowsExceededException, WriteException {
 		String field_value = "";
-		String field_visibility = "";
 		boolean first = true;
-		for (RPProperty rr : proprietaDellaTipologia) {
+		for (Property rr : proprietaDellaTipologia) {
 
 			PropertyEditor pe = rr.getTypo().getRendering()
-					.getPropertyEditor(applicationService);
+					.getImportPropertyEditor(applicationService, ExcelBulkChangesService.FORMAT);
 			pe.setValue(rr.getObject());
 			if (!first) {
 				field_value += STOPFIELDS_EXCEL;
 			}
-			field_value += pe.getAsText();
-			if (!first) {
-				field_visibility += STOPFIELDS_EXCEL;
-			}
-			field_visibility += VisibilityConstants.getDescription(rr
+			String tmp = pe.getAsText();			
+			String field_visibility = VisibilityConstants.getDescription(rr
 					.getVisibility());
+			if(tmp.startsWith("[")) {
+			    field_value += "[visibility=" +field_visibility+" " + tmp.substring(1, tmp.length());
+			} else {
+			    field_value += "[visibility=" +field_visibility+"]" + tmp;
+			}
 			first = false;
 
 		}
@@ -94,19 +107,13 @@ public class UtilsXLS {
 		sheet.addCell(label_v);
 		Label labelCaption = new Label(y, 0, shortName);
 		sheet.addCell(labelCaption);
-		y = y + 1;
-		Label label_vv = new Label(y, i, field_visibility);
-		sheet.addCell(label_vv);
-		labelCaption = new Label(y, 0, shortName
-				+ ImportExportUtils.LABELCAPTION_VISIBILITY_SUFFIX);
-		sheet.addCell(labelCaption);
-
+		
 		return y;
 	}
 
 	public static int createCell(ApplicationService applicationService, int y,
 			int i, DecoratorRestrictedField decorator,
-			ResearcherPage researcher, WritableSheet sheet)
+			ACrisObject researcher, WritableSheet sheet)
 			throws IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException, RowsExceededException, WriteException {
 		String shortName = decorator.getShortName();
@@ -212,4 +219,41 @@ public class UtilsXLS {
 		return y;
 	}
 
+    public static int createCell(ApplicationService applicationService, int yy,
+            int ii, IContainable containable,
+            ACrisNestedObject rp, WritableSheet sheetNested) throws IOException,
+        RowsExceededException, WriteException
+    {
+        String field_value = "";
+        boolean first = true;
+        
+        
+        for (Object rrr : rp.getAnagrafica4view().get(containable.getShortName())) {
+
+            ANestedProperty rr = (ANestedProperty)rrr;
+            PropertyEditor pe = rr.getTypo().getRendering()
+                    .getImportPropertyEditor(applicationService, ExcelBulkChangesService.FORMAT);
+            pe.setValue(rr.getObject());
+            if (!first) {
+                field_value += STOPFIELDS_EXCEL;
+            }
+            String tmp = pe.getAsText();
+            String field_visibility = VisibilityConstants.getDescription(rr
+                    .getVisibility());
+            if(tmp.startsWith("[")) {
+                field_value += "[visibility=" +field_visibility+" " + tmp.substring(1, tmp.length());
+            } else {
+                field_value += "[visibility=" +field_visibility+"]" + tmp;
+            }
+            first = false;
+
+        }
+        yy = yy + 1;
+        Label label_v = new Label(yy, ii, field_value);
+        sheetNested.addCell(label_v);
+        Label labelCaption = new Label(yy, 0, containable.getShortName());
+        sheetNested.addCell(labelCaption);
+        
+        return yy;
+    }
 }

@@ -52,7 +52,9 @@ import org.hibernate.annotations.OrderBy;
         @NamedQuery(name = "ProjectNestedObject.findNestedObjectsByTypoID", query = "from ProjectNestedObject where typo.id = ?"),
         @NamedQuery(name = "ProjectNestedObject.findNestedObjectsByParentIDAndTypoShortname",  query = "from ProjectNestedObject where parent.id = ? and typo.shortName = ?"),
         @NamedQuery(name = "ProjectNestedObject.deleteNestedObjectsByTypoID", query = "delete from ProjectNestedObject where typo.id = ?"),
-        @NamedQuery(name = "ProjectNestedObject.maxPositionNestedObjectsByTypoID", query = "select max(positionDef) from ProjectNestedObject where typo.id = ?")
+        @NamedQuery(name = "ProjectNestedObject.maxPositionNestedObjectsByTypoID", query = "select max(positionDef) from ProjectNestedObject where typo.id = ?"),
+        @NamedQuery(name = "ProjectNestedObject.uniqueNestedObjectsByParentIdAndTypoIDAndSourceReference", query = "from ProjectNestedObject where parent.id = ? and typo.id = ? and sourceReference.sourceRef = ? and sourceReference.sourceID = ?"),
+        @NamedQuery(name = "ProjectNestedObject.uniqueByUUID", query = "from ProjectNestedObject where uuid = ?")
         })
 public class ProjectNestedObject extends ACrisNestedObject<ProjectNestedProperty, ProjectNestedPropertiesDefinition, ProjectProperty, ProjectPropertiesDefinition> 
 {
@@ -135,5 +137,12 @@ public class ProjectNestedObject extends ACrisNestedObject<ProjectNestedProperty
     public String getPublicPath()
     {
         return parent.getPublicPath();
+    }
+    
+    public ProjectNestedObject clone() throws CloneNotSupportedException
+    {
+        ProjectNestedObject clone = (ProjectNestedObject) super.clone();
+        clone.duplicaAnagrafica(this);        
+        return clone;
     }
 }

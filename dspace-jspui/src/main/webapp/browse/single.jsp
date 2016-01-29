@@ -129,8 +129,9 @@
 %>
 	<%-- Include the main navigation for all the browse pages --%>
 	<%-- This first part is where we render the standard bits required by both possibly navigations --%>
+<%  if (bi.hasPrevPage() || bi.hasNextPage()) { %>
 	<div id="browse_navigation" class="well text-center">
-	<form method="get" action="<%= formaction %>">
+	<form method="get" action="<%= formaction %>" class="form-inline">
 			<input type="hidden" name="type" value="<%= bix.getName() %>"/>
 			<input type="hidden" name="order" value="<%= direction %>"/>
 			<input type="hidden" name="rpp" value="<%= rpp %>"/>
@@ -180,28 +181,29 @@
 	// If we are not browsing by a date, render the string selection header //
 	else
 	{
+		String browseNavKey  = "browse.type.item." + bix.getName();
+		String browseStartKey = "browse.nav.enter." + bix.getName();
+		String browseJumpKey = "browse.nav.jump." + bix.getName();
 %>	
-		<span><fmt:message key="browse.nav.jump"/></span>
-        <a class="label label-default" href="<%= sharedLink %>&amp;starts_with=0">0-9</a>
+		<label class="sr-only" for="starts_with"><fmt:message key="<%= browseNavKey %>"/></label>
+		<input type="text" name="starts_with" class="form-control" size="60" 
+			placeholder="<fmt:message key="<%= browseStartKey %>" />" />
+		<input type="submit" class="btn btn-default" value="<fmt:message key="browse.nav.go"/>" />
+		<br/>
+		<span><fmt:message key="<%= browseJumpKey %>"/></span><br/>
 <%
 	    for (char c = 'A'; c <= 'Z'; c++)
 	    {
 %>
-        <a href="<%= sharedLink %>&amp;starts_with=<%= c %>"><%= c %></a>
+        <a class="label label-default" href="<%= sharedLink %>&amp;starts_with=<%= c %>"><%= c %></a>
 <%
 	    }
-%>
-		<br/>
-		<label for="starts_with"><fmt:message key="browse.nav.enter"/></label>
-		<input type="text" name="starts_with"/>
-		<input type="submit" class="btn btn-default" value="<fmt:message key="browse.nav.go"/>" />
-<%
 	}
 %>
 	</form>
 	</div>
 	<%-- End of Navigation Headers --%>
-
+<% } %>
 	<%-- Include a component for modifying sort by, order and results per page --%>
 	<div id="browse_controls" class="well text-center">
 	<form method="get" action="<%= formaction %>">

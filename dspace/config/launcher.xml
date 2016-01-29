@@ -416,5 +416,11 @@
             <class>org.dspace.authority.indexer.AuthorityIndexClient</class>
         </step>
     </command>
-
+	<command>
+        <name>load-cris-configuration</name>
+        <description>Load CRIS configuration from an XLS file</description>
+        <step>
+            <class>org.dspace.app.cris.batch.StartupMetadataConfiguratorTool</class>
+        </step>
+    </command>
 </commands>

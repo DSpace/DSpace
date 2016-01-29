@@ -210,6 +210,11 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
     <attribute>
+      <name>config</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
       <name>highlightrow</name>
       <required>false</required>
       <rtexprvalue>true</rtexprvalue>
@@ -652,6 +657,11 @@
     </attribute>
     <attribute>
       <name>style</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>badge</name>
       <required>false</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>
