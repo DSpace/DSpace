@@ -11,6 +11,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.xpath.XPathAPI;
@@ -49,7 +51,8 @@ import org.xml.sax.SAXException;
  * an XML file.
  *
  * The XML file structure needs to be:
- * {@code
+ *
+ * <pre>{@code
  * <import_structure>
  * <community>
  * <name>....</name>
@@ -59,18 +62,21 @@ import org.xml.sax.SAXException;
  * </collection>
  * </community>
  * </import_structure>
- * }
- * it can be arbitrarily deep, and supports all the metadata elements
+ * }</pre>
+ * 
+ * It can be arbitrarily deep, and supports all the metadata elements
  * that make up the community and collection metadata.  See the system
- * documentation for more details
+ * documentation for more details.
+ * 
+ * @author Richard Jones
  *
  * @author Richard Jones
  */
 
 public class StructBuilder {
     /**
-     * the output xml document which will contain updated information about the
-     * imported structure
+     * The output XML document which will contain updated information about the
+     * imported structure.
      */
     private static final org.jdom.Document xmlOutput
             = new org.jdom.Document(new Element("imported_structure"));
@@ -99,31 +105,40 @@ public class StructBuilder {
 
     /**
      * Main method to be run from the command line to import a structure into
-     * DSpace
+     * DSpace.  This is of the form:
      *
-     * This is of the form:
+     * <p>{@code StructBuilder -f [XML source] -e [administrator email] -o [output file]}</p>
+     * <p>to import, or
+     * <p>{@code StructBuilder -x -e [administrator email] -o [output file]}</p>
      *
-     * {@code StructBuilder -f [xml source] -e [administrator email] -o [output file]}
-     *
-     * The output file will contain exactly the same as the source xml document, but
+     * <p>to export.  The output file will contain exactly the same as the source XML document, but
      * with the handle for each imported item added as an attribute.
      *
-     * @param argv the command line arguments given
+     * @param argv command line arguments
      * @throws Exception if an error occurs
      */
     public static void main(String[] argv)
         throws Exception {
+        // Parse the command line.
         CommandLineParser parser = new PosixParser();
 
         Options options = new Options();
 
-        options.addOption("f", "file", true, "file");
-        options.addOption("e", "eperson", true, "eperson");
-        options.addOption("o", "output", true, "output");
-        options.addOption("x", "export", false, "export the current structure as XML");
+        options.addOption("f", "file", true, "File of new structure information.");
+        options.addOption("e", "eperson", true, "User who is manipulating the repository's structure.");
+        options.addOption("o", "output", true, "File to receive the structure map.");
+        options.addOption("x", "export", false, "Export the current structure as XML.");
+        options.addOption("h", "help", false, "Print this help message.");
 
         CommandLine line = parser.parse( options, argv );
 
+        // If the user asked for help, give it and exit.
+        if (line.hasOption('h')) {
+            giveHelp(options);
+            System.exit(0);
+        }
+
+        // Otherwise, analyze the command.
         String file = null;
         String eperson = null;
         String output = null;
@@ -141,7 +156,7 @@ public class StructBuilder {
         }
 
         if (output == null || eperson == null) {
-            usage();
+            usage(options);
             System.exit(1);
         }
 
@@ -151,18 +166,37 @@ public class StructBuilder {
         // set the context
         context.setCurrentUser(ePersonService.findByEmail(context, eperson));
 
+        // Export? Import?
         if (line.hasOption('x')) {
             exportStructure(context, output);
-            System.exit(0);
-        }
-
-        if (file == null) {
-            usage();
+        } else if (line.hasOption('f')) {
+            importStructure(context, file, output);
+        } else {
+            usage(options);
             System.exit(1);
         }
 
+        System.exit(0);
+    }
+
+    /**
+     * Import new Community/Collection structure.
+     *
+     * @param context
+     * @param input XML which describes the new communities and collections.
+     * @param output input, annotated with the new objects' identifiers.
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws TransformerException
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    private static void importStructure(Context context, String input, String output)
+            throws IOException, ParserConfigurationException, SAXException,
+            TransformerException, SQLException, AuthorizeException {
         // load the XML
-        Document document = loadXML(file);
+        Document document = loadXML(input);
 
         // run the preliminary validation, to be sure that the the XML document
         // is properly structured
@@ -311,12 +345,25 @@ public class StructBuilder {
     /**
      * Output the usage information
      */
-    private static void usage() {
-        System.out.println("Usage: java StructBuilder -f <source XML file> -o <output file> -e <eperson email>");
-        System.out.println(
-            "Communities will be created from the top level, and a map of communities to handles will be returned in " +
-                "the output file");
+    private static void usage(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printUsage(new PrintWriter(System.out), 80/* FIXME Magic */, "structure-builder", options);
         return;
+    }
+
+    /**
+     * Help the user more.
+     */
+    private static void giveHelp(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp(null,
+                "Import or export Community/Collection structure",
+                options,
+                "When importing (the default), communities will be created from "
+                    + "the top level, and a map of communities to handles will "
+                    + "be returned in the output file.  When exporting, the"
+                    + "current structure will be written to the map file.",
+                true);
     }
 
     /**
@@ -488,7 +535,7 @@ public class StructBuilder {
      * created communities (e.g. the handles they have been assigned)
      */
     private static Element[] handleCommunities(Context context, NodeList communities, Community parent)
-        throws TransformerException, SQLException, Exception {
+        throws TransformerException, SQLException, AuthorizeException, IOException {
         Element[] elements = new Element[communities.getLength()];
 
         for (int i = 0; i < communities.getLength(); i++) {
@@ -595,7 +642,7 @@ public class StructBuilder {
      * created collections (e.g. the handle)
      */
     private static Element[] handleCollections(Context context, NodeList collections, Community parent)
-        throws TransformerException, SQLException, AuthorizeException, IOException, Exception {
+        throws TransformerException, SQLException, AuthorizeException, IOException {
         Element[] elements = new Element[collections.getLength()];
 
         for (int i = 0; i < collections.getLength(); i++) {
