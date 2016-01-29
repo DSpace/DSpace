@@ -14,7 +14,6 @@ import org.dspace.importer.external.metadatamapping.contributor.MetadataContribu
 import org.dspace.importer.external.metadatamapping.service.GenerateQueryService;
 import org.dspace.importer.external.service.other.Imports;
 import org.dspace.importer.external.service.other.MetadataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.LinkedList;
@@ -24,27 +23,18 @@ import java.util.LinkedList;
  * Date: 29 May 2015
  */
 public abstract class AbstractImportMetadataSourceService<RecordType> extends MetadataSource implements Imports {
-	private GenerateQueryService generateQueryForItem = null;
+	protected GenerateQueryService generateQueryService = null;
 	private MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> metadataFieldMapping;
 
-	public GenerateQueryService getGenerateQueryForItem() {
-		return generateQueryForItem;
-	}
-
-	@Autowired
-	public void setGenerateQueryForItem(GenerateQueryService generateQueryForItem) {
-		this.generateQueryForItem = generateQueryForItem;
-	}
+    public AbstractImportMetadataSourceService(GenerateQueryService generateQueryService, MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> metadataFieldMapping){
+        this.generateQueryService=generateQueryService;
+        this.metadataFieldMapping = metadataFieldMapping;
+    }
 
 	public MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> getMetadataFieldMapping() {
 		return metadataFieldMapping;
 	}
 
-	@Required
-	public void setMetadataFieldMapping(
-			MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> metadataFieldMapping) {
-		this.metadataFieldMapping = metadataFieldMapping;
-	}
 
 	public ImportRecord transformSourceRecords(RecordType rt){
 		 return new ImportRecord(new LinkedList<MetadatumDTO>(getMetadataFieldMapping().resultToDCValueMapping(rt)));

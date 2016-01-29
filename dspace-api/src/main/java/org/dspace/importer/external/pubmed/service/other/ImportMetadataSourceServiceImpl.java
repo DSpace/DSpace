@@ -16,6 +16,8 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.MetadataSourceException;
 import org.dspace.importer.external.Query;
 import org.dspace.importer.external.datamodel.ImportRecord;
+import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
+import org.dspace.importer.external.metadatamapping.service.GenerateQueryService;
 import org.jaxen.JaxenException;
 
 import javax.ws.rs.client.Client;
@@ -38,6 +40,9 @@ public class ImportMetadataSourceServiceImpl extends org.dspace.importer.externa
 
     private WebTarget pubmedWebTarget;
 
+    public ImportMetadataSourceServiceImpl(GenerateQueryService generateQueryService, MetadataFieldMapping metadataFieldMapping) {
+        super(generateQueryService, metadataFieldMapping);
+    }
 
     @Override
     public int getNbRecords(String query) throws MetadataSourceException {
@@ -264,7 +269,7 @@ public class ImportMetadataSourceServiceImpl extends org.dspace.importer.externa
         private Query query;
 
         private FindMatchingRecords(Item item) throws  MetadataSourceException {
-            query = getGenerateQueryForItem().generateQueryForItem(item);
+            query = generateQueryService.generateQueryForItem(item);
         }
 
         public FindMatchingRecords(Query q) {

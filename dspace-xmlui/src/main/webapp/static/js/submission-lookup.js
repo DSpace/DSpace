@@ -45,7 +45,7 @@
     });
 
     function startLookup(searchInput,start) {
-        $.ajax({url: window.publication.contextPath+"/json/submissionLookup?search=" + searchInput +"&start="+start,
+        $.ajax({url: window.publication.contextPath+"/json/submissionLookup?search=" + searchInput +"&start="+start+"&type=pubmed",
             type: "POST",
             dataType: "json",
             async: true,

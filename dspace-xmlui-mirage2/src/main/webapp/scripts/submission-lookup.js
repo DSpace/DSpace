@@ -39,7 +39,7 @@
     });
 
     function startLookup(searchInput,start) {
-        $.ajax({url: window.import.contextPath+"/json/submissionLookup?" + searchInput +"&start="+start,
+        $.ajax({url: window.import.contextPath+"/json/submissionLookup?" + searchInput +"&start="+start+"&type=scidir",
             type: "POST",
             dataType: "json",
             async: true,

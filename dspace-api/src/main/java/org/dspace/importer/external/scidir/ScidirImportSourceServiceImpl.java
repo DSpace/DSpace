@@ -17,6 +17,9 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.importer.external.MetadataSourceException;
 import org.dspace.importer.external.Query;
 import org.dspace.importer.external.datamodel.ImportRecord;
+import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
+import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
+import org.dspace.importer.external.metadatamapping.service.GenerateQueryService;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.jaxen.JaxenException;
 
@@ -40,6 +43,10 @@ public class ScidirImportSourceServiceImpl extends AbstractImportMetadataSourceS
     private String apiUrl;
 
     private static Logger log = Logger.getLogger(ScidirImportSourceServiceImpl.class);
+
+    public ScidirImportSourceServiceImpl(GenerateQueryService generateQueryService, MetadataFieldMapping<OMElement, MetadataContributor<OMElement>> metadataFieldMapping) {
+        super(generateQueryService, metadataFieldMapping);
+    }
 
     public String getApiUrl() {
         return apiUrl;
@@ -207,7 +214,7 @@ public class ScidirImportSourceServiceImpl extends AbstractImportMetadataSourceS
         private Query query;
 
         private FindMatchingRecords(Item item) throws MetadataSourceException {
-            query = getGenerateQueryForItem().generateQueryForItem(item);
+            query = generateQueryService.generateQueryForItem(item);
         }
 
         public FindMatchingRecords(Query q) {

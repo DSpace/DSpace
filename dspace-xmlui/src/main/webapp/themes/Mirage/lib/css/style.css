@@ -1491,6 +1491,12 @@ ol.ds-ordered-list ol.ds-ordered-list ol.ds-ordered-list {
 .publication-records-modal, .publication-records-modal ul {
     list-style-type: none;
     padding-left: 0px;
+    margin-left:0;
+}
+
+.lookup-counter{
+    margin-top:35px
+    margin-bottom:35px
 }
 
 .publication-records-import-btn {
