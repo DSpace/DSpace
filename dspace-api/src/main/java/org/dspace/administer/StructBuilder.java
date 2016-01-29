@@ -40,6 +40,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.jdom.Element;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -245,6 +246,8 @@ public class StructBuilder {
      */
     private static void exportStructure(Context context, String output) {
         // Build a document from the Community/Collection hierarchy.
+        Element rootElement = xmlOutput.getRootElement();
+
         List<Community> communities = null;
         try {
             communities = communityService.findAllTop(context);
@@ -255,12 +258,13 @@ public class StructBuilder {
         }
 
         for (Community community : communities) {
-            xmlOutput.addContent(exportACommunity(community));
+            rootElement.addContent(exportACommunity(community));
         }
 
         // Now write the structure out.
         try (BufferedWriter out = new BufferedWriter(new FileWriter(output))) {
-            out.write(new XMLOutputter().outputString(xmlOutput));
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+            outputter.output(xmlOutput, out);
         }
         catch (IOException e) {
             System.out.printf("Unable to write to output file %s:  %s%n",
@@ -278,7 +282,7 @@ public class StructBuilder {
     private static Element exportACommunity(Community community) {
         // Export this Community.
         Element element = new Element("community");
-        element.setAttribute("identifier", community.getID().toString());
+        element.setAttribute("identifier", community.getHandle());
         element.addContent(new Element("name").setText(community.getName()));
         element.addContent(new Element("description")
                 .setText(communityService.getMetadataFirstValue(community,
@@ -315,7 +319,7 @@ public class StructBuilder {
     private static Element exportACollection(Collection collection) {
         // Export this Collection.
         Element element = new Element("collection");
-        element.setAttribute("identifier", collection.getID().toString());
+        element.setAttribute("identifier", collection.getHandle());
         element.addContent(new Element("name").setText(collection.getName()));
         element.addContent(new Element("description")
                 .setText(collectionService.getMetadataFirstValue(collection,
@@ -356,13 +360,13 @@ public class StructBuilder {
      */
     private static void giveHelp(Options options) {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp(null,
-                "Import or export Community/Collection structure",
+        formatter.printHelp("struct-builder",
+                "Import or export Community/Collection structure.",
                 options,
-                "When importing (the default), communities will be created from "
-                    + "the top level, and a map of communities to handles will "
-                    + "be returned in the output file.  When exporting, the"
-                    + "current structure will be written to the map file.",
+                "When importing (-f), communities will be created from the "
+                    + "top level, and a map of communities to handles will "
+                    + "be returned in the output file.  When exporting (-x),"
+                    + "the current structure will be written to the map file.",
                 true);
     }
 
