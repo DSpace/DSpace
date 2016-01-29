@@ -379,27 +379,29 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         try {
             ItemIterator items = null;
             try {
-                for (items = Item.findAll(context); items.hasNext();) {
-                    Item item = items.next();
-                    indexContent(context, item, force);
-                    item.decache();
-                }
-                for (items = Item.findAllWithdrawn(context); items.hasNext();) {
-                    Item item = items.next();
-                    indexContent(context, item, force);
-                    item.decache();
-                }
-                //Also index all our workflowitems !
+                // workflowitems
                 WorkflowItem[] workflowItems = WorkflowItem.findAll(context);
                 for (WorkflowItem workflowItem : workflowItems) {
                     indexContent(context, workflowItem.getItem(), force);
                     workflowItem.getItem().decache();
                 }
-                //Don't forget to also index the workspace items !
+                // workspace items
                 WorkspaceItem[] workspaceItems = WorkspaceItem.findAll(context);
                 for (WorkspaceItem workspaceItem : workspaceItems) {
                     indexContent(context, workspaceItem.getItem(), force);
                     workspaceItem.getItem().decache();
+                }
+		// archived items
+                for (items = Item.findAll(context); items.hasNext();) {
+                    Item item = items.next();
+                    indexContent(context, item, force);
+                    item.decache();
+                }
+		// withdrawn items
+                for (items = Item.findAllWithdrawn(context); items.hasNext();) {
+                    Item item = items.next();
+                    indexContent(context, item, force);
+                    item.decache();
                 }
             } finally {
                 if (items != null)
