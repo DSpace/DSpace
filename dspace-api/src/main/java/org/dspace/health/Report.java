@@ -12,11 +12,12 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
-import org.dspace.core.PluginManager;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 
 /**
  * @author LINDAT/CLARIN dev team
@@ -70,9 +71,10 @@ public class Report {
     public static LinkedHashMap<String, Check> checks() {
         LinkedHashMap<String, Check> checks = new LinkedHashMap<>();
         String check_names[] = ConfigurationManager.getProperty("healthcheck", "checks").split(",");
+        PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
         for ( String check_name : check_names ) {
-            Check check = (Check) PluginManager.getNamedPlugin(
-                "healthcheck", Check.class, check_name);
+            Check check = (Check) pluginService.getNamedPlugin(
+                Check.class, check_name);
             if ( null != check ) {
                 checks.put(check_name, check);
             }else {
