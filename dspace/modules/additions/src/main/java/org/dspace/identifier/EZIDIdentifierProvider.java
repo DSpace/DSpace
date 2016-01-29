@@ -751,7 +751,7 @@ public class EZIDIdentifierProvider extends IdentifierProvider
 
         for (Entry<String, String> datum : crosswalk.entrySet())
         {
-            Metadatum[] values = item.getMetadata(datum.getValue());
+            Metadatum[] values = item.getMetadataList(datum.getValue());
             if (null != values)
             {
                 for (Metadatum value : values)

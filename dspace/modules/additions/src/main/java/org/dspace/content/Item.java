@@ -575,7 +575,7 @@ public class Item extends DSpaceObject
      *            The metadata string of the form <schema
      *            prefix>.<element>[.<qualifier>|.*]
      */
-    public Metadatum[] getMetadata(String mdString)
+    public Metadatum[] getMetadataList(String mdString)
     {
         StringTokenizer dcf = new StringTokenizer(mdString, ".");
 
