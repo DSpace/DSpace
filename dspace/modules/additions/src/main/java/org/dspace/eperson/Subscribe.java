@@ -33,7 +33,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
 import org.dspace.core.ConfigurationManager;
@@ -492,7 +492,7 @@ public class Subscribe
                         HarvestedItemInfo hii = (HarvestedItemInfo) itemInfos
                                 .get(j);
 
-                        DCValue[] titles = hii.item.getDC("title", null,
+                        Metadatum[] titles = hii.item.getDC("title", null,
                                 Item.ANY);
                         emailText
                                 .append("      ")
@@ -511,7 +511,7 @@ public class Subscribe
                                             .getString("org.dspace.eperson.Subscribe.untitled"));
                         }
 
-                        DCValue[] authors = hii.item.getDC("contributor",
+                        Metadatum[] authors = hii.item.getDC("contributor",
                                 Item.ANY, Item.ANY);
 
                         if (authors.length > 0)
@@ -671,12 +671,12 @@ public class Subscribe
             // has the item modified today?
             if (lastUpdateStr.equals(today))
             {
-                DCValue[] dateAccArr = infoObject.item.getMetadata("dc",
+                Metadatum[] dateAccArr = infoObject.item.getMetadata("dc",
                         "date", "accessioned", Item.ANY);
                 // we need only the item archived yesterday
                 if (dateAccArr != null && dateAccArr.length > 0)
                 {
-                    for (DCValue date : dateAccArr)
+                    for (Metadatum date : dateAccArr)
                     {
                         if (date != null && date.value != null)
                         {
@@ -730,12 +730,12 @@ public class Subscribe
 
         for (HarvestedItemInfo infoObject : completeList)
         {
-            DCValue[] dateAccArr = infoObject.item.getMetadata("dc", "date",
+            Metadatum[] dateAccArr = infoObject.item.getMetadata("dc", "date",
                     "accessioned", Item.ANY);
 
             if (dateAccArr != null && dateAccArr.length > 0)
             {
-                for (DCValue date : dateAccArr)
+                for (Metadatum date : dateAccArr)
                 {
                     if (date != null && date.value != null)
                     {

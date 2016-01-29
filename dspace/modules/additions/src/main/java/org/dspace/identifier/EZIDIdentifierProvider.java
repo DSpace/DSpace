@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -143,8 +143,8 @@ public class EZIDIdentifierProvider
         }
 
         Item item = (Item)dso;
-        DCValue[] identifiers = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        for (DCValue identifier : identifiers)
+        Metadatum[] identifiers = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        for (Metadatum identifier : identifiers)
         {
             if ((null != identifier.value) && (identifier.value.startsWith(DOI_SCHEME)))
             {
@@ -380,8 +380,8 @@ public class EZIDIdentifierProvider
         }
 
         Item item = (Item)object;
-        DCValue found = null;
-        for (DCValue candidate : item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null))
+        Metadatum found = null;
+        for (Metadatum candidate : item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null))
         {
             if (candidate.value.startsWith(DOI_SCHEME))
             {
@@ -415,10 +415,10 @@ public class EZIDIdentifierProvider
         Item item = (Item)dso;
 
         // delete from EZID
-        DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        Metadatum[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         List<String> remainder = new ArrayList<String>();
         int skipped = 0;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (!id.value.startsWith(DOI_SCHEME))
             {
@@ -485,10 +485,10 @@ public class EZIDIdentifierProvider
 
         Item item = (Item)dso;
 
-        DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        Metadatum[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         List<String> remainder = new ArrayList<String>();
         int skipped = 0;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (!id.value.equals(idToDOI(identifier)))
             {
@@ -642,10 +642,10 @@ public class EZIDIdentifierProvider
 
         for (Entry<String, String> datum : crosswalk.entrySet())
         {
-            DCValue[] values = item.getMetadata(datum.getValue());
+            Metadatum[] values = item.getMetadata(datum.getValue());
             if (null != values)
             {
-                for (DCValue value : values)
+                for (Metadatum value : values)
                 {
                     String key = datum.getKey();
                     String mappedValue;

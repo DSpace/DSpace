@@ -26,7 +26,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.authority.Choices;
@@ -269,9 +269,9 @@ public class ItemAdapter extends AbstractAdapter
             }
             startElement(DIM, "dim", attributes);
 
-            DCValue[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY,
+            Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY,
                     Item.ANY);
-            for (DCValue dcv : dcvs)
+            for (Metadatum dcv : dcvs)
             {
                 if (!MetadataExposure.isHidden(context, dcv.schema,
                         dcv.element, dcv.qualifier))

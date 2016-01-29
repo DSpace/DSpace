@@ -25,7 +25,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -761,7 +761,7 @@ public class WorkflowManager
             String handle = HandleManager.findHandle(c, i);
 
             // Get title
-            DCValue[] titles = i.getDC("title", null, Item.ANY);
+            Metadatum[] titles = i.getDC("title", null, Item.ANY);
             String title = "";
             try
             {
@@ -1116,7 +1116,7 @@ public class WorkflowManager
     public static String getItemTitle(WorkflowItem wi) throws SQLException
     {
         Item myitem = wi.getItem();
-        DCValue[] titles = myitem.getDC("title", null, Item.ANY);
+        Metadatum[] titles = myitem.getDC("title", null, Item.ANY);
 
         // only return the first element, or "Untitled"
         if (titles.length > 0)
