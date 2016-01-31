@@ -13,6 +13,7 @@ import org.dspace.content.dao.MetadataFieldDAO;
 import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
@@ -57,6 +58,13 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     }
 
     @Override
+    public List<MetadataField> findAll(Context context, Class<MetadataField> clazz) throws SQLException {
+        Criteria criteria = createCriteria(context, MetadataField.class);
+        criteria.createAlias("metadataSchema", "s").addOrder(Order.asc("s.name")).addOrder(Order.asc("element")).addOrder(Order.asc("qualifier"));
+        return list(criteria);
+    }
+
+    @Override
     public MetadataField findByElement(Context context, String metadataSchema, String element, String qualifier) throws SQLException
     {
         Criteria criteria = createCriteria(context, MetadataField.class);
@@ -88,7 +96,9 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     public List<MetadataField> findAllInSchema(Context context, MetadataSchema metadataSchema) throws SQLException {
         // Get all the metadatafieldregistry rows
         Criteria criteria = createCriteria(context, MetadataField.class);
+        criteria.createAlias("metadataSchema", "s");
         criteria.add(Restrictions.eq("metadataSchema", metadataSchema));
+        criteria.addOrder(Order.asc("s.name")).addOrder(Order.asc("element")).addOrder(Order.asc("qualifier"));
         return list(criteria);
     }
 }
