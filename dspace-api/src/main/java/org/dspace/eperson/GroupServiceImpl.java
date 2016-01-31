@@ -388,6 +388,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     public void update(Context context, Group group) throws SQLException, AuthorizeException
     {
+
+        super.update(context, group);
         // FIXME: Check authorisation
         groupDAO.save(context, group);
 

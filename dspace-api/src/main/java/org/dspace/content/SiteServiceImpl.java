@@ -72,6 +72,9 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
         if(!authorizeService.isAdmin(context)){
             throw new AuthorizeException();
         }
+
+        super.update(context, site);
+
         if(site.isMetadataModified())
         {
             context.addEvent(new Event(Event.MODIFY_METADATA, site.getType(), site.getID(), site.getDetails(), getIdentifiers(context, site)));

@@ -413,6 +413,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogManager.getHeader(context, "update_item", "item_id="
                 + item.getID()));
 
+        super.update(context, item);
+
         // Set sequence IDs for bitstreams in item
         int sequence = 0;
         List<Bundle> bunds = item.getBundles();

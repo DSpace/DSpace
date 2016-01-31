@@ -235,6 +235,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         log.info(LogManager.getHeader(context, "update_community",
                 "community_id=" + community.getID()));
 
+        super.update(context, community);
+
         communityDAO.save(context, community);
         if (community.isModified())
         {
