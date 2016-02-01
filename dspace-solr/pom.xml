@@ -32,7 +32,7 @@
 
     <properties>
 
-        <solr.version>4.10.2</solr.version>
+        <solr.version>4.10.4</solr.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}/..</root.basedir>
@@ -235,7 +235,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>1.6.1</version>
+            <version>1.7.14</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

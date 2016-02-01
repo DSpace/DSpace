@@ -41,7 +41,7 @@
                      need to take precedence over the solr-core, the solr-core will still be loaded in the solr-core.jar
                      -->
                      <excludes>
-                         <exclude>WEB-INF/lib/apache-solr-core-4.10.2.jar</exclude>
+                         <exclude>WEB-INF/lib/apache-solr-core-4.10.4.jar</exclude>
                          <!--Also ensure we use the DSpace solr web.xml file else our localhost filter will not work !-->
                          <exclude>WEB-INF/web.xml</exclude>
                      </excludes>
