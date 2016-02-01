@@ -69,12 +69,12 @@ public class ResumableUploadStep extends UploadStep{
             String name = bitstream.getName();
             String url = makeBitstreamLink(item, bitstream);
             //long bytes = bitstream.getSize();
-            //String desc = bitstream.getDescription();
+            String desc = bitstream.getDescription();
             //String algorithm = bitstream.getChecksumAlgorithm();
             //String checksum = bitstream.getChecksum();
 
 
-            Row row = summary.addRow("bitstream-" + id, "data", "bitstream-" + id);
+            Row row = summary.addRow("bitstream-" + id, "data", "resumable-bitstream");
 
             // Add radio-button to select this as the primary bitstream
             Radio primary = row.addCell().addRadio("primary_bitstream_id");
@@ -87,6 +87,9 @@ public class ResumableUploadStep extends UploadStep{
             }
 
             row.addCell().addXref(url,name);
+            
+            // description
+            row.addCell().addText("description-" + id).setValue(desc);
             
             // status
             row.addCell("status-" + id, Cell.ROLE_DATA, "file-status-success").addFigure("/", null, null);

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +43,7 @@ import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.mortbay.log.Log;
 
 public class UploadFileChunk extends AbstractAction{
 
@@ -129,7 +131,7 @@ public class UploadFileChunk extends AbstractAction{
             //returnValues.put("status", "211");
             returnValues = new HashMap<String, String>();
         }
-        else{
+        else if(request.getMethod().equals("POST")){
             returnValues = new HashMap<String, String>();
             File completedFile = doPostResumable(request);
             
@@ -141,18 +143,71 @@ public class UploadFileChunk extends AbstractAction{
                 
                 log.info("sid : " + request.getParameter("submissionId"));
                 SubmissionInfo si = FlowUtils.obtainSubmissionInfo(objectModel, 'S' + request.getParameter("submissionId"));
-                log.info(si);
                 Item item = si.getSubmissionItem().getItem();
-                log.info(item);
                 Context context = ContextUtil.obtainContext(objectModel);
                 Bitstream b = this.createBitstream(context, completedFile, item);
-                returnValues.put("bitstream_id", String.valueOf(b.getID()));
-                
+                log.info("bid : " + b.getID());
+                returnValues.put("bitstream", String.valueOf(b.getID()));
+
+                // delete upload 
+                if (!deleteDirectory(new File(this.submissionDir))){
+                    log.warn("Coudln't delete temporary upload path " + this.chunkDir + ", ignoring it.");
+                }
                 
                 context.commit();
             }
             
             returnValues.put("status", "200");
+        }
+        else if(request.getMethod().equals("DELETE")){
+            log.info("jings");
+            
+            log.info("* " + request.getParameter("bitstreamId"));
+            
+            Context context = ContextUtil.obtainContext(objectModel);
+            SubmissionInfo si = FlowUtils.obtainSubmissionInfo(objectModel, 'S' + request.getParameter("submissionId"));
+            Item item = si.getSubmissionItem().getItem();
+            //item.
+            
+            
+
+            // try to find bitstream
+            try
+            {
+                int bid = Integer.parseInt(request.getParameter("bitstreamId"));
+                Bitstream bitstream = Bitstream.find(context, bid);
+               
+                if(bitstream != null){
+                    log.info("delete " + bitstream.getID());
+                    
+                    // remove bitstream from bundle..
+                    // delete bundle if it's now empty
+                    Bundle[] bundles = bitstream.getBundles();
+
+                    bundles[0].removeBitstream(bitstream);
+
+                    Bitstream[] bitstreams = bundles[0].getBitstreams();
+
+                    log.info("bundle len " + bitstreams.length);
+                    
+                    // remove bundle if it's now empty
+                    if (bitstreams.length < 1)
+                    {
+                        item.removeBundle(bundles[0]);
+                        item.update();
+                    }
+                    
+                    returnValues = new HashMap<String, String>();
+                    returnValues.put("status", "200");
+                }
+                else{
+                    log.error("Bitstream " + bid + " not found. Can't delete");
+                }
+            }
+            catch (NumberFormatException nfe)
+            {
+                log.error("Invalud bitstream id " + request.getParameter("bitstreamId") + " Can't delete");
+            }
         }
 
         return returnValues;
@@ -251,6 +306,7 @@ public class UploadFileChunk extends AbstractAction{
                     foundAll = false;
                     break;
                 }
+                
                 currentSize += file.length();
             }
             

@@ -13,16 +13,11 @@ $.ajaxSetup ({
 
 var href = window.location.href;
 var params = href.split('/');
-console.log("**");
-
-
-// console.log($('input[name="submit-id"]'));
-// console.log($('input[name="submit-id"]').val());
+var url = '/handle/' + params[4] + '/' + params[5] + '/upload';
 var sid = $('input[name="submit-id"]').val();
-//console.log($('input[name="submit-id"]').value());
 
 var r = new Resumable({
-    target: '/handle/' + params[4] + '/' + params[5] + '/upload',
+    target: url,
     chunkSize: 1024 * 1024,
     simultaneousUploads: 1,
     testChunks: true,
@@ -57,27 +52,6 @@ var html = '\
   <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Are you sure you want to delete <span id="file-name"></span>?</p>\
 </div>';
 
-/*
-<div class="resumable-files">\
-  <div class="panel panel-default">\
-    <div class="panel-heading">Files To Upload</div>\
-    <table class="table resumable-list">\
-      <thead>\
-      <th>Primary</th>\
-      <th>File</th>\
-      <th>Size</th>\
-      <th>Description</th>\
-      <th>Format</th>\
-      <th>Status</th>\
-      </thead>\
-      <tbody></tbody>\
-    </table>\
-  </div>\
-</div>';
-*/
-
-
-
 if(r.support) {
     $('#aspect_submission_StepTransformer_div_submit-file-upload').prepend(html);
 
@@ -108,14 +82,17 @@ if(r.support) {
         console.log(file);
         var tableRow =
             '<tr class="ds-table-row">\
-               <td class="ds-table-cell"></td>\
-               <td class="ds-table-cell">' + file.fileName + '</td>\
+               <td class="ds-table-cell">\
+                 <div class="radio"><label><input id="primary-' +  file.uniqueIdentifier + '" type="radio" name="primary_bitstream_id" disabled="disabled"></label></div>\
+               </td>\
+               <td class="ds-table-cell"><div>' + file.fileName + '</div></td>\
                <td class="ds-table-cell">\
                  <input id="file-description-' + file.uniqueIdentifier + '" class="ds-text-field form-control" type="text" value="" name="description" disabled="disabled"></input>\
                </td>\
                <td id="file-status-' +  file.uniqueIdentifier + '" class="ds-table-cell"></td>\
-               <td class="ds-table-cell"></td>\
-              </tr>';
+               <td id="file-info-' +  file.uniqueIdentifier + '" class="ds-table-cell"></td>\
+               <td id="file-delete-' +  file.uniqueIdentifier + '" class="ds-table-cell"></td>\
+             </tr>';
 
         // Add the file to the list
         $('#aspect_submission_StepTransformer_table_submit-upload-summary tbody').append(tableRow);
@@ -154,10 +131,12 @@ if(r.support) {
 
         $('#file-description-' + file.uniqueIdentifier).removeAttr('disabled');
         $('#file-description-' + file.uniqueIdentifier).attr('name', 'description-' + bId);
-
-
-        // console.log(bId[0]);
-        // console.log($(bId[0]).text());
+        $('#primary-' + file.uniqueIdentifier).removeAttr('disabled');
+        $('#primary-' + file.uniqueIdentifier).attr('value', bId);
+        $('#file-status-' +  file.uniqueIdentifier).text('');
+        $('#file-status-' +  file.uniqueIdentifier).attr('class', 'file-status-success');
+        $('#file-info-' +  file.uniqueIdentifier).attr('class', 'file-info');
+        $('#file-delete-' +  file.uniqueIdentifier).attr('class', 'file-delete');
     });
 
     r.on('fileError', function(file, message){
@@ -175,11 +154,9 @@ if(r.support) {
         $('.progress-bar').css({width:Math.floor(r.progress()*100) + '%'});
     });
 
-    //$('header').hide();
-
     $('.file-delete').click(function(e){
-        console.log("=>");
-        console.log($(e.target).attr('id'));
+        var cell = e.target;
+        var fileName = $($(cell).siblings()[1]).find('a').text();
 
         var height = 140;
         var width = 700;
@@ -187,23 +164,48 @@ if(r.support) {
             height: height,
             width: width,
             modal: true,
-
+            autoOpen: false,
             buttons: {
-                Cancel: function() {
+                Cancel: function(){
                     $( this ).dialog( "close" );
                 },
-                "Delete": function() {
-                    $( this ).dialog( "close" );
+                "Delete": function(ev) {
+
+                    var id = $(cell).attr('id');
+                    var bid = id.split('-')[1];
+                    console.log(bid + " : " + sid);
+
+                    $.ajax({
+                        type: "DELETE",
+                        url: url + "?submissionId=" + sid + "&bitstreamId=" + bid,
+                        cache: false,
+                        success: $.proxy(function(data){
+                            console.log(url)
+                            console.log($(cell).parent());
+                            //$(row).hide();
+                            $(cell).parent().hide();
+
+                            $(this).dialog( "close" );
+                        }, this),
+                        error: function(jqXHR, status, error){
+                            console.error("Problem deleting " + fileName + " : " +
+                                          status + " : " + error);
+
+                        }
+                    });
+
                 }
             }
         });
-
+        $('#file-name').text(fileName);
 
         // for some reason jquery dialog not centring, so do it manually
-        var top = ($(window).height() / 2) - (height / 2);
-        var left = ($(window).width() / 2) - (width / 2);
+        var top = $(document).scrollTop() + ($(window).height() / 2) - (height / 2);
+        var left = $(document).scrollLeft() + ($(window).width() / 2) - (width / 2);
         $('.ui-dialog').css('top', top + 'px');
         $('.ui-dialog').css('left', left + 'px');
+
+        $("#dialog-confirm").dialog("open");
     });
 
     function resume() {
