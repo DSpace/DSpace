@@ -26,9 +26,8 @@
 
 <dspace:layout locbar="nolink" title="Statistics" feedData="NONE">
     <ul class="list-group">
-        <li class="list-group-item"><a href="/stat/stat.jsp">Personal</a></li>
+        <li class="list-group-item"><a href="/statistics/report">Статистика</a></li>
         <li class="list-group-item"><a href="/stat/person-stat.jsp">Newest Persons</a></li>
-        <li class="list-group-item"><a href="/stat/faculty-stat.jsp">Faculty</a></li>
     </ul>
 </dspace:layout>
 
