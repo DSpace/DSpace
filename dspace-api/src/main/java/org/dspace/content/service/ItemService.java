@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Service interface class for the Item object.
@@ -403,6 +404,8 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
                                               String schema, String element, String qualifier, String value)
             throws SQLException, AuthorizeException, IOException;
 
+    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause, int offset, int limit)
+       throws SQLException, AuthorizeException, IOException;
 
     /**
      * Find all the items in the archive with a given authority key value
@@ -456,4 +459,10 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @return total items
      */
     public int countItems(Context context, Community community) throws SQLException;
+
+    int countTotal(Context context) throws SQLException;
+
+    int getNotArchivedItemsCount(Context context) throws SQLException;
+
+    int countWithdrawnItems(Context context) throws SQLException;
 }

@@ -7,6 +7,7 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 import javax.persistence.*;
@@ -53,8 +54,14 @@ public class ClaimedTask {
     @JoinColumn(name = "owner_id")
     private EPerson owner;
 
-    public ClaimedTask()
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService#create(Context)}
+     *
+     */
+    protected ClaimedTask()
     {
+
     }
 
     public int getId() {

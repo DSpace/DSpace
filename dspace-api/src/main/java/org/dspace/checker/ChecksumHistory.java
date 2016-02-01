@@ -7,6 +7,9 @@
  */
 package org.dspace.checker;
 
+import org.dspace.core.Context;
+import org.dspace.content.Bitstream;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
@@ -33,8 +36,9 @@ public class ChecksumHistory
     @SequenceGenerator(name="checksum_history_check_id_seq", sequenceName="checksum_history_check_id_seq", allocationSize = 1)
     private long id;
 
-    @Column(name = "bitstream_id")
-    private UUID bitstreamId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bitstream_id")
+    private Bitstream bitstream;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "process_start_date", nullable = false)
@@ -55,7 +59,11 @@ public class ChecksumHistory
     private ChecksumResult checksumResult;
 
 
-    public ChecksumHistory()
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.checker.service.ChecksumHistoryService#addHistory(Context, MostRecentChecksum)}
+     */
+    protected ChecksumHistory()
     {
     }
 
@@ -66,13 +74,13 @@ public class ChecksumHistory
     /**
      * @return Returns the bitstreamId.
      */
-    public UUID getBitstreamId()
+    public Bitstream getBitstream()
     {
-        return bitstreamId;
+        return bitstream;
     }
 
-    public void setBitstreamId(UUID bitstreamId) {
-        this.bitstreamId = bitstreamId;
+    public void setBitstream(Bitstream bitstream) {
+        this.bitstream = bitstream;
     }
 
     /**

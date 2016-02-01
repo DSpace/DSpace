@@ -14,7 +14,6 @@ import java.util.List;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.search.QueryResults;
 
 /**
  * Generic search.  See plug-ins derived from this interface.

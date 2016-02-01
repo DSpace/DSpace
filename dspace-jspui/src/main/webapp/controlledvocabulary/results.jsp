@@ -37,30 +37,29 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.net.URLEncoder"            %>
+<%@ page import="java.util.List"                 %>
 <%@ page import="org.dspace.content.Community"   %>
 <%@ page import="org.dspace.content.Collection"  %>
 <%@ page import="org.dspace.content.Item"        %>
-<%@ page import="org.dspace.search.QueryResults" %>
+<%@ page import="org.dspace.discovery.DiscoverResult" %>
 
 <%
     // Get the attributes
     Community   community        = (Community   ) request.getAttribute("community" );
     Collection  collection       = (Collection  ) request.getAttribute("collection");
-    Community[] communityArray   = (Community[] ) request.getAttribute("community.array");
-    Collection[] collectionArray = (Collection[]) request.getAttribute("collection.array");
-    
-    Item      [] items       = (Item[]      )request.getAttribute("items");
-    Community [] communities = (Community[] )request.getAttribute("communities");
-    Collection[] collections = (Collection[])request.getAttribute("collections");
+
+    List<Item>      items       = (List<Item>      )request.getAttribute("items");
+    List<Community> communities = (List<Community> )request.getAttribute("communities");
+    List<Collection>collections = (List<Collection>)request.getAttribute("collections");
 
     String query = (String) request.getAttribute("query");
 
-    QueryResults qResults = (QueryResults)request.getAttribute("queryresults");
+    DiscoverResult qResults = (DiscoverResult)request.getAttribute("queryresults");
 
-    int pageTotal   = ((Integer)request.getAttribute("pagetotal"  )).intValue();
-    int pageCurrent = ((Integer)request.getAttribute("pagecurrent")).intValue();
-    int pageLast    = ((Integer)request.getAttribute("pagelast"   )).intValue();
-    int pageFirst   = ((Integer)request.getAttribute("pagefirst"  )).intValue();
+    long pageTotal   = ((Long)request.getAttribute("pagetotal"  )).longValue();
+    long pageCurrent = ((Long)request.getAttribute("pagecurrent")).longValue();
+    long pageLast    = ((Long)request.getAttribute("pagelast"   )).longValue();
+    long pageFirst   = ((Long)request.getAttribute("pagefirst"  )).longValue();
 %>
 
 <dspace:layout titlekey="jsp.search.results.title">
@@ -70,14 +69,7 @@
 <h1><fmt:message key="jsp.search.results.title"/></h1>
     
   
-
-<% if( qResults.getErrorMsg()!=null )
-{
- %>
-    <p align="center" class="submitFormWarn"><%= qResults.getErrorMsg() %></p>
-<%
-}
-else if( qResults.getHitCount() == 0 )
+<% if( qResults.getTotalSearchResults() == 0 )
 {
  %>
     <%-- <p align="center">Search produced no results.</p> --%>
@@ -90,26 +82,26 @@ else
     <%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
 	<p align="center"><fmt:message key="jsp.search.results.results">
         <fmt:param><%=qResults.getStart()+1%></fmt:param>
-        <fmt:param><%=qResults.getStart()+qResults.getHitHandles().size()%></fmt:param>
-        <fmt:param><%=qResults.getHitCount()%></fmt:param>
+        <fmt:param><%=qResults.getStart()+qResults.getMaxResults()%></fmt:param>
+        <fmt:param><%=qResults.getTotalSearchResults()%></fmt:param>
     </fmt:message></p>
 
 <% } %>
 
-<% if (communities.length > 0 ) { %>
+<% if (communities.size() > 0 ) { %>
     <%-- <h3>Community Hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.comhits"/></h3>
     <dspace:communitylist  communities="<%= communities %>" />
 <% } %>
 
-<% if (collections.length > 0 ) { %>   
+<% if (collections.size() > 0 ) { %>   
     <br/>
     <%-- <h3>Collection hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.colhits"/></h3>
     <dspace:collectionlist collections="<%= collections %>" />
 <% } %>
 
-<% if (items.length > 0) { %>
+<% if (items.size() > 0) { %>
     <br/>
     <%-- <h3>Item hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.itemhits"/></h3>
@@ -139,10 +131,10 @@ else
     String nextURL = prevURL;
 
     prevURL = prevURL
-            + (pageCurrent-2) * qResults.getPageSize();
+            + (pageCurrent-2) * qResults.getMaxResults();
 
     nextURL = nextURL
-            + (pageCurrent) * qResults.getPageSize();
+            + (pageCurrent) * qResults.getMaxResults();
     
     
 if (pageFirst != pageCurrent)
@@ -151,7 +143,7 @@ if (pageFirst != pageCurrent)
 };
 
 
-for( int q = pageFirst; q <= pageLast; q++ )
+for( long q = pageFirst; q <= pageLast; q++ )
 {
     String myLink = "<a href=\""
                     + request.getContextPath()
@@ -168,7 +160,7 @@ for( int q = pageFirst; q <= pageLast; q++ )
     else
     {
         myLink = myLink
-            + (q-1) * qResults.getPageSize()
+            + (q-1) * qResults.getMaxResults()
             + "\">"
             + q
             + "</a>";

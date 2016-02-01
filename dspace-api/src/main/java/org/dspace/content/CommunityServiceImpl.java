@@ -235,6 +235,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         log.info(LogManager.getHeader(context, "update_community",
                 "community_id=" + community.getID()));
 
+        super.update(context, community);
+
         communityDAO.save(context, community);
         if (community.isModified())
         {
@@ -669,5 +671,10 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     @Override
     public Community findByLegacyId(Context context, int id) throws SQLException {
         return communityDAO.findByLegacyId(context, id, Community.class);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return communityDAO.countRows(context);
     }
 }

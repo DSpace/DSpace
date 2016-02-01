@@ -22,7 +22,6 @@ import java.util.Date;
 @Table(name="most_recent_checksum")
 public class MostRecentChecksum implements Serializable
 {
-
     @Id
     @OneToOne
     @JoinColumn(name="bitstream_id", nullable = false)
@@ -60,6 +59,14 @@ public class MostRecentChecksum implements Serializable
     @OneToOne
     @JoinColumn(name= "result")
     private ChecksumResult checksumResult;
+
+    /**
+     * Protected constructor, create handled by the
+     * {@link org.dspace.checker.service.MostRecentChecksumService}
+     */
+    protected MostRecentChecksum()
+    {
+    }
 
     public Bitstream getBitstream() {
         return bitstream;

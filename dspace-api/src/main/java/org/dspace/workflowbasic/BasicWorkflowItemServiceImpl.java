@@ -151,4 +151,9 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     public List<BasicWorkflowItem> findByOwner(Context context, EPerson ePerson) throws SQLException {
         return workflowItemDAO.findByOwner(context, ePerson);
     }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return workflowItemDAO.countRows(context);
+    }
 }

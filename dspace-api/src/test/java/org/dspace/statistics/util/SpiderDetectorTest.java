@@ -9,6 +9,7 @@ package org.dspace.statistics.util;
 
 import mockit.Mock;
 import mockit.MockUp;
+import org.dspace.AbstractDSpaceTest;
 import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author mwood
  */
-public class SpiderDetectorTest
+public class SpiderDetectorTest extends AbstractDSpaceTest
 {
     private static final String NOT_A_BOT_ADDRESS = "192.168.0.1";
 
@@ -76,8 +77,6 @@ public class SpiderDetectorTest
         candidate = "wiki.dspace.org";
         req.setRemoteHost(candidate);
         assertFalse(candidate + " matched DNS patterns", SpiderDetector.isSpider(req));
-        
-        req = null;
     }
 
     /**
@@ -146,7 +145,7 @@ public class SpiderDetectorTest
 
         @Mock
         public void $clinit() {}
-        
+
         @Mock
         public boolean isUseProxies()
         {

@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import org.dspace.core.Context;
 import org.hibernate.annotations.Type;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -65,7 +66,14 @@ public class MetadataValue
     @JoinColumn(name="dspace_object_id")
     protected DSpaceObject dSpaceObject;
 
-    protected MetadataValue() {
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.MetadataValueService#create(Context, DSpaceObject, MetadataField)}
+     *
+     */
+    protected MetadataValue()
+    {
+
     }
 
     /**

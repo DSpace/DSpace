@@ -27,14 +27,15 @@ import org.apache.cocoon.reading.AbstractReader;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleServiceImpl;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.SearchUtils;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.search.DSQuery;
-import org.dspace.search.QueryArgs;
-import org.dspace.search.QueryResults;
 import org.xml.sax.SAXException;
 
 /**
@@ -69,6 +70,7 @@ public class OpenURLReader extends AbstractReader implements Recyclable {
 
 	protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
+        @Override
 	public void generate() throws IOException, SAXException,
 			ProcessingException {
 	}
@@ -141,18 +143,27 @@ public class OpenURLReader extends AbstractReader implements Recyclable {
 	}
 
 	private String getFirstHandle(String query) throws IOException {
-		List<String> handles = getHandles(query);
-		for (String handle : handles) {
-			return handle;
-		}
-		return null;
-	}
+                
+            // Construct a Discovery query
+            DiscoverQuery queryArgs = new DiscoverQuery();
+            queryArgs.setQuery(query);
+            // we want Items only
+            queryArgs.setDSpaceObjectFilter(Constants.ITEM);
+                
+            try
+            {
+                DiscoverResult queryResults = SearchUtils.getSearchService().search(context, queryArgs);
+                List<DSpaceObject> objResults = queryResults.getDspaceObjects();
 
-	private List<String> getHandles(String query) throws IOException {
-		QueryArgs args = new QueryArgs();
-		args.setQuery(query);
-		QueryResults results = DSQuery.doQuery(context, args);
-		return results.getHitHandles();
+                if(objResults!=null && !objResults.isEmpty())
+                    return objResults.get(0).getHandle();
+                else
+                    return null;
+            }
+            catch(SearchServiceException e)
+            {
+                throw new IOException(e);
+            }
 	}
 
 	/**

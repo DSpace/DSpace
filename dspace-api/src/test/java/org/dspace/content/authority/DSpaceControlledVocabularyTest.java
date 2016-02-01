@@ -10,7 +10,8 @@ package org.dspace.content.authority;
 import java.io.IOException;
 
 import org.dspace.content.Collection;
-import org.dspace.core.PluginManager;
+import org.dspace.AbstractDSpaceTest;
+import org.dspace.core.factory.CoreServiceFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.*;
@@ -20,7 +21,7 @@ import org.junit.*;
  *
  * @author mwood
  */
-public class DSpaceControlledVocabularyTest
+public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest
 {
     public DSpaceControlledVocabularyTest()
     {
@@ -83,9 +84,9 @@ public class DSpaceControlledVocabularyTest
         String locale = null;
         // This "farm" Controlled Vocab is included in TestEnvironment data 
         // (under /src/test/data/dspaceFolder/) and it should be auto-loaded
-        // by test configs in /src/test/data/dspace.cfg.more
+        // by test configs in /src/test/data/dspaceFolder/config/local.cfg
         DSpaceControlledVocabulary instance = (DSpaceControlledVocabulary)
-                PluginManager.getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
+                CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
         assertNotNull(instance);
         Choices result = instance.getMatches(field, text, collection, start,
                 limit, locale);

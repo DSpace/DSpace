@@ -21,10 +21,6 @@
     </properties>
 
     <build>
-        <filters>
-            <!-- Filter using the properties file defined by dspace-parent POM -->
-            <filter>${filters.file}</filter>
-        </filters>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -34,7 +30,7 @@
                     <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
                     <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
                     <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-                    <!-- Filter the web.xml -->
+                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                 </configuration>
                 <executions>
@@ -61,6 +57,7 @@
                         <exclude>**/DD_belated*</exclude>
                         <exclude>**/detectmobile*</exclude>
                         <exclude>**/sc-mobile*</exclude>
+                        <exclude>**/handlebars/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

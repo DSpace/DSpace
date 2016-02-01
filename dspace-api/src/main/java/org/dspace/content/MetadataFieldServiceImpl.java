@@ -88,6 +88,11 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
     }
 
     @Override
+    public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchemaName, String element) throws SQLException {
+        return metadataFieldDAO.findFieldsByElementNameUnqualified(context, metadataSchemaName, element);
+    }
+
+    @Override
     public List<MetadataField> findAll(Context context) throws SQLException
     {
         return metadataFieldDAO.findAll(context, MetadataField.class);

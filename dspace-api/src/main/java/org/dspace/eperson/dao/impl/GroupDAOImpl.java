@@ -153,4 +153,13 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         return sqlQuery.list();
     }
 
+    @Override
+    public List<Group> getEmptyGroups(Context context) throws SQLException {
+        return list(createQuery(context, "SELECT g from Group g where g.epeople is EMPTY"));
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Group"));
+    }
 }

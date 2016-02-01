@@ -566,6 +566,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         log.info(LogManager.getHeader(context, "update_collection",
                 "collection_id=" + collection.getID()));
 
+        super.update(context, collection);
         collectionDAO.save(context, collection);
 
         if (collection.isModified())
@@ -763,6 +764,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
+    public List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException {
+        return collectionDAO.findCollectionsWithSubscribers(context);
+    }
+
+    @Override
     public DSpaceObject getAdminObject(Context context, Collection collection, int action) throws SQLException {
         DSpaceObject adminObject = null;
         Community community = null;
@@ -830,5 +836,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Override
     public Collection findByLegacyId(Context context, int id) throws SQLException {
         return collectionDAO.findByLegacyId(context, id, Collection.class);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return collectionDAO.countRows(context);
+    }
+
+    @Override
+    public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException {
+        return collectionDAO.getCollectionsWithBitstreamSizesTotal(context);
     }
 }

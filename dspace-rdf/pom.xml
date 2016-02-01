@@ -18,13 +18,6 @@
         <root.basedir>${basedir}/..</root.basedir>
     </properties>
 
-    <build>
-        <filters>
-            <!-- Filter using the properties file defined by dspace-parent POM -->
-            <filter>${filters.file}</filter>
-        </filters>
-    </build>
-
     <dependencies>
         <!-- Use jena to create, store and load rdf -->
         <dependency>

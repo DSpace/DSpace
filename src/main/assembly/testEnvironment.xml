@@ -40,11 +40,10 @@
             <sources>
                 <outputDirectoryMapping>dspace</outputDirectoryMapping>
                 <fileSets>
-                    <!-- First, copy over custom/overridden configs, filtering each of them -->
+                    <!-- First, copy over custom/overridden configs -->
                     <fileSet>
                         <directory>src/test/data/dspaceFolder/config</directory>
                         <outputDirectory>config</outputDirectory>
-                        <filtered>true</filtered>
                     </fileSet>
                     <!-- Then copy over everything else (EXCEPT configs) -->
                     <fileSet>
@@ -73,7 +72,6 @@
                         <includes>
                             <include>config/**</include>
                         </includes>
-                        <filtered>true</filtered>
                     </fileSet>
                     <!-- Then add in other necessary directories -->
                     <fileSet>
@@ -87,25 +85,6 @@
                     <fileSet>
                         <directory>solr</directory>
                         <outputDirectory>solr</outputDirectory>
-                    </fileSet>
-                </fileSets>
-            </sources>
-        </moduleSet>
-        <!-- Finally, copy the 'dspace.cfg.more' from the 'dspace-api' into
-             the root directory of the ZIP. This config will be merged/weaved
-             into the default dspace.cfg (see fileweaver maven plugin) -->
-        <moduleSet>
-            <includes>
-                <include>org.dspace:dspace-api</include>
-            </includes>
-            <sources>
-                <outputDirectoryMapping>/</outputDirectoryMapping>
-                <fileSets>
-                    <fileSet>
-                        <directory>src/test/data</directory>
-                        <includes>
-                            <include>dspace.cfg.more</include>
-                        </includes>
                     </fileSet>
                 </fileSets>
             </sources>

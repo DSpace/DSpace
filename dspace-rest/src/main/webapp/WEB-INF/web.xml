@@ -42,6 +42,11 @@
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
     
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/static/*</url-pattern>
+    </servlet-mapping>
+    
     <!-- Security settings and mapping -->
     <security-constraint>
         <web-resource-collection>
@@ -53,16 +58,10 @@
         </user-data-constraint>
     </security-constraint>
     
-    <!-- DSpace Configuration Information -->
-    <context-param>
-        <param-name>dspace-config</param-name>
-        <param-value>${dspace.dir}/config/dspace.cfg</param-value>
-    </context-param>
-
-    <!-- new ConfigurationService initialization for dspace.dir -->
+    <!-- ConfigurationService initialization for dspace.dir -->
     <context-param>
         <description>
-            The location of the main DSpace configuration file
+            The location of the DSpace home directory
         </description>
         <param-name>dspace.dir</param-name>
         <param-value>${dspace.dir}</param-value>

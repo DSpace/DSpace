@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.workflow.WorkflowItem;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -70,6 +72,17 @@ public class WorkspaceItem implements InProgressSubmission, Serializable
     )
     private final List<Group> supervisorGroups = new ArrayList<>();
 
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.content.service.WorkspaceItemService#create(Context, Collection, boolean)}
+     * or
+     * {@link org.dspace.content.service.WorkspaceItemService#create(Context, WorkflowItem)}
+     *
+     */
+    protected WorkspaceItem()
+    {
+
+    }
 
     /**
      * Get the internal ID of this workspace item

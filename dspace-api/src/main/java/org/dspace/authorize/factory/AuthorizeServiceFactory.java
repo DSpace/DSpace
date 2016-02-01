@@ -9,7 +9,7 @@ package org.dspace.authorize.factory;
 
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the authorize package, use AuthorizeServiceFactory.getInstance() to retrieve an implementation
@@ -24,6 +24,6 @@ public abstract class AuthorizeServiceFactory {
 
     public static AuthorizeServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("authorizeServiceFactory", AuthorizeServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("authorizeServiceFactory", AuthorizeServiceFactory.class);
     }
 }

@@ -14,6 +14,7 @@ import java.io.File;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.content.Collection;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPath;
@@ -25,8 +26,8 @@ import org.xml.sax.InputSource;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.SelfNamedPlugin;
+import org.dspace.services.ConfigurationService;
 
 /**
  * ChoiceAuthority source that reads the JSPUI-style hierarchical vocabularies
@@ -94,7 +95,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
                     return name.endsWith(".xml");
                 }
             }
-            String vocabulariesPath = ConfigurationManager.getProperty("dspace.dir")
+            String vocabulariesPath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
                     + "/config/controlled-vocabularies/";
             String[] xmlFiles = (new File(vocabulariesPath)).list(new xmlFilter());
             List<String> names = new ArrayList<String>();
@@ -111,13 +112,15 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     {
     	if (vocabulary == null)
         {
+            ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+
         	log.info("Initializing " + this.getClass().getName());
         	vocabularyName = this.getPluginInstanceName();
-            String vocabulariesPath = ConfigurationManager.getProperty("dspace.dir") + "/config/controlled-vocabularies/";
+            String vocabulariesPath = config.getProperty("dspace.dir") + "/config/controlled-vocabularies/";
             String configurationPrefix = "vocabulary.plugin." + vocabularyName;
-            storeHierarchy = ConfigurationManager.getBooleanProperty(configurationPrefix + ".hierarchy.store", storeHierarchy);
-            suggestHierarchy = ConfigurationManager.getBooleanProperty(configurationPrefix + ".hierarchy.suggest", suggestHierarchy);
-            String configuredDelimiter = ConfigurationManager.getProperty(configurationPrefix + ".delimiter");
+            storeHierarchy = config.getBooleanProperty(configurationPrefix + ".hierarchy.store", storeHierarchy);
+            suggestHierarchy = config.getBooleanProperty(configurationPrefix + ".hierarchy.suggest", suggestHierarchy);
+            String configuredDelimiter = config.getProperty(configurationPrefix + ".delimiter");
             if (configuredDelimiter != null)
             {
             	hierarchyDelimiter = configuredDelimiter.replaceAll("(^\"|\"$)","");

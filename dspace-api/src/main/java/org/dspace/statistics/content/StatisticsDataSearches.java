@@ -13,11 +13,11 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.ObjectCount;
 import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.content.filter.StatisticsFilter;
-import org.dspace.utils.DSpace;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -113,7 +113,7 @@ public class StatisticsDataSearches extends StatisticsData {
 
                         dataset.setRowLabel(i, String.valueOf(i + 1));
                         String displayedValue = queryCount.getValue();
-                        if(new DSpace().getConfigurationService().getPropertyAsType("usage-statistics.search.statistics.unescape.queries", Boolean.TRUE)){
+                        if(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyAsType("usage-statistics.search.statistics.unescape.queries", Boolean.TRUE)){
                             displayedValue = displayedValue.replace("\\", "");
                         }
                         dataset.addValueToMatrix(i, 0, displayedValue);

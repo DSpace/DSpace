@@ -9,6 +9,7 @@ package org.dspace.authorize;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hibernate.proxy.HibernateProxyHelper;
@@ -71,6 +72,15 @@ public class ResourcePolicy{
 
     @Column(name="rpdescription", length = 100)
     private String rpdescription;
+
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.authorize.service.ResourcePolicyService#create(Context)}
+     */
+    protected ResourcePolicy()
+    {
+
+    }
 
     /**
      * Return true if this object equals obj, false otherwise.

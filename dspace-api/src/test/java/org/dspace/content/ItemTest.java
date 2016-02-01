@@ -404,7 +404,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
      */
     @Test
     public void testAddMetadata_7args_1_authority() throws InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException, SQLException {
-        //we have enabled an authority control in dspace-test.cfg to run this test
+        //we have enabled an authority control in our test local.cfg to run this test
         //as MetadataAuthorityManager can't be mocked properly
 
         String schema = "dc";
@@ -504,7 +504,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     @Test
     public void testAddMetadata_7args_2_authority() throws SQLException
     {
-        //we have enabled an authority control in dspace-test.cfg to run this test
+        //we have enabled an authority control in our test local.cfg to run this test
         //as MetadataAuthorityManager can't be mocked properly
 
         String schema = "dc";

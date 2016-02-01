@@ -67,4 +67,9 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
         query.setString("oldPrefix", oldPrefix);
         return query.executeUpdate();
     }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Handle"));
+    }
 }

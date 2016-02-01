@@ -37,7 +37,7 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.LogManager" %>
-<%@ page import="org.dspace.core.PluginManager" %>
+<%@ page import="org.dspace.core.factory.CoreServiceFactory" %>
 <%@ page import="org.dspace.plugin.SiteHomeProcessor" %>
 
 <%
@@ -53,7 +53,7 @@
         
         try
         {
-            SiteHomeProcessor[] chp = (SiteHomeProcessor[]) PluginManager.getPluginSequence(SiteHomeProcessor.class);
+            SiteHomeProcessor[] chp = (SiteHomeProcessor[]) CoreServiceFactory.getInstance().getPluginService().getPluginSequence(SiteHomeProcessor.class);
             for (int i = 0; i < chp.length; i++)
             {
                 chp[i].process(context, request, response);

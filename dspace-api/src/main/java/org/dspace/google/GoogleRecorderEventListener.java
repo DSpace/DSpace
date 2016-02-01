@@ -16,15 +16,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.services.model.Event;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -63,9 +61,9 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
             log.debug("Usage event received " + event.getName());
 
             // This is a wee bit messy but these keys should be combined in future.
-            analyticsKey = new DSpace().getConfigurationService().getProperty("jspui.google.analytics.key");
+            analyticsKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("jspui.google.analytics.key");
             if (analyticsKey == null ) {
-                analyticsKey = new DSpace().getConfigurationService().getProperty("xmlui.google.analytics.key");
+                analyticsKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.google.analytics.key");
             }
 
             if (analyticsKey != null ) {

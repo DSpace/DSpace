@@ -25,7 +25,7 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -93,7 +93,7 @@ public class DOIIdentifierProviderTest
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
 
-            config = kernelImpl.getConfigurationService();
+            config = DSpaceServicesFactory.getInstance().getConfigurationService();
             // Configure the service under test.
             config.setProperty(DOIIdentifierProvider.CFG_PREFIX, PREFIX);
             config.setProperty(DOIIdentifierProvider.CFG_NAMESPACE_SEPARATOR, 
@@ -101,7 +101,7 @@ public class DOIIdentifierProviderTest
         
             connector = new MockDOIConnector();
             
-            provider = new DSpace().getServiceManager().getServiceByName(DOIIdentifierProvider.class.getName(), DOIIdentifierProvider.class);
+            provider = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(DOIIdentifierProvider.class.getName(), DOIIdentifierProvider.class);
             provider.setConfigurationService(config);
             provider.setDOIConnector(connector);
         }

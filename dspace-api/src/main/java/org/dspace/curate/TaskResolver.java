@@ -24,19 +24,19 @@ import javax.script.ScriptException;
 import org.apache.log4j.Logger;
 
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 
 /**
  * TaskResolver takes a logical name of a curation task and attempts to deliver 
  * a suitable implementation object. Supported implementation types include:
- * (1) Classpath-local Java classes configured and loaded via PluginManager.
+ * (1) Classpath-local Java classes configured and loaded via PluginService.
  * (2) Local script-based tasks, viz. coded in any scripting language whose
  * runtimes are accessible via the JSR-223 scripting API. This really amounts
  * to the family of dynamic JVM languages: JRuby, Jython, Groovy, Javascript, etc
  * Note that the requisite jars and other resources for these languages must be
  * installed in the DSpace instance for them to be used here.
- * Further work may involve remote URL-loadable code, etc. 
- * 
+ * Further work may involve remote URL-loadable code, etc.
+ *
  * Scripted tasks are managed in a directory configured with the
  * dspace/config/modules/curate.cfg property "script.dir". A catalog of
  * scripted tasks named 'task.catalog" is kept in this directory.
@@ -195,7 +195,7 @@ public class TaskResolver
 	 */
 	public ResolvedTask resolveTask(String taskName)
 	{
-		CurationTask ctask = (CurationTask)PluginManager.getNamedPlugin("curate", CurationTask.class, taskName);
+		CurationTask ctask = (CurationTask)CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(CurationTask.class, taskName);
 		if (ctask != null)
 		{
 			return new ResolvedTask(taskName, ctask);

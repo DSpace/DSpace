@@ -34,8 +34,8 @@ import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 
 /**
  * Servlet for retrieving bitstreams. The bits are simply piped to the user. If
@@ -183,7 +183,7 @@ public class BitstreamServlet extends DSpaceServlet
         //new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,
 		//		Constants.BITSTREAM, bitstream.getID());
 
-        new DSpace().getEventService().fireEvent(
+        DSpaceServicesFactory.getInstance().getEventService().fireEvent(
         		new UsageEvent(
         				UsageEvent.Action.VIEW, 
         				request, 

@@ -24,7 +24,7 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -66,7 +66,7 @@ public class VersionHistoryServlet extends DSpaceServlet
                 item.getOwningCollection()))
         {
             // Check if only administrators can view the item history
-            if (new DSpace().getConfigurationService().getPropertyAsType(
+            if (DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyAsType(
                     "versioning.item.history.view.admin", true))
             {
                 throw new AuthorizeException();

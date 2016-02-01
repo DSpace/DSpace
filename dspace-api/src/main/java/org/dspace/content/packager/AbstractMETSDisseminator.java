@@ -73,8 +73,9 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.license.factory.LicenseServiceFactory;
 import org.dspace.license.service.CreativeCommonsService;
 import org.jdom.Element;
@@ -583,14 +584,16 @@ public abstract class AbstractMETSDisseminator
                 xwalkName = typeSpec; 
             }
 
+            PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
+
             // First, check to see if the crosswalk we are using is a normal DisseminationCrosswalk
-            boolean xwalkFound = PluginManager.hasNamedPlugin(DisseminationCrosswalk.class, xwalkName);
+            boolean xwalkFound = pluginService.hasNamedPlugin(DisseminationCrosswalk.class, xwalkName);
 
             if(xwalkFound)
             {
                 // Find the crosswalk we will be using to generate the metadata for this mdSec
                 DisseminationCrosswalk xwalk = (DisseminationCrosswalk)
-                    PluginManager.getNamedPlugin(DisseminationCrosswalk.class, xwalkName);
+                    pluginService.getNamedPlugin(DisseminationCrosswalk.class, xwalkName);
 
                 if (xwalk.canDisseminate(dso))
                 {
@@ -629,7 +632,7 @@ public abstract class AbstractMETSDisseminator
             else
             {
                 StreamDisseminationCrosswalk sxwalk = (StreamDisseminationCrosswalk)
-                  PluginManager.getNamedPlugin(StreamDisseminationCrosswalk.class, xwalkName);
+                    pluginService.getNamedPlugin(StreamDisseminationCrosswalk.class, xwalkName);
                 if (sxwalk != null)
                 {
                     if (sxwalk.canDisseminate(context, dso))

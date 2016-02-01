@@ -23,10 +23,10 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrServiceImpl;
 import org.dspace.discovery.SolrServiceIndexPlugin;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.sort.OrderFormat;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
-import org.dspace.utils.DSpace;
 
 /**
  * 
@@ -136,13 +136,11 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                         {
                             int minConfidence = metadataAuthorityService.getMinConfidence(values.get(0).getMetadataField());
 
-                            boolean ignoreAuthority = new DSpace()
-                                    .getConfigurationService()
+                            boolean ignoreAuthority = DSpaceServicesFactory.getInstance().getConfigurationService()
                                     .getPropertyAsType(
                                             "discovery.browse.authority.ignore."
                                                     + bi.getName(),
-                                            new DSpace()
-                                                    .getConfigurationService()
+                                            DSpaceServicesFactory.getInstance().getConfigurationService()
                                                     .getPropertyAsType(
                                                             "discovery.browse.authority.ignore",
                                                             new Boolean(false)),
@@ -187,13 +185,11 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                         distValuesForAC.add(values.get(x).getValue());
 
                                         String preferedLabel = null;
-                                        boolean ignorePrefered = new DSpace()
-                                                .getConfigurationService()
+                                        boolean ignorePrefered = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                 .getPropertyAsType(
                                                         "discovery.browse.authority.ignore-prefered."
                                                                 + bi.getName(),
-                                                        new DSpace()
-                                                                .getConfigurationService()
+                                                        DSpaceServicesFactory.getInstance().getConfigurationService()
                                                                 .getPropertyAsType(
                                                                         "discovery.browse.authority.ignore-prefered",
                                                                         new Boolean(
@@ -206,13 +202,11 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                         }
                                         List<String> variants = null;
 
-                                        boolean ignoreVariants = new DSpace()
-                                                .getConfigurationService()
+                                        boolean ignoreVariants = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                 .getPropertyAsType(
                                                         "discovery.browse.authority.ignore-variants."
                                                                 + bi.getName(),
-                                                        new DSpace()
-                                                                .getConfigurationService()
+                                                        DSpaceServicesFactory.getInstance().getConfigurationService()
                                                                 .getPropertyAsType(
                                                                         "discovery.browse.authority.ignore-variants",
                                                                         new Boolean(

@@ -84,6 +84,7 @@ public class PDFFilter extends MediaFilter
             // get input stream from bitstream
             // pass to filter, get string back
             PDFTextStripper pts = new PDFTextStripper();
+            pts.setSortByPosition(true);
             PDDocument pdfDoc = null;
             Writer writer = null;
             File tempTextFile = null;

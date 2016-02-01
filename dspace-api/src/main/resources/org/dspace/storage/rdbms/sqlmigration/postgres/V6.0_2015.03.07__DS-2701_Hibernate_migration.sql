@@ -107,6 +107,8 @@ ALTER TABLE EPersonGroup2EPerson DROP COLUMN eperson_group_legacy_id;
 ALTER TABLE EPersonGroup2EPerson DROP COLUMN eperson_legacy_id;
 ALTER TABLE epersongroup2eperson DROP COLUMN id;
 ALTER TABLE EPersonGroup2EPerson add primary key (eperson_group_id,eperson_id);
+CREATE INDEX EpersonGroup2Eperson_group on EpersonGroup2Eperson(eperson_group_id);
+CREATE INDEX EpersonGroup2Eperson_person on EpersonGroup2Eperson(eperson_id);
 
 -- Migrate GROUP2GROUP table
 ALTER TABLE Group2Group RENAME COLUMN parent_id to parent_legacy_id;
@@ -121,6 +123,8 @@ ALTER TABLE Group2Group DROP COLUMN parent_legacy_id;
 ALTER TABLE Group2Group DROP COLUMN child_legacy_id;
 ALTER TABLE Group2Group DROP COLUMN id;
 ALTER TABLE Group2Group add primary key (parent_id,child_id);
+CREATE INDEX Group2Group_parent on Group2Group(parent_id);
+CREATE INDEX Group2Group_child on Group2Group(child_id);
 
 -- Migrate collection2item
 ALTER TABLE Collection2Item RENAME COLUMN collection_id to collection_legacy_id;
@@ -134,6 +138,8 @@ ALTER TABLE Collection2Item ALTER COLUMN item_id SET NOT NULL;
 ALTER TABLE Collection2Item DROP COLUMN collection_legacy_id;
 ALTER TABLE Collection2Item DROP COLUMN item_legacy_id;
 ALTER TABLE Collection2Item DROP COLUMN id;
+CREATE INDEX Collecion2Item_collection on Collection2Item(collection_id);
+CREATE INDEX Collecion2Item_item on Collection2Item(item_id);
 
 -- Magic query that will delete all duplicate collection item_id references from the database (if we don't do this the primary key creation will fail)
 DELETE FROM collection2item a USING (
@@ -160,6 +166,8 @@ ALTER TABLE Community2Community DROP COLUMN parent_legacy_id;
 ALTER TABLE Community2Community DROP COLUMN child_legacy_id;
 ALTER TABLE Community2Community DROP COLUMN id;
 ALTER TABLE Community2Community add primary key (parent_comm_id,child_comm_id);
+CREATE INDEX Community2Community_parent on Community2Community(parent_comm_id);
+CREATE INDEX Community2Community_child on Community2Community(child_comm_id); 
 
 -- Migrate community2collection
 ALTER TABLE community2collection RENAME COLUMN collection_id to collection_legacy_id;
@@ -174,7 +182,8 @@ ALTER TABLE community2collection DROP COLUMN collection_legacy_id;
 ALTER TABLE community2collection DROP COLUMN community_legacy_id;
 ALTER TABLE community2collection DROP COLUMN id;
 ALTER TABLE community2collection add primary key (collection_id,community_id);
-
+CREATE INDEX community2collection_collection on community2collection(collection_id);
+CREATE INDEX community2collection_community on community2collection(community_id);
 
 -- Migrate Group2GroupCache table
 ALTER TABLE Group2GroupCache RENAME COLUMN parent_id to parent_legacy_id;
@@ -189,6 +198,8 @@ ALTER TABLE Group2GroupCache DROP COLUMN parent_legacy_id;
 ALTER TABLE Group2GroupCache DROP COLUMN child_legacy_id;
 ALTER TABLE Group2GroupCache DROP COLUMN id;
 ALTER TABLE Group2GroupCache add primary key (parent_id,child_id);
+CREATE INDEX Group2GroupCache_parent on Group2GroupCache(parent_id);
+CREATE INDEX Group2GroupCache_child on Group2GroupCache(child_id);
 
 -- Migrate Item2Bundle
 ALTER TABLE item2bundle RENAME COLUMN bundle_id to bundle_legacy_id;
@@ -203,6 +214,8 @@ ALTER TABLE item2bundle DROP COLUMN bundle_legacy_id;
 ALTER TABLE item2bundle DROP COLUMN item_legacy_id;
 ALTER TABLE item2bundle DROP COLUMN id;
 ALTER TABLE item2bundle add primary key (bundle_id,item_id);
+CREATE INDEX item2bundle_bundle on item2bundle(bundle_id);
+CREATE INDEX item2bundle_item on item2bundle(item_id);
 
 --Migrate Bundle2Bitsteam
 ALTER TABLE bundle2bitstream RENAME COLUMN bundle_id to bundle_legacy_id;
@@ -217,18 +230,21 @@ ALTER TABLE bundle2bitstream DROP COLUMN bundle_legacy_id;
 ALTER TABLE bundle2bitstream DROP COLUMN bitstream_legacy_id;
 ALTER TABLE bundle2bitstream DROP COLUMN id;
 ALTER TABLE bundle2bitstream add primary key (bitstream_id,bundle_id,bitstream_order);
-
+CREATE INDEX bundle2bitstream_bundle on bundle2bitstream(bundle_id);
+CREATE INDEX bundle2bitstream_bitstream on bundle2bitstream(bitstream_id);
 
 -- Migrate item
 ALTER TABLE item RENAME COLUMN submitter_id to submitter_id_legacy_id;
 ALTER TABLE item ADD COLUMN submitter_id UUID REFERENCES EPerson(uuid);
 UPDATE item SET submitter_id = eperson.uuid FROM eperson WHERE item.submitter_id_legacy_id = eperson.eperson_id;
 ALTER TABLE item DROP COLUMN submitter_id_legacy_id;
+CREATE INDEX item_submitter on item(submitter_id);
 
 ALTER TABLE item RENAME COLUMN owning_collection to owning_collection_legacy;
 ALTER TABLE item ADD COLUMN owning_collection UUID REFERENCES Collection(uuid);
 UPDATE item SET owning_collection = Collection.uuid FROM Collection WHERE item.owning_collection_legacy = collection.collection_id;
 ALTER TABLE item DROP COLUMN owning_collection_legacy;
+CREATE INDEX item_collection on item(owning_collection);
 UPDATE item SET in_archive = FALSE WHERE in_archive IS NULL;
 UPDATE item SET discoverable = FALSE WHERE discoverable IS NULL;
 UPDATE item SET withdrawn = FALSE WHERE withdrawn IS NULL;
@@ -238,17 +254,20 @@ ALTER TABLE bundle RENAME COLUMN primary_bitstream_id to primary_bitstream_legac
 ALTER TABLE bundle ADD COLUMN primary_bitstream_id UUID REFERENCES Bitstream(uuid);
 UPDATE bundle SET primary_bitstream_id = (SELECT Bitstream.uuid FROM Bitstream WHERE bundle.primary_bitstream_legacy_id = Bitstream.bitstream_id);
 ALTER TABLE bundle DROP COLUMN primary_bitstream_legacy_id;
-
+CREATE INDEX bundle_primary on bundle(primary_bitstream_id);
 
 -- Migrate community references
 ALTER TABLE Community RENAME COLUMN admin to admin_legacy;
 ALTER TABLE Community ADD COLUMN admin UUID REFERENCES EPersonGroup(uuid);
 UPDATE Community SET admin = EPersonGroup.uuid FROM EPersonGroup WHERE Community.admin_legacy = EPersonGroup.eperson_group_id;
 ALTER TABLE Community DROP COLUMN admin_legacy;
+CREATE INDEX Community_admin on Community(admin);
+
 ALTER TABLE Community RENAME COLUMN logo_bitstream_id to logo_bitstream_legacy_id;
 ALTER TABLE Community ADD COLUMN logo_bitstream_id UUID REFERENCES Bitstream(uuid);
 UPDATE Community SET logo_bitstream_id = (SELECT Bitstream.uuid FROM Bitstream WHERE Community.logo_bitstream_legacy_id = Bitstream.bitstream_id);
 ALTER TABLE Community DROP COLUMN logo_bitstream_legacy_id;
+CREATE INDEX Community_bitstream on Community(logo_bitstream_id);
 
 
 --Migrate Collection references
@@ -281,6 +300,12 @@ ALTER TABLE Collection DROP COLUMN template_item_legacy_id;
 ALTER TABLE Collection DROP COLUMN logo_bitstream_legacy_id;
 ALTER TABLE Collection DROP COLUMN admin_legacy;
 
+CREATE INDEX Collection_workflow1 on Collection(workflow_step_1);
+CREATE INDEX Collection_workflow2 on Collection(workflow_step_2);
+CREATE INDEX Collection_workflow3 on Collection(workflow_step_3);
+CREATE INDEX Collection_submitter on Collection(submitter);
+CREATE INDEX Collection_template on Collection(template_item_id);
+CREATE INDEX Collection_bitstream on Collection(logo_bitstream_id);
 
 -- Migrate resource policy references
 ALTER TABLE ResourcePolicy RENAME COLUMN eperson_id to eperson_id_legacy_id;
@@ -303,6 +328,9 @@ UPDATE ResourcePolicy SET dspace_object = (SELECT bitstream.uuid FROM bitstream 
 UPDATE resourcepolicy SET resource_type_id = -1 WHERE resource_type_id IS NULL;
 UPDATE resourcepolicy SET action_id = -1 WHERE action_id IS NULL;
 
+CREATE INDEX resourcepolicy_person on resourcepolicy(eperson_id);
+CREATE INDEX resourcepolicy_group on resourcepolicy(epersongroup_id);
+CREATE INDEX resourcepolicy_object on resourcepolicy(dspace_object);
 
 -- Migrate Subscription
 ALTER TABLE Subscription RENAME COLUMN eperson_id to eperson_legacy_id;
@@ -313,19 +341,22 @@ ALTER TABLE Subscription RENAME COLUMN collection_id to collection_legacy_id;
 ALTER TABLE Subscription ADD COLUMN collection_id UUID REFERENCES Collection(uuid);
 UPDATE Subscription SET collection_id = (SELECT collection.uuid FROM collection WHERE Subscription.collection_legacy_id = collection.collection_id);
 ALTER TABLE Subscription DROP COLUMN collection_legacy_id;
-
+CREATE INDEX Subscription_person on Subscription(eperson_id);
+CREATE INDEX Subscription_collection on Subscription(collection_id);
 
 -- Migrate versionitem
 ALTER TABLE versionitem RENAME COLUMN eperson_id to eperson_legacy_id;
 ALTER TABLE versionitem ADD COLUMN eperson_id UUID REFERENCES EPerson(uuid);
 UPDATE versionitem SET eperson_id = eperson.uuid FROM eperson WHERE versionitem.eperson_legacy_id = eperson.eperson_id;
 ALTER TABLE versionitem DROP COLUMN eperson_legacy_id;
+CREATE INDEX versionitem_person on versionitem(eperson_id);
 
 ALTER TABLE versionitem RENAME COLUMN item_id to item_legacy_id;
 ALTER TABLE versionitem ADD COLUMN item_id UUID REFERENCES Item(uuid);
 UPDATE versionitem SET item_id = (SELECT item.uuid FROM item WHERE versionitem.item_legacy_id = item.item_id);
 ALTER TABLE versionitem DROP COLUMN item_legacy_id;
 UPDATE versionitem SET version_number = -1 WHERE version_number IS NULL;
+CREATE INDEX versionitem_item on versionitem(item_id);
 
 -- Migrate handle table
 ALTER TABLE handle RENAME COLUMN resource_id to resource_legacy_id;
@@ -334,6 +365,7 @@ UPDATE handle SET resource_id = community.uuid FROM community WHERE handle.resou
 UPDATE handle SET resource_id = collection.uuid FROM collection WHERE handle.resource_legacy_id = collection.collection_id AND handle.resource_type_id = 3;
 UPDATE handle SET resource_id = item.uuid FROM item WHERE handle.resource_legacy_id = item.item_id AND handle.resource_type_id = 2;
 UPDATE handle SET resource_type_id = -1 WHERE resource_type_id IS NULL;
+CREATE INDEX handle_object on handle(resource_id);
 
 -- Migrate metadata value table
 DROP VIEW dcvalue;
@@ -352,12 +384,16 @@ ALTER TABLE metadatavalue DROP COLUMN IF EXISTS resource_id;
 ALTER TABLE metadatavalue DROP COLUMN resource_type_id;
 UPDATE MetadataValue SET confidence = -1 WHERE confidence IS NULL;
 UPDATE metadatavalue SET place = -1 WHERE place IS NULL;
+CREATE INDEX metadatavalue_object on metadatavalue(dspace_object_id);
+CREATE INDEX metadatavalue_field on metadatavalue(metadata_field_id);
+CREATE INDEX metadatavalue_field_object on metadatavalue(metadata_field_id, dspace_object_id);
 
 -- Alter harvested item
 ALTER TABLE harvested_item RENAME COLUMN item_id to item_legacy_id;
 ALTER TABLE harvested_item ADD COLUMN item_id UUID REFERENCES item(uuid);
 UPDATE harvested_item SET item_id = (SELECT item.uuid FROM item WHERE harvested_item.item_legacy_id = item.item_id);
 ALTER TABLE harvested_item DROP COLUMN item_legacy_id;
+CREATE INDEX harvested_item_item on harvested_item(item_id);
 
 -- Alter harvested collection
 ALTER TABLE harvested_collection RENAME COLUMN collection_id to collection_legacy_id;
@@ -366,19 +402,22 @@ UPDATE harvested_collection SET collection_id = (SELECT collection.uuid FROM col
 ALTER TABLE harvested_collection DROP COLUMN collection_legacy_id;
 UPDATE harvested_collection SET harvest_type = -1 WHERE harvest_type IS NULL;
 UPDATE harvested_collection SET harvest_status = -1 WHERE harvest_status IS NULL;
-
+CREATE INDEX harvested_collection_collection on harvested_collection(collection_id);
 
 --Alter workspaceitem
 ALTER TABLE workspaceitem RENAME COLUMN item_id to item_legacy_id;
 ALTER TABLE workspaceitem ADD COLUMN item_id UUID REFERENCES Item(uuid);
 UPDATE workspaceitem SET item_id = (SELECT item.uuid FROM item WHERE workspaceitem.item_legacy_id = item.item_id);
 ALTER TABLE workspaceitem DROP COLUMN item_legacy_id;
+CREATE INDEX workspaceitem_item on workspaceitem(item_id);
 
 ALTER TABLE workspaceitem RENAME COLUMN collection_id to collection_legacy_id;
 ALTER TABLE workspaceitem ADD COLUMN collection_id UUID REFERENCES Collection(uuid);
 ALTER TABLE workspaceitem ADD CONSTRAINT workspaceitem_collection_id_fk FOREIGN KEY (collection_id) REFERENCES collection;
 UPDATE workspaceitem SET collection_id = (SELECT collection.uuid FROM collection WHERE workspaceitem.collection_legacy_id = collection.collection_id);
 ALTER TABLE workspaceitem DROP COLUMN collection_legacy_id;
+CREATE INDEX workspaceitem_coll on workspaceitem(collection_id);
+
 UPDATE workspaceitem SET multiple_titles = FALSE WHERE multiple_titles IS NULL;
 UPDATE workspaceitem SET published_before = FALSE WHERE published_before IS NULL;
 UPDATE workspaceitem SET multiple_files = FALSE WHERE multiple_files IS NULL;
@@ -394,7 +433,7 @@ ALTER TABLE epersongroup2workspaceitem DROP COLUMN id;
 ALTER TABLE epersongroup2workspaceitem ALTER COLUMN workspace_item_id SET NOT NULL;
 ALTER TABLE epersongroup2workspaceitem ALTER COLUMN eperson_group_id SET NOT NULL;
 ALTER TABLE epersongroup2workspaceitem add primary key (workspace_item_id,eperson_group_id);
-
+CREATE INDEX epersongroup2workspaceitem_group on epersongroup2workspaceitem(eperson_group_id);
 
 --Alter most_recent_checksum
 ALTER TABLE most_recent_checksum RENAME COLUMN bitstream_id to bitstream_legacy_id;
@@ -403,11 +442,13 @@ UPDATE most_recent_checksum SET bitstream_id = (SELECT Bitstream.uuid FROM Bitst
 ALTER TABLE most_recent_checksum DROP COLUMN bitstream_legacy_id;
 UPDATE most_recent_checksum SET to_be_processed = FALSE WHERE to_be_processed IS NULL;
 UPDATE most_recent_checksum SET matched_prev_checksum = FALSE WHERE matched_prev_checksum IS NULL;
+CREATE INDEX most_recent_checksum_bitstream on most_recent_checksum(bitstream_id);
 
 ALTER TABLE checksum_history RENAME COLUMN bitstream_id to bitstream_legacy_id;
 ALTER TABLE checksum_history ADD COLUMN bitstream_id UUID REFERENCES Bitstream(uuid);
 UPDATE checksum_history SET bitstream_id = (SELECT Bitstream.uuid FROM Bitstream WHERE checksum_history.bitstream_legacy_id = Bitstream.bitstream_id);
 ALTER TABLE checksum_history DROP COLUMN bitstream_legacy_id;
+CREATE INDEX checksum_history_bitstream on checksum_history(bitstream_id);
 
 --Alter table doi
 ALTER TABLE doi ADD COLUMN dspace_object UUID REFERENCES dspaceobject(uuid);
@@ -416,6 +457,7 @@ UPDATE doi SET dspace_object = (SELECT collection.uuid FROM collection WHERE doi
 UPDATE doi SET dspace_object = (SELECT item.uuid FROM item WHERE doi.resource_id = item.item_id AND doi.resource_type_id = 2)  WHERE doi.resource_type_id = 2;
 UPDATE doi SET dspace_object = (SELECT bundle.uuid FROM bundle WHERE doi.resource_id = bundle.bundle_id AND doi.resource_type_id = 1)  WHERE doi.resource_type_id = 1;
 UPDATE doi SET dspace_object = (SELECT bitstream.uuid FROM bitstream WHERE doi.resource_id = bitstream.bitstream_id AND doi.resource_type_id = 0)  WHERE doi.resource_type_id = 0;
+CREATE INDEX doi_object on doi(dspace_object);
 
 UPDATE bitstreamformatregistry SET support_level = -1 WHERE support_level IS NULL;
 

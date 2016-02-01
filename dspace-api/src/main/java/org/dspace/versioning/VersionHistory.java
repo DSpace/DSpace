@@ -7,6 +7,7 @@
  */
 package org.dspace.versioning;
 
+import org.dspace.core.Context;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -34,6 +35,16 @@ public class VersionHistory {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "versionHistory")
     @OrderBy(value = "versionNumber desc")
     private List<Version> versions = new ArrayList<Version>();
+
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.versioning.service.VersionHistoryService#create(Context)}
+     *
+     */
+    protected VersionHistory()
+    {
+
+    }
 
     public int getId() {
         return id;

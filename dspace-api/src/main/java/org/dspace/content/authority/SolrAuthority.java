@@ -21,7 +21,7 @@ import org.apache.solr.common.params.CommonParams;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,7 +38,7 @@ import java.util.Map;
 public class SolrAuthority implements ChoiceAuthority {
 
     private static final Logger log = Logger.getLogger(SolrAuthority.class);
-    protected RestSource source = new DSpace().getServiceManager().getServiceByName("AuthoritySource", RestSource.class);
+    protected RestSource source = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("AuthoritySource", RestSource.class);
     protected boolean externalResults = false;
     protected final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
 
@@ -249,9 +249,7 @@ public class SolrAuthority implements ChoiceAuthority {
 
 
     public static AuthoritySearchService getSearchService() {
-        DSpace dspace = new DSpace();
-
-        org.dspace.kernel.ServiceManager manager = dspace.getServiceManager();
+        org.dspace.kernel.ServiceManager manager = DSpaceServicesFactory.getInstance().getServiceManager();
 
         return manager.getServiceByName(AuthoritySearchService.class.getName(), AuthoritySearchService.class);
     }

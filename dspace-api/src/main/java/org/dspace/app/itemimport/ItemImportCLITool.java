@@ -20,7 +20,6 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.search.DSIndexer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,7 +53,6 @@ public class ItemImportCLITool {
 
     public static void main(String[] argv) throws Exception
     {
-        DSIndexer.setBatchProcessingMode(true);
         Date startTime = new Date();
         int status = 0;
 
@@ -408,7 +406,6 @@ public class ItemImportCLITool {
                 System.out.println("***End of Test Run***");
             }
         } finally {
-            DSIndexer.setBatchProcessingMode(false);
             Date endTime = new Date();
             System.out.println("Started: " + startTime.getTime());
             System.out.println("Ended: " + endTime.getTime());

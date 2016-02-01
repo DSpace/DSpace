@@ -37,7 +37,8 @@ import org.xml.sax.SAXException;
  * Generate an OpenSearch compliant search results document for DSpace, either scoped by a collection,
  * a community or the whole repository.
  *
- * This class implements the generate() method in order to issue a search using the PostgreSQL indexes.
+ * This class implements the generate() method in order to issue a search using the Discovery search service
+ * (Solr based search)
  * Search params are parsed by AbstractOpenSearchGenerator class.
 
  * I18N: Feed's are internationalized, meaning that they may contain references

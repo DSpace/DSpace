@@ -7,9 +7,9 @@
  */
 package org.dspace.statistics.factory;
 
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.service.ElasticSearchLoggerService;
 import org.dspace.statistics.service.SolrLoggerService;
-import org.dspace.utils.DSpace;
 
 /**
  * Abstract factory to get services for the statistics package, use StatisticsServiceFactory.getInstance() to retrieve an implementation
@@ -24,6 +24,6 @@ public abstract class StatisticsServiceFactory {
 
     public static StatisticsServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("statisticsServiceFactory", StatisticsServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("statisticsServiceFactory", StatisticsServiceFactory.class);
     }
 }

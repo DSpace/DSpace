@@ -31,10 +31,9 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -125,8 +124,7 @@ public class ItemRequestContactAuthor extends AbstractDSpaceTransformer implemen
 
         Item item = requestItem.getItem();
 
-        RequestItemAuthor requestItemAuthor = new DSpace()
-                .getServiceManager()
+        RequestItemAuthor requestItemAuthor = DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServiceByName(RequestItemAuthorExtractor.class.getName(),
                         RequestItemAuthorExtractor.class)
                 .getRequestItemAuthor(context, item);

@@ -8,10 +8,11 @@
 package org.dspace.sword;
 
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
@@ -44,11 +45,12 @@ public class SWORDIngesterFactory
             DSpaceObject dso)
             throws DSpaceSWORDException, SWORDErrorException
     {
+        PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
+
         if (dso instanceof Collection)
         {
-            SWORDIngester ingester = (SWORDIngester) PluginManager
-                    .getNamedPlugin("sword-server", SWORDIngester.class,
-                            deposit.getPackaging());
+            SWORDIngester ingester = (SWORDIngester) pluginService
+                    .getNamedPlugin(SWORDIngester.class, deposit.getPackaging());
             if (ingester == null)
             {
                 throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT,
@@ -58,9 +60,8 @@ public class SWORDIngesterFactory
         }
         else if (dso instanceof Item)
         {
-            SWORDIngester ingester = (SWORDIngester) PluginManager
-                    .getNamedPlugin("sword-server", SWORDIngester.class,
-                            "SimpleFileIngester");
+            SWORDIngester ingester = (SWORDIngester) pluginService
+                    .getNamedPlugin(SWORDIngester.class, "SimpleFileIngester");
             if (ingester == null)
             {
                 throw new DSpaceSWORDException(

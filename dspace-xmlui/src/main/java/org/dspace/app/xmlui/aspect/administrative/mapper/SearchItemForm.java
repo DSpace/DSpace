@@ -28,7 +28,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.PluginConfigurationError;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -179,7 +179,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
         // Which search provider do we use?
         SearchRequestProcessor processor = null;
         try {
-            processor = (SearchRequestProcessor) PluginManager
+            processor = (SearchRequestProcessor) CoreServiceFactory.getInstance().getPluginService()
                     .getSinglePlugin(SearchRequestProcessor.class);
         } catch (PluginConfigurationError e) {
             log.warn("{} not properly configured.  Please configure the {} plugin.  {}",

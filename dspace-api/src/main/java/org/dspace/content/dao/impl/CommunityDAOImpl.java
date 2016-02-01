@@ -160,4 +160,9 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         hibernateQuery.setParameter("eperson_id", ePerson.getID());
         return list(hibernateQuery);
     }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Community"));
+    }
 }

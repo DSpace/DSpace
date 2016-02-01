@@ -20,7 +20,6 @@ import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.rdf.negotiation.Negotiator;
-import org.dspace.utils.DSpace;
 
 /**
  *

@@ -65,7 +65,7 @@ import java.util.List;
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  */
-public abstract class AbstractSearch extends AbstractDSpaceTransformer implements CacheableProcessingComponent{
+public abstract class AbstractSearch extends AbstractDSpaceTransformer implements CacheableProcessingComponent {
 
     private static final Logger log = Logger.getLogger(AbstractSearch.class);
 
@@ -725,39 +725,26 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             }
         }
     }
-
+    
     /**
-     * Query DSpace for a list of all items / collections / or communities that
-     * match the given search query.
-     *
-     *
-     * @param scope the dspace object parent
+     *  Prepare DiscoverQuery given the current scope and query string
+     * 
+     *  @param scope the dspace object parent
      */
-    public void performSearch(DSpaceObject scope) throws UIException, SearchServiceException {
-
-        if (queryResults != null)
-        {
-            return;
-        }
-
-        String query = getQuery();
-
-        // Escape any special characters in this user-entered query
+    public DiscoverQuery prepareQuery(DSpaceObject scope, String query, String[] fqs) throws UIException, SearchServiceException {
+    	
+    	this.queryArgs = new DiscoverQuery();
+    	
+    	int page = getParameterPage();
+    	    	
+    	// Escape any special characters in this user-entered query
         query = DiscoveryUIUtils.escapeQueryChars(query);
 
-        int page = getParameterPage();
+    	List<String> filterQueries = new ArrayList<String>();
 
-        List<String> filterQueries = new ArrayList<String>();
-
-        String[] fqs = getFilterQueries();
-
-        if (fqs != null)
-        {
+        if (fqs != null) {
             filterQueries.addAll(Arrays.asList(fqs));
-        }
-
-
-        this.queryArgs = new DiscoverQuery();
+        }        
 
         //Add the configured default filter queries
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
@@ -765,9 +752,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         queryArgs.addFilterQueries(defaultFilterQueries.toArray(new String[defaultFilterQueries.size()]));
 
         if (filterQueries.size() > 0) {
-            queryArgs.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
+        	queryArgs.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
         }
-
 
         queryArgs.setMaxResults(getParameterRpp());
 
@@ -841,11 +827,25 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         }
 
         queryArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled());
-
-        this.queryResults = SearchUtils.getSearchService().search(context, scope, queryArgs);
+        
+        return queryArgs;
     }
 
+    /**
+     * Query DSpace for a list of all items / collections / or communities that
+     * match the given search query.
+     *
+     *
+     * @param scope the dspace object parent
+     */
+    public void performSearch(DSpaceObject scope) throws UIException, SearchServiceException {
 
+        if (queryResults != null) {
+            return;
+        }
+        
+        this.queryResults = SearchUtils.getSearchService().search(context, scope, prepareQuery(scope, getQuery(), getFilterQueries()));
+    }
 
     /**
      * Returns a list of the filter queries for use in rendering pages, creating page more urls, ....
@@ -1108,3 +1108,4 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 + countCollections + "," + countItems + ")"));
     }
 }
+

@@ -17,7 +17,6 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.service.*;
 import org.dspace.core.Constants;
@@ -414,6 +413,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogManager.getHeader(context, "update_item", "item_id="
                 + item.getID()));
 
+        super.update(context, item);
+
         // Set sequence IDs for bitstreams in item
         int sequence = 0;
         List<Bundle> bunds = item.getBundles();
@@ -747,13 +748,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
                     + " has no default item READ policies");
         }
 
-        // if come from InstallItem: remove all submission/workflow policies
-        authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_SUBMISSION);
-        authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_WORKFLOW);
-
         try {
-            //We just removed all policies so only an admin will be able to add additional policies, ignore the authorizations for now.
+            //ignore the authorizations for now.
             context.turnOffAuthorisationSystem();
+
+            // if come from InstallItem: remove all submission/workflow policies
+            authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_SUBMISSION);
+            authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_WORKFLOW);
+
             // add default policies only if not already in place
             List<ResourcePolicy> policiesToAdd = filterPoliciesToAdd(context, defaultCollectionPolicies, item);
             authorizeService.addPolicies(context, policiesToAdd, item);
@@ -935,6 +937,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         {
             return itemDAO.findByMetadataField(context, mdf, value, true);
         }
+    }
+
+    @Override
+    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause, int offset, int limit)
+          throws SQLException, AuthorizeException, IOException
+    {
+        return itemDAO.findByMetadataQuery(context, listFieldList, query_op, query_val, collectionUuids, regexClause, offset, limit);
     }
 
     @Override
@@ -1144,5 +1153,20 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             throws SQLException
     {
         return itemDAO.findByLastModifiedSince(context, last);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return itemDAO.countRows(context);
+    }
+
+    @Override
+    public int getNotArchivedItemsCount(Context context) throws SQLException {
+        return itemDAO.countNotArchived(context);
+    }
+
+    @Override
+    public int countWithdrawnItems(Context context) throws SQLException {
+        return itemDAO.countWithdrawn(context);
     }
 }

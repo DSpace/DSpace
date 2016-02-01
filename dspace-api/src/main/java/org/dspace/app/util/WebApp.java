@@ -7,6 +7,8 @@
  */
 package org.dspace.app.util;
 
+import org.dspace.core.Context;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -38,6 +40,15 @@ public class WebApp {
 
     @Column(name = "isui")
     private Integer isui;
+
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.app.util.service.WebAppService#create(Context, String, String, Date, int)}
+     */
+    protected WebApp()
+    {
+
+    }
 
     public Integer getId() {
         return id;

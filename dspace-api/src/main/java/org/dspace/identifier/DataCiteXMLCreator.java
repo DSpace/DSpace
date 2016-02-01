@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
@@ -93,7 +93,7 @@ public class DataCiteXMLCreator
         if (null != this.xwalk)
             return;
 
-        this.xwalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(
+        this.xwalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
                 DisseminationCrosswalk.class, this.CROSSWALK_NAME);
 
         if (this.xwalk == null)

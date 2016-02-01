@@ -174,4 +174,16 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
     public Bitstream getFirstBitstream(Item item, String bundleName) throws SQLException;
 
     public BitstreamFormat getFormat(Context context, Bitstream bitstream) throws SQLException;
+
+    public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException;
+
+    public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException;
+
+    int countTotal(Context context) throws SQLException ;
+
+    int countDeletedBitstreams(Context context) throws SQLException;
+
+    int countBitstreamsWithoutPolicy(Context context) throws SQLException;
+
+    List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
 }

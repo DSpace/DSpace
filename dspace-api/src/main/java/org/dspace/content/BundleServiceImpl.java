@@ -361,6 +361,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         log.info(LogManager.getHeader(context, "update_bundle", "bundle_id="
                 + bundle.getID()));
 
+        super.update(context, bundle);
         bundleDAO.save(context, bundle);
 
         if (bundle.isModified() || bundle.isMetadataModified())
@@ -427,5 +428,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     @Override
     public Bundle findByLegacyId(Context context, int id) throws SQLException {
         return bundleDAO.findByLegacyId(context, id, Bundle.class);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return bundleDAO.countRows(context);
     }
 }

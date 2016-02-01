@@ -318,6 +318,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             authorizeService.authorizeAction(context, ePerson, Constants.WRITE);
         }
 
+        super.update(context, ePerson);
+
         ePersonDAO.save(context, ePerson);
 
         log.info(LogManager.getHeader(context, "update_eperson",
@@ -368,6 +370,11 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
+    public List<EPerson> findEPeopleWithSubscription(Context context) throws SQLException {
+        return ePersonDAO.findAllSubscribers(context);
+    }
+
+    @Override
     public void updateLastModified(Context context, EPerson dso) throws SQLException {
         //Not used
     }
@@ -392,5 +399,10 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Override
     public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException {
         return ePersonDAO.findNotActiveSince(context, date);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return ePersonDAO.countRows(context);
     }
 }

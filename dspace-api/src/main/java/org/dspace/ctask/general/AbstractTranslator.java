@@ -51,9 +51,9 @@ public abstract class AbstractTranslator extends AbstractCurationTask
 
         // Load configuration
         authLang = ConfigurationManager.getProperty("default.locale");
-        authLangField = ConfigurationManager.getProperty(PLUGIN_PREFIX, "translate.field.language");
-        String toTranslateStr = ConfigurationManager.getProperty(PLUGIN_PREFIX, "translate.field.targets");
-        String langsStr = ConfigurationManager.getProperty(PLUGIN_PREFIX, "translate.language.targets");
+        authLangField = ConfigurationManager.getProperty(PLUGIN_PREFIX, "field.language");
+        String toTranslateStr = ConfigurationManager.getProperty(PLUGIN_PREFIX, "field.targets");
+        String langsStr = ConfigurationManager.getProperty(PLUGIN_PREFIX, "language.targets");
         toTranslate = toTranslateStr.split(",");
         langs = langsStr.split(",");
 
@@ -184,7 +184,7 @@ public abstract class AbstractTranslator extends AbstractCurationTask
         /*
          * Override this method in your translator
          * Only needed to set key, etc.
-         * apiKey = ConfigurationManager.getProperty(PLUGIN_PREFIX, "translate.api.key.[service]");
+         * apiKey = ConfigurationManager.getProperty(PLUGIN_PREFIX, "translator.api.key.[service]");
          *
          */
     }

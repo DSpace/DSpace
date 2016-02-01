@@ -37,7 +37,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginConfigurationError;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 
 /**
  * Servlet for editing and deleting (expunging) items
@@ -61,7 +61,7 @@ public class ItemMapServlet extends DSpaceServlet
     {
     	try
         {
-            internalLogic = (SearchRequestProcessor) PluginManager
+            internalLogic = (SearchRequestProcessor) CoreServiceFactory.getInstance().getPluginService()
                     .getSinglePlugin(SearchRequestProcessor.class);
         }
         catch (PluginConfigurationError e)

@@ -8,6 +8,7 @@
 package org.dspace.handle;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 
 import javax.persistence.*;
 
@@ -35,6 +36,20 @@ public class Handle {
 
     @Column(name = "resource_type_id")
     private Integer resourceTypeId;
+
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.handle.service.HandleService#createHandle(Context, DSpaceObject)}
+     * or
+     * {@link org.dspace.handle.service.HandleService#createHandle(Context, DSpaceObject, String)}
+     * or
+     * {@link org.dspace.handle.service.HandleService#createHandle(Context, DSpaceObject, String, boolean)}
+     *
+     */
+    protected Handle()
+    {
+
+    }
 
     public Integer getId() {
         return id;

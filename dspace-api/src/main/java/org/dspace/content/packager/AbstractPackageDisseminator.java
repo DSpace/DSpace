@@ -37,21 +37,10 @@ import java.util.List;
  * <P>
  * All Package disseminators should either extend this abstract class
  * or implement <code>PackageDisseminator</code> to better suit their needs.
- * <P>
- * WARNING: If you choose to extend this Abstract class, you must DISABLE
- * plugin instance caching for your new class in dspace.cfg. This will ensure
- * that "packageFileList" and any other global instance variables are RESET
- * for each package dissemination. To DISABLE plugin instance caching, just place
- * the following configuration in your dspace.cfg:
- * <code>
- * plugin.reusable.[full-class-name] = false
- * </code>
- * For more information see the org.dspace.core.PluginManager cacheMe() method,
- * which defaults to caching all plugin class instances.
  *
  * @author Tim Donohue
  * @see PackageDisseminator
- * @see PluginManager
+ * @see PluginService
  */
 public abstract class AbstractPackageDisseminator
         implements PackageDisseminator
