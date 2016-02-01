@@ -41,7 +41,7 @@
                     <label for="endDate"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.date-to") %>:</label>
                     <input type="text" id="endDate" class="form-control" value="01.01.2016">
                 </div>
-                <button type="button" class="btn btn-default" onclick="updateGrid();"><%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-community.form.button.update") %></button>
+                <button type="button" class="btn btn-default" onclick="updateGrid();"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.update") %></button>
             </form>
 
             <div id="reportTable" style="width:800px;"></div>
@@ -60,7 +60,7 @@
                         sort: "string",
                         template: "{common.treetable()} #name#"
                     },
-                    {id: "submission_count", header: "<%= LocaleSupport.getLocalizedMessage(pageContext, "report.submission-count") %>", width: 200, sort: "int"}
+                    {id: "submission_count", header: "<%= LocaleSupport.getLocalizedMessage(pageContext, "report.submissions-count") %>", width: 200, sort: "int"}
                 ],
                 autoheight: true,
                 autowidth: true,

@@ -4,11 +4,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.storage.rdbms.DatabaseManager" %>
-<%@ page import="org.dspace.storage.rdbms.TableRowIterator" %>
-<%@ page import="org.dspace.storage.rdbms.TableRow" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
-<%@ page import="java.sql.SQLException" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <% org.dspace.core.Context context = org.dspace.app.webui.util.UIUtil.obtainContext(request);
 
@@ -26,8 +23,8 @@
 
 <dspace:layout locbar="nolink" title="Statistics" feedData="NONE">
     <ul class="list-group">
-        <li class="list-group-item"><a href="/statistics/report">Статистика</a></li>
-        <li class="list-group-item"><a href="/stat/person-stat.jsp">Newest Persons</a></li>
+        <li class="list-group-item"><a href="/statistics/report"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.statistics") %></a></li>
+        <li class="list-group-item"><a href="/stat/person-stat.jsp"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.newest-persons") %></a></li>
     </ul>
 </dspace:layout>
 
