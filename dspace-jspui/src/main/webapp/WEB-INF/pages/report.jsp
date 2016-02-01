@@ -1,4 +1,5 @@
 <%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -33,14 +34,14 @@
         <div style="margin: 0 auto; width: 800px;">
             <form class="form-inline" style="margin-bottom: 20px;">
                 <div class="form-group">
-                    <label for="beginDate">С:</label>
+                    <label for="beginDate"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.date-from") %>:</label>
                     <input type="text" id="beginDate" class="form-control" value="05.12.2010">
                 </div>
                 <div class="form-group">
-                    <label for="endDate">По:</label>
+                    <label for="endDate"><%= LocaleSupport.getLocalizedMessage(pageContext, "report.date-to") %>:</label>
                     <input type="text" id="endDate" class="form-control" value="01.01.2016">
                 </div>
-                <button type="button" class="btn btn-default" onclick="updateGrid();">Обновить</button>
+                <button type="button" class="btn btn-default" onclick="updateGrid();"><%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-community.form.button.update") %></button>
             </form>
 
             <div id="reportTable" style="width:800px;"></div>
@@ -54,12 +55,12 @@
                 columns: [
                     {
                         id: "name",
-                        header: ["Депозитор", {content: "textFilter"}],
+                        header: ["<%= LocaleSupport.getLocalizedMessage(pageContext, "report.depositor") %>", {content: "textFilter"}],
                         width: 600,
                         sort: "string",
                         template: "{common.treetable()} #name#"
                     },
-                    {id: "submission_count", header: "Количество загрузок", width: 200, sort: "int"}
+                    {id: "submission_count", header: "<%= LocaleSupport.getLocalizedMessage(pageContext, "report.submission-count") %>", width: 200, sort: "int"}
                 ],
                 autoheight: true,
                 autowidth: true,

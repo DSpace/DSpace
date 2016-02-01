@@ -24,7 +24,7 @@ public class SubmissionHelper {
 
     public HashMap<String, List<Submission>> getSubmissionList() {
         String query = "SELECT MAX(text_value) AS text_value FROM item LEFT JOIN metadatavalue ON item_id = resource_id AND metadata_field_id = 28 AND text_value LIKE 'Submitted by%' WHERE in_archive AND resource_id IS NOT NULL GROUP BY resource_id";
-        ArrayList<Submission> rows = new ArrayList<>();
+        List<Submission> rows = new LinkedList<>();
 
         try {
             ResultSet resSet = statement.executeQuery(query);

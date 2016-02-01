@@ -2,15 +2,15 @@ package ua.edu.sumdu.essuir.entity;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Person {
     private String email;
     private ChairEntity chairEntity;
     private String name;
-    private List<Date> submissions = new ArrayList<>();
+    private List<Date> submissions = new LinkedList<>();
 
     public Person(EPerson person, List<Submission> submissions) {
         this.email = person.getEmail();

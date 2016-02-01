@@ -3,13 +3,13 @@ package ua.edu.sumdu.essuir.entity;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Chair {
     private String chairName;
-    private List<Person> persons = new ArrayList<>();
+    private List<Person> persons = new LinkedList<>();
 
     public Chair(String chairName) {
         this.chairName = chairName;
