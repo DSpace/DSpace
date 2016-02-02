@@ -110,7 +110,13 @@
         <dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-jspui-api</artifactId>
-		</dependency>
+			<exclusions>
+				<exclusion>
+					<artifactId>asm</artifactId>
+					<groupId>asm</groupId>
+				</exclusion>
+			</exclusions>
+        </dependency>
     </dependencies>
 
     <developers>
