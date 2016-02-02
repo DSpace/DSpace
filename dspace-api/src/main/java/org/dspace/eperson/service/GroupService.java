@@ -198,8 +198,10 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     public boolean isEmpty(Group group);
 
     /**
-     * Initializes the group names for anymous & administrator
-     * @param context the dspace context
+     * Initializes the group names for anonymous & administrator, and marks them
+     * "permanent".
+     *
+     * @param context the DSpace context
      * @throws SQLException database exception
      * @throws AuthorizeException
      */
