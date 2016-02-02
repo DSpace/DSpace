@@ -39,8 +39,8 @@
 		<org.hibernate.jpa.version>1.0.1.Final</org.hibernate.jpa.version>
 		
 		
-		<org.jdyna.version>5.5-SNAPSHOT</org.jdyna.version>		
-		<it.cilea.ccommons.version>2.2-SNAPSHOT</it.cilea.ccommons.version>
+		<org.jdyna.version>5.5</org.jdyna.version>		
+		<it.cilea.ccommons.version>2.1</it.cilea.ccommons.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.7</java.version>
         <lucene.version>4.10.2</lucene.version>
