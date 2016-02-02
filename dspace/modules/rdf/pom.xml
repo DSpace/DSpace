@@ -87,6 +87,10 @@
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-api</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-jspui-api</artifactId>
+		</dependency>
     </dependencies>
 
 </project>
