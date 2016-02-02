@@ -188,7 +188,7 @@ public class MetadataRegistryResource extends Resource
     /**
      * Returns metadata field with basic properties. 
      * 
-     * @param schemaPreix
+     * @param schemaPrefix
      *            Prefix for schema in DSpace.
      * @param element
      *            Unqualified element name for field in the metadata registry.
@@ -221,7 +221,7 @@ public class MetadataRegistryResource extends Resource
     /**
      * Returns metadata field with basic properties. 
      * 
-     * @param schemaPreix
+     * @param schemaPrefix
      *            Prefix for schema in DSpace.
      * @param element
      *            Element name for field in the metadata registry.

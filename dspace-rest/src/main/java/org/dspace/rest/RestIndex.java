@@ -42,8 +42,6 @@ public class RestIndex {
     protected EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static Logger log = Logger.getLogger(RestIndex.class);
 
-    @javax.ws.rs.core.Context public static ServletContext servletContext;
-
     /**
      * Return html page with information about REST api. It contains methods all
      * methods provide by REST api.
@@ -52,7 +50,7 @@ public class RestIndex {
      */
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String sayHtmlHello() { 
+    public String sayHtmlHello(@Context ServletContext servletContext) {
     	// TODO Better graphics, add arguments to all methods. (limit, offset, item and so on)
         return "<html><title>DSpace REST - index</title>" +
                 "<body>"
