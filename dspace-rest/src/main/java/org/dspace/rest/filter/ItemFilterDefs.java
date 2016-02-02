@@ -99,12 +99,12 @@ public class ItemFilterDefs implements ItemFilterList {
 	    },
 	    has_pdf_original("Item has a PDF Original Bitstream", null, CAT_MIME) {
 	        public boolean testItem(Context context, Item item) {
-	        	return ItemFilterUtil.countOriginalBitstreamMime(context, item, "application/pdf") > 0;
+	        	return ItemFilterUtil.countOriginalBitstreamMime(context, item, "application/pdf".split(",")) > 0;
 	        }        
 	    },
 	    has_jpg_original("Item has JPG Original Bitstream", null, CAT_MIME) {
 	        public boolean testItem(Context context, Item item) {
-	        	return ItemFilterUtil.countOriginalBitstreamMime(context, item, "image/jpeg") > 0;
+	        	return ItemFilterUtil.countOriginalBitstreamMime(context, item, "image/jpeg".split(",")) > 0;
 	        }        
 	    },
 	    ;
