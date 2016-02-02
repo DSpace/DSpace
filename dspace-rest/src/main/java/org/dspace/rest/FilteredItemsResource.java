@@ -26,6 +26,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -107,7 +108,7 @@ public class FilteredItemsResource extends Resource {
             @QueryParam("query_op[]") @DefaultValue("exists") List<String> query_op,
             @QueryParam("query_val[]") @DefaultValue("") List<String> query_val,
             @QueryParam("collSel[]") @DefaultValue("") List<String> collSel,
-    		@Context HttpHeaders headers, @Context HttpServletRequest request) {
+    		@Context HttpHeaders headers, @Context HttpServletRequest request, @Context ServletContext servletContext) {
         org.dspace.core.Context context = null;
         ItemFilterSet itemFilterSet = new ItemFilterSet(filters, true);
         ItemFilter result = itemFilterSet.getAllFiltersFilter();
@@ -133,7 +134,7 @@ public class FilteredItemsResource extends Resource {
 
             Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, listFieldList, query_op, query_val, uuids, regexClause, offset, limit);
              
-            int count = itemFilterSet.processSaveItems(context, childItems, true, expand);
+            int count = itemFilterSet.processSaveItems(context, servletContext, childItems, true, expand);
     	    writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
     	    result.annotateQuery(query_field, query_op, query_val);
     	    result.setUnfilteredItemCount(count);

@@ -43,7 +43,6 @@
       <xs:element name="link" type="xs:string"/>
       <xs:element name="expand" type="xs:string" maxOccurs="unbounded"/>
       <xs:element name="handle" type="xs:string" minOccurs="0"/>
-      <xs:element name="id" type="xs:int" minOccurs="0"/>
       <xs:element name="name" type="xs:string" minOccurs="0"/>
       <xs:element name="type" type="xs:string" minOccurs="0"/>
       <xs:element name="UUID" type="xs:string" minOccurs="0"/>

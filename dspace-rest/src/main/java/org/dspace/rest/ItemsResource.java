@@ -104,7 +104,7 @@ public class ItemsResource extends Resource
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
-            item = new Item(dspaceItem, expand, context);
+            item = new Item(dspaceItem, servletContext, expand, context);
             context.complete();
             log.trace("Item(id=" + itemId + ") was successfully read.");
 
@@ -178,7 +178,7 @@ public class ItemsResource extends Resource
                 {
                     if (itemService.isItemListedForUser(context, dspaceItem))
                     {
-                        items.add(new Item(dspaceItem, expand, context));
+                        items.add(new Item(dspaceItem, servletContext, expand, context));
                         writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                                 headers, request, context);
                     }
@@ -240,7 +240,7 @@ public class ItemsResource extends Resource
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
-            metadata = new org.dspace.rest.common.Item(dspaceItem, "metadata", context).getMetadata();
+            metadata = new org.dspace.rest.common.Item(dspaceItem, servletContext, "metadata", context).getMetadata();
             context.complete();
         }
         catch (SQLException e)
@@ -299,7 +299,7 @@ public class ItemsResource extends Resource
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
-            List<Bitstream> itemBitstreams = new Item(dspaceItem, "bitstreams", context).getBitstreams();
+            List<Bitstream> itemBitstreams = new Item(dspaceItem, servletContext, "bitstreams", context).getBitstreams();
 
             if ((offset + limit) > (itemBitstreams.size() - offset))
             {
@@ -540,7 +540,7 @@ public class ItemsResource extends Resource
             }
 
             dspaceBitstream = bitstreamService.find(context, dspaceBitstream.getID());
-            bitstream = new Bitstream(dspaceBitstream, "", context);
+            bitstream = new Bitstream(dspaceBitstream, servletContext, "", context);
 
             context.complete();
 
@@ -567,7 +567,7 @@ public class ItemsResource extends Resource
             processFinally(context);
         }
 
-        log.info("Bitstream(id=" + bitstream.getId() + ") was successfully added into item(id=" + itemId + ").");
+        log.info("Bitstream(id=" + bitstream.getUUID() + ") was successfully added into item(id=" + itemId + ").");
         return bitstream;
     }
 
@@ -932,7 +932,7 @@ public class ItemsResource extends Resource
             while (itemIterator.hasNext())
             {
                 org.dspace.content.Item dspaceItem = itemIterator.next();
-                Item item = new Item(dspaceItem, "", context);
+                Item item = new Item(dspaceItem, servletContext, "", context);
                 writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                         request, context);
                 items.add(item);

@@ -36,7 +36,7 @@ import org.dspace.usage.UsageEvent;
 public class Resource
 {
 
-    @javax.ws.rs.core.Context public static ServletContext servletContext;
+    @javax.ws.rs.core.Context public ServletContext servletContext;
 
     private static Logger log = Logger.getLogger(Resource.class);
 
@@ -46,9 +46,6 @@ public class Resource
         writeStatistics = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("rest.stats", false);
     }
 
-    static public String getServletContextPath() {
-        return servletContext.getContextPath();
-    }
     /**
      * Create context to work with DSpace database. It can create context
      * with or without a logged in user (parameter user is null). Throws
