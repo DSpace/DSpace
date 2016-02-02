@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +42,6 @@ import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.mortbay.log.Log;
 
 public class UploadFileChunk extends AbstractAction{
 
@@ -54,7 +52,6 @@ public class UploadFileChunk extends AbstractAction{
     
     private String submissionDir;
     private String chunkDir;
-    //private Map objectModel;
     
     static{
         if (ConfigurationManager.getProperty("upload.temp.dir") != null)
@@ -67,14 +64,6 @@ public class UploadFileChunk extends AbstractAction{
     }
     
     private void init(Request request){
-        /*String resumableIdentifier;
-        if(request.getParameter("resumableIdentifier") == null){
-            resumableIdentifier = request.get("resumableIdentifier").toString();
-        }
-        else{
-            resumableIdentifier = request.getParameter("resumableIdentifier");
-        }*/
-        
         // parent directory containing all bitstreams related to a submission
         this.submissionDir = tempDir + File.separator + request.getParameter("submissionId");
         
@@ -86,13 +75,13 @@ public class UploadFileChunk extends AbstractAction{
         if (!uploadDir.exists()) {
             uploadDir.mkdir();
         }
-        File finalDir = new File(this.chunkDir);
-        if (!finalDir.exists()) {
-            finalDir.mkdir();
+        
+        if(this.chunkDir != null && this.chunkDir.length() > 0){ 
+            File finalDir = new File(this.chunkDir);
+            if (!finalDir.exists()) {
+                finalDir.mkdir();
+            }
         }
-
-        log.info(this.submissionDir);
-        log.info(this.chunkDir);
     }
     
     @SuppressWarnings("rawtypes")
@@ -115,20 +104,13 @@ public class UploadFileChunk extends AbstractAction{
         log.info("===> " + request.getParameter("submissionId"));
         HashMap<String, String> returnValues = null;
         
-        //WebContinuation wb = FlowHelper.getWebContinuation(objectModel);
-        //log.info(wb.getContinuation().getClass());
-        //FlowUtils.obtainSubmissionInfo(getObjectModel(), workspaceID);
         
         if(request.getMethod().equals("GET"))
         {
             if(doGetResumable(request, response)){
                 log.info("ok");
-                
-                // if no exception has been throw then assume success
-                //returnValues = new HashMap<String, String>();
             }
             
-            //returnValues.put("status", "211");
             returnValues = new HashMap<String, String>();
         }
         else if(request.getMethod().equals("POST")){
@@ -141,72 +123,27 @@ public class UploadFileChunk extends AbstractAction{
                     log.warn("Coudln't delete temporary upload path " + this.chunkDir + ", ignoring it.");
                 }
                 
-                log.info("sid : " + request.getParameter("submissionId"));
                 SubmissionInfo si = FlowUtils.obtainSubmissionInfo(objectModel, 'S' + request.getParameter("submissionId"));
                 Item item = si.getSubmissionItem().getItem();
                 Context context = ContextUtil.obtainContext(objectModel);
                 Bitstream b = this.createBitstream(context, completedFile, item);
-                log.info("bid : " + b.getID());
-                returnValues.put("bitstream", String.valueOf(b.getID()));
-
+                
                 // delete upload 
                 if (!deleteDirectory(new File(this.submissionDir))){
-                    log.warn("Coudln't delete temporary upload path " + this.chunkDir + ", ignoring it.");
+                    log.warn("Coudln't delete submission upload path " + this.submissionDir + ", ignoring it.");
                 }
                 
                 context.commit();
+
+                returnValues.put("bitstream", String.valueOf(b.getID()));
             }
             
             returnValues.put("status", "200");
         }
         else if(request.getMethod().equals("DELETE")){
-            log.info("jings");
-            
-            log.info("* " + request.getParameter("bitstreamId"));
-            
-            Context context = ContextUtil.obtainContext(objectModel);
-            SubmissionInfo si = FlowUtils.obtainSubmissionInfo(objectModel, 'S' + request.getParameter("submissionId"));
-            Item item = si.getSubmissionItem().getItem();
-            //item.
-            
-            
-
-            // try to find bitstream
-            try
-            {
-                int bid = Integer.parseInt(request.getParameter("bitstreamId"));
-                Bitstream bitstream = Bitstream.find(context, bid);
-               
-                if(bitstream != null){
-                    log.info("delete " + bitstream.getID());
-                    
-                    // remove bitstream from bundle..
-                    // delete bundle if it's now empty
-                    Bundle[] bundles = bitstream.getBundles();
-
-                    bundles[0].removeBitstream(bitstream);
-
-                    Bitstream[] bitstreams = bundles[0].getBitstreams();
-
-                    log.info("bundle len " + bitstreams.length);
-                    
-                    // remove bundle if it's now empty
-                    if (bitstreams.length < 1)
-                    {
-                        item.removeBundle(bundles[0]);
-                        item.update();
-                    }
-                    
-                    returnValues = new HashMap<String, String>();
-                    returnValues.put("status", "200");
-                }
-                else{
-                    log.error("Bitstream " + bid + " not found. Can't delete");
-                }
-            }
-            catch (NumberFormatException nfe)
-            {
-                log.error("Invalud bitstream id " + request.getParameter("bitstreamId") + " Can't delete");
+            if(this.doDeleteResumable(request, objectModel)){
+                returnValues = new HashMap<String, String>();
+                returnValues.put("status", "200");
             }
         }
 
@@ -339,7 +276,76 @@ public class UploadFileChunk extends AbstractAction{
         
         return completedFile;
     }    
+    
+    protected boolean doDeleteResumable(Request request, Map objectModel){
+        boolean success = false;
+        
+        try
+        {
+            Context context = ContextUtil.obtainContext(objectModel);
+            String sBid = request.getParameter("bitstreamId");
+            
+            if(sBid != null && sBid.length() > 0){
+                // delete bitstream from dspace item
+                int bid = Integer.parseInt(sBid);
 
+                //request.get("resumableFilename").toString();
+                Bitstream bitstream = Bitstream.find(context, bid);
+
+                if(bitstream != null){
+                    log.info("delete " + bitstream.getID());
+
+                    // remove bitstream from bundle..
+                    // delete bundle if it's now empty
+                    Bundle[] bundles = bitstream.getBundles();
+                    bundles[0].removeBitstream(bitstream);
+                    Bitstream[] bitstreams = bundles[0].getBitstreams();
+
+                    // remove bundle if it's now empty
+                    if (bitstreams.length < 1)
+                    {
+                        SubmissionInfo si = FlowUtils.obtainSubmissionInfo(objectModel, 'S' + request.getParameter("submissionId"));
+                        Item item = si.getSubmissionItem().getItem();
+
+                        item.removeBundle(bundles[0]);
+                        item.update();
+                    }
+
+                    success = true;
+                }
+                else{
+                    
+                    log.error("Bitstream " + bid + " not found. Can't delete");
+                }
+            }
+            else{
+                // delete incomplete upload from disk
+                if(!deleteDirectory(new File(this.chunkDir))){
+                    log.warn("Could not delete incomplete upload: " + chunkDir);
+                }
+                else{
+                    log.info(chunkDir + " deleted");
+                    success = true;
+                }
+            }
+        }
+        catch(NumberFormatException nfe)
+        {
+            log.error("Invalid bitstream id " + request.getParameter("bitstreamId") + " Can't delete");
+        }
+        catch(SQLException ex){
+            log.error(ex);
+        }
+        catch(AuthorizeException ex){
+            log.error(ex);
+        }
+        catch(IOException ex){
+            log.error(ex);
+        }
+
+        return success;
+    }
+            
     // assembles a file from it chunks
     protected File makeFileFromChunks(HttpServletRequest request) 
             throws IOException

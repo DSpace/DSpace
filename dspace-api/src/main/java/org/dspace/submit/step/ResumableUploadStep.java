@@ -12,6 +12,8 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -30,22 +32,25 @@ public class ResumableUploadStep extends AbstractProcessingStep{
             log.info(key);
             
             if(key.startsWith("description-")){
-                log.info("*");
-
                 String val = request.getParameter(key.toString());
                 if(val != null && val.length() > 0){
-                    log.info(request.getParameter(val));
-                    log.info(key.split("-")[1]);
                     int bistreamId = Integer.parseInt(key.split("-")[1]);
 
                     Bitstream b = Bitstream.find(context, bistreamId);
                     b.setDescription(val);
-
                     b.update();
                 }
             }
+            else if(key.equals("primary_bitstream_id")){
+                Item item = subInfo.getSubmissionItem().getItem();
+                Bundle[] bundles = item.getBundles("ORIGINAL");
+                if (bundles.length > 0){
+                    bundles[0].setPrimaryBitstreamID(Integer.valueOf(request.getParameter(key.toString())).intValue());
+                    bundles[0].update();
+                }
+            }
         }
-
+        
         return 0;
     }
 

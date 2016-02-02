@@ -66,14 +66,6 @@ public class ResumableUploadStep extends UploadStep{
         for (Bitstream bitstream : bitstreams)
         {
             int id = bitstream.getID();
-            String name = bitstream.getName();
-            String url = makeBitstreamLink(item, bitstream);
-            //long bytes = bitstream.getSize();
-            String desc = bitstream.getDescription();
-            //String algorithm = bitstream.getChecksumAlgorithm();
-            //String checksum = bitstream.getChecksum();
-
-
             Row row = summary.addRow("bitstream-" + id, "data", "resumable-bitstream");
 
             // Add radio-button to select this as the primary bitstream
@@ -86,16 +78,22 @@ public class ResumableUploadStep extends UploadStep{
                 primary.setOptionSelected(String.valueOf(id));
             }
 
-            row.addCell().addXref(url,name);
+            String url = makeBitstreamLink(item, bitstream);
+            row.addCell().addXref(url, bitstream.getName());
             
             // description
-            row.addCell().addText("description-" + id).setValue(desc);
+            row.addCell().addText("description-" + id).setValue(bitstream.getDescription());
             
             // status
             row.addCell("status-" + id, Cell.ROLE_DATA, "file-status-success").addFigure("/", null, null);
             
             // info
-            row.addCell("info-" + id, Cell.ROLE_DATA, "file-info").addFigure("/", null, null);
+            Cell info = row.addCell("info-" + id, Cell.ROLE_DATA, "file-info"); 
+            info.addFigure("/", null, null);
+            info.addHidden("file-extra-bytes").setValue(String.valueOf(bitstream.getSize()));
+            info.addHidden("file-extra-format").setValue(bitstream.getFormatDescription());
+            info.addHidden("file-extra-algorithm").setValue(bitstream.getChecksumAlgorithm());
+            info.addHidden("file-extra-checksum").setValue(bitstream.getChecksum());
             
             // delete
             row.addCell("delete-" + id, Cell.ROLE_DATA, "file-delete").addFigure("/", null, null);
@@ -108,8 +106,8 @@ public class ResumableUploadStep extends UploadStep{
     public void addPageMeta(PageMeta pageMeta) throws WingException,
         SAXException, SQLException, AuthorizeException, IOException
     {
+        super.addPageMeta(pageMeta);
         pageMeta.addMetadata("javascript", "static").addContent("static/js/upload-resumable.js");
-        pageMeta.addMetadata("jings", "crivvens");
     }
 
     @Override
