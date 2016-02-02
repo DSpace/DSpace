@@ -136,7 +136,7 @@
         <dependency>
             <groupId>org.atteo</groupId>
             <artifactId>evo-inflector</artifactId>
-            <version>1.0.1</version>
+            <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
