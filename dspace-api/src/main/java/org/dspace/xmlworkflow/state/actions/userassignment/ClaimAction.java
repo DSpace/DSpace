@@ -88,7 +88,7 @@ public class ClaimAction extends UserSelectionAction {
         if(roleMembers != null && (roleMembers.getEPersons().size() > 0 || roleMembers.getGroups().size() >0)){
             //Create task for the users left
             XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().createPoolTasks(c, wfi, roleMembers, getParent().getStep(), getParent());
-            if(ConfigurationManager.getBooleanProperty("workflow", "notify.returned.tasks", false))
+            if(ConfigurationManager.getBooleanProperty("workflow", "notify.returned.tasks", true))
             {
                 alertUsersOnActivation(c, wfi, roleMembers);
             }
