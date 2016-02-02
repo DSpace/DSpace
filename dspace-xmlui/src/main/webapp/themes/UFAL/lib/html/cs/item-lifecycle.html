@@ -1,80 +1,63 @@
 <div id="faq-like">
 
-     <h2>Deposited Item Lifecycle</h2>
+     <h2>Životní cyklus položek v repozitáři</h2>
 
      <hr />
      <ul id="faqs-list">
-         <li><a href="#submitted-item">Submitted Item</a></li>
-         <li><a href="#edited-item">Edited Item</a></li>
-         <li><a href="#published-item">Published Item</a></li>
-         <li><a href="#modifying-item">Deleting and Modifying of Published Item</a></li>
-         <li><a href="#restricted-submissions">Restricted submissions</a></li>
+         <li><a href="#submitted-item">Nově vložené příspěvky</a></li>
+         <li><a href="#edited-item">Příspěvky procházející kontrolou</a></li>
+         <li><a href="#published-item">Publikované příspěvky</a></li>
+         <li><a href="#modifying-item">Mazání a úprava publikovaných příspěvků</a></li>
+         <li><a href="#restricted-submissions">Příspěvky s omezeními</a></li>
      </ul>
      <hr />
 
     <div>
-      <h3 id="submitted-item">Submitted Item</h3>
-      <p>After you <a href="deposit">deposit</a> a submission it will be inserted into a 
-      pool of submitted items. The item is not publicly available and waits for an editor
-      to approve (or reject) it.    
+      <h3 id="submitted-item">Nově vložené příspěvky</h3>
+      <p>Jakmile příspěvek <a href="deposit">vložíte</a>, je zařazen do kolekce všech vložených příspěvků. Příspěvek  zatím není veřejně přístupný a čeká, až ho redaktor schválí (nebo zamítne).
       </p>
     </div>
 
     <div>
-      <h3 id="edited-item">Edited Item</h3>
-      <p>The task of the editor is to verify whether the submission meets our requirements in respect to 
-      metadata quality and completeness, bitstream consistency and IPR. The editor can return the submission to the data depositor 
-      describing the needed changes. This step is repeated until the editor approves the item. The approved item becomes a 
-      published item. 
+      <h3 id="edited-item">Příspěvky procházející kontrolou</h3>
+      <p>Úkolem redaktora repozitáře je ověřit, zda příspěvek splňuje naše požadavky ohledně kvality a úplnosti metadat, konzistence souboru(ů) s daty a ohledně práv k duševnímu vlastnictví (IPR). Redaktor může příspěvek autorovi (vkladateli příspěvku) vrátit a popíše mu, jaké změny v příspěvku požaduje. Tento krok se opakuje, dokud redaktor příspěvek neschválí. Ze schváleného příspěvku se pak stane příspěvek publikovaný. 
       </p>
     </div>
 
     <div>
-      <h3 id="published-item">Published Item</h3>
-      <p>A published item obtains a PID (persistent identifier) which should be used for referencing and citing e.g., 
-      <strong>http://hdl.handle.net/11858/00-097C-0000-0022-F59C-8</strong>. The LINDAT repository will ensure that
-      the PID (more precisely, we use http handle proxy of the PID) will be resolved into a working web page (even if the current
-          server infrastructure changes or is moved)
-      describing your resource.    
+      <h3 id="published-item">Publikované příspěvky</h3>
+      <p>Publikovaný příspěvek získá PID (trvalý "perzistentní" identifikátor), který se používá pro reference a citace, např. 
+      <strong>http://hdl.handle.net/11858/00-097C-0000-0022-F59C-8</strong>. LINDAT repozitář zajistí, že PID (přesněji řečeno, pro PID používáme http proxy) vždy povede na platnou webovou stránku (i v případě, že současná infrastruktura serveru bude změněna nebo přesunuta jinam).
       </p>
       
       <p>
-      Published items are available through our search interface, browsing mode. Metadata of all items are submitted to 
-      search engines and are available through OAI-PMH protocol (several institutes harvest our repository for item's metadata
-      e.g., <a href="http://catalog.clarin.eu/vlo/">http://catalog.clarin.eu/vlo/</a>). Bitstreams of public submissions
-          (see <a href="#restricted-submissions">Restricted Submissions</a>) are also available through OAI-ORE protocol.
-      </p>
-    </div>
+      
+Publikované příspěvky jsou k dispozici v našem vyhledávacím rozhraní, v režimu prohlížení. Metadata všech datových položek jsou zpřístupněna obecným internetovým vyhledávačům a jsou také k dispozici prostřednictvím protokolu OAI-PMH (mnohé instituce využívají náš repozitář právě pro získání a agregaci uložených metadat), např. <a href="http://catalog.clarin.eu/vlo/">http://catalog.clarin.eu/vlo/</a>). Prostřednictvím protokolu OAI-ORE jsou k dispozici rovněž datové soubory veřejných příspěvků (pro data s omezeným přístupem viz <a href="#restricted-submissions"> Příspěvky s omezeními</a>).</div>
 
     
     <div>
-      <h3 id="modifying-item">Deleting and Modifying of Published Item</h3>
-      <p>Anybody can request deletion of published items; however, these will be evaluated on case-by-case basis.
-      Furthermore, we reserve the right to keep the metadata of published submissions available
-      in case there is no specific reason why to delete the metadata. The reason is that it is against
-      the concept of PIDs (<strong>persistent</strong> identifiers).
-      All PIDs are available through OAI-PMH interface even if only to inform that the item
-      has been deleted.    
+      <h3 id="modifying-item">Mazání a úprava publikovaných příspěvků</h3>
+      <p>O vymazání publikovaných příspěvků může požádat kdokoli; ale jednotlivé žádosti budou vyhodnocovány případ od případu.
+      Vyhrazujeme si právo ponechat metadata publikovaných příspěvků k dispozici v případě, že neexistuje žádný zvláštní důvod, proč je odstranit. Takový postup by byl proti pojetí <strong>persistentních</strong> identifikátorů - PID.
+      Všechny identifikátory PID zůstávají i po vymazání příspěvku k dispozici přes systémové rozhraní OAI-PMH, i když pak lze získat jen informaci o tom, že příspěvek byl vymazán.    
       </p>
       
-      <p>We allow for minor edits of the submission (e.g., typos) through our <strong>Help Desk</strong>. These are also
-      evaluated on case-by-case basis. For major changes, the user is requested to submit a new version of that item
-      and we will indicate in the metadata that it is replaced by a newer version. 
+      <p>Přes naši <strong>Linku podpory</strong> umožňujeme provést drobné změny v příspěvcích (např. opravu překlepů v dokumentaci). I zde záleží na konkrétním případu a rozsahu změny.
+     Pokud jde o větší změny, vkladatel příspěvku je obvykle vyzván, aby předložil novou verzi příspěvku. Zároveň zařídíme, aby z metadat původní položky vedl odkaz na novou verzi, a původní položka bude pak označena jako "zastaralá".
+       
       </p>
     </div>
 
     <div>
-      <h3 id="restricted-submissions">Restricted Submissions</h3>
-      <p>First of all, all metadata are always publicly available. We 
-      support open access submissions; however, we also support 
-      <strong>restrictive licences</strong> for bitstreams which require e-signing before downloading the bitstreams.
-      We keep track of these e-signatures in case there are IPR infringements.</p>
+      <h3 id="restricted-submissions">Příspěvky s omezeními</h3>
+      <p>Pokud není možné, obvykle z důvodu nejasného nebo omezeného právního statusu části dat, která ukládáte do repozitáře, přiřadit datům nebo nástroji otevřenou licenci, je možné dohodnout takovou <strong>restriktivní</strong> (omezenou) licenci, která bude vyžadovat explicitní souhlas uživatele s jejími podmínkami. Zdůrazňujeme, že toto nelze aplikovat na metadata položky - ta jsou vždy veřejně a otevřeně dostupná. 
+      Podporujeme tedy i takové restriktivní licence pro balíčky souborů s daty, které vyžadují před stahováním "elektronický podpis."
+      Tyto elektronické podpisy uchováváme pro případy sporů o porušení práv k duševnímu vlastnictví.
       
-       <p><a href="licenses">See currently available licenses</a> or <a class="helpdesk-tolink" href="#">ask us</a>
-      to add a specific one.</p>
+       <p><a href="licenses">Podívejte se na licence, které jsou v současné době k dispozici,</a> nebo nás <a class="helpdesk-tolink" href="#">kontaktujte</a>, pokud budete chtít nějakou speciální licenci přidat. 
+     </p>
       
-      <p>We also support putting embargo on bitstreams which means that the bitstreams become publicly available
-      after specific dates.</p>
+      <p>Podporujeme také (dočasné) embargo na balíčky souborů s daty, což znamená, že je zpřístupňujeme veřejnosti až po určité době, kterou můžete při vkládání nastavit.</p>
     </div>
     
 </div>
