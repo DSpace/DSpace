@@ -303,7 +303,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			}
 
 			log.debug("Starting to determine special groups");
-			String defaultRoles = configurationService.getProperty("authentication-shibboleth.default-roles");
+			String[] defaultRoles = configurationService.getArrayProperty("authentication-shibboleth.default-roles");
 			String roleHeader = configurationService.getProperty("authentication-shibboleth.role-header");
 			boolean ignoreScope = configurationService.getBooleanProperty("authentication-shibboleth.role-header.ignore-scope", true);
 			boolean ignoreValue = configurationService.getBooleanProperty("authentication-shibboleth.role-header.ignore-value", false);
@@ -316,8 +316,8 @@ public class ShibAuthentication implements AuthenticationMethod
 			List<String> affiliations = findMultipleAttributes(request, roleHeader);
 			if (affiliations == null) {
 				if (defaultRoles != null)
-					affiliations = Arrays.asList(defaultRoles.split(","));
-				log.debug("Failed to find Shibboleth role header, '"+roleHeader+"', falling back to the default roles: '"+defaultRoles+"'");
+					affiliations = Arrays.asList(defaultRoles);
+				log.debug("Failed to find Shibboleth role header, '"+roleHeader+"', falling back to the default roles: '"+String.join(",", defaultRoles) +"'");
 			} else {
 				log.debug("Found Shibboleth role header: '"+roleHeader+"' = '"+affiliations+"'");
 			}
@@ -351,7 +351,7 @@ public class ShibAuthentication implements AuthenticationMethod
 						log.debug("Unable to find role mapping for the value, '"+affiliation+"', there should be a mapping in config/modules/authentication-shibboleth.cfg:  role."+affiliation+" = <some group name>");
 						continue;
 					} else {
-						log.debug("Mapping role affiliation to DSpace group: '"+groupNames+"'");
+						log.debug("Mapping role affiliation to DSpace group: '"+String.join(",",groupNames)+"'");
 					}
 
 					// Add each group to the list.
@@ -923,7 +923,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			return;
 		}
 
-		log.debug("Loading additional eperson metadata from: 'authentication.shib.eperson.metadata' = '"+mappingString+"'");
+		log.debug("Loading additional eperson metadata from: 'authentication.shib.eperson.metadata' = '"+String.join(",", mappingString) +"'");
 
 
 		for (String metadataString : mappingString) {
