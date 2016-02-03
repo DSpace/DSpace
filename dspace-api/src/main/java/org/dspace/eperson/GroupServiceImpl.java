@@ -90,10 +90,14 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public void setName(Context context, Group group, String name) throws SQLException {
-        if (!group.isPermanent())
-            group.setName(context, name);
-        else
+        if (group.isPermanent())
+        {
+            log.error("Attempt to rename permanent Group {} to {}.",
+                    group.getName(), name);
             throw new SQLException("Attempt to rename a permanent Group");
+        }
+        else
+            group.setName(context, name);
     }
 
     @Override
