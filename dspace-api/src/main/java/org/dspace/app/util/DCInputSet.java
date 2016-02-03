@@ -136,6 +136,36 @@ public class DCInputSet
     	return false;
     }
 	
+    /**
+     * Does the current input set define the named field?
+     * and is valid for the specified document type
+     * Scan through every field in every page of the input set
+     *
+     * @return true if the current set has the named field
+     */
+     public boolean isFieldPresent(String fieldName, String documentType)
+     {
+     	if(documentType == null){
+     		documentType = "";
+     	}
+     	for (int i = 0; i < inputPages.length; i++)
+ 	    {
+     		DCInput[] pageInputs = inputPages[i];
+     		for (int row = 0; row < pageInputs.length; row++)
+     		{
+     			String fullName = pageInputs[row].getElement() + "." + 
+ 				              	  pageInputs[row].getQualifier();
+     			if (fullName.equals(fieldName) )
+     			{
+     				if(pageInputs[row].isAllowedFor(documentType)){
+     					return true;
+     				}
+     			}
+     		}
+ 	    }
+     	return false;
+     }
+    
     protected boolean doField(DCInput dcf, boolean addTitleAlternative,
 		    					   boolean addPublishedBefore)
     {
