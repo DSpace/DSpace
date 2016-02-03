@@ -520,7 +520,7 @@ var CommunitySelector = function(report, parent, paramCollSel) {
 			$.each(comm.collection, function(index, coll) {
 				var opt = report.myHtmlUtil.addOpt(collSel, prefix + "--" + coll.name, coll.id);
 				$.each(paramCollSel, function(index, collid){
-					if (collid == report.getId(coll)) {
+					if (collid == coll.id) {
 						opt.attr("selected", true);
 					}
 				});
