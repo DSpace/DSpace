@@ -20,6 +20,9 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.pdfparser.PDFParser;
+import org.apache.pdfbox.io.ScratchFile;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.io.RandomAccessBufferedFileInputStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.dspace.authorize.AuthorizeException;
@@ -294,7 +297,18 @@ public class PDFPackager
 
         try
         {
-            PDFParser parser = new PDFParser(metadata);
+            ScratchFile scratchFile = null;
+            try
+            {
+                long useRAM = Runtime.getRuntime().freeMemory()*80/100; // use up to 80% of JVM free memory
+                scratchFile = new ScratchFile(MemoryUsageSetting.setupMixed(useRAM)); // then fallback to temp file (unlimited size)
+            }
+            catch (IOException ioe)
+            {
+                log.warn("Error initializing scratch file: " + ioe.getMessage());
+            }
+        
+            PDFParser parser = new PDFParser(new RandomAccessBufferedFileInputStream(metadata), scratchFile);
             parser.parse();
             cos = parser.getDocument();
 

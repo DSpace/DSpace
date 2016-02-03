@@ -9,11 +9,11 @@ package org.dspace.disseminate;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.dspace.authorize.AuthorizeException;
@@ -301,18 +301,17 @@ public class CitationDocument {
      *
      * @param bitstream The source bitstream being cited. This must be a PDF.
      * @return The temporary File that is the finished, cited document.
-     * @throws java.io.FileNotFoundException
      * @throws SQLException
      * @throws org.dspace.authorize.AuthorizeException
      */
     public File makeCitedDocument(Bitstream bitstream)
-            throws IOException, SQLException, AuthorizeException, COSVisitorException {
-        PDDocument document = new PDDocument();
+            throws IOException, SQLException, AuthorizeException {
+    	PDDocument document = new PDDocument();
         PDDocument sourceDocument = new PDDocument();
         try {
             Item item = (Item) bitstream.getParentObject();
             sourceDocument = sourceDocument.load(bitstream.retrieve());
-            PDPage coverPage = new PDPage(PDPage.PAGE_SIZE_LETTER);
+            PDPage coverPage = new PDPage(PDRectangle.LETTER); // TODO: needs to be configurable
             generateCoverPage(document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);
 
@@ -324,7 +323,7 @@ public class CitationDocument {
         }
     }
 
-    private void generateCoverPage(PDDocument document, PDPage coverPage, Item item) throws IOException, COSVisitorException {
+    protected void generateCoverPage(PDDocument document, PDPage coverPage, Item item) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, coverPage);
         try {
             int ypos = 760;
@@ -391,8 +390,8 @@ public class CitationDocument {
         }
     }
 
-    private void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDPage coverPage) {
-        List<PDPage> sourcePageList = sourceDocument.getDocumentCatalog().getAllPages();
+    protected void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDPage coverPage) {
+        PDPageTree sourcePageList = sourceDocument.getDocumentCatalog().getPages();
 
         if (isCitationFirstPage()) {
             //citation as cover page
@@ -407,14 +406,13 @@ public class CitationDocument {
             }
             document.addPage(coverPage);
         }
-        sourcePageList.clear();
     }
 
     public int drawStringWordWrap(PDPage page, PDPageContentStream contentStream, String text,
                                     int startX, int startY, PDFont pdfFont, float fontSize) throws IOException {
         float leading = 1.5f * fontSize;
 
-        PDRectangle mediabox = page.findMediaBox();
+        PDRectangle mediabox = page.getMediaBox();
         float margin = 72;
         float width = mediabox.getWidth() - 2*margin;
 
@@ -514,7 +512,7 @@ public class CitationDocument {
         final int rows = content.length;
         final int cols = content[0].length;
         final float rowHeight = 20f;
-        final float tableWidth = page.findMediaBox().getWidth()-(2*margin);
+        final float tableWidth = page.getMediaBox().getWidth()-(2*margin);
         final float tableHeight = rowHeight * rows;
         final float colWidth = tableWidth/(float)cols;
         final float cellMargin=5f;
