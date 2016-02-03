@@ -77,7 +77,6 @@ public class ShibAuthentication implements AuthenticationMethod
 	/** Maximum length for eperson additional metadata fields **/
     protected final int METADATA_MAX_SIZE = 1024;
 
-    protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
@@ -226,7 +225,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			// Step 4: Log the user in.
 			context.setCurrentUser(eperson);
 			request.getSession().setAttribute("shib.authenticated", true);
-            authenticationService.initEPerson(context, request, eperson);
+			AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
 
 			log.info(eperson.getEmail()+" has been authenticated via shibboleth.");
 			return AuthenticationMethod.SUCCESS;
@@ -730,7 +729,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		eperson.setCanLogIn(true);
 
 		// Commit the new eperson
-        authenticationService.initEPerson(context, request, eperson);
+		AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
         ePersonService.update(context, eperson);
 		context.dispatchEvents();
 
@@ -880,7 +879,7 @@ public class ShibAuthentication implements AuthenticationMethod
 
 		else if (ePersonService.checkPassword(context, eperson, password)) {
 			// Password matched
-            authenticationService.initEPerson(context, request, eperson);
+			AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
 			context.setCurrentUser(eperson);
 			log.info(eperson.getEmail()+" has been authenticated via shibboleth using password-based sword compatibility mode.");
 			return SUCCESS;
