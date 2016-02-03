@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * Class representing a group of e-people.
- * 
+ *
  * @author David Stuve
  */
 @Entity
@@ -150,14 +150,14 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     {
         return groups;
     }
-    
+
     /**
      * Return <code>true</code> if <code>other</code> is the same Group as
      * this object, <code>false</code> otherwise
-     * 
+     *
      * @param obj
      *            object to compare to
-     * 
+     *
      * @return <code>true</code> if object passed in represents the same group
      *         as this object
      */
@@ -200,11 +200,14 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
         return getGroupService().getName(this);
     }
 
+    /** Change the name of this Group. */
     public void setName(Context context, String name) throws SQLException
     {
         if (!permanent)
             getGroupService().setMetadataSingleValue(context, this,
                     MetadataSchema.DC_SCHEMA, "title", null, null, name);
+        else
+            throw new SQLException("Attempt to rename a permanent Group");
     }
 
     public boolean isGroupsChanged() {
