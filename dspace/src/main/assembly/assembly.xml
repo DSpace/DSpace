@@ -99,6 +99,7 @@
             <include>*:jar:*</include>
          </includes>
          <outputDirectory>lib</outputDirectory>
+         <useProjectArtifact>false</useProjectArtifact>
       </dependencySet>
    </dependencySets>
 
