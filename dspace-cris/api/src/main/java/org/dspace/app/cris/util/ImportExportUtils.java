@@ -454,7 +454,7 @@ public class ImportExportUtils {
         if (template.getType() > CrisConstants.CRIS_DYNAMIC_TYPE_ID_START)
         {
             DynamicObjectType type = applicationService.get(DynamicObjectType.class, (template.getType()-CrisConstants.CRIS_DYNAMIC_TYPE_ID_START));
-            List<DynamicPropertiesDefinition> tps = type.getMask();            
+            List<DynamicPropertiesDefinition> tps = applicationService.findMaskById(DynamicObjectType.class, type.getId());            
             for (DynamicPropertiesDefinition tp : tps)
             {
                 IContainable ic = applicationService.findContainableByDecorable(
@@ -464,7 +464,8 @@ public class ImportExportUtils {
                     metadataFirstLevel.add(ic);
                 }
             }
-            List<DynamicTypeNestedObject> ttps = type.getTypeNestedDefinitionMask();
+            
+            List<DynamicTypeNestedObject> ttps = applicationService.findNestedMaskById(DynamicObjectType.class, type.getId());
             for (DynamicTypeNestedObject ttp : ttps)
             {
                 IContainable ic = applicationService.findContainableByDecorable(
