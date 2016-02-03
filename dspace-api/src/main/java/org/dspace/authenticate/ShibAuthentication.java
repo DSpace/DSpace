@@ -317,7 +317,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			if (affiliations == null) {
 				if (defaultRoles != null)
 					affiliations = Arrays.asList(defaultRoles);
-				log.debug("Failed to find Shibboleth role header, '"+roleHeader+"', falling back to the default roles: '"+String.join(",", defaultRoles) +"'");
+				log.debug("Failed to find Shibboleth role header, '"+roleHeader+"', falling back to the default roles: '"+ StringUtils.join(defaultRoles, ",") + "'");
 			} else {
 				log.debug("Found Shibboleth role header: '"+roleHeader+"' = '"+affiliations+"'");
 			}
@@ -351,7 +351,7 @@ public class ShibAuthentication implements AuthenticationMethod
 						log.debug("Unable to find role mapping for the value, '"+affiliation+"', there should be a mapping in config/modules/authentication-shibboleth.cfg:  role."+affiliation+" = <some group name>");
 						continue;
 					} else {
-						log.debug("Mapping role affiliation to DSpace group: '"+String.join(",",groupNames)+"'");
+						log.debug("Mapping role affiliation to DSpace group: '"+ StringUtils.join(groupNames, ",") +"'");
 					}
 
 					// Add each group to the list.
@@ -923,7 +923,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			return;
 		}
 
-		log.debug("Loading additional eperson metadata from: 'authentication.shib.eperson.metadata' = '"+String.join(",", mappingString) +"'");
+		log.debug("Loading additional eperson metadata from: 'authentication.shib.eperson.metadata' = '"+ StringUtils.join(mappingString, ",") +"'");
 
 
 		for (String metadataString : mappingString) {
