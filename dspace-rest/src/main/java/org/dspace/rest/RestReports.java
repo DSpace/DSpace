@@ -11,7 +11,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -39,8 +38,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class RestReports {
     private static Logger log = Logger.getLogger(RestReports.class);
 
-    @javax.ws.rs.core.Context public static ServletContext servletContext;
-    
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     public static final String REST_RPT_URL = "rest.report-url.";
 

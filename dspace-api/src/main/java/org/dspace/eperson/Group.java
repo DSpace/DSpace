@@ -203,11 +203,8 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     /** Change the name of this Group. */
     public void setName(Context context, String name) throws SQLException
     {
-        if (!permanent)
-            getGroupService().setMetadataSingleValue(context, this,
-                    MetadataSchema.DC_SCHEMA, "title", null, null, name);
-        else
-            throw new SQLException("Attempt to rename a permanent Group");
+        getGroupService().setMetadataSingleValue(context, this,
+                MetadataSchema.DC_SCHEMA, "title", null, null, name);
     }
 
     public boolean isGroupsChanged() {
