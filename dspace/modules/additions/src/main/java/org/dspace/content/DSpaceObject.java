@@ -1384,4 +1384,17 @@ public abstract class DSpaceObject
         }
     }
 
+    // UMD Custom Method 
+    public boolean matchPublic(String schema, String element, String qualifier,
+            String language, Metadatum dcv)
+    {
+        return match(schema, element, qualifier, language, dcv);
+    }
+
+    // UMD Custom method
+    public void setMetadataPublic(List<Metadatum> metadata)
+    {
+        setMetadata(metadata);
+    }
+
 }

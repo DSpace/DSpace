@@ -1663,12 +1663,6 @@ public class Item extends DSpaceObject
         return policiesToAdd;
     }
 
-    public boolean matchPublic(String schema, String element, String qualifier,
-            String language, Metadatum dcv)
-    {
-        return match(schema, element, qualifier, language, dcv);
-    }
-
     /**
      * Moves the item from one collection to another one
      * 
@@ -2173,12 +2167,6 @@ public class Item extends DSpaceObject
         return getMetadata();
     }
 
-
-    // UMD Custom method?
-    public void setMetadataPublic(List<Metadatum> metadata)
-    {
-        setMetadata(metadata);
-    }
 
     @Override
     protected void getAuthoritiesAndConfidences(String fieldKey, String[] values, String[] authorities, int[] confidences, int i) {
