@@ -545,9 +545,7 @@
         <profile>
             <id>dspace-jspui</id>
             <activation>
-                <file>
-                    <exists>dspace-jspui/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>dspace-jspui</module>

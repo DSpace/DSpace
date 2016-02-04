@@ -39,11 +39,11 @@
             </activation>
             <modules>
             	<module>additions</module>
-            	<module>jspui</module>
                 <module>rest</module>
                 <module>oai</module>
                 <module>xmlui-mirage2</module>
                 <module>xmlui</module>
+                <module>swordv2</module>
             </modules>
         </profile>
         <profile>
@@ -54,6 +54,7 @@
             </modules>
         </profile>
         <profile>
+        	<!-- This profiles builds all modules including the modules that are not used in umd (jspui, sword,solr) -->
             <id>all-modules</id>
             <modules>
             	<module>additions</module>
