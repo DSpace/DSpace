@@ -67,11 +67,6 @@ public class MetadataFieldTest extends AbstractUnitTest
             this.mf.setScopeNote(scopeNote);
             context.restoreAuthSystemState();
         }
-        catch (AuthorizeException ex)
-        {
-            log.error("Authorize Error in init", ex);
-            fail("Authorize Error in init");
-        }
         catch (SQLException ex)
         {
             log.error("SQL Error in init", ex);

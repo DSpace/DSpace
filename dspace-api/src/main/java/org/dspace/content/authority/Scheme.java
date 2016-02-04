@@ -666,8 +666,7 @@ public class Scheme extends AuthorityObject
      * @param c
      *            collection to add
      */
-    public void addConcept(Concept c) throws SQLException,
-            AuthorizeException
+    public void addConcept(Concept c) throws SQLException
     {
         // Check authorisation
         AuthorizeManager.isAdmin(myContext);
@@ -755,7 +754,7 @@ public class Scheme extends AuthorityObject
     }
 
 
-    public Concept createConcept() throws SQLException, AuthorizeException, NoSuchAlgorithmException {
+    public Concept createConcept() throws SQLException, AuthorizeException {
         Concept concept = Concept.create(this.myContext);
         Date date = new Date();
         concept.setLastModified(date);
@@ -767,7 +766,7 @@ public class Scheme extends AuthorityObject
         return concept;
     }
 
-    public Concept createConcept(String identifier) throws SQLException, AuthorizeException, NoSuchAlgorithmException {
+    public Concept createConcept(String identifier) throws SQLException, AuthorizeException {
 
         Concept concept = Concept.create(this.myContext, identifier);
 

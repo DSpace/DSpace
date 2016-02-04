@@ -165,27 +165,16 @@ public class Concept extends AuthorityObject
      * @param context
      *            DSpace context object
      */
-    public static Concept create(Context context) throws SQLException,
-            AuthorizeException
+    public static Concept create(Context context) throws SQLException, AuthorizeException
     {
-        // authorized?
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to create an Concept");
-        }
-
         return create(context, AuthorityObject.createIdentifier());
     }
 
-    public static Concept create(Context context, String identifier) throws SQLException,
-            AuthorizeException
+    public static Concept create(Context context, String identifier) throws SQLException, AuthorizeException
     {
         // authorized?
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to create an Concept");
+        if (!AuthorizeManager.isAdmin(context)) {
+            throw new AuthorizeException("You must be an admin to create a Concept");
         }
 
         // Create a table row
@@ -243,12 +232,13 @@ public class Concept extends AuthorityObject
      * @param t
      *            term
      */
-    public void removePreferredTerm(Term t)throws SQLException,
-            AuthorizeException, IOException
+    public void removePreferredTerm(Term t)throws SQLException, AuthorizeException, IOException
     {
 
-        // Check authorisation
-        AuthorizeManager.isAdmin(myContext);
+        // authorized?
+        if (!AuthorizeManager.isAdmin(myContext)) {
+            throw new AuthorizeException("You must be an admin to remove a Concept's Preferred Term");
+        }
         log.info(LogManager.getHeader(myContext, "remove_preferredTerm",
                 "concept_id=" + getID() + ",term_id=" + t.getID()));
 
@@ -281,11 +271,12 @@ public class Concept extends AuthorityObject
      * @param t
      *            term
      */
-    public void removeAltTerm(Term t)throws SQLException,
-            AuthorizeException, IOException
+    public void removeAltTerm(Term t)throws SQLException, AuthorizeException, IOException
     {
-        // Check authorisation
-        AuthorizeManager.isAdmin(myContext);
+        // authorized?
+        if (!AuthorizeManager.isAdmin(myContext)) {
+            throw new AuthorizeException("You must be an admin to remove a Concept's Alternate Term");
+        }
         log.info(LogManager.getHeader(myContext, "remove_altTerm",
                 "concept_id=" + getID() + ",term_id=" + t.getID()));
 
@@ -316,11 +307,12 @@ public class Concept extends AuthorityObject
      *
      * @param c
      */
-    public void removeParentConcept(Concept c)throws SQLException,
-            AuthorizeException, IOException
+    public void removeParentConcept(Concept c)throws SQLException, AuthorizeException, IOException
     {
-        // Check authorisation
-        AuthorizeManager.isAdmin(myContext);
+        // authorized?
+        if (!AuthorizeManager.isAdmin(myContext)) {
+            throw new AuthorizeException("You must be an admin to remove a Concept's Parent Concept");
+        }
         log.info(LogManager.getHeader(myContext, "remove_parentConcept",
                 "concept_id=" + getID() + ",parent_concept_id=" + c.getID()));
 
@@ -343,11 +335,12 @@ public class Concept extends AuthorityObject
      *
      * @param c
      */
-    public void removeChildConcept(Concept c)throws SQLException,
-            AuthorizeException, IOException
+    public void removeChildConcept(Concept c)throws SQLException, AuthorizeException, IOException
     {
-        // Check authorisation
-        AuthorizeManager.isAdmin(myContext);
+        // authorized?
+        if (!AuthorizeManager.isAdmin(myContext)) {
+            throw new AuthorizeException("You must be an admin to remove a Concept's Child Concept");
+        }
         log.info(LogManager.getHeader(myContext, "remove_parentConcept",
                 "concept_id=" + getID() + ",child_concept_id=" + c.getID()));
 
@@ -443,7 +436,7 @@ public class Concept extends AuthorityObject
      * @return the matching Concepts, or null if not found
      */
     public static ArrayList<Concept> findByConceptMetadata(Context context, String searchString, String metadataSchema, String metadataElement)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
         try {
@@ -457,9 +450,9 @@ public class Concept extends AuthorityObject
             if (row == null) {
                 return null;
             } else {
-            while(row.hasNext()) {
-                concepts.add(new Concept(context,row.next()));
-            }
+                while(row.hasNext()) {
+                    concepts.add(new Concept(context,row.next()));
+                }
             }
         } catch (NullPointerException e) {
             log.error("Unable to find concept by metadata: search=" + searchString + ", schema=" + metadataSchema + ", element=" + metadataElement, e);
@@ -1228,12 +1221,12 @@ public class Concept extends AuthorityObject
         return conceptArray;
     }
 
-    public void addParentConcept(Concept incoming,int roleId) throws SQLException,
-            AuthorizeException
+    public void addParentConcept(Concept incoming,int roleId) throws SQLException, AuthorizeException
     {
-
-        // Check authorisation
-        AuthorizeManager.isAdmin(myContext);
+        // authorized?
+        if (!AuthorizeManager.isAdmin(myContext)) {
+            throw new AuthorizeException("You must be an admin to modify a Concept's Parent Concept");
+        }
 
         log.info(LogManager.getHeader(myContext, "add_parentConcept",
                 "concept_id=" + getID() + ",parent_concept_id=" + incoming.getID()));
@@ -1268,11 +1261,12 @@ public class Concept extends AuthorityObject
         }
     }
 
-    public void addChildConcept(Concept outgoing, int roleId) throws SQLException,
-            AuthorizeException
+    public void addChildConcept(Concept outgoing, int roleId) throws SQLException, AuthorizeException
     {
-        // Check authorisation
-        AuthorizeManager.isAdmin(myContext);
+        // authorized?
+        if (!AuthorizeManager.isAdmin(myContext)) {
+            throw new AuthorizeException("You must be an admin to add a Concept's Child Concept");
+        }
 
         log.info(LogManager.getHeader(myContext, "add_childConcept",
                 "concept_id=" + getID() + ",child_concept_id=" + outgoing.getID()));
@@ -1342,11 +1336,12 @@ public class Concept extends AuthorityObject
         return label;
     }
 
-    public void addTerm(Term t,int role_id) throws SQLException,
-            AuthorizeException
+    public void addTerm(Term t,int role_id) throws SQLException, AuthorizeException
     {
-        // Check authorisation
-        AuthorizeManager.isAdmin(myContext);
+        // authorized?
+        if (!AuthorizeManager.isAdmin(myContext)) {
+            throw new AuthorizeException("You must be an admin to add a Term to a Concept");
+        }
 
         log.info(LogManager.getHeader(myContext, "add_term",
                 "concept_id=" + getID() + ",term_id=" + t.getID()));

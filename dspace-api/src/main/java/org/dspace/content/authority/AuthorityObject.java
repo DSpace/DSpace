@@ -9,7 +9,6 @@ package org.dspace.content.authority;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -434,7 +433,7 @@ public abstract class AuthorityObject extends DSpaceObject {
 
     private transient MetadataField[] allMetadataFields = null;
 
-    protected MetadataField getMetadataField(AuthorityMetadataValue dcv) throws SQLException, AuthorizeException
+    protected MetadataField getMetadataField(AuthorityMetadataValue dcv) throws SQLException
     {
         if (allMetadataFields == null)
         {
@@ -478,7 +477,7 @@ public abstract class AuthorityObject extends DSpaceObject {
     /**
      * Update the scheme - writing out scheme object and Concept list if necessary
      */
-    public void update() throws SQLException, AuthorizeException
+    public void update() throws SQLException
     {
         if(metadataModified)
         {

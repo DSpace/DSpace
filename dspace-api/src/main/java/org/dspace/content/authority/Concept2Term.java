@@ -241,8 +241,7 @@ public class Concept2Term
      * @throws org.dspace.authorize.AuthorizeException
      */
     public static Concept2Term findByElement(Context context, int role_id,
-                                             int concept_id, int term_id) throws SQLException,
-            AuthorizeException
+                                             int concept_id, int term_id) throws SQLException
     {
         // Grab rows from DB
         TableRowIterator tri;
@@ -417,8 +416,7 @@ public class Concept2Term
      * @throws org.dspace.authorize.AuthorizeException
      */
     private static boolean hasElement(Context context, int role_id,
-                                      int concept_id, int term_id) throws SQLException,
-            AuthorizeException
+                                      int concept_id, int term_id) throws SQLException
     {
         return Concept2Term.findByElement(context, role_id, concept_id,
                 term_id) != null;
@@ -461,8 +459,7 @@ public class Concept2Term
      * @throws java.io.IOException
      */
     private boolean unique(Context context, int role_id, int concept_id,
-                           int term_id) throws IOException, SQLException,
-            AuthorizeException
+                           int term_id) throws IOException, SQLException
     {
         int count = 0;
         Connection con = null;
@@ -787,7 +784,7 @@ public class Concept2Term
 
 
     public static Concept2Term findByConceptAndTerm(Context context,Integer concept_id,Integer term_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (concept_id == null||term_id == null||concept_id<0||term_id<0)
         {
@@ -835,7 +832,7 @@ public class Concept2Term
 
 
     public Concept2Term[] findByConceptAndRole(Context context,Integer concept_id,Integer role_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (concept_id == null||role_id == null||concept_id<0||role_id<0)
         {
@@ -882,7 +879,7 @@ public class Concept2Term
 
     }
     public Concept2Term[] findByTermAndRole(Context context,Integer term_id,Integer role_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (term_id == null||role_id == null||term_id<0||role_id<0)
         {
@@ -929,7 +926,7 @@ public class Concept2Term
     }
 
     public Concept2Term[] findByTerm(Context context,Integer term_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (term_id == null||term_id<0)
         {
@@ -976,7 +973,7 @@ public class Concept2Term
     }
 
     public Concept2Term[] findByConcept(Context context,Integer term_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (term_id == null||term_id<0)
         {

@@ -238,11 +238,9 @@ public class Concept2Concept
 
      * @return recalled metadata relation
      * @throws java.sql.SQLException
-     * @throws org.dspace.authorize.AuthorizeException
      */
     public static Concept2Concept findByElement(Context context, int role_id,
-                                                int incoming_id, int outgoing_id) throws SQLException,
-            AuthorizeException
+                                                int incoming_id, int outgoing_id) throws SQLException
     {
         // Grab rows from DB
         TableRowIterator tri;
@@ -414,11 +412,9 @@ public class Concept2Concept
 
      * @return true if the relation exists
      * @throws java.sql.SQLException
-     * @throws org.dspace.authorize.AuthorizeException
      */
     private static boolean hasElement(Context context, int role_id,
-                                      int incoming_id, int outgoing_id) throws SQLException,
-            AuthorizeException
+                                      int incoming_id, int outgoing_id) throws SQLException
     {
         return Concept2Concept.findByElement(context, role_id, incoming_id,
                 outgoing_id) != null;
@@ -456,13 +452,11 @@ public class Concept2Concept
      * @param role_id
 
      * @return true if unique
-     * @throws org.dspace.authorize.AuthorizeException
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
     private boolean unique(Context context, int role_id, int incoming_id,
-                           int outgoing_id) throws IOException, SQLException,
-            AuthorizeException
+                           int outgoing_id) throws IOException, SQLException
     {
         int count = 0;
         Connection con = null;
@@ -787,7 +781,7 @@ public class Concept2Concept
 
 
     public static Concept2Concept findByConceptAndConcept(Context context,Integer incoming_id,Integer outgoing_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (incoming_id == null||outgoing_id == null||incoming_id<0||outgoing_id<0)
         {
@@ -835,7 +829,7 @@ public class Concept2Concept
 
 
     public static Concept2Concept[] findByParentAndRole(Context context,Integer incoming_id,Integer role_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (incoming_id == null||role_id == null||incoming_id<0||role_id<0)
         {
@@ -882,7 +876,7 @@ public class Concept2Concept
 
     }
     public static Concept2Concept[] findByChildAndRole(Context context,Integer outgoing_id,Integer role_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (outgoing_id == null||role_id == null||outgoing_id<0||role_id<0)
         {
@@ -929,7 +923,7 @@ public class Concept2Concept
     }
 
     public static Concept2Concept[] findByChild(Context context,Integer outgoing_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (outgoing_id == null||outgoing_id<0)
         {
@@ -976,7 +970,7 @@ public class Concept2Concept
     }
 
     public static Concept2Concept[] findByParent(Context context,Integer incoming_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (incoming_id == null||incoming_id<0)
         {

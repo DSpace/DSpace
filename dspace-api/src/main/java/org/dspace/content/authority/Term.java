@@ -186,7 +186,7 @@ public class Term extends AuthorityObject {
      */
 
     public static Term findByLiteralForm(Context context , String literalForm)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (literalForm == null)
         {
