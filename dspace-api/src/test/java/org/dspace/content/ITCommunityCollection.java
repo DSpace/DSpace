@@ -96,12 +96,38 @@ public class ITCommunityCollection extends AbstractIntegrationTest
         assertThat("testCreateTree 2", (Community) collectionService.getParentObject(context, col1), equalTo(child1));
         assertThat("testCreateTree 3", (Community) collectionService.getParentObject(context, col2), equalTo(child1));
     }
+    
+    /**
+     * Tests the creation of items in a community/collection tree
+     */
+    @Test
+    @PerfTest(invocations = 25, threads = 1)
+    @Required(percentile95 = 1200, average = 700, throughput = 1)
+    public void testCreateItems() throws SQLException, AuthorizeException
+    {
+        //we create the structure
+        context.turnOffAuthorisationSystem();
+        Community parent = communityService.create(null, context);
+        Community child1 = communityService.create(parent, context);
+        
+        Collection col1 = collectionService.create(context, child1);
+        Collection col2 = collectionService.create(context, child1);
+        
+        Item item1 = installItemService.installItem(context, workspaceItemService.create(context, col1, false));
+        Item item2 = installItemService.installItem(context, workspaceItemService.create(context, col2, false));
+
+        context.restoreAuthSystemState();
+
+        //verify it works as expected
+        assertThat("testCreateItems 0", (Collection) itemService.getParentObject(context, item1), equalTo(col1));
+        assertThat("testCreateItems 1", (Collection) itemService.getParentObject(context, item2), equalTo(col2));
+    }
 
      /**
       * Tests that count items works as expected
       */
     @Test
-    @PerfTest(invocations = 50, threads = 1)
+    @PerfTest(invocations = 25, threads = 1)
     @Required(percentile95 = 2000, average= 1800)
     public void testCountItems() throws SQLException, AuthorizeException, IOException {
         //make it an even number, not too high to reduce time during testing
