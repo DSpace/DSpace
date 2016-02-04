@@ -1821,7 +1821,7 @@
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
-                                        select="string('http://http://www.elifesciences.org/the-journal/')"/>
+                                        select="string('http://www.elifesciences.org/the-journal/')"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
