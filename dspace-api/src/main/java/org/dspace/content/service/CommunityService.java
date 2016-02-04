@@ -243,13 +243,6 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
 
     public void canEdit(Context context, Community community) throws AuthorizeException, SQLException;
 
-    /**
-    * counts items in this community
-    *
-    * @return  total items
-    */
-    public int countItems(Context context, Community community) throws SQLException;
-
     public Community findByAdminGroup(Context context, Group group) throws SQLException;
 
     public List<Community> findAuthorized(Context context, List<Integer> actions) throws SQLException;

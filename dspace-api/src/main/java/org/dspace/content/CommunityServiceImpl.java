@@ -571,22 +571,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     }
 
     @Override
-    public int countItems(Context context, Community community) throws SQLException {
-        int total = 0;
-       	// add collection counts
-        List<Collection> cols = community.getCollections();
-        for (Collection col : cols) {
-            total += itemService.countItems(context, col);
-        }
-        // add sub-community counts
-        List<Community> comms = community.getSubcommunities();
-        for (int j = 0; j < comms.size(); j++) {
-            total += countItems(context, comms.get(j));
-        }
-        return total;
-    }
-
-    @Override
     public Community findByAdminGroup(Context context, Group group) throws SQLException {
         return communityDAO.findByAdminGroup(context, group);
     }
