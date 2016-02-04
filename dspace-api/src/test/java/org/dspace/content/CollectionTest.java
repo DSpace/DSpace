@@ -1961,6 +1961,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     {
         //0 by default
         assertTrue("testCountItems 0", itemService.countItems(context, collection) == 0);
+        
+        //NOTE: a more thorough test of item counting is in ITCommunityCollection integration test
     }
 
     /**
