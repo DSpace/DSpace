@@ -113,7 +113,7 @@ public class WorkflowManager
     private static Map<Integer, Boolean> noEMail = new HashMap<Integer, Boolean>();
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(WorkflowManager.class);
+    private static final Logger log = Logger.getLogger(WorkflowManager.class);
 
     /**
      * Translate symbolic name of workflow state into number.
@@ -214,7 +214,7 @@ public class WorkflowManager
     {
         ArrayList<WorkflowItem> mylist = new ArrayList<WorkflowItem>();
 
-        String myquery = "SELECT * FROM WorkflowItem WHERE owner= ? ";
+        String myquery = "SELECT * FROM WorkflowItem WHERE owner= ? ORDER BY workflow_id";
 
         TableRowIterator tri = DatabaseManager.queryTable(c,
         		"workflowitem", myquery,e.getID());
@@ -250,7 +250,7 @@ public class WorkflowManager
 
         String myquery = "SELECT workflowitem.* FROM workflowitem, TaskListItem" +
         		" WHERE tasklistitem.eperson_id= ? " +
-        		" AND tasklistitem.workflow_id=workflowitem.workflow_id";
+			" AND tasklistitem.workflow_id=workflowitem.workflow_id ORDER BY workflowitem.workflow_id";
 
         TableRowIterator tri = DatabaseManager
                 .queryTable(c, "workflowitem", myquery, e.getID());
@@ -786,7 +786,8 @@ public class WorkflowManager
         catch (MessagingException e)
         {
             log.warn(LogManager.getHeader(c, "notifyOfArchive",
-                    "cannot email user" + " item_id=" + i.getID()));
+                    "cannot email user; item_id=" + i.getID()
+                    + ":  " + e.getMessage()));
         }
     }
 
@@ -951,8 +952,9 @@ public class WorkflowManager
         }
         catch (MessagingException e)
         {
-            log.warn(LogManager.getHeader(c, "notifyOfCuration", "cannot email users" +
-                                          " of workflow_item_id" + wi.getID()));
+            log.warn(LogManager.getHeader(c, "notifyOfCuration",
+                    "cannot email users of workflow_item_id " + wi.getID()
+                            + ":  " + e.getMessage()));
         }
     }
 
@@ -1036,8 +1038,9 @@ public class WorkflowManager
                 String gid = (mygroup != null) ?
                              String.valueOf(mygroup.getID()) : "none";
                 log.warn(LogManager.getHeader(c, "notifyGroupofTask",
-                        "cannot email user" + " group_id" + gid
-                                + " workflow_item_id" + wi.getID()));
+                        "cannot email user group_id=" + gid
+                                + " workflow_item_id=" + wi.getID()
+                                + ":  " + e.getMessage()));
             }
         }
     }
@@ -1083,9 +1086,10 @@ public class WorkflowManager
         {
             // log this email error
             log.warn(LogManager.getHeader(c, "notify_of_reject",
-                    "cannot email user" + " eperson_id" + e.getID()
-                            + " eperson_email" + e.getEmail()
-                            + " workflow_item_id" + wi.getID()));
+                    "cannot email user eperson_id=" + e.getID()
+                            + " eperson_email=" + e.getEmail()
+                            + " workflow_item_id=" + wi.getID()
+                            + ":  " + re.getMessage()));
 
             throw re;
         }
@@ -1093,9 +1097,10 @@ public class WorkflowManager
         {
             // log this email error
             log.warn(LogManager.getHeader(c, "notify_of_reject",
-                    "cannot email user" + " eperson_id" + e.getID()
-                            + " eperson_email" + e.getEmail()
-                            + " workflow_item_id" + wi.getID()));
+                    "cannot email user eperson_id=" + e.getID()
+                            + " eperson_email=" + e.getEmail()
+                            + " workflow_item_id=" + wi.getID()
+                            + ":  " + ex.getMessage()));
         }
     }
 

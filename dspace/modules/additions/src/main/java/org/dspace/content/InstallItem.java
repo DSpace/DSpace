@@ -230,7 +230,7 @@ public class InstallItem
 
         // Notify interested parties of newly archived Item
         c.addEvent(new Event(Event.INSTALL, Constants.ITEM, item.getID(),
-                item.getHandle()));
+                item.getHandle(), item.getIdentifiers(c)));
 
         // remove in-progress submission
         is.deleteWrapper();

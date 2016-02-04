@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,12 +39,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -73,6 +76,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Metadatum;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
@@ -681,14 +685,14 @@ public class ItemImport
         if (dataLoader!=null){
             System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
 
-        	te.setDataLoader(dataLoader);
+		te.setDataLoader(dataLoader);
 
-        	DSpaceOutputGenerator outputGenerator = new DSpaceOutputGenerator(outputMap);
-        	outputGenerator.setOutputDirectory(outputFolder);
+		DSpaceOutputGenerator outputGenerator = new DSpaceOutputGenerator(outputMap);
+		outputGenerator.setOutputDirectory(outputFolder);
 
-        	te.setOutputGenerator(outputGenerator);
+		te.setOutputGenerator(outputGenerator);
 
-        	try {
+		try {
         		TransformationResult res = te.transform(new TransformationSpec());
         		List<String> output = res.getOutput();
         		outputGenerator.writeOutput(output);
@@ -1265,21 +1269,21 @@ public class ItemImport
         else
         {
             // If we're just test the import, let's check that the actual metadata field exists.
-        	MetadataSchema foundSchema = MetadataSchema.find(c,schema);
+		MetadataSchema foundSchema = MetadataSchema.find(c,schema);
 
-        	if (foundSchema == null)
-        	{
-        		System.out.println("ERROR: schema '"+schema+"' was not found in the registry.");
-        		return;
-        	}
+		if (foundSchema == null)
+		{
+			System.out.println("ERROR: schema '"+schema+"' was not found in the registry.");
+			return;
+		}
 
-        	int schemaID = foundSchema.getSchemaID();
-        	MetadataField foundField = MetadataField.findByElement(c, schemaID, element, qualifier);
+		int schemaID = foundSchema.getSchemaID();
+		MetadataField foundField = MetadataField.findByElement(c, schemaID, element, qualifier);
 
-        	if (foundField == null)
-        	{
-        		System.out.println("ERROR: Metadata field: '"+schema+"."+element+"."+qualifier+"' was not found in the registry.");
-        		return;
+		if (foundField == null)
+		{
+			System.out.println("ERROR: Metadata field: '"+schema+"."+element+"."+qualifier+"' was not found in the registry.");
+			return;
             }
         }
     }
@@ -1752,7 +1756,7 @@ public class ItemImport
      */
     private void registerBitstream(Context c, Item i, int assetstore,
             String bitstreamPath, String bundleName, String description )
-        	throws SQLException, IOException, AuthorizeException
+		throws SQLException, IOException, AuthorizeException
     {
         // TODO validate assetstore number
         // TODO make sure the bitstream is there
