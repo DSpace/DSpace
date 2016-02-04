@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.core.Context;
@@ -25,10 +24,8 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.type.StandardBasicTypes;
-import org.hibernate.type.Type;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -237,6 +234,18 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
         return count(query);
     }
+    
+    @Override
+    public int countItems(Context context, List<Collection> collections, boolean includeArchived, boolean includeWithdrawn) throws SQLException {
+        Query query = createQuery(context, "select count(distinct i) from Item i " +
+                                            "join i.collections collection " +
+                                            "WHERE collection IN (:collections) AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
+        query.setParameterList("collections", collections);
+        query.setParameter("in_archive", includeArchived);
+        query.setParameter("withdrawn", includeWithdrawn);
+
+        return count(query);
+    }
 
     @Override
     public Iterator<Item> findByLastModifiedSince(Context context, Date since)
@@ -253,12 +262,10 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    public int countNotArchived(Context context) throws SQLException {
-        return count(createQuery(context, "SELECT count(*) FROM Item i WHERE i.inArchive=false AND i.withdrawn=false"));
-    }
-
-    @Override
-    public int countWithdrawn(Context context) throws SQLException {
-        return count(createQuery(context, "SELECT count(*) FROM Item i WHERE i.withdrawn=true"));
+    public int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException {
+        Query query = createQuery(context, "SELECT count(*) FROM Item i WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
+        query.setParameter("in_archive", includeArchived);
+        query.setParameter("withdrawn", includeWithdrawn);
+        return count(query); 
     }
 }

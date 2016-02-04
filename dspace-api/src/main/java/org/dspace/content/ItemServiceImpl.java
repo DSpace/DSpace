@@ -1116,12 +1116,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public int countItems(Context context, Community community) throws SQLException {
+        // First we need a list of all collections under this community in the hierarchy
         List<Collection> collections = communityService.getAllCollections(context, community);
-        int itemCount = 0;
-        for(Collection collection : collections) {
-            itemCount += countItems(context, collection);
-        }
-        return itemCount;
+        
+        // Now, lets count unique items across that list of collections
+        return itemDAO.countItems(context, collections, true, false);
     }
 
     @Override
@@ -1161,12 +1160,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public int getNotArchivedItemsCount(Context context) throws SQLException {
-        return itemDAO.countNotArchived(context);
+    public int countNotArchivedItems(Context context) throws SQLException {
+        // return count of items not in archive and also not withdrawn
+        return itemDAO.countItems(context, false, false);
     }
 
     @Override
     public int countWithdrawnItems(Context context) throws SQLException {
-        return itemDAO.countWithdrawn(context);
+       // return count of items that are in archive and withdrawn
+       return itemDAO.countItems(context, true, true);
     }
 }
