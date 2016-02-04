@@ -595,4 +595,8 @@ public class Context
     public void shutDownDatabase() throws SQLException {
         dbConnection.shutdown();
     }
+
+	public void clearCache() throws SQLException {
+		this.getDBConnection().clearCache();
+	}
 }
