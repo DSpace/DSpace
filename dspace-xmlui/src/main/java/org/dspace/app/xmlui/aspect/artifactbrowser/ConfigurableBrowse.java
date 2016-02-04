@@ -46,12 +46,11 @@ import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.authority.ChoiceAuthorityServiceImpl;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
@@ -685,7 +684,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             if(!request.getParameters().containsKey("type"))
             {
                 // default to first browse index.
-                String defaultBrowseIndex = ConfigurationManager.getProperty("webui.browse.index.1");
+                String defaultBrowseIndex = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.browse.index.1");
                 if(defaultBrowseIndex != null)
                 {
                     type = defaultBrowseIndex.split(":")[0];
@@ -852,7 +851,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             if (params.etAl < 0)
             {
                 // there is no limit, or the UI says to use the default
-                int etAl = ConfigurationManager.getIntProperty("webui.browse.author-limit");
+                int etAl = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("webui.browse.author-limit");
                 if (etAl != 0)
                 {
                     this.browseInfo.setEtAl(etAl);

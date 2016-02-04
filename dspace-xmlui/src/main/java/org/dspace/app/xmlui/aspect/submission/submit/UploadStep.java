@@ -41,7 +41,7 @@ import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -192,7 +192,7 @@ public class UploadStep extends AbstractSubmissionStep
         Item item = submission.getItem();
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
-        boolean disableFileEditing = (submissionInfo.isInWorkflow()) && !ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
+        boolean disableFileEditing = (submissionInfo.isInWorkflow()) && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("workflow.reviewer.file-edit");
         java.util.List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
         java.util.List<Bitstream> bitstreams = new ArrayList<>();
         if (bundles.size() > 0)
@@ -375,7 +375,7 @@ public class UploadStep extends AbstractSubmissionStep
     public void make_sherpaRomeo_submission(Item item, Division divIn) throws WingException {
 
 
-        if (ConfigurationManager.getBooleanProperty("webui.submission.sherparomeo-policy-enabled", true)){
+        if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.sherparomeo-policy-enabled", true)){
 
             SHERPASubmitService sherpaSubmitService = new DSpace().getSingletonService(SHERPASubmitService.class);
 

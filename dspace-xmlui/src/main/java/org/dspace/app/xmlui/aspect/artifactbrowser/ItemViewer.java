@@ -52,7 +52,6 @@ import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.app.xmlui.wing.element.Metadata;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.slf4j.Logger;
@@ -89,7 +88,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 	/** XHTML crosswalk instance */
 	private DisseminationCrosswalk xHTMLHeadCrosswalk = null;
 
-	private final String sfxFile = ConfigurationManager.getProperty("dspace.dir")
+	private final String sfxFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
             + File.separator + "config" + File.separator + "sfx.xml";
 
 	private String sfxQuery = null;
@@ -191,7 +190,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addTrail().addContent(T_trail);
 
         // Add SFX link
-        String sfxserverUrl = ConfigurationManager.getProperty("sfx.server.url");
+        String sfxserverUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.url");
         if (sfxserverUrl != null && sfxserverUrl.length() > 0)
         {
             sfxQuery = "";
@@ -267,13 +266,13 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             md.addContent(idValue);
         }
 
-        String sfxserverImg = ConfigurationManager.getProperty("sfx.server.image_url");
+        String sfxserverImg = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.image_url");
         if (sfxserverImg != null && sfxserverImg.length() > 0)
         {
             pageMeta.addMetadata("sfx","image_url").addContent(sfxserverImg);
         }
 
-        boolean googleEnabled = ConfigurationManager.getBooleanProperty(
+        boolean googleEnabled = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
             "google-metadata.enable", false);
 
         if (googleEnabled)

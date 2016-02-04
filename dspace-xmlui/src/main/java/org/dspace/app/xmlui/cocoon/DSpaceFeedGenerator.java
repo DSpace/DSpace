@@ -34,14 +34,12 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.FeedUtils;
 import org.dspace.app.util.SyndicationFeed;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowserScope;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.sort.SortException;
@@ -50,7 +48,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -100,7 +98,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     private String handle = null;
     
     /** number of DSpace items per feed */
-    private static final int ITEM_COUNT = ConfigurationManager.getIntProperty("webui.feed.items");
+    private static final int ITEM_COUNT = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("webui.feed.items");
     
     /**
      * How long should RSS feed cache entries be valid? milliseconds * seconds *
@@ -111,12 +109,12 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     static
     {
         final String ageCfgName = "webui.feed.cache.age";
-        final long ageCfg = ConfigurationManager.getIntProperty(ageCfgName, 24);
+        final long ageCfg = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty(ageCfgName, 24);
         CACHE_AGE = 1000 * 60 * 60 * ageCfg;
     }
     
     /** configuration option to include Item which does not have READ by Anonymous enabled **/
-    private static boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", true);
+    private static boolean includeRestrictedItems = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("harvest.includerestricted.rss", true);
 
 
     /** Cache of this object's validitity */
@@ -269,7 +267,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             return recentSubmissionItems;
         }
 
-        String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
+        String source = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("recent.submissions.sort-option");
         BrowserScope scope = new BrowserScope(context);
         if (dso instanceof Collection)
         {

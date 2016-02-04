@@ -26,7 +26,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -262,7 +262,7 @@ public class AuthenticationUtil
             if (id != null)
             {
                 // Should we check for an ip match from the start of the request to now?
-                boolean ipcheck = ConfigurationManager.getBooleanProperty("xmlui.session.ipcheck", true);
+                boolean ipcheck = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.session.ipcheck", true);
 
                 String address = (String)session.getAttribute(CURRENT_IP_ADDRESS);
                 if (!ipcheck || (address != null && address.equals(request.getRemoteAddr())))
@@ -320,7 +320,7 @@ public class AuthenticationUtil
     throws SQLException, AuthorizeException
     {
     	// Only allow loginAs if the administrator has allowed it.
-    	if (!ConfigurationManager.getBooleanProperty("webui.user.assumelogin", false))
+    	if (!DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.user.assumelogin", false))
         {
             return;
         }

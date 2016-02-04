@@ -19,7 +19,7 @@ import org.apache.excalibur.source.Source;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.TimeStampValidity;
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.mozilla.javascript.EvaluatorException;
 import org.xml.sax.SAXException;
 
@@ -197,7 +197,7 @@ public class ConcatenationReader extends ResourceReader {
         inputStream = new SequenceInputStream(streamEnumeration);
 
         try {
-            if (ConfigurationManager.getBooleanProperty("xmlui.theme.enableMinification",false) && this.doMinify) {
+            if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.theme.enableMinification",false) && this.doMinify) {
                 compressedOutput(inputStream);
             } else {
                 normalOutput(inputStream);

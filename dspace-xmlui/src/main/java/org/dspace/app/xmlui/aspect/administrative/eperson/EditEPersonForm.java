@@ -28,10 +28,9 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -318,7 +317,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	       
 	        Button submitLoginAs = special.addButton("submit_login_as");
 	        submitLoginAs.setValue(T_submit_login_as);
-	        if (!ConfigurationManager.getBooleanProperty("webui.user.assumelogin", false))
+	        if (!DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.user.assumelogin", false))
             {
                 submitLoginAs.setDisabled();
             }

@@ -13,11 +13,10 @@ import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -70,7 +69,7 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
                     continue;
                 }
                 //If one isn't admin enabled no need to check for admin
-                if(!ConfigurationManager.getBooleanProperty("google-analytics", "authorization.admin." + statisticsDisplayType, true)){
+                if(!DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("google-analytics.authorization.admin." + statisticsDisplayType, true)){
                     adminCheckNeeded = false;
                 }
             }

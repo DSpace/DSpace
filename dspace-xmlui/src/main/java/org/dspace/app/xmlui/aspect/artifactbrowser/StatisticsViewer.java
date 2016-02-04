@@ -16,10 +16,9 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.statistics.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -90,7 +89,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
             try
             {
                 initialise();
-                boolean showReport = ConfigurationManager.getBooleanProperty("report.public");
+                boolean showReport = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("report.public");
 
                 // If the report isn't public
                 if (!showReport)
@@ -207,7 +206,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
             IOException, AuthorizeException
     {
         initialise();
-        boolean publicise = ConfigurationManager.getBooleanProperty("report.public");
+        boolean publicise = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("report.public");
 
         // Check that the reports are either public, or user is an administrator
         if (!publicise && !authorizeService.isAdmin(context))
@@ -539,7 +538,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         {
             mainTitle = "Statistics for " + name;
 
-            if (ConfigurationManager.getBooleanProperty("report.show.server", true))
+            if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("report.show.server", true))
             {
                 mainTitle += " on " + serverName;
             }

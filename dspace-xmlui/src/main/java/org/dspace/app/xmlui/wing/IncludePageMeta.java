@@ -16,7 +16,7 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -171,7 +171,7 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
         }
 
         // concatenation
-        if (ConfigurationManager.getBooleanProperty("xmlui.theme.enableConcatenation",false)) {
+        if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.theme.enableConcatenation",false)) {
             metadataList = enableConcatenation();
         }
     }

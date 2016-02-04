@@ -25,7 +25,7 @@ import org.apache.cocoon.environment.Response;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.reading.AbstractReader;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import org.apache.log4j.Logger;
@@ -125,7 +125,7 @@ public class SitemapReader extends AbstractReader implements Recyclable
     private void sendFile(String file, 
             boolean compressed) throws IOException, ResourceNotFoundException
     {
-        File f = new File(ConfigurationManager.getProperty("sitemap.dir"), file);
+        File f = new File(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sitemap.dir"), file);
 
         HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 

@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestSchedulingService;
 
@@ -65,7 +65,7 @@ public class DSpaceCocoonServletFilter implements Filter
     		webappConfigPath = arg0.getServletContext().getRealPath("/") 
     				+ File.separator + "WEB-INF" + File.separator + "xmlui.xconf";
     		
-    		installedConfigPath = ConfigurationManager.getProperty("dspace.dir")
+    		installedConfigPath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
 	                + File.separator + "config" + File.separator + "xmlui.xconf";
     		
 	        XMLUIConfiguration.loadConfig(webappConfigPath,installedConfigPath);
@@ -85,7 +85,7 @@ public class DSpaceCocoonServletFilter implements Filter
     				"DSpace configuration directory. \n\n",e);
     	}
    
-		if (ConfigurationManager.getBooleanProperty("oai", "harvester.autoStart"))
+		if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("oai.harvester.autoStart"))
     	{
     		try {
                 harvestSchedulingService.startNewScheduler();
@@ -144,12 +144,12 @@ public class DSpaceCocoonServletFilter implements Filter
                     realResponse.sendRedirect(locationWithTrailingSlash);
                 }    
 	        // if force ssl is on and the user has authenticated and the request is not secure redirect to https
-                else if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl"))
+                else if ((DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.force.ssl"))
                         && (AuthenticationUtil.isLoggedIn(realRequest))
                         && (!realRequest.isSecure()))
                 {
                     StringBuffer location = new StringBuffer("https://");
-                    location.append(ConfigurationManager.getProperty("dspace.hostname"))
+                    location.append(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname"))
                         .append(realRequest.getRequestURI())
                             .append(realRequest.getQueryString() == null ? ""
                                     : ("?" + realRequest.getQueryString()));

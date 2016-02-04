@@ -20,7 +20,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -156,7 +156,7 @@ public class UploadWithEmbargoStep extends UploadStep
             editPolicy=null;
         }
 
-        isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        isAdvancedFormEnabled=DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
     }
 
     public void addPageMeta(PageMeta pageMeta) throws WingException, AuthorizeException, IOException, SAXException, SQLException {
@@ -187,7 +187,7 @@ public class UploadWithEmbargoStep extends UploadStep
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
 		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
-		boolean disableFileEditing = (submissionInfo.isInWorkflow()) && !ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
+		boolean disableFileEditing = (submissionInfo.isInWorkflow()) && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("workflow.reviewer.file-edit");
         java.util.List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
         java.util.List<Bitstream> bitstreams = new ArrayList<>();
 		if (bundles.size() > 0)
