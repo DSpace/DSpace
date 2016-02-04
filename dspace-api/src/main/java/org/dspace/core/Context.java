@@ -598,6 +598,6 @@ public class Context
     }
     
     public void clearCache() throws SQLException {
-    	((Session)this.getDBConnection().getSession()).clear();
+    	this.getDBConnection().clearCache();
     }
 }
