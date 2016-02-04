@@ -44,7 +44,7 @@ public class XMLUIStartSubmissionLookupStep extends AbstractProcessingStep {
         String publicationID = request.getParameter("publication_id");
 
         if (StringUtils.isNotBlank(publicationID)) {
-            ImportService importService = new DSpace().getServiceManager().getServiceByName(null, ImportService.class);
+            ImportService importService = new DSpace().getServiceManager().getServiceByName("importService", ImportService.class);
             Item item = subInfo.getSubmissionItem().getItem();
             try {
             ImportRecord   record = importService.getRecord(getPublicationUrl(), publicationID);

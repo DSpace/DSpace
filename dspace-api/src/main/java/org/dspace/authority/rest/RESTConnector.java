@@ -47,6 +47,9 @@ public class RESTConnector {
         String fullPath = url + '/' + path;
         HttpGet httpGet = new HttpGet(fullPath);
         try {
+            if(log.isDebugEnabled()){
+                log.debug("Retrieving document from path : "+ fullPath);
+            }
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpResponse getResponse = httpClient.execute(httpGet);
             //do not close this httpClient

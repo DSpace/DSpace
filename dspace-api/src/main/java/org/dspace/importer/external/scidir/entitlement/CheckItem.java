@@ -20,7 +20,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathExpressionException;
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Set;
 
@@ -68,9 +72,21 @@ public abstract class CheckItem {
         if (response != null) {
             try {
                 Node hostingNode = XMLUtils.getNode(response, getCheckNodeXPath());
-
-                Node hostingAllowedNode = XMLUtils.getNode(hostingNode, "hosting-platform[@type='non-commercial']/document-version[journal_article_version/text()='AM']/hosting-allowed");
-
+                Node hostingAllowedNode;
+                if(hostingNode==null){
+                    // If the hostingNode == null
+                    // -> Log the response and return the initially created articelAcces object since it's no use continuing the processing
+                    TransformerFactory tf = TransformerFactory.newInstance();
+                    Transformer transformer = tf.newTransformer();
+                    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                    StringWriter writer = new StringWriter();
+                    transformer.transform(new DOMSource(response), new StreamResult(writer));
+                    String output = writer.getBuffer().toString().replaceAll("\n|\r", "");
+                    log.warn("Error retrieving required nodes from the response: "+output);
+                    return articleAccess;
+                }else{
+                    hostingAllowedNode = XMLUtils.getNode(hostingNode, "hosting-platform[@type='non-commercial']/document-version[journal_article_version/text()='AM']/hosting-allowed");
+                }
                 if (hostingAllowedNode != null) {
                     NamedNodeMap attributes = hostingAllowedNode.getAttributes();
 
@@ -78,6 +94,10 @@ public abstract class CheckItem {
                     articleAccess.setStartDate(attributes.getNamedItem("start_date").getTextContent());
                 }
             } catch (XPathExpressionException e) {
+                log.error("Error", e);
+            } catch (TransformerConfigurationException e) {
+                log.error("Error", e);
+            } catch (TransformerException e) {
                 log.error("Error", e);
             }
         }
