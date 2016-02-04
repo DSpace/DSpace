@@ -369,10 +369,10 @@ public class EditProfile extends AbstractDSpaceTransformer
             subscriptions.enableDeleteOperation();
 
             subscriptions.addOption(-1, T_select_collection);
-            for (Collection possible : possibleList)
+            CollectionDropDown.CollectionPathEntry[] possibleEntries = CollectionDropDown.annotateWithPaths(possibleList);
+            for (CollectionDropDown.CollectionPathEntry possible : possibleEntries)            
             {
-                subscriptions.addOption(possible.getID(),
-                        CollectionDropDown.collectionPath(possible));
+                subscriptions.addOption(possible.collection.getID(), possible.path);
             }
 
             for (Collection collection : currentList)

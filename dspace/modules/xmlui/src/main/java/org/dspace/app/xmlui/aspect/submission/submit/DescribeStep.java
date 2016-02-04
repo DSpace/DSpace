@@ -141,8 +141,11 @@ public class DescribeStep extends AbstractSubmissionStep
     {
         super.addPageMeta(pageMeta);
         int collectionID = submission.getCollection().getID();
-        pageMeta.addMetadata("choice", "collection").addContent(
-                String.valueOf(collectionID));
+        pageMeta.addMetadata("choice", "collection").addContent(String.valueOf(collectionID));
+        pageMeta.addMetadata("stylesheet", "screen", "datatables", true).addContent("../../static/Datatables/DataTables-1.8.0/media/css/datatables.css");
+        pageMeta.addMetadata("javascript", "static", "datatables", true).addContent("static/Datatables/DataTables-1.8.0/media/js/jquery.dataTables.min.js");
+        pageMeta.addMetadata("stylesheet", "screen", "person-lookup", true).addContent("../../static/css/authority/person-lookup.css");
+        pageMeta.addMetadata("javascript", null, "person-lookup", true).addContent("../../static/js/person-lookup.js");
 
         String jumpTo = submissionInfo.getJumpToField();
         if (jumpTo != null)
@@ -186,10 +189,9 @@ public class DescribeStep extends AbstractSubmissionStep
 
         // Fetch the document type (dc.type)
         String documentType = "";
-        if ((item.getMetadata("dc.type") != null)
-                && (item.getMetadata("dc.type").length > 0))
+        if( (item.getMetadataByMetadataString("dc.type") != null) && (item.getMetadataByMetadataString("dc.type").length >0) )
         {
-            documentType = item.getMetadata("dc.type")[0].value;
+            documentType = item.getMetadataByMetadataString("dc.type")[0].value;
         }
 
         // Iterate over all inputs and add it to the form.

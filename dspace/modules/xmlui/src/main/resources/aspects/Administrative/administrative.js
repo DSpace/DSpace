@@ -36,6 +36,7 @@ importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowAuthorizatio
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowCurationUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMetadataImportUtils);
+importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowBatchImportUtils);
 importClass(Packages.java.lang.System);
 importClass(Packages.org.dspace.core.ConfigurationManager);
 
@@ -574,6 +575,18 @@ function startMetadataImport() {
 	cocoon.redirectTo(cocoon.request.getContextPath());
 	getDSContext().complete();
 	cocoon.exit();
+}
+
+function startBatchImport()
+{
+
+    assertAdministrator();
+
+    doBatchImport();
+
+    cocoon.redirectTo(cocoon.request.getContextPath());
+    getDSContext().complete();
+    cocoon.exit();
 }
 
 /**
@@ -2281,6 +2294,61 @@ function doMetadataImportConfirm() {
 	assertAdministrator();
 	sendPageAndWait("admin/metadataimport/confirm", {}, result);
 	return null;
+}
+
+/**
+ * Manage batch metadata import
+ *
+ */
+
+function doBatchImport()
+{
+    var result;
+
+    assertAdministrator();
+    do
+    {
+        sendPageAndWait("admin/batchimport/main",{},result);
+        result = null;
+
+        if (cocoon.request.get("submit_upload"))
+        {
+            result = doBatchImportUpload();
+
+        }
+
+    } while (true);
+}
+
+function doBatchImportUpload()
+{
+    var result = FlowBatchImportUtils.processUploadZIP(getDSContext(),cocoon.request);
+
+    assertAdministrator();
+    do
+    {
+        sendPageAndWait("admin/batchimport/upload",{},result);
+        result = null;
+
+        if (cocoon.request.get("submit_return"))
+        {
+            return null;
+        }
+        else if (cocoon.request.get("submit_confirm"))
+        {
+
+            result = doBatchImportConfirm();
+            return result;
+        }
+    } while (true);
+}
+
+function doBatchImportConfirm()
+{
+    var result = FlowBatchImportUtils.processBatchImport(getDSContext(),cocoon.request);
+    assertAdministrator();
+    sendPageAndWait("admin/batchimport/confirm",{},result);
+    return null;
 }
 
 /**
