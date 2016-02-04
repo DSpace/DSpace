@@ -74,7 +74,7 @@ public class ItemCheck extends Check {
                 "Withdrawn items: %d\n", itemService.countWithdrawnItems(context));
             ret += String.format(
                 "Not published items (in workspace or workflow mode): %d\n",
-                itemService.getNotArchivedItemsCount(context));
+                itemService.countNotArchivedItems(context));
 
             for (Map.Entry<Integer, Long> row : workspaceItemService.getStageReachedCounts(context)) {
                 ret += String.format("\tIn Stage %s: %s\n",
