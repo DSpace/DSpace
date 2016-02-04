@@ -115,7 +115,7 @@
                 <configuration>
                     <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                          maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
-                    <argLine>${surefire.argLine}</argLine>
+                    <argLine>${test.argLine}</argLine>
                     <!-- tests whose name starts by Abstract will be ignored -->
                     <excludes>
                         <exclude>**/Abstract*</exclude>
@@ -132,6 +132,9 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
+                   <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
+                        maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
+                   <argLine>${test.argLine}</argLine>
                    <excludes>
                       <exclude>**/Abstract*</exclude>
                    </excludes>
@@ -295,19 +298,19 @@
            </properties>
        </profile>
 
-        <!-- Allow for passing extra memory to Unit tests (via maven-surefire-plugin).
+        <!-- Allow for passing extra memory to Unit/Integration tests.
              By default this gives unit tests 512MB of memory (when tests are enabled), 
-             unless tweaked on commandline (e.g. "-Dsurefire.argLine=-Xmx512m"). Since 
-             m-surefire-p forks a new JVM for testing, it ignores MAVEN_OPTS. -->
+             unless tweaked on commandline (e.g. "-Dtest.argLine=-Xmx512m"). Since 
+             m-surefire-p and m-failsafe-p both fork a new JVM for testing, they ignores MAVEN_OPTS. -->
         <profile>
-            <id>surefire-argLine</id>
+            <id>test-argLine</id>
             <activation>
                 <property>
-                    <name>!surefire.argLine</name>
+                    <name>!test.argLine</name>
                 </property>
             </activation>
             <properties>
-                <surefire.argLine>-Xmx512m</surefire.argLine>
+                <test.argLine>-Xmx512m</test.argLine>
             </properties>
         </profile>
 
