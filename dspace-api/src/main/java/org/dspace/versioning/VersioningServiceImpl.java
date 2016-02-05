@@ -42,6 +42,11 @@ public class VersioningServiceImpl implements VersioningService {
     private DefaultItemVersionProvider provider;
 
 
+    protected VersioningServiceImpl()
+    {
+
+    }
+
     /** Service Methods */
     @Override
     public Version createNewVersion(Context c, Item item){

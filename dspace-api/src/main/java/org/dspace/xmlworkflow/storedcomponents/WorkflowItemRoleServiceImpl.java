@@ -30,6 +30,11 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
     @Autowired(required = true)
     private WorkflowItemRoleDAO workflowItemRoleDAO;
 
+    protected WorkflowItemRoleServiceImpl()
+    {
+
+    }
+
     @Override
     public List<WorkflowItemRole> find(Context context, XmlWorkflowItem workflowItem, String role) throws SQLException {
         return workflowItemRoleDAO.findByWorkflowItemAndRole(context, workflowItem, role);

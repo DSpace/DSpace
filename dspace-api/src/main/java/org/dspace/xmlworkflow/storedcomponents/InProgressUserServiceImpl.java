@@ -29,6 +29,11 @@ public class InProgressUserServiceImpl implements InProgressUserService {
     @Autowired(required = true)
     protected InProgressUserDAO inProgressUserDAO;
 
+    protected InProgressUserServiceImpl()
+    {
+
+    }
+
     @Override
     public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson) throws SQLException {
         return inProgressUserDAO.findByWorkflowItemAndEPerson(context, workflowItem, ePerson);

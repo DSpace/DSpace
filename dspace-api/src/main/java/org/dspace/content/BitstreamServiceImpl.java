@@ -59,6 +59,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Autowired(required = true)
     protected BitstreamStorageService bitstreamStorageService;
 
+    protected BitstreamServiceImpl()
+    {
+        super();
+    }
 
     @Override
     public Bitstream find(Context context, UUID id) throws SQLException {

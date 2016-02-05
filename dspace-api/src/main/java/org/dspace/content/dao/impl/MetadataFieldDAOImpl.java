@@ -26,7 +26,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> implements MetadataFieldDAO {
+public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> implements MetadataFieldDAO
+{
+    protected MetadataFieldDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public MetadataField find(Context context, int metadataFieldId, MetadataSchema metadataSchema, String element,

@@ -123,6 +123,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     private HttpSolrServer solr = null;
 
 
+    protected SolrServiceImpl()
+    {
+
+    }
+
     protected HttpSolrServer getSolr()
     {
         if ( solr == null)

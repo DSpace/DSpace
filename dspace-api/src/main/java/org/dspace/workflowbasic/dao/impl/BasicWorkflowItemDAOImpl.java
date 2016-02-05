@@ -29,7 +29,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflowItem> implements BasicWorkflowItemDAO {
+public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflowItem> implements BasicWorkflowItemDAO
+{
+    protected BasicWorkflowItemDAOImpl()
+    {
+        super();
+    }
 
 
     @Override

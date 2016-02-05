@@ -26,7 +26,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> implements CollectionRoleDAO {
+public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> implements CollectionRoleDAO
+{
+    protected CollectionRoleDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public List<CollectionRole> findByCollection(Context context, Collection collection) throws SQLException {

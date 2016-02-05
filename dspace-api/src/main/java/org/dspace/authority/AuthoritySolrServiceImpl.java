@@ -33,6 +33,10 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
     private static final Logger log = Logger.getLogger(AuthoritySolrServiceImpl.class);
 
+    protected AuthoritySolrServiceImpl()
+    {
+
+    }
 
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.

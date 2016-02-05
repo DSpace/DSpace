@@ -75,6 +75,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired(required = true)
     protected VersioningService versioningService;
 
+    protected ItemServiceImpl()
+    {
+        super();
+    }
+
     @Override
     public Thumbnail getThumbnail(Context context, Item item, boolean requireOriginal) throws SQLException {
         Bitstream thumbBitstream;

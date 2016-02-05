@@ -27,7 +27,12 @@ import java.sql.SQLException;
  * @author Ben Bosman (ben at atmire dot com)
  * @author kevinvandevelde at atmire.com
  */
-public class VersionHistoryDAOImpl extends AbstractHibernateDAO<VersionHistory> implements VersionHistoryDAO {
+public class VersionHistoryDAOImpl extends AbstractHibernateDAO<VersionHistory> implements VersionHistoryDAO
+{
+    protected VersionHistoryDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public VersionHistory findByItem(Context context, Item item) throws SQLException {

@@ -53,6 +53,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     @Autowired(required = true)
     protected ResourcePolicyService resourcePolicyService;
 
+    protected BundleServiceImpl()
+    {
+        super();
+    }
+
     @Override
     public Bundle find(Context context, UUID id) throws SQLException
     {

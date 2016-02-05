@@ -60,6 +60,12 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     @Autowired(required = true)
     protected SiteService siteService;
 
+    protected CommunityServiceImpl()
+    {
+        super();
+
+    }
+
     @Override
     public Community create(Community parent, Context context) throws SQLException, AuthorizeException {
         return create(parent, context, null);

@@ -32,7 +32,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> implements CommunityDAO {
+public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> implements CommunityDAO
+{
+    protected CommunityDAOImpl()
+    {
+        super();
+    }
 
     /**
      * Get a list of all communities in the system. These are alphabetically

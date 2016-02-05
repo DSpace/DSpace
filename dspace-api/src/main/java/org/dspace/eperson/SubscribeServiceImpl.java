@@ -41,6 +41,11 @@ public class SubscribeServiceImpl implements SubscribeService
     @Autowired(required = true)
     protected CollectionService collectionService;
 
+    protected SubscribeServiceImpl()
+    {
+
+    }
+
     @Override
     public List<Subscription> findAll(Context context) throws SQLException {
         return subscriptionDAO.findAllOrderedByEPerson(context);

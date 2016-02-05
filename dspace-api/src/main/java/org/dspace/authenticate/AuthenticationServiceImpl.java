@@ -65,6 +65,10 @@ public class AuthenticationServiceImpl implements AuthenticationService, Initial
     @Autowired(required = true)
     protected EPersonService ePersonService;
 
+    protected AuthenticationServiceImpl()
+    {
+
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {

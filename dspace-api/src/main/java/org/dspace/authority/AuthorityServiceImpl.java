@@ -34,6 +34,11 @@ public class AuthorityServiceImpl implements AuthorityService{
     @Autowired(required = true)
     protected List<AuthorityIndexerInterface> indexers;
 
+    protected AuthorityServiceImpl()
+    {
+
+    }
+
     @Override
     public void indexItem(Context context, Item item) throws SQLException, AuthorizeException {
         if(!isConfigurationValid()){

@@ -26,7 +26,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> implements InProgressUserDAO {
+public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> implements InProgressUserDAO
+{
+    protected InProgressUserDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson) throws SQLException {

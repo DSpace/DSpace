@@ -72,6 +72,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     protected boolean isQuiet = false;
     protected boolean isForce = false; // default to not forced
 
+    protected MediaFilterServiceImpl()
+    {
+
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {

@@ -42,8 +42,15 @@ import java.util.UUID;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDAO {
+public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDAO
+{
     private static final Logger log = Logger.getLogger(ItemDAOImpl.class);
+
+    protected ItemDAOImpl()
+    {
+        super();
+    }
+
     @Override
     public Iterator<Item> findAll(Context context, boolean archived) throws SQLException {
         Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive");

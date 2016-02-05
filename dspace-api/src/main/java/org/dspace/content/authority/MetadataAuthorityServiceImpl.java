@@ -74,6 +74,11 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService
     /** fallback default value unless authority.minconfidence = X is configured. */
     protected int defaultMinConfidence = Choices.CF_ACCEPTED;
 
+    protected MetadataAuthorityServiceImpl()
+    {
+
+    }
+
     public void init() {
 
         if(isAuthorityRequired == null)

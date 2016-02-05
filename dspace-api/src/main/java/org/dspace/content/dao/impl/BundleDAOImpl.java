@@ -21,7 +21,12 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class BundleDAOImpl extends AbstractHibernateDSODAO<Bundle> implements BundleDAO {
+public class BundleDAOImpl extends AbstractHibernateDSODAO<Bundle> implements BundleDAO
+{
+    protected BundleDAOImpl()
+    {
+        super();
+    }
 
 
     @Override

@@ -69,6 +69,11 @@ public class MetadataExposureServiceImpl implements MetadataExposureService
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
+    protected MetadataExposureServiceImpl()
+    {
+
+    }
+
     @Override
     public boolean isHidden(Context context, String schema, String element, String qualifier)
         throws SQLException

@@ -31,7 +31,12 @@ import java.util.Map;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> implements WorkspaceItemDAO {
+public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> implements WorkspaceItemDAO
+{
+    protected WorkspaceItemDAOImpl()
+    {
+        super();
+    }
 
 
     @Override

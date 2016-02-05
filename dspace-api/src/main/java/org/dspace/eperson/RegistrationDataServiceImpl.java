@@ -27,6 +27,11 @@ public class RegistrationDataServiceImpl implements RegistrationDataService
     @Autowired(required = true)
     protected RegistrationDataDAO registrationDataDAO;
 
+    protected RegistrationDataServiceImpl()
+    {
+
+    }
+
     @Override
     public RegistrationData create(Context context) throws SQLException, AuthorizeException {
         return registrationDataDAO.create(context, new RegistrationData());

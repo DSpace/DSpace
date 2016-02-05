@@ -73,6 +73,11 @@ public class EmbargoServiceImpl implements EmbargoService
     @Autowired(required = true)
     protected PluginService pluginService;
 
+    protected EmbargoServiceImpl()
+    {
+
+    }
+
     @Override
     public void setEmbargo(Context context, Item item)
         throws SQLException, AuthorizeException

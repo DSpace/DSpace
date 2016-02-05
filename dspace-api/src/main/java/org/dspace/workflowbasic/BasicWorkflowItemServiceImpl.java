@@ -46,6 +46,11 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     protected TaskListItemService taskListItemService;
 
 
+    protected BasicWorkflowItemServiceImpl()
+    {
+
+    }
+
     @Override
     public BasicWorkflowItem create(Context context, Item item, Collection collection) throws SQLException, AuthorizeException {
         if(findByItem(context, item) != null){

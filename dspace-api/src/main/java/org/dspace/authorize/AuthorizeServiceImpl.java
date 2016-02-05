@@ -61,6 +61,11 @@ public class AuthorizeServiceImpl implements AuthorizeService
     @Autowired(required = true)
     protected WorkflowItemService workflowItemService;
 
+    protected AuthorizeServiceImpl()
+    {
+
+    }
+
     @Override
     public void authorizeAnyOf(Context c, DSpaceObject o, int[] actions)throws AuthorizeException, SQLException
     {

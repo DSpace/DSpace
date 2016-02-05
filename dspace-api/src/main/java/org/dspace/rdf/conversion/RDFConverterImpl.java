@@ -31,7 +31,7 @@ public class RDFConverterImpl implements RDFConverter
     protected List<ConverterPlugin> plugins;
     private static final Logger log = Logger.getLogger(RDFConverterImpl.class);
     
-    public RDFConverterImpl()
+    protected RDFConverterImpl()
     {
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.plugins = new ArrayList<ConverterPlugin>();

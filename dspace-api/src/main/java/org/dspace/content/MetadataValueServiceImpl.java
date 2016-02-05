@@ -40,7 +40,7 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
 
-    public MetadataValueServiceImpl() {
+    protected MetadataValueServiceImpl() {
 
     }
 

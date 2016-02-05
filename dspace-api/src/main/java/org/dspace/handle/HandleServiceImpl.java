@@ -51,7 +51,7 @@ public class HandleServiceImpl implements HandleService
     protected SiteService siteService;
 
     /** Public Constructor */
-    public HandleServiceImpl()
+    protected HandleServiceImpl()
     {
     }
 

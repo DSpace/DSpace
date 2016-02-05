@@ -25,7 +25,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> implements MetadataSchemaDAO {
+public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> implements MetadataSchemaDAO
+{
+    protected MetadataSchemaDAOImpl()
+    {
+        super();
+    }
 
     /**
      * Get the schema object corresponding to this namespace URI.

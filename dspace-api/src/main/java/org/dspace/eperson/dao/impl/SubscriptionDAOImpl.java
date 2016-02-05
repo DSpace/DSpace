@@ -28,7 +28,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> implements SubscriptionDAO {
+public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> implements SubscriptionDAO
+{
+    protected SubscriptionDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public List<Subscription> findByEPerson(Context context, EPerson eperson) throws SQLException {

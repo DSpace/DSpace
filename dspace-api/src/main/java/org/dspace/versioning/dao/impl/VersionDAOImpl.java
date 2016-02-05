@@ -29,6 +29,10 @@ import java.sql.SQLException;
  */
 public class VersionDAOImpl extends AbstractHibernateDAO<Version> implements VersionDAO
 {
+    protected VersionDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public Version findByItem(Context context, Item item) throws SQLException {

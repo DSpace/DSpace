@@ -52,6 +52,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     protected WorkflowService workflowService;
 
 
+    protected WorkspaceItemServiceImpl()
+    {
+
+    }
+
     @Override
     public WorkspaceItem find(Context context, int id) throws SQLException {
         WorkspaceItem workspaceItem = workspaceItemDAO.findByID(context, WorkspaceItem.class, id);

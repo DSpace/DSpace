@@ -26,7 +26,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> implements MetadataValueDAO {
+public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> implements MetadataValueDAO
+{
+    protected MetadataValueDAOImpl()
+    {
+        super();
+    }
 
 
     @Override

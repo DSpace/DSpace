@@ -30,6 +30,11 @@ public class VersionHistoryServiceImpl implements VersionHistoryService
     @Autowired(required = true)
     protected VersionHistoryDAO versionHistoryDAO;
 
+    protected VersionHistoryServiceImpl()
+    {
+
+    }
+
     @Override
     public VersionHistory create(Context context) throws SQLException {
         return versionHistoryDAO.create(context, new VersionHistory());

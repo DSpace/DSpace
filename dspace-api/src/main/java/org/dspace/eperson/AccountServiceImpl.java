@@ -49,6 +49,11 @@ public class AccountServiceImpl implements AccountService
     @Autowired(required = true)
     protected RegistrationDataService registrationDataService;
 
+    protected AccountServiceImpl()
+    {
+
+    }
+
     /**
      * Email registration info to the given email address.
      *

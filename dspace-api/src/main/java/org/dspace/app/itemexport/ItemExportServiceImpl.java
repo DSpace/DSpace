@@ -85,6 +85,11 @@ public class ItemExportServiceImpl implements ItemExportService
     /** log4j logger */
     private Logger log = Logger.getLogger(ItemExportServiceImpl.class);
 
+    protected ItemExportServiceImpl()
+    {
+
+    }
+
 
     @Override
     public void exportItem(Context c, Iterator<Item> i,

@@ -54,6 +54,11 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Autowired(required = true)
     protected SubscribeService subscribeService;
 
+    protected EPersonServiceImpl()
+    {
+        super();
+    }
+
     @Override
     public EPerson find(Context context, UUID id) throws SQLException {
         return ePersonDAO.findByID(context, EPerson.class, id);

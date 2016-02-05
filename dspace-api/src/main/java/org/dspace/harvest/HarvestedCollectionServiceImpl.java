@@ -31,6 +31,10 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
     @Autowired(required = true)
     protected HarvestedCollectionDAO harvestedCollectionDAO;
 
+    protected HarvestedCollectionServiceImpl()
+    {
+    }
+
     @Override
     public HarvestedCollection find(Context context, Collection collection) throws SQLException {
         return harvestedCollectionDAO.findByCollection(context, collection);

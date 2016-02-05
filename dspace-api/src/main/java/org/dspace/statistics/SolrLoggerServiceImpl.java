@@ -105,6 +105,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
    	    public String text()   { return text; }
    	}
 
+    protected SolrLoggerServiceImpl()
+    {
+
+    }
+
 
     @Override
     public void afterPropertiesSet() throws Exception

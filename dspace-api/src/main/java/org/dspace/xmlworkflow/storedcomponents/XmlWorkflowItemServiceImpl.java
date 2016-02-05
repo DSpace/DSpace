@@ -55,6 +55,11 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     private Logger log = Logger.getLogger(XmlWorkflowItemServiceImpl.class);
 
 
+    protected XmlWorkflowItemServiceImpl()
+    {
+
+    }
+
     @Override
     public XmlWorkflowItem create(Context context, Item item, Collection collection) throws SQLException, AuthorizeException {
         XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemDAO.create(context, new XmlWorkflowItem());

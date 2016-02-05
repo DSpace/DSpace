@@ -40,6 +40,11 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
     @Autowired(required = true)
     protected SiteDAO siteDAO;
 
+    protected SiteServiceImpl()
+    {
+        super();
+    }
+
     @Override
     public Site createSite(Context context) throws SQLException {
         Site site = findSite(context);

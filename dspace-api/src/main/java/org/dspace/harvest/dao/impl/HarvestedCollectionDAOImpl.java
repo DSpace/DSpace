@@ -29,7 +29,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCollection> implements HarvestedCollectionDAO {
+public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCollection> implements HarvestedCollectionDAO
+{
+    protected HarvestedCollectionDAOImpl()
+    {
+        super();
+    }
 
 
     @Override
