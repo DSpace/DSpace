@@ -136,10 +136,12 @@
 
   <xs:complexType name="status">
     <xs:sequence>
+      <xs:element name="apiVersion" type="xs:string" minOccurs="0"/>
       <xs:element name="authenticated" type="xs:boolean"/>
       <xs:element name="email" type="xs:string" minOccurs="0"/>
       <xs:element name="fullname" type="xs:string" minOccurs="0"/>
       <xs:element name="okay" type="xs:boolean"/>
+      <xs:element name="sourceVersion" type="xs:string" minOccurs="0"/>
       <xs:element name="token" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
