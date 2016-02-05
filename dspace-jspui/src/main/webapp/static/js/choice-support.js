@@ -289,7 +289,13 @@ function DSpaceChoicesLoad(form)
                  olabel += node.data;
             }
             var ovalue = opt.getAttributeNode('value').value;
-            var option = new Option(olabel, ovalue);
+            var oauthority = opt.getAttributeNode('authority').value;
+            var re = /(.*)::(.*)::(.*)/; 
+            
+            var subst = '$3'; 
+             
+            var result = oauthority.replace(re, subst);
+            var option = new Option(olabel + '(' + result +')', ovalue);
             option.authority = opt.getAttributeNode('authority').value;
             select.add(option, null);
             if (value == ovalue)
