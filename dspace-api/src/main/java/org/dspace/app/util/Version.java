@@ -62,17 +62,13 @@ public class Version
 
         // Is Discovery available?
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
-        String consumers = config.getPropertyAsType("event.dispatcher.default.consumers", ""); // Avoid null pointer
-        List<String> consumerList = Arrays.asList(consumers.split("\\s*,\\s*"));
-        if (consumerList.contains("discovery"))
-        {
-            System.out.println("     Discovery:  enabled.");
-        }
-
-        // Is Lucene search enabled?
-        if (consumerList.contains("search"))
-        {
-            System.out.println(" Lucene search:  enabled.");
+        String[] consumers = config.getArrayProperty("event.dispatcher.default.consumers");
+        for (String consumer : consumers) {
+            if (consumer.equals("discovery"))
+            {
+                System.out.println("     Discovery:  enabled.");
+                break;
+            }
         }
 
         // Java version
