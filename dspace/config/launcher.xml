@@ -389,4 +389,37 @@
             <class>com.atmire.authority.IndexClient</class>
         </step>
     </command>
+
+    <command>
+        <name>journal-stats</name>
+        <description>Generate statistics by journal</description>
+        <step>
+            <class>org.datadryad.journalstatistics.main.RunStatistics</class>
+        </step>
+    </command>
+
+    <command>
+        <name>index-authority</name>
+        <description>Indexes all metadata fields that use solr authority</description>
+        <step>
+            <class>org.dspace.authority.indexer.AuthorityIndexClient</class>
+        </step>
+    </command>
+
+    <command>
+        <name>import-journal</name>
+        <description>Import authority from solr to database</description>
+        <step>
+            <class>org.datadryad.authority.ImportJournal2Authority</class>
+        </step>
+    </command>
+
+    <command>
+        <name>association-anywhere</name>
+        <description>Import associate anywhere to journal</description>
+        <step>
+            <class>org.datadryad.anywhere.AssociationAnywhere</class>
+        </step>
+    </command>
+
 </commands>

@@ -6,6 +6,7 @@ import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.Message;
+import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Item;
@@ -49,6 +50,11 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
 
         pageMeta.addTrailLink(contextPath + "/", "Dryad Home");
         pageMeta.addTrail().addContent("Submission");
+        pageMeta.addMetadata("stylesheet", "screen", "datatables", true).addContent("../../static/Datatables/DataTables-1.8.0/media/css/datatables.css");
+//            pageMeta.addMetadata("stylesheet", "screen", null, true).addContent("../../themes/AtmireModules/lib/css/datatables-overrides.css");
+        pageMeta.addMetadata("stylesheet", "screen", "person-lookup", true).addContent("lib/css/person-lookup.css");
+        pageMeta.addMetadata("javascript", null, "person-lookup", true).addContent("lib/js/person-lookup.js");
+        pageMeta.addMetadata("javascript", null, "dryad-submisison-reorder-edit", true).addContent("/lib/js/dryad-submisison-reorder-edit.js");
     }
 
     @Override
@@ -108,8 +114,8 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column5"));
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column7"));
 
-            fileItem.addHighlight("content").addXref(url, fileFound.getName());
-            fileItem.addHighlight("content").addContent((fileFound.getSize() / 1000) + "Kb");
+            fileItem.addHighlight("content").addXref(url, XSLUtils.getShortFileName(fileFound.getName(), 50));
+            fileItem.addHighlight("content").addContent((fileFound.getSize() / 1000) + " Kb");
             fileItem.addHighlight("content").addContent(fileFound.getFormat().getDescription());
             fileItem.addHidden("remove_dataset_id").setValue("" + fileFound.getID());
             fileItem.addHidden("dataset_id_present").setValue("" + fileFound.getID());
@@ -230,6 +236,12 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
             actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
     }
 
+    public void addOptions(Options options) throws SAXException, WingException,
+            SQLException, IOException, AuthorizeException
+    {
+        options.addList("human-subjects");
+        options.addList("large-data-packages");
+    }
 
 
     public List addReviewSection(List list) throws SAXException, WingException, SQLException, IOException, AuthorizeException {

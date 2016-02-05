@@ -116,6 +116,19 @@ CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
 CREATE SEQUENCE harvested_collection_seq;
 CREATE SEQUENCE harvested_item_seq;
+CREATE SEQUENCE scheme_seq;
+CREATE SEQUENCE schememetadatavalue_seq;
+CREATE SEQUENCE concept_seq;
+CREATE SEQUENCE conceptmetadatavalue_seq;
+CREATE SEQUENCE scheme2concept_seq;
+CREATE SEQUENCE term_seq;
+CREATE SEQUENCE termmetadatavalue_seq;
+CREATE SEQUENCE concept2term_seq;
+CREATE SEQUENCE concept2termrole_seq;
+CREATE SEQUENCE concept2conceptrole_seq;
+CREATE SEQUENCE concept2concept_seq;
+
+
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -779,6 +792,167 @@ CREATE TABLE harvested_item
 );
 
 CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
+
+
+--------------------------------------------------------------------------------------------------------------
+-- METADATA CONCEPT AND ATTRIBUTES
+--------------------------------------------------------------------------------------------------------------
+CREATE TABLE Scheme
+(
+  id              INTEGER PRIMARY KEY,
+  identifier      VARCHAR(256),
+  created         DATE,
+  modified        DATE,
+  status          VARCHAR(256),
+  lang            VARCHAR(24),
+  topconcept      BOOLEAN
+);
+
+
+-- Notes and Attributes describing the Concepts
+CREATE TABLE SchemeMetadataValue
+(
+  id                 INTEGER PRIMARY KEY,
+  parent_id          INTEGER REFERENCES Scheme(id),
+  field_id           INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
+  text_value         TEXT,
+  text_lang          VARCHAR(24),
+  place              INTEGER,
+  authority          VARCHAR(100),
+  confidence         INTEGER DEFAULT -1,
+  hidden             BOOLEAN
+);
+
+
+CREATE TABLE Concept
+(
+  id   INTEGER PRIMARY KEY,
+  identifier          VARCHAR(256),
+  created DATE,
+  modified DATE,
+  status VARCHAR(256),
+  lang VARCHAR(24),
+  source VARCHAR(256),
+  topconcept BOOLEAN
+);
+
+
+
+-- Notes and Attributes describing the Concepts
+CREATE TABLE ConceptMetadataValue
+(
+  id                 INTEGER PRIMARY KEY,
+  parent_id          INTEGER REFERENCES Concept(id),
+  field_id           INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
+  text_value         TEXT,
+  text_lang          VARCHAR(24),
+  place              INTEGER,
+  authority          VARCHAR(100),
+  confidence         INTEGER DEFAULT -1,
+  hidden             BOOLEAN
+);
+
+
+--------------------------------------------------------------------------------------------------------------
+-- METADATA TERM AND ATTRIBUTES
+--------------------------------------------------------------------------------------------------------------
+CREATE TABLE Term
+(
+  id                  INTEGER PRIMARY KEY,
+  identifier          VARCHAR(256),
+  created             DATE,
+  modified            DATE,
+  source              VARCHAR(256),
+  status              VARCHAR(256),
+  literalForm         TEXT,
+  lang                VARCHAR(24)
+
+);
+
+-- Notes and Attributes describing the Term
+CREATE TABLE TermMetadataValue
+(
+  id                  INTEGER PRIMARY KEY,
+  parent_id           INTEGER REFERENCES Term(id),
+  field_id            INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
+  text_value          TEXT,
+  text_lang           VARCHAR(24),
+  place               INTEGER,
+  authority           VARCHAR(100),
+  confidence          INTEGER DEFAULT -1,
+  hidden              BOOLEAN
+);
+
+
+--------------------------------------------------------------------------------------------------------------
+-- METADATA CONCEPT ASSOCIATIVE RELATIONSHIP   Concept2ConceptRole    Concept2Concept
+--------------------------------------------------------------------------------------------------------------
+CREATE TABLE Concept2ConceptRole
+(
+  id             INTEGER PRIMARY KEY,
+  role           VARCHAR(64),
+  label          VARCHAR(64),
+  scope_note     TEXT,
+  CONSTRAINT Concept2ConceptRoleName UNIQUE(label)
+);
+
+CREATE TABLE Concept2Concept
+(
+  id            INTEGER PRIMARY KEY,
+  incoming_id   INTEGER REFERENCES Concept(id),
+  outgoing_id   INTEGER REFERENCES Concept(id),
+  role_id   INTEGER REFERENCES Concept2ConceptRole(id)
+);
+
+
+
+--------------------------------------------------------------------------------------------------------------
+-- METADATA CONCEPT / TERM RELATIONSHIPS
+--------------------------------------------------------------------------------------------------------------
+CREATE TABLE Concept2TermRole
+(
+  id             INTEGER PRIMARY KEY,
+  role           VARCHAR(64),
+  label          VARCHAR(64),
+  scope_note     TEXT,
+  CONSTRAINT Concept2TermRoleName UNIQUE(label)
+);
+CREATE TABLE Concept2Term
+(
+  id            INTEGER PRIMARY KEY,
+  concept_id   	INTEGER REFERENCES Concept(id),
+  term_id   	INTEGER REFERENCES Term(id),
+  role_id   INTEGER REFERENCES Concept2TermRole(id)
+);
+
+
+CREATE TABLE Scheme2Concept
+(
+  id            INTEGER PRIMARY KEY,
+  scheme_id   	INTEGER REFERENCES Scheme(id),
+  concept_id   	INTEGER REFERENCES Concept(id)
+
+);
+
+--------------------------------------------------------------------------------------------------------------
+-- EXAMPLE DATA
+--------------------------------------------------------------------------------------------------------------
+--
+-- INSERT INTO Scheme VALUES (nextval('scheme_seq'),'Author','2014-09-20','2014-09-20','Accepted','en','true');
+
+-- INSERT INTO Concept2TermRole VALUES (nextval('concept2termrole_seq'),'prefLabel','prefLabel');
+-- INSERT INTO Concept2TermRole VALUES (nextval('concept2termrole_seq'),'alt','altfLabel');
+
+-- INSERT INTO Concept2ConceptRole VALUES (nextval('concept2conceptrole_seq'),'hierarchical','Broader/Narrower');
+-- INSERT INTO Concept2ConceptRole VALUES (nextval('concept2conceptrole_seq'),'associative','Associate');
+-- INSERT INTO Concept2ConceptRole VALUES (nextval('concept2conceptrole_seq'),'associative','Equal');
+
+
+-- ALTER TABLE eperson ADD COLUMN orcid VARCHAR(256);
+
+-- ALTER TABLE eperson ADD COLUMN access_token VARCHAR(256);
+
+
 
 
 

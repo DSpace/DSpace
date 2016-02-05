@@ -132,11 +132,10 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
         Table table = main.addTable("versionhistory", 1, 1);
         
         Row header = table.addRow(Row.ROLE_HEADER);
-        header.addCell().addContent(T_column1);
-        header.addCell().addContent(T_column2);
-        //header.addCell().addContent(T_column3);
-        header.addCell().addContent(T_column4);
-        header.addCell().addContent(T_column5);
+        header.addCell().addContent(T_column1);    // item
+        header.addCell().addContent(T_column2);    // version
+        header.addCell().addContent(T_column4);    // date
+        header.addCell().addContent(T_column5);    // summary
 
         if(!isItemView){
             header.addCell().addContent(T_column6);

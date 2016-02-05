@@ -26,6 +26,7 @@
     <modules>
         <module>identifier-services</module>
         <module>api</module>
+        <module>api-tests</module>
         <!--<module>discovery</module>-->
         <module>atmire-workflow</module>
         <module>xmlui</module>
@@ -37,8 +38,10 @@
         <module>dataone-mn</module>
         <module>journal-submit</module>
         <module>versioning</module>
-        <module>atmire-solr-authority</module>
         <module>payment-system</module>
+        <module>dryad-rest-webapp</module>
+        <module>dryad-widgets</module>
+        <module>journal-landing</module>
         <!--module>solr-load-tester</module-->
 	</modules>
 
@@ -110,14 +113,6 @@
                    <version>${pom.version}</version>
                </dependency>
 
-               <dependency>
-                   <groupId>com.atmire</groupId>
-                   <artifactId>atmire-authority</artifactId>
-                   <version>${pom.version}</version>
-               </dependency>
-
-
-
 
                <dependency>
                    <groupId>org.dspace.modules</groupId>
@@ -140,8 +135,20 @@
                    <type>war</type>
                </dependency>
 
+               <dependency>
+                   <groupId>org.dspace.modules</groupId>
+                   <artifactId>dryad-widgets-webapp</artifactId>
+                   <type>jar</type>
+                   <classifier>classes</classifier>
+                   <version>${pom.version}</version>
+               </dependency>
 
-
+               <dependency>
+                   <groupId>org.dspace.modules</groupId>
+                   <artifactId>dryad-widgets-webapp</artifactId>
+                   <version>${pom.version}</version>
+                   <type>war</type>
+               </dependency>
 
            </dependencies>
        </dependencyManagement>

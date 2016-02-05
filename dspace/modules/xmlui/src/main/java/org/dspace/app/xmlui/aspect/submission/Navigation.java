@@ -55,6 +55,7 @@ import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.wing.Message;
@@ -63,6 +64,7 @@ import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
@@ -200,37 +202,11 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 	    options.addList("administrative");         
 
 	    account.setHead(T_my_account);
-            account.addItemXref(contextPath+"/submissions",T_submissions);
-            if(coll != null){
-                boolean canHaveTasks = false;
-                try {
-                    HashMap<String,Role> roles = WorkflowUtils.getCollectionRoles(coll);
-                    for(String roleName : roles.keySet()){
-                        Role role = roles.get(roleName);
-                        Group group = WorkflowUtils.getRoleGroup(context, coll.getID(), role);
-                        if(group != null){
-                            if(group.isMember(context.getCurrentUser())){
-                                canHaveTasks = true;
-                            }else{
-                                //Also check the member groups
-                                Group[] groups = group.getMemberGroups();
-                                for (Group g : groups) {
-                                    if(g.isMember(context.getCurrentUser())){
-                                        canHaveTasks = true;
-                                    }
-                                }
-                            }
-                        }
+        account.addItemXref(contextPath+"/submissions",T_submissions);
 
-
-                    }
-                } catch (Exception e) {
-                    log.error(LogManager.getHeader(context, "Error while retrieving workflow roles", ""), e);
-                }
-
-                if(canHaveTasks){
-                    account.addItemXref(contextPath+"/my-tasks",T_my_tasks);
-                }
+            if(AuthorizeManager.isCuratorOrAdmin(context))
+            {
+                account.addItemXref(contextPath+"/my-tasks",T_my_tasks);
             }
         }
 

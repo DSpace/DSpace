@@ -65,6 +65,9 @@ public class SolrLogger
     private static int count = 0;
     private static int commit = 10;
 
+    private static final String REFERRER_SOLR_FIELD = "referrer";
+    private static final String REFERRER_HTTP_HEADER = "referer";
+
     static
     {
     	log.info("solr.spidersfile:" + ConfigurationManager.getProperty("solr.spidersfile"));
@@ -170,6 +173,21 @@ public class SolrLogger
             SolrInputDocument doc1 = new SolrInputDocument();
             // Save our basic info that we already have
 
+            final String originalReferrer = request.getHeader(REFERRER_HTTP_HEADER);
+            log.info("SolrLogger - referrer: " + originalReferrer);
+            final Boolean reviewTokenPresent = SolrLoggerUtils.isReviewTokenPresent(originalReferrer);
+            final Boolean reviewDOIPresent = SolrLoggerUtils.isReviewDOIPresent(originalReferrer);
+            if(originalReferrer!=null) {
+                String cleanedReferrer = originalReferrer;
+                if(reviewTokenPresent) {
+                    cleanedReferrer = SolrLoggerUtils.replaceReviewToken(cleanedReferrer, SolrLoggerUtils.DUMMY_TOKEN);
+                }
+                if(reviewDOIPresent) {
+                    cleanedReferrer = SolrLoggerUtils.replaceReviewDOI(cleanedReferrer, SolrLoggerUtils.DUMMY_DOI);
+                }
+                doc1.addField(REFERRER_SOLR_FIELD, cleanedReferrer);
+            }
+
             String ip = request.getRemoteAddr();
 	    log.debug("IP is " + ip);
 	    String xff = request.getHeader("X-Forwarded-For");
@@ -190,15 +208,12 @@ public class SolrLogger
 				}
 			}
 	        }
-	    
-            doc1.addField("ip", ip);
 
+            // Don't record IP addresses for review links
+            if(!reviewTokenPresent) {
+                doc1.addField("ip", ip);
+            }
 
-
-            String referrer = request.getHeader("referer");
-            log.info("SolrLogger - referrer: " + request.getHeader("referer"));
-            if(referrer!=null)
-                doc1.addField("referrer", referrer);
 
             doc1.addField("id", dspaceObject.getID());
             doc1.addField("type", dspaceObject.getType());
@@ -220,8 +235,12 @@ public class SolrLogger
 		if(ip.equals("::1")) {
 		    doc1.addField("dns", "localhost");
 		} else {
-		    String dns = DnsLookup.reverseDns(ip);
-		    doc1.addField("dns", dns.toLowerCase());
+                    // Don't record DNS addresses for review links
+                    if(!reviewTokenPresent) {
+                        //
+                        String dns = DnsLookup.reverseDns(ip);
+                        doc1.addField("dns", dns.toLowerCase());
+                    }
 		}
             }
             catch (Exception e)
@@ -539,6 +558,32 @@ public class SolrLogger
         for(String ip : SpiderDetector.getSpiderIpAddresses()){
             deleteIP(ip);
         }
+    }
+
+
+    /**
+     * Removes ip/dns and scrubs review link from solr for items downloaded in review
+     */
+    public static void deleteReviewIdentifiers() throws SolrServerException, IOException {
+        final List<SolrInputDocument> documents = new ArrayList<SolrInputDocument>();
+        ResultProcessor processor = new ResultProcessor() {
+            @Override
+            public void process(SolrDocument doc) throws IOException, SolrServerException {
+                doc.removeFields("ip");
+                doc.removeFields("dns");
+                // Remove the original referrer
+                final String originalReferrer = doc.getFieldValue("referrer").toString();
+                final String cleanedReferrer = SolrLoggerUtils.replaceReviewToken(originalReferrer, SolrLoggerUtils.DUMMY_TOKEN);
+                doc.setField(REFERRER_SOLR_FIELD, cleanedReferrer);
+                SolrInputDocument newInput = ClientUtils.toSolrInputDocument(doc);
+                documents.add(newInput);
+            }
+        };
+        String query = REFERRER_SOLR_FIELD + ":http*token=*";
+        processor.execute(query);
+        solr.deleteByQuery(query);
+        solr.add(documents);
+        solr.commit();
     }
 
     /*

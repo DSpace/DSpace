@@ -287,7 +287,7 @@ public class WorkflowManager {
     public static void deleteAllTasks(Context c, WorkflowItem wi) throws SQLException, AuthorizeException {
         deleteAllPooledTasks(c, wi);
 
-        List<ClaimedTask> allClaimedTasks = ClaimedTask.findByWorkflowId(c,wi.getID());
+        List<ClaimedTask> allClaimedTasks = ClaimedTask.findByWorkflowId(c, wi.getID());
         for(ClaimedTask task: allClaimedTasks){
             deleteClaimedTask(c, wi, task);
         }
@@ -317,12 +317,18 @@ public class WorkflowManager {
 
     public static void deleteClaimedTask(Context c, WorkflowItem wi, ClaimedTask task) throws SQLException, AuthorizeException {
         if(task != null){
+            EPerson e = EPerson.find(c, task.getOwnerID());
+            EPerson submitter = wi.getItem().getSubmitter();
             task.delete();
-            removeUserItemPolicies(c, wi.getItem(), EPerson.find(c, task.getOwnerID()));
+            removeUserItemPolicies(c, wi.getItem(), e);
+            // add back the original owner's policies
+            grantUserAllItemPolicies(c, wi.getItem(), submitter);
             //Also make sure that the user gets policies on our data files
             Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wi.getItem());
             for (Item dataFile : dataFiles) {
-                removeUserItemPolicies(c, dataFile, EPerson.find(c, task.getOwnerID()));
+                removeUserItemPolicies(c, dataFile, e);
+                // add back the original owner's policies
+                grantUserAllItemPolicies(c, dataFile, submitter);
             }
         }
     }
@@ -394,15 +400,17 @@ public class WorkflowManager {
             addPolicyToItem(context, item, Constants.WRITE, epa);
         if(!userHasPolicies.contains(Constants.DELETE))
             addPolicyToItem(context, item, Constants.DELETE, epa);
+        if(!userHasPolicies.contains(Constants.REMOVE))
+            addPolicyToItem(context, item, Constants.REMOVE, epa);
         if(!userHasPolicies.contains(Constants.ADD))
             addPolicyToItem(context, item, Constants.ADD, epa);
     }
 
     private static void addPolicyToItem(Context context, Item item, int type, EPerson epa) throws AuthorizeException, SQLException {
-        AuthorizeManager.addPolicy(context ,item, type, epa);
+        AuthorizeManager.addPolicy(context, item, type, epa);
         Bundle[] bundles = item.getBundles();
         for (Bundle bundle : bundles) {
-            AuthorizeManager.addPolicy(context ,bundle, type, epa);
+            AuthorizeManager.addPolicy(context, bundle, type, epa);
             Bitstream[] bits = bundle.getBitstreams();
             for (Bitstream bit : bits) {
                 AuthorizeManager.addPolicy(context, bit, type, epa);
@@ -447,7 +455,7 @@ public class WorkflowManager {
      *            Context
      * @param wi
      *            WorkflowItem to operate on
-     * @param e
+     * @param ePerson
      *            EPerson doing the operation
      * @param action the action which triggered this reject
      * @param rejection_message
@@ -457,7 +465,7 @@ public class WorkflowManager {
      * @throws java.sql.SQLException ...
      * @throws org.dspace.authorize.AuthorizeException ...
      */
-    public static WorkspaceItem rejectWorkflowItem(Context c, WorkflowItem wi, EPerson e, Action action,
+    public static WorkspaceItem rejectWorkflowItem(Context c, WorkflowItem wi, EPerson ePerson, Action action,
             String rejection_message, boolean sendMail) throws SQLException, AuthorizeException,
             IOException
     {
@@ -474,33 +482,27 @@ public class WorkflowManager {
             workflowItemRole.delete();
         }
 
+        if (ePerson == null) {
+            ePerson = c.getCurrentUser();
+        }
+
         // rejection provenance
         Item myitem = wi.getItem();
 
         // Get current date
         String now = DCDate.getCurrent().toString();
-        org.dspace.content.Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, myitem);
-        if(dataFiles!=null){
-            for(Item dataFile:dataFiles) {
-                if(dataFile.getMetadata("internal", "workflow", "submitted", Item.ANY).length == 0){
-                    //A newly (re-)submitted publication
-                    dataFile.addMetadata("internal", "workflow", "submitted", null, Boolean.TRUE.toString());
-                    myitem.update();
-                }
-            }
-
-        }
 
         // Here's what happened
-        if(action != null){
-            // Get user's name + email address
-            String usersName = getEPersonName(e);
-            String provDescription = action.getProvenanceStartId() + " Rejected by " + usersName + ", reason: "
-                    + rejection_message + " on " + now + " (GMT) ";
-
-            // Add to item as a DC field
-            myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        String provDescription = "";
+        if(action != null) {
+            provDescription = action.getProvenanceStartId() + " ";
         }
+        // Get user's name + email address
+        provDescription = provDescription + "Rejected by " + getEPersonName(ePerson) + ", reason: "
+                + rejection_message + " on " + now + " (GMT) ";
+
+        // Add to item as a DC field
+        myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
 
         myitem.update();
 
@@ -509,13 +511,13 @@ public class WorkflowManager {
 
         if(sendMail){
             // notify that it's been rejected
-            WorkflowEmailManager.notifyOfReject(c, wi, e, rejection_message);
+            WorkflowEmailManager.notifyOfReject(c, wi, ePerson, rejection_message);
         }
 
         log.info(LogManager.getHeader(c, "reject_workflow", "workflow_item_id="
                 + wi.getID() + "item_id=" + wi.getItem().getID()
                 + "collection_id=" + wi.getCollection().getID() + "eperson_id="
-                + (e == null ? "" :  e.getID())));
+                + (ePerson == null ? "" : ePerson.getID())));
 
         return wsi;
     }
@@ -571,7 +573,7 @@ public class WorkflowManager {
     {
         String submitter = e.getFullName();
 
-        submitter = submitter + "(" + e.getEmail() + ")";
+        submitter = submitter + " (" + e.getEmail() + ")";
 
         return submitter;
     }
@@ -604,6 +606,7 @@ public class WorkflowManager {
 
         // Add message to the DC
         myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
+
         myitem.update();
     }
 

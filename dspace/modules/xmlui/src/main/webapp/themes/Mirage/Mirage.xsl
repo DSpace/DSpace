@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-
     The contents of this file are subject to the license and copyright
     detailed in the LICENSE and NOTICE files at the root of the source
     tree and available online at
-
     http://www.dspace.org/license/
-
 -->
 <!--
     Original author: Alexey Maslov
@@ -24,7 +21,7 @@
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:confman="org.dspace.core.ConfigurationManager"
-                exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
+                exclude-result-prefixes="confman dc dim dri i18n mets mods xhtml xlink xsl">
 
     <xsl:import href="../dri2xhtml-alt/dri2xhtml.xsl"/>
     <xsl:import href="lib/xsl/core/global-variables.xsl"/>
@@ -40,10 +37,12 @@
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/community-list.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/collection-list.xsl"/>
+    <xsl:import href="lib/xsl/aspect/JournalLandingPage/main.xsl"/>
     <xsl:import href="integrated-view.xsl"/>
     <xsl:import href="DryadItemSummary.xsl"/>
     <xsl:import href="DryadUtils.xsl"/>
     <xsl:import href="DryadSearch.xsl"/>
+    
     <xsl:output indent="yes"/>
     <xsl:variable name="iframe.maxheight" select="confman:getIntProperty('iframe.maxheight', 300)"/>
     <xsl:variable name="iframe.maxwidth" select="confman:getIntProperty('iframe.maxwidth', 600)"/>
@@ -111,7 +110,8 @@
             #aspect_statistics_StatisticsTransformer_div_stats,
             #aspect_dryadinfo_DryadBlogFeed_div_blog-hook {
                 height: 300px;
-                overflow: visible;
+                overflow-x: visible;
+                overflow-y: scroll;
             }
 
         #aspect_statistics_StatisticsTransformer_div_stats table {
@@ -238,20 +238,34 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
-                        <div><span class="publication-date">2014-03-18</span>
-                            <a href="/pages/membershipMeeting2014">
-                                <img alt="Dryad Membership Meeting 2014" src="/themes/Mirage/images/membershipMeeting2014.png" />
+						<div><span class="publication-date">2015-12-16</span>
+						                            <a href="http://blog.datadryad.org/2015/12/15/new-pricing-structure-with-simplified-terms-and-increased-size-limits/">
+						                                <img alt="" src="/themes/Mirage/images/watering-can.png" />
+						                                <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">New Dryad pricing structure for 2016 with simplified terms and increased size limits</p>
+						                                <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn more &#187;</p>
+						                            </a>
+						                        </div>
+                        <div><span class="publication-date">2015-04-14</span>
+                            <a href="/pages/submissionIntegration">
+                                <img src="/themes/Mirage/images/integration-slide.jpg" alt="Publishers: Simplify data submission. Strengthen links between articles and data. For free. Integrate your journal with Dryad now" />
                             </a>
                         </div>
-                        <div><span class="publication-date">2013-03-01</span>
-                            <a href="/pages/pricing">
-                                <img alt="" src="/themes/Mirage/images/watering-can.png" />
-                                <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
-                                    Data Publishing Charges to help sustain open data at Dryad
+                        <div><span class="publication-date">2015-02-15</span>
+                            <a href="/pages/dryadlab">
+                                <img alt="" src="/themes/Mirage/images/dryadlab-promo.png" />
+                                <p style="width: 580px; color: #444; font-size: 80%; top: 75px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
+                                    DryadLab is a collection of free, openly-licensed, high-quality, hands-on, educational modules for students to engage in scientific inquiry using real data.
                                 </p>
-                                <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn More &#187;</p>
+                                <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 6px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn More &#187;</p>
                             </a>
                         </div>
+                        <!--><div><span class="publication-date">2015-03-23</span>
+                            <a href="/pages/membershipOverview">
+                                <img alt="" src="/themes/Mirage/images/watering-can.png" />
+                                <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Help grow open data at Dryad:<br />Become an organizational member</p>
+                                <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn more &#187;</p>
+                            </a>
+                        </div>-->
                         <div><span class="publication-date">2013-02-01</span>
                             <p Xid="ds-dryad-is" style="font-size: 88%; line-height: 1.35em;"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
@@ -267,9 +281,9 @@
                         </div>
                         <div><span class="publication-date">2013-01-01</span>
                             <a href="/pages/repository#keyFeatures">
-                                <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Desosit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
-                           </a>
-                       </div>
+                                <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Deposit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -321,41 +335,13 @@
 
             <!-- START CONNECT  -->
             <div class="home-col-2" style="clear: right;">
-                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
+                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Latest from @datadryad
                 </h1>
 
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 475px; font-size: 14px;">
                     <div id="connect-illustrated-prose">
-                        <p>
-                            <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" 
-                                 alt="Dryad's data packages are like seeds."
-                                 title="Dryad's data packages are like seeds." />
-                            Publishers, societies, universities, libraries,
-                            funders, and other stakeholder organizations are
-                            invited to become <a href="/pages/membershipOverview">members</a>.
-                            Tap into an active knowledge-sharing network,
-                            receive discounts on submission fees, and help
-                            shape Dryad's future.
-                            <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" 
-                                 alt="Researchers use Dryad data in their new work."
-                                 title="Researchers use Dryad data in their new work."/>
-                        </p>
-                        <p>
-                            <a href="/pages/journalIntegration">Submission integration</a> 
-                            is a free service that allows publishers to
-                            coordinate manuscript and data submissions.
-                            It makes submitting data easy for researchers; makes linking
-                            articles and data easy for journals; and enables
-                            confidential review of data prior to publication.
-                        </p>
-                        <p>
-                            <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" 
-                                 alt="New data is added to Dryad, and the cycle continues."
-                                 title="New data is added to Dryad, and the cycle continues."/>
-                            Submission fees support the cost of keeping Dryad's content free to use.
-                            Flexible <a href="/pages/pricing">pricing plans</a> 
-                            provide volume discounts.
-                        </p>
+		      <a class="twitter-timeline" href="https://twitter.com/datadryad" data-widget-id="572434627277901824">Latest from @datadryad</a>
+		      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>	
                     </div>
                 </div>
             </div>
@@ -367,8 +353,8 @@
                     <a href="#recently-published-data"><span>Recently published</span></a>
 
                     <a href="#most-viewed-data"><span>Popular</span></a>
-                    <a id="by_author" href="#by-author"><span>By Author</span></a>
-                    <a id="by_journal" href="#by-journal"><span>By Journal</span></a>
+                    <a id="by_author" href="#by-author"><span>By author</span></a>
+                    <a id="by_journal" href="#by-journal"><span>By journal</span></a>
 
                 </div>
                 <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 649px; overflow: auto;">
@@ -420,20 +406,18 @@
             <div class="home-col-2" style="clear: both; margin-left: 25px;">
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
-		  <div class="container">
-<!-- Proceedings of the Royal Society B -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aproceedings%5C+of%5C+the%5C+royal%5C+society%5C+b%5C%7C%5C%7C%5C%7CProceedings%5C+of%5C+the%5C+Royal%5C+Society%5C+B">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ProceedingsB.png" alt="Proceedings of the Royal Society B" /></a>
-        <!-- Scientific Data -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ascientific%5C+data%5C%7C%5C%7C%5C%7CScientific%5C+Data">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ScientificData.png" alt="Scientific Data" /></a>
-        <!-- BMC Ecology -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abmc%5C+ecology%5C%7C%5C%7C%5C%7CBMC%5C+Ecology">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BMCEcology.png" alt="BMC Ecology" /></a>
-        <!-- BMC Evolutionary Biology -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abmc%5C+evolutionary%5C+biology%5C%7C%5C%7C%5C%7CBMC%5C+Evolutionary%5C+Biology">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BMCEvolBiology.png" alt="BMC Evolutionary Biology" /></a>
+                    <div class="container">
+                        <!-- Behavioral Ecology -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abehavioral%5C+ecology%5C%7C%5C%7C%5C%7CBehavioral%5C+Ecology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BEHECOCover.png" alt="Behavioral Ecology" /></a>
+                        <!-- Biotropica -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abiotropica%5C%7C%5C%7C%5C%7CBiotropica"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BITRCover.png" alt="Biotropica" /></a>
+						<!-- Development -->
+						<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Adevelopment%5C%7C%5C%7C%5C%7CDevelopment"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-DEVELOPMENT_cover.png" alt="Development" /></a>
+						<!-- American Journal of Botany -->
+						<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aamerican%5C+journal%5C+of%5C+botany%5C%7C%5C%7C%5C%7CAmerican%5C+Journal%5C+of%5C+Botany"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-AMJBOTCover.png" alt="American Journal of Botany" /></a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-
-
             <!-- START STATISTICS -->
             <div class="home-col-2" style="margin-left: 25px;">
                 <div id="aspect_statistics_StatisticsTransformer_div_home" class="repository">
@@ -466,12 +450,9 @@
         The template to handle dri:options. Since it contains only dri:list tags (which carry the actual
         information), the only things than need to be done is creating the ds-options div and applying
         the templates inside it.
-
         In fact, the only bit of real work this template does is add the search box, which has to be
         handled specially in that it is not actually included in the options div, and is instead built
         from metadata available under pageMeta.
-
-
 -->
 
     <xsl:template match="dri:options/dri:list[@n='administrative']"/>
@@ -485,10 +466,26 @@
     <xsl:template match="dri:options">
         <div id="ds-options-wrapper">
             <div id="ds-options">
-                <!-- Once the search box is built, the other parts of the options are added -->
-                <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>
+                <xsl:variable name="uri" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'])"/>
+                <xsl:choose>
+                    <!-- on the "My Submissions" page, have the "Submit data now" button at top of sidebar -->
+                    <xsl:when test="$uri = 'submissions'">
+                        <xsl:apply-templates select="dri:list[@n='DryadSubmitData']"/>
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>                        
+                    </xsl:when>
+                    <!-- on the "My Tasks" page, suppress "Submit data now" -->
+                    <xsl:when test="$uri = 'my-tasks'">
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>                        
+                    </xsl:when>
+                    <!-- Once the search box is built, the other parts of the options are added -->
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>
+                    </xsl:otherwise>
+                </xsl:choose>
                 <xsl:apply-templates select="dri:list[@n='Payment']"/>
                 <xsl:apply-templates select="dri:list[@n='need-help']"/>
+                <xsl:apply-templates select="dri:list[@n='human-subjects']"/>
+                <xsl:apply-templates select="dri:list[@n='large-data-packages']"/>
             </div>
         </div>
     </xsl:template>
@@ -496,13 +493,9 @@
     <xsl:template match="dri:options/dri:list[@n='DryadInfo']" priority="3">
         <div id="main-menu">
             <ul class="sf-menu">
-
                 <xsl:apply-templates select="dri:list" mode="nested"/>
-
-
                 <xsl:apply-templates select="dri:item" mode="nested"/>
             </ul>
-
         </div>
     </xsl:template>
     -->
@@ -570,16 +563,43 @@
         </h1>
         <div id="ds_connect_with_dryad" class="ds-static-div primary" style="font-size: 14px;">
             <p style="margin-bottom: 0;">
-                Learn more about:
-            </p>
-            <ul style="list-style: none; margin-left: 1em;">
-                <li><a href="/pages/membershipOverview">Membership</a></li>
-                <li><a href="/pages/journalIntegration">Submission integration</a></li>
-                <li><a href="/pages/pricing">Pricing plans</a></li>
-            </ul> 
+                We encourage organizations to:</p>
+				<ul style="list-style: none; margin-left: 1em;">
+				<li><a href="/pages/membershipOverview">Become a member</a></li>
+				<li><a href="/pages/payment">Sponsor data publishing fees</a></li> 
+				<li><a href="/pages/submissionIntegration">Integrate your journal(s)</a>, or</li>
+				<li>All of the above</li>
+			</ul>
         </div>      
 	  </div>
     </xsl:template>
+
+    <xsl:template match="dri:options/dri:list[@n='large-data-packages']" priority="3">
+        <div class="NOT-simple-box">
+            <h1 class="ds-div-head ds_large_data_package_head" id="ds_large_data_package_head">Large data packages</h1>
+            <div id="ds_large_data_package" class="ds-static-div primary" style="font-size: 14px;">
+                <p style="margin-bottom: 0;">
+                    Note that for data packages over 20GB, submitters will
+                    be asked to pay $50 for each additional 10GB, or part thereof.
+                </p>
+            </div>      
+        </div>
+    </xsl:template>
+
+    <xsl:template match="dri:options/dri:list[@n='human-subjects']" priority="3">
+        <!-- note margin space added to top here -->
+        <div class="NOT-simple-box ds-margin-top-20">
+            <h1 class="ds-div-head ds_human_subjects_head" id="ds_human_subjects_head">Got human subject data?</h1>
+            <div id="ds_human_subjects" class="ds-static-div primary" style="font-size: 14px;">
+                <p style="margin-bottom: 0;">
+                    Dryad does not accept submissions that contain personally identifiable 
+                    human subject information. Human subject data must be properly anonymized. 
+                    <a href="/pages/faq#depositing-acceptable-data">Read more about the kinds of data Dryad accepts</a>.
+                </p> 
+            </div>      
+        </div>
+    </xsl:template>
+
 
     <xsl:template match="dri:options/dri:list[@n='DryadSubmitData']" priority="3">
       <div id="submit-data-sidebar-box" class="simple-box">
@@ -603,7 +623,7 @@
     <xsl:template match="dri:options/dri:list[@n='DryadMail']" priority="3">
         <!-- START MAILING LIST-->
         <div class="home-col-2">
-            <h1 class="ds-div-head">Dryad Mailing List</h1>
+            <h1 class="ds-div-head">Dryad mailing list</h1>
             <div id="file_news_div_mailing_list" class="ds-static-div primary">
                 <p class="ds-paragraph">
                     <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
@@ -618,14 +638,19 @@
     <!--xsl:variable name="doc" select="document(concat('pages/', $pageName, '.xhtml'))"/-->
 
     <xsl:template match="dri:xref[@rend='embed']">
-               
+               
         <xsl:variable name="url" select="concat('pages/',@target)"/>
-               
+               
         <xsl:copy-of select="document(string($url))/html/*"/>
-           
+           
     </xsl:template>
 
-
+    <!-- description of dataset for 'Submission overview' page -->
+    <xsl:template match="dri:hi[@rend='dataset-description']">
+        <p>
+            <xsl:value-of select="."/>
+        </p>
+    </xsl:template>
 
     <xsl:template match="dri:body/dri:div/dri:list[@id='aspect.submission.StepTransformer.list.submit-progress']"/>
 
@@ -732,9 +757,7 @@
                         </xsl:choose>
                     </xsl:with-param>
                     </xsl:call-template>
-
                     <div class="ds-form-content">
-
                     <xsl:if test="dri:field[@type='radio']">
                         <xsl:apply-templates select="dri:field[@type='radio']"/>
                         <br/>
@@ -745,7 +768,6 @@
                         - journalID_status_in_review
                         - journalID
                         - MANUSCRIPT NUMBER
-
                     -->
                     <xsl:for-each select="dri:field[@type='composite']/dri:field">
                         <tr class="selectPubSubmitTable"><td>
@@ -760,7 +782,7 @@
                                 <i18n:text><xsl:value-of select="dri:label"/></i18n:text>
                                 <xsl:text>: </xsl:text>
                             </label>
-
+                            <br/>
 
 
                             <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
@@ -887,7 +909,6 @@ parameter that is being used (see variable defined above) -->
 
     <!--
 <xsl:template match="/dri:document/dri:body/dri:div/dri:div[@id='aspect.discovery.SimpleSearch.div.search-results']/dri:list">
-
 </xsl:template>
 -->
     <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='tabs']">
@@ -913,7 +934,7 @@ parameter that is being used (see variable defined above) -->
             </div>
         </li>
         <li class="ds-form-item">
-            <a id="advanced-search" href="#">Advanced Search</a>
+            <a id="advanced-search" href="#">Advanced search</a>
         </li>
     </xsl:template>
 
@@ -1012,40 +1033,48 @@ parameter that is being used (see variable defined above) -->
                             />_tooltip
                     </xsl:attribute>
                 </xsl:if>
-
                 <xsl:apply-templates/>
             </span>
         </xsl:if>
     </xsl:template-->
     <!--add hidden class to help text-->
     <xsl:template match="dri:help" mode="compositeComponent">
-        <span class="composite-help">
-            <xsl:if test="ancestor::dri:field[@rend='hidden']">
-                <xsl:attribute name="class">
-                    <xsl:text>hidden</xsl:text>
-                </xsl:attribute>
-            </xsl:if>
-            <xsl:apply-templates />
-        </span>
-    </xsl:template>
-    <xsl:template match="dri:help">
-        <xsl:if
-                test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset' or @id= 'aspect.submission.StepTransformer.div.submit-select-publication' or @id= 'aspect.dryadfeedback.MembershipApplicationForm.div.membership-form' or @id= 'aspect.artifactbrowser.FeedbackForm.div.feedback-form'])">
-            <!--Only create the <span> if there is content in the <dri:help> node-->
-            <xsl:if test="./text() or ./node()">
-                <span>
-                    <xsl:attribute name="class">
-                        <xsl:text>field-help</xsl:text>
-                    </xsl:attribute>
+        <xsl:choose>
+            <xsl:when test="ancestor::dri:div[@id='aspect.dryadfeedback.MembershipApplicationForm.div.membership-form']"/>
+            <xsl:otherwise>
+                <span class="composite-help">
                     <xsl:if test="ancestor::dri:field[@rend='hidden']">
                         <xsl:attribute name="class">
                             <xsl:text>hidden</xsl:text>
                         </xsl:attribute>
                     </xsl:if>
-                    <xsl:apply-templates/>
+                    <xsl:apply-templates />
                 </span>
-            </xsl:if>
-        </xsl:if>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="dri:help">
+        <xsl:choose>
+            <!-- only display <help> in tooltip for feedback form -->
+            <xsl:when test="ancestor::dri:div[@id='aspect.artifactbrowser.FeedbackForm.div.feedback-form']"/>
+            
+            <xsl:when test="not(ancestor::dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-publication' or @id= 'aspect.submission.StepTransformer.div.submit-describe-dataset' or @id= 'aspect.submission.StepTransformer.div.submit-select-publication' or @id= 'aspect.dryadfeedback.MembershipApplicationForm.div.membership-form' or @id= 'aspect.artifactbrowser.FeedbackForm.div.feedback-form'])">
+                <!--Only create the <span> if there is content in the <dri:help> node-->
+                <xsl:if test="./text() or ./node()">
+                    <span>
+                        <xsl:attribute name="class">
+                            <xsl:text>field-help</xsl:text>
+                        </xsl:attribute>
+                        <xsl:if test="ancestor::dri:field[@rend='hidden']">
+                            <xsl:attribute name="class">
+                                <xsl:text>hidden</xsl:text>
+                            </xsl:attribute>
+                        </xsl:if>
+                        <xsl:apply-templates/>
+                    </span>
+                </xsl:if>
+            </xsl:when>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='most_recent' or @n='link-to-button']">
@@ -1121,7 +1150,7 @@ parameter that is being used (see variable defined above) -->
 
     <!-- Add Empty select option if no authors listed.  Prevents Subject Keywords from breaking -->
     <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item/dri:field[@id='aspect.submission.StepTransformer.field.dc_contributor_correspondingAuthor' and @type='select']">
-        <select>
+        <select class="ds-select-field">
             <xsl:apply-templates/>
             <xsl:if test="not(dri:option)">
                 <option value=""/>
@@ -1396,5 +1425,73 @@ parameter that is being used (see variable defined above) -->
       </xsl:if>
   
   </xsl:template>
-  
+
+
+    <xsl:template match="//dri:item[@rend='total']">
+        <li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-form-item odd total">
+            <xsl:attribute name="id">
+                <xsl:value-of select="translate(@id,'.','_')"/>
+            </xsl:attribute>
+            <span class="ds-form-label">Your total
+                <img src="/themes/Mirage/images/help.jpg" class="label-mark">
+                    <xsl:attribute name="title">xmlui.PaymentSystem.shoppingcart.order.help.title</xsl:attribute>
+                    <xsl:attribute name="attr" namespace="http://apache.org/cocoon/i18n/2.1">title</xsl:attribute>
+                </img>
+                :
+            </span>
+            <div class="ds-form-content"><xsl:value-of select="."/></div>
+        </li>
+    </xsl:template>
+
+    <!-- Confirmations for destructive buttons -->
+    <xsl:template name="destructiveSubmitButton">
+      <xsl:param name="confirmationText" select="'Are you sure?'" />
+        <!-- Adapted from normalField in dri2xhtml-alt/core/forms.xsl -->
+        <xsl:variable name="submitButtonId" select="translate(@id,'.','_')"/>
+        <input>
+            <xsl:call-template name="fieldAttributes"/>
+            <xsl:if test="@type='button'">
+                <xsl:attribute name="type">submit</xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="value">
+                <xsl:choose>
+                    <xsl:when test="./dri:value[@type='raw']">
+                        <xsl:value-of select="./dri:value[@type='raw']"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="./dri:value[@type='default']"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:if test="dri:value/i18n:text">
+                <xsl:attribute name="i18n:attr">value</xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="onclick">
+                <xsl:text>if(confirm('</xsl:text><!--
+                --><xsl:value-of select="$confirmationText" /><!--
+                --><xsl:text>')){ </xsl:text>
+                <xsl:text>  jQuery('#</xsl:text><!--
+                --><xsl:value-of select="$submitButtonId" /><!--
+                --><xsl:text>').submit(); } else {</xsl:text>
+                <xsl:text>return false;</xsl:text>
+                <xsl:text>}</xsl:text>
+            </xsl:attribute>
+            <xsl:apply-templates />
+        </input>
+    </xsl:template>
+
+    <!-- Confirm before lifting embargo -->
+    <xsl:template match="//dri:field[@id='aspect.administrative.item.EditItemEmbargoForm.field.submit_lift_embargo']">
+        <xsl:call-template name="destructiveSubmitButton">
+            <xsl:with-param name="confirmationText" select="'Are you sure you would like to lift this embargo now?'" />
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- Confirm before deleting data files in submission overview -->
+    <xsl:template match="//dri:field[starts-with(@id,'aspect.submission.submit.OverviewStep.field.submit_delete_dataset')]">
+        <xsl:call-template name="destructiveSubmitButton">
+            <xsl:with-param name="confirmationText" select="'Are you sure you would like to delete this Data file?'" />
+        </xsl:call-template>
+    </xsl:template>
+
 </xsl:stylesheet>

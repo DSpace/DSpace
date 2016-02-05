@@ -23,6 +23,7 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -116,7 +117,7 @@ public class EditFileStep extends AbstractStep
     	
         int itemID = submissionInfo.getSubmissionItem().getItem().getID();
     	String fileUrl = contextPath + "/bitstream/item/" + itemID + "/" + bitstream.getName();
-    	String fileName = bitstream.getName();
+    	String fileName = XSLUtils.getShortFileName(bitstream.getName(), 25);
     	
     	// Build the form that describes an item.
     	Division div = body.addInteractiveDivision("submit-edit-file", actionURL, Division.METHOD_POST, "primary submission");

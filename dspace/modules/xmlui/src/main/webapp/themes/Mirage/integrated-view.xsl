@@ -14,6 +14,7 @@
                 xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xalan="http://xml.apache.org/xalan" xmlns:datetime="http://exslt.org/dates-and-times"
                 xmlns:encoder="xalan://java.net.URLEncoder" exclude-result-prefixes="xalan strings encoder datetime"
+                xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
                 version="1.0" xmlns:strings="http://exslt.org/strings"
                 xmlns:confman="org.dspace.core.ConfigurationManager">
 
@@ -61,9 +62,9 @@
         <table class="package-file-description">
           <tbody>
           <tr>
-            <th>Title</th>
-            <th><xsl:value-of select=".//dim:field[@element='title']"/></th>        
-	    <!-- Download count -->
+              <th>Title</th>
+              <th><xsl:value-of select=".//dim:field[@element='title']"/></th>
+              <!-- Download count -->
 	    <xsl:variable name="downloads" select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
 	    <xsl:if test="$downloads > 0">
 	      <tr>
@@ -94,32 +95,31 @@
               <a>
                 <!-- Download Link -->
                 <xsl:attribute name="href">
-                    <xsl:value-of select="mets:FLocat/@xlink:href"/>
+                     <xsl:choose>
+                         <xsl:when test="mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
+                           <xsl:choose>
+                             <xsl:when test="starts-with(mets:FLocat[@LOCTYPE='TXT']/@xlink:title,'//')">
+                               <xsl:value-of select="concat('http:',mets:FLocat[@LOCTYPE='TXT']/@xlink:title)"/>
+                             </xsl:when>
+                             <xsl:otherwise>
+                               <xsl:value-of select="concat('http://',mets:FLocat[@LOCTYPE='TXT']/@xlink:title)"/>
+                             </xsl:otherwise>
+                           </xsl:choose>
+                         </xsl:when>
+                         <xsl:otherwise>
+                          <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
                 </xsl:attribute>
 
-                <xsl:value-of select="mets:FLocat/@xlink:title"/>
+                <xsl:value-of select="util:getShortFileName(mets:FLocat/@xlink:title, 50)"/>
                 <!-- File Size -->
-                <span class="bitstream-filesize">
-		  <xsl:text> (</xsl:text>
-                    <xsl:choose>
-                        <xsl:when test="@SIZE &lt; 1000">
-                            <xsl:value-of select="@SIZE"/>
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
-                        </xsl:when>
-                        <xsl:when test="@SIZE &lt; 1000000">
-                            <xsl:value-of select="substring(string(@SIZE div 1000),1,5)"/>
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
-                        </xsl:when>
-                        <xsl:when test="@SIZE &lt; 1000000000">
-                            <xsl:value-of select="substring(string(@SIZE div 1000000),1,5)"/>
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="substring(string(@SIZE div 1000000000),1,5)"/>
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
-                        </xsl:otherwise>
-                    </xsl:choose>
-		    <xsl:text>)</xsl:text></span></a>
+                <xsl:text> (</xsl:text>
+                <xsl:call-template name="fileSizeString">
+                    <xsl:with-param name="size" select="@SIZE"/>
+                </xsl:call-template>
+                <xsl:text>)</xsl:text>
+              </a>
             </td>
           </tr>
 
@@ -145,6 +145,8 @@
               <xsl:otherwise>
                 <xsl:variable name="my_doi"
                               select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
+                <xsl:variable name="my_full_doi"
+                  select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'http://dx.doi')]"/>
                 <xsl:variable name="my_uri"
                               select="//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
                 <xsl:attribute name="href">
@@ -154,6 +156,11 @@
                         <xsl:with-param name="doiIdentifier" select="$my_doi"/>
                       </xsl:call-template>
                     </xsl:when>
+                    <xsl:when test="$my_full_doi">
+                      <xsl:call-template name="checkURL">
+                        <xsl:with-param name="doiIdentifier" select="$my_full_doi"/>
+                      </xsl:call-template>
+                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="$my_uri"/>
                     </xsl:otherwise>

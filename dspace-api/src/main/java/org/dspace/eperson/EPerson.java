@@ -251,7 +251,46 @@ public class EPerson extends DSpaceObject
             }
         }
     }
+    /**
+     * Find the eperson by their netid.
+     *
+     * @param context
+     *            DSpace context
+     * @param orcid
+     *            orcid ID
+     *
+     * @return corresponding EPerson, or <code>null</code>
+     */
+    public static EPerson findByOrcidId(Context context, String orcid)
+            throws SQLException
+    {
+        if (orcid == null)
+        {
+            return null;
+        }
 
+        TableRow row = DatabaseManager.findByUnique(context, "eperson", "orcid", orcid);
+
+        if (row == null)
+        {
+            return null;
+        }
+        else
+        {
+            // First check the cache
+            EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
+                    .getIntColumn("eperson_id"));
+
+            if (fromCache != null)
+            {
+                return fromCache;
+            }
+            else
+            {
+                return new EPerson(context, row);
+            }
+        }
+    }
     /**
      * Find the epeople that match the search query across firstname, lastname or email.
      * 

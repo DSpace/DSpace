@@ -93,6 +93,41 @@
       </input>
     </xsl:template>
 
+
+    <xsl:template name="addLookupButtonAuthor">
+        <input type="button" name="{concat('lookup_',@n)}" class="ds-button-field ds-add-button" >
+            <xsl:attribute name="value">
+                <xsl:text>Look up author in the ORCID&#174; registry</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="onClick">
+                <xsl:text>javascript:AuthorLookup('</xsl:text>
+                <!-- URL -->
+                <xsl:value-of select="concat($context-path, '/choices/')"/>
+                <xsl:choose>
+                    <xsl:when test="starts-with(@n, 'value_')">
+                        <xsl:value-of select="dri:params/@choices"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="@n"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:text>', '</xsl:text>
+                <xsl:value-of select="@n"/>
+                <xsl:text>', </xsl:text>
+                <!-- Collection ID for context -->
+                <xsl:choose>
+                    <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='choice'][@qualifier='collection']">
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='choice'][@qualifier='collection']"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>-1</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:text>);</xsl:text>
+            </xsl:attribute>
+        </input>
+    </xsl:template>
+
     <!-- Fragment to display an authority confidence icon.
        -  Insert an invisible 1x1 image which gets "covered" by background
        -  image as dictated by the CSS, so icons are easily adjusted in CSS.
@@ -100,10 +135,13 @@
       -->
     <xsl:template name="authorityConfidenceIcon">
       <!-- default confidence value won't show any image. -->
-      <xsl:param name="confidence" select="'blank'"/>
-      <xsl:param name="id" select="''"/>
+        <xsl:param name="confidence" select="'blank'"/>
+        <xsl:param name="id" select="''"/>
+        <xsl:param name="authType" select="''"/>
+
       <xsl:variable name="lcConfidence" select="translate($confidence,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
-      <img i18n:attr="title">
+
+        <img i18n:attr="title">
         <xsl:if test="string-length($id) > 0">
           <xsl:attribute name="id">
              <xsl:value-of select="$id"/>
@@ -116,7 +154,7 @@
           <xsl:text>ds-authority-confidence </xsl:text>
           <xsl:choose>
             <xsl:when test="string-length($lcConfidence) > 0">
-              <xsl:value-of select="concat('cf-',$lcConfidence,' ')"/>
+              <xsl:value-of select="concat('cf-',$lcConfidence,' ',$authType,' ')"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:text>cf-blank </xsl:text>

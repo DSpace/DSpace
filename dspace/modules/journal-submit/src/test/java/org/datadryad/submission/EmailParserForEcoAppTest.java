@@ -67,15 +67,6 @@ public class EmailParserForEcoAppTest extends TestCase{
 
     @Test
     public void testParseMessage() {
-        ParsingResult testResult = testParser.parseMessage(keywordTest);
-        assertNotNull(testResult);
-        assertNotNull(testResult.getSubmissionData());
-        String test1 = testResult.getSubmissionData().toString();  //too bad this is already a StringBuffer...
-        assertTrue(test1.contains("<Manuscript>08093</Manuscript>"));
-        assertTrue(test1.contains("<keyword>Paleohistology</keyword>"));
-        assertTrue(test1.contains("<keyword>Archosaurs</keyword>"));
-        //System.out.println(testResult.getSubmissionData().toString());
-
     }
 
 }

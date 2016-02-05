@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wf-config>
+    <workflow-map>
+        <name-map collection="default" workflow="default"/>
+    </workflow-map>
+
+    <workflow start="requiresReviewStep" id="default">
+        <roles>
+            <role id="curator" name="Curator" />
+            <!--TODO: rename the group if needed-->
+            <role id="editors" name="Editors" />
+        </roles>
+
+        <step id="requiresReviewStep" nextStep="reviewStep" userSelectionMethod="noUserSelectionAction">
+            <alternativeOutcome>
+                <step status="1">dryadAcceptEditReject</step>
+            </alternativeOutcome>
+            <action id="requiresReviewAction"/>
+        </step>
+
+        <step id="reviewStep" nextStep="dryadAcceptEditReject" userSelectionMethod="assignOriginalSubmitterAction">
+            <alternativeOutcome>
+                <step status="1">pendingdelete</step>
+            </alternativeOutcome>
+            <action id="reviewAction"/>
+        </step>
+
+        <!-- Editor has the option of sending item to blackout.  Item will still go through finalPaymentAction -->
+              
+        <step id="dryadAcceptEditReject" nextStep="finalPaymentStep" userSelectionMethod="claimAction" role="editors">
+            <action id="dryadAcceptEditRejectAction"/>
+            <alternativeOutcome>
+                <!-- if outcome of dryadAcceptEditRejectAction is 1, curator has selected blackout -->
+                <step status="1">pendingPublicationFinalPaymentStep</step>
+            </alternativeOutcome>
+        </step>
+
+        <!-- Approve and archive selected -->
+        <step id="finalPaymentStep" nextStep="completePaymentStep" userSelectionMethod="noUserSelectionAction">
+            <action id="finalPaymentAction"/>
+            <alternativeOutcome>
+                <step status="1">reAuthorizationPaymentStep</step>
+            </alternativeOutcome>
+        </step>
+        
+        <step id="reAuthorizationPaymentStep" nextStep="completePaymentStep" userSelectionMethod="assignOriginalSubmitterAction">
+            <action id="reAuthorizationPaymentAction"/>
+        </step>
+        
+        <!-- Blackout selected.  Use the same payment auth actions but different steps for blackout -->
+        <step id="pendingPublicationFinalPaymentStep" nextStep="registerPendingPublicationStep" userSelectionMethod="noUserSelectionAction">
+            <action id="finalPaymentAction"/>
+            <alternativeOutcome>
+                <step status="1">pendingPublicationReAuthorizationPaymentStep</step>
+            </alternativeOutcome>
+        </step>
+
+        <step id="pendingPublicationReAuthorizationPaymentStep" nextStep="registerPendingPublicationStep" userSelectionMethod="assignOriginalSubmitterAction">
+            <action id="reAuthorizationPaymentAction"/>
+        </step>
+
+        <!-- Register an identifier and then send to pendingPublicationStep -->
+        <step id="registerPendingPublicationStep" nextStep="pendingPublicationStep" userSelectionMethod="noUserSelectionAction" role="curator">
+            <action id="registerPendingPublicationAction"/>
+        </step>
+        
+        <!-- Parked after registration, waiting for a curator to claim -->
+        <step id="pendingPublicationStep" nextStep="completePaymentStep" userSelectionMethod="claimAction" role="curator">
+            <action id="afterPublicationAction"/>
+        </step>
+
+
+        <step id="pendingdelete"  userSelectionMethod="noUserSelectionAction">
+            <action id="pendingdelete"/>
+        </step>
+
+        <!-- Approve and archive selected -->
+        <step id="completePaymentStep" userSelectionMethod="noUserSelectionAction">
+            <action id="completePaymentAction"/>
+        </step>
+    </workflow>
+</wf-config>

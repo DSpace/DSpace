@@ -177,15 +177,6 @@ public class CDLDataCiteService {
     }
 
 
-    private String changePrefixDOIForTestEnv(String doi) {
-        // if test env
-        if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
-            doi = doi.substring(doi.indexOf('/') + 1);
-            doi = "doi:10.5072/FK2/" + doi;
-        }
-        return doi;
-    }
-
     /**
      * Determine if Dryad should register a DOI for an item.  We should not
      * register items in workflow/workspace, or items that are part of other
@@ -350,7 +341,7 @@ public class CDLDataCiteService {
             try {
                 // if item is in blackout, change target to the blackout URL
                 if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
-                    target = "http://datadryad.org/publicationBlackout";
+                    target = ConfigurationManager.getProperty("dryad.blackout.url");
                 }
             } catch (SQLException ex) {
                 log.error("Error checking if item is in blackout: " + ex.getLocalizedMessage());
@@ -519,6 +510,9 @@ public class CDLDataCiteService {
 	    log.error("unable to create metadata list for " + item.getHandle(), e);
         } catch (IOException e) {
 	    log.error("unable to create metadata list for " + item.getHandle(), e);
+        } catch (NullPointerException e) {
+            // When crosswalk cannot be found, NPE is triggered
+	    log.error("unable to create metadata list for " + item.getHandle(), e);
         }
         return metadata;
     }
@@ -623,13 +617,13 @@ public class CDLDataCiteService {
     }
 
     public void emailException(String error, String item, String operation) throws IOException {
-        String admin = ConfigurationManager.getProperty("mail.admin");
+        String recipient = ConfigurationManager.getProperty("curator_errors.recipient");
         Locale locale = I18nUtil.getDefaultLocale();
         String emailFile = I18nUtil.getEmailFilename(locale, "datacite_error");
         Email email = ConfigurationManager.getEmail(emailFile);
 
         // Write our stack trace to a string for output
-        email.addRecipient(admin);
+        email.addRecipient(recipient);
 
         // Add details to display in the email message
         email.addArgument(operation);

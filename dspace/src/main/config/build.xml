@@ -268,7 +268,7 @@ Common usage:
 
 
     <!-- Loads bitstream format and Dublin Core type registries -->
-      <!--target name="update_metadata_registries" description="Update initial contents of registries">
+      <target name="update_metadata_registries" description="Update initial contents of registries">
 
           <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
               <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
@@ -304,9 +304,14 @@ Common usage:
               <sysproperty key="dspace.configuration" value="${config}" />
               <arg line="-u -f '${dspace.dir}/config/registries/workflow-types.xml'" />
           </java>
+          <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
+              <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+              <sysproperty key="dspace.log.init.disable" value="true" />
+              <sysproperty key="dspace.configuration" value="${config}" />
+              <arg line="-u -f '${dspace.dir}/config/registries/person-types.xml'" />
+          </java>
 
-
-      </target-->
+      </target>
 
 
 
@@ -849,7 +854,17 @@ Common usage:
         </java>
     </target>
 
+    <target name="update_database" description="Create database tables">
 
+        <!-- Load the EAC schema -->
+        <java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="false">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="authority.sql" />
+        </java>
+
+    </target>
     <!-- ============================================================= -->
     <!-- Remove the database tables                                    -->
     <!-- ============================================================= -->
@@ -909,7 +924,7 @@ Common usage:
     <!-- Do a fresh system install                                     -->
     <!-- ============================================================= -->
 
-    <target name="fresh_install" depends="init_installation,init_configs,test_database,setup_database,load_registries" description="Do a fresh install of the system, overwriting any data">
+    <target name="fresh_install" depends="init_installation,init_configs,test_database,setup_database,load_registries,update_database" description="Do a fresh install of the system, overwriting any data">
 
         <delete failonerror="no">
             <fileset dir="${dspace.dir}/bin" includes="**/*" />

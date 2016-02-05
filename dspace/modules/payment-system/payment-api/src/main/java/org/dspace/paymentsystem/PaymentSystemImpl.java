@@ -18,9 +18,10 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.Xref;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
+import org.dspace.content.authority.Concept;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
+import org.dspace.JournalUtils;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.VersionHistoryImpl;
@@ -71,10 +72,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
                         message("xmlui.PaymentSystem.shoppingcart.order.total");
 
-        protected static final Message T_noInteg=
-
-                        message("xmlui.PaymentSystem.shoppingcart.order.noIntegrateFee");
-
         protected static final Message T_Country=
 
                         message("xmlui.PaymentSystem.shoppingcart.order.country");
@@ -89,7 +86,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
 
 
-    protected static final String Country_Help_Text= "Submitters requesting a Waiver must be employees of an institution in an eligible country or be independent researchers in residence in an eligible country. Eligible countries are those classified by the World Bank as low-income or lower-middle-income economies.";
+    protected static final String Country_Help_Text= "Submitters requesting a waiver must be employees of an institution in an eligible country or be independent researchers in residence in an eligible country. Eligible countries are those classified by the World Bank as low-income or lower-middle-income economies.";
 
     protected static final String Voucher_Help_Text="Organizations may sponsor submissions to Dryad by purchasing and distributing voucher codes redeemable for one Data Publishing Charge.  Submitters redeeming vouchers may only use them with the permission of the purchaser.";
 
@@ -126,7 +123,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
         newShoppingcart.setJournal(null);
         newShoppingcart.setJournalSub(false);
         newShoppingcart.setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
-        newShoppingcart.setNoInteg(PaymentSystemConfigurationManager.getNotIntegratedJournalFeeProperty(currency));
         newShoppingcart.setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
         Double totalPrice =  calculateShoppingCartTotal(context, newShoppingcart, null);
         newShoppingcart.setTotal(totalPrice);
@@ -148,7 +144,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
     public void setCurrency(ShoppingCart shoppingCart,String currency)throws SQLException{
         shoppingCart.setCurrency(currency);
         shoppingCart.setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
-        shoppingCart.setNoInteg(PaymentSystemConfigurationManager.getNotIntegratedJournalFeeProperty(currency));
         shoppingCart.setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
         shoppingCart.update();
         shoppingCart.setModified(false);
@@ -205,6 +200,15 @@ public class PaymentSystemImpl implements PaymentSystemService {
             if(shoppingCarts.size()>0)
             {
                 return shoppingCarts.get(0);
+            } else {
+                // if the original item doesn't have a shopping cart,
+                // this item must've been created before the payment system was in place.
+                // We should create a completed placeholder cart for the original item, but make sure it is marked
+                // that it was created for versioning and should not be re-charged.
+                ShoppingCart versionCart = createNewShoppingCart(context,itemId,context.getCurrentUser().getID(),"",ShoppingCart.CURRENCY_US,ShoppingCart.STATUS_COMPLETED);
+                versionCart.setNote("cart created for versioning; do not charge");
+                versionCart.update();
+                return versionCart;
             }
 
         }
@@ -220,63 +224,101 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
     }
 
-    public Double calculateShoppingCartTotal(Context context,ShoppingCart shoppingcart,String journal) throws SQLException{
-        log.debug("recalculating shopping cart total");
-
-        Double price = new Double(0);
-
-        if(hasDiscount(context,shoppingcart,journal))
-        {
-            //has discount , only caculate the file surcharge fee
-            price =getSurchargeLargeFileFee(context, shoppingcart);
-        }
-        else
-        {
-            //no journal,voucher,country discount
-            Double basicFee = shoppingcart.getBasicFee();
-            double fileSizeFee=getSurchargeLargeFileFee(context, shoppingcart);
-            price = basicFee+fileSizeFee;
-            price = price+getNoIntegrateFee(context,shoppingcart,journal);
+    /**
+     * Calculate the shopping cart total
+     * @param discount if true, basicFee is ignored
+     * @param fileSizeSurcharge surcharge to add for large files
+     * @param basicFee basic submission fee
+     * @return the shopping cart total, based on the input parameters
+     */
+    static double calculateTotal(boolean discount,
+            double fileSizeSurcharge,
+            double basicFee) {
+        double price;
+        if(discount) {
+            price = fileSizeSurcharge;
+        } else {
+            // no journal, voucher, or country discount
+            price = basicFee + fileSizeSurcharge;
         }
         return price;
     }
 
-    public double getSurchargeLargeFileFee(Context context, ShoppingCart shoppingcart) throws SQLException {
-        Item item =Item.find(context, shoppingcart.getItem());
-        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, item);
-        Long allowedSizeT=PaymentSystemConfigurationManager.getMaxFileSize();
-        long allowedSize = allowedSizeT;
+    public Double calculateShoppingCartTotal(Context context,ShoppingCart shoppingcart,String journal) throws SQLException{
+        log.debug("recalculating shopping cart total");
+        boolean discount = hasDiscount(context,shoppingcart,journal);
+        double fileSizeSurcharge = getSurchargeLargeFileFee(context, shoppingcart);
+        double basicFee = shoppingcart.getBasicFee();
+        double price = calculateTotal(discount, fileSizeSurcharge, basicFee);
+        return price;
+    }
 
-        double totalSurcharge=0;
-        long totalSizeDataFile=0;
+    /**
+     * Calculate the surcharge for a data package, based on its size in bytes
+     * @param allowedSize the maximum size allowed before large file surcharge
+     * @param totalDataFileSize the total size of data files in bytes
+     * @param fileSizeFeeAfter the fee per unit to assess after exceeding allowedSize
+     * @param initialSurcharge Initial surcharge, e.g. 15 for the first 1GB exceeding 10GB.
+     * @param surchargeUnitSize amount of data to assess a fileSizeFeeAfter on, e.g. 1GB = 1*1024*1024
+     * @return The total surcharge to assess.
+     */
+    static double calculateFileSizeSurcharge(
+            long allowedSize,
+            long totalDataFileSize,
+            double fileSizeFeeAfter,
+            double initialSurcharge,
+            long surchargeUnitSize) {
+        double totalSurcharge = 0.0;
+        if(totalDataFileSize > allowedSize){
+            totalSurcharge = initialSurcharge;
+            int unit = 0;
+            //eg. $10 after every 1 gb
+            if(surchargeUnitSize > 0) {
+                Long overSize = (totalDataFileSize - allowedSize) / surchargeUnitSize;
+                unit = overSize.intValue();
+            }
+            totalSurcharge = totalSurcharge+fileSizeFeeAfter*unit;
+        }
+        return totalSurcharge;
+    }
+
+    /**
+     * Get the total size in bytes of all bitstreams within a data package.
+     * Assumes item is a data package and DryadWorkFlowUtils.getDataFiles returns
+     * data file items with bundles, bitstreams.
+     * @param context
+     * @param dataPackage
+     * @return
+     * @throws SQLException
+     */
+    public long getTotalDataFileSize(Context context, Item dataPackage) throws SQLException {
+        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, dataPackage);
+        long size = 0;
         for(Item dataFile : dataFiles){
-
             Bundle bundles[] = dataFile.getBundles();
             for(Bundle bundle:bundles)
             {
                 Bitstream bitstreams[]=bundle.getBitstreams();
                 for(Bitstream bitstream:bitstreams)
                 {
-                    totalSizeDataFile=totalSizeDataFile+bitstream.getSize();
+                    size += bitstream.getSize();
                 }
             }
-
         }
+        return size;
+    }
 
-        if(totalSizeDataFile > allowedSize){
-            totalSurcharge+=shoppingcart.getSurcharge();
-            int unit =0;
-            Long UNITSIZE=PaymentSystemConfigurationManager.getUnitSize();  //1 GB
-            //eg. $10 after every 1 gb
-            if(UNITSIZE!=null&&UNITSIZE>0) {
-                Long overSize = (totalSizeDataFile-allowedSize)/UNITSIZE;
-                unit = overSize.intValue();
-            }
-            totalSurcharge = totalSurcharge+shoppingcart.getSurcharge()*unit;
+    public double getSurchargeLargeFileFee(Context context, ShoppingCart shoppingcart) throws SQLException {
+        // Extract values from database objects and configuration to pass to calculator
+        String currency = shoppingcart.getCurrency();
 
-        }
+        long allowedSize = PaymentSystemConfigurationManager.getMaxFileSize().longValue();
+        double fileSizeFeeAfter = PaymentSystemConfigurationManager.getAllSizeFileFeeAfterProperty(currency);
+        Long unitSize = PaymentSystemConfigurationManager.getUnitSize();  //1 GB
 
-
+        Item item = Item.find(context, shoppingcart.getItem());
+        long totalSizeDataFile = getTotalDataFileSize(context, item);
+        double totalSurcharge = calculateFileSizeSurcharge(allowedSize, totalSizeDataFile, fileSizeFeeAfter, shoppingcart.getSurcharge(), unitSize);
         return totalSurcharge;
     }
 
@@ -302,59 +344,12 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
                 }
                 //update the journal and journal subscribtion
-                updateJournal(shoppingcart,journal);
+                updateJournal(context,shoppingcart,journal);
 
             }
         return shoppingcart.getJournalSub();
     }
 
-    public double getNoIntegrateFee(Context context, ShoppingCart shoppingcart, String journal) throws SQLException {
-        Double totalPrice = new Double(0);
-        if(journal==null){
-            Item item = Item.find(context,shoppingcart.getItem()) ;
-            if(item!=null)
-            {
-                try{
-                    DCValue[] values = item.getMetadata("prism.publicationName");
-                    if(values!=null && values.length > 0){
-                        journal=values[0].value;
-                    }
-                }catch (Exception e)
-                {
-                    log.error("Exception when get journal name in geting no integration fee:", e);
-                }
-            }
-
-        }
-        if(journal!=null)
-        {
-            try{
-                DryadJournalSubmissionUtils util = new DryadJournalSubmissionUtils();
-                Map<String, String> properties = util.journalProperties.get(journal);
-                if(properties!=null){
-                String subscription = properties.get("integrated");
-                if(subscription==null || !subscription.equals(ShoppingCart.FREE))
-                {
-
-                    totalPrice= shoppingcart.getNoInteg();
-                }
-
-
-            }
-            else
-            {
-                totalPrice= shoppingcart.getNoInteg();
-            }
-            }catch(Exception e){
-                log.error("Exception when get no integration fee:", e);
-            }
-        }
-        else
-        {
-            totalPrice= shoppingcart.getNoInteg();
-        }
-        return totalPrice;
-    }
 
     private boolean voucherValidate(Context context,ShoppingCart shoppingcart){
         VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
@@ -364,7 +359,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
     public boolean hasDiscount(Context context,ShoppingCart shoppingcart,String journal)throws SQLException{
         //this method check all the discount: journal,country,voucher
             Boolean journalSubscription =  getJournalSubscription(context, shoppingcart, journal);
-            Boolean countryDiscount = getCountryWaiver(context,shoppingcart,journal);
+            Boolean countryDiscount = getCountryWaiver(context,shoppingcart);
             Boolean voucherDiscount = voucherValidate(context,shoppingcart);
 
             if(journalSubscription||countryDiscount||voucherDiscount){
@@ -379,7 +374,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
     public int getWaiver(Context context,ShoppingCart shoppingcart,String journal)throws SQLException{
         //this method check all the discount: journal,country,voucher
         Boolean journalSubscription =  getJournalSubscription(context, shoppingcart, journal);
-        Boolean countryDiscount = getCountryWaiver(context,shoppingcart,journal);
+        Boolean countryDiscount = getCountryWaiver(context,shoppingcart);
         Boolean voucherDiscount = voucherValidate(context,shoppingcart);
 
         if(countryDiscount){
@@ -393,7 +388,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return ShoppingCart.NO_WAIVER;
     }
     
-    public boolean getCountryWaiver(Context context, ShoppingCart shoppingCart, String journal) throws SQLException{
+    public boolean getCountryWaiver(Context context, ShoppingCart shoppingCart) throws SQLException{
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         Properties countryArray = manager.getAllCountryProperty();
 
@@ -430,12 +425,12 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return payerName;
     }
 
-    private void updateJournal(ShoppingCart shoppingCart,String journal){
+    private void updateJournal(Context c,ShoppingCart shoppingCart,String journal){
         if(!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
         {
             if(journal!=null&&journal.length()>0) {
                 //update shoppingcart journal
-                Map<String, String> properties = DryadJournalSubmissionUtils.journalProperties.get(journal);
+                Map<String, String> properties = JournalUtils.findJournalProperties(c,journal);
                 Boolean subscription = false;
                 if(properties!=null){
                     if(StringUtils.equals(properties.get("subscriptionPaid"), ShoppingCart.FREE))
@@ -473,18 +468,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 result += format("Price",symbol+Double.toString(shoppingCart.getBasicFee()));
             }
 
-            Double noIntegrateFee =  getNoIntegrateFee(c,shoppingCart,null);
-
-            //add the no integrate fee if it is not 0
-            if(!hasDiscount(c,shoppingCart,null)&&noIntegrateFee>0&&!hasDiscount(c,shoppingCart,null))
-            {
-                result += format("Non-integrated submission", "" + noIntegrateFee);
-            }
-            else
-            {
-                result += format("Non-integrated submission", symbol+"0.0");
-            }
-
             //add the large file surcharge section
             format("Excess data storage", symbol+Double.toString(getSurchargeLargeFileFee(c,shoppingCart)));
 
@@ -493,7 +476,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 Voucher v = Voucher.findById(c, shoppingCart.getVoucher());
                 if(v != null)
                 {
-                    result += format("Voucher Applied", v.getCode());
+                    result += format("Voucher applied", v.getCode());
                 }
             }catch (Exception e)
             {
@@ -619,7 +602,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
             countryList.setLabel(T_Country);
             countryList.setHelp(Country_Help_Text);
-            countryList.addOption("","Select Your Country");
+            countryList.addOption("","Select your country");
             for(String temp:countryArray){
                 String[] countryTemp = temp.split(":");
                 if(shoppingCart.getCountry()!=null&&shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
@@ -634,7 +617,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
         if(shoppingCart.getCountry().length()>0)
         {
-            info.addItem("remove-country","remove-country").addXref("#","Remove Country : "+shoppingCart.getCountry());
+            info.addItem("remove-country","remove-country").addXref("#","Remove country : "+shoppingCart.getCountry());
         }
         else
         {
@@ -698,7 +681,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         voucher.addButton("apply","apply");
         if(voucher1!=null){
             voucherText.setValue(voucher1.getCode());
-            info.addItem("remove-voucher","remove-voucher").addXref("#", "Remove Voucher : " + voucher1.getCode(), "remove-voucher", "remove-voucher");
+            info.addItem("remove-voucher","remove-voucher").addXref("#", "Remove voucher : " + voucher1.getCode(), "remove-voucher", "remove-voucher");
         }
         else{
             info.addItem("remove-voucher","remove-voucher").addXref("#", "", "remove-voucher", "remove-voucher");
@@ -726,18 +709,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         {
             info.addItem("price","price").addContent(String.format("%s%.0f", symbol, shoppingCart.getBasicFee()));
         }
-        Double noIntegrateFee =  this.getNoIntegrateFee(context,shoppingCart,null);
 
-        //add the no integrate fee if it is not 0
-        info.addLabel(T_noInteg);
-        if(!this.hasDiscount(context,shoppingCart,null)&&noIntegrateFee>0&&!this.hasDiscount(context,shoppingCart,null))
-        {
-            info.addItem("no-integret","no-integret").addContent(String.format("%s%.0f", symbol, noIntegrateFee));
-        }
-        else
-        {
-            info.addItem("no-integret","no-integret").addContent(symbol+"0");
-        }
         generateSurchargeFeeForm(context,info,manager,shoppingCart);
 
 

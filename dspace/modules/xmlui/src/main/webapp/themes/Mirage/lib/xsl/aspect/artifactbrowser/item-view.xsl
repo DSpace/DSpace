@@ -53,7 +53,14 @@
                 <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='ORE']"/>
             </xsl:when>
             <xsl:otherwise>
-                <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
+                <xsl:choose>
+                  <xsl:when test="./mets:fileSec/mets:fileGrp/mets:file/mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
+                    <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.files-external-head</i18n:text></h2>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
+                  </xsl:otherwise>
+                </xsl:choose>
                 <table class="ds-table file-list">
                     <tr class="ds-table-header-row">
                         <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-file</i18n:text></th>
@@ -347,8 +354,14 @@
         <xsl:template match="mets:fileGrp[@USE='CONTENT']">
         <xsl:param name="context"/>
         <xsl:param name="primaryBitstream" select="-1"/>
-
-        <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
+        <xsl:choose>
+          <xsl:when test="mets:file/mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
+            <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.files-external-head</i18n:text></h2>
+          </xsl:when>
+          <xsl:otherwise>
+            <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
+          </xsl:otherwise>
+      </xsl:choose>
         <div class="file-list">
             <xsl:choose>
                 <!-- If one exists and it's of text/html MIME type, only display the primary bitstream -->
@@ -393,7 +406,29 @@
                     </xsl:choose>
                 </a>
             </div>
-            <div class="file-metadata" style="height: {$thumbnail.maxheight}px;">
+            <div class="file-metadata" style="min-height: {$thumbnail.maxheight}px;">
+              <xsl:choose>
+                <xsl:when test="mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
+                 <div>
+                    <span class="bold">
+                        <i18n:text>xmlui.submit.dataset.form.dataset.repo-name.help</i18n:text>
+                        <xsl:text>:</xsl:text>
+                    </span>
+                    <span>
+                      <xsl:value-of select="substring-before(mets:FLocat[@LOCTYPE='TXT']/@xlink:text,':')"/>
+                    </span>
+                </div>
+                <div>
+                    <span class="bold">
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-file</i18n:text>
+                        <xsl:text>:</xsl:text>
+                    </span>
+                    <span>
+                        <xsl:value-of select="mets:FLocat[@LOCTYPE='TXT']/@xlink:title"/>
+                    </span>
+                </div>
+              </xsl:when>
+              <xsl:otherwise>
                 <div>
                     <span class="bold">
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-name</i18n:text>
@@ -401,7 +436,7 @@
                     </span>
                     <span>
                         <xsl:attribute name="title"><xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/></xsl:attribute>
-                        <xsl:value-of select="util:shortenString(mets:FLocat[@LOCTYPE='URL']/@xlink:title, 32, 5)"/>
+                        <xsl:value-of select="util:getShortFileName(mets:FLocat[@LOCTYPE='URL']/@xlink:title, 32)"/>
                     </span>
                 </div>
                 <!-- File size always comes in bytes and thus needs conversion -->
@@ -411,24 +446,9 @@
                         <xsl:text>:</xsl:text>
                     </span>
                     <span>
-                        <xsl:choose>
-                            <xsl:when test="@SIZE &lt; 1000">
-                                <xsl:value-of select="@SIZE"/>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
-                            </xsl:when>
-                            <xsl:when test="@SIZE &lt; 1000000">
-                                <xsl:value-of select="substring(string(@SIZE div 1000),1,5)"/>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
-                            </xsl:when>
-                            <xsl:when test="@SIZE &lt; 1000000000">
-                                <xsl:value-of select="substring(string(@SIZE div 1000000),1,5)"/>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="substring(string(@SIZE div 1000000000),1,5)"/>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <xsl:call-template name="fileSizeString">
+                            <xsl:with-param name="size" select="@SIZE"/>
+                        </xsl:call-template>
                     </span>
                 </div>
                 <!-- Lookup File Type description in local messages.xml based on MIME Type.
@@ -475,12 +495,28 @@
                     <span>
                         <xsl:value-of select="@CHECKSUM"/>
                     </span>
-                </div>
+               </div>
+              </xsl:otherwise>
+            </xsl:choose>
             </div>
-            <div class="file-link" style="height: {$thumbnail.maxheight}px;">
+            <div class="file-link" style="min-height: {$thumbnail.maxheight}px;">
                 <a>
                     <xsl:attribute name="href">
-                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                       <xsl:choose>
+                         <xsl:when test="mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
+                           <xsl:choose>
+                             <xsl:when test="starts-with(mets:FLocat[@LOCTYPE='TXT']/@xlink:title,'//')">
+                               <xsl:value-of select="concat('http:',mets:FLocat[@LOCTYPE='TXT']/@xlink:title)"/>
+                             </xsl:when>
+                             <xsl:otherwise>
+                               <xsl:value-of select="concat('http://',mets:FLocat[@LOCTYPE='TXT']/@xlink:title)"/>
+                             </xsl:otherwise>
+                           </xsl:choose>
+                         </xsl:when>
+                         <xsl:otherwise>
+                          <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:attribute>
                     <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
                 </a>

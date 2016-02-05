@@ -29,23 +29,35 @@
 		    <name>selenium_test_url</name>
 		    <value>${seleniumTestURL}</value>
 		  </property>
+		  <property>
+		    <name>selenium_test_browser</name>
+		    <value>${seleniumTestBrowser}</value>
+		  </property>
 		</systemProperties>
 	      </configuration>
 	    </plugin>
 	  </plugins>
 	</build>
 
-        <dependencies>
-            <dependency>
-                <groupId>org.seleniumhq.selenium</groupId>
-                <artifactId>selenium-java</artifactId>
-                <version>2.12.0</version>
-            </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>2.45.0</version>
+        </dependency>
 	    <dependency>
-	      <groupId>junit</groupId>
-	      <artifactId>junit</artifactId>
-	      <version>4.8.1</version>
-	      <scope>test</scope>
+	        <groupId>junit</groupId>
+	        <artifactId>junit</artifactId>
+	        <version>4.8.1</version>
+	        <scope>test</scope>
 	    </dependency>
-        </dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.1.2</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
+
 </project>

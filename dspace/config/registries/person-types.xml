@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+
+<dspace-dc-types>
+
+    <dc-schema>
+        <name>person</name>
+        <namespace>http://purl.org/dspace/models/person</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>orcid</element>
+        <qualifier>id</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>familyName</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>givenName</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>creditName</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>otherName</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>country</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>keyword</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>external</element>
+        <qualifier>identifier</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>researcher</element>
+        <qualifier>url</qualifier>
+    </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>biography</element>
+    </dc-type>
+
+
+    <dc-type>
+        <schema>person</schema>
+        <element>email</element>
+    </dc-type>
+
+
+    <dc-type>
+        <schema>person</schema>
+        <element>institution</element>
+    </dc-type>
+
+</dspace-dc-types>

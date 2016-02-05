@@ -104,6 +104,7 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         pageMeta.addTrailLink(contextPath + "/submissions", T_non_archived_trail);
         pageMeta.addTrail().addContent(T_internal_trail);
+        pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(item));
     }
 
     private String getTitle(Item item) {

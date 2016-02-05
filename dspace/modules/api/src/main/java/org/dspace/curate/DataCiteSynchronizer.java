@@ -57,7 +57,7 @@ public class DataCiteSynchronizer extends AbstractCurationTask{
         try {
             // if item is in blackout, change target to the blackout URL
             if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
-                target = "http://datadryad.org/publicationBlackout";
+                target = ConfigurationManager.getProperty("dryad.blackout.url");
             }
         } catch (SQLException ex) {
             this.setResult("Unable to check if item is in publication blackout: " + ex.getLocalizedMessage());

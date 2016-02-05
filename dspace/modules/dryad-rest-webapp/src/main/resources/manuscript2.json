@@ -1,0 +1,48 @@
+{
+  "abstract": "This is the abstract of the article", 
+  "authors": {
+    "author": [
+      {
+        "familyName": "Smith", 
+        "givenNames": "John", 
+        "identifier": "0000-0000-0000-0000", 
+        "identifierType": "orcid"
+      }, 
+      {
+        "familyName": "Jones", 
+        "givenNames": "Sally"
+      }
+    ]
+  }, 
+  "correspondingAuthor": {
+    "address": {
+      "addressLine1": "123 Main St", 
+      "addressLine2": "Box 40560", 
+      "addressLine3": "", 
+      "city": "Anytown", 
+      "country": "United States", 
+      "state": "North Carolina", 
+      "zip": "27511"
+    }, 
+    "author": {
+      "familyName": "Smith", 
+      "givenNames": "John", 
+      "identifier": "0000-0000-0000-0000", 
+      "identifierType": "orcid"
+    }, 
+    "email": "smith@example.com"
+  }, 
+  "dryadDataDOI": "doi:10.5061/dryad.abc123", 
+  "keywords": {
+    "keyword": [
+      "Science", 
+      "Data", 
+      "Publishing"
+    ]
+  }, 
+  "manuscriptId": "MS12345-abc", 
+  "publicationDOI": "doi:10.12345/987cba", 
+  "publicationDate": "2014-10-17T00:00:00-04:00", 
+  "status": "submitted", 
+  "title": "Title of article 1"
+}

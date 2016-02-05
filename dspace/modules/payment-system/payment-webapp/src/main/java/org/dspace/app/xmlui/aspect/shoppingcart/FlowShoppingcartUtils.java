@@ -45,7 +45,6 @@ public class FlowShoppingcartUtils {
             String country = request.getParameter("country");
             String currency = request.getParameter("currency");
             String basicFee = request.getParameter("basicFee");
-            String noInteg = request.getParameter("noInteg");
             String surCharge = request.getParameter("surCharge");
             String transactionId = request.getParameter("transactionId");
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
@@ -127,13 +126,7 @@ public class FlowShoppingcartUtils {
                         {
                             shoppingCart.setSurcharge(new Double(0.0));
                         }
-                    if (noInteg != null && noInteg.length()>0 && Double.parseDouble(noInteg)>0) {
-                        shoppingCart.setNoInteg(Double.parseDouble(noInteg));
-                    }
-                    else
-                        {
-                            shoppingCart.setNoInteg(new Double(0.0));
-                        }
+
                     if (basicFee != null && basicFee.length()>0 && Double.parseDouble(basicFee)>0) {
                         shoppingCart.setBasicFee(Double.parseDouble(basicFee));
                     }

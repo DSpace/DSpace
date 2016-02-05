@@ -8,19 +8,17 @@
 package org.dspace.curate;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.dspace.JournalUtils;
+import org.dspace.content.authority.Concept;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -36,6 +34,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Bundle;
 import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -46,6 +45,8 @@ import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.utils.DSpace;
 
 import org.apache.log4j.Logger;
+
+import org.datadryad.api.DryadDataFile;
 
 /**
  * DataFileStats retrieves detailed statistics about a data file.
@@ -84,30 +85,25 @@ public class DataFileStats extends AbstractCurationTask {
 	    throw new IOException("unable to initiate xml processor", e);
 	}
 
-
-	// init list of journals that support embargo and review
-        String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
-	log.info("initializing journal settings from property file " + journalPropFile);
-        Properties properties = new Properties();
 	try {
-	    properties.load(new InputStreamReader(new FileInputStream(journalPropFile), "UTF-8"));
-	    String journalTypes = properties.getProperty("journal.order");
-	    for (int i = 0; i < journalTypes.split(",").length; i++) {
-		String journalType = journalTypes.split(",")[i].trim();
-		String journalDisplay = properties.getProperty("journal." + journalType + ".fullname");
-		String integrated = properties.getProperty("journal." + journalType + ".integrated");
-		String embargo = properties.getProperty("journal." + journalType + ".embargoAllowed", "true");
-		String allowReviewWorkflow = properties.getProperty("journal." + journalType + ".allowReviewWorkflow", "false");
 
-		if(integrated != null && Boolean.valueOf(integrated)) {
-		    integratedJournals.add(journalDisplay);
-		}
-		if(allowReviewWorkflow != null && Boolean.valueOf(allowReviewWorkflow)) {
-		    journalsThatAllowReview.add(journalDisplay);
-		}
-		if(embargo != null && Boolean.valueOf(embargo)) {
-		    integratedJournalsThatAllowEmbargo.add(journalDisplay);
-		}
+        for(Concept concept:JournalUtils.getJournalConcepts(context)){
+
+            String journalDisplay = concept.getPreferredLabel();
+            String integrated = JournalUtils.getIntegrated(concept);
+            String embargo = JournalUtils.getEmbargoAllowed(concept);
+            String allowReviewWorkflow = JournalUtils.getAllowReviewWorkflow(concept);
+
+            if(integrated != null && Boolean.valueOf(integrated)) {
+                integratedJournals.add(journalDisplay);
+            }
+            if(allowReviewWorkflow != null && Boolean.valueOf(allowReviewWorkflow)) {
+                journalsThatAllowReview.add(journalDisplay);
+            }
+            if(embargo != null && Boolean.valueOf(embargo)) {
+                integratedJournalsThatAllowEmbargo.add(journalDisplay);
+            }
+
 	    }
 	} catch(Exception e) {
 	    log.error("Unable to initialize the journal settings");
@@ -141,7 +137,8 @@ public class DataFileStats extends AbstractCurationTask {
 	int numReadmes = 0;
 	boolean wentThroughReview = false;
 	String dateAccessioned = "\"[unknown]\"";
-
+        String fileName = "\"[unknown]\"";
+        String mimeType = "\"[unknown]\"";
 
 	
 	try {
@@ -154,7 +151,7 @@ public class DataFileStats extends AbstractCurationTask {
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output headers for the CSV file that will be created by processing all items in this collection
 	    report("handle, fileDOI, articleDOI, journal, journalAllowsEmbargo, journalAllowsReview, numKeywords, fileSize, " +
-		   "embargoType, embargoDate, numberOfDownloads, numReadmes, wentThroughReview, dateAccessioned");
+		   "embargoType, embargoDate, numberOfDownloads, numReadmes, wentThroughReview, dateAccessioned, fileName, mimeType");
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
 
@@ -309,13 +306,25 @@ public class DataFileStats extends AbstractCurationTask {
 		Document statsdoc = docb.parse(downloadStatURL.openStream());
 		NodeList nl = statsdoc.getElementsByTagName("result");
 		numberOfDownloads = nl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
-		
+
+                // file name (of first bitstream)
+                DryadDataFile df = new DryadDataFile(item);
+                Bitstream bitstream = df.getFirstBitstream();
+                fileName = bitstream.getName();
+                    
+                // file type (of first bitstream)
+                BitstreamFormat bf = bitstream.getFormat();
+                mimeType = bf.getMIMEType();
+
+                // report output
 		report(handle + ", " + fileDOI + ", " + articleDOI + ", \"" + journal + "\", " +
 		       journalAllowsEmbargo + ", " + journalAllowsReview + ", " + numKeywords + ", " +
 		       fileSize + ", " + embargoType + ", " + embargoDate + ", " + numberOfDownloads + ", " +
-		       numReadmes + ", " + wentThroughReview + ", " + dateAccessioned);
+		       numReadmes + ", " + wentThroughReview + ", " + dateAccessioned + ", " + fileName + ", " + mimeType);
 		
 		log.info(handle + " done.");
+
+                
 	    } catch (Exception e) {
 		log.fatal("Skipping -- Exception in processing " + handle, e);
 		setResult("Object has a fatal error: " + handle + "\n" + e.getMessage());

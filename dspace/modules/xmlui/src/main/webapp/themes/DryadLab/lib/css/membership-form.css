@@ -1,0 +1,32 @@
+/* 
+ * Page-specific style for Dryad membership form
+ */
+ label.ds-form-label
+ {
+    display: block;
+    margin: 20px 0 0;
+    color: #555;
+    font-weight: bold;
+    font-size: 1.3em;
+ }
+ .required-mark {
+    color: #2a3;
+ }
+ #required-fields-note {
+    float: right; 
+    padding-right: 12px; 
+    font-size: 1.1em;
+ }
+ form.membership-form ul li {
+    color: inherit;
+    margin-bottom: 4px;
+ }
+ form.membership-form textarea,
+ form.membership-form input[type='text'] {
+    width: 500px;
+ }
+ fieldset.ds-radio-field label {
+    display: block;
+    margin: 5px 0 5px 30px;
+    margin-
+ }

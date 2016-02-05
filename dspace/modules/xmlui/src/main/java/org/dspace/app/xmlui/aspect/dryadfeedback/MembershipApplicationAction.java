@@ -45,6 +45,7 @@ public class MembershipApplicationAction extends AbstractAction
         String membership_year_start = request.getParameter("membership_year_start"); // required
         String membership_length = request.getParameter("membership_length"); // required
         String rep_name = request.getParameter("rep_name"); // required
+        String rep_title = request.getParameter("rep_title"); // required
         String rep_email = request.getParameter("rep_email"); // required
         String comments = request.getParameter("comments");
         String submittedOnce = request.getParameter("submitted_once");
@@ -193,6 +194,7 @@ public class MembershipApplicationAction extends AbstractAction
         email.addArgument(membership_year_start);
         email.addArgument(membership_length);
         email.addArgument(rep_name);
+        email.addArgument(rep_title);
         email.addArgument(rep_email);
         email.addArgument(comments);
         email.addArgument(agent);

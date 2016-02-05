@@ -972,6 +972,11 @@ function doWorkflow()
             getDSContext().complete();
             cocoon.exit();
         }
+        else if (cocoon.request.get("submit-credit")){
+            var step = cocoon.request.get("stepID");
+            var action =  cocoon.request.get("actionID");
+            cocoon.redirectTo(contextPath+"/handle/"+handle+"/workflow?workflowID="+workflowItemId+"&stepID="+step+"&actionID="+action+"&submit-credit=true&credit=true",true);
+        }
         else if (cocoon.request.get("submit-voucher"))
         {
             cocoon.redirectTo(contextPath+"/handle/"+handle+"/workflow_new?workflowID="+workflowItemId+"&stepID=reAuthorizationPaymentStep&actionID=reAuthorizationPaymentAction&submit-voucher=true&voucher="+cocoon.request.get("voucher"),true);

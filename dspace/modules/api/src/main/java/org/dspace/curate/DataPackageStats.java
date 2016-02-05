@@ -21,6 +21,10 @@ import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.dspace.JournalUtils;
+import org.dspace.content.authority.Concept;
+import org.dspace.content.authority.Scheme;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -71,9 +75,9 @@ public class DataPackageStats extends AbstractCurationTask {
     DocumentBuilder docb = null;
     static long total = 0;
     private Context context;
-    private static List<String> journalsThatAllowReview = new ArrayList<String>();
-    private static List<String> integratedJournals = new ArrayList<String>();
-    private static List<String> integratedJournalsThatAllowEmbargo = new ArrayList<String>();
+//    private static List<String> journalsThatAllowReview = new ArrayList<String>();
+//    private static List<String> integratedJournals = new ArrayList<String>();
+//    private static List<String> integratedJournalsThatAllowEmbargo = new ArrayList<String>();
     
     @Override 
     public void init(Curator curator, String taskId) throws IOException {
@@ -87,35 +91,6 @@ public class DataPackageStats extends AbstractCurationTask {
 	    docb = dbf.newDocumentBuilder();
 	} catch (ParserConfigurationException e) {
 	    throw new IOException("unable to initiate xml processor", e);
-	}
-
-
-	// init list of journals that support embargo and review
-        String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
-	log.info("initializing journal settings from property file " + journalPropFile);
-        Properties properties = new Properties();
-	try {
-	    properties.load(new InputStreamReader(new FileInputStream(journalPropFile), "UTF-8"));
-	    String journalTypes = properties.getProperty("journal.order");
-	    for (int i = 0; i < journalTypes.split(",").length; i++) {
-		String journalType = journalTypes.split(",")[i].trim();
-		String journalDisplay = properties.getProperty("journal." + journalType + ".fullname");
-		String integrated = properties.getProperty("journal." + journalType + ".integrated");
-		String embargo = properties.getProperty("journal." + journalType + ".embargoAllowed", "true");
-		String allowReviewWorkflow = properties.getProperty("journal." + journalType + ".allowReviewWorkflow", "false");
-
-		if(integrated != null && Boolean.valueOf(integrated)) {
-		    integratedJournals.add(journalDisplay);
-		}
-		if(allowReviewWorkflow != null && Boolean.valueOf(allowReviewWorkflow)) {
-		    journalsThatAllowReview.add(journalDisplay);
-		}
-		if(embargo != null && Boolean.valueOf(embargo)) {
-		    integratedJournalsThatAllowEmbargo.add(journalDisplay);
-		}
-	    }
-	} catch(Exception e) {
-	    log.error("Unable to initialize the journal settings");
 	}
     }
     
@@ -213,12 +188,20 @@ public class DataPackageStats extends AbstractCurationTask {
 		// journalAllowsEmbargo
 		// embargoes are allowed for all non-integrated journals
 		// embargoes are also allowed for integrated journals that have set the embargoesAllowed option
-		if(!integratedJournals.contains(journal) || integratedJournalsThatAllowEmbargo.contains(journal)) {
-		    journalAllowsEmbargo = true;
+        //use new journal utils to read the configuration from database instead of from the file
+        Scheme journalScheme = Scheme.findByIdentifier(context,"Journal");
+        Concept[] journalConcept = Concept.findByPreferredLabel(context,journal,journalScheme.getID());
+
+
+
+		if(journalConcept!=null&&journalConcept.length>0) {
+            if(JournalUtils.getBooleanIntegrated(journalConcept[0])|| JournalUtils.getBooleanEmbargoAllowed(journalConcept[0])) {
+		        journalAllowsEmbargo = true;
+            }
 		} 
 
 		// journalAllowsReview
-		if(journalsThatAllowReview.contains(journal)) {
+		if(journalConcept!=null&&journalConcept.length>0&&JournalUtils.getBooleanAllowReviewWorkflow(journalConcept[0])) {
 		    journalAllowsReview = true;
 		}
 				
@@ -266,54 +249,6 @@ public class DataPackageStats extends AbstractCurationTask {
 		if(manuscriptNum != null && manuscriptNum.trim().length() > 0) {
 		    log.debug("has a real manuscriptNum = " + manuscriptNum);
 
-
-		    /* 
-		    // number of keywords in journal email -- currently commented out because it wasn't working for 2012 and later.
-		    
-		    //find metadata file for the manuscript
-		    int firstdash = manuscriptNum.indexOf("-");
-		    String journalAbbrev = manuscriptNum.substring(0, firstdash);
-		    if(journalAbbrev.startsWith("0") ||
-		       journalAbbrev.startsWith("1") ||
-		       journalAbbrev.startsWith("2") ||
-		       journalAbbrev.startsWith("3") ||
-		       journalAbbrev.startsWith("4") ||
-		       journalAbbrev.startsWith("5") ||
-		       journalAbbrev.startsWith("6") ||
-		       journalAbbrev.startsWith("7") ||
-		       journalAbbrev.startsWith("8") ||
-		       journalAbbrev.startsWith("9")) {
-			//handle older manuscript numbers from amnat
-			journalAbbrev = "amNat";
-			manuscriptNum = "amNat-" + manuscriptNum;
-			firstdash = 5;
-		    }
-
-		    if(!journalAbbrev.equals("new")) {
-			numKeywordsJournal = "0";
-			String journalDir="/opt/dryad/submission/journalMetadata/";
-			manuscriptNum = manuscriptNum.substring(firstdash + 1);
-			int lastdash = manuscriptNum.lastIndexOf("-");
-			if(lastdash >= 0) {
-			    manuscriptNum = manuscriptNum.substring(0, lastdash);		    
-			    File journalFile = new File(journalDir + journalAbbrev + "/" + manuscriptNum + ".xml");
-			    
-			    //get keywords from the file and count them
-			    if(journalFile.exists()) {
-				Document journaldoc = docb.parse(new FileInputStream(journalFile));
-				NodeList nl = journaldoc.getElementsByTagName("keyword");
-				numKeywordsJournal = "" + nl.getLength();
-			    } else {
-				report("Unable to find journal file " + journalFile);
-				log.error("Unable to find journal file " + journalFile);
-			    }
-			} else {
-			    report("Unable to parse manuscript number " +  manuvals[0].value);
-			    log.error("Unable to parse manuscript number " +  manuvals[0].value);
-			}
-			log.debug("numKeywordsJournal = " + numKeywordsJournal);
-		     }
-		    */
 		}
 
 

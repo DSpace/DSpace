@@ -6,6 +6,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.Item;
+import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.identifier.DOIIdentifierProvider;
@@ -48,7 +49,7 @@ public class DepositConfirmedStep extends AbstractSubmissionStep{
 
         Division dataPackageDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
 
-        dataPackageDiv.addPara().addContent("Thank you for your submission! Your submission has been forwarded to the Dryad curation staff. Once curation staff have reviewed your submission, you will receive a permanent DOI that can be used to cite the data package. You will hear from us within two business days.");
+        dataPackageDiv.addPara().addContent("Thank you for your submission! Your data package has been forwarded to Dryad curation staff, and you have been sent a confirmation email containing a provisional DOI for your data package. Once your submission has been reviewed and approved, the DOI becomes permanent and can be used to cite your data package. You will hear from us within two business days.");
 
 	dataPackageDiv.addPara("data-label", "bold").addContent(item.getName());
 
@@ -62,7 +63,7 @@ public class DepositConfirmedStep extends AbstractSubmissionStep{
 
         int i = 0;
         for (org.dspace.content.Item dataFile : dataFiles){
-            addPara(dataFileDiv, " " + dataFile.getName());
+            addPara(dataFileDiv, " " + XSLUtils.getShortFileName(dataFile.getName(), 50));
         }
 
     }

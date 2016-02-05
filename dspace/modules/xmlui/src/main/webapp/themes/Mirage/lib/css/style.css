@@ -61,6 +61,7 @@ a:hover {
     background-color: transparent;
     color: #444;
     min-width: 950px;
+    padding-bottom: 10px;
 }
 
 #ds-header {
@@ -244,13 +245,6 @@ a.discreet {
 #ds-body {
     float: left;
     width: 675px;
-    padding-top: 12px;
-}
-/* alignment fix for "nested" bodies */
-#ds-body #ds-body {
-    padding: 0;
-    margin: 0;
-    margin-top: -1em;
 }
 
 #ds-options-wrapper {
@@ -444,10 +438,13 @@ div.bioText {
 } 
 
 #aspect_eperson_PasswordLogin_div_register h1, #aspect_eperson_PasswordLogin_div_login h1 {
-    font-size: 130%;
+    margin: 20px 0px 0px; /* top right bottom left */
+	font-size: 130%;
     text-align: center;
 }
-
+#aspect_eperson_PasswordLogin_div_login p a {
+    margin-right: 20px;
+}
 #aspect_eperson_PasswordLogin_div_login {
     margin: 20px 0px 40px; /* top right bottom left */
     float: right;
@@ -480,7 +477,7 @@ div.bioText {
 #aspect_submission_StepTransformer_list_doi > table {
     border: 1px solid #ccc;
     float: left;
-    width: 497px;
+    width: 95%;
     display: inline-block;
     padding: 10px;
     position: relative;
@@ -774,6 +771,11 @@ li.ds-form-item .ds-form-label{
     font-size: 123.1%;
 }
 
+.ds-form-label.help{
+    font-weight: bold;
+    font-size: 123.1%;
+}
+
 li.ds-form-item label.ds-composite-component{
     display: block;
     float: left;
@@ -788,6 +790,7 @@ li.ds-form-item label.ds-composite-component input.ds-text-field{
 
 li.ds-form-item .ds-select-field {
     margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .ds-add-button,
@@ -841,7 +844,14 @@ li.ds-form-item label.ds-composite-component.last{
 }
 .submission .ds-form-list .ds-previous-values {
     clear: left;
-    width: 500px;
+    width: 100%;
+}
+
+td.ds-reorder-edit-input-col {
+    width: 80%;
+}
+img.ds-authority-confidence.cf-blank {
+    display: none;
 }
 
 #aspect_submission_Submissions_div_submissions .ds-static-div,
@@ -1284,7 +1294,7 @@ div.simple-item-view-description h3{
 }
 
 .file-metadata {
-    width: 400px;
+    width: 450px;
 }
 
 .file-metadata span,
@@ -1533,9 +1543,8 @@ a.learn-to-submit-button:hover {
     padding-top: 0px;
     padding-bottom: 8px;
 }
-#browse-data-buttons {
+h1 + div.tab-buttons {
     padding-top: 8px;
-    padding-bottom: 0px;
 } 
 .tab-buttons a {
     display: inline-block;
@@ -1811,6 +1820,7 @@ img.pub-cover {
 .publication-header .pub-title {
     font-size: 1.2em;
     font-weight: bold;
+    word-wrap: break-word;
 }
 .citation-sample {
     background-color: #ddd;
@@ -1835,6 +1845,7 @@ table.package-file-description {
     -moz-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
     -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    table-layout:fixed;
 }
 table.package-file-description th:first-child {
     width: 120px;
@@ -1844,6 +1855,7 @@ table.package-file-description th {
     font-weight: bold;
     text-align: left;
     vertical-align: top;
+    word-wrap:break-word;
 }
 table.package-metadata th:first-child,
 table.package-file-description th:first-child {
@@ -1913,6 +1925,10 @@ div.ds-form-content {
     display: block;
     padding: 7px;
     width:100%;
+}
+a.ds-form-content {
+    vertical-align: text-top;
+    padding: 7px;
 }
 span.ds-form-label,label.ds-form-label {
     display: block;
@@ -1996,6 +2012,7 @@ fieldset.ds-form-list ol {
     width: 100%;
     list-style-type: none;
 }
+
 fieldset.ds-form-list legend {
     color: #336699;
     background-color: inherit;
@@ -2350,6 +2367,10 @@ li#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div{
     padding:10px;
 }
 
+#aspect_paymentsystem_ShoppingCartTransformer_list_need-help {
+    margin-bottom: 20px;
+}
+
 ul.navigation-link{
     padding: 5px 0;
     list-style: none;
@@ -2405,12 +2426,11 @@ div.step-link{
     color:green;
 }
 .label-mark{
-
+    margin-left: 5px;
+    vertical-align: middle;
     width:20px;
     display:inline;
 }
-
-
 
 #aspect_eperson_TermsOfService_div_background{
     display: none;
@@ -2474,7 +2494,9 @@ table#aspect_submission_workflow_WorkflowTransformer_table_workflow-actions tr.a
     color:red
 }
 
-#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country div,#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher div,#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info div {
+#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country div,
+#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher div,
+#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info div {
     width:100% !important;
 }
 
@@ -2489,7 +2511,7 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
 
 .help-title{
     color:grey;
-    font-size: 0.5em;
+    font-size: 0.66em;
 }
 
 #aspect_submission_submit_OverviewStep_div_submit-completed-overview{
@@ -2499,6 +2521,28 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
     box-shadow: 0px 0px 0px rgba(33, 33, 33, 1.0);
 }
 
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview > div.ds-static-div.subdiv {
+    margin-bottom: 18px;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview > h1.ds-div-head {
+    color: #336699;
+    background-color: inherit;
+    font-size: 115%;
+    font-weight: bolder;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview ul.ds-artifact-list li.ds-artifact-item {
+    padding: 0 !important;
+    margin-left: 0;
+    text-indent: 0 !important;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview ul.ds-artifact-list li.ds-artifact-item div {
+    padding: 0 !important;
+    margin-bottom: 10px;
+}
+
 #aspect_submission_submit_OverviewStep_div_finalizedivision{
     padding-top: 6px;
 }
@@ -2506,3 +2550,122 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
 #SpiderTrap p a{
     color: transparent;
 }
+
+input.ds-author-order-col {
+    width: 2em;
+}
+td.ds-author-input-col {
+    width: 80%;
+}
+td.ds-author-input-col input {
+    width: 45%;
+}
+
+/* membershipOverview.xhtml */
+ul.membership-overview {
+    margin-bottom: 10px;
+}
+h1 + div.field-help {
+    margin-top: -24px;
+    float: right;
+}
+.currency-table {
+    width: 90%;
+    margin: 1.5em auto 0.5em;
+}
+.currency-table td {
+     text-align: center;
+}
+table.currency-table td.left {
+    text-align: left;
+}
+.currency-table th:first-child,
+.currency-table td:first-child {
+    text-align: left;
+    padding-left: 8px;
+}
+.currency-table tr {
+    background-color: #eee;
+}
+.currency-table tr.odd {
+    background-color: #fff;
+}
+.charter-mark {
+    color: #40841C;
+}
+
+.pricing-block {
+    width: 90%;
+    margin: 1.5em auto 1.5em;
+}
+.pricing-block fieldset {
+    margin-bottom: .5em;
+}
+.pricing { float: right; }
+input.percentage, input.articles { width: 3em; }
+span.income { float: right; }
+.add-on {
+    display: inline-block;
+    width: 1em;
+    padding: 4px 0px;
+}
+#calculate_buttons { float: right; }
+#calculate_button { margin-right: 0px; }
+.pricing-table {
+    width: 100%;
+    margin-bottom: 0.5em;
+}
+.pricing-table td, .pricing-table th {
+    text-align: left;
+    font-size:90%;
+}
+.pricing-table th:first-child,
+.pricing-table td:first-child {
+    text-align: left;
+    padding-left: 8px;
+}
+.pricing-table tr {
+    background-color: #eee;
+}
+.pricing-table tr.odd {
+    background-color: #fff;
+}
+.pricing_errors {
+    display: none;
+    color: red;
+}
+.pricing-table {
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+}
+.pricing-table th,
+.pricing-table td {
+    background-color: #eee;
+}
+.pricing-table tr.odd td {
+    background-color: #fff;
+}
+.pricing-table td.plan-name,
+.currency-table td.plan-name {
+    font-weight: bold;
+    color: #40841c; 
+}
+
+.special-announcement {
+    background-color: #ddeedd;
+    border-radius: 5px 5px 5px 5px;
+    font-size: 17px;
+    margin-bottom: 16px;
+    margin-top: 4px;
+    padding: 8px 12px 6px;
+    text-align: left;
+}
+h2.pricing-plan {
+    font-style: italic;
+}
+
+
+.orcid-error{
+    color:red;
+}
+

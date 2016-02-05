@@ -10,7 +10,7 @@ package org.dspace.core;
 /**
  * Class with constants and matching strings, for DSpace types. These numbers
  * must never be changed!!
- * 
+ *
  * @author David Stuve
  * @version $Revision$
  */
@@ -40,11 +40,20 @@ public class Constants
     /** Type of individual eperson objects */
     public static final int EPERSON = 7;
 
+    /** DSpace site type */
+    public static final int SCHEME = 8;
+
+    /** Type of eperson groups */
+    public static final int CONCEPT = 9;
+
+    /** Type of individual eperson objects */
+    public static final int TERM = 10;
+
     /**
      * lets you look up type names from the type IDs
      */
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM",
-            "COLLECTION", "COMMUNITY", "SITE", "GROUP", "EPERSON" };
+            "COLLECTION", "COMMUNITY", "SITE", "GROUP", "EPERSON", "SCHEME", "CONCEPT", "TERM" };
 
     /**
      * Special Bundle and Bitstream Names:
@@ -80,7 +89,7 @@ public class Constants
     /**
      * Action of deleting something. Different from removing something from a
      * container. (DELETE is now obsolete)
-     * 
+     *
      * @see #REMOVE
      */
     public static final int DELETE = 2;
@@ -94,7 +103,7 @@ public class Constants
 
     /**
      * Action of removing something from a container. Different from deletion.
-     * 
+     *
      * @see #DELETE
      */
     public static final int REMOVE = 4;
@@ -126,7 +135,7 @@ public class Constants
      * Administrative actions - System Admin, Community Admin, Collection Admin
      */
     public static final int ADMIN = 11;
-    
+
     /** Position of front page news item -- top box */
     public static final int NEWS_TOP = 0;
 
@@ -165,7 +174,7 @@ public class Constants
     public static final int[] actionTypeRelevance = {
             RBITSTREAM | RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 0 - READ
             RBITSTREAM | RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 1 -
-                                                                     // WRITE
+            // WRITE
             0, // 2 - DELETE (obsolete)
             RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 3 - ADD
             RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 4 - REMOVE
@@ -182,10 +191,10 @@ public class Constants
 
     /**
      * If you know the type string, look up the corresponding type ID constant.
-     * 
+     *
      * @param type
      *            String with the name of the type (must be exact match)
-     * 
+     *
      * @return the corresponding type ID, or <code>-1</code> if the type
      *         string is unknown
      */
@@ -205,10 +214,10 @@ public class Constants
     /**
      * If you know the action string, look up the corresponding type ID
      * constant.
-     * 
+     *
      * @param action
      *            String with the name of the action (must be exact match)
-     * 
+     *
      * @return the corresponding action ID, or <code>-1</code> if the action
      *         string is unknown
      */

@@ -87,7 +87,7 @@ public class PropagateItemMetadataAction extends AbstractAction {
             // Clear out any existing metadata for this field
             dataFile.clearMetadata(first.schema, first.element, first.qualifier, Item.ANY);
             for(DCValue value : values) {
-                dataFile.addMetadata(value.schema, value.element, value.qualifier, value.language, value.value);
+                dataFile.addMetadata(value.schema, value.element, value.qualifier, value.language, value.value, value.authority, value.confidence);
             }
             dataFile.update();
         }

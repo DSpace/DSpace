@@ -43,7 +43,7 @@ ul.ui-menu li a.ui-state-hover {
 /* this magic gets the 16x16 icon to show up.. setting height/width didn't
    do it, but adding padding actually made it show up. */
 img.ds-authority-confidence
-{ width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: bottom; display: inline-block;}
+{ width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: middle; display: inline-block;}
 
 img.ds-authority-confidence.cf-unset
   { background: transparent url(../../images/authority_control/confidence/bug.png); }
@@ -62,6 +62,8 @@ img.ds-authority-confidence.cf-uncertain
 img.ds-authority-confidence.cf-accepted
   { background: transparent url(../../images/authority_control/confidence/6-thumb2.gif); }
 
+img.ds-authority-confidence.cf-accepted.orcid
+  { background: transparent url(../../images/authority_control/confidence/orcid_16x16.gif); }
 /* hide authority-value inputs in forms */
 input.ds-authority-value { display:none; }
 /** XXX Change to this to get the authority value to show up for debugging:

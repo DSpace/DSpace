@@ -80,7 +80,7 @@ public class WorkflowFactory {
                 }
             } catch (Exception e){
                 log.error("Error while retrieving workflow for collection: " + collection.getHandle(), e);
-                throw new WorkflowConfigurationException("Error while retrieving workflow for the following collection: " + collection.getHandle());
+                throw new WorkflowConfigurationException("Error while retrieving workflow for the following collection: " + collection.getHandle(), e);
             }
         }else{
             return workflowCache.get(collection.getHandle());

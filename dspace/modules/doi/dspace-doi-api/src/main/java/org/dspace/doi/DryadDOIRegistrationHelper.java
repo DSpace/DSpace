@@ -20,7 +20,7 @@ public class DryadDOIRegistrationHelper {
     public static boolean isDataPackageInPublicationBlackout(Item dataPackage) throws SQLException {
         // Publication blackout is indicated by provenance metadata
         boolean isInBlackout = false;
-        DCValue provenance[] =  dataPackage.getMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en");
+        DCValue provenance[] =  dataPackage.getMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", Item.ANY);
         for(DCValue dcValue : provenance) {
             // only return true if the last recorded provenance indicates publication blackout
             if(dcValue.value != null)

@@ -1,6 +1,7 @@
 package org.dspace.app.xmlui.aspect.submission.submit;
 
 import org.apache.log4j.Logger;
+import org.dspace.JournalUtils;
 import org.dspace.app.util.*;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.Item;
@@ -10,10 +11,7 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.content.*;
-import org.dspace.content.authority.MetadataAuthorityManager;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.Choice;
+import org.dspace.content.authority.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.workflow.DryadWorkflowUtils;
@@ -63,41 +61,6 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
     private static final String PUBLICATION_BLACKOUT = "publicationBlackout";
     private static final String NOTIFY_ON_REVIEW = "notifyOnReview";
     private static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
-
-
-    public static final java.util.Map<String, Map<String, String>> journalProperties = new HashMap<String, Map<String, String>>();
-    static{
-        String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
-        Properties properties = new Properties();
-        try {
-            properties.load(new InputStreamReader(new FileInputStream(journalPropFile), "UTF-8"));
-            String journalTypes = properties.getProperty("journal.order");
-
-            for (int i = 0; i < journalTypes.split(",").length; i++) {
-                String journalType = journalTypes.split(",")[i].trim();
-
-                String str = "journal." + journalType + ".";
-
-                Map<String, String> map = new HashMap<String, String>();
-                map.put(FULLNAME, properties.getProperty(str + FULLNAME));
-                map.put(METADATADIR, properties.getProperty(str + METADATADIR));
-                map.put(INTEGRATED, properties.getProperty(str + INTEGRATED));
-                map.put(PUBLICATION_BLACKOUT, properties.getProperty(str + PUBLICATION_BLACKOUT, "false"));
-                map.put(NOTIFY_ON_REVIEW, properties.getProperty(str + NOTIFY_ON_REVIEW));
-                map.put(NOTIFY_ON_ARCHIVE, properties.getProperty(str + NOTIFY_ON_ARCHIVE));
-
-                String key = properties.getProperty(str + FULLNAME);
-                journalProperties.put(key, map);
-            }
-
-        }catch (IOException e) {
-            log.error("Error while loading journal properties", e);
-        }
-    }
-
-
-
-
 
     /**
      * Return the inputs reader. Note, the reader must have been
@@ -377,7 +340,7 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
         }
     }
 
-    private static void renderEmbargoField(Context context, List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly,  org.dspace.content.Item item) throws WingException {
+    private static void renderEmbargoField(Context context, List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly,  org.dspace.content.Item item) throws WingException,SQLException {
         // Plain old select list.
         Select select = form.addItem().addSelect(fieldName, "submit-select");
 
@@ -411,12 +374,12 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
         }
 
         // show "Publish immediately" only if publicationBlackout=false or not defined in DryadJournalSubmission.properties.
-        Map<String, String> values = journalProperties.get(journalFullName);
-        String isBlackedOut=null;
-        if(values!=null && values.size() > 0)
-            isBlackedOut = values.get(PUBLICATION_BLACKOUT);
+        Concept[]  journalConcepts = JournalUtils.getJournalConcept(context,journalFullName);
+        Boolean isBlackedOut=false;
+        if(journalConcepts!=null && journalConcepts.length > 0)
+            isBlackedOut = JournalUtils.getBooleanPublicationBlackout(journalConcepts[0]);
 
-        if(isBlackedOut==null || isBlackedOut.equals("false"))
+        if(!isBlackedOut)
             select.addOption("none", "Publish immediately");
 
         select.addOption("oneyear", "1 year embargo");
@@ -988,12 +951,12 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
             }
         }
 
-        form.addLabel(dcInput.getLabel());
         if (filePresent == null) {
             //We do not have a file (yet) so show an upload box
 
             org.dspace.app.xmlui.wing.element.Item fileItem = form.addItem();
             File file = fileItem.addFile(fieldName);
+            file.setLabel(dcInput.getLabel());
             fileItem.addHidden(fieldName + "-description").setValue(fieldName);
 
 
@@ -1005,10 +968,13 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
 
             file.setHelp(dcInput.getHints());
         } else {
+            form.addLabel(dcInput.getLabel());
             //We have the file create an url for it
             String url = makeBitstreamLink(contextPath, item, filePresent);
-//            org.dspace.app.xmlui.wing.element.Item fileItem = form.addItem();
+
+            //org.dspace.app.xmlui.wing.element.Item fileItem = form.addItem();
             Item fileItem = form.addItem("submission-file-" + fieldName, "");
+            
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column2"));
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column3"));
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column5"));

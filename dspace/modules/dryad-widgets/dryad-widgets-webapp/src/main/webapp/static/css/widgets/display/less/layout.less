@@ -1,0 +1,268 @@
+
+.dryad-ddw-header {
+    padding-top: 6px;
+    padding-right: 12px;
+    padding-bottom: 0px;
+    padding-left: 12px;
+}
+
+.dryad-ddw-lg {
+    max-width: 100%;
+    width: 100%;
+
+    .dryad-ddw-header { min-height:  80px; }
+    .dryad-ddw-footer { min-height:  80px; max-height: 80px; }
+
+    .dryad-ddw-header {
+        .dryad-ddw-banner {
+            float: right;
+            li {
+                text-align: right;
+            }
+            img {
+                position: relative;
+                top: -8px;
+                right: -18px; // 6px outside
+            }
+        }
+        .dryad-ddw-title {
+        }
+        .dryad-ddw-stats {
+            ul {
+                position: relative;
+                bottom: 0;
+    
+                li {
+                    padding-right: 2em;
+                    float: left;
+                }
+            }
+        }
+    }
+    .dryad-ddw-body {
+        position: relative;
+        height: 100%;
+        .dryad-ddw-frame {
+        height: 100%;
+            width: auto;
+            overflow-x:   scroll;
+            overflow-y:   scroll;
+            iframe.dryad-ddw-data {
+                overflow:   scroll;
+            }
+        }
+        .dryad-ddw-control {
+            width: (@button-width-l + 2 * @button-margin);
+            height: 100%;
+            float: right;
+            ul {
+                position:    absolute;
+                top:         @button-offset-top;
+                right:       @button-offset-right;
+                
+                li {
+                    margin-left:    auto;
+                    height:         @button-width-l;
+                    width:          @button-height-l; 
+                    margin-bottom:  1em;
+                }
+            }
+        }
+    }
+    .dryad-ddw-footer {
+        overflow-y: scroll;
+        p {
+            margin-left: 3em;
+            margin-right: 3em;
+        }
+        .dryad-ddw-control {
+            display: none;
+        }
+    }
+}
+
+.dryad-ddw-md {
+    height: 100%;
+    max-width: 100%;
+    width: 100%;
+
+    .dryad-ddw-header { min-height:  80px; }
+    .dryad-ddw-footer { min-height:  80px; max-height: 80px; }
+
+    .dryad-ddw-header {
+        .dryad-ddw-banner {
+            float: right;
+            li {
+                text-align: right;
+            }
+            img {
+                position: relative;
+                top: -8px;
+                right: -18px; // 6px outside
+            }
+        }
+        .dryad-ddw-title {
+            overflow: hidden;
+        }
+        .dryad-ddw-stats {
+            ul {
+                position: relative;
+                bottom: 0;
+    
+                li {
+                    padding-right: 2em;
+                    float: left;
+                }
+            }
+        }
+    }
+    .dryad-ddw-body {
+        position: relative;
+        height: 100%;
+        .dryad-ddw-frame {
+            width: auto;
+            overflow-x:   scroll;
+            overflow-y:   scroll;
+            iframe.dryad-ddw-data {
+                overflow:   scroll;
+            }
+        }
+        .dryad-ddw-control {
+            width: (@button-width-l + 2 * @button-margin);
+            height: 100%;
+            float: right;
+            ul {
+                position:    absolute;
+                top:         @button-offset-top;
+                right:       @button-offset-right;
+                
+                li {
+                    margin-left:    auto;
+                    height:         @button-width-l;
+                    width:          @button-height-l; 
+                    margin-bottom:  1em;
+                }
+            }
+        }
+    }
+    .dryad-ddw-footer {
+        overflow-y: scroll;
+        p {
+            margin-left: 3em;
+            margin-right: 3em;
+        }
+        .dryad-ddw-control {
+            display: none;
+        }
+    }
+}
+.dryad-ddw-sm {
+    max-width: 100%;
+    width: 100%;
+
+    .dryad-ddw-header { min-height:  80px; }
+    .dryad-ddw-footer { min-height:  70px; }
+
+    .dryad-ddw-header {
+        position: relative;
+        .dryad-ddw-banner {
+            float: left;
+            width: 50%;
+        }
+        .dryad-ddw-title {
+            float:left;
+            width: 75%;
+        }
+        .dryad-ddw-stats {
+            float: right;
+            width: 25%;
+            position: absolute;
+            bottom: @header-padding-bottom;
+            right: 0;
+            ul {
+                li {
+                    padding-right: 2em;
+                    float: left;
+                }
+            }
+        }
+    }
+    .dryad-ddw-body {
+        .dryad-ddw-frame {
+            left: 0;
+            top: 0;
+        }
+        .dryad-ddw-control {
+            ul {
+                display: none;
+            }
+        }
+    }
+    .dryad-ddw-footer {
+        p {
+            display: none;
+        }
+        .dryad-ddw-control {
+            ul {
+                text-align: center;
+                margin-left: auto;
+                margin-right: auto;
+                
+                li {
+                    display: inline-block;
+                    height: @button-width-s;
+                    width: @button-height-s;
+                    margin-left: 3%;
+                    margin-right: 3%;
+                    margin-top: 8px;
+                }
+            }
+        }
+    }
+}
+
+.dryad-ddw-xs {
+    max-width: @xs-max;
+    width: @xs-max;
+
+    .dryad-ddw-header {
+        min-height:  30px;
+        .dryad-ddw-title {
+        }
+        .dryad-ddw-stats {
+            ul {
+                list-style-type: none;
+                li {
+                    padding-right: 2em;
+                    float: left;
+                }
+            }
+        }
+    }
+    .dryad-ddw-footer, .dryad-ddw-control, .dryad-ddw-banner {
+        display: none;
+    }
+}
+
+&.dryad-popup.dryad-ddw-citation {
+    width:      auto;
+    max-width:  500px;
+}
+&.dryad-popup.dryad-ddw-share {
+    width:      auto;
+    max-width:  300px;
+    div {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+div.dryad-ddw-share {
+    width:      auto;
+    max-width: 300px;
+    iframe {
+        height:     20px;
+        max-height: 20px;
+        width:      20px;
+    }
+}

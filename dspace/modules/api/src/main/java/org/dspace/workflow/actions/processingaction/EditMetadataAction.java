@@ -41,7 +41,7 @@ public class EditMetadataAction extends ProcessingAction {
     public static final int OUTCOME_BLACKOUT = 1;
 
     //TODO: rename to AcceptAndEditMetadataAction
-    
+
     @Override
     public void activate(Context c, WorkflowItem wf) throws SQLException {
 

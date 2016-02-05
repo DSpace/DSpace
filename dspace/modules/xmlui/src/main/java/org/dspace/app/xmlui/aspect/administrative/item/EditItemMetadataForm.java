@@ -70,7 +70,6 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         private static final Message T_head1 = message("xmlui.administrative.item.EditItemMetadataForm.head1");
         private static final Message T_name_label = message("xmlui.administrative.item.EditItemMetadataForm.name_label");
         private static final Message T_value_label = message("xmlui.administrative.item.EditItemMetadataForm.value_label");
-        private static final Message T_lang_label = message("xmlui.administrative.item.EditItemMetadataForm.lang_label");
         private static final Message T_submit_add = message("xmlui.administrative.item.EditItemMetadataForm.submit_add");
         private static final Message T_para1 = message("xmlui.administrative.item.EditItemMetadataForm.para1");
 
@@ -92,6 +91,13 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         
                 pageMeta.addMetadata("choice", "collection").addContent(String.valueOf(collectionID));
                 pageMeta.addMetadata("title").addContent(T_title);
+
+                pageMeta.addMetadata("stylesheet", "screen", "datatables", true).addContent("../../static/Datatables/DataTables-1.8.0/media/css/datatables.css");
+        //        pageMeta.addMetadata("stylesheet", "screen", null, true).addContent("../../themes/AtmireModules/lib/css/datatables-overrides.css");
+                pageMeta.addMetadata("stylesheet", "screen", "person-lookup", true).addContent("lib/css/person-lookup.css");
+                pageMeta.addMetadata("javascript", "static", null, true).addContent("static/Datatables/DataTables-1.8.0/media/js/jquery.dataTables.min.js");
+                pageMeta.addMetadata("javascript", null, "person-lookup", true).addContent("lib/js/person-lookup.js");
+                pageMeta.addMetadata("javascript", null, "person-lookup", true).addContent("lib/js/choice-support.js");
 
                 pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
                 pageMeta.addTrailLink(contextPath + "/admin/item", T_item_trail);
@@ -184,12 +190,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 Composite addComposite = addForm.addItem().addComposite("value");
                 addComposite.setLabel(T_value_label);
                 TextArea addValue = addComposite.addTextArea("value");
-                Text addLang = addComposite.addText("language");
-
                 addValue.setSize(4, 35);
-                addLang.setLabel(T_lang_label);
-                addLang.setSize(6);
-
                 addForm.addItem().addButton("submit_add").setValue(T_submit_add);
 
                 
@@ -215,7 +216,6 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 header.addCell().addContent(T_column1);
                 header.addCell().addContent(T_column2);
                 header.addCell().addContent(T_column3);
-                header.addCell().addContent(T_column4);
 
                 ChoiceAuthorityManager cmgr = ChoiceAuthorityManager.getManager();
                 for(DCValue value : values)
@@ -259,8 +259,8 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                         else
                         {
                             TextArea mdValue = mdCell.addTextArea("value_"+index);
-                        mdValue.setSize(4,35);
-                        mdValue.setValue(value.value);
+                            mdValue.setSize(4,35);
+                            mdValue.setValue(value.value);
                             boolean isAuth = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
                             if (isAuth)
                             {
@@ -274,18 +274,20 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                             if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey))
                             {
                                 mdValue.setChoices(fieldKey);
-                                mdValue.setChoicesPresentation(Params.PRESENTATION_LOOKUP);
+                                if(Params.PRESENTATION_AUTHORLOOKUP.equals(cmgr.getPresentation(fieldKey))){
+                                    mdValue.setChoicesPresentation(Params.PRESENTATION_AUTHORLOOKUP);
+                                }else{
+                                    mdValue.setChoicesPresentation(Params.PRESENTATION_LOOKUP);
+                                }
+
                                 mdValue.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldKey));
                             }
                         }
-                        Text mdLang = row.addCell().addText("language_"+index);
-                        mdLang.setSize(6);
-                        mdLang.setValue(value.language);
 
                         // Tick the index counter;
                         index++;
-                }
 
+                }
                 
                 
                 

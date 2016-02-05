@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -145,6 +148,62 @@ public class DryadWorkflowUtils {
         return request.getContextPath() + "/submit?workspaceID=" + newDataFileItem.getID() + "&skipOverview=true";
 
     }
+    
+    public static boolean isAtLeastOneDataFileVisible(Context context, Item item) throws SQLException {
+        Item[] datafiles = DryadWorkflowUtils.getDataFiles(context, item);
+        for (Item i : datafiles) {
+            String lift = ConfigurationManager.getProperty("embargo.field.lift");
+            DCValue[] values = i.getMetadata(lift);
+            if (values == null || values.length == 0)
+                return true;
 
+        }
+        return false;
+    }
 
+    public static String getAuthors(Item item) {
+        ArrayList<DCValue> mdlist = new ArrayList<DCValue>();
+        for (DCValue i : item.getMetadata("dc.contributor.author")) {
+            mdlist.add(i);
+        }
+        for (DCValue i : item.getMetadata("dc.creator")) {
+            mdlist.add(i);
+        }
+        for (DCValue i : item.getMetadata("dc.contributor")) {
+            mdlist.add(i);
+        }
+        StringBuilder authorString = new StringBuilder();
+        for (DCValue metadata : mdlist) {
+            authorString.append("@");
+            if (metadata.value.indexOf(",") != -1) {
+                String[] parts = metadata.value.split(",");
+
+                if (parts.length > 1) {
+                    StringTokenizer tokenizer = new StringTokenizer(parts[1], ". ");
+
+                    authorString.append(parts[0]).append(" ");
+
+                    while (tokenizer.hasMoreTokens()) {
+                        authorString.append(tokenizer.nextToken().charAt(0));
+                    }
+                }
+            } else {
+                authorString.append(metadata.value);
+            }
+            authorString.append("@");
+
+            // check for orcid:
+            if (metadata.authority != null) {
+                Pattern p = Pattern.compile(".+orcid::(.+)");
+                Matcher m = p.matcher(metadata.authority);
+                if (m.matches()) {
+                    authorString.append("#").append(m.group(1)).append("#");
+                }
+            }
+
+            authorString.append(",");
+        }
+
+        return authorString.length() > 0 ? authorString.toString() : "";
+    }
 }

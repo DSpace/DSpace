@@ -64,7 +64,7 @@ import org.dspace.core.PluginManager;
 import org.dspace.handle.HandleManager;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-
+import org.dspace.workflow.DryadWorkflowUtils;
 /**
  * Display basic meta-meta information about the item and allow the user to
  * change it's state such as withdraw or reinstate, possibily even completely
@@ -142,18 +142,13 @@ public class ViewItem extends AbstractDSpaceTransformer {
 						pkgMeta.value);
 			}
 
-			buffer.append(parseName(pkg.getMetadata("dc.contributor.author")));
-			buffer.append(parseName(pkg.getMetadata("dc.creator")));
-			buffer.append(parseName(pkg.getMetadata("dc.contributor")));
-
-			author = buffer.toString().trim();
-			author = author.endsWith(",") ? author.substring(0,
-					author.length() - 1) : author;
-
-			pageMeta.addMetadata("authors", "package").addContent(author + " ");
+			pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(pkg));
 			pageMeta.addMetadata("title", "package").addContent(
 					pkgTitle.endsWith(".") ? pkgTitle + " " : pkgTitle + ". ");
 
+			if (pkg.getMetadata("dryad.curatorNotePublic") != null) {
+				pageMeta.addMetadata("curatorNotePublic", "package").addContent(pkg.getMetadata("dryad.curatorNotePublic").toString());
+			}
 			if ((values = pkg.getMetadata("dc.date.issued")).length > 0) {
 				pageMeta.addMetadata("dateIssued", "package").addContent(
 						"(" + values[0].value.substring(0, 4) + ")");
@@ -312,55 +307,6 @@ public class ViewItem extends AbstractDSpaceTransformer {
 		else {
 			showfullPara.addXref(link).addContent(T_show_full);
 		}
-	}
-
-	private String parseName(DCValue[] aMetadata) {
-		StringBuilder buffer = new StringBuilder();
-		int position = 0;
-
-		for (DCValue metadata : aMetadata) {
-
-			if (metadata.value.indexOf(",") != -1) {
-				String[] parts = metadata.value.split(",");
-
-				if (parts.length > 1) {
-					StringTokenizer tokenizer = new StringTokenizer(parts[1],
-							". ");
-
-					buffer.append(parts[0]).append(" ");
-
-					while (tokenizer.hasMoreTokens()) {
-						buffer.append(tokenizer.nextToken().charAt(0));
-					}
-				}
-			}
-			else {
-				// now the minority case (as we clean up the data)
-				String[] parts = metadata.value.split("\\s+|\\.");
-				String author = parts[parts.length - 1].replace("\\s+|\\.", "");
-				char ch;
-
-				buffer.append(author).append(" ");
-
-				for (int index = 0; index < parts.length - 1; index++) {
-					if (parts[index].length() > 0) {
-						ch = parts[index].replace("\\s+|\\.", "").charAt(0);
-						buffer.append(ch);
-					}
-				}
-			}
-
-			if (++position < aMetadata.length) {
-				if (aMetadata.length > 2) {
-					buffer.append(", ");
-				}
-				else {
-					buffer.append(" and ");
-				}
-			}
-		}
-
-		return buffer.length() > 0 ? buffer.toString() : "";
 	}
 
 	/**

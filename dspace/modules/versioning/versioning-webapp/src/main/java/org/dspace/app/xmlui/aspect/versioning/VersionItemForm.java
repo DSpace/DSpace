@@ -81,6 +81,7 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
         Composite addComposite = fields.addItem().addComposite("summary");
         addComposite.setLabel(T_summary);
         TextArea addValue = addComposite.addTextArea("summary");
+        addValue.setMaxLength(255);
         if (errors.contains("version_reason")) {
             addValue.addError(T_reason);
         }

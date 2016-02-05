@@ -19,7 +19,36 @@
       <version>1.7.3-SNAPSHOT</version>
    </parent>
 
-
+    <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <argLine>-Ddspace.configuration="${default.dspace.dir}/config/dspace.cfg"</argLine>
+            </configuration>
+         </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+      </plugins>
+    </build>
    <!--
       The Subversion repository location is used by Continuum to update against
       when changes have occured, this spawns a new build cycle and releases snapshots
@@ -85,7 +114,6 @@
 
    <dependencies>
 
-       <!-- DSpace API -->
        <dependency>
            <groupId>com.atmire</groupId>
            <artifactId>atmire-workflow-api</artifactId>
@@ -114,7 +142,7 @@
        <dependency>
            <groupId>org.dspace.dependencies.solr</groupId>
            <artifactId>dspace-solr-solrj</artifactId>
-           <version>1.4.0.1-SNAPSHOT</version>
+           <version>1.4.0.1</version>
        </dependency>
        <!---->
        <!--<dependency>-->
@@ -150,31 +178,98 @@
             <artifactId>versioning-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency-->
-
-
+       <dependency>
+           <groupId>com.sun.jersey</groupId>
+           <artifactId>jersey-servlet</artifactId>
+           <version>${jersey.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>com.sun.jersey</groupId>
+           <artifactId>jersey-json</artifactId>
+           <version>${jersey.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>org.apache.commons</groupId>
+           <artifactId>commons-lang3</artifactId>
+           <version>3.3.2</version>
+       </dependency>
+       <dependency>
+           <groupId>com.sun.jersey</groupId>
+           <artifactId>jersey-client</artifactId>
+           <version>${jersey.version}</version>
+           <scope>test</scope>
+       </dependency>
+       <dependency>
+           <groupId>org.apache.oltu.oauth2</groupId>
+           <artifactId>org.apache.oltu.oauth2.common</artifactId>
+           <version>${oltu.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>org.apache.oltu.oauth2</groupId>
+           <artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
+           <version>${oltu.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>org.apache.oltu.oauth2</groupId>
+           <artifactId>org.apache.oltu.oauth2.resourceserver</artifactId>
+           <version>${oltu.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>javax.servlet</groupId>
+           <artifactId>servlet-api</artifactId>
+           <version>${servlet-api.version}</version>
+           <scope>provided</scope>
+       </dependency>
+       <!-- the core, which includes Streaming API, shared low-level abstractions (but NOT data-binding) -->
+       <dependency>
+           <groupId>com.fasterxml.jackson.core</groupId>
+           <artifactId>jackson-core</artifactId>
+           <version>${jackson.version}</version>
+       </dependency>
+       <!-- databinding; ObjectMapper, JsonNode and related classes are here -->
+       <dependency>
+           <groupId>com.fasterxml.jackson.core</groupId>
+           <artifactId>jackson-databind</artifactId>
+           <version>${jackson.version}</version>
+       </dependency>
+       <!-- Just the annotations; use this dependency if you want to attach annotations
+            to classes without connecting them to the code. -->
+       <dependency>
+           <groupId>com.fasterxml.jackson.core</groupId>
+           <artifactId>jackson-annotations</artifactId>
+           <version>${jackson.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>com.fasterxml.jackson.jaxrs</groupId>
+           <artifactId>jackson-jaxrs-json-provider</artifactId>
+           <version>${jackson.version}</version>
+       </dependency>
        <!-- New dependencies -->
        <dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis</artifactId>
 			<version>1.4</version>
-		</dependency>
-
+       </dependency>
        <dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>8.1-407.jdbc3</version>
-		</dependency>
-		<dependency>
+       </dependency>
+       <dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.5</version>
-		</dependency>
-		<dependency>
+       </dependency>
+       <dependency>
 			<groupId>org.dspace.dependencies</groupId>
 			<artifactId>dspace-perst</artifactId>
 			<version>4.21</version>
-		</dependency>
-
+       </dependency>
    </dependencies>
-
+    <properties>
+        <jersey.version>1.18.1</jersey.version>
+        <oltu.version>1.0.0</oltu.version>
+        <servlet-api.version>2.5</servlet-api.version>
+        <jackson.version>2.6.4</jackson.version>
+    </properties>
 </project>

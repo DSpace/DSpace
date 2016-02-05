@@ -1,0 +1,72 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<!-- We have to comment out the DTD to run, but use it to validate when editing -->
+<!--
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+-->
+<html>
+ <head>
+  <title>Data Publishing Charges</title>
+     <style type="text/css">
+         div#ds-body { margin: 0px 0px 0px 0px;padding-right: 10px; top: 165px;}
+     </style>
+ </head>
+ <body>
+  <div id="ds-body">
+    <h1 class="ds-div-head">Data Publishing Charges<a id="pricing">&#160;</a></h1>
+   
+    <div class="ds-static-div primary">
+		
+		<p>Dryad is a <strong>nonprofit</strong> organization that provides <strong>long-term access</strong> 
+        to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of 
+        nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from <a href="/pages/membershipOverview">members</a> and data submitters.</p>
+		
+		<p>Dryad's <strong>Data Publishing Charges (<abbr title="Data Publishing Charge">DPC</abbr>s)</strong> 
+        are designed to sustain its core functions by recovering the basic costs of curating and preserving 
+        data. (See a <a href="http://blog.datadryad.org/2015/12/15/new-pricing-structure-with-simplified-terms-and-increased-size-limits/">breakdown of Dryad's expenses</a>).</p>
+        <div style="float: right; margin-top:-24px;">
+            <span class="field-help" style="display: inline;">Show all amounts in </span>
+            <!-- TODO: refactor this to share code with 'MembershipApplicationForm' -->
+            <select id="displayed-currency" name="displayed-currency" class="ds-select-field">
+                <option value="USD">USD$</option>
+                <option value="GBP">GBP£</option>
+                <option value="CAD">CAD$</option>
+                <option value="EUR">EUR€</option>
+                <option value="AUD">AUD$</option>
+                <option value="JPY">JPY¥</option>
+            </select>
+        </div>
+        
+        <p><strong>Waivers</strong> are granted upon request for submissions originating from researchers based in countries <a href="http://data.worldbank.org/about/country-classifications/country-and-lending-groups">classified by the World Bank as low-income or lower-middle-income economies</a>.</p>    
+		
+		<p>The base DPC per data package is <span class="msg-DPC_pay_on_submission">$120</span>. DPCs are collected upon data publication. The submitter is asked to commit to the charge at the time of submission, and is charged if the accompanying publication is accepted, unless:</p>
+		<p>
+			<ul>
+				<li>the associated journal, or another organization, has already contracted with Dryad to <a href="/pages/paymentPlans#sponsoring">sponsor the DPC</a>, or</li>
+				<li>the submitter is based in a fee-waiver country (see above).</li>
+			</ul>
+		</p>
+		<p>To determine whether your DPC will be covered, <a href="/pages/journalLookup">look up your journal</a>. If there is no payment plan or sponsor in place, the DPC is <span class="msg-DPC_pay_on_submission">$120</span>.</p>  
+        
+      <h3>Excess data storage</h3> 
+	<p>Dryad charges excess storage fees for data packages totaling over 20GB. These overage fees are charged to the submitter, even if there is a sponsor in place for the DPC.</p>
+	<p>For data packages in excess of the 20GB size limit, submitters will be charged <span class="msg-excessDataStorageFee_first_surcharge">$50</span> for each additional 10GB, or part thereof. (Packages between 20 and 30GB = <span class="msg-excessDataStorageFee_first_surcharge">$50</span>, between 30 and 40GB = <span class="msg-excessDataStorageFee_double_first_surcharge">$100</span>, and so on).</p>
+
+      <h3>Payment options</h3> 
+	<p>DPCs and overage fees are payable by credit card. Prepaid DPC vouchers can be purchased by contacting <a href="mailto:help@datadryad.org">help@datadryad.org</a>, with bulk discounts for purchases of 25 or more.</p>
+
+       
+    </div>
+
+    <div class="page-license">
+      <p>
+        All text on this page is available under a 
+        <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC-BY 3.0 license.
+          <img src="/themes/Dryad/images/cc-by.png" alt="CC-BY 3.0 icon"/>
+          <span class="accessibly-hidden">(opens in a new window)</span>
+        </a>             
+      </p>
+    </div>  
+    <div>Last revised: 2016-01-05</div>
+  </div>
+ </body>
+</html>

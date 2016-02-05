@@ -122,7 +122,7 @@ public class EditItemEmbargoForm extends AbstractDSpaceTransformer {
     private void addButtons(Division embargoDiv) throws WingException {
         Para buttonPara = embargoDiv.addPara("buttons", "");
 
-        buttonPara.addButton("submit_lift_emabrgo").setValue(T_submit_lift_embargo);
+        buttonPara.addButton("submit_lift_embargo").setValue(T_submit_lift_embargo);
         buttonPara.addButton("submit_return").setValue(T_submit_return);
     }
 

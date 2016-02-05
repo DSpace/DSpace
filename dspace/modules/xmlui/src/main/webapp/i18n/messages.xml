@@ -117,10 +117,10 @@
 
 
 
-	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Recently Published
-		Data&#160;&#160;<a href="/feed/atom_1.0/10255/3" class="single-image-link"
+	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Recently published
+		data&#160;&#160;<a href="/feed/atom_1.0/10255/3" class="single-image-link"
 			title="Web feed of data packages recently added to Dryad"><img
-				src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS feed - Recently Published Data"/></a>
+				src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS feed - Recently published data"/></a>
 	</message>
 
 
@@ -311,27 +311,27 @@
 	<message key="xmlui.ArtifactBrowser.Contact.head">Contact us</message>
 	<message key="xmlui.ArtifactBrowser.Contact.para1">{0} administrators may be contacted
 		at:</message>
-	<message key="xmlui.ArtifactBrowser.Contact.feedback_label">On-line form</message>
+	<message key="xmlui.ArtifactBrowser.Contact.feedback_label">Online form</message>
 	<message key="xmlui.ArtifactBrowser.Contact.feedback_link">Feedback</message>
 	<message key="xmlui.ArtifactBrowser.Contact.email">Email</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackForm.java -->
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Contact Us</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Contact us</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Give feedback</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.head">Contact Us</message>
-    <message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para1">Journals, publishers or societies seeking more information about <a href="/pages/membershipOverview" target="_blank">membership</a>, <a href="/pages/journalIntegration" target="_blank">submission integration</a>, <a href="/pages/pricing" target="_blank">payment plans</a> or other ways to be part of Dryad please email: <a href="mailto:director@datadryad.org">director@datadryad.org</a>. </message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.head">Contact us</message>
+    <message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para1">Journals, publishers or societies seeking more information about <a href="/pages/membershipOverview">membership</a>, <a href="/pages/submissionIntegration">submission integration</a>, <a href="/pages/payment">payment plans</a> or other ways to be part of Dryad please email: <a href="mailto:director@datadryad.org">director@datadryad.org</a>. </message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para2">For urgent requests, or to submit a help ticket, send us feedback on the web site or for general technical questions please email: <a href="mailto:help@datadryad.org">help@datadryad.org</a>.</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para3">For information about Dryad staff and project personnel, please see <a href="/pages/whoWeAre#staff">Who We Are</a>.</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.head"><h2 class="feedbackform-heading">Postal Address</h2></message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para3">For information about Dryad staff and project personnel, please see <a href="/pages/ourTeam#staff">Our Team</a>.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.head"><h2 class="feedbackform-heading">Postal address</h2></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.para1">Dryad<br/>PO Box 585<br/>Durham, NC 27702-0585 USA</message>
   <message key="xmlui.ArtifactBrowser.FeedbackForm.forum.head"><h2 class="feedbackform-heading">Suggest and vote for new features</h2></message>
-  <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a class="feedbackform-user-voice-link" href="#" onclick="showClassicWidget(); return false;"><img width="16" height="16" src="/themes/Mirage/images/icon.idea.16px.png" alt="Give your Feedback"></img>&#160;Ideas Forum&#160;</a></message>
-  <message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.head"><h2 class="feedbackform-heading">Contact Form</h2></message>
+  <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a class="feedbackform-user-voice-link" href="#" onclick="showClassicWidget(); return false;"><img width="16" height="16" src="/themes/Mirage/images/icon.idea.16px.png" alt="Give your Feedback"></img>&#160;Ideas forum&#160;</a></message>
+  <message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.head"><h2 class="feedbackform-heading">Contact form</h2></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.para1"><p>You may also submit your inquiry or help ticket using the form below.</p></message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email">Your Email</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email">Your email</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email_help">This address will ONLY be used to follow up on your feedback.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.comments">Comments</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.submit">Send Feedback</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.submit">Send feedback</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackSent.java -->
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.title">Give feedback</message>
@@ -499,7 +499,7 @@
 
 	<!-- General keys used by the EPerson aspect -->
 	<message key="xmlui.EPerson.trail_new_registration">New user registration</message>
-	<message key="xmlui.EPerson.trail_forgot_password">Forgot Password</message>
+	<message key="xmlui.EPerson.trail_forgot_password">Forgot password</message>
 
 	<!-- org.dspace.app.xmlui.eperson.CannotRegister.java -->
 	<message key="xmlui.EPerson.CannotRegister.title">Registration unavailable</message>
@@ -509,24 +509,24 @@
 		comments.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.EditProfile.java -->
-	<message key="xmlui.EPerson.EditProfile.title_update">Update Profile</message>
-	<message key="xmlui.EPerson.EditProfile.title_create">Create Profile</message>
-	<message key="xmlui.EPerson.EditProfile.trail_update">Update Profile</message>
-	<message key="xmlui.EPerson.EditProfile.head_update">Update Profile</message>
-	<message key="xmlui.EPerson.EditProfile.head_create">Create Profile</message>
-	<message key="xmlui.EPerson.EditProfile.head_identify">Profile Description</message>
+	<message key="xmlui.EPerson.EditProfile.title_update">Update profile</message>
+	<message key="xmlui.EPerson.EditProfile.title_create">Create profile</message>
+	<message key="xmlui.EPerson.EditProfile.trail_update">Update profile</message>
+	<message key="xmlui.EPerson.EditProfile.head_update">Update profile</message>
+	<message key="xmlui.EPerson.EditProfile.head_create">Create profile</message>
+	<message key="xmlui.EPerson.EditProfile.head_identify">Profile description</message>
 	<message key="xmlui.EPerson.EditProfile.head_security">Password</message>
-	<message key="xmlui.EPerson.EditProfile.email_address">Email Address</message>
-	<message key="xmlui.EPerson.EditProfile.first_name">First Name</message>
-	<message key="xmlui.EPerson.EditProfile.last_name">Last Name</message>
-	<message key="xmlui.EPerson.EditProfile.telephone">Contact Telephone</message>
+	<message key="xmlui.EPerson.EditProfile.email_address">Email address</message>
+	<message key="xmlui.EPerson.EditProfile.first_name">First name</message>
+	<message key="xmlui.EPerson.EditProfile.last_name">Last name</message>
+	<message key="xmlui.EPerson.EditProfile.telephone">Contact telephone</message>
 	<message key="xmlui.EPerson.EditProfile.Language">Language</message>
 	<message key="xmlui.EPerson.EditProfile.subscriptions">Subscriptions</message>
 	<message key="xmlui.EPerson.EditProfile.subscriptions_help">You may subscribe to collections to
 		receive daily e-mail alerts of new items added. You can subscribe to as many or as few
 		collections as you wish. Another alternative to daily e-mail alerts is to use the RSS feeds
 		available for all collections.</message>
-	<message key="xmlui.EPerson.EditProfile.email_subscriptions">Email Subscriptions</message>
+	<message key="xmlui.EPerson.EditProfile.email_subscriptions">Email subscriptions</message>
 	<message key="xmlui.EPerson.EditProfile.select_collection">( Select Collection )</message>
 	<message key="xmlui.EPerson.EditProfile.update_password_instructions">Optionally, you can enter a
 		new password in the box below, and confirm it by typing it again into the second box. It should
@@ -537,11 +537,11 @@
 	<message key="xmlui.EPerson.EditProfile.password">Password</message>
 	<message key="xmlui.EPerson.EditProfile.confirm_password">Retype to confirm</message>
     <message key="xmlui.EPerson.EditProfile.terms">Terms of Service</message>
-    <message key="xmlui.EPerson.EditProfile.terms_help">To use Dryad's data publishing services, you must agree to the <a target="_blank" href="/themes/Mirage/docs/TermsOfService-Letter-2013.08.22.pdf">Terms of Service</a>.</message>
+    <message key="xmlui.EPerson.EditProfile.terms_help">To use Dryad's data publishing services, you must agree to the <a target="_blank" href="/pages/policies">Terms of Service</a>.</message>
     <message key="xmlui.EPerson.EditProfile.terms.checkbox">I agree to Dryad's Terms of Service.</message>
 
-    <message key="xmlui.EPerson.EditProfile.submit_update">Complete Registration</message>
-	<message key="xmlui.EPerson.EditProfile.submit_create">Update Profile</message>
+    <message key="xmlui.EPerson.EditProfile.submit_update">Complete registration</message>
+	<message key="xmlui.EPerson.EditProfile.submit_create">Update profile</message>
 	<message key="xmlui.EPerson.EditProfile.error_required">This field is required</message>
 	<message key="xmlui.EPerson.EditProfile.error_invalid_password">Choose a password at least 6
 		characters long</message>
@@ -552,11 +552,11 @@
 	<message key="xmlui.EPerson.EditProfile.head_security"><legend class="ds-head">Security</legend></message>
 
 	<!-- org.dspace.app.xmlui.eperson.EPersonUtils.java -->
-	<message key="xmlui.EPerson.EPersonUtils.register_verify_email">Verify Email</message>
-	<message key="xmlui.EPerson.EPersonUtils.register_create_profile">Create Profile</message>
+	<message key="xmlui.EPerson.EPersonUtils.register_verify_email">Verify email</message>
+	<message key="xmlui.EPerson.EPersonUtils.register_create_profile">Create profile</message>
 	<message key="xmlui.EPerson.EPersonUtils.register_finished">Finished</message>
-	<message key="xmlui.EPerson.EPersonUtils.forgot_verify_email">Verify Email</message>
-	<message key="xmlui.EPerson.EPersonUtils.forgot_reset_password">Reset Password</message>
+	<message key="xmlui.EPerson.EPersonUtils.forgot_verify_email">Verify email</message>
+	<message key="xmlui.EPerson.EPersonUtils.forgot_reset_password">Reset password</message>
 	<message key="xmlui.EPerson.EPersonUtils.forgot_finished">Finished</message>
 
 	<!-- org.dspace.app.xmlui.eperson.ForgotPasswordFinished.java -->
@@ -577,17 +577,17 @@
 	<!-- org.dspace.app.xmlui.eperson.Navigation.java -->
 	<message key="xmlui.EPerson.Navigation.my_account">My Account</message>
 	<message key="xmlui.EPerson.Navigation.profile">Profile</message>
-	<message key="xmlui.EPerson.Navigation.logout">Logout</message>
-	<message key="xmlui.EPerson.Navigation.login">Login or Register</message>
+	<message key="xmlui.EPerson.Navigation.logout">Log out</message>
+	<message key="xmlui.EPerson.Navigation.login">Log in or register</message>
 	<message key="xmlui.EPerson.Navigation.register">Register</message>
-    <message key="xmlui.EPerson.Navigation.paymentsystem">Payment System</message>
+    <message key="xmlui.EPerson.Navigation.paymentsystem">Payment system</message>
 
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 	<message key="xmlui.EPerson.PasswordLogin.title">Sign in to Dryad</message>
 	<message key="xmlui.EPerson.PasswordLogin.trail">Sign in to Dryad</message>
-	<message key="xmlui.EPerson.PasswordLogin.head1">I have a Dryad account<br/>and would like to login</message>
-	<message key="xmlui.EPerson.PasswordLogin.head2">I do not have a Dryad account<br/>and would like to create one</message>
-	<message key="xmlui.EPerson.PasswordLogin.email_address"><nobr>E-Mail Address: </nobr></message>
+	<message key="xmlui.EPerson.PasswordLogin.head1">Log in to an existing account</message>
+	<message key="xmlui.EPerson.PasswordLogin.head2">Sign up for a new account</message>
+	<message key="xmlui.EPerson.PasswordLogin.email_address"><nobr>E-mail address: </nobr></message>
 	<message key="xmlui.EPerson.PasswordLogin.error_bad_login">The email address and/or password
 		supplied were not valid.</message>
 	<message key="xmlui.EPerson.PasswordLogin.password">Password: </message>
@@ -596,25 +596,25 @@
 	<message key="xmlui.EPerson.PasswordLogin.para1">Create an account to submit data and/or
 	subscribe to email updates.</message>
 	<message key="xmlui.EPerson.PasswordLogin.submitReg">Register</message>
-	<message key="xmlui.EPerson.PasswordLogin.submitLogin">Login</message>
+	<message key="xmlui.EPerson.PasswordLogin.submitLogin">Log in</message>
 	<message key="xmlui.EPerson.PasswordLogin.register_link">Create a Dryad account.</message>
-	<message key="xmlui.EPerson.RegLogin.head">Login is required for data submission, but not for data use.</message>
+	<message key="xmlui.EPerson.RegLogin.head">You must have a Dryad account to submit data.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.LDAPLogin.java -->
 	<message key="xmlui.EPerson.LDAPLogin.title">Sign in</message>
 	<message key="xmlui.EPerson.LDAPLogin.trail">Sign in</message>
 	<message key="xmlui.EPerson.LDAPLogin.head1">Sign in to Dryad</message>
 	<message key="xmlui.EPerson.LDAPLogin.title">Sign in</message>
-	<message key="xmlui.EPerson.LDAPLogin.username">User Name</message>
-	<message key="xmlui.EPerson.LDAPLogin.error_bad_login">The user name and/or password supplied were
+	<message key="xmlui.EPerson.LDAPLogin.username">Username</message>
+	<message key="xmlui.EPerson.LDAPLogin.error_bad_login">The username and/or password supplied were
 		not valid.</message>
 	<message key="xmlui.EPerson.LDAPLogin.password">Password</message>
 	<message key="xmlui.EPerson.LDAPLogin.submit">Sign in</message>
 
 	<!-- org.dspace.app.xmlui.eperson.LoginChooser.java -->
-	<message key="xmlui.EPerson.LoginChooser.title">Choose a Login Method</message>
-	<message key="xmlui.EPerson.LoginChooser.trail">Choose Login</message>
-	<message key="xmlui.EPerson.LoginChooser.head1">Choose a Login Method</message>
+	<message key="xmlui.EPerson.LoginChooser.title">Choose a login method</message>
+	<message key="xmlui.EPerson.LoginChooser.trail">Choose login</message>
+	<message key="xmlui.EPerson.LoginChooser.head1">Choose a login method</message>
 	<message key="xmlui.EPerson.LoginChooser.para1">Log in via:</message>
 	<message key="org.dspace.authenticate.ShibAuthentication.title">Shibboleth
 		Authentication</message>
@@ -633,15 +633,15 @@
 		arguments received.</message>
 	<message key="xmlui.EPerson.FailedAuthentication.NoSuchUser">A user was not found with the
 		credentials provided.</message>
-	<message key="xmlui.EPerson.FailedAuthentication.title">Authentication Failed</message>
-	<message key="xmlui.EPerson.FailedAuthentication.trail">Failed Authentication</message>
-	<message key="xmlui.EPerson.FailedAuthentication.h1">Authentication Failed</message>
+	<message key="xmlui.EPerson.FailedAuthentication.title">Authentication failed</message>
+	<message key="xmlui.EPerson.FailedAuthentication.trail">Failed authentication</message>
+	<message key="xmlui.EPerson.FailedAuthentication.h1">Authentication failed</message>
 
 	<!-- Login xml files -->
-	<message key="xmlui.eperson.noAuthMethod.head">No Authentication Method Found</message>
+	<message key="xmlui.eperson.noAuthMethod.head">No authentication method found</message>
 	<message key="xmlui.eperson.noAuthMethod.p1">No authentication method was found. Please contact
 		the site administrator.</message>
-	<message key="xmlui.eperson.shibbLoginFailure.head">Shibboleth Login Failed</message>
+	<message key="xmlui.eperson.shibbLoginFailure.head">Shibboleth login failed</message>
 	<message key="xmlui.eperson.shibbLoginFailure.p1">Shibboleth authentication not available at this
 		time. Please contact the site administrator.</message>
 
@@ -654,9 +654,8 @@
 
 	<!-- org.dspace.app.xmlui.eperson.RegistrationFinished.java -->
 	<message key="xmlui.EPerson.RegistrationFinished.title">Registration finished</message>
-	<message key="xmlui.EPerson.RegistrationFinished.head">Registration Finished</message>
-	<message key="xmlui.EPerson.RegistrationFinished.para1">You're now registered to use Dryad. You
-		can submit new data and subscribe to receive email updates about new items.</message>
+	<message key="xmlui.EPerson.RegistrationFinished.head">Registration finished</message>
+	<message key="xmlui.EPerson.RegistrationFinished.para1">You're now registered to use Dryad.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.ResetPassword.java -->
 	<message key="xmlui.EPerson.ResetPassword.title">Reset password</message>
@@ -664,9 +663,9 @@
 	<message key="xmlui.EPerson.ResetPassword.para1">Please enter a new password into the box below,
 		and confirm it by typing it again into the second box. It should be at least six characters
 		long.</message>
-	<message key="xmlui.EPerson.ResetPassword.email_address">Email Address</message>
+	<message key="xmlui.EPerson.ResetPassword.email_address">Email address</message>
 	<message key="xmlui.EPerson.ResetPassword.new_password">New password</message>
-	<message key="xmlui.EPerson.ResetPassword.confirm_password">Retype to Confirm</message>
+	<message key="xmlui.EPerson.ResetPassword.confirm_password">Retype to confirm</message>
 	<message key="xmlui.EPerson.ResetPassword.submit">Reset password</message>
 	<message key="xmlui.EPerson.ResetPassword.error_invalid_password">Choose a password at least 6
 		characters long</message>
@@ -674,12 +673,12 @@
 		to confirm</message>
 
 	<!-- org.dspace.app.xmlui.eperson.StartForgotPassword.java -->
-	<message key="xmlui.EPerson.StartForgotPassword.title">Forgot Password</message>
-	<message key="xmlui.EPerson.StartForgotPassword.head">Forgot Password</message>
+	<message key="xmlui.EPerson.StartForgotPassword.title">Forgot password</message>
+	<message key="xmlui.EPerson.StartForgotPassword.head">Forgot password</message>
 	<message key="xmlui.EPerson.StartForgotPassword.para1">Enter the email address you provided when
 		you registered with Dryad. An email will be sent to that address with further
 		instructions.</message>
-	<message key="xmlui.EPerson.StartForgotPassword.email_address">Email Address</message>
+	<message key="xmlui.EPerson.StartForgotPassword.email_address">Email address</message>
 	<message key="xmlui.EPerson.StartForgotPassword.email_address_help">Enter the same address used when registering.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.error_not_found">Email address not
 		found.</message>
@@ -696,11 +695,12 @@
 	<message key="xmlui.EPerson.StartRegistration.head2">New user registration</message>
 	<message key="xmlui.EPerson.StartRegistration.para2">Register an account to subscribe to
 		collections for email updates, and submit new items to Dryad.</message>
-	<message key="xmlui.EPerson.StartRegistration.email_address">Email Address</message>
+	<message key="xmlui.EPerson.StartRegistration.email_address">Email address</message>
 	<message key="xmlui.EPerson.StartRegistration.email_address_help">This address will be verified	and used as your login name.</message>
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Unable to send email to this
 		address.</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_register">Register</message>
+    <message key="xmlui.EPerson.StartRegistration.no_orcid_found">This ORCID is not associated with an existing Dryad account. Please create a Dryad user account, then on the Profile page link your ORCID account.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.VerifyEmail.java -->
 	<message key="xmlui.EPerson.VerifyEmail.title">Verification email sent</message>
@@ -732,7 +732,7 @@
 	<message key="xmlui.Submission.general.submission.trail">Item submission</message>
 	<message key="xmlui.Submission.general.submission.head">Item submission</message>
 	<message key="xmlui.Submission.general.submission.previous">&lt; Previous</message>
-	<message key="xmlui.Submission.general.submission.save">Save &amp; Exit</message>
+	<message key="xmlui.Submission.general.submission.save">Save &amp; exit</message>
 	<message key="xmlui.Submission.general.submission.next">Next &gt;</message>
 	<message key="xmlui.Submission.general.submission.complete">Save file and continue</message>
 	<message key="xmlui.Submission.general.workflow.title">Reviewing </message>
@@ -795,7 +795,7 @@
 	<message key="xmlui.Submission.Submissions.submit_head3">Authoring:</message>
 	<message key="xmlui.Submission.Submissions.submit_info3">No submissions left unfinished.</message>
 	<message key="xmlui.Submission.Submissions.submit_head4">Supervising:</message>
-	<message key="xmlui.Submission.Submissions.submit_submit_remove">Remove selected submissions</message>
+	<message key="xmlui.Submission.Submissions.submit_submit_remove">Delete selected submissions</message>
 	<!-- Same transformer, inprogress section -->
 	<message key="xmlui.Submission.Submissions.progress_head1">Submissions being reviewed</message>
 	<message key="xmlui.Submission.Submissions.progress_info1">These are your completed submissions
@@ -877,6 +877,12 @@
 	<message key="xmlui.Submission.submit.DescribeStep.day">Day</message>
 	<message key="xmlui.Submission.submit.DescribeStep.series_name">Volume</message>
 	<message key="xmlui.Submission.submit.DescribeStep.report_no">Number</message>
+	<message key="xmlui.Submission.submit.DescribeStep.add">Add</message>
+	<message key="xmlui.Submission.submit.DescribeStep.update">Update</message>
+	<message key="xmlui.Submission.submit.DescribeStep.remove">Remove</message>
+	<message key="xmlui.Submission.submit.DescribeStep.edit">Edit</message>
+	<message key="xmlui.Submission.submit.DescribeStep.order">Order</message>
+	<message key="xmlui.Submission.submit.DescribeStep.author">Author</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
 	<message key="xmlui.Submission.submit.UploadStep.head">Upload File(s)</message>
@@ -891,9 +897,7 @@
 		the file from reaching us correctly, or you have attempted to upload a file format marked for
 		internal system use only. Please try again.</message>
 	<message key="xmlui.Submission.submit.UploadStep.description">File Description</message>
-	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief
-		description of the file, for example "<i>Main article</i>", or "<i>Experiment data
-		readings</i>".</message>
+	<message key="xmlui.Submission.submit.UploadStep.description_help">Enter either "<i>dataset-file</i>", or "<i>dc_readme</i>".</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload"
 		>Upload file &amp; add another</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
@@ -918,9 +922,7 @@
 	<message key="xmlui.Submission.submit.EditFileStep.head">Edit File</message>
 	<message key="xmlui.Submission.submit.EditFileStep.file">File</message>
 	<message key="xmlui.Submission.submit.EditFileStep.description">File Description</message>
-	<message key="xmlui.Submission.submit.EditFileStep.description_help">Optionally, provide a brief
-		description of the contents; for example, "<i>Main article</i>", or "<i>Experiment data
-			readings</i>".</message>
+	<message key="xmlui.Submission.submit.EditFileStep.description_help">Enter either "<i>dataset-file</i>", or "<i>dc_readme</i>".</message>
 	<message key="xmlui.Submission.submit.EditFileStep.info1">Select the format of the file from the
 		list below, for example "<i>Adobe PDF</i>" or "<i>Microsoft Word</i>." <strong>If the format is
 			not in the list</strong>, please describe it in the input box below the list.</message>
@@ -980,7 +982,7 @@
 	<message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">I Grant the License</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_error">You must grant this license to
 		complete your submission. If you are unable to grant this license at this time you may save your
-		work and return later or remove the submission by clicking the 'Save &amp; Exit' button
+		work and return later or remove the submission by clicking the 'Save &amp; exit' button
 		below.</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.RemovedStep -->
@@ -1032,7 +1034,7 @@
 		and found it is <strong>not</strong> suitable for inclusion in the collection, select "Reject".
 		You will then be asked to enter a message indicating why the item is unsuitable, and whether the
 		submitter should change something and resubmit.</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_submit">Reject item</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_submit">Return item to submitter</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_help">Select this option to change
 		the item's metadata.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_submit">Edit metadata</message>
@@ -1049,12 +1051,12 @@
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.RejectTaskStep -->
 	<message key="xmlui.Submission.workflow.RejectTaskStep.info1">Please enter your reason for
-		rejecting the submission into the box below, indicating whether the submitter may fix a problem
+		returning the submission into the box below, indicating whether the submitter may fix a problem
 		and resubmit.</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.reason">Reason</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.reason_required">The reason field is
 		required</message>
-	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_reject">Reject item</message>
+	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_reject">Return item to submitter</message>
 
 
 
@@ -1779,9 +1781,7 @@
 		file on your computer corresponding to your item. If you click "Browse...", a new window will
 		appear in which you can locate and select the file from your computer.</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.description_label">Description</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Optionally, provide a
-		brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data
-			readings</i>".</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Enter either "<i>dataset-file</i>", or "<i>dc_readme</i>".</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.submit_upload">Upload</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.no_bundles">You need the ADD &amp; WRITE
 		privilege on at least one bundle to be able to upload new bitstreams.</message>
@@ -1879,9 +1879,7 @@
 	<message key="xmlui.administrative.item.EditBitstreamForm.primary_option_yes">yes</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.primary_option_no">no</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.description_label">Description</message>
-	<message key="xmlui.administrative.item.EditBitstreamForm.description_help">Optionally, provide a
-		brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data
-			readings</i>"."</message>
+	<message key="xmlui.administrative.item.EditBitstreamForm.description_help">Enter either "<i>dataset-file</i>", or "<i>dc_readme</i>".</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.para1">Select the format of the file
 		from the list below, for example "<i>Adobe PDF</i>" or "<i>Microsoft Word</i>", <b>OR</b> if the
 		format is not in the list, please describe it in the box below.</message>
@@ -2643,6 +2641,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Files in this item</message>
+  <message key="xmlui.dri2xhtml.METS-1.0.files-external-head">Find this item in an external repository</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Files</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-name">Name</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-size">Size</message>
@@ -2849,21 +2848,24 @@
 		to this item.</message>
 
 
-	<message key="xmlui.submit.select.pub.head">Initial Information About Your Submission</message>
+	<message key="xmlui.submit.select.pub.head">Submitting your data to Dryad</message>
     <message key="xmlui.submit.select.pub.trail">
         <ul class="navigation-link">
-            <li class="selected"><b>1. Describe Publication</b></li>
-            <li>2. Upload Data Files</li>
+            <li class="selected"><b>1. Describe publication</b></li>
+            <li>2. Upload data files</li>
             <li>3. Review</li>
-            <li>4. Checkout &amp; Submit</li>
+            <li>4. Check out &amp; submit</li>
         </ul>
     </message>
     <message key="xmlui.submit.select.pub.help">
-Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-term access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from members and data submitters. Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data. In many cases, this charge is covered by <a href="/pages/integratedJournals">supporting journals, societies, and publishers</a>.  In the absence of a sponsoring organization, the submitter is required to pay the DPC.
+Thank you for archiving your data in the Dryad Digital Repository, where it can be easily discovered, cited and re-used. Follow the steps below to describe your publication, upload your data files, and finalize/pay for your submission. You may save your submission at any time and return to it later at <a href="/submissions" target="_blank">My Submissions</a>. For questions about and best practices for depositing your data, please see our <a href="/pages/faq#depositing" target="_blank">FAQ</a>.<br />
+<br />
+Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-term access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from members and data submitters.<br />
+<br />Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data. In many cases, this charge is covered by <a href="/pages/integratedJournals" target="_blank">supporting journals, societies, and publishers</a>. In the absence of a sponsoring organization, the submitter is required to pay the DPC.
     </message>
     <message key="xmlui.submit.select.country.head"><span class="ds-form-label">Country-based Fee Waiver</span><br /><br /></message>
     <message key="xmlui.submit.select.country.help">
-<span class="country-help">Waivers are granted upon request for submissions by researchers employed by an institution in an Eligible Country or who are independent researcher in residence in an Eligible Country. Eligible countries are those listed by the World Bank as low-income or lower-middle-income economies. Select a country to request a waiver before you begin your submission. </span>
+<span class="country-help">Waivers are granted upon request for submissions by researchers employed by an institution in an Eligible Country or who are independent researchers-in-residence in an Eligible Country. Eligible countries are those listed by the World Bank as low-income or lower-middle-income economies. Select a country to request a waiver before you begin your submission.</span>
     </message>
     <message key="xmlui.submit.select.country.error">Please select a country</message>
 	<message key="xmlui.submit.select.pub.form_head">Submit new content</message>
@@ -2873,10 +2875,10 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.submit.select.pub.form.option.existing">Select existing data package</message>
 	<message key="xmlui.submit.select.pub.form.error">Please fill in a valid data package
 		identifier</message>
-	<message key="xmlui.submit.select.pub.form.license">&#160;By clicking this checkbox, I certify that I agree to the Dryad  <a target="_blank" href="/pages/policies">Terms of Service</a>. I understand that by submitting data to Dryad,
+	<message key="xmlui.submit.select.pub.form.license">&#160;By clicking this checkbox, I certify that I have read and agree to the Dryad  <a target="_blank" href="/pages/policies">Terms of Service</a>. I understand that by submitting data to Dryad,
 		I am agreeing to release it under the terms of the <div id="cc-label" style="display: inline;"><a
 			href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative Commons Zero
-			(CC0)</a> waiver. All authors of the data have agreed to the terms of this waiver. <a href="/pages/faq#info-cc0" target="_blank">Why does Dryad require CC0?</a>
+			(CC0)</a> waiver and that I have the right to do so. All authors of the data have agreed to the terms of this waiver. <a href="/pages/faq#info-cc0" target="_blank">Why does Dryad require CC0?</a>
 			&#160;&#160;&#160;&#160;<a class="single-image-link" href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank"><img src="/themes/Dryad/images/cc-zero.png" alt="CC0 logo"></img></a></div></message>
 	<message key="xmlui.submit.select.pub.form.license_error">You must accept the CC0 waiver to continue the submission.</message>
 
@@ -2896,47 +2898,43 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.submit.publication.describe.trail">
         <div>
             <ul class="navigation-link">
-                <li>1. Describe Publication</li>
-                <li class="selected"><b>2. Upload Data Files</b></li>
+                <li class="selected"><b>1. Describe publication</b></li>
+                <li>2. Upload data files</li>
                 <li>3. Review</li>
-                <li>4. Checkout &amp; Submit</li>
+                <li>4. Check out &amp; submit</li>
             </ul>
         </div>
 	</message>
     <message key="xmlui.submit.publication.describe.help">
-        <div>Please describe your publication in as much detail as possible. Providing a detailed description will make it easier for others to find your data in Dryad. Please describe the publication only. Do not enter information specific to your data files on this page.
-
-            Fields marked with an asterisk (*) are required. For more information on expected contents for a field, hold your mouse over the field in question.
+        <div>Please describe your publication in as much detail as possible. Providing a detailed description will make it easier for others to find your data in Dryad.<br />
+<br />On this page, please describe the publication <strong>only</strong>. You will provide information specific to your data files on the next page.<br />
+<br />Fields marked with an asterisk (*) are required. For more information on expected contents for a field, mouse over the ? icon.
         </div>
+	</message>
+    <message key="xmlui.submit.publication.describe.nodetails">
+        <div><strong>We don't have any details about your article, so you will have to provide its description.</strong></div>
 	</message>
 	<message key="xmlui.submit.publication.describe.form.help">Publication metadata</message>
 
-	<message key="xmlui.submit.dataset.describe.head">Add and Describe Data File</message>
+	<message key="xmlui.submit.dataset.describe.head">Add and describe data file</message>
 	<message key="xmlui.submit.dataset.describe.trail">
         <div>
             <ul class="navigation-link">
-                <li>1. Describe Publication</li>
-                <li class="selected"><b>2. Upload Data Files</b></li>
+                <li>1. Describe publication</li>
+                <li class="selected"><b>2. Upload data files</b></li>
                 <li>3. Review</li>
-                <li>4. Checkout &amp; Submit</li>
+                <li>4. Check out &amp; submit</li>
             </ul>
         </div>
 	</message>
     <message key="xmlui.submit.dataset.describe.help">
         <div>
-            Please select a data file from your computer,
-            and describe the data file in as much detail as possible. Note that a data file will not
-            necessarily have the same authors and keywords as the publication, though for convenience some
-            of this information has been copied from the description of your publication. Providing a
-            detailed description will make it easier for others to find your data in Dryad. <br/>
-            <br/> Only one file may be uploaded and described on this page. Once this data file has been
-            saved, you may add additional files to the data package. If you have a large number of closely
-            related files, they may be submitted in an archive format such as tar or zip. If you have
-            trouble submitting files, please contact us at <a href="mailto:help@datadryad.org"
-                >help@datadryad.org</a>. Note that the total content submitted to Dryad for a given
-            publication must be less than 10GB.<br/>
-            <br/> Fields marked with an asterisk (*) are required. For more information on expected contents
-            for a field, hold your mouse over the field in question.
+            Please select and upload a data file from your computer, and describe the data file in as much detail as possible. Providing a detailed description will make it easier for others to find your data in Dryad. (While a data file may not have the same authors and keywords as the publication, for convenience, some of this information has been copied over. Please update as needed).<br />
+<br />Only one file may be uploaded and described on this page. Once this data file has been saved, you may add additional files to the data package. If you have a large number of related files, they may be submitted in an archive format such as .tar or .zip.<br />
+<br />Note that there will be additional fees if the total content submitted to Dryad for a given publication is more than 20GB. Submitters will be asked to pay $50 for each additional 10GB, or part thereof.<br />
+<br />Please remember that Dryad does <strong>not</strong> accept data submissions that contain personally identifiable human subject information or non-CC0 compatible licenses. <a href="/pages/faq#depositing" target="_blank">View guidance</a> about what types of data Dryad accepts and our preferred file formats.<br />
+<br />Fields marked with an asterisk (*) are required. For more information on expected contents for a field, mouse over the ? icon. If you have trouble submitting files, please contact us at <a href="mailto:help@datadryad.org"
+                >help@datadryad.org</a>.
         </div>
 	</message>
 	<message key="xmlui.submit.dataset.form.pub.head">Publication</message>
@@ -2954,7 +2952,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<!--<message key="xmlui.submit.complete.dataset.help">Thank you for submitting data to Dryad. The-->
 	<!--items you submitted have been given the following identifiers:</message>-->
 	<message key="xmlui.submit.complete.dataset.help">Thank you for submitting data to Dryad, the
-		items you have submitted will now go through the reviewing process.</message>
+		items you have submitted will now go through the review process.</message>
 	<message key="xmlui.submit.complete.dataset.label.pub">Publication you have submitted the data file(s) for</message>
 	<message key="xmlui.submit.complete.dataset.label.pub-only">Publication you have submitted</message>
 	<message key="xmlui.submit.complete.dataset.label.data">Data file</message>
@@ -2964,7 +2962,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.submit.dataset.no-actions.2"> for the actions.</message>
 	<message key="xmlui.submit.dataset.no-actions.data-package">data package</message>
 
-	<message key="xmlui.Submission.general.submission.complete.datapackage">Continue to describe data file</message>
+	<message key="xmlui.Submission.general.submission.complete.datapackage">Continue to upload and describe data file</message>
 
 	<message key="xmlui.submit.dataset.license">By uploading data to Dryad, you agree to release it
 		under the terms of the <br/><a href="http://creativecommons.org/publicdomain/zero/1.0/"
@@ -2973,16 +2971,16 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 		</a></message>
 
 
-	<message key="xmlui.submit.dataset.complete.head">Data File completed</message>
+	<message key="xmlui.submit.dataset.complete.head">Data file completed</message>
 	<message key="xmlui.submit.dataset.complete.text">The data file has been submitted; do you wish to
-		submit another data file or finish up the submission?</message>
+		submit another data file or finish the submission?</message>
 	<message key="xmlui.submit.dataset.complete.trail">
         <div>
             <ul class="navigation-link">
-                <li>1. Describe Publication</li>
-                <li>2. Upload Data Files</li>
+                <li>1. Describe publication</li>
+                <li>2. Upload data files</li>
                 <li class="selected"><b>3. Review</b></li>
-                <li>4. Checkout &amp; Submit</li>
+                <li>4. Check out &amp; submit</li>
             </ul>
         </div>
     </message>
@@ -3003,23 +3001,22 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.Submission.submit.OverviewStep.trail">
         <div>                                                                                                                                                                                                 <br/>
             <ul class="navigation-link">
-                <li>1. Describe Publication</li>
-                <li>2. Upload Data Files</li>
+                <li>1. Describe publication</li>
+                <li>2. Upload data files</li>
                 <li class="selected"><b>3. Review</b></li>
-                <li>4. Checkout &amp; Submit</li>
+                <li>4. Check out &amp; submit</li>
             </ul>
         </div>
 	</message>
     <message key="xmlui.Submission.submit.OverviewStep.help">
-        <div>                                                                                                                                                                                                 <br/>
-            Press a button to edit the description of
-            your publication, add or modify all attached data files, or finalize the submission.
+        <div>                                                                                                                                                
+            From this page, you can edit the description of your data package, add additional data files, modify uploaded files, and/or finalize your submission and proceed to checkout.
         </div>
 	</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Describe publication:</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.2">Add and describe data files:</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.3">Upload data files to partner repositories (optional):</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Checkout and finalize submission:</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Your data package</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.2">Your data files</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.3">Upload data files to partner repositories (optional)</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Checkout and finalize submission</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.add-datafile">Add new data file</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.finalize">Continue to checkout</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.edit">Edit</message>
@@ -3029,21 +3026,19 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 		submission until all the data files are through the submission workflow.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.error.finalize.one-file">You cannot finish the
 		submission until at least one data file is attached to the publication.</message>
-	<message key="xmlui.Submission.submit.OverviewStep.finalize.help">When you have added all data
-		files for this publication, press the button below to checkout and finish the submission. A Dryad curator
-		will review the submission to ensure the descriptions are complete and the files are not
-		corrupted. After this brief review, your data will be archived in Dryad.</message>
+	<message key="xmlui.Submission.submit.OverviewStep.finalize.help">When you are satisfied with your submission, click the button below to proceed to checkout.<br /> 
+	<br />A Dryad curator will review the submission to ensure the descriptions are complete, and that the files meet Dryad criteria for archiving and are not corrupted. After this brief review, your data will be archived in Dryad.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.delete-datapackage">Delete entire submission</message>
-	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit publication description</message>
+	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit data package description</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.button.finalize">Finalize submission</message>
-    <message key="xmlui.Submission.submit.Checkout.head">Checkout &amp; Submit</message>
+    <message key="xmlui.Submission.submit.Checkout.head">Check out &amp; submit</message>
     <message key="xmlui.Submission.submit.Checkout.trail">
         <div><br/>
             <ul class="navigation-link">
-                <li>1. Describe Publication</li>
-                <li>2. Upload Data Files</li>
+                <li>1. Describe publication</li>
+                <li>2. Upload data files</li>
                 <li>3. Review</li>
-                <li class="selected"><b>4. Checkout &amp; Submit</b></li>
+                <li class="selected"><b>4. Check out &amp; submit</b></li>
             </ul>
         </div>
     </message>
@@ -3113,7 +3108,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.DryadItemSummary.spatialCov">Spatial Coverage</message>
 	<message key="xmlui.DryadItemSummary.temporalCov">Temporal Coverage</message>
 	<message key="xmlui.DryadItemSummary.keywords">Keywords</message>
-	<message key="xmlui.DryadItemSummary.depDate">Date Submitted</message>
+	<message key="xmlui.DryadItemSummary.depDate">Date Published</message>
 	<message key="xmlui.DryadItemSummary.unknown">unknown</message>
 	<message key="xmlui.DryadItemSummary.downloads">Downloaded</message>
 	<message key="xmlui.DryadItemSummary.views">Pageviews</message>
@@ -3121,6 +3116,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.DryadItemSummary.withdrawn">The current Item is withdrawn</message>
     <message key="xmlui.DryadItemSummary.in_workflow">Unpublished data -- the associated publication is in review </message>
     <message key="xmlui.DryadItemSummary.notCurrentVersion">This is not the most current version of this Item</message>
+	<message key="xmlui.DryadItemSummary.not_in_review">This item has been archived at </message>
     <message key="xmlui.DryadItemSummary.mostCurrentVersion">&#160;&#160;[View current version]</message>
     <message key="xmlui.DryadItemSummary.charge">Payment Charge</message>
     <message key="xmlui.DryadItemSummary.transactionId">Transaction Id</message>
@@ -3227,7 +3223,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 
     <message key="xmlui.Submission.submit.OverviewStep.headgenbank">Genbank</message>
 	<message key="xmlui.Submission.submit.OverviewStep.genbankhelp"></message>
-    <message key="xmlui.general.cancel_delete">Cancel &amp; Delete</message>
+    <message key="xmlui.general.cancel_delete">Cancel &amp; delete</message>
 
 
     <message key="xmlui.ArtifactBrowser.RestrictedItem.questions">If you have questions about the status of this item, please send them to the Dryad curation staff:</message>
@@ -3286,6 +3282,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.Submission.result-table.head.title">Title</message>
     <message key="xmlui.Submission.result-table.head.submitter">Submitter</message>
     <message key="xmlui.Submission.result-table.head.datafiles">Number of data files</message>
+    <message key="xmlui.Submission.result-table.head.lastupdated">Last updated</message>
     <message key="xmlui.Submission.result-table.head.owner">Task owner</message>
 
     <message key="xmlui.Submission.Submissions.step.head.dryadAcceptEditReject_claimed">In Curation: Claimed</message>
@@ -3304,8 +3301,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
     <message key="xmlui.submit.publication.unknown_doi">I do not know the DOI or PubMedID for my publication. It was published in the journal:</message>
     <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select the status of your publication</span><br/></message>
-    <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.  
-    <strong>Did you receive an email from your journal with a link to Dryad?  Using this link to initiate your submission will save you time and effort by automatically entering the article metadata and the correct payment type for your journal.</strong></message>
+    <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.<br />
+    <br /><strong>Did you receive an email from your journal with a link to Dryad? Using this link to initiate your submission will save you time and effort by automatically entering the article metadata and the correct payment type for your journal.</strong></message>
 
 
     <message key="xmlui.submit.publication.journal.manu.acc.label">&#160; This manuscript has been accepted for publication in the above named journal.</message>
@@ -3319,9 +3316,9 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
      <message key="xmlui.submit.publication.enter_article_doi">Enter publication's DOI or PubMed ID</message>
 
      <message key="xmlui.submit.select.pub.form.manu_error">Please, provide a manuscript number</message>
-     <message key="xmlui.submit.publication.journal.select.label.new">Enter Your Journal Title</message>
-     <message key="xmlui.submit.publication.journal.manu.label.new">Enter Your Manuscript Number</message>
-     <message key="xmlui.submit.publication.journal.manu.label.review">Enter Your Manuscript Number (if available)</message>
+     <message key="xmlui.submit.publication.journal.select.label.new">Enter your journal title</message>
+     <message key="xmlui.submit.publication.journal.manu.label.new">Enter your manuscript number</message>
+     <message key="xmlui.submit.publication.journal.manu.label.review">Enter your manuscript number (if available)</message>
 
     <message key="xmlui.submit.publication.journal.help_in_review">If your journal is not listed, you must wait until your manuscript has been accepted before submitting data to Dryad.</message>
 
@@ -3344,14 +3341,15 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_type.label2">Please briefly describe the nature of the organization and its interest in Dryad’s mission.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_type">Organization type is required</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">3. Gross annual revenue <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Dryad membership fees are based on members' annual revenue. Please specify currency and annual revenue.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">3. Membership level <span class="required-mark">*</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Please specify currency.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue_currency">Currency selection is required</message>
 
     <!-- Checkbox options for org_annual_revenue -->
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million"><span id="msg-less_than_10_million">Less than $10 million per year (annual membership fee US$1000)</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million"><span id="msg-greater_than_10_million">Greater than $10 million per year (annual membership fee US$5000)</span></message>
-
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million"><span class="msg-greater_than_10_million"><b>Sustainer</b>: annual membership dues <span class="largeOrgFee">&#x00A0;</span> (annual revenue greater than <span class="revenueThreshold">&#x00A0;</span> per year)</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million"><span class="msg-less_than_10_million"><b>Supporter</b>: annual membership dues <span class="smallOrgFee">&#x00A0;</span> (annual revenue less than <span class="revenueThreshold">&#x00A0;</span> per year)</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.advocate_all_organizations"><span class="msg-advocate-all-organizations"><b>Advocate</b>: annual membership dues <span class="advocateFee">&#x00A0;</span> (open to all organizations, no journal discounts)</span></message>
+    
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Annual revenue is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_contact_name.label1">4. Billing contact name<span class="required-mark">*</span></message>
@@ -3364,13 +3362,13 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.billing_address">Billing address is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label1">7. Publications</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label2">One member benefit is a discount on payment plans for qualifying journals published by the member. Please list journals that your organization publishes. If too many to list here, please send to <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label2">One benefit for Sustainer and Supporter members is a discount on payment plans for qualifying journals published by the member. Please list journals that your organization publishes. If too many to list here, please send to <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_term.label1">8. Membership term <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_term.label2">Membership years run January-December.  Membership may start in 2013 or 2014 and may be selected for multiple years.<br/></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.label">Membership term starting January </message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.2013">2013</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.2014">2014</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_term.label2">Membership years run January&#x2013;December.  Membership may start in the current year or the following year, and may be selected for multiple years.<br/></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.label">Membership term starting January of&#x00A0;</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.current">current year</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.following">following year</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_length.label">and having duration </message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_length.1">1 year</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_length.2">2 years</message>
@@ -3380,14 +3378,17 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.membership_length">Duration of membership is required.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.membership_year_start">Membership term starting year is required.</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label1">9. Organizational representative <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label2">The organizational representative will receive all regular communications on behalf of the member organization, excepting those concerning dues. The representative may serve as the delegate at the Annual Meeting or appoint another delegate in his/her place. </message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_name">Representative name is required</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_org.label1">9. Organizational representative <span class="required-mark">*</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_org.label2">The organizational representative will receive all regular communications on behalf of the member organization, excepting those concerning dues. The representative may serve as the delegate at the Annual Meeting or appoint another delegate in his/her place. </message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_email.label1">10. Organizational representative's email address <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_email">Representative's email address is required</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name">Name</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_name">Name is required</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_title">Title</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_title">Title is required</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_email">Email address</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_email">Email address is required</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label1">11. Comments</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label1">10. Comments</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label2">Please add any additional information, comments or questions here.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.submit">Submit</message>
@@ -3406,7 +3407,6 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.PaymentSystem.shoppingcart.order.payer">Payer</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.price">Data Publishing Charge</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.surcharge">Excess data storage</message>
-    <message key="xmlui.PaymentSystem.shoppingcart.order.noIntegrateFee">Non-integrated submission</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.country">Fee-waiver country</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.total">Your total</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.voucher">Voucher code</message>
@@ -3414,7 +3414,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.PaymentSystem.shoppingcart.order.customerName">Customer Name</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.apply">Apply</message>
     <message key="xmlui.PaymentSystem.shoppingcart.verified"><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Your payment information has been verified.<br/><br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button below.</span></message>
-    <message key="xmlui.PaymentSystem.shoppingcart.help"><strong>Need Help?</strong><br/>Email us at <a href="mailto:help@datadryad.org">help@datadryad.org</a> or send a message via our <a href="/feedback">contact form</a>.</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.help"><strong>Need help?</strong><br/><a href="mailto:help@datadryad.org">Email us</a> or send a message via our <a href="/feedback">contact form</a>.</message>
 
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep">Payment information must be reauthorized</message>
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_claimed">Reauthorize payment : claimed</message>
@@ -3422,6 +3422,16 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationPaymentStep">Publication Blackout: Payment information must be reauthorized</message>
     <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationPaymentStep_claimed">Publication Blackout: Reauthorize payment : claimed</message>
     <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationPaymentStep_pool">Publication Blackout: Reauthorize payment : Unclaimed</message>
+
+
+
+    <message key="xmlui.Submission.Submissions.step.head.reAuthorizationCreditStep">Credit information must be reauthorized</message>
+    <message key="xmlui.Submission.Submissions.step.head.reAuthorizationCreditStep_claimed">Reauthorize credit : claimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.reAuthorizationCreditStep_pool">Reauthorize credit : Unclaimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationCreditStep">Publication Blackout: Credit information must be reauthorized</message>
+    <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationCreditStep_claimed">Publication Blackout: Reauthorize credit : claimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationCreditStep_pool">Publication Blackout: Reauthorize credit : Unclaimed</message>
+
     <message key="xmlui.administrative.Navigation.administrative_access_shoppingcart">Shopping Cart</message>
 
     <message key="xmlui.property.ManageShoppingcartMain.title">Manage Shopping Cart</message>
@@ -3554,5 +3564,17 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.administrative.item.PropagateItemMetadataForm.no_value">No Value</message>
     <message key="xmlui.administrative.item.PropagateItemMetadataForm.update">Update</message>
     <message key="xmlui.administrative.item.PropagateItemMetadataForm.return">Return</message>
-
+    <message key="xmlui.PaymentSystem.shoppingcart.order.help.title">Total price is calculated based on the currency and rate at the time of submission</message>
+    <message key="org.dspace.authenticate.OAuthAuthentication.title">Oauth Authentication</message>
+    
+    <!-- org.datadryad.dspace.statistics: xmlui home page statistics -->
+    <message key="org.datadryad.dspace.statistics.type">Type</message>
+    <message key="org.datadryad.dspace.statistics.total">Total</message>
+    <message key="org.datadryad.dspace.statistics.thirtydays">30 days</message>
+    <message key="org.datadryad.dspace.statistics.datapackges">Data packages</message>
+    <message key="org.datadryad.dspace.statistics.datafiles">Data files</message>
+    <message key="org.datadryad.dspace.statistics.journals">Journals</message>
+    <message key="org.datadryad.dspace.statistics.authors">Authors</message>
+    <message key="org.datadryad.dspace.statistics.downloads">Downloads</message>
+    
 </catalogue>

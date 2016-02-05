@@ -13,5 +13,5 @@
     <bean id="reAuthorizationPaymentAction" class="org.dspace.app.xmlui.aspect.submission.workflow.actions.processingaction.ReAuthorizationPaymentActionXMLUI" scope="prototype"/>
     <bean id="afterPublicationAction" class="org.dspace.app.xmlui.aspect.submission.workflow.actions.processingaction.AfterPublicationActionXMLUI" scope="prototype"/>
 
-
+    <bean id="reAuthorizationCreditAction" class="org.dspace.app.xmlui.aspect.submission.workflow.actions.processingaction.ReAuthorizationCreditActionXMLUI" scope="prototype"/>
 </beans>

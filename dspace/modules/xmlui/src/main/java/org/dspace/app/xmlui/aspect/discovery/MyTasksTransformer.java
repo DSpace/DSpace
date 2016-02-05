@@ -244,6 +244,10 @@ public class MyTasksTransformer extends DiscoverySubmissions{
 
 
         SolrDocumentList solrResults = queryResults.getResults();
+	if(solrResults.size() <= 0) {
+	    log.debug("no solr results for workflow step " + count.getName());
+	    return;
+	}
 
         if(isStepFilterPage()){
             // Pagination variables.
@@ -274,7 +278,7 @@ public class MyTasksTransformer extends DiscoverySubmissions{
         }
 
 
-        Table resultTable = workflowResultsDiv.addTable("results", solrResults.size(), 2);
+	Table resultTable = workflowResultsDiv.addTable("results", solrResults.size(), 2);
 
         boolean showMoreUrl = false;
         if(solrResults.size() < solrResults.getNumFound()){

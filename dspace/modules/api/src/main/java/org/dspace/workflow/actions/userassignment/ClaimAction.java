@@ -29,12 +29,12 @@ public class ClaimAction extends UserSelectionAction {
     @Override
     public void activate(Context context, WorkflowItem wfItem) throws SQLException, IOException, AuthorizeException {
         Step owningStep = getParent().getStep();
-
         EPerson[] allMembers = getParent().getStep().getRole().getMembers(context, wfItem);
+        String recipient = ConfigurationManager.getProperty("automated.email.recipient");
         // Create pooled tasks for each member of our group
         if(allMembers != null && allMembers.length > 0){
             WorkflowManager.createPoolTasks(context, wfItem, allMembers, owningStep, getParent());
-            alertUsersOnActivation(context, wfItem, allMembers);
+            alertUsersOnActivation(context, wfItem, recipient);
         }
         else
             log.info(LogManager.getHeader(context, "warning while activating claim action", "No group was found for the following roleid: " + getParent().getStep().getRole().getId()));
@@ -54,8 +54,7 @@ public class ClaimAction extends UserSelectionAction {
         }
     }
 
-    @Override
-    public void alertUsersOnActivation(Context c, WorkflowItem wfi, EPerson[] members) throws IOException, SQLException {
+    public void alertUsersOnActivation(Context c, WorkflowItem wfi, String recipient) throws IOException, SQLException {
         Email mail = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "submit_datapackage_task"));
         mail.addArgument(wfi.getItem().getName());
         //Add the titles of the data files
@@ -72,9 +71,10 @@ public class ClaimAction extends UserSelectionAction {
         mail.addArgument(WorkflowManager.getMyDSpaceLink());
 
         try {
-            WorkflowUtils.emailRecipients(members, mail);
+            mail.addRecipient(recipient);
+            mail.send();
         } catch (MessagingException e) {
-            log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task", "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
+            log.info(LogManager.getHeader(c, "error emailing about task", "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
         }
     }
 

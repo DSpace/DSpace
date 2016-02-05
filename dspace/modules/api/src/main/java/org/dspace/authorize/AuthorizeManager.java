@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -216,7 +217,7 @@ public class AuthorizeManager
     /**
      * same authorize, returns boolean for those who don't want to deal with
      * catching exceptions.
-     * 
+     *
      * @param c
      *            DSpace context, containing current user
      * @param o
@@ -438,6 +439,60 @@ public class AuthorizeManager
         {
             return Group.isMember(c, 1);
         }
+    }
+
+    public static boolean isSeniorCurator(Context c) throws SQLException
+    {
+        // if we're ignoring authorization, user is member of admin
+        if (c.ignoreAuthorization())
+        {
+            return true;
+        }
+
+        EPerson e = c.getCurrentUser();
+
+        if (e == null)
+        {
+            return false; // anonymous users can't be admins....
+        }
+        else
+        {
+            Group seniorCurator = Group.findByName(c, ConfigurationManager.getProperty("core.authorization.site-admin.group"));
+            if(seniorCurator==null)
+            {
+                return false;
+            }
+
+            return Group.isMember(c, seniorCurator.getID());
+        }
+    }
+
+    public static boolean isCuratorOrAdmin(Context context){
+        try{
+
+            boolean isSystemAdmin = isAdmin(context);
+            if(isSystemAdmin)
+            {
+                return true;
+            }
+            else
+            {
+                boolean isSeniorCurator = isSeniorCurator(context);
+                if(isSeniorCurator)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+        }catch (Exception e)
+        {
+
+        }
+        return false;
     }
 
     ///////////////////////////////////////////////

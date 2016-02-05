@@ -1,0 +1,18 @@
+# Error email message
+#
+# Title of submission: {0}
+# Submitter: {1}
+# Error: {2}
+# Shopping cart contents: {3}
+#
+Subject: Dryad: Error Receipt
+
+There was a problem with the payment processing step in Dryad.
+
+Title of submission: {0}
+Submitter: {1}
+Error: {2}
+
+Shopping Cart Contents
+
+{3}

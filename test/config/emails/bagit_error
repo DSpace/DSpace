@@ -1,0 +1,19 @@
+# Email sent to DSpace admin when a bagit export fails to complete
+#
+# Parameters: {0} the export error
+#             {1} the email address of the person requesting the item
+#             {2} the item that did not export correctly
+#             {3} the location of the files created by the disseminator
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Dryad - Problem with the bagit exporter
+A bagit export was not successfully completed, due to the following reason:
+
+{0}
+ 
+The item was requested by {1}
+ 
+The item in question is {2}
+ 
+The location of the work products is {3}

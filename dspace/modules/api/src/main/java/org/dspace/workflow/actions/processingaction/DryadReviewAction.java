@@ -10,7 +10,7 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
+import org.dspace.JournalUtils;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
 
@@ -40,6 +40,12 @@ public class DryadReviewAction extends ProcessingAction {
         UUID uuid = UUID.randomUUID();
         //Next add our unique key to our workflowitem
         wf.getItem().addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "reviewerKey", null, uuid.toString());
+        try{
+            wf.getItem().update();
+        } catch (AuthorizeException e)
+        {
+            log.error("cant update reviewerKey for item:"+wf.getItem().getID());
+        }
 
         try {
             Role role = WorkflowUtils.getCollectionRoles(wf.getCollection()).get("curator");
@@ -75,9 +81,9 @@ public class DryadReviewAction extends ProcessingAction {
         if(values!=null && values.length> 0){
             String journal = values[0].value;
             if(journal!=null){
-                Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(journal);
+                Map<String, String> properties = JournalUtils.getPropertiesByJournal(journal);
                 if(properties!=null){
-                    String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_REVIEW);
+                    String emails = properties.get(JournalUtils.NOTIFY_ON_REVIEW);
                     log.debug("reviewers for journal " + journal + " are " + emails);
                     if(emails != null) {
                         String[] emails_=emails.split(",");
@@ -202,23 +208,26 @@ public class DryadReviewAction extends ProcessingAction {
         //add the submitter
         email.addArgument(wf.getSubmitter().getFullName() + " ("  + wf.getSubmitter().getEmail() + ")");
 
-	// add the review URL (with access token)
-        email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/review?wfID=" + wf.getID() + "&token=" + key);
+	// add the review URL (using provisional DOI as key)
+        email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/review?doi=" + doi);
 
 	// add journal's manuscript number
-	String manuScriptIdentifier = "";
+	String manuScriptIdentifier = "none available";
 	DCValue[] manuScripIdentifiers = wf.getItem().getMetadata(MetadataSchema.DC_SCHEMA, "identifier", "manuscriptNumber", Item.ANY);
 	if(0 < manuScripIdentifiers.length){
 	    manuScriptIdentifier = manuScripIdentifiers[0].value;
 	}
 	
-	if(manuScriptIdentifier.length() == 0) {
-	    manuScriptIdentifier = "none available";
-	}
-	
 	email.addArgument(manuScriptIdentifier);
 
-	
+	// Add journal name
+	String journalName = "not available";
+	DCValue[] journalNames = wf.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
+	if(0 < journalNames.length){
+	    journalName = journalNames[0].value;
+	}
+        
+        email.addArgument(journalName);
 
             email.send();
         } catch (Exception e) {

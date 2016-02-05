@@ -536,6 +536,22 @@
 		</profile>
 
 		<!--
+           Builds Dryad REST WebApp
+        -->
+		<profile>
+			<id>dryad-rest-webapp</id>
+			<activation>
+				<file>
+					<exists>../dryad-rest-webapp/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dryad-rest-webapp</module>
+			</modules>
+		</profile>
+
+
+		<!--
            These profiles setup properties and build configuration
            appropriate to the database that DSpace will be installed
            against.
@@ -827,7 +843,7 @@
 	<dependency>
 	  <groupId>org.dspace.modules</groupId>
 	  <artifactId>bagit-api</artifactId>
-	  <version>0.0.1</version>
+      <version>${pom.version}</version>
 	</dependency>
 	<dependency>
 	  <groupId>org.dspace.modules</groupId>
@@ -852,11 +868,7 @@
 	  <version>1.2.5</version>
 	</dependency>
 	
-        <dependency>
-	  <groupId>com.atmire</groupId>
-	  <artifactId>atmire-authority</artifactId>
-	  <version>${pom.version}</version>
-        </dependency>
+
 	
     </dependencies>      
 </project>

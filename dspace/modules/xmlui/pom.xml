@@ -201,7 +201,7 @@
       <dependency>
          <groupId>org.dspace.modules</groupId>
          <artifactId>bagit-api</artifactId>
-         <version>0.0.1</version>
+          <version>${project.version}</version>
       </dependency>
 
        <dependency>
@@ -334,6 +334,45 @@
            <artifactId>payment-webapp</artifactId>
            <type>war</type>
        </dependency>
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>dryad-widgets-webapp</artifactId>
+           <type>war</type>
+       </dependency>
+
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>dryad-widgets-webapp</artifactId>
+           <type>jar</type>
+           <classifier>classes</classifier>
+           <exclusions>
+               <exclusion>
+                   <artifactId>ehcache</artifactId>
+                   <groupId>net.sf.ehcache</groupId>
+               </exclusion>
+           </exclusions>
+           <version>${project.version}</version>
+       </dependency>
+
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>journal-landing-webapp</artifactId>
+           <type>jar</type>
+           <classifier>classes</classifier>
+           <exclusions>
+               <exclusion>
+                   <artifactId>ehcache</artifactId>
+                   <groupId>net.sf.ehcache</groupId>
+               </exclusion>
+           </exclusions>
+           <version>${project.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>journal-landing-webapp</artifactId>
+           <type>war</type>
+           <version>${project.version}</version>
+       </dependency>
 
        <dependency>
            <groupId>org.springframework</groupId>
@@ -341,17 +380,24 @@
            <version>3.0.5.RELEASE</version>
        </dependency>
 
-
-       <dependency>
-           <groupId>com.atmire</groupId>
-           <artifactId>atmire-authority</artifactId>
-       </dependency>
-
        <dependency>
            <artifactId>dspace-cocoon-servlet-service-impl</artifactId>
            <groupId>org.dspace.dependencies.cocoon</groupId>
            <version>1.0.3</version>
        </dependency>
+
+       <dependency>
+       <groupId>org.apache.oltu.oauth2</groupId>
+       <artifactId>org.apache.oltu.oauth2.client</artifactId>
+       <version>1.0.0</version>
+       </dependency>
+        <!-- Ensure slf4j api version 1.5.6.
+             oltu brings in 1.6.1, but rest of DSpace 1.7 expects 1.5.6 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.6</version>
+        </dependency>
 
    </dependencies>
 

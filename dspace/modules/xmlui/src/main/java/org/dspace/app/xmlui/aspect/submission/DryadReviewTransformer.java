@@ -20,11 +20,11 @@ import org.dspace.content.Item;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
-import org.dspace.identifier.IdentifierService;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowRequirementsManager;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -32,6 +32,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.dspace.workflow.ClaimedTask;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -52,31 +53,70 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     protected static final Message T_workflow_title = message("xmlui.Submission.general.workflow.title");
     private static final Message T_head_has_part = message("xmlui.ArtifactBrowser.ItemViewer.head_hasPart");
     private static final Message T_in_workflow = message("xmlui.DryadItemSummary.in_workflow");
+    private static final Message T_not_in_review = message("xmlui.DryadItemSummary.not_in_review");
 
 
-    private String doi;
     private WorkflowItem wfItem;
     private boolean authorized;
+    private boolean currentlyInReview;
+    private String requestDoi;
     List<Item> dataFiles = new ArrayList<Item>();
 
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
         super.setup(resolver, objectModel, src, parameters);
         authorized = false;
+        currentlyInReview = false;
 
         Request request = ObjectModelHelper.getRequest(objectModel);
 
-        int wfItemId;
+        // Reviewers may access with either
+        // 1. wfID + token
+        // 2. provisional DOI (since it is not yet public)
 
-        if ( (wfItem=getWFItem(request)) == null) return;
-
-
-        String token = request.getParameter("token");
-        if (token != null) {
+        requestDoi = request.getParameter("doi");
+        if(requestDoi != null) {
+            authorized = true;
+            loadWFItemByDOI(requestDoi);
+            if(wfItem == null) {
+                // Not found
+                return;
+            }
+            // DOI was found. Set authorized true and the reviewerToken for downloads
             String reviewerKey = getItemToken();
-            authorized = token.equals(reviewerKey);
-            if (authorized)
-                request.getSession().setAttribute("reviewerToken", token);
+            request.getSession().setAttribute("reviewerToken", reviewerKey);
+        } else {
+            requestDoi = "";
+            // DOI not present, require token
+            String token = request.getParameter("token");
+            if (token != null) {
+                loadWFItem(request); // Looks up by wfID or itemId
+                if(wfItem == null) {
+                    // item not found
+                    return;
+                }
+                // item lookup successful, make sure token matches
+                String reviewerKey = getItemToken();
+                authorized = token.equals(reviewerKey);
+                if (authorized) {
+                    request.getSession().setAttribute("reviewerToken", token);
+                }
+            }
+        }
+
+        // Check if the item is actually in review
+        // taskowner has step_id=reviewStep, action_id=reviewAction, owner_id=submitter's eperson ID
+        try {
+            List<ClaimedTask> tasks = ClaimedTask.findByWorkflowId(context, wfItem.getID());
+            // find a task with reviewStep
+            for(ClaimedTask task : tasks) {
+                if(task.getStepID().equals("reviewStep")) {
+                    currentlyInReview = true;
+                }
+            }
+        } catch (SQLException ex) {
+            log.error("Exception checking for claimed task with reviewStep", ex);
+            return;
         }
     }
 
@@ -115,91 +155,118 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         if (!authorized) {
             throw new AuthorizeException("You are not authorized to review the submission");
         }
-        Request request = ObjectModelHelper.getRequest(objectModel);
-
-        Division div = body.addInteractiveDivision("main-div", contextPath + "/review", Division.METHOD_POST, "");
-
-        // Adding message for withdrawn or workflow item
-        addWarningMessage(wfItem.getItem(), div);
-
-        //Add an overview of the item in question
-        String showfull = request.getParameter("submit_full_item_info");
-
-        // if the user selected showsimple, remove showfull.
-        if (showfull != null && request.getParameter("submit_simple_item_info") != null)
-            showfull = null;
-
-
-        DCValue[] vals = wfItem.getItem().getMetadata("dc.title");
-        ReferenceSet referenceSet = null;
-
-        if (showfull == null) {
-            referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_SUMMARY_VIEW);
-            if (vals != null && vals[0] != null)
-                referenceSet.setHead(vals[0].value);
-            else
-                referenceSet.setHead(T_workflow_head);
-            div.addPara().addButton("submit_full_item_info").setValue(T_showfull);
-        } else {
-            referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_DETAIL_VIEW);
-            if (vals != null && vals[0] != null)
-                referenceSet.setHead(vals[0].value);
-            else
-                referenceSet.setHead(T_workflow_head);
-            div.addPara().addButton("submit_simple_item_info").setValue(T_showsimple);
-
-            div.addHidden("submit_full_item_info").setValue("true");
-        }
-
-
-
-        // adding the dataFile
-        org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(wfItem.getItem());
-        if (wfItem.getItem().getMetadata("dc.relation.haspart").length > 0) {
-            ReferenceSet hasParts;
-            hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
-            hasParts.setHead(T_head_has_part);
-
-            if (dataFiles.size() == 0) retrieveDataFiles(wfItem.getItem());
-
-            for (Item obj : dataFiles) {
-                hasParts.addReference(obj);
+        if (!currentlyInReview) {
+            if (requestDoi.equals("")) {
+                throw new AuthorizeException("Malformed DOI or package does not exist");
             }
-        }
+            Division div = body.addDivision("not_in_review");
+            Para p = div.addPara();
+            p.addContent(T_not_in_review);
+            requestDoi = requestDoi.replace("doi:","");
+            String archivedURL = ConfigurationManager.getProperty("doi.hostname") + "/" + requestDoi;
+            p.addXref(archivedURL,archivedURL);
+        } else {
+            Request request = ObjectModelHelper.getRequest(objectModel);
 
-        div.addHidden("token").setValue(request.getParameter("token"));
-        div.addHidden("wfID").setValue(String.valueOf(wfItem.getID()));
+            Division div = body.addInteractiveDivision("main-div", contextPath + "/review", Division.METHOD_POST, "");
+
+            // Adding message for withdrawn or workflow item
+            addWarningMessage(wfItem.getItem(), div);
+
+            //Add an overview of the item in question
+            String showfull = request.getParameter("submit_full_item_info");
+
+            // if the user selected showsimple, remove showfull.
+            if (showfull != null && request.getParameter("submit_simple_item_info") != null)
+                showfull = null;
+
+
+            DCValue[] vals = wfItem.getItem().getMetadata("dc.title");
+            ReferenceSet referenceSet = null;
+
+            if (showfull == null) {
+                referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_SUMMARY_VIEW);
+                if (vals != null && vals[0] != null)
+                    referenceSet.setHead(vals[0].value);
+                else
+                    referenceSet.setHead(T_workflow_head);
+                div.addPara().addButton("submit_full_item_info").setValue(T_showfull);
+            } else {
+                referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_DETAIL_VIEW);
+                if (vals != null && vals[0] != null)
+                    referenceSet.setHead(vals[0].value);
+                else
+                    referenceSet.setHead(T_workflow_head);
+                div.addPara().addButton("submit_simple_item_info").setValue(T_showsimple);
+
+                div.addHidden("submit_full_item_info").setValue("true");
+            }
+
+
+            // adding the dataFile
+            org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(wfItem.getItem());
+            if (wfItem.getItem().getMetadata("dc.relation.haspart").length > 0) {
+                ReferenceSet hasParts;
+                hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
+                hasParts.setHead(T_head_has_part);
+
+                if (dataFiles.size() == 0) retrieveDataFiles(wfItem.getItem());
+
+                for (Item obj : dataFiles) {
+                    hasParts.addReference(obj);
+                }
+            }
+
+            div.addHidden("token").setValue(request.getParameter("token"));
+            div.addHidden("wfID").setValue(String.valueOf(wfItem.getID()));
+        }
     }
 
-    private WorkflowItem
-    getWFItem(Request request) throws IOException {
+    private void loadWFItemByDOI(String doi) throws IOException {
+        wfItem = null;
+        DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+
+        if (!doi.startsWith("doi:")) {
+            doi = "doi:" + doi;
+        }
+        try {
+            DSpaceObject obj = dis.resolve(context, doi);
+            if (obj instanceof Item) {
+                wfItem = WorkflowItem.findByItemId(context, obj.getID());
+            }
+        } catch (IdentifierNotFoundException e) {
+            requestDoi = "";
+            log.error(e);
+        } catch (IdentifierNotResolvableException e) {
+            requestDoi = "";
+            log.error(e);
+        } catch (SQLException e) {
+            requestDoi = "";
+            log.error(e);
+        } catch (AuthorizeException e) {
+            requestDoi = "";
+            log.error(e);
+        }
+    }
+
+    private void
+    loadWFItem(Request request) throws IOException {
         int wfItemId;
+        wfItem = null;
         try {
             if (request.getParameter("wfID") != null) {
                 wfItemId = Integer.parseInt(request.getParameter("wfID"));
                 wfItem = WorkflowItem.find(context, wfItemId);
             }
-            else if (request.getParameter("doi") != null) {
-                DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-                DSpaceObject obj = null;
-                obj = dis.resolve(context, request.getParameter("doi"));
-                if (obj instanceof Item)
-                    wfItem = WorkflowItem.findByItemId(context, obj.getID());
-            }
             else if (request.getParameter("itemID") != null) {
                 Item item = Item.find(context, Integer.parseInt(request.getParameter("itemID")));
                 wfItem = WorkflowItem.findByItemId(context, item.getID());
             }
-        } catch (IdentifierNotFoundException e) {
-            log.error(e);
-        } catch (IdentifierNotResolvableException e) {
-            log.error(e);
         } catch (SQLException e) {
             log.error(e);
         } catch (AuthorizeException e) {
             log.error(e);
         }
-        return wfItem;
     }
 
     private String getItemToken() {
@@ -272,7 +339,6 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
      */
     public void recycle()
     {
-        this.doi = null;
         this.wfItem = null;
 	this.authorized = false;
 	this.dataFiles=new ArrayList<Item>();

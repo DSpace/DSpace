@@ -1,0 +1,74 @@
+{
+    "USD": {
+        "memberDPC_voucher": "$95",
+        "nonMemberDPC_voucher": "$105",
+        "memberDPC_deferred": "$105",
+        "nonMemberDPC_deferred": "$115",
+        "memberDPC_subscription": "$40",
+        "nonMemberDPC_subscription": "$50",
+        "DPC_pay_on_submission": "$120",
+        "excessDataStorageFee_first_surcharge": "$50",
+        "excessDataStorageFee_double_first_surcharge": "$100",
+        "excessDataStorageFee_per_additional_surcharge": "$50"
+    },
+    "EUR": {
+        "memberDPC_voucher": "€87",
+        "nonMemberDPC_voucher": "€96",
+        "memberDPC_deferred": "€96",
+        "nonMemberDPC_deferred": "€105",
+        "memberDPC_subscription": "€37",
+        "nonMemberDPC_subscription": "€46",
+        "DPC_pay_on_submission": "€110",
+        "excessDataStorageFee_first_surcharge": "€46",
+        "excessDataStorageFee_double_first_surcharge": "€92",
+        "excessDataStorageFee_per_additional_surcharge": "€46"
+    },
+    "GBP": {
+        "memberDPC_voucher": "£64", 
+        "nonMemberDPC_voucher": "£70",
+        "memberDPC_deferred": "£70",
+        "nonMemberDPC_deferred": "£77",
+        "memberDPC_subscription": "£27",
+        "nonMemberDPC_subscription": "£34",
+        "DPC_pay_on_submission": "£80",
+        "excessDataStorageFee_first_surcharge": "£34",
+        "excessDataStorageFee_double_first_surcharge": "£68",
+        "excessDataStorageFee_per_additional_surcharge": "£34"
+    },
+    "CAD": {
+        "memberDPC_voucher": "$133",
+        "nonMemberDPC_voucher": "$146",
+        "memberDPC_deferred": "$146",
+        "nonMemberDPC_deferred": "$160",
+        "memberDPC_subscription": "$56",
+        "nonMemberDPC_subscription": "$70",
+        "DPC_pay_on_submission": "$168",
+        "excessDataStorageFee_first_surcharge": "$34",
+        "excessDataStorageFee_double_first_surcharge": "$68",
+        "excessDataStorageFee_per_additional_surcharge": "$34"
+    },
+    "JPY": {
+        "memberDPC_voucher": "¥11500",
+        "nonMemberDPC_voucher": "¥12712",
+        "memberDPC_deferred": "¥12712",
+        "nonMemberDPC_deferred": "¥13927",
+        "memberDPC_subscription": "¥4844",
+        "nonMemberDPC_subscription": "¥6055",
+        "DPC_pay_on_submission": "¥14532",
+        "excessDataStorageFee_first_surcharge": "¥6055",
+        "excessDataStorageFee_double_first_surcharge": "¥12110",
+        "excessDataStorageFee_per_additional_surcharge": "¥6055"
+    },
+    "AUD": {
+        "memberDPC_voucher": "$132",
+        "nonMemberDPC_voucher": "$146",
+        "memberDPC_deferred": "$146",
+        "nonMemberDPC_deferred": "$160",
+        "memberDPC_subscription": "$56",
+        "nonMemberDPC_subscription": "$70",
+        "DPC_pay_on_submission": "$167",
+        "excessDataStorageFee_first_surcharge": "$70",
+        "excessDataStorageFee_double_first_surcharge": "$140",
+        "excessDataStorageFee_per_additional_surcharge": "$70"
+    }
+}

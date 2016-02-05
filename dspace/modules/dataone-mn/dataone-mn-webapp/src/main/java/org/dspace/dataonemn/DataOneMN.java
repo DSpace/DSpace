@@ -75,49 +75,6 @@ public class DataOneMN extends HttpServlet implements Constants {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
-       Opens a DSpace context, and cleanly recovers if there is a problem opening it.
-    **/
-    private Context getContext() throws ServletException {
-	Context ctxt = null;
-	
-	try {
-	    ctxt = new Context();
-	    
-	    log.debug("DSpace context initialized");
-	    return ctxt;
-	}
-	catch (SQLException e) {
-	    log.error("Unable to initialize DSpace context", e);
-	    
-	    try {
-		if (ctxt != null) {
-		    ctxt.complete();
-		}
-	    }
-	    catch (SQLException e2) {
-		log.warn("unable to close context cleanly;" + e2.getMessage(), e2);
-	    }
-	    
-	    throw new ServletException("Unable to initialize DSpace context", e);
-	}
-    }
-
-    
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private void closeContext(Context ctxt) throws ServletException {
-	log.debug("closing context " + ctxt);
-	try {
-	    if (ctxt != null && ctxt.getDBConnection() != null) {   //if the connection is null how can we commit?
-		ctxt.complete();
-	    }
-	    log.debug("DSpace context closed.");
-	} catch (SQLException e) {
-	    log.warn("unable to close context cleanly;" + e.getMessage(), e);
-	}
-    }
-    
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /**
      * Receives the HEAD HTTP call and passes off to the appropriate method.
      **/
     protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -126,16 +83,24 @@ public class DataOneMN extends HttpServlet implements Constants {
 	String reqPath = buildReqPath(request.getPathInfo());
 	log.debug("pathinfo=" + reqPath);
 
-	Context ctxt = getContext();
-	
-	if (reqPath.startsWith("/object/")) {
-	    ObjectManager objManager = new ObjectManager(ctxt, myFiles, myPackages);
-	    describe(reqPath, response, objManager);
-	} else {
-	    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	Context context = null;
+
+	try{
+	    context = new Context();
+	    
+	    if (reqPath.startsWith("/object/")) {
+		ObjectManager objManager = new ObjectManager(context, myFiles, myPackages);
+		describe(reqPath, response, objManager);
+	    } else {
+		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	    }
+	} catch (SQLException e) {
+	    log.error("Unable to initialize context and object manager", e);
+	} finally {
+	    if (context != null) {
+		context.abort();
+	    }
 	}
-	
-	closeContext(ctxt);
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,8 +168,6 @@ public class DataOneMN extends HttpServlet implements Constants {
         String queryString = request.getQueryString();
        	log.debug("reqPath=" + reqPath);
 	
-	Context ctxt = null;
-	
 	LogEntry le = new LogEntry();
 	String requestIP = request.getHeader("x-forwarded-for");
         if(requestIP == null) {
@@ -222,10 +185,12 @@ public class DataOneMN extends HttpServlet implements Constants {
 	le.setSubject(subjectBuff.toString());
 	le.setNodeIdentifier(d1NodeID);
 	//code for setting the log time moved to the LogEntry class, since the format needs to work with solr
+
+	Context context = null;
 	
 	try {
-	    ctxt = getContext();
-	    ObjectManager objManager = new ObjectManager(ctxt, myFiles, myPackages);     
+	    context = new Context();
+	    ObjectManager objManager = new ObjectManager(context, myFiles, myPackages);     
 		    
 	    if (reqPath.startsWith("/monitor/ping")) {
 		ping(response, objManager);
@@ -287,7 +252,9 @@ public class DataOneMN extends HttpServlet implements Constants {
 	} catch (Exception e) {
 	    log.error("UNEXPECTED EXCEPTION", e);
 	} finally {
-	    closeContext(ctxt);
+	    if (context != null) {
+		context.abort();
+	    }
 	}
     }
     
@@ -298,8 +265,8 @@ public class DataOneMN extends HttpServlet implements Constants {
      **/
     public void init() throws ServletException {
 	log.debug("initializing...");
-	ServletContext context = this.getServletContext();
-	String configFileName = context.getInitParameter("dspace.config");
+	ServletContext scontext = this.getServletContext();
+	String configFileName = scontext.getInitParameter("dspace.config");
 	File aConfig = new File(configFileName);
 	
 	if (aConfig != null) {
@@ -387,17 +354,26 @@ public class DataOneMN extends HttpServlet implements Constants {
 	}
 	catch (IllegalArgumentException details) {}
 	// See http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
-	// for explanation of ZZ time zone formatting
+	// for explanation of ZZ and Z time zone formatting
 	try {  
-	    return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSZZ").parseDateTime(date).toDate();
+	    return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSZZ").withOffsetParsed().parseDateTime(date).toDate();
 	}
 	catch (IllegalArgumentException details) {}
 	
 	try {
-	    return DateTimeFormat.forPattern("yyyyMMdd'T'HHmmss.SSSSZZ").parseDateTime(date).toDate();
+	    return DateTimeFormat.forPattern("yyyyMMdd'T'HHmmss.SSSSZZ").withOffsetParsed().parseDateTime(date).toDate();
 	}
 	catch (IllegalArgumentException details) {}
-	
+	try {
+		return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSZ").withOffsetParsed().parseDateTime(date).toDate();
+	}
+	catch (IllegalArgumentException details) {}
+
+	try {
+		return DateTimeFormat.forPattern("yyyyMMdd'T'HHmmss.SSSSZ").withOffsetParsed().parseDateTime(date).toDate();
+	}
+	catch (IllegalArgumentException details) {}
+
 	return null;
     }
 
@@ -780,13 +756,11 @@ public class DataOneMN extends HttpServlet implements Constants {
 	try {
 	    long length = objManager.getObjectSize(id, idTimestamp);
 	    response.setContentLength((int) length);
-
+	    
 	    if (id.endsWith("/bitstream")) {
-	    ServletContext context = getServletContext();
 
 	    log.warn("NEED TO GET CORRECT MIME TYPE");
 	    String mimeType = "application/octet-stream";
-	    //String mimeType = context.getMimeType("f." + format);
 
 	    if (mimeType == null || mimeType.equals("")) {
 	        mimeType = "application/octet-stream";
@@ -848,9 +822,6 @@ public class DataOneMN extends HttpServlet implements Constants {
 	catch (Exception details) {
 	    log.error("UNEXPECTED EXCEPTION", details);
 	    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-	}
-	finally {
-	    objManager.completeContext();
 	}
     }
 

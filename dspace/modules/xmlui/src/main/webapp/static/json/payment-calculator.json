@@ -1,0 +1,26 @@
+{
+    "plan-sustainer" : {
+        "subscription"  : 40,
+        "voucher"       : 95,
+        "deferred"      : 105,
+        "dues"          : 5000
+    },
+    "plan-supporter" : {
+        "subscription"  : 40,
+        "voucher"       : 95,
+        "deferred"      : 105,
+        "dues"          : 1000
+    },
+    "plan-advocate" : {
+        "subscription"  : 50,
+        "voucher"       : 105,
+        "deferred"      : 115,
+        "dues"          : 500
+    },
+    "plan-nonmember" : {
+        "subscription"  : 50,
+        "voucher"       : 105,
+        "deferred"      : 115,
+        "dues"          : 0
+    }
+}

@@ -137,7 +137,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
             initial-scale = 1.0 retains dimensions instead of zooming out if page height > device height
             maximum-scale = 1.0 retains dimensions instead of zooming in if page width < device width
             -->
-            <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
             <link rel="shortcut icon">
                 <xsl:attribute name="href">
@@ -427,22 +427,31 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">About</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/repository">Repository features and technology</a>
-                                </li>
-                                <li>
                                     <a href="/pages/organization">The organization</a>
                                 </li>
                                 <li>
-                                    <a href="http://blog.datadryad.org" target="_blank">News and views</a>
+                                    <a href="/pages/ourTeam">Our team</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/whoWeAre">Who we are</a>
+                                    <a href="/pages/repository">Repository features and technology</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/employment">Employment Opportunities</a>
+                                    <a href="/pages/policies">Policies</a>
                                 </li>
                                 <li>
-                                  <a href="/pages/faq">Frequently asked questions</a>
+                                    <a href="http://blog.datadryad.org" target="_blank">Blog: News and views</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/dryadlab" target="_blank">DryadLab: Research data for educators</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/employment">Employment opportunities</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/membershipMeeting">Membership meeting</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/faq">FAQs</a>
                                 </li>
                             </ul>
                         </li>
@@ -450,16 +459,25 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">For researchers</a>
                             <ul>
                                 <li>
-                                  <a href="/pages/faq#depositing">Submit data</a>
+                                  <a href="/handle/10255/3/submit">Submit data</a>
                                 </li>
                                 <li>
-                                  <a href="/pages/faq#using">Use data</a>
+                                  <a href="/discover?query=&amp;submit=Search#advanced">Use data</a>
                                 </li>
                                 <li>
-                                  <a href="/pages/integratedJournals">Look up your journal</a>
+                                  <a href="/pages/journalLookup">Look up your journal</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/faq">FAQs</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/payment">Payment</a>
                                 </li>
                                 <li>
                                   <a href="/pages/institutionalSponsors">Institutional sponsors</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/dryadlab" target="_blank">Educational outreach with DryadLab</a>
                                 </li>
                                 <li>
                                     <a href="/pages/policies">Terms of service</a>
@@ -470,13 +488,22 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">For organizations</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/journalIntegration">Journal integration</a>
+                                    <a href="/pages/bePartOfDryad">Be part of Dryad</a>
+                                </li> 
+                                <li>
+                                    <a href="/pages/submissionIntegration">Submission integration</a>
                                 </li>                            
                                 <li>
                                     <a href="/pages/membershipOverview">Membership</a>
+                                </li> 
+                                <li>
+                                    <a href="/pages/membershipMeeting">Membership meeting</a>
                                 </li>                            
                                 <li>
-                                    <a href="/pages/pricing">Pricing plans</a>
+                                    <a href="/pages/paymentPlans">Payment plans</a>
+                                </li> 
+                                <li>
+                                    <a href="/pages/paymentPlanComparisonTool">Payment plan comparison tool</a>
                                 </li>                            
                             </ul>
                         </li>
@@ -565,9 +592,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <xsl:otherwise>
                                 <li class="no-hover-highlight">
                                     <a href="/login">
-                                        <span id="login-item">Login</span>
+                                        <span id="login-item">Log in</span>
                                         <span class="accessibly-hidden"> or </span>
-                                        <span id="sign-up-item">Sign Up</span>
+                                        <span id="sign-up-item">Sign up</span>
                                     </a>
                                 </li>
                             </xsl:otherwise>
@@ -779,6 +806,18 @@ references to stylesheets pulled directly from the pageMeta element. -->
                 <xsl:value-of
                         select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
                 <xsl:text>/lib/js/jquery.bxslider.min.js</xsl:text>
+            </xsl:attribute>
+            &#160;
+        </script>
+
+        <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:text>/themes/</xsl:text>
+                <xsl:value-of
+                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                <xsl:text>/lib/js/jquery.dataTables.js</xsl:text>
             </xsl:attribute>
             &#160;
         </script>

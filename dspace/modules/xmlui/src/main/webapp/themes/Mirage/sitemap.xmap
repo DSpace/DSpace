@@ -147,7 +147,8 @@
 
                     <map:parameter name="stylesheet.screen#7" value="lib/css/jquery-ui-1.css"/>
                     <map:parameter name="stylesheet.screen#8" value="lib/css/jquery.bxslider.css"/>
-                    <map:parameter name="stylesheet.screen#9" value="lib/css/superfish.css"/>
+                    <map:parameter name="stylesheet.screen#9" value="lib/css/jquery.dataTables.css"/>
+                    <map:parameter name="stylesheet.screen#10" value="lib/css/superfish.css"/>
                 </map:transform>
 
                 <map:transform type="IncludePageMeta">
@@ -213,7 +214,8 @@
 
                         <map:parameter name="stylesheet.screen#7" value="lib/css/jquery-ui-1.css"/>
                         <map:parameter name="stylesheet.screen#8" value="lib/css/jquery.bxslider.css"/>
-                        <map:parameter name="stylesheet.screen#9" value="lib/css/superfish.css"/>
+                        <map:parameter name="stylesheet.screen#9" value="lib/css/jquery.dataTables.css"/>
+                        <map:parameter name="stylesheet.screen#10" value="lib/css/superfish.css"/>
                     </map:transform>
 
                     <map:transform type="IncludePageMeta">
@@ -267,7 +269,8 @@
 
                         <map:parameter name="stylesheet.screen#7" value="lib/css/jquery-ui-1.css"/>
                         <map:parameter name="stylesheet.screen#8" value="lib/css/jquery.bxslider.css"/>
-                        <map:parameter name="stylesheet.screen#9" value="lib/css/superfish.css"/>
+                        <map:parameter name="stylesheet.screen#9" value="lib/css/jquery.dataTables.css"/>
+                        <map:parameter name="stylesheet.screen#10" value="lib/css/superfish.css"/>
                     </map:transform>
 
                     <map:transform type="IncludePageMeta">
@@ -319,7 +322,8 @@
 
                         <map:parameter name="stylesheet.screen#7" value="lib/css/jquery-ui-1.css"/>
                         <map:parameter name="stylesheet.screen#8" value="lib/css/jquery.bxslider.css"/>
-                        <map:parameter name="stylesheet.screen#9" value="lib/css/superfish.css"/>
+                        <map:parameter name="stylesheet.screen#9" value="lib/css/jquery.dataTables.css"/>
+                        <map:parameter name="stylesheet.screen#10" value="lib/css/superfish.css"/>
                     </map:transform>
 
                     <map:transform type="IncludePageMeta">

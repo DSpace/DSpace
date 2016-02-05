@@ -1,0 +1,573 @@
+<?xml version="1.0"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<catalogue xml:lang="en" xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
+
+    <message key="xmlui.administrative.Navigation.administrative_term_registries">Term Registry</message>
+    <message key="xmlui.administrative.Navigation.administrative_concept_registries">Concept Registry</message>
+    <message key="xmlui.administrative.Navigation.administrative_authority_control">Authroty Control</message>
+    <message key="xmlui.administrative.Navigation.administrative_relation_registries">Concept Relation Registry</message>
+    <message key="xmlui.administrative.Navigation.administrative_scheme_registries">Scheme Registry</message>
+
+
+    <message key="xmlui.administrative.registries.general.metadata_term_registry_trail">Term registry</message>
+    <message key="xmlui.administrative.registries.general.metadata_concept_registry_trail">Concept registry</message>
+
+
+
+    <message key="xmlui.administrative.registries.EditConceptRelationSchema.column1"></message>
+    <message key="xmlui.administrative.registries.EditConceptRelationSchema.column2">ID</message>
+    <message key="xmlui.administrative.registries.EditConceptRelationSchema.column3">Element</message>
+    <message key="xmlui.administrative.registries.EditConceptRelationSchema.column4">Scope Note</message>
+
+
+    <message key="xmlui.administrative.registries.EditMetadataSchema.error_incoming_empty">The field's incoming is required.</message>
+    <message key="xmlui.administrative.registries.EditMetadataSchema.error_incoming_badchar">The field's incoming contains a bad character. The element may NOT contain: periods, underscores, or spaces.</message>
+    <message key="xmlui.administrative.registries.EditMetadataSchema.error_incoming_tolong">The field's incoming is to long, it must be less than 32 characters.</message>
+    <message key="xmlui.administrative.registries.EditMetadataSchema.error_outgoing_tolong">The field's outgoing is to long, it must be less than 32 characters.</message>
+    <message key="xmlui.administrative.registries.EditMetadataSchema.error_outgoing_badchar">The field's outgoing contains a bad character. The outgoing may NOT contain: periods, underscores, or spaces.</message>
+
+    <!-- org.dspace.app.xmlui.administrative.registries.MetadatTermRegistryMain.java -->
+    <message key="xmlui.administrative.registries.TermRegistryMain.title">Term Registry</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.head1">Term registry</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.para1">The term registry maintains a list of all fields available in the repository. These fields may be divided amongst multiple schemas.  However, DSpace requires the qualified Dublin Core schema. You may extend the Dublin Core schema with additional fields or add new schemas to the registry.</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.column1"></message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.column2">ID</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.column3">Namespace</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.column4">Creation Date</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.submit_delete">Delete term schema</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.head2">Add a new term schema</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.namespace">Namespace</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.namespace_help">Namespace should be an established URI location for the new term schema.</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.namespace_error">This field is required.</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.name">Creation Date</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.name_help">Shorthand notation for the term schema. This will be used to prefix a field's name (e.g. dc.element.qualifier). The name must be less than 32 characters and cannot include spaces, periods or underscores.</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.name_error">This field is required and must be less than 32 characters and cannot contain any spaces, periods, or underscores.</message>
+    <message key="xmlui.administrative.registries.TermRegistryMain.submit_add">Add new term schema</message>
+
+
+
+    <!-- org.dspace.app.xmlui.administrative.registries.MetadatTermRegistryMain.java -->
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.title">Concept Registry</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.head1">Term registry</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.para1">The concept registry maintains a list of all  fields available in the repository. These fields may be divided amongst multiple schemas.  However, DSpace requires the qualified Dublin Core schema. You may extend the Dublin Core schema with additional fields or add new schemas to the registry.</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.column1"></message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.column2">ID</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.column3">Namespace</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.column4">Creation Date</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.submit_delete">Delete concept schema</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.head2">Add a new concept schema</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.namespace">Namespace</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.namespace_help">Namespace should be an established URI location for the new concept schema.</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.namespace_error">This field is required.</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.name">Creation Date</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.name_help">Shorthand notation for the concept schema. This will be used to prefix a field's name (e.g. dc.element.qualifier). The name must be less than 32 characters and cannot include spaces, periods or underscores.</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.name_error">This field is required and must be less than 32 characters and cannot contain any spaces, periods, or underscores.</message>
+    <message key="xmlui.administrative.registries.ConceptRegistryMain.submit_add">Add new concept schema</message>
+
+
+    <!-- org.dspace.app.xmlui.administrative.registries.MetadatSchemeRegistryMain.java -->
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.title">Scheme Registry</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.head1">Scheme registry</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.para1">The term registry maintains a list of all fields available in the repository. These fields may be divided amongst multiple schemas.  However, DSpace requires the qualified Dublin Core schema. You may extend the Dublin Core schema with additional fields or add new schemas to the registry.</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.column1"></message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.column2">ID</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.column3">Namespace</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.column4">Creation Date</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.submit_delete">Delete term schema</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.head2">Add a new term schema</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.namespace">Namespace</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.namespace_help">Namespace should be an established URI location for the new term schema.</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.namespace_error">This field is required.</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.name">Creation Date</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.name_help">Shorthand notation for the term schema. This will be used to prefix a field's name (e.g. dc.element.qualifier). The name must be less than 32 characters and cannot include spaces, periods or underscores.</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.name_error">This field is required and must be less than 32 characters and cannot contain any spaces, periods, or underscores.</message>
+    <message key="xmlui.administrative.registries.SchemeRegistryMain.submit_add">Add new term schema</message>
+
+
+
+
+
+    <!-- org.dspace.app.xmlui.administrative.registries.MetadatConceptRelationRegistryMain.java -->
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.title">Concept Relation Registry</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.head1">Concept Relation registry</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.para1">The concept relation registry maintains a list of all fields available in the repository. These fields may be divided amongst multiple schemas.  However, DSpace requires the qualified Dublin Core schema. You may extend the Dublin Core schema with additional fields or add new schemas to the registry.</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.column1"></message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.column2">ID</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.column3">Namespace</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.column4">Creation Date</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.submit_delete">Delete concept relation schema</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.head2">Add a new concept relation schema</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.namespace">Namespace</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.namespace_help">Namespace should be an established URI location for the new concept relation schema.</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.namespace_error">This field is required.</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.name">Name</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.name_help">Shorthand notation for the concept relation schema. This will be used to prefix a field's name (e.g. dc.element.qualifier). The name must be less than 32 characters and cannot include spaces, periods or underscores.</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.name_error">This field is required and must be less than 32 characters and cannot contain any spaces, periods, or underscores.</message>
+    <message key="xmlui.administrative.registries.ConceptRelationRegistryMain.submit_add">Add new concept relation schema</message>
+
+
+
+
+
+
+
+
+    <message key="xmlui.aspect.authority.concept.general.epeople_trail">Manage Concept</message>
+
+
+    <!-- ManageConceptMain -->
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.title">Manage Concept</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.main_head">Concept management</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.actions_head">Actions</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.actions_create">Create a new Concept</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.actions_create_link">Click here to add a new Concept.</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.actions_browse">Browse Concept</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.actions_browse_link">Click here to browse all Concept.</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.actions_search">Search for Concept</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.search_help">Concept are searched by any partial match on Identifier or name</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.search_para1">Below is the list of Concept that matched your search query. Select the Concept you want to delete and click the delete button to continue or click on an Concept's Identifier or name to edit them.</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.search_head">Search results</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.search_column1"></message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.search_column2">ID</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.search_column3">Creation Date</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.search_column4">Preferred Term</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.submit_delete">Delete Concept</message>
+    <message key="xmlui.aspect.authority.concept.ManageConceptMain.no_results">Your search found no results..</message>
+
+
+    <!-- org.dspace.app.xmlui.aspect.authority.concept.AddEPersonForm -->
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.title">Add Concept</message>
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.trail">Add Concept</message>
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.head1">Create a new Concept</message>
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.email_taken">That Identifier address is in use by another Concept. Identifier must be unique.</message>
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.head2">New Concept's information:</message>
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.error_email_unique">Identifier must be unique</message>
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.error_email">Identifier is required</message>
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.error_fname">First name is required</message>
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.error_lname">Last name is required</message>
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.req_certs">Require Certificate</message>
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.can_log_in">Can Log In</message>
+    <message key="xmlui.aspect.authority.concept.AddConceptForm.submit_create">Create Concept</message>
+
+    <!-- EditConceptForm -->
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.title">Edit Concept</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.trail">Edit Concept</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.head1">Edit an Concept</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.email_taken">That Identifier address is in use by another Concept. Identifier must be unique.</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.head2">{0}'s information:</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.error_email_unique">Identifier must be unique</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.error_email">Identifier is required</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.error_fname">First name is required</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.error_lname">Last name is required</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.req_certs">Require Certificate</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.can_log_in">Can Log In</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.submit_reset_password">Reset Password</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.special_help">You may also permanently remove this Concept from the system or reset his/her password. When resetting a password the user will be sent an Identifier containing a special link they can follow to choose a new password.</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.submit_delete">Delete Concept</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.submit_login_as">Login as Concept</message>
+
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.delete_constraint">This concept is unable to be deleted because of the following constraint(s):</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.delete_constraint.last_conjunction">and</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.delete_constraint.item">concept has submitted one or more items</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.delete_constraint.workflowitem">concept has an active submission workflow</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.delete_constraint.tasklistitem">concept has a workflow task awaiting their attention</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.delete_constraint.unknown">concept has an unidentified constraint within the system</message>
+
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.member_head">Groups this Concept is a member of:</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.indirect_member">(via group: {0})</message>
+    <message key="xmlui.aspect.authority.concept.EditConceptForm.member_none">none</message>
+
+
+
+    <!-- ManageTermMain -->
+    <message key="xmlui.aspect.authority.term.ManageTermMain.title">Manage Terms</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.main_head">Term management</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.actions_head">Actions</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.actions_create">Create a new Term</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.actions_create_link">Click here to add a new Term.</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.actions_browse">Browse Term</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.actions_browse_link">Click here to browse all Term.</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.actions_search">Search for Term</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.search_help">Term are searched by any partial match on identifier or name</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.search_para1">Below is the list of Term that matched your search query. Select the Term you want to delete and click the delete button to continue or click on an Term's identifier or name to edit them.</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.search_head">Search results</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.search_column1"></message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.search_column2">ID</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.search_column3">Creation Date</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.search_column4">Literal Form</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.submit_delete">Delete Term</message>
+    <message key="xmlui.aspect.authority.term.ManageTermMain.no_results">Your search found no results..</message>
+
+
+    <!-- AddTermForm -->
+    <message key="xmlui.aspect.authority.term.AddTermForm.title">Add Term</message>
+    <message key="xmlui.aspect.authority.term.AddTermForm.trail">Add Term</message>
+    <message key="xmlui.aspect.authority.term.AddTermForm.head1">Create a new Term</message>
+    <message key="xmlui.aspect.authority.term.AddTermForm.email_taken">That identifier address is in use by another Term. Identifier must be unique.</message>
+    <message key="xmlui.aspect.authority.term.AddTermForm.head2">New Term's information:</message>
+    <message key="xmlui.aspect.authority.term.AddTermForm.error_email_unique">identifier address must be unique</message>
+    <message key="xmlui.aspect.authority.term.AddTermForm.error_email">identifier is required</message>
+    <message key="xmlui.aspect.authority.term.AddTermForm.error_fname">First name is required</message>
+    <message key="xmlui.aspect.authority.term.AddTermForm.error_lname">Last name is required</message>
+    <message key="xmlui.aspect.authority.term.AddTermForm.req_certs">Require Certificate</message>
+    <message key="xmlui.aspect.authority.term.AddTermForm.can_log_in">Can Log In</message>
+    <message key="xmlui.aspect.authority.term.AddTermForm.submit_create">Create Term</message>
+
+    <!-- EditTermForm -->
+    <message key="xmlui.aspect.authority.term.EditTermForm.title">Edit Term</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.trail">Edit Term</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.head1">Edit an Term</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.email_taken">That identifier address is in use by another Term. identifier must be unique.</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.head2">{0}'s information:</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.error_email_unique">identifier must be unique</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.error_email">identifier is required</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.error_fname">First name is required</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.error_lname">Last name is required</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.req_certs">Require Certificate</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.can_log_in">Can Log In</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.submit_reset_password">Reset Password</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.special_help">You may also permanently remove this Term from the system or reset his/her password. When resetting a password the user will be sent an identifier containing a special link they can follow to choose a new password.</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.submit_delete">Delete Term</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.submit_login_as">Login as Term</message>
+
+    <message key="xmlui.aspect.authority.term.EditTermForm.delete_constraint">This term is unable to be deleted because of the following constraint(s):</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.delete_constraint.last_conjunction">and</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.delete_constraint.item">term has submitted one or more items</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.delete_constraint.workflowitem">term has an active submission workflow</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.delete_constraint.tasklistitem">term has a workflow task awaiting their attention</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.delete_constraint.unknown">term has an unidentified constraint within the system</message>
+
+    <message key="xmlui.aspect.authority.term.EditTermForm.member_head">Groups this Term is a member of:</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.indirect_member">(via group: {0})</message>
+    <message key="xmlui.aspect.authority.term.EditTermForm.member_none">none</message>
+
+
+
+
+
+    <!-- org.dspace.app.xmlui.aspect.authority.term.DeleteEPeopleConfirm -->
+    <message key="xmlui.aspect.authority.term.DeleteEPeopleConfirm.title">Confirm Term Deletion</message>
+    <message key="xmlui.aspect.authority.term.DeleteEPeopleConfirm.trail">Confirm Delete</message>
+    <message key="xmlui.aspect.authority.term.DeleteEPeopleConfirm.confirm_head">Confirm Deletion</message>
+    <message key="xmlui.aspect.authority.term.DeleteEPeopleConfirm.confirm_para">The following Term will be deleted: </message>
+    <message key="xmlui.aspect.authority.term.DeleteEPeopleConfirm.submit_confirm">Confirm Deletion</message>
+    <message key="xmlui.aspect.authority.term.DeleteEPeopleConfirm.head_id">ID</message>
+    <message key="xmlui.aspect.authority.term.DeleteEPeopleConfirm.head_name">Creation Date</message>
+    <message key="xmlui.aspect.authority.term.DeleteEPeopleConfirm.head_email">Identifier</message>
+
+
+    <message key="xmlui.administrative.Navigation.administrative_metadata_concept">Manage Concept</message>
+    <message key="xmlui.administrative.Navigation.administrative_metadata_term">Manage Term</message>
+    <message key="xmlui.administrative.Navigation.administrative_metadata_concept_relation">Manage Concept Relation</message>
+    <message key="xmlui.administrative.Navigation.administrative_metadata_concept_2_term_relation">Manage Concept 2 Term Relation</message>
+
+    <!-- org.dspace.app.xmlui.administrative.term.AddTermForm -->
+    <message key="xmlui.administrative.term.AddTermForm.title">Add Term</message>
+    <message key="xmlui.administrative.term.AddTermForm.trail">Add Term</message>
+    <message key="xmlui.administrative.term.AddTermForm.head1">Create a new Term</message>
+    <message key="xmlui.administrative.term.AddTermForm.email_taken">That Identifier is in use by another Term. identifier must be unique.</message>
+    <message key="xmlui.administrative.term.AddTermForm.head2">New Term's information:</message>
+    <message key="xmlui.administrative.term.AddTermForm.error_email_unique">Identifier address must be unique</message>
+    <message key="xmlui.administrative.term.AddTermForm.error_email">Identifier is required</message>
+    <message key="xmlui.administrative.term.AddTermForm.error_fname">First name is required</message>
+    <message key="xmlui.administrative.term.AddTermForm.error_lname">Last name is required</message>
+    <message key="xmlui.administrative.term.AddTermForm.req_certs">Require Certificate</message>
+    <message key="xmlui.administrative.term.AddTermForm.can_log_in">Can Log In</message>
+    <message key="xmlui.administrative.term.AddTermForm.submit_create">Create Term</message>
+
+
+    <!-- org.dspace.app.xmlui.administrative.concept.AddConceptForm -->
+    <message key="xmlui.administrative.concept.AddConceptForm.title">Add Concept</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.trail">Add Concept</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.head1">Create a new Concept</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.email_taken">That Identifier address is in use by another Concept. Identifier must be unique.</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.head2">New Concept's information:</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.error_email_unique">Identifier address must be unique</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.error_email">Identifier address is required</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.error_fname">First name is required</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.error_lname">Last name is required</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.req_certs">Require Certificate</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.can_log_in">Can Log In</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.submit_create">Create Concept</message>
+
+
+
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.search_column5"></message>
+    <!-- org.dspace.app.xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain -->
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.title">Manage Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.main_head">Concept management</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.actions_head">Actions</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.actions_create">Create a new Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.actions_create_link">Click here to add a new Concept To Term.</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.actions_browse">Browse Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.actions_browse_link">Click here to browse all Concept To Term.</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.actions_search">Search for Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.search_help">Concept To Term are searched by any partial match on Identifier or name</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.search_para1">Below is the list of Concept To Term that matched your search query. Select the Concept To Term you want to delete and click the delete button to continue or click on an Concept To Term's Identifier or name to edit them.</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.search_head">Search results</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.search_column1"></message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.search_column2">ID</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.search_column3">Creation Date</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.search_column4">Identifier</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.submit_delete">Delete Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.ManageConcept2TermMain.no_results">Your search found no results..</message>
+
+
+    <!-- org.dspace.app.xmlui.aspect.authority.metadatarelation.AddTermForm -->
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.title">Add Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.trail">Add Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.head1">Create a new Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.email_taken">That Identifier is in use by another Concept To Term. Identifier must be unique.</message>
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.head2">New Concept To Term's information:</message>
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.error_email_unique">Identifier must be unique</message>
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.error_email">Identifier is required</message>
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.error_fname">First name is required</message>
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.error_lname">Last name is required</message>
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.req_certs">Require Certificate</message>
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.can_log_in">Can Log In</message>
+    <message key="xmlui.aspect.authority.metadatarelation.AddConcept2TermForm.submit_create">Create Concept To Term</message>
+
+    <!-- org.dspace.app.xmlui.aspect.authority.metadatarelation.EditConcept2TermForm -->
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.title">Edit Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.trail">Edit Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.head1">Edit an Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.email_taken">That Identifier address is in use by another Concept To Term. Identifier must be unique.</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.head2">{0}'s information:</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.error_email_unique">Identifier address must be unique</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.error_email">Identifier address is required</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.error_fname">First name is required</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.error_lname">Last name is required</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.req_certs">Require Certificate</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.can_log_in">Can Log In</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.submit_reset_password">Reset Password</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.special_help">You may also permanently remove this Concept To Term from the system or reset his/her password. When resetting a password the user will be sent an Identifier containing a special link they can follow to choose a new password.</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.submit_delete">Delete Concept To Term</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.submit_login_as">Login as Concept To Term</message>
+
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.delete_constraint">This relation is unable to be deleted because of the following constraint(s):</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.delete_constraint.last_conjunction">and</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.delete_constraint.item">relation has submitted one or more items</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.delete_constraint.workflowitem">relation has an active submission workflow</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.delete_constraint.tasklistitem">relation has a workflow task awaiting their attention</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.delete_constraint.unknown">relation has an unidentified constraint within the system</message>
+
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.member_head">Groups this Concept To Term is a member of:</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.indirect_member">(via group: {0})</message>
+    <message key="xmlui.aspect.authority.metadatarelation.EditConcept2TermForm.member_none">none</message>
+
+
+
+
+
+    <!-- org.dspace.app.xmlui.aspect.authority.metadatarelation.DeleteEPeopleConfirm -->
+    <message key="xmlui.aspect.authority.metadatarelation.DeleteEPeopleConfirm.title">Confirm Concept To Term Deletion</message>
+    <message key="xmlui.aspect.authority.metadatarelation.DeleteEPeopleConfirm.trail">Confirm Delete</message>
+    <message key="xmlui.aspect.authority.metadatarelation.DeleteEPeopleConfirm.confirm_head">Confirm Deletion</message>
+    <message key="xmlui.aspect.authority.metadatarelation.DeleteEPeopleConfirm.confirm_para">The following Concept To Term will be deleted: </message>
+    <message key="xmlui.aspect.authority.metadatarelation.DeleteEPeopleConfirm.submit_confirm">Confirm Deletion</message>
+    <message key="xmlui.aspect.authority.metadatarelation.DeleteEPeopleConfirm.head_id">ID</message>
+    <message key="xmlui.aspect.authority.metadatarelation.DeleteEPeopleConfirm.head_name">Creation Date</message>
+    <message key="xmlui.aspect.authority.metadatarelation.DeleteEPeopleConfirm.head_email">Identifier</message>
+
+
+    <!-- org.dspace.app.xmlui.administrative.metadatarelation.AddConcept2TermForm -->
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.title">Add Concept To Term</message>
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.trail">Add Concept To Term</message>
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.head1">Create a new Concept</message>
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.email_taken">That Identifier address is in use by another Concept To Term. Identifier must be unique.</message>
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.head2">New Concept To Term's information:</message>
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.error_email_unique">Identifier address must be unique</message>
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.error_email">Identifier address is required</message>
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.error_fname">First name is required</message>
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.error_lname">Last name is required</message>
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.req_certs">Require Certificate</message>
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.can_log_in">Can Log In</message>
+    <message key="xmlui.administrative.metadatarelation.AddConcept2TermForm.submit_create">Create Concept To Term</message>
+
+    <message key="xmlui.administrative.concept.AddConceptForm.top_concept">Top Concept</message>
+    <message key="xmlui.administrative.FlowConceptUtils.add_Concept_success_notice">Successfully Added</message>
+    <message key="xmlui.administrative.term.EditTermForm.head1">Edit Term</message>
+    <message key="xmlui.administrative.term.EditTermForm.trail">Edit Term</message>
+    <message key="xmlui.administrative.term.general.epeople_trail">Term</message>
+    <message key="xmlui.administrative.term.EditTermForm.head2">Term Properties</message>
+    <message key="xmlui.Term.EditProfile.literalForm_address">Literal Form</message>
+    <message key="xmlui.Term.EditProfile.status">Status</message>
+
+    <message key="xmlui.Term.EditProfile.source">Source</message>
+    <message key="xmlui.Term.EditProfile.identifier">Identifier</message>
+    <message key="xmlui.Term.EditProfile.language">Language</message>
+
+
+    <message key="xmlui.administrative.term.EditTermForm.move_term">Move</message>
+    <message key="xmlui.administrative.term.EditTermForm.submit_delete">Delete</message>
+    <message key="xmlui.administrative.term.EditTermForm.move_term_help">Move term help</message>
+
+
+    <message key="xmlui.administrative.registries.Concept2TermMain.column1"></message>
+    <message key="xmlui.administrative.registries.Concept2TermMain.column2">Relation Id</message>
+    <message key="xmlui.administrative.registries.Concept2TermMain.column3">Role Id</message>
+    <message key="xmlui.administrative.registries.Concept2TermMain.column4">Concept Id</message>
+    <message key="xmlui.administrative.registries.Concept2TermMain.column5">Term Id</message>
+
+
+    <message key="xmlui.administrative.Navigation.administrative_metadata_registry">Registry</message>
+    <message key="xmlui.administrative.Navigation.administrative_metadata_scheme">Manage Scheme</message>
+
+    <message key="xmlui.aspect.authority.concept.ManageMetadataRegistryMain.actions_head">Metadata Registries</message>
+    <message key="xmlui.aspect.authority.concept.ManageMetadataRegistryMain.main_head">Metadata Registries</message>
+    <message key="xmlui.aspect.authority.concept.general.concept_trail">Metadata Registries</message>
+
+
+    <!-- org.dspace.app.xmlui.administrative.scheme.ManageSchemeMain -->
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.title">Manage Scheme</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.main_head">Scheme management</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.actions_head">Actions</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.actions_create">Create a new Scheme</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.actions_create_link">Click here to add a new Scheme.</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.actions_browse">Browse Scheme</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.actions_browse_link">Click here to browse all Scheme.</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.actions_search">Search for Scheme</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.search_help">Scheme are searched by any partial match on Identifier or name</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.search_para1">Below is the list of Scheme that matched your search query. Select the Scheme you want to delete and click the delete button to continue or click on an Scheme's Identifier or name to edit them.</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.search_head">Search results</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.search_column1"></message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.search_column2">ID</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.search_column3">Creation Date</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.search_column4">Identifier</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.submit_delete">Delete Scheme</message>
+    <message key="xmlui.aspect.authority.scheme.ManageSchemeMain.no_results">Your search found no results..</message>
+
+
+    <!-- AddSchemeForm -->
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.title">Add Scheme</message>
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.trail">Add Scheme</message>
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.head1">Create a new Scheme</message>
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.email_taken">That Identifier address is in use by another Scheme. Identifier must be unique.</message>
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.head2">New Scheme's Attribute:</message>
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.error_email_unique">Identifier must be unique</message>
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.error_email">Identifier is required</message>
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.error_fname">First name is required</message>
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.error_lname">Last name is required</message>
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.req_certs">Require Certificate</message>
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.can_log_in">Can Log In</message>
+    <message key="xmlui.aspect.authority.scheme.AddSchemeForm.submit_create">Create Scheme</message>
+
+    <!-- org.dspace.app.xmlui.administrative.scheme.EditSchemeForm -->
+    <message key="xmlui.administrative.scheme.EditSchemeForm.title">Edit Scheme</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.trail">Edit Scheme</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.head1">Edit an Scheme</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.email_taken">That Identifier is in use by another Scheme. Identifier must be unique.</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.head2">{0}'s information:</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.error_email_unique">Identifier must be unique</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.error_email">Identifier is required</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.error_fname">First name is required</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.error_lname">Last name is required</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.req_certs">Require Certificate</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.can_log_in">Can Log In</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.submit_reset_password">Reset Password</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.special_help">You may also permanently remove this Scheme from the system or reset his/her password. When resetting a password the user will be sent an Identifier containing a special link they can follow to choose a new password.</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.submit_delete">Delete Scheme</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.submit_login_as">Login as Scheme</message>
+
+    <message key="xmlui.administrative.scheme.EditSchemeForm.delete_constraint">This scheme is unable to be deleted because of the following constraint(s):</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.delete_constraint.last_conjunction">and</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.delete_constraint.item">scheme has submitted one or more items</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.delete_constraint.workflowitem">scheme has an active submission workflow</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.delete_constraint.tasklistitem">scheme has a workflow task awaiting their attention</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.delete_constraint.unknown">scheme has an unidentified constraint within the system</message>
+
+    <message key="xmlui.administrative.scheme.EditSchemeForm.member_head">Groups this Scheme is a member of:</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.indirect_member">(via group: {0})</message>
+    <message key="xmlui.administrative.scheme.EditSchemeForm.member_none">none</message>
+
+
+
+
+
+    <!-- org.dspace.app.xmlui.administrative.scheme.DeleteEPeopleConfirm -->
+    <message key="xmlui.administrative.scheme.DeleteEPeopleConfirm.title">Confirm Scheme Deletion</message>
+    <message key="xmlui.administrative.scheme.DeleteEPeopleConfirm.trail">Confirm Delete</message>
+    <message key="xmlui.administrative.scheme.DeleteEPeopleConfirm.confirm_head">Confirm Deletion</message>
+    <message key="xmlui.administrative.scheme.DeleteEPeopleConfirm.confirm_para">The following Scheme will be deleted: </message>
+    <message key="xmlui.administrative.scheme.DeleteEPeopleConfirm.submit_confirm">Confirm Deletion</message>
+    <message key="xmlui.administrative.scheme.DeleteEPeopleConfirm.head_id">ID</message>
+    <message key="xmlui.administrative.scheme.DeleteEPeopleConfirm.head_name">Create Date</message>
+    <message key="xmlui.administrative.scheme.DeleteEPeopleConfirm.head_email">Identifier</message>
+
+
+    <message key="xmlui.administrative.Navigation.administrative_metadata_concept">Manage Concept</message>
+    <message key="xmlui.administrative.Navigation.administrative_metadata_term">Manage Scheme</message>
+    <message key="xmlui.administrative.Navigation.administrative_metadata_concept_relation">Manage Concept Relation</message>
+    <message key="xmlui.administrative.Navigation.administrative_metadata_concept_2_term_relation">Manage Concept 2 Scheme Relation</message>
+
+    <!-- org.dspace.app.xmlui.administrative.scheme.AddSchemeForm -->
+    <message key="xmlui.administrative.scheme.AddSchemeForm.title">Add Scheme</message>
+    <message key="xmlui.administrative.scheme.AddSchemeForm.trail">Add Scheme</message>
+    <message key="xmlui.administrative.scheme.AddSchemeForm.head1">Create a new Scheme</message>
+    <message key="xmlui.administrative.scheme.AddSchemeForm.email_taken">That Identifier address is in use by another Scheme. Identifier must be unique.</message>
+    <message key="xmlui.administrative.scheme.AddSchemeForm.head2">New Scheme's information:</message>
+    <message key="xmlui.administrative.scheme.AddSchemeForm.error_email_unique">Identifier must be unique</message>
+    <message key="xmlui.administrative.scheme.AddSchemeForm.error_email">Identifier is required</message>
+    <message key="xmlui.administrative.scheme.AddSchemeForm.error_fname">First name is required</message>
+    <message key="xmlui.administrative.scheme.AddSchemeForm.error_lname">Last name is required</message>
+    <message key="xmlui.administrative.scheme.AddSchemeForm.req_certs">Require Certificate</message>
+    <message key="xmlui.administrative.scheme.AddSchemeForm.can_log_in">Can Log In</message>
+    <message key="xmlui.administrative.scheme.AddSchemeForm.submit_create">Create Scheme</message>
+
+
+    <!-- org.dspace.app.xmlui.administrative.concept.AddConceptForm -->
+    <message key="xmlui.administrative.concept.AddConceptForm.title">Add Concept</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.trail">Add Concept</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.head1">Create a new Concept</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.email_taken">That Identifier address is in use by another Concept. Identifier must be unique.</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.head2">New Concept's information:</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.error_email_unique">Identifier must be unique</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.error_email">Identifier is required</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.error_fname">First name is required</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.error_lname">Last name is required</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.req_certs">Require Certificate</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.can_log_in">Can Log In</message>
+    <message key="xmlui.administrative.concept.AddConceptForm.submit_create">Create Concept</message>
+
+    <message key="xmlui.administrative.scheme.AddSchemeForm.scheme">Manage Scheme</message>
+    <message key="xmlui.aspect.authority.scheme.general.scheme_trail">Manage Scheme</message>
+    <message key="xmlui.administrative.FlowSchemeUtils.add_Scheme_success_notice">Scheme Successfully added</message>
+
+
+    <message key="xmlui.Scheme.EditProfile.source">Source</message>
+    <message key="xmlui.Scheme.EditProfile.identifier">Identifier</message>
+    <message key="xmlui.Scheme.EditProfile.language">Language</message>
+    <message key="xmlui.administrative.scheme.general.scheme_trail">Scheme</message>
+
+
+    <message key="xmlui.Scheme.EditProfile.status">Status</message>
+    <message key="xmlui.administrative.concept.EditConceptForm.trail">Edit Concept</message>
+    <message key="xmlui.administrative.concept.EditConceptForm.head1">Edit Concept</message>
+    <message key="xmlui.administrative.concept.EditConceptForm.head2">Concept Attribute</message>
+    <message key="xmlui.Concept.EditProfile.status">Status</message>
+    <message key="xmlui.Concept.EditProfile.topConcept">Top Concept</message>
+    <message key="xmlui.Concept.EditProfile.identifier">Identifier</message>
+
+    <message key="xmlui.Concept.EditProfile.language">Language</message>
+    <message key="xmlui.administrative.concept.EditConceptForm.move_term_help">Move Help Text</message>
+    <message key="xmlui.administrative.FlowSchemeUtils.edit_Scheme_success_notice">Scheme Successfully Edited</message>
+    <message key="xmlui.administrative.FlowTermUtils.identifier_exists_notice">Scheme with this identifier exists, Please select a uniq identifier</message>
+
+    <message key="xmlui.administrative.FlowTermUtils.delete_Term_success_notice">Term Successfully deleted</message>
+
+    <message key="xmlui.administrative.FlowConceptUtils.delete_Concept_success_notice">Concept Successfully deleted</message>
+
+    <message key="xmlui.administrative.FlowSchemeUtils.delete_Scheme_success_notice">Scheme Successfully deleted</message>
+
+    <message key="xmlui.ChoiceLookupTransformer.field.prism_publicationName.title">Look up journal</message>
+    <message key="xmlui.ChoiceLookupTransformer.field.prism_publicationName.help">Enter the key word of the journal name</message>
+
+</catalogue>

@@ -46,8 +46,8 @@
         <Context docBase="oai" path="/oai" reloadable="true" cachingAllowed="false" allowLinking="true"/>
         <Context docBase="doi" path="/doi" reloadable="true" cachingAllowed="false" allowLinking="true"/>
         <Context docBase="dataone-mn-webapp" path="/mn" reloadable="true" cachingAllowed="false" allowLinking="true"/>
+        <Context docBase="dryad-rest-webapp" path="/api" reloadable="true" cachingAllowed="false" allowLinking="true"/>
       </Host>
-
     </Engine>
   </Service>
 </Server>

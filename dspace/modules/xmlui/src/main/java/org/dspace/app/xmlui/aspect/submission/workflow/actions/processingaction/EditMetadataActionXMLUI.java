@@ -26,7 +26,7 @@ import org.dspace.versioning.VersionHistory;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
+import org.dspace.JournalUtils;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -103,7 +103,7 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
     protected static final Message T_archive_reason_blackout_false =
             message("xmlui.Submission.workflow.EditMetadataActionXMLUI.archive_reason_blackout_false");
 
-    private DryadJournalSubmissionUtils.RecommendedBlackoutAction recommendedBlackoutAction;
+    private JournalUtils.RecommendedBlackoutAction recommendedBlackoutAction;
 
     @Override
     public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
@@ -150,7 +150,7 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
         }
 
         // Check if this item should enter blackout by default or not
-        this.recommendedBlackoutAction = DryadJournalSubmissionUtils.recommendedBlackoutAction(context, item, collection);
+        this.recommendedBlackoutAction = JournalUtils.recommendedBlackoutAction(context, item, collection);
 
         switch (page){
             case EditMetadataAction.MAIN_PAGE:
@@ -169,8 +169,8 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
         table.setHead(T_info1);
 
         Boolean blackoutRecommended;
-        blackoutRecommended = (recommendedBlackoutAction == DryadJournalSubmissionUtils.RecommendedBlackoutAction.BLACKOUT_TRUE
-                || recommendedBlackoutAction == DryadJournalSubmissionUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
+        blackoutRecommended = (recommendedBlackoutAction == JournalUtils.RecommendedBlackoutAction.BLACKOUT_TRUE
+                || recommendedBlackoutAction == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
 
         // Approve
         Row approveRow = table.addRow(null, null, blackoutRecommended ? "" : "archive_or_blackout_recommended");

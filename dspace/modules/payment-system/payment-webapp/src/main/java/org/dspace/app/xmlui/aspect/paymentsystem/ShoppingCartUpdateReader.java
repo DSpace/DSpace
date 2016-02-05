@@ -92,7 +92,6 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         String journal =request.getParameter("journal");
         Double basicFee =shoppingCart.getBasicFee();
         Double surcharge = paymentSystemService.getSurchargeLargeFileFee(context,shoppingCart);
-        Double noIntegrateFee = paymentSystemService.getNoIntegrateFee(context,shoppingCart,journal);
         Integer voucherId= shoppingCart.getVoucher();
         Voucher voucher = Voucher.findById(context,voucherId);
         String voucherCode = "";
@@ -111,7 +110,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
 
 
 
-        String result = "{\"total\":\""+symbol+String.valueOf(Double.toString(total))+"\",\"country\":\""+StringEscapeUtils.escapeJava(shoppingCart.getCountry())+"\",\"price\":\""+symbol+basicFee+"\",\"surcharge\":\""+symbol+surcharge+"\",\"noIntegrateFee\":\""+symbol+noIntegrateFee+"\",\"voucher\":\""+voucherCode+"\""+",\"errorMessage\":\""+errorMessage+"\",\"waiverMessage\":\""+waiverMessage+"\",\"payer\":\""+payername+"\"}";
+        String result = "{\"total\":\""+symbol+String.valueOf(Double.toString(total))+"\",\"country\":\""+StringEscapeUtils.escapeJava(shoppingCart.getCountry())+"\",\"price\":\""+symbol+basicFee+"\",\"surcharge\":\""+symbol+surcharge+"\",\"voucher\":\""+voucherCode+"\""+",\"errorMessage\":\""+errorMessage+"\",\"waiverMessage\":\""+waiverMessage+"\",\"payer\":\""+payername+"\"}";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(result.getBytes("UTF-8"));
         byte[] buffer = new byte[8192];
         response.setHeader("Content-Length", String.valueOf(result.length()));

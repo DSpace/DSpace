@@ -19,6 +19,7 @@
     <bean id="afterPublicationActionAPI" class="org.dspace.workflow.actions.processingaction.AfterPublicationAction" scope="prototype"/>
 
     <bean id="reAuthorizationPaymentActionAPI" class="org.dspace.workflow.actions.processingaction.ReAuthorizationPaymentAction" scope="prototype"/>
+    <bean id="reAuthorizationCreditActionAPI" class="org.dspace.workflow.actions.processingaction.ReAuthorizationCreditAction" scope="prototype"/>
 
     <bean id="dryadAcceptEditRejectAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="dryadAcceptEditRejectAction"/>
@@ -103,7 +104,12 @@
         <property name="processingAction" ref="reAuthorizationPaymentActionAPI"/>
         <property name="requiresUI" value="true"/>
     </bean>
+    <bean id="reAuthorizationCreditAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="reAuthorizationCreditAction"/>
 
+        <property name="processingAction" ref="reAuthorizationCreditActionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
 
 
 
