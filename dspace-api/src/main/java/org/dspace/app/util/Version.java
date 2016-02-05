@@ -63,13 +63,15 @@ public class Version
         // Is Discovery available?
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         String[] consumers = config.getArrayProperty("event.dispatcher.default.consumers");
+        String discoveryStatus = "not enabled.";
         for (String consumer : consumers) {
             if (consumer.equals("discovery"))
             {
-                System.out.println("     Discovery:  enabled.");
+                discoveryStatus = "enabled.";
                 break;
             }
         }
+        System.out.println("     Discovery:  " + discoveryStatus);
 
         // Java version
         System.out.printf("           JRE:  %s version %s\n",
