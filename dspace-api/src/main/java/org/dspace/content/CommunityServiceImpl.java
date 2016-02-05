@@ -264,7 +264,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             admins = groupService.create(context);
             context.restoreAuthSystemState();
 
-            admins.setName(context, "COMMUNITY_" + community.getID() + "_ADMIN");
+            groupService.setName(context, admins, "COMMUNITY_" + community.getID() + "_ADMIN");
             groupService.update(context, admins);
         }
 

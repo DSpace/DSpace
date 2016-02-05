@@ -603,7 +603,7 @@ public class FlowContainerUtils
         }
 		
 		Group role = groupService.create(context);
-		role.setName(context, "COLLECTION_"+collection.getID().toString() +"_DEFAULT_READ");
+        groupService.setName(context, role, "COLLECTION_"+collection.getID().toString() +"_DEFAULT_READ");
 		
 		// Remove existing privileges from the anonymous group.
 		authorizeService.removePoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);

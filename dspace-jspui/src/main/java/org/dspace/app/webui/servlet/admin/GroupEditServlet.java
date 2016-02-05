@@ -97,7 +97,7 @@ public class GroupEditServlet extends DSpaceServlet
 
                 if (!newName.equals(group.getName()))
                 {
-                    group.setName(c, newName);
+                    groupService.setName(c, group, newName);
                     groupService.update(c, group);
                 }
 
@@ -257,7 +257,7 @@ public class GroupEditServlet extends DSpaceServlet
             {
                 group = groupService.create(c);
 
-                group.setName(c, "new group" + group.getID());
+                groupService.setName(c, group, "new group" + group.getID());
                 groupService.update(c, group);
 
                 request.setAttribute("group", group);

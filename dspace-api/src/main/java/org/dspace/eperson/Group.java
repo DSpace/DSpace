@@ -201,7 +201,7 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     /** Change the name of this Group. */
-    public void setName(Context context, String name) throws SQLException
+    void setName(Context context, String name) throws SQLException
     {
         getGroupService().setMetadataSingleValue(context, this,
                 MetadataSchema.DC_SCHEMA, "title", null, null, name);
