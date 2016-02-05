@@ -87,17 +87,7 @@ public class CompleteStep extends AbstractProcessingStep
         boolean success = false;
         try
         {
-            if(StringUtils.equals(configurationService.getProperty("workflow.framework"), "xmlworkflow"))
-            {
-                try{
-                    workflowService.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
-                }catch (Exception e){
-                    log.error(LogManager.getHeader(context, "Error while starting xml workflow", "Item id: " + subInfo.getSubmissionItem().getItem().getID()), e);
-                    throw new ServletException(e);
-                }
-            }else{
-                workflowService.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
-            }
+            workflowService.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
             success = true;
         }
         catch (Exception e)
