@@ -430,7 +430,7 @@ j(document).ready(function() {
 <div class="col-lg-12 col-md-4 col-sm-6">
 <div class="media altmetric">
 	<div class="media-left">
-      		<div class='altmetric-embed' data-badge-popover="right" data-badge-type="donut" data-link-target='_blank' data-doi="<%= doi %>"></div>
+      		<div class='altmetric-embed' data-hide-no-mentions="true" data-badge-popover="right" data-badge-type="donut" data-link-target='_blank' data-doi="<%= doi %>"></div>
 	</div>
 	<div class="media-body media-middle text-center">
 		<h4 class="media-heading"><fmt:message key="jsp.display-item.citation.altmetric"/></h4>
