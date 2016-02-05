@@ -48,7 +48,7 @@ public class AbstractFormat {
                     sb.append('=').append(parts[i].substring(0, lastComma)).
                             append("\n").append(parts[i].substring(lastComma));
                 }
-                sb.append(parts[parts.length-1]);
+                sb.append('=').append(parts[parts.length-1]);
 
                 this.value = sb.toString();
             }
