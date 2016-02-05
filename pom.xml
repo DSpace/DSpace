@@ -545,7 +545,9 @@
         <profile>
             <id>dspace-jspui</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <file>
+                    <exists>dspace-jspui/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-jspui</module>
@@ -616,7 +618,9 @@
         <profile>
             <id>dspace-swordv2</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <file>
+                    <exists>dspace-swordv2/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-swordv2</module>
