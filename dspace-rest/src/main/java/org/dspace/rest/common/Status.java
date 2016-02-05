@@ -79,7 +79,6 @@ public class Status
         return this.okay;
     }
 
-    @JsonProperty("okay")
     public void setOkay(boolean okay)
     {
         this.okay = okay;
@@ -90,7 +89,6 @@ public class Status
         return authenticated;
     }
 
-    @JsonProperty("authenticated")
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
     }
@@ -100,7 +98,6 @@ public class Status
         return email;
     }
 
-    @JsonProperty("email")
     public void setEmail(String email) {
         this.email = email;
     }
@@ -110,7 +107,6 @@ public class Status
         return fullname;
     }
 
-    @JsonProperty("fullname")
     public void setFullname(String fullname) {
         this.fullname = fullname;
     }
@@ -120,7 +116,6 @@ public class Status
         return this.sourceVersion;
     }
 
-    @JsonProperty("sourceVersion")
     public void setSourceVersion(String sourceVersion) {
         this.sourceVersion = sourceVersion;
     }
@@ -130,7 +125,6 @@ public class Status
         return this.apiVersion;
     }
 
-    @JsonProperty("apiVersion")
     public void setApiVersion(String apiVersion) {
         this.apiVersion = apiVersion;
     }
