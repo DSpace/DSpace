@@ -125,7 +125,7 @@ public class SelectGroupTag extends TagSupport
 			}
 			
 			out.print("</select>");
-			out.print("<br/><div class=\"row container\">");
+			out.print("<br/><div class=\"btn-group btn-group-justified\" role=\"group\">");
             String p = (multiple ? 
                     LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.SelectGroupTag.selectGroups")
@@ -134,17 +134,32 @@ public class SelectGroupTag extends TagSupport
             
             if (multiple)
 			{
-                out.print("<input class=\"btn btn-danger\" type=\"button\" value=\""
+                out.print("<div class=\"btn-group\" role=\"group\">");
+                out.print("<input class=\"hidden-xs btn btn-danger\" type=\"button\" value=\""
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                 "org.dspace.app.webui.jsptag.SelectGroupTag.removeSelected")
                                 + "\" onclick=\"javascript:removeSelected(window.document.epersongroup.group_ids);\"/>");
+				out.print("<input class=\"hidden-md hidden-lg hidden-sm visible-xs btn btn-danger\" type=\"button\" value=\""
+                            + LocaleSupport.getLocalizedMessage(pageContext,
+                                "org.dspace.app.webui.jsptag.SelectGroupTag.remove")
+                                + "\" onclick=\"javascript:removeSelected(window.document.epersongroup.group_ids);\"/>");
+                out.print("</div>");
+                out.print("<div class=\"btn-group\" role=\"group\">");
+                out.print("</div>");
 			}
-            
-            out.print("<input class=\"btn btn-primary pull-right\" type=\"button\" value=\"" + p 
+            out.print("<div class=\"btn-group\" role=\"group\">");
+            out.print("<input class=\"hidden-xs btn btn-primary\" type=\"button\" value=\"" + p 
+                            + "\" onclick=\"javascript:popup_window('"
+                            + req.getContextPath() + "/tools/group-select-list?multiple=" 
+                            + multiple + "', 'group_popup');\" />");
+			out.print("<input class=\"hidden-md hidden-lg hidden-sm visible-xs btn btn-primary\" type=\"button\" value=\"" + LocaleSupport.getLocalizedMessage(pageContext,
+                    "org.dspace.app.webui.jsptag.SelectGroupTag.select") 
                             + "\" onclick=\"javascript:popup_window('"
                             + req.getContextPath() + "/tools/group-select-list?multiple=" 
                             + multiple + "', 'group_popup');\" />");
             out.print("</div>");
+            out.print("</div>");
+            
 		}
 		catch (IOException ie)
 		{

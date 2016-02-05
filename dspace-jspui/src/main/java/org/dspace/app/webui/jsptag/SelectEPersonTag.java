@@ -130,7 +130,7 @@ public class SelectEPersonTag extends TagSupport
             // add blank option value if no person selected to ensure that code is xhtml compliant 
             //out.print("<option/>");
             out.print("</select>");
-            out.print("<br/><div class=\"row container\">");
+            out.print("<br/><div class=\"btn-group btn-group-justified\" role=\"group\">");
             String p = (multiple ? 
                             LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.SelectEPersonTag.selectPeople")
@@ -139,17 +139,36 @@ public class SelectEPersonTag extends TagSupport
 
             if (multiple)
             {
-                out.print("<input class=\"btn btn-danger\" type=\"button\" value=\""
+                out.print("<div class=\"btn-group\" role=\"group\">");
+                out.print("<input class=\"hidden-xs btn btn-danger\" type=\"button\" value=\""
                                         + LocaleSupport.getLocalizedMessage(pageContext,
                                                 "org.dspace.app.webui.jsptag.SelectEPersonTag.removeSelected")
                                         + "\" onclick=\"javascript:removeSelected(window.document.epersongroup.eperson_id);\"/>");
+                out.print("<input class=\"hidden-md hidden-lg hidden-sm visible-xs btn btn-danger\" type=\"button\" value=\""
+                            + LocaleSupport.getLocalizedMessage(pageContext,
+                                "org.dspace.app.webui.jsptag.SelectEPersonTag.remove")
+                                + "\" onclick=\"javascript:removeSelected(window.document.epersongroup.eperson_id);\"/>");
+                out.print("</div>");
+                out.print("<div class=\"btn-group\" role=\"group\">");
+                out.print("</div>");
             }
             
-            out.print("<input class=\"btn btn-primary pull-right\" type=\"button\" value=\"" + p
+            out.print("<div class=\"btn-group\" role=\"group\">");
+            out.print("<input class=\"hidden-xs btn btn-primary\" type=\"button\" value=\"" + p
                     + "\" onclick=\"javascript:popup_window('"
                     + req.getContextPath() + "/tools/eperson-list?multiple="
                     + multiple + "', 'eperson_popup');\" />");
+            out.print(
+                    "<input class=\"hidden-md hidden-lg hidden-sm visible-xs btn btn-primary\" type=\"button\" value=\""
+                            + LocaleSupport.getLocalizedMessage(pageContext,
+                                    "org.dspace.app.webui.jsptag.SelectEPersonTag.select")
+                            + "\" onclick=\"javascript:popup_window('"
+                            + req.getContextPath()
+                            + "/tools/eperson-list?multiple=" + multiple
+                            + "', 'eperson_popup');\" />");
             out.print("</div>");
+            out.print("</div>");
+            
         }
         catch (IOException ie)
         {

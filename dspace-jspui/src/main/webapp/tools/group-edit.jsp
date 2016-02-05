@@ -71,11 +71,11 @@
     </div>
     
     <div class="col-md-6">
-	    <label for="eperson_id"><fmt:message key="jsp.tools.group-edit.group"/></label>
+	    <label for="group_ids"><fmt:message key="jsp.tools.group-edit.group"/></label>
 	    <dspace:selectgroup   multiple="true" selected="<%= groups  %>"/>
 	</div>
 	</div>
 	<br/>
-    <div class="row"><input class="btn btn-success col-md-2 col-md-offset-5" type="submit" name="submit_group_update" value="<fmt:message key="jsp.tools.group-edit.update.button"/>" onclick="javascript:finishEPerson();finishGroups();"/></div>
+    <div class="row text-center"><input class="btn btn-success" type="submit" name="submit_group_update" value="<fmt:message key="jsp.tools.group-edit.update.button"/>" onclick="javascript:finishEPerson();finishGroups();"/></div>
    </form>
 </dspace:layout>
