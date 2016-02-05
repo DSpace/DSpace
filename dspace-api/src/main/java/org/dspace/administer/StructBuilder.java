@@ -34,8 +34,8 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Element;
+import org.jdom2.output.XMLOutputter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -70,7 +70,7 @@ public class StructBuilder
     /** the output xml document which will contain updated information about the 
      * imported structure
      */
-    private static org.jdom.Document xmlOutput = new org.jdom.Document(new Element("imported_structure"));
+    private static org.jdom2.Document xmlOutput = new org.jdom2.Document(new Element("imported_structure"));
     
     /** a hashtable to hold metadata for the collection being worked on */
     private static Map<String, String> collectionMap = new HashMap<String, String>();

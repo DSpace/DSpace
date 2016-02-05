@@ -18,14 +18,14 @@ import java.util.Map;
 import org.dspace.app.xmlui.wing.WingConstants;
 import org.dspace.app.xmlui.wing.WingContext;
 import org.dspace.app.xmlui.wing.WingException;
-import org.jdom.Attribute;
-import org.jdom.Content;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Text;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.SAXOutputter;
+import org.jdom2.Attribute;
+import org.jdom2.Content;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Text;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.SAXOutputter;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -328,7 +328,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 		for (int i = 0; i < parent.getContentSize(); i++) {
 			Content decedent = parent.getContent(i);
 
-			if (decedent instanceof org.jdom.Text) {
+			if (decedent instanceof org.jdom2.Text) {
 
 			} else if (decedent instanceof Element) {
 				Element element = (Element) decedent;

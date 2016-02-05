@@ -16,9 +16,9 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.Verifier;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.Verifier;
 
 import java.io.File;
 import java.io.FileInputStream;

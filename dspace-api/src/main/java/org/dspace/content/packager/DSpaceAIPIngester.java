@@ -10,7 +10,7 @@ package org.dspace.content.packager;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;

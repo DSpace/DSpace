@@ -38,8 +38,8 @@ import org.dspace.eperson.service.EPersonService;
 
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 
 /**
  * Crosswalk of technical metadata for DSpace AIP.  This is

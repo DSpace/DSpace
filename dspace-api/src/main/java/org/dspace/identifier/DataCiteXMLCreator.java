@@ -13,8 +13,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Element;
+import org.jdom2.output.XMLOutputter;
 
 /**
  * Provide XML based metadata crosswalk for EZID Identifier provider module.

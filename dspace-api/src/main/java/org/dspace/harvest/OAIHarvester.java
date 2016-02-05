@@ -50,11 +50,11 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.harvest.service.HarvestedItemService;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.input.DOMBuilder;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.input.DOMBuilder;
+import org.jdom2.output.XMLOutputter;
 import org.xml.sax.SAXException;
 
 

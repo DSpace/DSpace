@@ -15,9 +15,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.SelfNamedPlugin;
-import org.jdom.Namespace;
-import org.jdom.transform.XSLTransformException;
-import org.jdom.transform.XSLTransformer;
+import org.jdom2.Namespace;
+import org.jdom2.transform.XSLTransformException;
+import org.jdom2.transform.XSLTransformer;
 
 /**
  * Configurable XSLT-driven Crosswalk

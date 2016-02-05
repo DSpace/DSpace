@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
 
 import org.jaxen.JaxenException;
 import org.jaxen.jdom.JDOMXPath;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.XMLOutputter;
 
 import org.dspace.core.ConfigurationManager;
 
@@ -397,7 +397,7 @@ public class CCLookup {
 	} // getLicenseName
 
 
-	public org.jdom.Document getLicenseDocument() {
+	public org.jdom2.Document getLicenseDocument() {
 		return this.license_doc;
 	}
 

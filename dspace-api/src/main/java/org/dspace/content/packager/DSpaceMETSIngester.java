@@ -24,7 +24,7 @@ import org.dspace.app.mediafilter.MediaFilter;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * Packager plugin to ingest a
