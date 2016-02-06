@@ -305,7 +305,8 @@ public class PDFPackager
             ScratchFile scratchFile = null;
             try
             {
-                scratchFile = new ScratchFile(MemoryUsageSetting.setupMixed(104857600)); // use up to 100 MB memory, fallback to temp file (unlimited size)
+                long useRAM = Runtime.getRuntime().freeMemory()*80/100; // use up to 80% of JVM free memory
+                scratchFile = new ScratchFile(MemoryUsageSetting.setupMixed(useRAM)); // then fallback to temp file (unlimited size)
             }
             catch (IOException ioe)
             {
