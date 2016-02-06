@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.image.*;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
+import java.awt.Font;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -77,6 +78,12 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
         // read in bitstream's image
         BufferedImage buf = ImageIO.read(source);
 
+        return getThumb(currentItem, buf, verbose);
+    }
+
+    public InputStream getThumb(Item currentItem, BufferedImage buf, boolean verbose)
+            throws Exception
+    {
         // get config params
         float xmax = (float) ConfigurationManager
                 .getIntProperty("thumbnail.maxwidth");
@@ -87,6 +94,12 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
         boolean hqscaling = (boolean) ConfigurationManager
                 .getBooleanProperty("thumbnail.hqscaling");
 
+        return getThumbDim(currentItem, buf, verbose, xmax, ymax, blurring, hqscaling, 0, 0, null);
+    }
+
+    public InputStream getThumbDim(Item currentItem, BufferedImage buf, boolean verbose, float xmax, float ymax, boolean blurring, boolean hqscaling, int brandHeight, int brandFontPoint, String brandFont)
+            throws Exception
+    {
         // now get the image dimensions
         float xsize = (float) buf.getWidth(null);
         float ysize = (float) buf.getHeight(null);
@@ -167,6 +180,15 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
         Graphics2D g2d = thumbnail.createGraphics();
         g2d.drawImage(buf, 0, 0, (int) xsize, (int) ysize, null);
 
+        if (brandHeight != 0) {
+            Brand brand = new Brand((int) xsize, brandHeight, new Font(brandFont, Font.PLAIN, brandFontPoint), 5);
+            BufferedImage brandImage = brand.create(ConfigurationManager.getProperty("webui.preview.brand"),
+                                                    ConfigurationManager.getProperty("webui.preview.brand.abbrev"),
+                                                    currentItem == null ? "" : "hdl:" + currentItem.getHandle());
+
+            g2d.drawImage(brandImage, (int)0, (int)ysize, (int) xsize, (int) 20, null);
+        }
+
         // now create an input stream for the thumbnail buffer and return it
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -213,14 +235,13 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
      return normal;
     }
 
-    public BufferedImage getBlurredInstance(BufferedImage buf)
-    {
     /**
      * Convenience method that returns a blurred instance of the
      * provided {@code BufferedImage}.
      *
      */
-
+    public BufferedImage getBlurredInstance(BufferedImage buf)
+    {
      buf = getNormalizedInstance(buf);
 
      // kernel for blur op
