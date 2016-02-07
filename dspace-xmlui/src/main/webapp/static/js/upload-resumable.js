@@ -33,7 +33,7 @@ var html = '\
 <div id="resumable-upload">\
 <div class="resumable-drop col-md-12" ondragenter="jQuery(this).addClass(\'resumable-dragover\');" ondragend="jQuery(this).removeClass(\'resumable-dragover\');" ondrop="jQuery(this).removeClass(\'resumable-dragover\');">\
   <span class="glyphicon glyphicon-upload"></span>\
-  <a class="resumable-browse">blah blah</a>\
+  <a class="resumable-browse">Click or drag and drop files here</a>\
 </div>\
 </div>\
 <div class="resumable-progress">\
@@ -65,7 +65,7 @@ if(r.support) {
     $('#resumable-upload').show();
 
     r.assignDrop($('.resumable-drop')[0]);
-    r.assignBrowse($('.resumable-browse')[0]);
+    r.assignBrowse($('.resumable-drop')[0]);
 
     var themePath = window.DSpace.theme_path;
     $('#progress-resume-link img').attr('src', themePath + "images/resume.png");
