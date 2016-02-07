@@ -133,6 +133,9 @@ public class UploadFileChunk extends AbstractAction{
                     log.warn("Coudln't delete submission upload path " + this.submissionDir + ", ignoring it.");
                 }
                 
+                log.info("bitstream created " + b.getID());
+                log.info(b.getBundles().length);
+                
                 context.commit();
 
                 returnValues.put("bitstream", String.valueOf(b.getID()));

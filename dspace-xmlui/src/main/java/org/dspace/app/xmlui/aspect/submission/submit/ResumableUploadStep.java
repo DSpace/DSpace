@@ -85,18 +85,19 @@ public class ResumableUploadStep extends UploadStep{
             row.addCell().addText("description-" + id).setValue(bitstream.getDescription());
             
             // status
-            row.addCell("status-" + id, Cell.ROLE_DATA, "file-status-success").addFigure("/", null, null);
+            //row.addCell("status-" + id, Cell.ROLE_DATA, "file-status-success").addFigure("/", null, null);
+            row.addCell("status-" + id, Cell.ROLE_DATA, "file-status-success");
             
             // info
             Cell info = row.addCell("info-" + id, Cell.ROLE_DATA, "file-info"); 
-            info.addFigure("/", null, null);
+            //info.addFigure("/", null, null);
             info.addHidden("file-extra-bytes").setValue(String.valueOf(bitstream.getSize()));
             info.addHidden("file-extra-format").setValue(bitstream.getFormatDescription());
             info.addHidden("file-extra-algorithm").setValue(bitstream.getChecksumAlgorithm());
             info.addHidden("file-extra-checksum").setValue(bitstream.getChecksum());
             
             // delete
-            row.addCell("delete-" + id, Cell.ROLE_DATA, "file-delete").addFigure("/", null, null);
+            row.addCell("delete-" + id, Cell.ROLE_DATA, "file-delete");//.addFigure("/", null, null);
         }
         
         // add standard control/paging buttons

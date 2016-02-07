@@ -69,10 +69,10 @@ public class UploadFileChunkGenerator extends AbstractGenerator{
             contentHandler.characters(checksum.toCharArray(), 0, checksum.length());
             contentHandler.endElement("","checksum", "checksum");
             
-            contentHandler.startElement("", "url", "url", emptyAttr);
-            String url = this.bitstream.getHandle(); 
-            contentHandler.characters(url.toCharArray(), 0, url.length());
-            contentHandler.endElement("","url", "url");
+            contentHandler.startElement("", "sequenceId", "sequenceId", emptyAttr);
+            String sId = String.valueOf(this.bitstream.getSequenceID()); 
+            contentHandler.characters(sId.toCharArray(), 0, sId.length());
+            contentHandler.endElement("","sequenceId", "sequenceId");
             
         }
 

@@ -87,7 +87,8 @@ if(r.support) {
                <td class="ds-table-cell">\
                  <div class="radio"><label><input id="primary-' +  file.uniqueIdentifier + '" type="radio" name="primary_bitstream_id" disabled="disabled"></label></div>\
                </td>\
-               <td class="ds-table-cell"><div>' + file.fileName + '</div></td>\
+               <td class="ds-table-cell">\
+                 <div id="file-name-' + file.uniqueIdentifier + '">' + file.fileName + '</div></td>\
                <td class="ds-table-cell">\
                  <input id="file-description-' + file.uniqueIdentifier + '" class="ds-text-field form-control" type="text" value="" name="description" disabled="disabled"></input>\
                </td>\
@@ -108,7 +109,6 @@ if(r.support) {
         $('#progress-resume-link').show();
         $('#progress-pause-link').hide();
 
-        console.log(arg);
         $('#file-delete-' + currentFile.uniqueIdentifier).attr('class', 'file-delete');
     });
 
@@ -123,16 +123,23 @@ if(r.support) {
         var bytes = $($(xml).find("size")[0]).text();
         var format = $($(xml).find("format")[0]).text();
         var fullChecksum = $($(xml).find("checksum")[0]).text();
+        var sequenceId = $($(xml).find("sequenceId")[0]).text();
         var checksum = fullChecksum.split(':');
+        var href = '/bitstream/item/' + sid + '/' + file.fileName + '?sequence=' + sequenceId;
+        var fAnchor = '<a href="' + href + '">' + file.fileName + '</a>';
 
         $('#file-description-' + file.uniqueIdentifier).removeAttr('disabled');
         $('#file-description-' + file.uniqueIdentifier).attr('name', 'description-' + bId);
+        $('#file-name-'        + file.uniqueIdentifier).empty();
+        $('#file-name-'        + file.uniqueIdentifier).append(fAnchor);
         $('#primary-'          + file.uniqueIdentifier).removeAttr('disabled');
         $('#primary-'          + file.uniqueIdentifier).attr('value', bId);
         $('#file-status-'      + file.uniqueIdentifier).text('');
         $('#file-status-'      + file.uniqueIdentifier).attr('class', 'file-status-success');
         $('#file-info-'        + file.uniqueIdentifier).attr('class', 'file-info');
         $('#file-delete-'      + file.uniqueIdentifier).attr('class', 'file-delete');
+
+        // give the successful upload a new id
         $('#file-delete-'      + file.uniqueIdentifier).parent().attr('id', 'aspect_submission_StepTransformer_cell_delete-' + bId);
 
         var extra = '<input name="file-extra-bytes" type="hidden" value="' + bytes + '"></input>\
@@ -166,7 +173,7 @@ if(r.support) {
         if($(infoCell).hasClass('file-info')){
             // completed upload
             fileName = $(fileCell).find('a').text();
-            var bid = cellId.split('-')[1];
+            var bid = $(cell).parent().attr('id').split('-')[1];
             param = "bitstreamId=" + bid;
         }
         else{
@@ -177,9 +184,7 @@ if(r.support) {
             param = "resumableIdentifier=" + resumableIdentifier;
         }
 
-        console.log(fileName);
         console.log(param);
-
 
         var height = 140;
         var width = 700;
@@ -193,21 +198,24 @@ if(r.support) {
                     $( this ).dialog( "close" );
                 },
                 "Delete": function(ev) {
-
-
                     $.ajax({
                         type: "DELETE",
                         url: url + "?submissionId=" + sid + "&" + param,
                         cache: false,
                         success: $.proxy(function(data){
-                            console.log(url)
-                            console.log($(cell).parent());
-                            //$(row).hide();
-                            $(cell).parent().hide();
+                            var parent = $(cell).parent();
+                            var next = parent.next();
+                            if(next.find('td').length === 1){
+                                // next element is an info row remove it too
+                                next.remove();
+                            }
+                            parent.remove();
 
                             $(this).dialog("close");
-
-                            r.cancel();
+                            console.log(param.substring(0, 9));
+                            if(param.substring(0, 9) === 'resumable'){
+                                r.cancel();
+                            }
                         }, this),
                         error: function(jqXHR, status, error){
                             console.error("Problem deleting " + fileName + " : " +
