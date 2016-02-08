@@ -517,6 +517,7 @@
             <br/>
             <br/>
         </div>
+    </xsl:template>
 
     <xsl:template match="dim:dim" mode="itemDetailView-DIM">
         <xsl:call-template name="itemSummaryView-DIM-title"/>
