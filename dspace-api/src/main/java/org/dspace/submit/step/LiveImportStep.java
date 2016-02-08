@@ -54,7 +54,7 @@ public class LiveImportStep extends AbstractProcessingStep {
         }
 
         if (StringUtils.isNotBlank(importId)) {
-            ImportService importService = new DSpace().getServiceManager().getServiceByName(null, ImportService.class);
+            ImportService importService = new DSpace().getServiceManager().getServiceByName("importService", ImportService.class);
             Item item = subInfo.getSubmissionItem().getItem();
             try {
                 ImportRecord record = importService.getRecord(url, "eid(" + importId + ")");

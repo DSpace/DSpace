@@ -270,7 +270,7 @@ public class UpdateElsevierItems {
 
     private static ImportRecord getRecord(String field, String value) throws MetadataSourceException {
         if(importService==null){
-            importService = new DSpace().getServiceManager().getServiceByName(null, ImportService.class);
+            importService = new DSpace().getServiceManager().getServiceByName("importService", ImportService.class);
         }
 
         if(StringUtils.isBlank(url)) {
