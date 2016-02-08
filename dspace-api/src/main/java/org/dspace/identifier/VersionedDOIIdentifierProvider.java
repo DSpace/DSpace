@@ -9,7 +9,6 @@ package org.dspace.identifier;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -17,7 +16,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.identifier.doi.DOIConnector;
 import org.dspace.identifier.doi.DOIIdentifierException;
@@ -39,15 +37,15 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
  /** log4j category */
     private static Logger log = Logger.getLogger(VersionedDOIIdentifierProvider.class);
     
-    private DOIConnector connector;
+    protected DOIConnector connector;
 
     static final char DOT = '.';
-    private static final String pattern = "\\d+\\" + String.valueOf(DOT) +"\\d+";
+    protected static final String pattern = "\\d+\\" + String.valueOf(DOT) +"\\d+";
     
     @Autowired(required = true)
-    private VersioningService versioningService;
+    protected VersioningService versioningService;
     @Autowired(required = true)
-    private VersionHistoryService versionHistoryService;
+    protected VersionHistoryService versionHistoryService;
     
     @Override
     public String mint(Context context, DSpaceObject dso)
@@ -79,7 +77,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
         {
             log.error("Error while attemping to retrieve information about a DOI for " 
                     + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
-                    + " with ID " + dso.getID() + ".");
+                    + " with ID " + dso.getID() + ".", ex);
             throw new RuntimeException("Error while attempting to retrieve "
                     + "information about a DOI for "
                     + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
@@ -122,6 +120,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
                 try {
                     loadOrCreateDOI(context, dso, versionedDOI);
                 } catch (SQLException ex) {
+                    log.error("A problem with the database connection occurd while processing DOI " + versionedDOI + ".", ex);
                     throw new RuntimeException("A problem with the database connection occured.", ex);
                 }
                 return versionedDOI;
@@ -170,7 +169,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
         {
             doi = loadOrCreateDOI(context, dso, doiIdentifier);
         } catch (SQLException ex) {
-            log.error("Error in databse connection: " + ex.getMessage());
+            log.error("Error in databse connection: " + ex.getMessage(), ex);
             throw new RuntimeException("Error in database conncetion.", ex);
         }
 
@@ -227,7 +226,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
         return identifier;
     }
     
-    private String getDOIPostfix(String identifier) 
+    protected String getDOIPostfix(String identifier) 
             throws DOIIdentifierException{
     
         String doiPrefix = DOI.SCHEME.concat(getPrefix()).concat(String.valueOf(SLASH)).concat(getNamespaceSeparator());
@@ -278,7 +277,6 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
             }
 
             doi.setDoi(identifier);
-            doi.setResourceTypeId(dso.getType());
             doi.setDSpaceObject(dso);
             doi.setStatus(null);
             doiService.update(context, doi);

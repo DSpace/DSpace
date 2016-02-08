@@ -847,7 +847,6 @@ public class DOIIdentifierProvider
         // prepare new doiRow
         doi.setDoi(doiIdentifier);
         doi.setDSpaceObject(dso);
-        doi.setResourceTypeId(dso.getType());
         doi.setStatus(null);
         try {
             doiService.update(context, doi);

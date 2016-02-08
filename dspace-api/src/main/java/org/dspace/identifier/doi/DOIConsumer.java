@@ -20,7 +20,6 @@ import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.dspace.xmlworkflow.state.Workflow;
 
 /**
  *
