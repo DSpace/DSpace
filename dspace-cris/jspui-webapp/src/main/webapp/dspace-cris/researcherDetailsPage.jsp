@@ -228,15 +228,20 @@
 		    	if (isAdmin) {
 				%>
 				<fmt:message key="jsp.cris.detail.info.sourceid.none" var="i18nnone" />
-				<div class="cris-record-info">
-					<span class="cris-record-info-sourceid"><b><fmt:message key="jsp.cris.detail.info.sourceid" /></b> ${!empty researcher.sourceID?researcher.sourceID:i18nnone}</span>
+				<div class="row cris-record-info">
+					<div class="col-sm-6">
+					<span class="cris-record-info-sourceid"><b><fmt:message key="jsp.cris.detail.info.sourceid" /></b> ${!empty researcher.sourceID?researcher.sourceID:i18nnone}</span><br/>
 					<span class="cris-record-info-sourceref"><b><fmt:message key="jsp.cris.detail.info.sourceref" /></b> ${!empty researcher.sourceRef?researcher.sourceRef:i18nnone}</span>
-					<span class="cris-record-info-created"><b><fmt:message key="jsp.cris.detail.info.created" /></b> ${researcher.timeStampInfo.timestampCreated.timestamp}</span>
-					<span class="cris-record-info-updated"><b><fmt:message key="jsp.cris.detail.info.updated" /></b> ${researcher.timeStampInfo.timestampLastModified.timestamp}</span>
+					</div>
+					<div class="col-sm-6">
+					<span class="cris-record-info-created"><b><fmt:message key="jsp.cris.detail.info.created" /></b> <fmt:message key="jsp.display-cris.entity.created"><fmt:param value="${researcher.timeStampInfo.timestampCreated.timestamp}" /></fmt:message></span><br/>
+					<span class="cris-record-info-updated"><b><fmt:message key="jsp.cris.detail.info.updated" /></b> <fmt:message key="jsp.display-cris.entity.updated"><fmt:param value="${researcher.timeStampInfo.timestampLastModified.timestamp}" /></fmt:message></span>
+					</div>
 				</div>
 			 	<%
 		    	}
 				%>
+				
 			 </div>
 			 <div class="form-group pull-right" style="margin-top:1.5em;">
 				<div class="btn-group">
