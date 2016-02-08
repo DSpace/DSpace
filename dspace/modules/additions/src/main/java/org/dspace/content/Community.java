@@ -399,6 +399,8 @@ public class Community extends DSpaceObject
     }
 
     /**
+     * UMD Custom Method
+     * 
      * Get a list of top level communities in the system which belong to a
      * particular group. These are alphabetically sorted by community name.
      * 
@@ -411,11 +413,20 @@ public class Community extends DSpaceObject
             CommunityGroup group) throws SQLException
     {
         // get all communities that are not children
+        int titleFieldId = MetadataField.findByElement(
+                context,
+                MetadataSchema.find(context, MetadataSchema.DC_SCHEMA)
+                        .getSchemaID(), "title", null).getFieldID();
         TableRowIterator tri = DatabaseManager.queryTable(context, "community",
-                "SELECT * FROM community WHERE NOT community_id IN "
-                        + "(SELECT child_comm_id FROM community2community) "
-                        + "AND group_id=" + group.getID() + " "
-                        + "ORDER BY name");
+                        "SELECT c.* FROM community c "
+                                + "LEFT JOIN metadatavalue m on (m.resource_id = c.community_id"
+                                + " and m.resource_type_id = "
+                                + Constants.COMMUNITY
+                                + " and m.metadata_field_id = "
+                                + titleFieldId
+                                + ") WHERE NOT c.community_id IN (SELECT child_comm_id FROM community2community) "
+                                + "AND c.group_id=" + group.getID() + " "
+                                + "ORDER BY m.text_value");
 
         List communities = new ArrayList();
 
