@@ -573,7 +573,7 @@ public class ApplicationService extends ExtendedTabService
     public ResearcherPage getResearcherPageByEPersonId(Integer id)
     {
 		if (cacheRpByEPerson != null) {
-			Element element = cacheRpByEPerson.get(id);
+			Element element = cacheRpByEPerson.getQuiet(id);
 			if (element != null) {
 				ResearcherPage rp = (ResearcherPage) element.getValue();
 				if (!isExpiredCache(ResearcherPage.class, element, id, rp)) {
@@ -612,7 +612,7 @@ public class ApplicationService extends ExtendedTabService
             Class<T> className)
     {        
 		if (cacheByCrisID != null) {
-			Element element = cacheByCrisID.get(crisID);
+			Element element = cacheByCrisID.getQuiet(crisID);
 			if (element != null) {
 				T crisObject = (T) element.getValue();
 				if (!isExpiredCache(className, element, crisObject.getId(), crisObject)) {
@@ -651,7 +651,7 @@ public class ApplicationService extends ExtendedTabService
             Class<T> className)
     {
 		if (cacheBySource != null) {
-			Element element = cacheBySource.get(sourceRef + "-" + sourceID);
+			Element element = cacheBySource.getQuiet(sourceRef + "-" + sourceID);
 			if (element != null) {
 				T crisObject = (T) element.getValue();
 				if (!isExpiredCache(className, element, crisObject.getId(), crisObject)) {
@@ -673,7 +673,7 @@ public class ApplicationService extends ExtendedTabService
     public ACrisObject getEntityByUUID(String uuid)
     {
 		if (cacheByUUID != null) {
-			Element element = cacheByUUID.get(uuid);
+			Element element = cacheByUUID.getQuiet(uuid);
 			if (element != null) {
 				ACrisObject crisObject = (ACrisObject) element.getValue();
 				if (!isExpiredCache(crisObject.getClass(), element, crisObject.getId(), crisObject)) {
