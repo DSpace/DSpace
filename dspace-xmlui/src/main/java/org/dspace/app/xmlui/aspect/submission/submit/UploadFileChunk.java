@@ -47,9 +47,7 @@ public class UploadFileChunk extends AbstractAction{
 
     private static final Logger log = Logger.getLogger(UploadFileChunk.class);
     
-    private static String tempDir;
-    private static Object mutex = new Object();
-    
+    private static String tempDir;    
     private String submissionDir;
     private String chunkDir;
     
@@ -82,6 +80,9 @@ public class UploadFileChunk extends AbstractAction{
                 finalDir.mkdir();
             }
         }
+        
+        log.info(this.submissionDir);
+        log.info(this.chunkDir);
     }
     
     @SuppressWarnings("rawtypes")
@@ -98,12 +99,8 @@ public class UploadFileChunk extends AbstractAction{
         
         this.init(request);
         
-        log.info("=> " + request.getMethod());
         String handle = parameters.getParameter("handle", null);
-        log.info("==> " + handle);
-        log.info("===> " + request.getParameter("submissionId"));
         HashMap<String, String> returnValues = null;
-        
         
         if(request.getMethod().equals("GET"))
         {
@@ -119,9 +116,9 @@ public class UploadFileChunk extends AbstractAction{
             
             if(completedFile != null){
                 // delete temporary chunk directory 
-                if (!deleteDirectory(new File(this.chunkDir))){
+                /*if (!deleteDirectory(new File(this.chunkDir))){
                     log.warn("Coudln't delete temporary upload path " + this.chunkDir + ", ignoring it.");
-                }
+                }*/
                 
                 SubmissionInfo si = FlowUtils.obtainSubmissionInfo(objectModel, 'S' + request.getParameter("submissionId"));
                 Item item = si.getSubmissionItem().getItem();
@@ -230,9 +227,14 @@ public class UploadFileChunk extends AbstractAction{
         
         // cocoon will have uploaded the chunk automatically
         // now move it to temporary directory
+        
+        
+                
         File chunkOrg = ((PartOnDisk)request.get("file")).getFile();
         File chunk = new File(chunkPath);
         chunkOrg.renameTo(new File(chunkPath));
+        
+        log.info("rename file " + ((PartOnDisk)request.get("file")).getFile() + " to " + chunkPath);
         
         boolean foundAll = true;
         long currentSize = 0l;
@@ -273,8 +275,6 @@ public class UploadFileChunk extends AbstractAction{
             log.info(chunkPath + " Uploaded");
             
             completedFile = chunk;
-            // bitstream directory not needed
-            //this.deleteBitstreamDirectory();
         }
         
         return completedFile;

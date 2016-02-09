@@ -848,7 +848,10 @@
 	<message key="xmlui.Submission.submit.UploadStep.checksum">File checksum:</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_remove">Remove selected files</message>
 
-
+	<message key="xmlui.Submission.submit.ResumableUploadStep.select">Select</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.status">Status</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.info">Info</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.delete">Delete</message>
 
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>

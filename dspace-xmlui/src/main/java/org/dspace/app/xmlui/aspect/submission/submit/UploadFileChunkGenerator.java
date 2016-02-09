@@ -21,7 +21,7 @@ public class UploadFileChunkGenerator extends AbstractGenerator{
     private Bitstream bitstream;
     private static final AttributesImpl emptyAttr = new AttributesImpl();
     
-    public void setup(SourceResolver resolver, Map objectModel, 
+    public void setup(SourceResolver resolver, @SuppressWarnings("rawtypes") Map objectModel, 
             String src, Parameters par)  
                     throws ProcessingException, SAXException, IOException 
     {
@@ -79,5 +79,4 @@ public class UploadFileChunkGenerator extends AbstractGenerator{
         contentHandler.endElement("", "upload", "upload");
         contentHandler.endDocument();
     }
-
 }

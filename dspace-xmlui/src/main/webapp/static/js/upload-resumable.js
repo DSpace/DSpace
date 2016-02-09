@@ -6,15 +6,9 @@
  * http://www.dspace.org/license/
  */
 
-$.ajaxSetup ({
-    // Disable caching of AJAX responses
-    cache: false
-});
-
 var href = window.location.href;
 var params = href.split('/');
 var url = '/handle/' + params[4] + '/' + params[5] + '/upload';
-var sid = $('input[name="submit-id"]').val();
 
 var r = new Resumable({
     target: url,
@@ -26,50 +20,65 @@ var r = new Resumable({
     query:{"submissionId": $('input[name="submit-id"]').val()}
 });
 
-var html = '\
-<div class="resumable-error">\
-  Resumable upload is unsupported in this browser/>\
-</div>\
-<div id="resumable-upload">\
-<div class="resumable-drop col-md-12" ondragenter="jQuery(this).addClass(\'resumable-dragover\');" ondragend="jQuery(this).removeClass(\'resumable-dragover\');" ondrop="jQuery(this).removeClass(\'resumable-dragover\');">\
-  <span class="glyphicon glyphicon-upload"></span>\
-  <a class="resumable-browse">Click or drag and drop files here</a>\
-</div>\
-</div>\
-<div class="resumable-progress">\
-  <table>\
-    <tr>\
-      <td width="100%"><div class="progress-container"><div class="progress-bar"></div></div></td>\
-      <td class="progress-text" nowrap="nowrap"></td>\
-      <td class="progress-pause" nowrap="nowrap">\
-        <a id="progress-resume-link" href="#" onclick="resume(); return(false);" ><img title="Resume upload" /></a>\
-        <a id="progress-pause-link" href="#" onclick="r.pause(); return(false);" ><img title="Pause upload" /></a>\
-      </td>\
-    </tr>\
-  </table>\
-</div>\
-<div id="dialog-confirm" style="display: none;" title="Delete File?">\
-  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Are you sure you want to delete <span id="file-name"></span>?</p>\
-</div>';
-
 if(r.support) {
-    // file object currently being processed
-    var currentFile;
+    // resumable is supported hide standard form
+    $('#aspect_submission_StepTransformer_div_submit-upload').hide();
+
+    $.ajaxSetup ({
+        // Disable caching of AJAX responses
+        cache: false
+    });
+
+    var sid = $('input[name="submit-id"]').val();
+    var html = '\
+      <div id="resumable-upload">\
+        <div id="resumable-drop" class="col-md-12"">\
+          <span class="glyphicon glyphicon-upload"></span>\
+          <a class="resumable-browse">Click or drag and drop files here</a>\
+        </div>\
+      </div>\
+      <div class="resumable-progress">\
+        <table>\
+          <tr>\
+            <td width="100%"><div class="progress-container"><div class="progress-bar"></div></div></td>\
+            <td class="progress-text" nowrap="nowrap"></td>\
+            <td class="progress-pause" nowrap="nowrap">\
+              <a id="progress-resume-link"><img title="Resume upload" /></a>\
+              <a id="progress-pause-link"><img title="Pause upload" /></a>\
+            </td>\
+          </tr>\
+        </table>\
+      </div>\
+      <div id="dialog-confirm" style="display: none;" title="Delete File(s)?">\
+        <p><span id="delete-icon" class="ui-icon ui-icon-alert" ></span><span id="delete-text">?</span></p>\
+      </div>';
 
     $('#aspect_submission_StepTransformer_div_submit-file-upload').prepend(html);
 
+    // file object currently being processed
+    var currentFile;
+
     // Show a place for dropping/selecting files
-    $('.resumable-error').hide();
     $('#simple-upload').hide();
-    $('.resumable-drop').show();
+    $('#resumable-drop').show();
     $('#resumable-upload').show();
 
-    r.assignDrop($('.resumable-drop')[0]);
-    r.assignBrowse($('.resumable-drop')[0]);
+    r.assignDrop($('#resumable-drop')[0]);
+    r.assignBrowse($('#resumable-drop')[0]);
 
     var themePath = window.DSpace.theme_path;
     $('#progress-resume-link img').attr('src', themePath + "images/resume.png");
     $('#progress-pause-link img').attr('src', themePath + "images/pause.png");
+
+    $('#resumable-drop').on('dragenter', function(e){
+        $(this).addClass('resumable-dragover');
+    });
+    $('#resumable-drop').on('dragleave', function(e){
+        $(this).removeClass('resumable-dragover');
+    });
+    $('#resumable-drop').on('dragdrop', function(e){
+        $(this).removeClass('resumable-dragover');
+    });
 
     // Handle file add event
     r.on('fileAdded', function(file){
@@ -88,11 +97,14 @@ if(r.support) {
                  <div class="radio"><label><input id="primary-' +  file.uniqueIdentifier + '" type="radio" name="primary_bitstream_id" disabled="disabled"></label></div>\
                </td>\
                <td class="ds-table-cell">\
+                 <div class="checkbox"><label><input id="select-' +  file.uniqueIdentifier + '" type="checkbox" name="select" disabled="disabled"></label></div>\
+               </td>\
+               <td class="ds-table-cell">\
                  <div id="file-name-' + file.uniqueIdentifier + '">' + file.fileName + '</div></td>\
                <td class="ds-table-cell">\
                  <input id="file-description-' + file.uniqueIdentifier + '" class="ds-text-field form-control" type="text" value="" name="description" disabled="disabled"></input>\
                </td>\
-               <td id="file-status-' +  file.uniqueIdentifier + '" class="ds-table-cell"></td>\
+               <td id="file-status-' +  file.uniqueIdentifier + '" class="file-uploading ds-table-cell"><div></div></td>\
                <td id="file-info-'   +  file.uniqueIdentifier + '" class="ds-table-cell"></td>\
                <td id="file-delete-' +  file.uniqueIdentifier + '" class="ds-table-cell"></td>\
              </tr>';
@@ -128,12 +140,14 @@ if(r.support) {
         var href = '/bitstream/item/' + sid + '/' + file.fileName + '?sequence=' + sequenceId;
         var fAnchor = '<a href="' + href + '">' + file.fileName + '</a>';
 
-        $('#file-description-' + file.uniqueIdentifier).removeAttr('disabled');
-        $('#file-description-' + file.uniqueIdentifier).attr('name', 'description-' + bId);
-        $('#file-name-'        + file.uniqueIdentifier).empty();
-        $('#file-name-'        + file.uniqueIdentifier).append(fAnchor);
         $('#primary-'          + file.uniqueIdentifier).removeAttr('disabled');
         $('#primary-'          + file.uniqueIdentifier).attr('value', bId);
+        $('#select-'           + file.uniqueIdentifier).removeAttr('disabled');
+        $('#select-'           + file.uniqueIdentifier).attr('value', bId);
+        $('#file-name-'        + file.uniqueIdentifier).empty();
+        $('#file-name-'        + file.uniqueIdentifier).append(fAnchor);
+        $('#file-description-' + file.uniqueIdentifier).removeAttr('disabled');
+        $('#file-description-' + file.uniqueIdentifier).attr('name', 'description-' + bId);
         $('#file-status-'      + file.uniqueIdentifier).text('');
         $('#file-status-'      + file.uniqueIdentifier).attr('class', 'file-status-success');
         $('#file-info-'        + file.uniqueIdentifier).attr('class', 'file-info');
@@ -158,7 +172,7 @@ if(r.support) {
 
     r.on('fileProgress', function(file){
         // Handle progress for both the file and the overall upload
-        $('#file-status-'+file.uniqueIdentifier).html(Math.floor(file.progress()*100) + '%');
+        $('#file-status-' + file.uniqueIdentifier + ' div').html(Math.floor(file.progress()*100) + '%');
         $('.progress-bar').css({width:Math.floor(r.progress()*100) + '%'});
     });
 
@@ -166,28 +180,67 @@ if(r.support) {
         var cell = e.target;
         var cellId = $(cell).attr('id');
 
-        var fileCell = $(cell).siblings()[1]
-        var infoCell = $(cell).siblings()[4];
+        var fileCell = $(cell).siblings()[2]
+        var infoCell = $(cell).siblings()[5];
         var fileName, param;
+        var toBeDeleted = [];
+        var text = "Are you sure you want to delete ";
 
         if($(infoCell).hasClass('file-info')){
-            // completed upload
-            fileName = $(fileCell).find('a').text();
-            var bid = $(cell).parent().attr('id').split('-')[1];
-            param = "bitstreamId=" + bid;
+            $.each($('tr input[name=select]:checked'), function(i, entry){
+                toBeDeleted.push($(entry).val());
+            });
+
+            if(toBeDeleted.length === 0){
+                // no files have been selected just delete row click on
+                var bid = $(cell).parent().attr('id').split('-')[1];
+                toBeDeleted.push(bid);
+
+                text += $(fileCell).find('a').text() + "?";
+            }
+            else if(toBeDeleted.length === 1){
+                // just check selected file is same as row delete click
+                var bid = $(cell).parent().attr('id').split('-')[1];
+                if(bid !== toBeDeleted[0]){
+                    // there is a mismatch, make actual delete to be row click
+                    toBeDeleted[0] = bid;
+                    text = 'The file that will be deleted does not match the one you selected, Do you want to continue?'
+                }
+                else{
+                    text += $(fileCell).find('a').text() + "?";
+                }
+            }
+            else{
+                text += " the " + toBeDeleted.length + " selected files?"
+            }
         }
         else{
-            // unfinished
-            fileName = $(fileCell).find('div').text();
-
-            var resumableIdentifier = cellId.split('file-delete-')[1];
-            param = "resumableIdentifier=" + resumableIdentifier;
+            text += $(fileCell).find('div').text() + "?";
         }
 
-        console.log(param);
+        var deleteFile = function(param){
+            var deferred = $.Deferred();
 
-        var height = 140;
-        var width = 700;
+            $.ajax({
+                type: "DELETE",
+                url: url + "?submissionId=" + sid + "&" + param,
+                cache: false,
+                success: $.proxy(function(data){
+                    deferred.resolve();
+                }, this),
+                error: function(jqXHR, status, error){
+                    var error = "Problem deleting file with " + param + " : " +
+                                  status + " : " + error
+                    console.error(error);
+                    deferred.reject(error);
+                }
+            });
+
+            return deferred.promise();
+        };
+
+        var height = 180;
+        var width = 500;
         $("#dialog-confirm").dialog({
             height: height,
             width: width,
@@ -195,39 +248,49 @@ if(r.support) {
             autoOpen: false,
             buttons: {
                 Cancel: function(){
-                    $( this ).dialog( "close" );
+                    $(this).dialog( "close" );
                 },
                 "Delete": function(ev) {
-                    $.ajax({
-                        type: "DELETE",
-                        url: url + "?submissionId=" + sid + "&" + param,
-                        cache: false,
-                        success: $.proxy(function(data){
-                            var parent = $(cell).parent();
-                            var next = parent.next();
-                            if(next.find('td').length === 1){
-                                // next element is an info row remove it too
-                                next.remove();
-                            }
-                            parent.remove();
+                    if(toBeDeleted.length > 0){
+                        $.each(toBeDeleted, function(i, bid){
+                            var promise = deleteFile("bitstreamId=" + bid);
+                            promise.done(function(){
+                                var row = $('#aspect_submission_StepTransformer_row_bitstream-' + bid);
+                                var next = row.next();
+                                if(next.find('td').length === 1){
+                                    // next element is an info row remove it too
+                                    next.remove();
+                                }
+                                row.remove();
+                            });
+                            promise.fail(function(err) {
+                                // ?
+                            });
+                        });
+                    }
+                    else{
+                        // must be unfinished upload
+                        var resumableIdentifier = cellId.split('file-delete-')[1];
+                        var promise = deleteFile("resumableIdentifier=" + resumableIdentifier);
 
-                            $(this).dialog("close");
-                            console.log(param.substring(0, 9));
-                            if(param.substring(0, 9) === 'resumable'){
-                                r.cancel();
-                            }
-                        }, this),
-                        error: function(jqXHR, status, error){
-                            console.error("Problem deleting " + fileName + " : " +
-                                          status + " : " + error);
+                        promise.done(function(){
+                            $(cell).parent().remove();
 
-                        }
-                    });
+                            // cancel upload with resumablejs
+                            r.cancel();
+                        });
+                        promise.fail(function(err) {
+                            // ?
+                        });
 
+                    }
+
+                    $(this).dialog("close");
                 }
             }
         });
-        $('#file-name').text(fileName);
+
+        $('#delete-text').text(text);
 
         // for some reason jquery dialog not centring, so do it manually
         var top = $(document).scrollTop() + ($(window).height() / 2) - (height / 2);
@@ -244,9 +307,6 @@ if(r.support) {
         var parent = $(cell).parent();
         var cellId = $(cell).attr('id');
         var newRowId = $(parent).attr('id') + '-extra';
-        console.log(newRowId);
-
-        console.log($('#' + newRowId).is(":visible"));
 
         if($('#' + newRowId).is(":visible")){
             $('#' + newRowId).hide();
@@ -261,19 +321,17 @@ if(r.support) {
                 var checksum = $(cell).find("[name='file-extra-algorithm']").val() +
                     ":" + $(cell).find("[name='file-extra-checksum']").val();
 
-                var row = '<tr id="' + newRowId + '"><td colspan="6"><div>\
+                var row = '<tr id="' + newRowId + '"><td colspan="7"><div>\
                              <strong>bytes:</strong> ' +  bytes + '&nbsp\
                              <strong>format:</strong> ' + format + '&nbsp;\
                              <strong>checksum:</strong> ' + checksum + '&nbsp;\
                            </div></td></tr>';
-                console.log($(cell).find("[name='file-extra-bytes']").val());
-                console.log(cell);
                 $(parent).after(row);
             }
         }
     });
 
-    function resume() {
+    $('#progress-resume-link').on('click', function(e){
         // Show pause, hide resume
         $('#progress-resume-link').hide();
         $('#progress-pause-link').show();
@@ -281,6 +339,13 @@ if(r.support) {
         $('#file-delete-' + currentFile.uniqueIdentifier).removeAttr('class');
 
         r.upload();
-    }
+    });
 
+    $('#progress-pause-link').on('click', function(e){
+        r.pause();
+    });
+}
+else{
+    // resumable not supported hide resumable form
+    $('#aspect_submission_StepTransformer_div_resumable-upload').hide();
 }

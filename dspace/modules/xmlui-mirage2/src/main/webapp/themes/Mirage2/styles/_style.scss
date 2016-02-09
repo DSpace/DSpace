@@ -247,8 +247,7 @@ input[name='lookup_dc_subject_classification']{
 @import "../vendor/jquery-ui/themes/base/jquery.ui.dialog.css";
 
 /* Uploader: Drag & Drop */
-.resumable-error {font-size:14px; font-style:italic;}
-.resumable-drop{
+#resumable-drop{
     padding: 30px;
     font-size: 200%;
     text-align: center;
@@ -268,35 +267,69 @@ input[name='lookup_dc_subject_classification']{
     cursor: pointer;
 }
 
-.resumable-dragover {padding:30px; color:#555; background-color:#ddd; border:1px solid #999; opacity: 1;}
+.resumable-dragover{
+    padding: 30px;
+    color: #555;
+    background-color: #ddd;
+    border:1px solid #999;
+    opacity: 1;
+}
 
 /* Uploader: Progress bar */
-.resumable-progress {margin:30px 0 30px 0; width:100%; display:none;}
-.progress-container {height:7px; background:#9CBD94; position:relative; }
-.progress-bar {position:absolute; top:0; left:0; bottom:0; background:#45913A; width:0;}
-.progress-text {font-size:11px; line-height:9px; padding-left:10px;}
-.progress-pause {padding:0 0 0 7px;}
+.resumable-progress{
+    margin: 30px 0 30px 0;
+    width:100%; display:none;
+}
+
+.progress-container{
+    height: 7px;
+    background: #9CBD94;
+    position: relative;
+}
+
+.progress-bar{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background: #45913A;
+    width: 0;
+}
+
+.progress-text{
+    font-size: 11px;
+    line-height: 9px;
+    padding-left: 10px;
+}
+
+.progress-pause {
+    padding:0 0 0 7px;
+    cursor: pointer;
+}
+
 #progress-resume-link{
   display: none;
 }
-.is-paused #progress-resume-link {display:inline;}
-.is-paused #progress-pause-link {display:none;}
-.is-complete .progress-pause {display:none;}
+
+.is-paused #progress-resume-link {
+    display:inline;
+}
+.is-paused #progress-pause-link {
+    display:none;
+}
+
+.is-complete .progress-pause {
+    display:none;
+}
 
 /* Uploader: Hover & Active status */
-.uploader-item:hover, .is-active .uploader-item {border-color:#4a873c; cursor:pointer; }
-.uploader-item:hover .uploader-item-title, .is-active .uploader-item .uploader-item-title {background-color:rgba(74,135,60,0.8);}
-
-/* Uploader: Error status */
-/*.is-error .uploader-item:hover, .is-active.is-error .uploader-item {border-color:#900;}
-.is-error .uploader-item:hover .uploader-item-title, .is-active.is-error .uploader-item .uploader-item-title {background-color:rgba(153,0,0,0.6);}
-.is-error .uploader-item-creating-thumbnail {display:none;}
-*/
+/*.uploader-item:hover, .is-active .uploader-item {border-color:#4a873c; cursor:pointer; }
+.uploader-item:hover .uploader-item-title, .is-active .uploader-item .uploader-item-title {background-color:rgba(74,135,60,0.8);}*/
 
 #resumable-upload { display: none; text-align: center; }
-.resumable-drop a { text-decoration: none; font-weight: lighter; color: #fff; }
-.resumable-drop a:hover { text-decoration: underline; cursor: pointer; }
-.resumable-drop .glyphicon-upload { /*color: #c50e1f;*/ color: #fff; font-size: 200%; display: block; margin-bottom: 20px; }
+#resumable-drop a { text-decoration: none; font-weight: lighter; color: #fff; }
+#resumable-drop a:hover { text-decoration: underline; cursor: pointer; }
+#resumable-drop .glyphicon-upload { /*color: #c50e1f;*/ color: #fff; font-size: 200%; display: block; margin-bottom: 20px; }
 .resumable-files {display: none;}
 .resumable-files table tbody tr:nth-child(even) { background-color: #eee; }
 
@@ -323,6 +356,16 @@ input[name='lookup_dc_subject_classification']{
     background-repeat: no-repeat;
     background-position: center;
     cursor: pointer;
+}
+
+.file-uploading div{
+    padding-top: 0.5em;
+    padding-left: 0.5em;
+}
+
+#delete-icon{
+    float: left;
+    margin: 0 7px 20px 0;
 }
 
 #aspect_submission_StepTransformer_table_submit-upload-summary.table-striped.table-striped > tbody > tr:nth-child(2n+1) {

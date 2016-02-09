@@ -3,18 +3,18 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
-import org.dspace.app.util.SubmissionInfo;
-import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Cell;
+import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.Row;
+import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -25,15 +25,25 @@ import org.xml.sax.SAXException;
 
 public class ResumableUploadStep extends UploadStep{
     
-    private static final Logger log = Logger.getLogger(ResumableUploadStep.class);
-    
+    //private static final Logger log = Logger.getLogger(ResumableUploadStep.class);
+    private static final Message T_column_select =
+            message("xmlui.Submission.submit.ResumableUploadStep.select");
+    private static final Message T_column_status =
+            message("xmlui.Submission.submit.ResumableUploadStep.status");
+    private static final Message T_column_info =
+            message("xmlui.Submission.submit.ResumableUploadStep.info");
+    private static final Message T_column_delete =
+            message("xmlui.Submission.submit.ResumableUploadStep.delete");
+
     public void addBody(Body body) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
-    { 
+    {
+        super.addBody(body);
+        
         Item item = submission.getItem();
         Collection collection = submission.getCollection();
-        String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
-        Division div = body.addInteractiveDivision("submit-upload", actionURL, Division.METHOD_POST, "primary submission");
+        String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue?resumable=true";
+        Division div = body.addInteractiveDivision("resumable-upload", actionURL, Division.METHOD_POST, "primary submission");
         div.setHead(T_submission_head);
         addSubmissionProgressList(div);
         
@@ -42,7 +52,6 @@ public class ResumableUploadStep extends UploadStep{
         List upload = div.addList("submit-upload-new-list", List.TYPE_SIMPLE);
         submission.getID();
         
-        SubmissionInfo si = FlowUtils.obtainSubmissionInfo(this.objectModel, 'S' + String.valueOf(submission.getID()));
         div.addHidden("submit-id").setValue(submission.getID());
         
         Bundle[] bundles = item.getBundles("ORIGINAL");
@@ -57,11 +66,12 @@ public class ResumableUploadStep extends UploadStep{
 
         Row header = summary.addRow(Row.ROLE_HEADER);
         header.addCellContent(T_column0); // primary bitstream
+        header.addCellContent(T_column_select);
         header.addCellContent(T_column2); // file name
         header.addCellContent(T_column4); // description
-        header.addCellContent("Status");
-        header.addCellContent("Info");
-        header.addCellContent("Delete");
+        header.addCellContent(T_column_status);
+        header.addCellContent(T_column_info);
+        header.addCellContent(T_column_delete);
         
         for (Bitstream bitstream : bitstreams)
         {
@@ -78,6 +88,10 @@ public class ResumableUploadStep extends UploadStep{
                 primary.setOptionSelected(String.valueOf(id));
             }
 
+            // select file
+            CheckBox select = row.addCell().addCheckBox("select");
+            select.addOption(String.valueOf(id));
+            
             String url = makeBitstreamLink(item, bitstream);
             row.addCell().addXref(url, bitstream.getName());
             
@@ -85,19 +99,17 @@ public class ResumableUploadStep extends UploadStep{
             row.addCell().addText("description-" + id).setValue(bitstream.getDescription());
             
             // status
-            //row.addCell("status-" + id, Cell.ROLE_DATA, "file-status-success").addFigure("/", null, null);
             row.addCell("status-" + id, Cell.ROLE_DATA, "file-status-success");
             
             // info
-            Cell info = row.addCell("info-" + id, Cell.ROLE_DATA, "file-info"); 
-            //info.addFigure("/", null, null);
+            Cell info = row.addCell("info-" + id, Cell.ROLE_DATA, "file-info");
             info.addHidden("file-extra-bytes").setValue(String.valueOf(bitstream.getSize()));
             info.addHidden("file-extra-format").setValue(bitstream.getFormatDescription());
             info.addHidden("file-extra-algorithm").setValue(bitstream.getChecksumAlgorithm());
             info.addHidden("file-extra-checksum").setValue(bitstream.getChecksum());
             
             // delete
-            row.addCell("delete-" + id, Cell.ROLE_DATA, "file-delete");//.addFigure("/", null, null);
+            row.addCell("delete-" + id, Cell.ROLE_DATA, "file-delete");
         }
         
         // add standard control/paging buttons
