@@ -157,13 +157,13 @@
             <link rel="shortcut icon">
                 <xsl:attribute name="href">
                     <xsl:value-of select="$theme-path"/>
-                    <xsl:text>lib/images/favicon.ico</xsl:text>
+                    <xsl:text>images/favicon.ico</xsl:text>
                 </xsl:attribute>
             </link>
             <link rel="apple-touch-icon">
                 <xsl:attribute name="href">
                     <xsl:value-of select="$theme-path"/>
-                    <xsl:text>lib/images/apple-touch-icon.png</xsl:text>
+                    <xsl:text>images/apple-touch-icon.png</xsl:text>
                 </xsl:attribute>
             </link>
 
@@ -218,8 +218,7 @@
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverPort']"/>
                         <xsl:value-of select="$context-path"/>
                         <xsl:text>/</xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='context']"/>
-                        <xsl:text>description.xml</xsl:text>
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='autolink']"/>
                     </xsl:attribute>
                     <xsl:attribute name="title" >
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='shortName']"/>
@@ -262,7 +261,7 @@
 
             <xsl:text disable-output-escaping="yes">&lt;!--[if lt IE 9]&gt;
                 &lt;script src="</xsl:text><xsl:value-of select="concat($theme-path, 'vendor/html5shiv/dist/html5shiv.js')"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;/script&gt;
-                &lt;script src="</xsl:text><xsl:value-of select="concat($theme-path, 'vendor/respond/respond.min.js')"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;/script&gt;
+                &lt;script src="</xsl:text><xsl:value-of select="concat($theme-path, 'vendor/respond/dest/respond.min.js')"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;/script&gt;
                 &lt;![endif]--&gt;</xsl:text>
 
             <!-- Modernizr enables HTML5 elements & feature detects -->
@@ -294,6 +293,24 @@
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[substring(@element, 1, 9) = 'citation_']">
                 <meta name="{@element}" content="{.}"></meta>
             </xsl:for-each>
+
+            <!-- Add MathJAX JS library to render scientific formulas-->
+            <xsl:if test="confman:getProperty('webui.browse.render-scientific-formulas') = 'true'">
+                <script type="text/x-mathjax-config">
+                    MathJax.Hub.Config({
+                      tex2jax: {
+                        inlineMath: [['$','$'], ['\\(','\\)']],
+                        ignoreClass: "detail-field-data|detailtable|exception"
+                      },
+                      TeX: {
+                        Macros: {
+                          AA: '{\\mathring A}'
+                        }
+                      }
+                    });
+                </script>
+                <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
+            </xsl:if>
 
         </head>
     </xsl:template>
@@ -467,7 +484,7 @@
     <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
         placeholders for header images -->
     <xsl:template name="buildTrail">
-        <div class="trail-wrapper">
+        <div class="trail-wrapper hidden-print">
             <div class="container">
                 <div class="row">
                     <!--TODO-->
@@ -608,14 +625,10 @@
                    alt="{$ccLicenseName}"
                    title="{$ccLicenseName}"
                         >
-                    <img class="img-responsive">
-                        <xsl:attribute name="src">
-                            <xsl:value-of select="concat($theme-path,'/images/cc-ship.gif')"/>
-                        </xsl:attribute>
-                        <xsl:attribute name="alt">
-                            <xsl:value-of select="$ccLicenseName"/>
-                        </xsl:attribute>
-                    </img>
+                    <xsl:call-template name="cc-logo">
+                        <xsl:with-param name="ccLicenseName" select="$ccLicenseName"/>
+                        <xsl:with-param name="ccLicenseUri" select="$ccLicenseUri"/>
+                    </xsl:call-template>
                 </a>
             </div> <div class="col-sm-8">
                 <span>
@@ -625,6 +638,58 @@
             </div>
             </div>
         </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="cc-logo">
+        <xsl:param name="ccLicenseName"/>
+        <xsl:param name="ccLicenseUri"/>
+        <xsl:variable name="ccLogo">
+             <xsl:choose>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by/')">
+                       <xsl:value-of select="'cc-by.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by-sa/')">
+                       <xsl:value-of select="'cc-by-sa.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by-nd/')">
+                       <xsl:value-of select="'cc-by-nd.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by-nc/')">
+                       <xsl:value-of select="'cc-by-nc.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by-nc-sa/')">
+                       <xsl:value-of select="'cc-by-nc-sa.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by-nc-nd/')">
+                       <xsl:value-of select="'cc-by-nc-nd.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/publicdomain/zero/')">
+                       <xsl:value-of select="'cc-zero.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/publicdomain/mark/')">
+                       <xsl:value-of select="'cc-mark.png'" />
+                  </xsl:when>
+                  <xsl:otherwise>
+                       <xsl:value-of select="'cc-generic.png'" />
+                  </xsl:otherwise>
+             </xsl:choose>
+        </xsl:variable>
+        <img class="img-responsive">
+             <xsl:attribute name="src">
+                <xsl:value-of select="concat($theme-path,'/images/creativecommons/', $ccLogo)"/>
+             </xsl:attribute>
+             <xsl:attribute name="alt">
+                 <xsl:value-of select="$ccLicenseName"/>
+             </xsl:attribute>
+        </img>
     </xsl:template>
 
     <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->
@@ -739,7 +804,7 @@
             <!--we can't use $theme-path, because that contains the context path,
             and cocoon:// urls don't need the context path-->
             <xsl:value-of select="$pagemeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-            <xsl:text>scripts.xml</xsl:text>
+            <xsl:text>scripts-dist.xml</xsl:text>
         </xsl:variable>
         <xsl:for-each select="document($scriptURL)/scripts/script">
             <script src="{$theme-path}{@src}">&#160;</script>

@@ -10,7 +10,6 @@ package org.dspace.xmlworkflow.storedcomponents;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.InProgressSubmission;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -40,15 +39,15 @@ public class XmlWorkflowItem implements InProgressSubmission {
     /*
      * The current step in the workflow system in which this workflow item is present
      */
-    private static Logger log = Logger.getLogger(XmlWorkflowItem.class);
+    private static final Logger log = Logger.getLogger(XmlWorkflowItem.class);
 
     private Collection collection;
 
     private Item item;
 
-    private TableRow wfRow;
+    private final TableRow wfRow;
 
-    private Context ourContext;
+    private final Context ourContext;
 
 
     public static XmlWorkflowItem create(Context context) throws AuthorizeException, IOException, SQLException {
@@ -181,7 +180,7 @@ public class XmlWorkflowItem implements InProgressSubmission {
             query.append("WHERE collection_id=").append(collectionId);
         }
         int offset = (page - 1) * pagesize;
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name"))) {
+        if (DatabaseManager.isOracle()) {
             // First prepare the query to generate row numbers
             if (pagesize > 0 || offset > 0) {
                 query.insert(0, "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");

@@ -53,7 +53,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
@@ -124,7 +124,7 @@ public class DeleteItems {
         if (item == null) {
           log.info(strHandle + ": not found");
         } else {
-          DCValue dcval[] = item.getDC("title", null, Item.ANY);
+          Metadatum dcval[] = item.getDC("title", null, Item.ANY);
           String strTitle = dcval[0].value;
 
           // Remove from all collection; will be deleted when removed from

@@ -93,7 +93,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
@@ -210,7 +210,7 @@ public class EtdMangledDates
 	// get the item
 	Item item = (Item)HandleManager.resolveToObject(context, strHandle);
 
-	DCValue dcval[] = item.getDC("title", null, Item.ANY);
+	Metadatum dcval[] = item.getDC("title", null, Item.ANY);
 	log.info("  title: " + dcval[0].value);
 
 	lRead++;
@@ -288,7 +288,7 @@ public class EtdMangledDates
     sb.append("Item loaded: " + strHandle + "\n");
 
     // Title
-    DCValue dc[] = item.getDC("title", null, Item.ANY);
+    Metadatum dc[] = item.getDC("title", null, Item.ANY);
     sb.append("  Title: " + dc[0].value + "\n");
 
     // Collections
