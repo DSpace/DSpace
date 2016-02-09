@@ -611,19 +611,19 @@
 	
 	<script>
 		function showMoreClicked(index){
-			$('#moreinfo_'+index).toggle( "slow", function() {
+			j('#moreinfo_'+index).toggle( "slow", function() {
 				// Animation complete.
 			  });
-			$('#a1_'+index).toggle();
-			$('#a2_'+index).toggle();
+			j('#a1_'+index).toggle();
+			j('#a2_'+index).toggle();
 		}
 		
 		function showItemsClicked(index){
-			$('#iteminfo_'+index).toggle( "slow", function() {
+			j('#iteminfo_'+index).toggle( "slow", function() {
 				// Animation complete.
 			  });
-			$('#a3_'+index).toggle();
-			$('#a4_'+index).toggle();
+			j('#a3_'+index).toggle();
+			j('#a4_'+index).toggle();
 		}
 	</script>
 	
