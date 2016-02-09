@@ -236,8 +236,17 @@
         <xref target="{@OBJID}" n="community-browser-link">
             <xsl:value-of select="$dim/dim:field[@element='title']"/>
         </xref>
-            <xsl:variable name="description"
-                          select="$dim/dim:field[@element='description'][@qualifier='abstract']"/>
+        <!--Display community strengths (item counts) if they exist-->
+        <xsl:if test="string-length($dim/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+            <span>
+                <xsl:text> [</xsl:text>
+                <xsl:value-of
+                    select="$dim/dim:field[@element='format'][@qualifier='extent'][1]"/>
+                <xsl:text>]</xsl:text>
+            </span>
+        </xsl:if>
+
+        <xsl:variable name="description" select="$dim/dim:field[@element='description'][@qualifier='abstract']"/>
         <xsl:if test="string-length($description/text()) > 0">
             <p rend="hidden-xs">
                 <xsl:value-of select="$description"/>
