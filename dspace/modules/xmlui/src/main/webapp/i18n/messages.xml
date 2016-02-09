@@ -39,7 +39,7 @@
     <message key="xmlui.general.queue">Queue</message>
 
     <!-- Keys which are used by exception2dri.xsl on error pages -->
-    <message key="xmlui.error.contact_msg">Please contact the site administrator if you wish to report this error. If possible, please  provide details about what you were doing at the time this erro
+    <message key="xmlui.error.contact_msg">Please contact the site administrator if you wish to report this error. If possible, please  provide details about what you were doing at the time this error occurred.</message>
     <message key="xmlui.error.contact">Contact site administrator</message>
     <message key="xmlui.error.show_stack">Show underlying error stack</message>
 
