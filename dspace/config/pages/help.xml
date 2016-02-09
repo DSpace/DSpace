@@ -2,38 +2,51 @@
 
 <body>
 <div id="file.help.div.help" n="help" rend="primary">
-<head>MOspace Help</head>
-
+<head>MOspace Institutional Repository Help</head>
 
 <div id="top" n="top">
+<body>
+About the MOspace Institutional Repository
+</body>
 	<list n="toc" id="file.help.list.toc" type="bulleted">
 		<item><xref target="#what_is_mospace">What is MOspace?</xref></item>
 		<item><xref target="#why_is_mospace_important">Why is MOspace important?</xref></item>
 		<item><xref target="#how_is_mospace_different">How is MOspace different from a personal website</xref></item>
 		<item><xref target="#who_can_access_mospace">Who can access MOspace?</xref></item>
-		<item><xref target="#what_are_the_copyright_implications">What are the copyright implications of submitting to MOspace?</xref></item>
 		<item><xref target="#what_types_of_works">What types of works can be included in MOspace?</xref></item>
 		<item><xref target="#how_are_works_collected">How are works collected for MOspace?</xref></item>
+	</list>
+<body>
+Submitting content to the MOspace Institutional Repository
+</body>
+	<list n="toc" id="file.help.list.toc" type="bulleted">
 		<item><xref target="#who_can_submit">Who can submit works to MOspace?</xref></item>
 		<item><xref target="#benefits_of_submitting">What are the benefits of submitting works to MOspace?</xref></item>
+		<item><xref target="#what_are_the_copyright_implications">What are the copyright implications of submitting to MOspace?</xref></item>
 		<item><xref target="#how_to_submit">How can I submit works to MOspace?</xref></item>
+	</list>
+<body>
+Using the MOspace Institutional Repository
+</body>
+	<list n="toc" id="file.help.list.toc" type="bulleted">
 		<item><xref target="#how_to_cite">How do I cite something I find in MOspace?</xref></item>
-		<item><xref target="#browse">What do the BROWSE options do?</xref></item>
 		<item><xref target="#search">How do I SEARCH MOspace?</xref></item>
+		<item><xref target="#browse">What do the BROWSE options do?</xref></item>
 		<item><xref target="#what_is_searched">What is searched in the general keyword search?</xref></item>
 		<item><xref target="#what_is_not_searched">What is NOT searched (Stop Words)?</xref></item>
 		<item><xref target="#other_search_options">What other options do I have when constructing my search?</xref></item>
 		<item><xref target="#advanced_search">How do I use the Advanced Search form?</xref></item>
-		<item><xref target="#communities">What are Communities?</xref></item>
-		<item><xref target="#collections">What are Collections?</xref></item>
+		<item><xref target="#communities">What are Communities and Collections?</xref></item>
 		<item><xref target="#handles">What are Handles?</xref></item>
 	</list>
 </div>
-
+<head>
+About the MOspace Institutional Repository
+</head>
 <div id="what.is.mospace" n="whatis">
 <head>What is MOspace?</head>
 <p>
-MOspace is the digital institutional repository of the University of Missouri System and is a joint initiative of the University libraries, the Office of Library Systems, and the Division of Information Technology. It is a permanent digital storehouse of research and knowledge focusing on works created by those connected with the University of Missouri.
+The MOspace Institutional Repository is an online repository for creative and scholarly works and other resources created by faculty, students, and staff at the University of Missouri—Columbia and the University of Missouri—Kansas City.  MOspace makes these resources freely available on the web and assures their preservation for the future.
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
@@ -41,7 +54,10 @@ MOspace is the digital institutional repository of the University of Missouri Sy
 <div id="why.is.mospace.important" n="whyimportant">
 <head>Why is MOspace important?</head>
 <p>
-MOspace acts as a preservation tool and contributes to the international open access movement. Recent votes in favor of open access have passed in many institutions, including Harvard's Faculty of Arts and Sciences, Stanford's School of Education.
+The MOspace Institutional Repository acts as a preservation tool and contributes to the international open access movement.  MOspace is our part of the international open access movement.  For more information on open access, see <xref target="http://www.sparc.arl.org/issues/open-access">the SPARC website</xref>.
+</p>
+<p>
+An important part of the MOspace effort is encouraging authors not to sign away rights to their own works, as often happens when they publish in commercial journals. Retaining the copyright allows content to be made available to students and scholars without huge subscription fees. In MOspace, the author/creator retains copyright in all cases, so an author could also publish an item elsewhere, providing that the publisher allows (see this <xref target="http://www.sparc.arl.org/resource/complete-sparc-author-addendum-online">author's addendum</xref> on the SPARC website for an example addendum to a publisher's contract). 
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
@@ -49,7 +65,7 @@ MOspace acts as a preservation tool and contributes to the international open ac
 <div id="how.is.mospace.different" n="howdifferent">
 <head>How is MOspace different from a personal website?</head>
 <p>
-MOspace allows the library to preserve and provide open access to the items in a more permanent way than posting to a website. The use of DSpace software, an open source product developed at MIT, provides permanent URLs for documents deposited through it to the MOspace server.
+MOspace allows the library to preserve and provide open access to the items in a more permanent way than posting to a website. The use of DSpace software, an open source product developed at MIT, provides permanent URLs for resources.
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
@@ -59,13 +75,8 @@ MOspace allows the library to preserve and provide open access to the items in a
 <p>
 MOspace is open access, meaning anyone can view it from the open web. By providing free access to a rich body of work, MOspace promotes research and knowledge produced by the University of Missouri.
 </p>
-<p>[ <xref target="#top">back to top</xref> ]</p>
-</div>
-
-<div id="what.are.the.copyright.implications" n="copyright">
-<head>What are the copyright implications of submitting to MOspace?</head>
 <p>
-MOspace encourages authors not to sign away rights to their own works, as often happens when they publish in commercial journals.  Retaining the copyright allows content to be made available to students and scholars without huge subscription fees.  In MOspace, the author/creator retains copyright in all cases, so an author could also publish an item elsewhere, providing that the publisher allows (see this <xref target="http://www.arl.org/sparc/author/completeonline.shtml">author's addendum</xref> for an example addendum to a publisher's contract).  For items not commercially published, author permission is all that is needed to allow the Library to add it to MOspace.
+Use of resources is guided by a license for each item.  The MOspace default license is a Creative Commons Attribution-NonCommercial-NoDerivs License (CC BY-NC-ND).  The full legal codes of Creative Commons licenses are available at: https://creativecommons.org/licenses/.
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
@@ -98,15 +109,17 @@ MOspace includes, but is not limited to, the following content types:
 <div id="how.are.works.collected" n="howcollected">
 <head>How are works collected for MOspace?</head>
 <p>
-Faculty, staff and students are encouraged to submit works directly. Staff members of the MU libraries collect works in two ways. They can download items from websites or upload items directly via author submission.
+We download items from websites or upload items directly via author submission.
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
-
+<head>
+Submitting content to the MOspace Institutional Repository
+</head>
 <div id="who.can.submit" n="whosubmit">
 <head>Who can submit works to MOspace?</head>
 <p>
-Faculty, staff, students, and other individuals or entities affiliated or associated with the University of Missouri can submit. Works co-authored by those not affiliated with the university are accepted.  If you have any question, email <xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref>
+Faculty, students, staff, and other individuals or entities associated with the University of Missouri—Columbia, the University of Missouri—Kansas City, and the University of Missouri System are encouraged to submit works to MOspace.  Co-authors need not be affiliated with the University of Missouri. 
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
@@ -114,7 +127,38 @@ Faculty, staff, students, and other individuals or entities affiliated or associ
 <div id="benefits.of.submitting" n="benefits">
 <head>What are the benefits of submitting works to MOspace?</head>
 <p>
-MOspace provides content with increased visibility, a permanent URL, a dedication to preservation, and full-text searchability. Establishing MOspace is part of the crucial role libraries play in making knowledge accessible for a wider audience and preserving research and scholarship for future scholars. The
+<hi rend="bold">For Faculty, Students, and Staff</hi>
+
+MOspace makes your works widely available and provides a permanent URL for ongoing access.  MOspace fulfills the requirement of many grants for the deposit of research data.</p>  
+<p>
+Submitting scholarly work to MOspace offers many benefits:
+<list n="filetypes" id="file.help.list.filetypes" type="bulleted">
+	<item>Increased visibility</item>
+	<item>Author retention of copyright</item>
+	<item>Increased citation rates</item>
+	<item>Google search optimization</item>
+	<item>Full-text search and display</item>
+	<item>Perpetual access and preservation</item>
+	<item>Processing by library employees</item>
+</list>
+</p>
+MOspace allows the library to preserve and provide open access to items in a more permanent way than posting to a website.  The Libraries are committed to this ongoing effort as part of the next generation of library collections.
+<p>
+<hi rend="bold">For Users Worldwide</hi>
+</p>
+<p>
+For the most part, MOspace resources are available for use to any web user.  The exception to open access is with some theses and dissertations which have been restricted at the authors’ requests.
+</p>
+<p>[ <xref target="#top">back to top</xref> ]</p>
+</div>
+
+<div id="what.are.the.copyright.implications" n="copyright">
+<head>What are the copyright implications of submitting to MOspace?</head>
+<p>
+MOspace encourages authors not to sign away rights to their own works, as often happens when they publish in commercial journals.  Retaining the copyright allows content to be made available to students and scholars without huge subscription fees.  In MOspace, if you are the copyright holder, you retain the copyright in all cases, so that you can publish elsewhere, providing that the publisher allows such publishing.  See this <xref target="http://www.arl.org/sparc/author/completeonline.shtml">author's addendum</xref> on the SPARC website for an example addendum to a publisher's contract.  For items not commercially published, author permission is all that is needed to allow us to add it to MOspace.
+</p>
+<p>
+The default license used in MOspace is a Creative Commons Attribution-NonCommercial-NoDerivs License (CC BY-NC-ND).  The full legal codes of Creative Commons licenses are available at: https://creativecommons.org/licenses/.  You may choose to submit a different license.  Consult with your campus <xref target="mospace@missouri.edu">MOspace manager</xref> to discuss license options.
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
@@ -122,229 +166,188 @@ MOspace provides content with increased visibility, a permanent URL, a dedicatio
 <div id="how.to.submit" n="howtosubmit">
 <head>How can I submit works to MOspace?</head>
 <p>
-Authors associated the campuses in Columbia, Kansas City and St. Louis can submit works directly to <xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref> or call 573-882-1685 for additional Information. Authors associated with the Missouri University of Science and Technology should visit the <xref target="http://libguides.mst.edu/content.php?pid=362942">Submitting Content section of the Library Guide to Scholars’ Mine</xref>, email <xref target="mailto:scholarsmine@mst.edu">scholarsmine@mst.edu</xref> or call 573-334-4221 for additional information. 
-</p>
-<p>
-PDF is the preferred format for documents, but most electronic formats are accepted for submission. We look forward to receiving your submissions.
+See <xref target="https://mospace.umsystem.edu/xmlui/pages/add">Submitting Content to MOspace</xref>. 
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
 
-
 <div id="how.to.cite" n="howtocite">
 <head>How do I cite something I find in MOspace?</head>
 <p>
-Each item in MOspace has been assigned a "<xref target="#handles">handle</xref>," a persistent URL you can use when citing the item in publications or other communications. In most citation styles, you'll treat the MOspace item as an electronic publication.
+Each item in MOspace has been assigned a "<xref target="https://irsandbox.lso.umsystem.edu/xmlui/pages/help#handles">handle</xref>," a persistent URL you can use when citing the item in publications or other communications. In most citation styles, you'll treat the MOspace item as an electronic publication.
 </p>
 <p>
 For example:
 </p>
 <p>
-<hi rend="bold">APA Style</hi>: Schlicher, M. A. (2008). Biofuels in the US: Today and in the future. AgBioForum, 11, 1-7. Retrieved from http://hdl.handle.net/10355/32.
+<hi rend="bold">APA Style:</hi> Schlicher, M. A. (2008). Biofuels in the US: Today and in the future. AgBioForum, 11, 1-7. Retrieved from http://hdl.handle.net/10355/32.
 </p>
 <p>
-<hi rend="bold">Chicago Style</hi>: Schlicher, Martha A. "Biofuels in the US: Today and in the Future." AgBioForum 11 (2008): 1-7, http://hdl.handle.net/10355/32.
+<hi rend="bold">Chicago Style:</hi> Schlicher, Martha A. "Biofuels in the US: Today and in the Future." AgBioForum 11 (2008): 1-7, http://hdl.handle.net/10355/32.
 </p>
 <p>
-<hi rend="bold">MLA Style</hi>: Schlicher, Martha A. "Biofuels in the US: Today and in the Future." AgBioForum 11.1 (2008): 1-7. 24 Feb. 2009 &lt;http://hdl.handle.net/10355/32&gt;.
+<hi rend="bold">MLA Style:</hi> Schlicher, Martha A. "Biofuels in the US: Today and in the Future." AgBioForum 11.1 (2008): 1-7. 24 Feb. 2009 &lt;http://hdl.handle.net/10355/32&gt;.
 </p>
 <p>
-<hi rend="bold">Vancouver Style</hi>: Schlicher MA. Biofules in the US: today and in the future. AgBioForum 2008;11(1):1-7. Available from http://hdl.handle.net/10355/32.
+<hi rend="bold">Vancouver Style:</hi> Schlicher MA. Biofules in the US: today and in the future. AgBioForum 2008;11(1):1-7. Available from http://hdl.handle.net/10355/32.
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+<head>
+Using the MOspace Institutional Repository
+</head>
+<div id="search" n="search">
+<head>How do I search MOspace?</head>
+<p>
+You have more than one option. You may use a keyword search, which will search for the words you enter anywhere in the indexed fields. If you have a specific title or author, try a browse search.  The word(s) you enter will be searched from the beginning of indexed fields.  Keyword searches are a useful way to start if you don’t have a specific author or title in mind or aren’t sure of the author’s name or the exact title. These two types of searches are discussed in more detail below.
+</p>
+<p>
+To limit your search to a specific community or collection, navigate to that community or collection and use the search bar on that page.  
+</p>
+<p>[ <xref target="#top">back to top</xref> ]</p>
+</div>
 
 <div id="browse" n="browse">
 <head>What do the BROWSE options do?</head>
 <p>
-<hi rend="bold">Browse</hi> allows you to go through a list of items in some specified order:
+Browse allows you to retrieve a list of items in alphabetical or numerical order.  The words you enter in the search box are searched from the beginning from fields in MOspace and in the order you enter them.  From the browse results screen you can jump to a spot in the list by typing in the first few letters of your text string or by choosing an option in the menu of letters of the alphabet.  
 </p>
 <p>
-<hi rend="bold">Browse by Community/Collection</hi> takes you through the communities in alphabetical order and allows you to see the subcommunities and collections within each community.
-</p>
-<p>
-<hi rend="bold">Browse by Title</hi> allows you to move through an alphabetical list of all titles of items in MOspace.
-</p>
-<p>
-<hi rend="bold">Browse by Author</hi> allows you to move through an alphabetical list of all authors of items in MOspace.
-</p>
-<p>
-<hi rend="bold">Browse by Subject</hi> allows you to move through an alphabetical list of subjects assigned to items in MOspace.
-</p>
-<p>
-<hi rend="bold">Browse by Date</hi> allows you to move through a list of all items in MOspace in reverse chronological order.
-</p>
-<p>[ <xref target="#top">back to top</xref> ]</p>
-</div>
-
-
-<div id="search" n="search">
-<head>How do I SEARCH MOspace?</head>
-<p>
-To search all of MOspace, use the search box at the top of the navigation bar on the left (or the search box in the middle of the home page).
-</p>
-<p>
-<figure source="../static/images/help/searchtop.gif" />
-</p>
-<p>
-To limit your search to a specific community or collection, navigate to that community or collection and use the search bar on that page.
-</p>
-<p>
-<figure source="../static/images/help/searchother.gif" />
+Browse options are available for:
+<list n="filetypes" id="file.help.list.filetypes" type="bulleted">
+	<item>Community/Collection</item>
+	<item>Date Issued</item>
+	<item>Author – For personal names, search the last name first:  Smith, John</item>
+	<item>Author/Contribution – For personal names, search the last name first:  Smith, John</item>
+	<item>Title</item>
+	<item>Subject</item>
+	<item>Identifier</item>
+	<item>Thesis Department</item>
+	<item>Thesis Advisor</item>
+	<item>Thesis Semester</item>
+</list>
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
 
 <div id="what.is.searched" n="whatissearched">
-<head>What is searched in the general keyword search?</head>
+<head>What is searched in the general keyword SEARCH?</head>
 <p>
-MOspace uses the <xref target="http://lucene.apache.org/java/docs/">Apache Lucene</xref> search engine. Here are some search hints:
+With a keyword search, the words you enter will be found where ever they appear in a field.  The word(s) you enter in the search box will be searched against the following metadata fields:
+<list n="filetypes" id="file.help.list.filetypes" type="bulleted">
+	<item>Communities and collections</item>
+	<item>Date Issued</item>
+	<item>Creators and contributors, including authors, editors, and illustrators</item>
+	<item>Author/Contribution – For personal names, search the last name first:  Smith, John</item>
+	<item>Corporate names and meeting names</item>
+	<item>Names of sponsor</item>
+	<item>Dates (copyright, created, issued, submitted for theses)</item>
+	<item>Abstracts</item>
+	<item>Tables of contents</item>
+	<item>Related works</item>
+	<item>Subjects</item>
+	<item>Thesis departments</item>
+</list>
 </p>
-<p>
-The word(s) you enter in the search box will be searched against the title, author, subject abstract, series, sponsor and identifier fields of each item's record.
+<p>MOspace uses the <xref target="http://lucene.apache.org/core/">Apache Lucene</xref> search engine.
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
-
-
-<div id="what.is.not.searched" n="whatissearched">
-<head>What is NOT searched (Stop Words)?</head>
-<p>
-The search engine ignores certain words that occur frequently in English, but do not add value to the search. These are:
-</p>
-<p>
-"a", "and" , "are" , "as" , "at" , "be" , "but" , "by" , "for" , "if" , "in" , "into",
-</p>
-<p>
-"is" ,"it" ,"no" , "not" , "of" , "on" , "or" , "such", "the" , "to" , "was"
-</p>
-<p>[ <xref target="#top">back to top</xref> ]</p>
-</div>
-
-
-<div id="other.search.options" n="otheroptions">
-<head>What other options do I have when constructing my search?</head>
-
-<p><hi rend="bold">Truncation</hi> - Use an asterisk (*) after a word stem to get all hits having words starting with that root, for example:</p>
-<p><figure source="../static/images/help/search1.gif"> select* </figure></p>
-<p>will retrieve selects, selector, selectman, selecting.</p>
-
-<p><hi rend="bold">Stemming</hi> - The search engine automatically expands words with common endings to include plurals, past tenses ...etc.</p>
-
-<p><hi rend="bold">Phrase Searching</hi> - To search using multiple words as a phrase, put quotation marks (") around the phrase.</p>
-
-<p><figure source="../static/images/help/search8.jpg"> "organizational change" </figure></p>
-
-<p><hi rend="bold">Exact word match</hi> - Put a plus (+) sign before a word if it MUST appear in the search result. For instance, in the following search the word "training" is optional, but the word "dog" must be in the result.
-</p>
-<p><figure source="../static/images/help/search2.gif"> +dog training </figure></p>
-
-<p><hi rend="bold">Eliminate items with unwanted words</hi> - Put a minus (-) sign before a word if it should not appear in the search results. Alternatively, you can use NOT. This can limit your search to eliminate unwanted hits. For instance, in the search
-</p>
-<p><figure source="../static/images/help/search3.jpg"> training -cat </figure> or <figure source="../static/images/help/search4.jpg"> training NOT cat </figure></p>
-
-<p>you will get items containing the word "training", except those that also contain the word "cat".</p>
-
-<p><hi rend="bold">Boolean searching</hi> - The following Boolean operators can be used to combine terms. Note that they must be CAPITALIZED !</p>
-
-<p><hi rend="bold">AND</hi> - to limit searches to find items containing all words or phrases combined with this operator, e.g.</p>
-<p><figure source="../static/images/help/search5.jpg"> cats AND dogs </figure></p>
-<p>will retrieve all items that contain BOTH the words "cats" and "dogs".</p>
-
-<p><hi rend="bold">OR</hi> - to enlarge searches to find items containing any of the words or phrases surrounding this operator</p>
-<p><figure source="../static/images/help/search6.jpg"> cats OR dogs </figure></p>
-<p> will retrieve all items that contain EITHER the words "cats" or "dogs".</p>
-
-<p><hi rend="bold">NOT</hi> - to exclude items containing the word following this operator, e.g.</p>
-<p><figure source="../static/images/help/search4.jpg"> training NOT cat </figure></p>
-<p>will retrieve all items that contain the word "training" EXCEPT those also containing the word "cat".</p>
-
-<p>Parentheses can be used in the search query to group search terms into sets, and operators can then be applied to the whole set, e.g. </p>
-<p><figure source="../static/images/help/search7.jpg"> (cats OR dogs) AND (training OR discipline) </figure></p>
-<p>[ <xref target="#top">back to top</xref> ]</p>
-</div>
-
 
 <div id="advanced.search" n="advancedsearch">
-<head>How do I use the Advanced Search form?</head>
+<head>How do I use ADVANCED SEARCH?</head>
 <p>
-The advanced search page allows you to specify the fields you wish to search, and to combine these searches with the Boolean "and", "or" or "not".
+You will find three options on the Advanced Search page.  All of these allow you to search for a single word or multiple words.  Your options:
+<list n="filetypes" id="file.help.list.filetypes" type="numbered">
+	<item>Search by keywords in full-text of items plus many of the metadata fields in the records.  You may limit this search by a campus.</item>
+	<item>Search by keyword, as above, and include limits under Keyword Search by Field.  View these options by selecting, “[+] Search or Limit by Field.”</item>
+	<item>Search for words in specific fields.  Access this option by selecting, “[+] Search or Limit Field.”</item>
+</list>
 </p>
-<p>
-You can restrict your search to a community by clicking on the arrow to the right of the top box. If you want your search to encompass all of DSpace, leave that box in the default position.
+<p>The third option allows you to specify the field you wish to search and to include multiple fields in one search.  The searches are keyword searches; the text you enter will be used to retrieve items in which those words anywhere in the fields you select.  You also may choose to include words that you do not want to appear, by choosing, “Does Not Contain.”  This will help to exclude items that are not relevant to the results you want.
 </p>
-<p>
-Then select the field to search in the left hand column and enter the word or phrase you are searching in the right hand column. You can select the Boolean operator to combine searches by clicking on the arrow to the right of the "AND" box.
+<p>Fields available in Advanced Search:
+<list n="filetypes" id="file.help.list.filetypes" type="bulleted">
+	<item>Title</item>
+	<item>Author/Contributor</item>
+	<item>Subject</item>
+	<item>Subject:Place</item>
+	<item>Date Issued (year)</item>
+	<item>Sponsor</item>
+</list>
 </p>
+<p>After selecting a field, indicate whether the results should include the text (Contains) or exclude the text (Does Not Contains).  Use the plus sign to add additional fields in your search.</p>
 <p>
-<hi rend="bold">Note: You must use the input boxes in order. If you leave the first one blank your search will not work.</hi>
+<hi rend="bold">You must click on a “Search” button to execute the search.</hi>
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
 
-
-<div id="communities" n="communities">
-<head>What are Communities?</head>
+<div id="what.is.not.searched" n="whatissearched">
+<head>What words are NOT searched in a keyword search (Stop Words)?</head>
 <p>
-MOspace content is organized around Communities which can correspond to administrative entities such as schools, departments, labs and research centers. Within each community there can be an unlimited number subcommunities and an unlimited number of collections. Each collection may contain an unlimited number of items. This organization gives MOspace the flexibility to accommodate differing needs of communities by allowing them to
+The search engine ignores certain words that occur frequently in English, but do not add value to the search. These are:
+<list n="filetypes" id="file.help.list.filetypes" type="bulleted">
+	<item>a, an, and, are, as, at, be, but, by, for, if, in, into, is, it, no, not, of, on, or, such, that, the, their, then, there, these, they, this, to, was, will, with</item>
+</list>
 </p>
-<p>
-<list n="communityitems" id="file.help.list.community.items" type="bulleted">
-	<item>Decide on policies such as
-		<list n="communitypolicies" id="file.help.list.community.policies" type="bulleted">
-			<item>who contributes content</item>
-			<item>whether there will be a review process</item>
-			<item>who will have access</item>
-		</list>
-	</item>
-	<item>Determine workflow - reviewing, editing, metadata</item>
-	<item>Manage collections</item>
+<p>[ <xref target="#top">back to top</xref> ]</p>
+</div>
+
+<div id="other.search.options" n="otheroptions">
+<head>How do I limit search results and use facets</head>
+
+<p>MOspace uses facets to modify search results in the institutional repository.  You will see the different enabled facets displayed in a "Discover" section in your sidebar, by default, right below the Browse options. Applying a facet normally reduces the original search results. Many facets can be applied on the home page but generally they are applied after an initial search. Facets show counts for each value and allow the user to "drill down" or further restrict their search results based on those facets</p>
+<p>Our sidebar facets are:
+<list n="filetypes" id="file.help.list.filetypes" type="bulleted">
+	<item>Format</item>
+	<item>Subject</item>
+	<item>Date Issued</item>
+	<item>Author</item>
+	<item>Author/Contributor</item>
+	<item>Subect: Time Period</item>
+	<item>Subject: Place</item>
+	<item>Advisor</item>
+	<item>Thesis Department</item>
+	<item>Thesis Semester</item>
+	<item>Language</item>
 </list>
 </p>
 <p>
-Each community has its own entry page displaying information, news and links reflecting the interests of that community, as well as a descriptive list of collections within the community.
+It's important to know that multiple metadata fields can be included in one facet. An important feature of the facets is that their contents are automatically updated based on the context of the page.
+</p>
+<p>
+When using a keyword search in Advanced Search, you can limit your search results using the options under “Keyword search by field.”  On the Advanced Search page, you can access these by choosing, “Search or Limit by Field.”  This gives you the option to search for or exclude words in selected fields.  After executing a keyword search, you can further limit the search results by using facets, as described above.
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
 
-
-<div id="collections" n="collections">
-<head>What are Collections?</head>
+<div id="communities" n="communities">
+<head>What are Communities and Collections?</head>
 <p>
-Communities can maintain an unlimited number of collections in MOspace. Collections can be organized around a topic, or by type of information (such as working papers or datasets) or by any other sorting method a community finds useful in organizing its digital items. Collections can have different policies and workflows.
+MOspace content is organized around Communities and Sub-communities which correspond to administrative units such as schools, departments, labs, and research centers. Content in these are organized under collections. Communities, Sub-communities, and Collections have an entry page that may include information on that community or collection.  
 </p>
 <p>
-Each MOspace collection has its own entry page displaying information, news and links reflecting the interests of users of that collection.
+Collections can be organized around a topic, or by type of information (such as working papers or datasets) or by any other sorting method a community finds useful in organizing its digital items.
 </p>
-<p>[ <xref target="#top">back to top</xref> ]</p>
-</div>
-
 
 <div id="handles" n="handles">
 <head>What are Handles?</head>
 <p>
-When your item becomes a part of the MOspace repository it is assigned a persistent URL. This means that, unlike most URLs, this identifier will not have to be changed when the system migrates to new hardware, or when changes are made to the system. MOspace is committed to maintaining the integrity of this identifier so that you can safely use it to refer to your item when citing it in publications or other communications. Our persistent urls are registered with the <xref target="http://www.handle.net/">Handle System</xref>, a comprehensive system for assigning, managing, and resolving persistent identifiers, known as "handles," for digital objects and other resources on the Internet. The Handle System is administered by the <xref target="http://www.cnri.reston.va.us/">Corporation for National Research Initiatives (CNRI)</xref>, which undertakes, fosters, and promotes research in the public interest.
+MOspace items have persistent URLs.  There URLs are considered persistent, because they are registered with the <xref target="http://www.handle.net/">Handle System</xref>, a comprehensive system for assigning, managing, and resolving persistent identifiers. The use of handles means that, unlike most URLs, this identifier will not have to be changed when the system migrates to new hardware, or when changes are made to the system. 
+</p>
+<p>You will note that each item has two URLs associated with it.  Use the handle to ensure persistence.
+<list n="filetypes" id="file.help.list.filetypes" type="bulleted">
+	<item>Regular URL:  https://mospace.umsystem.edu/xmlui/handle/10355/8680</item>
+	<item>Handle:  http://hdl.handle.net/10355/8680</item>
+</list>
+The Handle System is administered by the <xref target="http://www.cnri.reston.va.us/">Corporation for National Research Initiatives (CNRI)</xref>, which undertakes, fosters, and promotes research in the public interest.
+</p>
+<p>
+MOspace is committed to maintaining the integrity of this identifier so that you can safely use it to refer to your item when citing it in publications or other communications. 
 </p>
 <p>[ <xref target="#top">back to top</xref> ]</p>
 </div>
-
-
-
-
-
 
 
 </div>
