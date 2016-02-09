@@ -2146,6 +2146,7 @@ public class ItemImport
 					
 					// create a new dspace context
 					context = new Context();
+					context.setRequiredItemWrapper(false);
 					eperson = EPerson.find(context, oldEPerson.getID());
 					context.setCurrentUser(eperson);
 					context.setIgnoreAuthorization(true);
