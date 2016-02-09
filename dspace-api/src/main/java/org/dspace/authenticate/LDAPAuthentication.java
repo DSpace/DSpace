@@ -36,7 +36,7 @@ import org.dspace.eperson.service.GroupService;
 /**
  * This combined LDAP authentication method supersedes both the 'LDAPAuthentication'
  * and the 'LDAPHierarchicalAuthentication' methods. It's capable of both:
- * - authenticaton  against a flat LDAP tree where all users are in the same unit
+ * - authentication  against a flat LDAP tree where all users are in the same unit
  *   (if search.user or search.password is not set)
  * - authentication against structured hierarchical LDAP trees of users. 
  *   An initial bind is required using a user name and password in order to
@@ -50,7 +50,7 @@ public class LDAPAuthentication
     implements AuthenticationMethod {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(LDAPAuthentication.class);
+    private static final Logger log = Logger.getLogger(LDAPAuthentication.class);
 
     protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -567,44 +567,48 @@ public class LDAPAuthentication
         }
 
         /**
-         * contact the ldap server and attempt to authenticate
+         * Contact the LDAP server and attempt to authenticate.
          */
         protected boolean ldapAuthenticate(String netid, String password,
                         Context context) {
-            if (!password.equals("")) {
+            Hashtable<String, String> env = new Hashtable<>();
+            if (null != password && !password.isEmpty()) {
                 // Set up environment for creating initial context
-                Hashtable<String, String> env = new Hashtable<String, String>();
                 env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY,
-                        "com.sun.jndi.ldap.LdapCtxFactory");
-                env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
+                        "com.sun.jndi.ldap.LdapCtxFactory"); // XXX is this needed?
+                if (null != ldap_provider_url)
+                    env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
 
                 // Authenticate
                 env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "Simple");
                 env.put(javax.naming.Context.SECURITY_PRINCIPAL, netid);
                 env.put(javax.naming.Context.SECURITY_CREDENTIALS, password);
-                env.put(javax.naming.Context.AUTHORITATIVE, "true");
-                env.put(javax.naming.Context.REFERRAL, "follow");
+            }
+            /* Else the LDAP provider may be externally configured in the "jndi.properties"
+             * application resource file.  See "Application Resource Files" in
+             * https://docs.oracle.com/javase/7/docs/api/javax/naming/Context.html
+             */
 
-                DirContext ctx = null;
-                try {
-                    // Try to bind
-                    ctx = new InitialDirContext(env);
-                } catch (NamingException e) {
-                    log.warn(LogManager.getHeader(context,
-                            "ldap_authentication", "type=failed_auth " + e));
-                    return false;
-                } finally {
-                    // Close the context when we're done
-                    try {
-                        if (ctx != null)
-                        {
-                            ctx.close();
-                        }
-                    } catch (NamingException e) {
-                    }
-                }
-            } else {
+            env.put(javax.naming.Context.AUTHORITATIVE, "true");
+            env.put(javax.naming.Context.REFERRAL, "follow");
+
+            DirContext ctx = null;
+            try {
+                // Try to bind
+                ctx = new InitialDirContext(env);
+            } catch (NamingException e) {
+                log.warn(LogManager.getHeader(context,
+                        "ldap_authentication", "type=failed_auth " + e));
                 return false;
+            } finally {
+                // Close the context when we're done
+                try {
+                    if (ctx != null)
+                    {
+                        ctx.close();
+                    }
+                } catch (NamingException e) {
+                }
             }
 
             return true;
