@@ -492,7 +492,8 @@ public class ItemImport
 
 
                 c.turnOffAuthorisationSystem();
-
+                c.setRequiredItemWrapper(false);
+                
                 if ("add".equals(command))
                 {
                     myloader.addItems(c, mycollections, sourcedir, mapfile, template);
