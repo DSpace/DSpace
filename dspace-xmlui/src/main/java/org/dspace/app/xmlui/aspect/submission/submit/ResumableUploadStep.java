@@ -32,9 +32,16 @@ public class ResumableUploadStep extends UploadStep{
             message("xmlui.Submission.submit.ResumableUploadStep.status");
     private static final Message T_column_info =
             message("xmlui.Submission.submit.ResumableUploadStep.info");
-    private static final Message T_column_delete =
+    
+    
+    private static final Message T_delete_message =
             message("xmlui.Submission.submit.ResumableUploadStep.delete");
+    private static final Message T_deletesf_message =
+            message("xmlui.Submission.submit.ResumableUploadStep.deletesf");
+    private static final Message T_deleteunmatch_message =
+            message("xmlui.Submission.submit.ResumableUploadStep.deleteunmatch");
 
+    
     public void addBody(Body body) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
     {
@@ -47,8 +54,17 @@ public class ResumableUploadStep extends UploadStep{
         div.setHead(T_submission_head);
         addSubmissionProgressList(div);
         
-        Division progressDiv = div.addDivision("submit-file-upload");
+        Division uploadDiv = div.addDivision("submit-file-upload");
+        Division drop = uploadDiv.addDivision("resumable-drop", "col-md-12");
         
+        Message T_column_delete = message("xmlui.Submission.submit.ResumableUploadStep.delete");
+        drop.addPara(T_column_delete);
+        
+        // progress bar and button
+        uploadDiv.addDivision("progress-button");
+        Division progressDiv = uploadDiv.addDivision("progress");
+        progressDiv.addDivision("progress-bar");
+                
         List upload = div.addList("submit-upload-new-list", List.TYPE_SIMPLE);
         submission.getID();
         
@@ -61,9 +77,9 @@ public class ResumableUploadStep extends UploadStep{
             bitstreams = bundles[0].getBitstreams();
         }
         
-        Table summary = progressDiv.addTable("submit-upload-summary",(bitstreams.length * 2) + 2,7);
+        Table summary = uploadDiv.addTable("resumable-upload-summary",(bitstreams.length * 2) + 2,7);
         summary.setHead(T_head2);
-
+        
         Row header = summary.addRow(Row.ROLE_HEADER);
         header.addCellContent(T_column0); // primary bitstream
         header.addCellContent(T_column_select);
@@ -79,7 +95,8 @@ public class ResumableUploadStep extends UploadStep{
             Row row = summary.addRow("bitstream-" + id, "data", "resumable-bitstream");
 
             // Add radio-button to select this as the primary bitstream
-            Radio primary = row.addCell().addRadio("primary_bitstream_id");
+            Radio primary = row.addCell("primary-" + id, Cell.ROLE_DATA, "file-primary").addRadio("primary_bitstream_id");
+            //Radio primary = row.addCell().addRadio("primary_bitstream_id");
             primary.addOption(String.valueOf(id));
 
             // If this bitstream is already marked as the primary bitstream
@@ -89,7 +106,8 @@ public class ResumableUploadStep extends UploadStep{
             }
 
             // select file
-            CheckBox select = row.addCell().addCheckBox("select");
+            CheckBox select = row.addCell("select-" + id, Cell.ROLE_DATA, "file-select").addCheckBox("select");
+            //CheckBox select = row.addCell().addCheckBox("select");
             select.addOption(String.valueOf(id));
             
             String url = makeBitstreamLink(item, bitstream);
@@ -111,6 +129,11 @@ public class ResumableUploadStep extends UploadStep{
             // delete
             row.addCell("delete-" + id, Cell.ROLE_DATA, "file-delete");
         }
+        
+        Division messages = div.addDivision("text-messages", "hide");
+        messages.addHidden("text-delete-msg").setValue(T_delete_message);
+        messages.addHidden("text-delete-sf").setValue(T_deletesf_message);
+        messages.addHidden("text-delete-unmatch").setValue(T_deleteunmatch_message);
         
         // add standard control/paging buttons
         addControlButtons(upload);
