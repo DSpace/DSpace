@@ -250,7 +250,7 @@ public class AuthorityMetadataValue {
      * @throws java.sql.SQLException
      * @throws org.dspace.authorize.AuthorizeException
      */
-    public void delete(Context context) throws SQLException, AuthorizeException
+    public void delete(Context context) throws SQLException
     {
         log.info(LogManager.getHeader(context, "delete_metadata_value",
                 " id=" + getValueId()));
@@ -265,7 +265,7 @@ public class AuthorityMetadataValue {
      * @throws java.sql.SQLException
      * @throws org.dspace.authorize.AuthorizeException
      */
-    public void create(Context context) throws SQLException, AuthorizeException
+    public void create(Context context) throws SQLException
     {
         // Create a table row and update it with the values
         row = DatabaseManager.row(tableName);
@@ -304,7 +304,7 @@ public class AuthorityMetadataValue {
      * @throws java.sql.SQLException
      * @throws org.dspace.authorize.AuthorizeException
      */
-    public void update(Context context) throws SQLException, AuthorizeException
+    public void update(Context context) throws SQLException
     {
         row.setColumn("parent_id", parentId);
         row.setColumn("field_id", fieldId);

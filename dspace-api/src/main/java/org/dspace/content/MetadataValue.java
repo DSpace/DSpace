@@ -256,9 +256,8 @@ public class MetadataValue
      * @param context
      *            DSpace context object
      * @throws SQLException
-     * @throws AuthorizeException
      */
-    public void create(Context context) throws SQLException, AuthorizeException
+    public void create(Context context) throws SQLException
     {
         // Create a table row and update it with the values
         row = DatabaseManager.row("MetadataValue");
@@ -286,10 +285,9 @@ public class MetadataValue
      * @return recalled metadata value
      * @throws IOException
      * @throws SQLException
-     * @throws AuthorizeException
      */
     public static MetadataValue find(Context context, int valueId)
-            throws IOException, SQLException, AuthorizeException
+            throws IOException, SQLException
     {
         // Grab rows from DB
         TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataValue",
@@ -331,10 +329,9 @@ public class MetadataValue
      * @return a collection of metadata values
      * @throws IOException
      * @throws SQLException
-     * @throws AuthorizeException
      */
     public static List<MetadataValue> findByField(Context context, int fieldId)
-            throws IOException, SQLException, AuthorizeException
+            throws IOException, SQLException
     {
         // Grab rows from DB
         TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataValue",
@@ -368,9 +365,8 @@ public class MetadataValue
      *
      * @param context dspace context
      * @throws SQLException
-     * @throws AuthorizeException
      */
-    public void update(Context context) throws SQLException, AuthorizeException
+    public void update(Context context) throws SQLException
     {
         row.setColumn("item_id", itemId);
         row.setColumn("metadata_field_id", fieldId);
@@ -390,9 +386,8 @@ public class MetadataValue
      *
      * @param context dspace context
      * @throws SQLException
-     * @throws AuthorizeException
      */
-    public void delete(Context context) throws SQLException, AuthorizeException
+    public void delete(Context context) throws SQLException
     {
         log.info(LogManager.getHeader(context, "delete_metadata_value",
                 " metadata_value_id=" + getValueId()));

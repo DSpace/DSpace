@@ -267,11 +267,9 @@ public class MetadataField
      * @param qualifier qualifier (may be ANY or null)
      * @return recalled metadata field
      * @throws SQLException
-     * @throws AuthorizeException
      */
     public static MetadataField findByElement(Context context, int schemaID,
-            String element, String qualifier) throws SQLException,
-            AuthorizeException
+            String element, String qualifier) throws SQLException
     {
         // Grab rows from DB
         TableRowIterator tri;
@@ -410,7 +408,7 @@ public class MetadataField
         if (!AuthorizeManager.isAdmin(context))
         {
             throw new AuthorizeException(
-                    "Only administrators may modiffy the Dublin Core registry");
+                    "Only administrators may modify the Dublin Core registry");
         }
 
         // Check to see if the schema ID was altered. If is was then we will
@@ -453,11 +451,9 @@ public class MetadataField
      * @param qualifier qualifier name
      * @return true if the field exists
      * @throws SQLException
-     * @throws AuthorizeException
      */
     private static boolean hasElement(Context context, int schemaID,
-            String element, String qualifier) throws SQLException,
-            AuthorizeException
+            String element, String qualifier) throws SQLException
     {
         return MetadataField.findByElement(context, schemaID, element,
                 qualifier) != null;
@@ -496,13 +492,11 @@ public class MetadataField
      * @param element
      * @param qualifier
      * @return true if unique
-     * @throws AuthorizeException
      * @throws SQLException
      * @throws IOException
      */
     private boolean unique(Context context, int schemaID, String element,
-            String qualifier) throws IOException, SQLException,
-            AuthorizeException
+            String qualifier) throws IOException, SQLException
     {
         int count = 0;
         Connection con = null;
