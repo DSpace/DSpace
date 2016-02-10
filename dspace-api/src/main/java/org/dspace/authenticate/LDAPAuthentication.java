@@ -45,29 +45,36 @@ import org.dspace.eperson.service.GroupService;
 /**
  * This combined LDAP authentication method supersedes both the 'LDAPAuthentication'
  * and the 'LDAPHierarchicalAuthentication' methods. It's capable of both:
- * - authenticaton  against a flat LDAP tree where all users are in the same unit
+ * - authentication against a flat LDAP tree where all users are in the same unit
  * (if search.user or search.password is not set)
  * - authentication against structured hierarchical LDAP trees of users.
  * An initial bind is required using a user name and password in order to
  * search the tree and find the DN of the user. A second bind is then required to
  * check the credentials of the user by binding directly to their DN.
  *
- * @author Stuart Lewis, Chris Yates, Alex Barbieri, Flavio Botelho, Reuben Pasquini, Samuel Ottenhoff, Ivan Masár
- * @version $Revision$
+ * @author Stuart Lewis
+ * @author Chris Yates
+ * @author Alex Barbieri
+ * @author Flavio Botelho
+ * @author Reuben Pasquini
+ * @author Samuel Ottenhoff
+ * @author Ivan Masár
  */
+@SuppressWarnings("UseOfObsoleteCollectionType")
 public class LDAPAuthentication
     implements AuthenticationMethod {
 
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(LDAPAuthentication.class);
+    private static final Logger log = LogManager.getLogger(LDAPAuthentication.class);
 
-    protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance()
-                                                                                      .getAuthenticationService();
-    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-
+    protected AuthenticationService authenticationService
+            = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+    protected EPersonService ePersonService
+            = EPersonServiceFactory.getInstance().getEPersonService();
+    protected GroupService groupService
+            = EPersonServiceFactory.getInstance().getGroupService();
 
     /**
      * Let a real auth method return true if it wants.
@@ -399,7 +406,7 @@ public class LDAPAuthentication
             }
 
             // Set up environment for creating initial context
-            Hashtable<String, String> env = new Hashtable<String, String>();
+            Hashtable<String, String> env = new Hashtable<>();
             env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
             env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
 
@@ -555,7 +562,7 @@ public class LDAPAuthentication
 
 
                 // Set up environment for creating initial context
-                Hashtable<String, String> env = new Hashtable<String, String>();
+                Hashtable<String, String> env = new Hashtable<>();
                 env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY,
                         "com.sun.jndi.ldap.LdapCtxFactory");
                 env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
