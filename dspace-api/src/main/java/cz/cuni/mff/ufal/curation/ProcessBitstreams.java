@@ -1,9 +1,9 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal.curation;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.zip.GZIPInputStream;
@@ -130,7 +130,7 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
         return ret;
     }
 
-    static ArchiveInputStream getIS(String mime, InputStream is) {
+    static InputStream getIS(String mime, InputStream is) {
         if ( mime.equals("application/zip") ) {
             return new ZipArchiveInputStream(is);
         }
@@ -143,6 +143,9 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
         }
         else if ( mime.equals("application/x-xz") ) {
         }
+        else if ( mime.startsWith("text/plain") ) {
+        	return is;
+        }
         return null;
     }
 
@@ -152,16 +155,24 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
         //
         try {
             String mime = b.getFormat().getMIMEType();
-            ArchiveInputStream is = getIS(mime, b.retrieve());
+            InputStream is = getIS(mime, b.retrieve());
             if ( null == is ) {
                 return SKIPPED;
             }
-            ArchiveEntry entry;
-            while ((entry = is.getNextEntry()) != null) {
-                String content = String.format(
-                    "%s|%d", entry.getName(), entry.getSize()
-                );
-                b.addMetadata( schema, element, "file", Item.ANY, content );
+            if(is instanceof ArchiveInputStream) {
+            	ArchiveInputStream ais = (ArchiveInputStream)is;
+	            ArchiveEntry entry;
+	            while ((entry = ais.getNextEntry()) != null) {
+	                String content = String.format(
+	                    "%s|%d", entry.getName(), entry.getSize()
+	                );
+	                b.addMetadata( schema, element, "file", Item.ANY, content );
+	            }
+            } else {
+            	InputStreamReader r = new InputStreamReader(is);
+            	char cbuf[] = new char[1000];
+            	r.read(cbuf, 0, 1000);
+            	b.addMetadata( schema, element, "file", Item.ANY, new String(cbuf) );            	
             }
         } catch (Exception e) {
             log.error(e);

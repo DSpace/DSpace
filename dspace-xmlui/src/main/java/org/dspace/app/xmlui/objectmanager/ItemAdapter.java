@@ -1140,3 +1140,4 @@ public class ItemAdapter extends AbstractAdapter
         endElement(METS,"file");
 	}
 }
+
