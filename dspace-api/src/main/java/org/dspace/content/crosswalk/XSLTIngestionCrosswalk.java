@@ -138,7 +138,7 @@ public class XSLTIngestionCrosswalk
         }
         try
         {
-            List dimList = xform.transform(metadata);
+            List<Element> dimList = xform.transform(metadata);
             ingestDIM(context, dso, dimList, createMissingMetadataFields);
         }
         catch (XSLTransformException e)
@@ -305,7 +305,7 @@ public class XSLTIngestionCrosswalk
         Document inDoc = builder.build(new FileInputStream(argv[i+1]));
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         Document dimDoc = null;
-        List dimList = null;
+        List<Element> dimList = null;
         if (list)
         {
             dimList = xform.transform(inDoc.getRootElement().getChildren());

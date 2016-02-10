@@ -31,6 +31,7 @@ import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.jdom2.Document;
+import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.Verifier;
@@ -259,7 +260,9 @@ public class XSLTDisseminationCrosswalk
 
         try
         {
-            return xform.transform(createDIM(dso).getChildren());
+//            return xform.transform(createDIM(dso).getChildren());
+            List<Content> children = createDIM(dso).getChildren();
+            return xform.transform(children);
         }
         catch (XSLTransformException e)
         {

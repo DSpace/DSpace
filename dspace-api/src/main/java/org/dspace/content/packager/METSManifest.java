@@ -36,12 +36,14 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.jdom2.Document;
 import org.jdom2.Content;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.jdom2.xpath.XPath;
+import org.jdom2.xpath.XPathFactory;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.filter.Filters;
+
 
 /**
  * <P>
@@ -287,7 +289,7 @@ public class METSManifest
              * log.debug(outputPretty.outputString(metsDocument));
              ****/
         }
-        catch (JDOMException je)
+        catch (Exception je)
         {
             throw new MetadataValidationException("Error validating METS in "
                     + is.toString(),  je);
@@ -387,11 +389,10 @@ public class METSManifest
             {
                 // Use a special namespace with known prefix
                 // so we get the right prefix.
-                XPath xpath = XPath.newInstance("descendant::mets:mdRef");
-                xpath.addNamespace(metsNS);
-                mdFiles = xpath.selectNodes(mets);
+                XPathExpression<Element> xpath = XPathFactory.instance().compile("descendant::mets:mdRef", Filters.element());
+                mdFiles = xpath.evaluate(mets);
             }
-            catch (JDOMException je)
+            catch (Exception je)
             {
                 throw new MetadataValidationException("Failed while searching for mdRef elements in manifest: ", je);
             }
@@ -421,10 +422,9 @@ public class METSManifest
 
         try
         {
-            XPath xpath = XPath.newInstance(
-"mets:fileSec/mets:fileGrp[@USE=\"CONTENT\"]/mets:file[@GROUPID=\""+groupID+"\"]");
-            xpath.addNamespace(metsNS);
-            List oFiles = xpath.selectNodes(mets);
+            XPathExpression<Element> xpath = XPathFactory.instance().compile("mets:fileSec/mets:fileGrp[@USE=\"CONTENT\"]/mets:file[@GROUPID=\""+groupID+"\"]", Filters.element());
+            List<Element> oFiles = xpath.evaluate(mets);
+
             if (oFiles.size() > 0)
             {
                 if (log.isDebugEnabled())
@@ -439,7 +439,7 @@ public class METSManifest
             }
                 return null;
         }
-        catch (JDOMException je)
+        catch (Exception je)
         {
             log.warn("Got exception on XPATH looking for Original file, "+je.toString());
             return null;
@@ -723,7 +723,7 @@ public class METSManifest
                 }
             }
         }
-        catch (JDOMException je)
+        catch (Exception je)
         {
             throw new MetadataValidationException("Error parsing or validating metadata section in mdRef or binData within "+mdSec.toString(), je);
         }
@@ -944,10 +944,9 @@ public class METSManifest
     {
         try
         {
-            XPath xpath = XPath.newInstance(path);
-            xpath.addNamespace(metsNS);
-            xpath.addNamespace(xlinkNS);
-            Object result = xpath.selectSingleNode(mets);
+            XPathExpression<Element> xpath = XPathFactory.instance().compile(path, Filters.element());
+            Element result = xpath.evaluateFirst(mets);
+
             if (result == null && nullOk)
             {
                 return null;
@@ -956,12 +955,12 @@ public class METSManifest
             {
                 return (Element) result;
             }
-            else
+            else // TODO: left over from upgrade to JDOM2: this shouldn't happen
             {
                 throw new MetadataValidationException("METSManifest: Failed to resolve XPath, path=\"" + path + "\"");
             }
         }
-        catch (JDOMException je)
+        catch (Exception je)
         {
             throw new MetadataValidationException("METSManifest: Failed to resolve XPath, path=\""+path+"\"", je);
         }

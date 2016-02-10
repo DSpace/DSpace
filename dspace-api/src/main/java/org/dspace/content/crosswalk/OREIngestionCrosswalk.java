@@ -37,9 +37,11 @@ import org.dspace.core.Context;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.xpath.XPath;
+import org.jdom2.xpath.XPathFactory;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.filter.Filters;
+
 
 /**
  * ORE ingestion crosswalk
@@ -114,23 +116,19 @@ public class OREIngestionCrosswalk
         Document doc = new Document();
         doc.addContent(root.detach());
         
-        XPath xpathLinks;
         List<Element> aggregatedResources;
         String entryId;
-		try {
-			xpathLinks = XPath.newInstance("/atom:entry/atom:link[@rel=\"" + ORE_NS.getURI()+"aggregates" + "\"]");
-			xpathLinks.addNamespace(ATOM_NS);
-	        aggregatedResources = xpathLinks.selectNodes(doc);
-	        
-	        xpathLinks = XPath.newInstance("/atom:entry/atom:link[@rel='alternate']/@href");
-	        xpathLinks.addNamespace(ATOM_NS);
-	        entryId = ((Attribute)xpathLinks.selectSingleNode(doc)).getValue();
-		} catch (JDOMException e) {
-			throw new CrosswalkException("JDOM exception occurred while ingesting the ORE", e);
-		}
+        try {
+            XPathExpression<Element> xpathLinks1 = XPathFactory.instance().compile("/atom:entry/atom:link[@rel=\"" + ORE_NS.getURI()+"aggregates" + "\"]", Filters.element());
+            aggregatedResources = xpathLinks1.evaluate(doc);
+            
+            XPathExpression<Element> xpathLinks2 = XPathFactory.instance().compile("/atom:entry/atom:link[@rel='alternate']/@href", Filters.element());
+            entryId = xpathLinks2.evaluateFirst(doc).getValue();
+        } catch (Exception e) {
+            throw new CrosswalkException("JDOM exception occurred while ingesting the ORE", e);
+        }
 
 		// Next for each resource, create a bitstream
-    	XPath xpathDesc;
     	NumberFormat nf=NumberFormat.getInstance(); 
 		nf.setGroupingUsed(false);
 		nf.setMinimumIntegerDigits(4);  
@@ -142,15 +140,12 @@ public class OREIngestionCrosswalk
         	
         	String bundleName;
         	Element desc = null;
-        	try {
-        		xpathDesc = XPath.newInstance("/atom:entry/oreatom:triples/rdf:Description[@rdf:about=\"" + this.encodeForURL(href) + "\"][1]");
-        		xpathDesc.addNamespace(ATOM_NS);
-        		xpathDesc.addNamespace(ORE_ATOM);
-        		xpathDesc.addNamespace(RDF_NS);
-        		desc = (Element)xpathDesc.selectSingleNode(doc);
-        	} catch (JDOMException e) {
-        		e.printStackTrace();
-        	}
+            try {
+                XPathExpression<Element> xpathDesc = XPathFactory.instance().compile("/atom:entry/oreatom:triples/rdf:Description[@rdf:about=\"" + this.encodeForURL(href) + "\"][1]", Filters.element());
+                desc = xpathDesc.evaluateFirst(doc);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         	
         	if (desc != null && desc.getChild("type", RDF_NS).getAttributeValue("resource", RDF_NS).equals(DS_NS.getURI() + "DSpaceBitstream"))
         	{

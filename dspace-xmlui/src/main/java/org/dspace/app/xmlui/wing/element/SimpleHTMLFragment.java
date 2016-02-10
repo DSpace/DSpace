@@ -282,7 +282,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
             }
 		}
 
-		element.setAttributes(new ArrayList<Attributes>());
+		element.setAttributes(new ArrayList<Attribute>());
 
 		for (Map.Entry<String, String> attr : attributes.entrySet()) {
 			element.setAttribute(attr.getKey(), attr.getValue());
