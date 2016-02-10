@@ -1,28 +1,24 @@
 package org.dspace.submit.step;
 
-import org.dspace.content.Collection;
-import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.app.util.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
-import org.apache.log4j.Logger;
+import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.core.Context;
+import org.dspace.submit.step.DescribeStep;
+import org.dspace.usagelogging.EventLogger;
 import org.dspace.workflow.DryadWorkflowUtils;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
 import java.io.IOException;
-import java.io.InputStream;
+import java.lang.String;
 import java.sql.SQLException;
-import java.util.*;
-import org.dspace.usagelogging.EventLogger;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * User: @author kevinvandevelde (kevin at atmire.com)
@@ -31,51 +27,7 @@ import org.dspace.usagelogging.EventLogger;
  *
  * The processing of the describe page for a data file
  */
-public class DescribeDatasetStep extends AbstractProcessingStep {
-
-    /**
-     * hash of all submission forms details
-     */
-    private static DCInputsReader inputsReader;
-
-    /***************************************************************************
-     * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
-     * additional user interaction may be required)
-     *
-     * (Do NOT use status of 0, since it corresponds to STATUS_COMPLETE flag
-     * defined in the JSPStepManager class)
-     **************************************************************************/
-    // user requested an extra input field to be displayed
-    public static final int STATUS_MORE_INPUT_REQUESTED = 1;
-
-    // there were required fields that were not filled out
-    public static final int STATUS_MISSING_REQUIRED_FIELDS = 2;
-    public static final int STATUS_FILE_UPLOAD_ONLY = 3;
-
-    private static final int FILE_UPLOAD_ERROR = 0;
-    private static final int FILE_NO_UPLOAD = 1;
-    private static final int FILE_UPLOAD_OK = 2;
-
-    // the metadata language qualifier
-    public static final String LANGUAGE_QUALIFIER = getDefaultLanguageQualifier();
-
-     /**
-     * log4j logger
-     */
-    private static Logger log = Logger.getLogger(DescribeDatasetStep.class);
-
-
-
-    /**
-     * Constructor
-     * @throws javax.servlet.ServletException thrown if we have problems with our dcinputsreader
-     */
-    public DescribeDatasetStep() throws ServletException {
-        //load the DCInputsReader
-        getInputsReader();
-    }
-
-
+public class DescribeDatasetStep extends DescribeStep {
     public int doProcessing(Context context, HttpServletRequest request, HttpServletResponse response, SubmissionInfo subInfo) throws ServletException, IOException, SQLException, AuthorizeException {
         // check what submit button was pressed in User Interface
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
@@ -171,7 +123,10 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
                 String[] vals = request.getParameterValues(fieldName);
                 if (vals != null) {
                     for (String val : vals) {
-                        item.addMetadata(schema, element, qualifier, LANGUAGE_QUALIFIER,val);
+                        if (!val.equals("")) {
+                            item.addMetadata(schema, element, qualifier, LANGUAGE_QUALIFIER,
+                                    val);
+                        }
                     }
                 }
             } else if (inputType.equals("series")) {
@@ -181,9 +136,9 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
                 readSeriesNumbersWithYear(request, item, schema, element, qualifier,
                         input.getRepeatable());
             } else if (inputType.equals("qualdrop_value")) {
-                List quals = getRepeatedParameter(request, schema + "_"
+                List<String> quals = getRepeatedParameter(request, schema + "_"
                         + element, schema + "_" + element + "_qualifier");
-                List vals = getRepeatedParameter(request, schema + "_"
+                List<String> vals = getRepeatedParameter(request, schema + "_"
                         + element, schema + "_" + element + "_value");
                 for (int z = 0; z < vals.size(); z++) {
                     String thisQual = (String) quals.get(z);
@@ -353,424 +308,12 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
         return STATUS_COMPLETE;
     }
 
-    private void removeBitstream(Context context, Item item, int bitId) throws SQLException, AuthorizeException, IOException {
-        Bitstream bit = Bitstream.find(context, bitId);
-        if(bit != null){
-            Bundle owningBundle = bit.getBundles()[0];
-            owningBundle.removeBitstream(bit);
-            // remove bundle if it's now empty
-            Bitstream[] bitstreams = owningBundle.getBitstreams();
-            if (bitstreams.length < 1)
-            {
-                item.removeBundle(owningBundle);
-                item.update();
-            }
-        }
-    }
-
-    private void removeAllBitstreams(Context context, Item item) throws SQLException, AuthorizeException, IOException {
-        Bundle[] bundles = item.getBundles();
-        for(Bundle b : bundles){
-            for(Bitstream bit : b.getBitstreams()){
-                removeBitstream(context, item, bit.getID());
-            }
-        }
-    }
-
-
-    public int getNumberOfPages(HttpServletRequest request, SubmissionInfo submissionInfo) throws ServletException {
-        // by default, use the "default" collection handle
-        String collectionHandle = DCInputsReader.DEFAULT_COLLECTION;
-
-        if (submissionInfo.getSubmissionItem() != null)
-        {
-            collectionHandle = submissionInfo.getSubmissionItem().getCollection()
-                    .getHandle();
-        }
-
-        // get number of input pages (i.e. "Describe" pages)
-        try
-        {
-            return getInputsReader().getNumberInputPages(collectionHandle);
-        }
-        catch (DCInputsReaderException e)
-        {
-            throw new ServletException(e);
-        }
-    }
-
-
-    protected int processUploadFile(Context context, HttpServletRequest request,
-                                        SubmissionInfo subInfo, String fileParam, boolean isReadmeFile)
-            throws ServletException, IOException, SQLException,
-            AuthorizeException {
-//        boolean formatKnown = true;
-        boolean fileOK = false;
-        BitstreamFormat bf;
-        Bitstream b;
-
-        //NOTE: File should already be uploaded.
-        //Manakin does this automatically via Cocoon.
-        //For JSP-UI, the SubmissionController.uploadFiles() does the actual upload
-
-        Enumeration attNames = request.getAttributeNames();
-
-        //loop through our request attributes
-        while (attNames.hasMoreElements()) {
-            String attr = (String) attNames.nextElement();
-
-            //if this ends with "-path", this attribute
-            //represents a newly uploaded file
-            if (attr.equals(fileParam + "-path")) {
-                //strip off the -path to get the actual parameter
-                //that the file was uploaded as
-
-                // Load the file's path and input stream and description
-                String filePath = (String) request.getAttribute(fileParam + "-path");
-                InputStream fileInputStream = (InputStream) request
-                        .getAttribute(fileParam + "-inputstream");
-
-
-
-                //attempt to get description from attribute first, then direct from a parameter
-                String fileDescription = (String) request
-                        .getAttribute(fileParam + "-description");
-                if (fileDescription == null || fileDescription.length() == 0)
-                    fileDescription = request.getParameter(fileParam + "-description");
-
-                // if information wasn't passed by User Interface, we had a problem
-                // with the upload
-                if (filePath == null || fileInputStream == null) {
-                    EventLogger.log(context, "submission-describe-dataset", "subaction=file_upload,error=missing_file");
-                    return FILE_UPLOAD_ERROR;
-                }
-
-                if (subInfo != null) {
-                    // Create the bitstream
-                    Item item = subInfo.getSubmissionItem().getItem();
-
-                    // do we already have a bundle?
-                    Bundle[] bundles = item.getBundles("ORIGINAL");
-
-                    if (bundles.length < 1) {
-                        // set bundle's name to ORIGINAL
-                        b = item.createSingleBitstream(fileInputStream, "ORIGINAL");
-                    } else {
-                        // we have a bundle already, just add bitstream
-                        b = bundles[0].createBitstream(fileInputStream);
-                    }
-
-                    // Strip all but the last filename. It would be nice
-                    // to know which OS the file came from.
-                    String noPath = filePath;
-
-                    while (noPath.indexOf('/') > -1) {
-                        noPath = noPath.substring(noPath.indexOf('/') + 1);
-                    }
-
-                    while (noPath.indexOf('\\') > -1) {
-                        noPath = noPath.substring(noPath.indexOf('\\') + 1);
-                    }
-
-                    //For a readme file we change the name to README
-                    if(isReadmeFile) {
-			String readmeExtension = "";
-			if(noPath.lastIndexOf(".") > 0) {
-			    readmeExtension = noPath.substring(noPath.lastIndexOf("."));
-			}
-			b.setName("README" + readmeExtension);
-		    } else {
-                        b.setName(noPath);
-		    }
-                    b.setSource(filePath);
-                    b.setDescription(fileDescription);
-
-                    // Identify the format
-                    bf = FormatIdentifier.guessFormat(context, b);
-                    b.setFormat(bf);
-
-                    // Update to DB
-                    b.update();
-                    item.update();
-
-                    if (bf == null || !bf.isInternal()) {
-                        fileOK = true;
-                    } else {
-                        log.warn("Attempt to upload file format marked as internal system use only");
-
-                        // remove bitstream from bundle..
-                        // delete bundle if it's now empty
-                        Bundle[] bnd = b.getBundles();
-
-                        bnd[0].removeBitstream(b);
-
-                        Bitstream[] bitstreams = bnd[0].getBitstreams();
-
-                        // remove bundle if it's now empty
-                        if (bitstreams.length < 1) {
-                            item.removeBundle(bnd[0]);
-                            item.update();
-                        }
-
-                        subInfo.setBitstream(null);
-                    }
-                }// if subInfo not null
-                else {
-                    // In any event, if we don't have the submission info, the request
-                    // was malformed
-                    EventLogger.log(context, "submission-describe-dataset", "subaction=file_upload,error=malformed_request");
-                    return FILE_UPLOAD_ERROR;
-                }
-
-                // as long as everything completed ok, commit changes. Otherwise show
-                // error page.
-                if (fileOK) {
-                    context.commit();
-
-                    // save this bitstream to the submission info, as the
-                    // bitstream we're currently working with
-                    subInfo.setBitstream(b);
-                    EventLogger.log(context, "submission-describe-dataset", "subaction=file_upload,size=" + b.getSize() + ",status=uploaded");
-
-                    return FILE_UPLOAD_OK;
-                    //if format was not identified
-//                    if (bf == null)
-//                    {
-                    // the bitstream format is unknown!
-//                        formatKnown=false;
-//                    }
-                } else {
-                    // if we get here there was a problem uploading the file!
-                    EventLogger.log(context, "submission-describe-dataset", "subaction=file_upload,error=unknown");
-                    return FILE_UPLOAD_ERROR;
-                }
-            }//end if attribute ends with "-path"
-        }//end while
-
-        return FILE_NO_UPLOAD;
-
-    }
-
-    private int processExternalUrl(HttpServletRequest request, SubmissionInfo subInfo) throws AuthorizeException, IOException, SQLException {
-        String identifier = request.getParameter("datafile_identifier");
-        String repository = request.getParameter("datafile_repo");
-        String otherRepoName = request.getParameter("other_repo_name");
-
-        if(identifier == null || identifier.trim().equals("") || repository == null || repository.equals("select-repo") || (repository.equals("other") && otherRepoName != null && "".equals(otherRepoName.trim())))
-            return FILE_UPLOAD_ERROR;
-
-
-        if(otherRepoName != null)
-            otherRepoName = otherRepoName.replaceAll("[^a-zA-Z0-9]", "");
-        DCRepositoryFile repoFile = new DCRepositoryFile(identifier, "other".equals(repository) ? otherRepoName : repository);
-
-        subInfo.getSubmissionItem().getItem().clearMetadata("dryad", "externalIdentifier", null, Item.ANY);
-        subInfo.getSubmissionItem().getItem().addMetadata("dryad", "externalIdentifier", null, null, repoFile.toString());
-        subInfo.getSubmissionItem().update();
-        return FILE_UPLOAD_OK;
-    }
-
-    /**
-     * @return the current DCInputsReader
-     * @throws javax.servlet.ServletException thrown if we have problems with the dcinputsreader
-     */
-    public static DCInputsReader getInputsReader() throws ServletException {
-        // load inputsReader only the first time
-        if (inputsReader == null) {
-            // read configurable submissions forms data
-            try {
-                inputsReader = new DCInputsReader();
-            }
-            catch (DCInputsReaderException e) {
-                throw new ServletException(e);
-            }
-        }
-
-        return inputsReader;
-    }
-
-
-    /**
-     * @return the default language qualifier for metadata
-     */
-
-    public static String getDefaultLanguageQualifier()
-    {
-       String language;
-       language = ConfigurationManager.getProperty("default.language");
-       if (language == null)
-       {
-	   // if there is no default set, ensure it is blank
-           language = "";
-       }
-       return language;
-    }
-
-
     // ****************************************************************
     // ****************************************************************
     // METHODS FOR FILLING DC FIELDS FROM METADATA FORMS
     // ****************************************************************
     // ****************************************************************
 
-    /**
-     * Set relevant metadata fields in an item from name values in the form.
-     * Some fields are repeatable in the form. If this is the case, and the
-     * field is "dc.contributor.author", the names in the request will be from
-     * the fields as follows:
-     *
-     * dc_contributor_author_last -> last name of first author
-     * dc_contributor_author_first -> first name(s) of first author
-     * dc_contributor_author_last_1 -> last name of second author
-     * dc_contributor_author_first_1 -> first name(s) of second author
-     *
-     * and so on. If the field is unqualified:
-     *
-     * dc_contributor_last -> last name of first contributor
-     * dc_contributor_first -> first name(s) of first contributor
-     *
-     * If the parameter "submit_dc_contributor_author_remove_n" is set, that
-     * value is removed.
-     *
-     * Otherwise the parameters are of the form:
-     *
-     * dc_contributor_author_last dc_contributor_author_first
-     *
-     * The values will be put in separate DCValues, in the form "last name,
-     * first name(s)", ordered as they appear in the list. These will replace
-     * any existing values.
-     *
-     * @param request
-     *            the request object
-     * @param item
-     *            the item to update
-     * @param schema
-     *            the metadata schema
-     * @param element
-     *            the metadata element
-     * @param qualifier
-     *            the metadata qualifier, or null if unqualified
-     * @param repeated
-     *            set to true if the field is repeatable on the form
-     */
-    protected void readNames(HttpServletRequest request, Item item,
-            String schema, String element, String qualifier, boolean repeated)
-    {
-        String metadataField = MetadataField
-                .formKey(schema, element, qualifier);
-
-        String fieldKey = MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
-        boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
-
-        // Names to add
-        List firsts = new LinkedList();
-        List lasts = new LinkedList();
-        List auths = new LinkedList();
-        List confs = new LinkedList();
-
-        if (repeated)
-        {
-            firsts = getRepeatedParameter(request, metadataField, metadataField
-                    + "_first");
-            lasts = getRepeatedParameter(request, metadataField, metadataField
-                    + "_last");
-            auths = getRepeatedParameter(request, metadataField, metadataField
-                    + "_authority");
-            confs = getRepeatedParameter(request, metadataField, metadataField
-                    + "_confidence");
-
-            // Find out if the relevant "remove" button was pressed
-            // TODO: These separate remove buttons are only relevant
-            // for DSpace JSP UI, and the code below can be removed
-            // once the DSpace JSP UI is obsolete!
-            String buttonPressed = Util.getSubmitButton(request, "");
-            String removeButton = "submit_" + metadataField + "_remove_";
-
-            if (buttonPressed.startsWith(removeButton))
-            {
-                int valToRemove = Integer.parseInt(buttonPressed
-                        .substring(removeButton.length()));
-
-                firsts.remove(valToRemove);
-                lasts.remove(valToRemove);
-                auths.remove(valToRemove);
-                confs.remove(valToRemove);
-            }
-        }
-        else
-        {
-            // Just a single name
-            String lastName = request.getParameter(metadataField + "_last");
-            String firstNames = request.getParameter(metadataField + "_first");
-            String authority = request.getParameter(metadataField + "_authority");
-            String confidence = request.getParameter(metadataField + "_confidence");
-
-            if (lastName != null)
-                lasts.add(lastName);
-            if (firstNames != null)
-                firsts.add(firstNames);
-            auths.add(authority == null ? "" : authority);
-            confs.add(confidence == null ? "" : confidence);
-        }
-
-        // Remove existing values, already done in doProcessing see also bug DS-203
-        // item.clearMetadata(schema, element, qualifier, Item.ANY);
-
-        // Put the names in the correct form
-        for (int i = 0; i < lasts.size(); i++)
-        {
-            String f = (String) firsts.get(i);
-            String l = (String) lasts.get(i);
-
-            // only add if lastname is non-empty
-            if ((l != null) && !((l.trim()).equals("")))
-            {
-                // Ensure first name non-null
-                if (f == null)
-                {
-                    f = "";
-                }
-
-                // If there is a comma in the last name, we take everything
-                // after that comma, and add it to the right of the
-                // first name
-                int comma = l.indexOf(',');
-
-                if (comma >= 0)
-                {
-                    f = f + l.substring(comma + 1);
-                    l = l.substring(0, comma);
-
-                    // Remove leading whitespace from first name
-                    while (f.startsWith(" "))
-                    {
-                        f = f.substring(1);
-                    }
-                }
-
-                // Add to the database -- unless required authority is missing
-                if (isAuthorityControlled)
-                {
-                    String authKey = auths.size() > i ? (String)auths.get(i) : null;
-                    String sconf = (authKey != null && confs.size() > i) ? (String)confs.get(i) : null;
-                    if (MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey) &&
-                        (authKey == null || authKey.length() == 0))
-                    {
-                        log.warn("Skipping value of "+metadataField+" because the required Authority key is missing or empty.");
-                        addErrorField(request, metadataField);
-                    }
-                    else
-                        item.addMetadata(schema, element, qualifier, null,
-                                new DCPersonName(l, f).toString(), authKey,
-                                (sconf != null && sconf.length() > 0) ?
-                                    Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
-                }
-                else
-                    item.addMetadata(schema, element, qualifier, null,
-                        new DCPersonName(l, f).toString());
-            }
-        }
-    }
 
     /**
      * Fill out an item's metadata values from a plain standard text field. If
@@ -816,9 +359,9 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
         boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
 
         // Values to add
-        List vals = null;
-        List auths = null;
-        List confs = null;
+        List<String> vals = null;
+        List<String> auths = null;
+        List<String> confs = null;
 
         if (repeated)
         {
@@ -894,290 +437,6 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
     }
 
     /**
-     * Fill out a metadata date field with the value from a form. The date is
-     * taken from the three parameters:
-     *
-     * element_qualifier_year element_qualifier_month element_qualifier_day
-     *
-     * The granularity is determined by the values that are actually set. If the
-     * year isn't set (or is invalid)
-     *
-     * @param request
-     *            the request object
-     * @param item
-     *            the item to update
-     * @param schema
-     *            the metadata schema
-     * @param element
-     *            the metadata element
-     * @param qualifier
-     *            the metadata qualifier, or null if unqualified
-     * @throws SQLException ...
-     */
-    protected void readDate(HttpServletRequest request, Item item, String schema,
-            String element, String qualifier) throws SQLException
-    {
-        String metadataField = MetadataField
-                .formKey(schema, element, qualifier);
-
-        int year = Util.getIntParameter(request, metadataField + "_year");
-        int month = Util.getIntParameter(request, metadataField + "_month");
-        int day = Util.getIntParameter(request, metadataField + "_day");
-
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, year);
-        cal.set(Calendar.MONTH, month);
-        cal.set(Calendar.DATE, day);
-
-        // FIXME: Probably should be some more validation
-        // Make a standard format date
-        DCDate d = new DCDate(cal.getTime());
-
-
-        // already done in doProcessing see also bug DS-203
-        // item.clearMetadata(schema, element, qualifier, Item.ANY);
-
-        if (year > 0)
-        {
-            // Only put in date if there is one!
-            item.addMetadata(schema, element, qualifier, null, d.toString());
-        }
-    }
-
-    /**
-     * Set relevant metadata fields in an item from series/number values in the
-     * form. Some fields are repeatable in the form. If this is the case, and
-     * the field is "relation.ispartof", the names in the request will be from
-     * the fields as follows:
-     *
-     * dc_relation_ispartof_series dc_relation_ispartof_number
-     * dc_relation_ispartof_series_1 dc_relation_ispartof_number_1
-     *
-     * and so on. If the field is unqualified:
-     *
-     * dc_relation_series dc_relation_number
-     *
-     * Otherwise the parameters are of the form:
-     *
-     * dc_relation_ispartof_series dc_relation_ispartof_number
-     *
-     * The values will be put in separate DCValues, in the form "last name,
-     * first name(s)", ordered as they appear in the list. These will replace
-     * any existing values.
-     *
-     * @param request
-     *            the request object
-     * @param item
-     *            the item to update
-     * @param schema
-     *            the metadata schema
-     * @param element
-     *            the metadata element
-     * @param qualifier
-     *            the metadata qualifier, or null if unqualified
-     * @param repeated
-     *            set to true if the field is repeatable on the form
-     */
-    protected void readSeriesNumbers(HttpServletRequest request, Item item,
-            String schema, String element, String qualifier, boolean repeated)
-    {
-        String metadataField = MetadataField
-                .formKey(schema, element, qualifier);
-
-        // Names to add
-        List series = new LinkedList();
-        List numbers = new LinkedList();
-
-        if (repeated)
-        {
-            series = getRepeatedParameter(request, metadataField, metadataField
-                    + "_series");
-            numbers = getRepeatedParameter(request, metadataField,
-                    metadataField + "_number");
-
-            // Find out if the relevant "remove" button was pressed
-            String buttonPressed = Util.getSubmitButton(request, "");
-            String removeButton = "submit_" + metadataField + "_remove_";
-
-            if (buttonPressed.startsWith(removeButton))
-            {
-                int valToRemove = Integer.parseInt(buttonPressed
-                        .substring(removeButton.length()));
-
-                series.remove(valToRemove);
-                numbers.remove(valToRemove);
-            }
-        }
-        else
-        {
-            // Just a single name
-            String s = request.getParameter(metadataField + "_series");
-            String n = request.getParameter(metadataField + "_number");
-
-            // Only put it in if there was a name present
-            if ((s != null) && !s.equals(""))
-            {
-                // if number is null, just set to a nullstring
-                if (n == null)
-                    n = "";
-
-                series.add(s);
-                numbers.add(n);
-            }
-        }
-
-        // Remove existing values, already done in doProcessing see also bug DS-203
-        // item.clearMetadata(schema, element, qualifier, Item.ANY);
-
-        // Put the names in the correct form
-        for (int i = 0; i < series.size(); i++)
-        {
-            String s = ((String) series.get(i)).trim();
-            String n = ((String) numbers.get(i)).trim();
-
-            // Only add non-empty
-            if (!s.equals("") || !n.equals(""))
-            {
-                item.addMetadata(schema, element, qualifier, null,
-                        new DCSeriesNumber(s, n).toString());
-            }
-        }
-    }
-
-    /**
-     * Set relevant metadata fields in an item from series/number values in the
-     * form. Some fields are repeatable in the form. If this is the case, and
-     * the field is "relation.ispartof", the names in the request will be from
-     * the fields as follows:
-     *
-     * dc_relation_ispartof_series dc_relation_ispartof_number
-     * dc_relation_ispartof_series_1 dc_relation_ispartof_number_1
-     *
-     * and so on. If the field is unqualified:
-     *
-     * dc_relation_series dc_relation_number
-     *
-     * Otherwise the parameters are of the form:
-     *
-     * dc_relation_ispartof_series dc_relation_ispartof_number
-     *
-     * The values will be put in separate DCValues, in the form "last name,
-     * first name(s)", ordered as they appear in the list. These will replace
-     * any existing values.
-     *
-     * @param request
-     *            the request object
-     * @param item
-     *            the item to update
-     * @param schema
-     *            the metadata schema
-     * @param element
-     *            the metadata element
-     * @param qualifier
-     *            the metadata qualifier, or null if unqualified
-     * @param repeated
-     *            set to true if the field is repeatable on the form
-     */
-    protected void readSeriesNumbersWithYear(HttpServletRequest request, Item item,
-            String schema, String element, String qualifier, boolean repeated)
-    {
-        String metadataField = MetadataField
-                .formKey(schema, element, qualifier);
-
-        // Names to add
-        List series = new LinkedList();
-        List numbers = new LinkedList();
-        List years = new LinkedList();
-
-        if (repeated)
-        {
-            series = getRepeatedParameter(request, metadataField, metadataField
-                    + "_series");
-            numbers = getRepeatedParameter(request, metadataField,
-                    metadataField + "_number");
-
-            years = getRepeatedParameter(request, metadataField,
-                    metadataField + "_year");
-            
-            // Find out if the relevant "remove" button was pressed
-            String buttonPressed = Util.getSubmitButton(request, "");
-            String removeButton = "submit_" + metadataField + "_remove_";
-
-            if (buttonPressed.startsWith(removeButton))
-            {
-                int valToRemove = Integer.parseInt(buttonPressed
-                        .substring(removeButton.length()));
-
-                series.remove(valToRemove);
-                numbers.remove(valToRemove);
-                years.remove(valToRemove);
-            }
-        }
-        else
-        {
-            // Just a single name
-            String s = request.getParameter(metadataField + "_series");
-            String n = request.getParameter(metadataField + "_number");
-            String y = request.getParameter(metadataField + "_year");
-
-            // Only put it in if there was a name present
-            if ((s != null) && !s.equals(""))
-            {
-                // if number is null, just set to a nullstring
-                if (n == null)
-                    n = "";
-                if (y == null)
-                    y = "";
-
-                series.add(s);
-                numbers.add(n);
-                years.add(y);
-            }
-        }
-
-        // Remove existing values, already done in doProcessing see also bug DS-203
-        // item.clearMetadata(schema, element, qualifier, Item.ANY);
-
-        // Put the names in the correct form
-        for (int i = 0; i < series.size(); i++)
-        {
-            String s = ((String) series.get(i)).trim();
-            String n = ((String) numbers.get(i)).trim();
-            String y = ((String) years.get(i)).trim();
-
-            // Only add non-empty
-            if (!s.equals("") || !n.equals("") || !y.equals(""))
-            {
-                item.addMetadata(schema, element, qualifier, null,
-                        new DCSeriesNumber(s, n, y).toString());
-            }
-        }
-    }
-
-    /**
-     * Get repeated values from a form. If "foo" is passed in as the parameter,
-     * values in the form of parameters "foo", "foo_1", "foo_2", etc. are
-     * returned.
-     * <P>
-     * This method can also handle "composite fields" (metadata fields which may
-     * require multiple params, etc. a first name and last name).
-     *
-     * @param request
-     *            the HTTP request containing the form information
-     * @param metadataField
-     *            the metadata field which can store repeated values
-     * @param param
-     *            the repeated parameter on the page (used to fill out the
-     *            metadataField)
-     *
-     * @return a List of Strings
-     */
-    protected List getRepeatedParameter(HttpServletRequest request, String metadataField, String param)
-    {
-        return getRepeatedParameter(request, metadataField, param, null);
-    }
-
-    /**
      * Get repeated values from a form. If "foo" is passed in as the parameter,
      * values in the form of parameters "foo", "foo_1", "foo_2", etc. are
      * returned.
@@ -1198,10 +457,10 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
      *
      * @return a List of Strings
      */
-    protected List getRepeatedParameter(HttpServletRequest request,
+    protected List<String> getRepeatedParameter(HttpServletRequest request,
             String metadataField, String param, String splitChar)
     {
-        List vals = new LinkedList();
+        List<String> vals = new LinkedList<String>();
 
         int i = 1;    //start index at the first of the previously entered values
         boolean foundLast = false;
@@ -1265,28 +524,6 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
                 + " param=" + metadataField + ", return count = "+vals.size());
 
         return vals;
-    }
-
-    /**
-     * Return the HTML / DRI field name for the given input.
-     *
-     * @param input ...
-     * @return ...
-     */
-    public static String getFieldName(DCInput input)
-    {
-        String dcSchema = input.getSchema();
-        String dcElement = input.getElement();
-        String dcQualifier = input.getQualifier();
-        if (dcQualifier != null && !dcQualifier.equals(Item.ANY))
-        {
-            return dcSchema + "_" + dcElement + '_' + dcQualifier;
-        }
-        else
-        {
-            return dcSchema + "_" + dcElement;
-        }
-
     }
 
 }
