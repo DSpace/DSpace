@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Get the DSPACE/bin directory
+./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s ItemStatsViewIndicatorsPlugin
+./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s RPStatsViewIndicatorsPlugin
+./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s OUStatsViewIndicatorsPlugin
+./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PJStatsViewIndicatorsPlugin
+#./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentileViewIndicatorsPlugin
+#./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentileViewAggregateIndicatorsPlugin
+#./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentileDownloadIndicatorsPlugin
+#./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentileDownloadAggregateIndicatorsPlugin

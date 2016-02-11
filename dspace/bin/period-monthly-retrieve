@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Get the DSPACE/bin directory
+./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s ItemStatsPeriodMonthPUBMEDIndicatorsPlugin
+./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s ItemStatsPeriodMonthSCOPUSIndicatorsPlugin
+./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s ItemStatsPeriodMonthWOSIndicatorsPlugin
+./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s ViewStatsPeriodMonthIndicatorsPlugin
