@@ -281,6 +281,7 @@ public class GenerateSitemaps
                                             ArrayList<AbstractMap.SimpleEntry<String, Date>> handleList) throws SQLException {
         if (excludes.contains(obj)) {
             log.info("Skipping " + obj.getHandle()  + "  '" + obj.getName() + "'");
+
             return;
         }
         handleList.add(new java.util.AbstractMap.SimpleEntry<String, Date>(obj.getHandle(),null));
@@ -292,7 +293,7 @@ public class GenerateSitemaps
                 log.info("Skipping " + i.getHandle() + "  '" + i.getName() + "'");
             } else {
                 Date lastMod = i.getLastModified();
-                handleList.add(new java.util.AbstractMap.SimpleEntry<String, Date>(obj.getHandle(),lastMod));
+                handleList.add(new java.util.AbstractMap.SimpleEntry<String, Date>(i.getHandle(),lastMod));
             }
         }
     }
