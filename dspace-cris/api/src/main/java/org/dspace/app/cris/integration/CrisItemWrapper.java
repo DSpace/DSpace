@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.integration;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,16 +16,20 @@ import java.util.StringTokenizer;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.CrisConstants;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemWrapperIntegration;
+import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
+import org.springframework.util.ReflectionUtils;
 
 public final class CrisItemWrapper implements MethodInterceptor, ItemWrapperIntegration
 {
+
+    private static final Logger log = Logger.getLogger(CrisItemWrapper.class);
     
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable
@@ -198,6 +203,18 @@ public final class CrisItemWrapper implements MethodInterceptor, ItemWrapperInte
         pf.addAdvice(new CrisItemWrapper());
         Item proxy = (Item)(pf.getProxy());
         proxy.extraInfo = item.getExtraInfo();
+        Field declaredField = null;
+        try {
+
+            declaredField = ReflectionUtils.findField(Item.class, "modifiedMetadata");
+            boolean accessible = declaredField.isAccessible();
+            declaredField.setAccessible(true);
+            declaredField.set(proxy, item.isModifiedMetadata());
+            declaredField.setAccessible(accessible);
+
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+        }
         return proxy;
     }
 }

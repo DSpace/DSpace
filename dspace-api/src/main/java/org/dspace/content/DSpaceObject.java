@@ -1407,4 +1407,9 @@ public abstract class DSpaceObject implements IGlobalSearchResult
 	public boolean isWithdrawn() {	
 		return false;
 	}
+
+    public boolean isModifiedMetadata()
+    {
+        return modifiedMetadata;
+    }
 }
