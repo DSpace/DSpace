@@ -25,7 +25,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.I18nUtil;
 import org.xml.sax.SAXException;
 
@@ -117,7 +117,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             pageMeta.addMetadata("dspace","version").addContent(dspaceVersion);
         }
 
-        String analyticsKey = ConfigurationManager.getProperty("xmlui.google.analytics.key");
+        String analyticsKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.google.analytics.key");
         if (analyticsKey != null && analyticsKey.length() > 0)
         {
                 analyticsKey = analyticsKey.trim();
@@ -125,9 +125,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         }
 
         // add metadata for OpenSearch auto-discovery links if enabled
-        if (ConfigurationManager.getBooleanProperty("websvc.opensearch.autolink"))
+        if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("websvc.opensearch.autolink"))
         {
-            pageMeta.addMetadata("opensearch", "shortName").addContent( ConfigurationManager.getProperty("websvc.opensearch.shortname") );
+            pageMeta.addMetadata("opensearch", "shortName").addContent( DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("websvc.opensearch.shortname") );
             pageMeta.addMetadata("opensearch", "autolink").addContent( "open-search/description.xml" );
         }
 

@@ -47,7 +47,7 @@ import org.dspace.browse.BrowserScope;
 import org.dspace.content.*;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
 
@@ -698,7 +698,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             if (params.etAl < 0)
             {
                 // there is no limit, or the UI says to use the default
-                int etAl = ConfigurationManager.getIntProperty("webui.browse.author-limit");
+                int etAl = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("webui.browse.author-limit");
                 if (etAl != 0)
                 {
                     this.browseInfo.setEtAl(etAl);

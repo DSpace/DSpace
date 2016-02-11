@@ -26,7 +26,7 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.jdom.Document;
@@ -280,7 +280,7 @@ public class ContainerAdapter extends AbstractAdapter
                 createField("dc","rights","license",null,rights_license);
                 createField("dc","title",null,null,title);
                 
-                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
                  
                 if (showCount)
                 {
@@ -313,7 +313,7 @@ public class ContainerAdapter extends AbstractAdapter
                 createField("dc","rights",null,null,rights);
                 createField("dc","title",null,null,title);
                 
-                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
         		
                 if (showCount)
                 {

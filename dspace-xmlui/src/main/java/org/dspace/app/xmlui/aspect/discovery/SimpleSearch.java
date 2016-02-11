@@ -25,11 +25,10 @@ import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -116,7 +115,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         // Build the DRI Body
         Division search = body.addDivision("search", "primary");
         search.setHead(T_head);
-        String searchUrl = ConfigurationManager.getProperty("dspace.url") + "/JSON/discovery/search";
+        String searchUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url") + "/JSON/discovery/search";
 
         search.addHidden("discovery-json-search-url").setValue(searchUrl);
         DSpaceObject currentScope = getScope();

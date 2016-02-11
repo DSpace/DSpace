@@ -34,7 +34,7 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.xml.sax.SAXException;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 
 
@@ -107,7 +107,7 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
             {
                 List<String> prefixes = new ArrayList<String>();
                 prefixes.add(handleService.getPrefix());
-                String additionalPrefixes = ConfigurationManager
+                String additionalPrefixes = DSpaceServicesFactory.getInstance().getConfigurationService()
                         .getProperty("handle.additional.prefixes");
                 if (StringUtils.isNotBlank(additionalPrefixes))
                 {
@@ -120,7 +120,7 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
             }
             else if (action.equals("listhandles"))
             {
-                if (ConfigurationManager.getBooleanProperty(
+                if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
                         "handle.hide.listhandles", true))
                 {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND);

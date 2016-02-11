@@ -25,7 +25,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.harvest.HarvestedCollection;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
 
@@ -140,7 +140,7 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 	    settings.addLabel(T_label_metadata_format);
     
 	    String key = "harvester.oai.metadataformats." + metadataFormatValue;
-	    String metadataString = ConfigurationManager.getProperty("oai", key);
+	    String metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("oai." + key);
 
 	    String displayName;
     	if (metadataString.indexOf(',') != -1)

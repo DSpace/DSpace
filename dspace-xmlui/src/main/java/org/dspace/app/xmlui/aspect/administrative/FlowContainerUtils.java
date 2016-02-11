@@ -25,7 +25,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
@@ -502,7 +502,7 @@ public class FlowContainerUtils
 			collectionService.removeSubmitters(context, collection);
 		}
         else{
-            if(ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+            if(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("workflow.workflow.framework").equals("xmlworkflow"))
             {
                 WorkflowUtils.deleteRoleGroup(context, collection, roleName);
             }else{
@@ -1116,7 +1116,7 @@ public class FlowContainerUtils
                 String task = request.getParameter("curate_task");
                 Curator curator = FlowCurationUtils.getCurator(task);
                 String objId = String.valueOf(dsoID);
-                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                String taskQueueName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.queuename");
                 boolean status = false;
                 Collection collection = collectionService.find(context, dsoID);
                 if (collection != null)
@@ -1177,7 +1177,7 @@ public class FlowContainerUtils
                 String task = request.getParameter("curate_task");
                 Curator curator = FlowCurationUtils.getCurator(task);
                 String objId = String.valueOf(dsoID);
-                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                String taskQueueName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.queuename");
                 boolean status = false;
                 Community community = communityService.find(context, dsoID);
                 if (community != null)

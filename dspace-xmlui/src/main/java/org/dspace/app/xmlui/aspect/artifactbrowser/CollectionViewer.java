@@ -27,7 +27,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -153,7 +153,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         HandleUtil.buildHandleTrail(context, collection,pageMeta,contextPath);
         
         // Add RSS links if available
-        String formats = ConfigurationManager.getProperty("webui.feed.formats");
+        String formats = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.feed.formats");
 		if ( formats != null )
 		{
 			for (String format : formats.split(","))

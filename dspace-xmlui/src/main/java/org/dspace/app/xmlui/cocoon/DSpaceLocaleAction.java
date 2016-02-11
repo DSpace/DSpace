@@ -17,7 +17,7 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.i18n.I18nUtils;
 import org.apache.cocoon.i18n.I18nUtils.LocaleValidator;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 
@@ -134,11 +134,11 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
     	 */
     	public DSpaceLocaleValidator()
     	{
-            if (ConfigurationManager.getProperty("webui.supported.locales") != null)
+            if (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.supported.locales") != null)
             {
             	supportedLocales = new ArrayList<Locale>();
             	
-                String supportedLocalesConfig = ConfigurationManager.getProperty("webui.supported.locales");
+                String supportedLocalesConfig = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.supported.locales");
                 
                 String[] parts = supportedLocalesConfig.split(",");
                 

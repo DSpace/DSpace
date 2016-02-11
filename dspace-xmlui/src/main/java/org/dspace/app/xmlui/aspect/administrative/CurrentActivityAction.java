@@ -19,10 +19,10 @@ import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
@@ -53,7 +53,7 @@ public class CurrentActivityAction extends AbstractAction
 	private static boolean recordAnonymousEvents = true;
 	
     /** record events from automatic bots */
-    private static boolean recordBotEvents = ConfigurationManager
+    private static boolean recordBotEvents = DSpaceServicesFactory.getInstance().getConfigurationService()
             .getBooleanProperty("currentActivityAction.recordBotEvents", false);
 
     private static String[] botStrings = (new DSpace()).getSingletonService(
@@ -67,18 +67,18 @@ public class CurrentActivityAction extends AbstractAction
 	 */
 	static {
 		// If the dspace.cfg has a max event count then use it.
-		if (ConfigurationManager.getProperty("xmlui.controlpanel.activity.max") != null)
+		if (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.controlpanel.activity.max") != null)
         {
-			MAX_EVENTS = ConfigurationManager.getIntProperty("xmlui.controlpanel.activity.max");
+			MAX_EVENTS = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("xmlui.controlpanel.activity.max");
         }
         else
         {
             MAX_EVENTS = 250;
         }
 		
-		if (ConfigurationManager.getProperty("xmlui.controlpanel.activity.ipheader") != null)
+		if (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.controlpanel.activity.ipheader") != null)
         {
-			IP_HEADER = ConfigurationManager.getProperty("xmlui.controlpanel.activity.ipheader");
+			IP_HEADER = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.controlpanel.activity.ipheader");
         }
         else
         {

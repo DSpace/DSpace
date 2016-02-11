@@ -22,7 +22,7 @@ import org.dspace.app.xmlui.wing.WingConstants;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
@@ -163,7 +163,7 @@ public class JSONLookupSearcher extends AbstractGenerator {
 
     public String getLookupURI() {
         if(lookupURI ==null){
-            lookupURI = ConfigurationManager.getProperty("publication-lookup","publication.url");
+            lookupURI = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("publication-lookup.ublication.url");
         }
         return lookupURI;
     }

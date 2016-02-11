@@ -14,10 +14,10 @@ import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.SourceResolver;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Class will read the DSpace configuration file via the ConfigurationManager
+ * Class will read the DSpace configuration file via the DSpaceServicesFactory.getInstance().getConfigurationService()
  * 
  * It accepts the name of the property to read and the name of the variable to
  * use in the sitemap scope.  
@@ -44,7 +44,7 @@ public class DSpacePropertyFileReader extends AbstractAction {
 		for (int i = 0; i < parameterNames.length; i++) {
 			final String paramName = parameterNames[i];
 			map.put(parameters.getParameter(paramName),
-					ConfigurationManager.getProperty(paramName));
+					DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(paramName));
 		}
 		
 		return map;

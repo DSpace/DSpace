@@ -29,13 +29,9 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
-import org.dspace.content.Item;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.discovery.*;
 import org.xml.sax.SAXException;
 
 import org.apache.log4j.Logger;
@@ -111,7 +107,7 @@ public class CSVExportDiscoveryNavigation  extends AbstractDSpaceTransformer imp
         String uri = request.getSitemapURI();
         
         // check value in dspace.cfg
-        String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export"); 
+        String search_export_config = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.search.metadata_export");
         
         // get query
         String query = decodeFromURL(request.getParameter("query"));

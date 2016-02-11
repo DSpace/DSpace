@@ -11,11 +11,10 @@ import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.avalon.framework.logger.AbstractLogEnabled;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -67,7 +66,7 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
                     continue;
                 }
                 //If one isn't admin enabled no need to check for admin
-                if(!ConfigurationManager.getBooleanProperty("usage-statistics", "authorization.admin." + statisticsDisplayType, true)){
+                if(!DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("usage-statistics.authorization.admin." + statisticsDisplayType, true)){
                     adminCheckNeeded = false;
                 }
             }

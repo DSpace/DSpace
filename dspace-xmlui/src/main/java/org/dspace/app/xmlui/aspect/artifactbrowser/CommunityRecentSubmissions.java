@@ -25,7 +25,7 @@ import org.dspace.browse.*;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.xml.sax.SAXException;
@@ -164,8 +164,8 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
             return recentSubmittedItems;
         }
 
-        String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
-        int numRecentSubmissions = ConfigurationManager.getIntProperty("recent.submissions.count", RECENT_SUBMISSIONS);
+        String source = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("recent.submissions.sort-option");
+        int numRecentSubmissions = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("recent.submissions.count", RECENT_SUBMISSIONS);
         if(numRecentSubmissions == 0)
         {
             return new ArrayList<>();

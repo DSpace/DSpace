@@ -30,7 +30,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -140,7 +140,7 @@ public class EditFileStep extends AbstractStep
         description.setValue(bitstream.getDescription());
 
         // if AdvancedAccessPolicy=false: add simmpleFormEmbargo in UploadStep
-        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled= DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         if(!isAdvancedFormEnabled){
             AccessStepUtil asu = new AccessStepUtil(context);
             // this step is possible only in case of AdvancedForm

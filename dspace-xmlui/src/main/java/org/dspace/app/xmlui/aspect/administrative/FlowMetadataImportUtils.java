@@ -24,7 +24,7 @@ import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.LogManager;
 
 /**
@@ -48,7 +48,7 @@ public class FlowMetadataImportUtils
     private static final Message T_no_changes = new Message("default", "xmlui.administrative.metadataimport.general.no_changes");
 
     // Other variables
-    private static final int limit = ConfigurationManager.getIntProperty("bulkedit", "gui-item-limit", 20);
+    private static final int limit = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("bulkedit.gui-item-limit", 20);
     private static Logger log = Logger.getLogger(FlowMetadataImportUtils.class);
 
     public static FlowResult processMetadataImport(Context context,Request request) throws SQLException, AuthorizeException, IOException, Exception
