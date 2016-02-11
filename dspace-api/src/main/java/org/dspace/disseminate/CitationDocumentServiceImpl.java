@@ -158,24 +158,21 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         }
 
         // Configurable text/fields, we'll set sane defaults
-        String header1Config = configurationService.getProperty("citation-page.header1");
-        if(StringUtils.isNotBlank(header1Config)) {
-            header1 = header1Config.split(",");
-        } else {
+        header1 = configurationService.getArrayProperty("citation-page.header1");
+        if (header1==null || header1.length==0)
+        {
             header1 = new String[]{"DSpace Institution", ""};
         }
 
-        String header2Config = configurationService.getProperty("citation-page.header2");
-        if(StringUtils.isNotBlank(header2Config)) {
-            header2 = header2Config.split(",");
-        } else {
+        header2 = configurationService.getArrayProperty("citation-page.header2");
+        if (header2==null || header2.length==0)
+        {
             header2 = new String[]{"DSpace Repository", "http://dspace.org"};
         }
 
-        String fieldsConfig = configurationService.getProperty("citation-page.fields");
-        if(StringUtils.isNotBlank(fieldsConfig)) {
-            fields = fieldsConfig.split(",");
-        } else {
+        fields = configurationService.getArrayProperty("citation-page.fields");
+        if (fields==null || fields.length==0)
+        {
             fields = new String[]{"dc.date.issued", "dc.title", "dc.creator", "dc.contributor.author", "dc.publisher", "_line_", "dc.identifier.citation", "dc.identifier.uri"};
         }
 
