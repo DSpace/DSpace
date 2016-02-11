@@ -205,46 +205,38 @@ public class DatabaseManager
      */
     public static TableRowIterator queryTable(Context context, String table, String query, Object... parameters ) throws SQLException
     {
-        if (log.isDebugEnabled())
-	    {
-		StringBuilder sb = new StringBuilder("Running query \"").append(query).append("\"  with parameters: ");
-		for (int i = 0; i < parameters.length; i++)
-		    {
-			if (i > 0)
-			    {
-				sb.append(",");
+        if (log.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder("Running query \"").append(query).append("\"  with parameters: ");
+            for (int i = 0; i < parameters.length; i++) {
+                if (i > 0) {
+                    sb.append(",");
 			    }
-			sb.append(parameters[i].toString());
+                sb.append(parameters[i].toString());
 		    }
-		log.debug(sb.toString());
+            log.debug(sb.toString());
 	    }
 
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
-        try
-        {
+        try {
             loadParameters(statement, parameters);
-
-            TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(), canonicalize(table));
-
+            TableRowIterator retTRI = null;
+            if (table == null) {
+                retTRI = new TableRowIterator(statement.executeQuery());
+            } else {
+                retTRI = new TableRowIterator(statement.executeQuery(), canonicalize(table));
+            }
             retTRI.setStatement(statement);
             return retTRI;
-        }
-        catch (SQLException sqle)
-	    {
-		log.error("problem running query: " + query, sqle);
-		if (statement != null)
-		    {
-			try
-			    {
-				statement.close();
-			    }
-			catch (SQLException s)			   
-			    {
-				log.error("unable to close prepared statement", s);
+        } catch (SQLException sqle) {
+            log.error("problem running query: " + query, sqle);
+            if (statement != null) {
+                try {
+                    statement.close();
+			    } catch (SQLException s) {
+                    log.error("unable to close prepared statement", s);
 			    }
 		    }
-		
-		throw sqle;
+            throw sqle;
 	    }
     }
     
@@ -266,46 +258,7 @@ public class DatabaseManager
     public static TableRowIterator query(Context context, String query,
             Object... parameters) throws SQLException    
     {
-        if (log.isDebugEnabled())
-        {
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < parameters.length; i++)
-            {
-                if (i > 0)
-               {
-                       sb.append(",");
-               }
-                sb.append(parameters[i].toString());
-            }
-            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
-        }
-
-        PreparedStatement statement = context.getDBConnection().prepareStatement(query);
-        try
-        {
-            loadParameters(statement,parameters);
-
-            TableRowIterator retTRI = new TableRowIterator(statement.executeQuery());
-
-            retTRI.setStatement(statement);
-            return retTRI;
-        }
-        catch (SQLException sqle)
-        {
-            if (statement != null)
-            {
-                try
-                {
-                    statement.close();
-                }
-                catch (SQLException s)
-                {
-		    log.error("unable to close statement", s);
-                }
-            }
-
-            throw sqle;
-        }
+        return queryTable(context, null, query, parameters);
     }
 
     /**
@@ -328,22 +281,7 @@ public class DatabaseManager
     public static TableRow querySingle(Context context, String query,
             Object... parameters) throws SQLException
     {
-        TableRow retRow = null;
-        TableRowIterator iterator = null;
-        try
-        {
-            iterator = query(context, query, parameters);
-            retRow = (!iterator.hasNext()) ? null : iterator.next();
-        }
-        finally
-        {
-            if (iterator != null)
-            {
-                iterator.close();
-            }
-        }
-
-        return (retRow);
+        return querySingleTable(context, null, query, parameters);
     }
     
     /**
@@ -365,19 +303,21 @@ public class DatabaseManager
      *                If a database error occurs
      */
     public static TableRow querySingleTable(Context context, String table,
-            String query, Object... parameters) throws SQLException
-    {
+            String query, Object... parameters) throws SQLException {
         TableRow retRow = null;
-        TableRowIterator iterator = queryTable(context, canonicalize(table), query, parameters);
+        TableRowIterator iterator = null;
 
-        try
-        {
+        if (table == null) {
+            iterator = queryTable(context, null, query, parameters);
+        } else {
+            iterator = queryTable(context, canonicalize(table), query, parameters);
+        }
+
+        try {
             retRow = (!iterator.hasNext()) ? null : iterator.next();
         }
-        finally
-        {
-            if (iterator != null)
-            {
+        finally {
+            if (iterator != null) {
                 iterator.close();
             }
         }
