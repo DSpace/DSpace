@@ -698,7 +698,7 @@ public class Collection extends DSpaceObject
         String myQuery = "SELECT item.* FROM item, collection2item WHERE "
                 + "item.item_id=collection2item.item_id AND "
                 + "collection2item.collection_id= ? "
-                + "AND item.in_archive='1' limit ? offset ?";
+                + "AND item.in_archive = '1'";
 
         TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
                 myQuery, getID());
@@ -722,12 +722,11 @@ public class Collection extends DSpaceObject
             throws SQLException
     {
         List<Serializable> params = new ArrayList<Serializable>();
-        StringBuffer myQuery = new StringBuffer(
-            "SELECT item.* " +
-            "FROM item, collection2item " +
-            "WHERE item.item_id = collection2item.item_id " +
-              "AND collection2item.collection_id = ? " +
-              "AND item.in_archive = '1'"
+        StringBuffer myQuery = new StringBuffer("SELECT item.* "
+                + "FROM item, collection2item "
+                + "WHERE item.item_id = collection2item.item_id "
+                + "AND collection2item.collection_id = ? "
+                + "AND item.in_archive='1' limit ? offset ?"
         );
 
         params.add(getID());
