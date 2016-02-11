@@ -68,7 +68,7 @@ public class RDFizer {
     /**
      * Set to remember with DSpaceObject were converted or deleted from the 
      * triplestore already. This set is helpful when converting or deleting 
-     * multiple DSpaceObjects (g.e. Communities with all Subcommunities and
+     * multiple DSpaceObjects (e.g. Communities with all Subcommunities and
      * Items).
      */
     protected Set<UUID> processed;
@@ -343,7 +343,7 @@ public class RDFizer {
         
         // if this method is used for conversion we should check if we have the
         // permissions to read a DSO before converting all of it decendents
-        // (g.e. check read permission on a community before converting all of
+        // (e.g. check read permission on a community before converting all of
         // its subcommunties and collections).
         // just skip items with missing permissions and report them.
         if (check)

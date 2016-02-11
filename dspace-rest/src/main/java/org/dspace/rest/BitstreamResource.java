@@ -666,7 +666,7 @@ public class BitstreamResource extends Resource
      *            If you want to access the item as the user logged into the context.
      *            The header "rest-dspace-token" with the token passed
      *            from the login method must be set.
-     * @return It returns Ok, if was all ok. Otherwise status code 500.
+     * @return It returns Ok, if all was ok. Otherwise status code 500.
      */
     @DELETE
     @Path("/{bitstream_id}/policy/{policy_id}")
@@ -751,7 +751,7 @@ public class BitstreamResource extends Resource
     }
 
     /**
-     * Find bitstream from DSpace database. This encapsulatets the 
+     * Find bitstream from DSpace database. This encapsulates the 
      * org.dspace.content.Bitstream.find method with a check whether the item exists and 
      * whether the user logged into the context has permission to preform the requested action.
      * 

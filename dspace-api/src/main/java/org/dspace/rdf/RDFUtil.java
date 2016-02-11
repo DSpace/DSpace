@@ -76,7 +76,7 @@ public class RDFUtil {
      * type SITE, COMMUNITY, COLLECTION or ITEM only. Currently dspace-rdf 
      * doesn't support Bundles or Bitstreams as independent entity.
      * @param context DSpace Context.
-     * @param type Type of the DSpaceObject you want to generate a URI for (g.e. 
+     * @param type Type of the DSpaceObject you want to generate a URI for (e.g. 
      *             {@link org.dspace.core.Constants#ITEM Constants.ITEM}.
      * @param id UUID of the DSpaceObject you want to generate a URI for.
      * @param handle Handle of the DSpaceObject you want to generate a URI for.
@@ -281,7 +281,7 @@ public class RDFUtil {
      * This is a shortcut to generate an RDF identifier for a DSpaceObject and
      * to delete the identified data from the named graph.
      * @param ctx
-     * @param type DSpaceObject type (g.e. {@link Constants#ITEM Constants.ITEM}).
+     * @param type DSpaceObject type (e.g. {@link Constants#ITEM Constants.ITEM}).
      * @param id Id of the DspaceObject.
      * @param handle Handle of the DSpaceObject.
      * @throws SQLException
