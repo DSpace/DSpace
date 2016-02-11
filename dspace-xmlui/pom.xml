@@ -26,35 +26,6 @@
             <filter>${filters.file}</filter>
         </filters>
         <plugins>
-
-
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>xml-maven-plugin</artifactId>
-                    <version>1.0.1</version>
-                    <executions>
-                      <execution>
-                        <id>validate-ALL-xmlui-xml-and-xsl</id>
-                        <phase>test</phase>
-                        <goals>
-                          <goal>validate</goal>
-                        </goals>
-                      </execution>
-                    </executions>
-                    <configuration>
-                      <validationSets>
-                        <!-- validate ALL XML and XSL files -->
-                        <validationSet>
-                            <dir>${basedir}</dir>
-                             <includes>
-                                 <include>**/*.xml</include>
-                                 <include>**/*.xsl</include>
-                             </includes>
-                         </validationSet>
-                       </validationSets>
-                    </configuration>
-                </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>

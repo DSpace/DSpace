@@ -284,7 +284,7 @@
                         </executions>
                         <configuration>
                           <validationSets>
-                            <!-- validate ALL XML and XSL files -->
+                            <!-- validate ALL XML and XSL config files in the testing folder -->
                              <validationSet>
                                  <dir>${agnostic.build.dir}/testing</dir>
                                  <includes>
@@ -292,7 +292,15 @@
                                      <include>**/*.xsl</include>
                                  </includes>
                              </validationSet>
-                              </validationSets>
+                             <!-- validate ALL XML and XSL files throughout the project -->
+                             <validationSet>
+                                <dir>${root.basedir}</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                     <include>**/*.xsl</include>
+                                 </includes>
+                              </validationSet>
+                          </validationSets>
                         </configuration>
                     </plugin>
 
