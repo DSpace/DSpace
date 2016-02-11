@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -98,13 +99,30 @@ public class StatsViewIndicatorsPlugin extends AStatsIndicatorsPlugin
                                 null, acquisitionDate, remark);
                         
                         if(resourceTypeId==Constants.ITEM) {
-                            remark = new HashMap<String, String>();
-                            remark.put("link", statDaily.getStatURL()+"&amp;type=bitstream");
-                            buildIndicator(pService, applicationService,
-                                    uuid, resourceType, resourceId,
-                                    data.getTotalSelectedDownload(),
-                                    ConstantMetrics.STATS_INDICATOR_TYPE_DOWNLOAD,
-                                    null, acquisitionDate, remark);
+                            for (String topKey : data
+                                    .getPeriodAndTotalTopDownload().keySet())
+                            {
+                                List<Long> tmpList = data
+                                        .getPeriodAndTotalTopDownload().get(topKey);
+                                remark = new HashMap<String, String>();
+                                remark.put("link", statDaily.getStatURL()+"&amp;type=bitstream");
+                                buildIndicator(pService, applicationService,
+                                        uuid, resourceType, resourceId,
+                                        tmpList.get(1),
+                                        ConstantMetrics.STATS_INDICATOR_TYPE_DOWNLOAD,
+                                        null, acquisitionDate, remark);                                
+                            }
+                        }
+                        else {
+                            if(data.getTotalSelectedDownload()!=null && data.getTotalSelectedDownload()>0) {
+                                remark = new HashMap<String, String>();
+                                remark.put("link", statDaily.getStatURL()+"&amp;type=bitstream");
+                                buildIndicator(pService, applicationService,
+                                        uuid, resourceType, resourceId,
+                                        data.getTotalSelectedDownload(),
+                                        ConstantMetrics.STATS_INDICATOR_TYPE_DOWNLOAD,
+                                        null, acquisitionDate, remark);
+                            }
                         }
                     }
 
