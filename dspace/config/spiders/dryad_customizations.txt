@@ -78,6 +78,9 @@
 
 # Other (ambiguous in whois db)
 208.115.111.243
+111.93.125.142
+182.118.13.19
+119.188.50.136
 
 # LOCKSS boxes
 128.42.174.11
@@ -96,3 +99,4 @@
 
 # WorldWideScience.org
 192.107.175.11
+
