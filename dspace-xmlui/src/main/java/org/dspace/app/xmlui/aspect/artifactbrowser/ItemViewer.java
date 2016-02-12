@@ -32,6 +32,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.fileaccess.factory.FileAccessServiceFactory;
 import org.dspace.fileaccess.service.ItemMetadataService;
@@ -92,22 +93,22 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     private DisseminationCrosswalk xHTMLHeadCrosswalk = null;
     
 	private final String sfxFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
-            + File.separator + "config" + File.separator + "sfx.xml";
+                + File.separator + "config" + File.separator + "sfx.xml";
 
-    private String sfxQuery = null;
+        private String sfxQuery = null;
 
-    private static final Logger log = LoggerFactory.getLogger(ItemViewer.class);
+        private static final Logger log = LoggerFactory.getLogger(ItemViewer.class);
 
-    protected SFXFileReaderService sfxFileReaderService = SfxServiceFactory.getInstance().getSfxFileReaderService();
+        protected SFXFileReaderService sfxFileReaderService = SfxServiceFactory.getInstance().getSfxFileReaderService();
 
-    protected static ItemMetadataService itemMetadataService = FileAccessServiceFactory.getInstance().getItemMetadataService();
+        protected static ItemMetadataService itemMetadataService = FileAccessServiceFactory.getInstance().getItemMetadataService();
 
-    /**
-     * Generate the unique caching key.
-     * This key must be unique inside the space of this component.
-     */
-    @Override
-    public Serializable getKey() {
+        /**
+         * Generate the unique caching key.
+         * This key must be unique inside the space of this component.
+         */
+        @Override
+        public Serializable getKey() {
         try {
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
@@ -125,94 +126,94 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         }
     }
 
-    /**
-     * Generate the cache validity object.
-     *
-     * The validity object will include the item being viewed,
-     * along with all bundles & bitstreams.
-     */
-    @Override
-    public SourceValidity getValidity()
-    {
-        DSpaceObject dso = null;
+        /**
+         * Generate the cache validity object.
+         *
+         * The validity object will include the item being viewed,
+         * along with all bundles & bitstreams.
+         */
+        @Override
+        public SourceValidity getValidity()
+        {
+            DSpaceObject dso = null;
 
-        if (this.validity == null)
-    	{
-	        try {
-	            dso = HandleUtil.obtainHandle(objectModel);
+            if (this.validity == null)
+            {
+                try {
+                    dso = HandleUtil.obtainHandle(objectModel);
 
-	            DSpaceValidity validity = new DSpaceValidity();
-	            validity.add(context, dso);
-	            this.validity =  validity.complete();
-	        }
-	        catch (Exception e)
-	        {
-	            // Ignore all errors and just invalidate the cache.
-	        }
+                    DSpaceValidity validity = new DSpaceValidity();
+                    validity.add(context, dso);
+                    this.validity =  validity.complete();
+                }
+                catch (Exception e)
+                {
+                    // Ignore all errors and just invalidate the cache.
+                }
 
-    	}
-    	return this.validity;
-    }
+            }
+            return this.validity;
+        }
 
-    /** Matches Handle System URIs. */
-    private static final Pattern handlePattern = Pattern.compile(
-            "hdl:|https?://hdl\\.handle\\.net/", Pattern.CASE_INSENSITIVE);
+        /** Matches Handle System URIs. */
+        private static final Pattern handlePattern = Pattern.compile(
+                "hdl:|https?://hdl\\.handle\\.net/", Pattern.CASE_INSENSITIVE);
 
-    /** Matches DOI URIs. */
-    private static final Pattern doiPattern = Pattern.compile(
-            "doi:|https?://(dx\\.)?doi\\.org/", Pattern.CASE_INSENSITIVE);
+        /** Matches DOI URIs. */
+        private static final Pattern doiPattern = Pattern.compile(
+                "doi:|https?://(dx\\.)?doi\\.org/", Pattern.CASE_INSENSITIVE);
 
-    /**
-     * Add the item's title and trail links to the page's metadata.
-     */
-    @Override
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
+        /**
+         * Add the item's title and trail links to the page's metadata.
+         */
+        @Override
+        public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
             AuthorizeException
-    {
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-        if (!(dso instanceof Item))
         {
-            return;
-        }
-
-        Item item = (Item) dso;
-
-        // Set the page title
-        String title = item.getName();
-
-        if (title != null)
-        {
-            pageMeta.addMetadata("title").addContent(title);
-        }
-        else
-        {
-            pageMeta.addMetadata("title").addContent(item.getHandle());
-        }
-
-        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(context, item,pageMeta,contextPath);
-        pageMeta.addTrail().addContent(T_trail);
-
-        // Add SFX link
-        String sfxserverUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.url");
-        if (sfxserverUrl != null && sfxserverUrl.length() > 0)
-        {
-            sfxQuery = "";
-
-            // parse XML file -> XML document will be build
-            sfxQuery = sfxFileReaderService.loadSFXFile(sfxFile, item);
-
-            // Remove initial &, if any
-            if (sfxQuery.startsWith("&"))
+            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            if (!(dso instanceof Item))
             {
-                sfxQuery = sfxQuery.substring(1);
+                return;
             }
-            sfxserverUrl = sfxserverUrl.trim() +"&" + sfxQuery.trim();
-            pageMeta.addMetadata("sfx","server").addContent(sfxserverUrl);
-        }
 
-        // Add persistent identifiers
+            Item item = (Item) dso;
+
+            // Set the page title
+            String title = item.getName();
+
+            if (title != null)
+            {
+                pageMeta.addMetadata("title").addContent(title);
+            }
+            else
+            {
+                pageMeta.addMetadata("title").addContent(item.getHandle());
+            }
+
+            pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
+            HandleUtil.buildHandleTrail(context, item,pageMeta,contextPath);
+            pageMeta.addTrail().addContent(T_trail);
+
+            // Add SFX link
+            String sfxserverUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.url");
+            if (sfxserverUrl != null && sfxserverUrl.length() > 0)
+            {
+                sfxQuery = "";
+
+                // parse XML file -> XML document will be build
+                sfxQuery = sfxFileReaderService.loadSFXFile(sfxFile, item);
+
+                // Remove initial &, if any
+                if (sfxQuery.startsWith("&"))
+                {
+                    sfxQuery = sfxQuery.substring(1);
+                }
+                sfxserverUrl = sfxserverUrl.trim() +"&" + sfxQuery.trim();
+                pageMeta.addMetadata("sfx","server").addContent(sfxserverUrl);
+            }
+
+            // Add persistent identifiers
         /* Temporarily switch to using metadata directly.
          * FIXME Proper fix is to have IdentifierService handle all durable
          * identifiers, whether minted here or elsewhere.
@@ -244,92 +245,92 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
         */
-        String identifierField = DSpaceServicesFactory.getInstance().getConfigurationService()
-                .getPropertyAsType("altmetrics.field", "dc.identifier.uri");
-        for (MetadataValue uri : ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getMetadataByMetadataString(dso, identifierField))
-        {
-            String idType, idValue;
-            Matcher handleMatcher = handlePattern.matcher(uri.getValue());
-            Matcher doiMatcher = doiPattern.matcher(uri.getValue());
-            if (handleMatcher.lookingAt())
+            String identifierField = DSpaceServicesFactory.getInstance().getConfigurationService()
+                    .getPropertyAsType("altmetrics.field", "dc.identifier.uri");
+            for (MetadataValue uri : ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getMetadataByMetadataString(dso, identifierField))
             {
-                idType = "handle";
-                idValue = uri.getValue().substring(handleMatcher.end());
+                String idType, idValue;
+                Matcher handleMatcher = handlePattern.matcher(uri.getValue());
+                Matcher doiMatcher = doiPattern.matcher(uri.getValue());
+                if (handleMatcher.lookingAt())
+                {
+                    idType = "handle";
+                    idValue = uri.getValue().substring(handleMatcher.end());
+                }
+                else if (doiMatcher.lookingAt())
+                {
+                    idType = "doi";
+                    idValue = uri.getValue().substring(doiMatcher.end());
+                }
+                else
+                {
+                    log.info("Unhandled identifier URI {}", uri.getValue());
+                    continue;
+                }
+                log.debug("Adding identifier of type {}", idType);
+                Metadata md = pageMeta.addMetadata("identifier", idType);
+                md.addContent(idValue);
             }
-            else if (doiMatcher.lookingAt())
+
+            String sfxserverImg = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.image_url");
+            if (sfxserverImg != null && sfxserverImg.length() > 0)
             {
-                idType = "doi";
-                idValue = uri.getValue().substring(doiMatcher.end());
+                pageMeta.addMetadata("sfx", "image_url").addContent(sfxserverImg);
             }
-            else
+
+            boolean googleEnabled = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
+                    "google-metadata.enable", false);
+
+            if (googleEnabled)
             {
-                log.info("Unhandled identifier URI {}", uri.getValue());
-                continue;
+                // Add Google metadata field names & values to DRI
+                GoogleMetadata gmd = new GoogleMetadata(context, item);
+
+                for (Entry<String, String> m : gmd.getMappings())
+                {
+                    pageMeta.addMetadata(m.getKey()).addContent(m.getValue());
+                }
             }
-            log.debug("Adding identifier of type {}", idType);
-            Metadata md = pageMeta.addMetadata("identifier", idType);
-            md.addContent(idValue);
-        }
 
-        String sfxserverImg = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.image_url");
-        if (sfxserverImg != null && sfxserverImg.length() > 0)
-        {
-            pageMeta.addMetadata("sfx", "image_url").addContent(sfxserverImg);
-        }
-
-        boolean googleEnabled = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
-            "google-metadata.enable", false);
-
-        if (googleEnabled)
-        {
-            // Add Google metadata field names & values to DRI
-            GoogleMetadata gmd = new GoogleMetadata(context, item);
-
-            for (Entry<String, String> m : gmd.getMappings())
+            // Metadata for <head> element
+            if (xHTMLHeadCrosswalk == null)
             {
-                pageMeta.addMetadata(m.getKey()).addContent(m.getValue());
+                xHTMLHeadCrosswalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
+                        DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
             }
-        }
 
-        // Metadata for <head> element
-        if (xHTMLHeadCrosswalk == null)
-        {
-            xHTMLHeadCrosswalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
-              DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
-        }
-
-        // Produce <meta> elements for header from crosswalk
-        try
-        {
-            List l = xHTMLHeadCrosswalk.disseminateList(context, item);
-            StringWriter sw = new StringWriter();
-
-            XMLOutputter xmlo = new XMLOutputter();
-            xmlo.output(new Text("\n"), sw);
-            for (int i = 0; i < l.size(); i++)
+            // Produce <meta> elements for header from crosswalk
+            try
             {
-                Element e = (Element) l.get(i);
-                // FIXME: we unset the Namespace so it's not printed.
-                // This is fairly yucky, but means the same crosswalk should
-                // work for Manakin as well as the JSP-based UI.
-                e.setNamespace(null);
-                xmlo.output(e, sw);
+                List l = xHTMLHeadCrosswalk.disseminateList(context, item);
+                StringWriter sw = new StringWriter();
+
+                XMLOutputter xmlo = new XMLOutputter();
                 xmlo.output(new Text("\n"), sw);
+                for (int i = 0; i < l.size(); i++)
+                {
+                    Element e = (Element) l.get(i);
+                    // FIXME: we unset the Namespace so it's not printed.
+                    // This is fairly yucky, but means the same crosswalk should
+                    // work for Manakin as well as the JSP-based UI.
+                    e.setNamespace(null);
+                    xmlo.output(e, sw);
+                    xmlo.output(new Text("\n"), sw);
+                }
+                pageMeta.addMetadata("xhtml_head_item").addContent(sw.toString());
             }
-            pageMeta.addMetadata("xhtml_head_item").addContent(sw.toString());
-        }
-        catch (CrosswalkException ce)
-        {
-            // TODO: Is this the right exception class?
-            throw new WingException(ce);
-        }
+            catch (CrosswalkException ce)
+            {
+                // TODO: Is this the right exception class?
+                throw new WingException(ce);
+            }
 
-        boolean entitlementCheck = ConfigurationManager.getBooleanProperty("elsevier-sciencedirect", "entitlement.check.enabled", false);
+            boolean entitlementCheck = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("elsevier-sciencedirect.entitlement.check.enabled", false);
         if(entitlementCheck) {
             pageMeta.addMetadata("window.DSpace", "item_pii").addContent(itemMetadataService.getPII(item));
             pageMeta.addMetadata("window.DSpace", "item_doi").addContent(itemMetadataService.getDOI(item));
-            pageMeta.addMetadata("window.DSpace", "elsevier_apikey").addContent(ConfigurationManager.getProperty("elsevier-sciencedirect", "api.key"));
-            pageMeta.addMetadata("window.DSpace", "elsevier_entitlement_url").addContent(ConfigurationManager.getProperty("elsevier-sciencedirect", "api.entitlement.url"));
+            pageMeta.addMetadata("window.DSpace", "elsevier_apikey").addContent(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("elsevier-sciencedirect", "api.key"));
+            pageMeta.addMetadata("window.DSpace", "elsevier_entitlement_url").addContent(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("elsevier-sciencedirect", "api.entitlement.url"));
         }
     }
 
