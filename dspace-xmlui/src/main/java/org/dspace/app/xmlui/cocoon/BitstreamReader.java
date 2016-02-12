@@ -314,7 +314,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         return;
                 }
                 else{
-                	if(ConfigurationManager.getProperty("request.item.type")==null||
+                	if(StringUtils.isBlank(ConfigurationManager.getProperty("request.item.type")) ||
                 			                			ConfigurationManager.getProperty("request.item.type").equalsIgnoreCase("logged")){
                         // The user does not have read access to this bitstream. Interrupt this current request
                         // and then forward them to the login page so that they can be authenticated. Once that is
