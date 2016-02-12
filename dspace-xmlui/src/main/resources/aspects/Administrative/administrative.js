@@ -2184,8 +2184,8 @@ function doAuthorizeContainer(containerType, containerID)
             return null;
         }
         else if (cocoon.request.get("submit_add")) {
-            // Create a new policy
-            result = doEditPolicy(containerType,containerID,null);
+            // Create a new policy (pass policyID=-1 to create a new one)
+            result = doEditPolicy(containerType,containerID,-1);
             if (result != null && result.getParameter("policyID"))
             	highlightID = result.getParameter("policyID");
         }
