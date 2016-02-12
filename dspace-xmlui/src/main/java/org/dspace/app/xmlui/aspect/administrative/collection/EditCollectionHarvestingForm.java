@@ -139,7 +139,7 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 	    // The big complex way of getting to our metadata
 	    settings.addLabel(T_label_metadata_format);
     
-	    String key = "harvester.oai.metadataformats." + metadataFormatValue;
+	    String key = "harvester.metadataformats." + metadataFormatValue;
 	    String metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("oai." + key);
 
 	    String displayName;
