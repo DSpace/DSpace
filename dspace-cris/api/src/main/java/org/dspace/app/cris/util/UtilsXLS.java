@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.util;
 
+import it.cilea.osd.jdyna.editor.AdvancedPropertyEditorSupport;
 import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
 import it.cilea.osd.jdyna.model.ANestedProperty;
 import it.cilea.osd.jdyna.model.AWidget;
@@ -86,7 +87,7 @@ public class UtilsXLS {
 		for (Property rr : proprietaDellaTipologia) {
 
 			PropertyEditor pe = rr.getTypo().getRendering()
-					.getImportPropertyEditor(applicationService, ExcelBulkChangesService.FORMAT);
+					.getImportPropertyEditor(applicationService, AdvancedPropertyEditorSupport.MODE_CSV);
 			pe.setValue(rr.getObject());
 			if (!first) {
 				field_value += STOPFIELDS_EXCEL;
@@ -232,7 +233,7 @@ public class UtilsXLS {
 
             ANestedProperty rr = (ANestedProperty)rrr;
             PropertyEditor pe = rr.getTypo().getRendering()
-                    .getImportPropertyEditor(applicationService, ExcelBulkChangesService.FORMAT);
+                    .getImportPropertyEditor(applicationService, AdvancedPropertyEditorSupport.MODE_CSV);
             pe.setValue(rr.getObject());
             if (!first) {
                 field_value += STOPFIELDS_EXCEL;
