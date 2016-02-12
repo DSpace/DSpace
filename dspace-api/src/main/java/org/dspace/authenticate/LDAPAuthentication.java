@@ -60,6 +60,10 @@ import org.dspace.eperson.service.GroupService;
  *  </li>
  * </ul>
  *
+ * <p>Administrative credentials may be left unconfigured.  If so, the application
+ * resource file mechanism defined by JNDI will be used to seek default credentials
+ * in a {@code /jndi.properties} resource.
+ *
  * @author Stuart Lewis
  * @author Chris Yates
  * @author Alex Barbieri
@@ -83,7 +87,7 @@ public class LDAPAuthentication
             = EPersonServiceFactory.getInstance().getGroupService();
 
     /**
-     * Let a real auth method return true if it wants.
+     * Let a real authentication method return true if it wants.
      *
      * @throws SQLException if database error
      */
@@ -110,8 +114,7 @@ public class LDAPAuthentication
     }
 
     /**
-     * Cannot change LDAP password through dspace, right?
-     *
+     * Cannot change LDAP password through DSpace, right?
      * @throws SQLException if database error
      */
     @Override
@@ -225,12 +228,15 @@ public class LDAPAuthentication
         String idField = ConfigurationManager.getProperty("authentication-ldap", "id_field");
         String dn = "";
 
-        // If adminUser is blank and anonymous search is not allowed, then we can't search so construct the DN
-        // instead of searching it
+        // If adminUser is blank and anonymous search is not allowed, then we
+        // can't search, so construct the DN instead of searching it.
+        // TODO This conflicts with application resource defaulting.  Instead
+        // replace authentication-ldap.search.anonymous with authentication-ldap.search,
+        // which simply selects searching vs. single-level composition.
         if ((StringUtils.isBlank(adminUser) || StringUtils.isBlank(adminPassword)) && !anonymousSearch) {
-            dn = idField + "=" + netid + "," + objectContext;
+            dn = idField + "=" + netid + "," + objectContext; // Single level
         } else {
-            dn = ldap.getDNOfUser(adminUser, adminPassword, context, netid);
+            dn = ldap.getDNOfUser(adminUser, adminPassword, context, netid); // Hierarchial (search)
         }
 
         // Check a DN was found
@@ -395,12 +401,27 @@ public class LDAPAuthentication
             log = thelog;
         }
 
+        /**
+         * Search the directory for the given user, using known(?) good
+         * credentials for binding.  The search is for an object with an attribute
+         * (configured by "id_field") having a value equal to the netid entered
+         * by the user.  The search starts at "search_context" and has scope
+         * "search_scope".
+         *
+         * @param adminUser DN of the user to bind for searching.
+         * @param adminPassword Password for adminUser.
+         * @param context DSpace context for the operation.
+         * @param netid Simple name of the user object for which to search.
+         * @return the DN of the first directory object found, if any.
+         *          {@code null} is returned if there is no match.
+         *          A warning will be logged if more than one object is matched.
+         */
         protected String getDNOfUser(String adminUser, String adminPassword, Context context, String netid) {
             // The resultant DN
             String resultDN;
 
-            // The search scope to use (default to 0)
-            int ldap_search_scope_value = 0;
+            // The search scope to use (default to object scope).
+            int ldap_search_scope_value = SearchControls.OBJECT_SCOPE;
             try {
                 ldap_search_scope_value = Integer.parseInt(ldap_search_scope.trim());
             } catch (NumberFormatException e) {
@@ -437,8 +458,9 @@ public class LDAPAuthentication
                     ctx.addToEnvironment(javax.naming.Context.SECURITY_PRINCIPAL, adminUser);
                     ctx.addToEnvironment(javax.naming.Context.SECURITY_CREDENTIALS, adminPassword);
                 }
-                /* Else the LDAP provider may be externally configured in the "jndi.properties"
-                 * application resource file.  See "Application Resource Files" in
+                /* Else the LDAP provider may be externally configured in the
+                 * "jndi.properties" application resource file.  See
+                 * "Application Resource Files" in
                  * https://docs.oracle.com/javase/7/docs/api/javax/naming/Context.html
                  * If no credentials are ever found, we'll do an anonymous bind.
                  */
@@ -446,7 +468,7 @@ public class LDAPAuthentication
                 Attributes matchAttrs = new BasicAttributes(true);
                 matchAttrs.put(new BasicAttribute(ldap_id_field, netid));
 
-                // look up attributes
+                // Search for the user's directory object.
                 try {
                     SearchControls ctrls = new SearchControls();
                     ctrls.setSearchScope(ldap_search_scope_value);
@@ -469,13 +491,11 @@ public class LDAPAuthentication
                         } else {
                             resultDN = (sr.getName() + "," + ldap_search_context);
                         }
-                        harvestAttributes(sr);
 
                         if (answer.hasMoreElements()) {
                             // Oh dear - more than one match
                             // Ambiguous user, can't continue
                             log.warn("More than one directory object matches {}", netid);
-
                         } else {
                             log.debug(LogManager.getHeader(context, "got DN", resultDN));
                             return resultDN;
@@ -510,18 +530,17 @@ public class LDAPAuthentication
         }
 
         /**
-         * Pluck interesting attributes from a search result and store them in
+         * Pluck interesting attributes of a directory object and store them in
          * fields for later use.
          *
-         * @param sr
+         * @param atts
          * @throws NamingException
          */
-        protected void harvestAttributes(SearchResult sr)
+        protected void harvestAttributes(Attributes atts)
                 throws NamingException
         {
             String attlist[] = {ldap_email_field, ldap_givenname_field,
                                 ldap_surname_field, ldap_phone_field, ldap_group_field};
-            Attributes atts = sr.getAttributes();
             Attribute att;
 
             if (attlist[0] != null) {
@@ -568,10 +587,10 @@ public class LDAPAuthentication
         /**
          * Contact the LDAP server and attempt to authenticate.
          */
-        protected boolean ldapAuthenticate(String netid, String password,
-                                           Context context) {
+        protected boolean ldapAuthenticate(String userDn, String password,
+                        Context context) {
             if (!password.equals("")) {
-                log.debug("ldapAuthenticate:  user '{}'", netid);
+                log.debug("ldapAuthenticate:  user '{}'", userDn);
 
                 LdapContext ctx = null;
                 StartTlsResponse startTLSResponse = null;
@@ -584,6 +603,7 @@ public class LDAPAuthentication
                     env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
 
                 try {
+                    Attributes userAttributes;
                     if(useStartTLS) {
                         // Get an anonymously bound context
                         env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "none");
@@ -599,19 +619,19 @@ public class LDAPAuthentication
                         // perform simple client authentication
                         ctx.addToEnvironment(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
                         ctx.addToEnvironment(javax.naming.Context.SECURITY_PRINCIPAL,
-                                             netid);
+                                userDn);
                         ctx.addToEnvironment(javax.naming.Context.SECURITY_CREDENTIALS,
                                              password);
                         ctx.addToEnvironment(javax.naming.Context.AUTHORITATIVE, "true");
                         ctx.addToEnvironment(javax.naming.Context.REFERRAL, "follow");
                         // dummy operation to check if authentication has succeeded
                         log.debug("Triggering authentication");
-                        ctx.getAttributes("");
+                        userAttributes = ctx.getAttributes(userDn);
                     } else {
                         log.debug("Not requesting STARTTLS");
                         // Authenticate
                         env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "Simple");
-                        env.put(javax.naming.Context.SECURITY_PRINCIPAL, netid);
+                        env.put(javax.naming.Context.SECURITY_PRINCIPAL, userDn);
                         env.put(javax.naming.Context.SECURITY_CREDENTIALS, password);
                         env.put(javax.naming.Context.AUTHORITATIVE, "true");
                         env.put(javax.naming.Context.REFERRAL, "follow");
@@ -619,7 +639,10 @@ public class LDAPAuthentication
                         // Try to bind
                         log.debug("Triggering authentication");
                         ctx = new InitialLdapContext(env, null);
+                        userAttributes = ctx.getAttributes(userDn);
                     }
+
+                    harvestAttributes(userAttributes);
                 } catch (NamingException | IOException e) {
                     // something went wrong (like wrong password) so return false
                     log.warn(LogManager.getHeader(context,
