@@ -87,14 +87,18 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 									if (StringUtils.isNotBlank(oldPrefProject)) {
 										// project preference is changed?
 										if (!(oldPrefProject.equals(rpProp.getValue().toString()))) {
-											rp.setOldOrcidProjectsPreference(rpProp.getValue().toString());
-											// remove the queue
-											orcidPreferencesUtils.deleteOrcidQueueByOwnerAndType(crisID,
-													CrisConstants.PROJECT_TYPE_ID);
-											// notify that we needed a PUT
-											orcidPreferencesUtils.notifyPut(rp, OrcidPreferencesUtils.ORCID_PUSH_CRISPJ_ACTIVATE_PUT);
+										    rp.setOldOrcidProjectsPreference(rpProp.getValue().toString());
+	                                        // delete first all queued projects and notify that we needed a PUT
+											notifyPut(crisID, rp, rpProp, CrisConstants.PROJECT_TYPE_ID, OrcidPreferencesUtils.ORCID_PUSH_CRISPJ_ACTIVATE_PUT);
 										}
-									}									
+									}
+									else {
+									    if(rpProp.getValue()!=null && !("0".equals(rpProp.getValue().toString()))) {
+									        rp.setOldOrcidProjectsPreference(rpProp.getValue().toString());
+									        // delete first all queued projects and notify that we needed a PUT
+									        notifyPut(crisID, rp, rpProp, CrisConstants.PROJECT_TYPE_ID, OrcidPreferencesUtils.ORCID_PUSH_CRISPJ_ACTIVATE_PUT);
+									    }
+									}
 									break;
 								}
 
@@ -105,14 +109,17 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 										// publications preference change
 										if (!(oldPrefPublications.equals(rpProp.getValue().toString()))) {
 											rp.setOldOrcidPublicationsPreference(rpProp.getValue().toString());
-											// delete first all publication
-											// queued
-											orcidPreferencesUtils.deleteOrcidQueueByOwnerAndType(crisID,
-													Constants.ITEM);
-											// notify that we needed a PUT
-											orcidPreferencesUtils.notifyPut(rp, OrcidPreferencesUtils.ORCID_PUSH_ITEM_ACTIVATE_PUT);
+											// delete first all queued publications and notify that we needed a PUT
+											notifyPut(crisID, rp, rpProp, Constants.ITEM, OrcidPreferencesUtils.ORCID_PUSH_ITEM_ACTIVATE_PUT);
 										}
-									}									
+									}
+									else {
+									    if(rpProp.getValue()!=null && !("0".equals(rpProp.getValue().toString()))) {
+									        rp.setOldOrcidPublicationsPreference(rpProp.getValue().toString());
+									        // delete first all queued publications and notify that we needed a PUT
+                                            notifyPut(crisID, rp, rpProp, Constants.ITEM, OrcidPreferencesUtils.ORCID_PUSH_ITEM_ACTIVATE_PUT);
+									    }
+									}
 									break;
 								}
 
@@ -189,6 +196,15 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 
 		log.debug("End Call onPostUpdate " + OrcidQueueListener.class);
 	}
+
+    private void notifyPut(String crisID, ResearcherPage rp, RPProperty rpProp, int typeToDeleteFromQueue, String putToActivate)
+    {
+        // remove the queue
+        orcidPreferencesUtils.deleteOrcidQueueByOwnerAndType(crisID,
+        		typeToDeleteFromQueue);
+        // notify that we needed a PUT
+        orcidPreferencesUtils.notifyPut(rp, putToActivate);
+    }
 
 	public OrcidPreferencesUtils getOrcidPreferencesUtils() {
 		return orcidPreferencesUtils;
