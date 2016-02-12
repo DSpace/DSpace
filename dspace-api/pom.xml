@@ -255,6 +255,7 @@
                                  <includes>
                                      <include>**/*.xml</include>
                                      <include>**/*.xsl</include>
+                                     <include>**/*.xconf</include>
                                  </includes>
                              </validationSet>
                              <!-- validate ALL XML and XSL files throughout the project -->
@@ -263,6 +264,7 @@
                                  <includes>
                                      <include>**/*.xml</include>
                                      <include>**/*.xsl</include>
+                                     <include>**/*.xmap</include>
                                  </includes>
                               </validationSet>
                           </validationSets>
