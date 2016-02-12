@@ -1371,16 +1371,42 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
     }
 
     /**
-     * Return <code>true</code> if <code>other</code> is the same Item as
-     * this object, <code>false</code> otherwise
+     * Return <code>true</code> if <code>other</code> is the same Item as this
+     * object, <code>false</code> otherwise
      *
+     * NOTE:
+     * There is a problem invoking equals() method on CGLIB proxies that are
+     * created by Spring AOP. (the problem is not in CGLIB itself).
+     * 
+     * The problem is, that all calls to equals() on a proxy are filtered by a
+     * special interceptor, which checks for equality of interfaces, advisors
+     * and targets, instead of just checking the targets for equality. (It
+     * invokes AopProxyUtils.equalsInProxy())
+     * 
+     * This can be a problem, when you have the same Object wrapped by different
+     * proxies, and you want the application to identify this as the same
+     * Object. This happens for example, then the same Object is retrieved from
+     * a DB twice by two different calls. Assuming these two Objects are
+     * equals() , they end up being wrapped by different proxies because these
+     * are different calls.
+     * 
+     * workaround:
+     * 
+     * Make the equals() method final. This works, but has 2 problems: You
+     * cannot reference any members inside the method because this refers to the
+     * proxy and not the target (you must use getId() instead of this.id ). You
+     * can never override equals() on extending classes.
+     * 
      * @param obj
      *            object to compare to
-     * @return <code>true</code> if object passed in represents the same item
-     *         as this object
+     * @return <code>true</code> if object passed in represents the same item as
+     *         this object
+     * 
+     * 
+     * 
      */
      @Override
-     public boolean equals(Object obj)
+     public final boolean equals(Object obj)
      {
          if (obj == null)
          {
