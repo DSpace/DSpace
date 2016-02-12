@@ -313,7 +313,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         return;
                 }
                 else{
-                	if(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("request.item.type")==null||
+                	if(StringUtils.isBlank(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("request.item.type")) ||
                 			                			DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("request.item.type").equalsIgnoreCase("logged")){
                         // The user does not have read access to this bitstream. Interrupt this current request
                         // and then forward them to the login page so that they can be authenticated. Once that is
