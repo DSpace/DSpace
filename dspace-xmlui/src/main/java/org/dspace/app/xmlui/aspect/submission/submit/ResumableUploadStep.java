@@ -14,7 +14,6 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -32,16 +31,22 @@ public class ResumableUploadStep extends UploadStep{
             message("xmlui.Submission.submit.ResumableUploadStep.status");
     private static final Message T_column_info =
             message("xmlui.Submission.submit.ResumableUploadStep.info");
-    
-    
-    private static final Message T_delete_message =
+    private static final Message T_column_delete =
             message("xmlui.Submission.submit.ResumableUploadStep.delete");
-    private static final Message T_deletesf_message =
-            message("xmlui.Submission.submit.ResumableUploadStep.deletesf");
-    private static final Message T_deleteunmatch_message =
-            message("xmlui.Submission.submit.ResumableUploadStep.deleteunmatch");
-
     
+    private static final Message T_clickdrop =
+            message("xmlui.Submission.submit.ResumableUploadStep.clickdrop");
+
+    private static final Message T_delete_message =
+            message("xmlui.Submission.submit.ResumableUploadStep.dialog.delete");
+    private static final Message T_deletesf_message =
+            message("xmlui.Submission.submit.ResumableUploadStep.dialog.deletesf");
+    private static final Message T_deleteunmatch_message =
+            message("xmlui.Submission.submit.ResumableUploadStep.dialog.deleteunmatch");
+
+    private static final Message T_upload_error =
+            message("xmlui.Submission.submit.ResumableUploadStep.error");
+
     public void addBody(Body body) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
     {
@@ -55,10 +60,11 @@ public class ResumableUploadStep extends UploadStep{
         addSubmissionProgressList(div);
         
         Division uploadDiv = div.addDivision("submit-file-upload");
-        Division drop = uploadDiv.addDivision("resumable-drop", "col-md-12");
         
-        Message T_column_delete = message("xmlui.Submission.submit.ResumableUploadStep.delete");
-        drop.addPara(T_column_delete);
+        // click / drag and drop area
+        Division drop = uploadDiv.addDivision("resumable-drop", "col-md-12");
+        drop.addPara();
+        drop.addPara(T_clickdrop);
         
         // progress bar and button
         uploadDiv.addDivision("progress-button");
@@ -130,10 +136,13 @@ public class ResumableUploadStep extends UploadStep{
             row.addCell("delete-" + id, Cell.ROLE_DATA, "file-delete");
         }
         
+        // some messages that the client needs
         Division messages = div.addDivision("text-messages", "hide");
         messages.addHidden("text-delete-msg").setValue(T_delete_message);
         messages.addHidden("text-delete-sf").setValue(T_deletesf_message);
         messages.addHidden("text-delete-unmatch").setValue(T_deleteunmatch_message);
+        
+        uploadDiv.addPara("error-message", "alert alert-danger hide").addContent(T_upload_error);
         
         // add standard control/paging buttons
         addControlButtons(upload);

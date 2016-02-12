@@ -246,10 +246,12 @@ input[name='lookup_dc_subject_classification']{
 
 @import "../vendor/jquery-ui/themes/base/jquery.ui.dialog.css";
 
-/* Uploader: Drag & Drop */
+#aspect_submission_StepTransformer_div_submit-file-upload{
+    padding-top: 0.5em;
+}
+
 #aspect_submission_StepTransformer_div_resumable-drop {
-    padding: 1em;
-    font-size: 250%;
+    padding-: 1em;
     text-align: center;
     color: white;
     font-weight: bold;
@@ -258,7 +260,7 @@ input[name='lookup_dc_subject_classification']{
     margin-top: 0.4em;
     margin-bottom: 0.2em;
     z-index: 1;
-    height: 8em;
+    height: 12em;
     top: 50%;
     vertical-align: middle !important;
     min-height: 6em;
@@ -266,8 +268,17 @@ input[name='lookup_dc_subject_classification']{
     cursor: pointer;
 }
 
-#aspect_submission_StepTransformer_div_resumable-drop p{
-  padding-top: 1em;
+#aspect_submission_StepTransformer_div_resumable-drop p {
+    padding: 0;
+    font-size: 1.4em;
+}
+
+#aspect_submission_StepTransformer_div_resumable-drop .glyphicon-upload{
+    padding-top: 0.5em;
+    font-size: 3.2em;
+    width: 2em;
+    height: 2em;
+    margin: 0;
 }
 
 #aspect_submission_StepTransformer_div_progress-button img{
@@ -299,7 +310,7 @@ input[name='lookup_dc_subject_classification']{
 }
 
 .resumable-dragover{
-    padding: 30px;
+    /*padding: 30px;*/
     color: #555;
     background-color: #ddd;
     border:1px solid #999;

@@ -65,7 +65,7 @@ public class ResumableUploadStep extends UploadStep{
             }
         }
         else{
-            // client is using tradition upload form, pass request onto base class
+            // client is using traditional upload form, pass request onto base class
             status = super.doProcessing(context, request, response, subInfo);
         }
         

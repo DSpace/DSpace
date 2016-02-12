@@ -62,7 +62,7 @@ if(r.support){
 
     // place for dropping/selecting files
     var rdId = 'aspect_submission_StepTransformer_div_resumable-drop';
-    $('#' + rdId).addClass('glyphicon glyphicon-upload');
+    $('#' + rdId + ' p:first').addClass('glyphicon glyphicon-upload');
     r.assignDrop($('#' + rdId)[0]);
     r.assignBrowse($('#' + rdId)[0]);
 
@@ -179,10 +179,12 @@ if(r.support){
     });
 
     r.on('fileError', function(file, message){
-        // Reflect that the file upload has resulted in error
-        $('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name + .resumable-file-progress').html('<span class="glyphicon glyphicon-exclamation-sign"></span>');
+        console.log();
+        $('.alert').removeClass('hide');
+
         r.removeFile(file);
-        r.upload();
+
+        //r.upload();
     });
 
     $(document).on('click', '.file-delete', function(e){
@@ -193,7 +195,8 @@ if(r.support){
         var infoCell = $(cell).siblings()[5];
         var fileName, param;
         var toBeDeleted = [];
-        var text = "Are you sure you want to delete ";
+        //var text = "Are you sure you want to delete ";
+        var text = $('input[name=text-delete-msg]').val() + " ";
 
         if($(infoCell).hasClass('file-info')){
             $.each($('tr input[name=select]:checked'), function(i, entry){
@@ -213,14 +216,14 @@ if(r.support){
                 if(bid !== toBeDeleted[0]){
                     // there is a mismatch, make actual delete to be row click
                     toBeDeleted[0] = bid;
-                    text = 'The file that will be deleted does not match the one you selected, Do you want to continue?'
+                    text = $('input[name=text-delete-unmatch]').val();
                 }
                 else{
                     text += $(fileCell).find('a').text() + "?";
                 }
             }
             else{
-                text += " the " + toBeDeleted.length + " selected files?"
+                text += toBeDeleted.length + " " + $('input[name=text-delete-sf]').val() + "?";
             }
         }
         else{

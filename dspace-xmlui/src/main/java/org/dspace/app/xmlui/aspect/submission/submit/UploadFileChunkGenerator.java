@@ -13,12 +13,14 @@ import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 public class UploadFileChunkGenerator extends AbstractGenerator{
     private static final Logger log = Logger.getLogger(UploadFileChunkGenerator.class);
     private Bitstream bitstream;
+    private String error;
     private static final AttributesImpl emptyAttr = new AttributesImpl();
     
     public void setup(SourceResolver resolver, @SuppressWarnings("rawtypes") Map objectModel, 
@@ -33,6 +35,8 @@ public class UploadFileChunkGenerator extends AbstractGenerator{
                 Context context = ContextUtil.obtainContext(objectModel);
                 this.bitstream = Bitstream.find(context, Integer.parseInt(bId));
             }
+            
+            this.error = par.getParameter("error");
         }
         catch(ParameterException ex){
             log.warn(ex);
@@ -73,10 +77,21 @@ public class UploadFileChunkGenerator extends AbstractGenerator{
             String sId = String.valueOf(this.bitstream.getSequenceID()); 
             contentHandler.characters(sId.toCharArray(), 0, sId.length());
             contentHandler.endElement("","sequenceId", "sequenceId");
-            
+        }
+        
+        log.info("* "  + this.error);
+        if(this.error != null && this.error.length() > 0){
+            log.info("**");
+            this.addElement(contentHandler, "errorkey", this.error);
         }
 
         contentHandler.endElement("", "upload", "upload");
         contentHandler.endDocument();
+    }
+    
+    private void addElement(ContentHandler contentHandler, String name, String value) throws SAXException{
+        contentHandler.startElement("", name, name, emptyAttr);
+        contentHandler.characters(value.toCharArray(), 0, value.length());
+        contentHandler.endElement("", name, name);
     }
 }
