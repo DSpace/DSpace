@@ -269,6 +269,44 @@
                         </executions>
                     </plugin>
 
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>xml-maven-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                          <execution>
+                            <id>validate-ALL-xml-and-xsl</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                              <goal>validate</goal>
+                            </goals>
+                          </execution>
+                        </executions>
+                        <configuration>
+                          <validationSets>
+                            <!-- validate ALL XML and XSL config files in the testing folder -->
+                             <validationSet>
+                                 <dir>${agnostic.build.dir}/testing</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                     <include>**/*.xsl</include>
+                                 </includes>
+                             </validationSet>
+                             <!-- validate ALL XML and XSL files throughout the project -->
+                             <validationSet>
+                                <dir>${root.basedir}</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                     <include>**/*.xsl</include>
+                                 </includes>
+                              </validationSet>
+                          </validationSets>
+                        </configuration>
+                    </plugin>
+
+
+
+
                     <!-- Run Unit/Integration Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
