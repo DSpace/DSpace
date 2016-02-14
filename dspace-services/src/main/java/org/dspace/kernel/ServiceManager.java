@@ -142,6 +142,6 @@ public interface ServiceManager {
      * 
      * @param settings a map of keys (names) and values
      */
-    public void pushConfig(Map<String, String> settings);
+    public void pushConfig(Map<String, Object> settings);
 
 }

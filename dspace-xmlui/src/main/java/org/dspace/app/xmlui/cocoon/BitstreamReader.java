@@ -39,7 +39,7 @@ import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.disseminate.factory.DisseminateServiceFactory;
@@ -48,7 +48,6 @@ import org.dspace.eperson.Group;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 import org.apache.log4j.Logger;
@@ -292,7 +291,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + item.getHandle() + ",withdrawn=true"));
             }
             // It item-request is enabled to all request we redirect to restricted-resource immediately without login request  
-            String requestItemType = ConfigurationManager.getProperty("request.item.type");
+            String requestItemType = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("request.item.type");
             if (!isAuthorized)
             {
                 if(context.getCurrentUser() != null || StringUtils.equalsIgnoreCase("all", requestItemType)){
@@ -314,8 +313,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         return;
                 }
                 else{
-                	if(ConfigurationManager.getProperty("request.item.type")==null||
-                			                			ConfigurationManager.getProperty("request.item.type").equalsIgnoreCase("logged")){
+                	if(StringUtils.isBlank(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("request.item.type")) ||
+                			                			DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("request.item.type").equalsIgnoreCase("logged")){
                         // The user does not have read access to this bitstream. Interrupt this current request
                         // and then forward them to the login page so that they can be authenticated. Once that is
                         // successful, their request will be resumed.
@@ -421,7 +420,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             
             // Log that the bitstream has been viewed, this is non-cached and the complexity
             // of adding it to the sitemap for every possible bitstream uri is not very tractable
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
                                 new UsageEvent(
                                                 UsageEvent.Action.VIEW,
                                                 ObjectModelHelper.getRequest(objectModel),
@@ -495,9 +494,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     
         // Determine our the maximum number of directories that will be removed for a path.
         int maxDepthPathSearch = 3;
-        if (ConfigurationManager.getProperty("xmlui.html.max-depth-guess") != null)
+        if (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.html.max-depth-guess") != null)
         {
-            maxDepthPathSearch = ConfigurationManager.getIntProperty("xmlui.html.max-depth-guess");
+            maxDepthPathSearch = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("xmlui.html.max-depth-guess");
         }
         
         // Search for the named bitstream on this item. Each time through the loop
@@ -622,7 +621,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         }
         
         // If this is a large bitstream then tell the browser it should treat it as a download.
-        int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
+        int threshold = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("xmlui.content_disposition_threshold");
         if (bitstreamSize > threshold && threshold != 0)
         {
                 String name  = bitstreamName;

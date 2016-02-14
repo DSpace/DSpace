@@ -36,11 +36,10 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.SubscribeServiceImpl;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -315,7 +314,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        {
            firstName.addError(T_error_required);
        }
-       if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       if (!registering && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
        {
            firstName.setDisabled();
        }
@@ -329,7 +328,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        {
            lastName.addError(T_error_required);
        }
-       if (!registering &&!ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       if (!registering &&!DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
        {
            lastName.setDisabled();
        }
@@ -342,7 +341,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        {
            phone.addError(T_error_required);
        }
-       if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       if (!registering && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
        {
            phone.setDisabled();
        }
@@ -363,7 +362,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        }
        lang.setOptionSelected((defaultLanguage == null || defaultLanguage.equals("")) ?
                               I18nUtil.DEFAULTLOCALE.toString() : defaultLanguage);
-       if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       if (!registering && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
        {
            lang.setDisabled();
        }
@@ -490,8 +489,8 @@ public class EditProfile extends AbstractDSpaceTransformer
      */
     private static Locale[] getSupportedLocales()
     {
-        String ll = ConfigurationManager.getProperty("webui.supported.locales");
-        if (ll != null)
+        String[] ll = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.supported.locales");
+        if(ll != null && ll.length>0)
         {
             return I18nUtil.parseLocales(ll);
         }

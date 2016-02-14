@@ -23,7 +23,7 @@ import org.dspace.content.packager.RoleDisseminator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.workflow.WorkflowException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -176,7 +176,7 @@ public class RoleCrosswalk
         try
         {
             PackageDisseminator dip = (PackageDisseminator)
-            PluginManager.getNamedPlugin(PackageDisseminator.class, ROLE_PACKAGER_PLUGIN);
+                   CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(PackageDisseminator.class, ROLE_PACKAGER_PLUGIN);
             if (dip == null)
             {
                 throw new CrosswalkInternalException("Cannot find a PackageDisseminator plugin named " + ROLE_PACKAGER_PLUGIN);
@@ -286,7 +286,7 @@ public class RoleCrosswalk
 
         //locate our "DSPACE-ROLES" PackageIngester plugin
         PackageIngester sip = (PackageIngester)
-                                PluginManager.getNamedPlugin(PackageIngester.class, ROLE_PACKAGER_PLUGIN);
+                                CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(PackageIngester.class, ROLE_PACKAGER_PLUGIN);
         if (sip == null)
         {
             throw new CrosswalkInternalException("Cannot find a PackageIngester plugin named " + ROLE_PACKAGER_PLUGIN);

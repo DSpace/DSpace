@@ -26,11 +26,11 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
-import org.dspace.utils.DSpace;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
@@ -62,7 +62,7 @@ public class DatabaseUtils
     // When this temp file exists, the "checkReindexDiscovery()" method will auto-reindex Discovery
     // Reindex flag file is at [dspace]/solr/search/conf/reindex.flag
     // See also setReindexDiscovery()/getReindexDiscover()
-    private static final String reindexDiscoveryFilePath = ConfigurationManager.getProperty("dspace.dir") +
+    private static final String reindexDiscoveryFilePath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir") +
                             File.separator + "solr" +
                             File.separator + "search" +
                             File.separator + "conf" +
@@ -79,6 +79,8 @@ public class DatabaseUtils
      */
     public static void main(String[] argv)
     {
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+
         // Usage checks
         if (argv.length < 1)
         {
@@ -370,6 +372,8 @@ public class DatabaseUtils
      */
     private synchronized static Flyway setupFlyway(DataSource datasource)
     {
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+
         if (flywaydb==null)
         {
             try(Connection connection = datasource.getConnection())
@@ -391,7 +395,7 @@ public class DatabaseUtils
                 // (We skip this for H2 as it's only used for unit testing)
                 if(!dbType.equals(DBMS_H2))
                 {
-                    scriptLocations.add("filesystem:" + ConfigurationManager.getProperty("dspace.dir") +
+                    scriptLocations.add("filesystem:" + config.getProperty("dspace.dir") +
                                         "/etc/" + dbType);
                 }
 
@@ -405,7 +409,8 @@ public class DatabaseUtils
                 // Special scenario: If XMLWorkflows are enabled, we need to run its migration(s)
                 // as it REQUIRES database schema changes. XMLWorkflow uses Java migrations
                 // which first check whether the XMLWorkflow tables already exist
-                if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+                String framework = config.getProperty("workflow.framework");
+                if (framework!=null && framework.equals("xmlworkflow"))
                 {
                     scriptLocations.add("classpath:org.dspace.storage.rdbms.xmlworkflow");
                 }
@@ -417,7 +422,7 @@ public class DatabaseUtils
                 // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
                 // In this situation, we have a Registry Updater that runs PRE-migration
                 // NOTE: DatabaseLegacyReindexer only indexes in Legacy Lucene & RDBMS indexes. It can be removed once those are obsolete.
-                List<FlywayCallback> flywayCallbacks = new DSpace().getServiceManager().getServicesByType(FlywayCallback.class);
+                List<FlywayCallback> flywayCallbacks = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(FlywayCallback.class);
                 flywaydb.setCallbacks(flywayCallbacks.toArray(new FlywayCallback[flywayCallbacks.size()]));
             }
             catch(SQLException e)
@@ -1025,7 +1030,7 @@ public class DatabaseUtils
         // If we don't know our schema, let's try the schema in the DSpace configuration
         if(StringUtils.isBlank(schema))
         {
-            schema = canonicalize(connection, ConfigurationManager.getProperty("db.schema"));
+            schema = canonicalize(connection, DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("db.schema"));
         }
             
         // Still blank? Ok, we'll find a "sane" default based on the DB type
@@ -1285,7 +1290,7 @@ public class DatabaseUtils
     protected static DataSource getDataSource()
     {
         // DataSource is configured via our ServiceManager (i.e. via Spring).
-        return new DSpace().getServiceManager().getServiceByName("dataSource", BasicDataSource.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("dataSource", BasicDataSource.class);
     }
 
     /**

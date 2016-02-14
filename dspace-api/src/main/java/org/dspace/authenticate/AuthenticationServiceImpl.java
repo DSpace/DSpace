@@ -18,13 +18,12 @@ import java.util.List;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -54,10 +53,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Larry Stone
  * @version $Revision$
  */
-public class AuthenticationServiceImpl implements AuthenticationService, InitializingBean
+public class AuthenticationServiceImpl implements AuthenticationService
 {
-    /** List of authentication methods, highest precedence first. */
-    protected List<AuthenticationMethod> methodStack;
 
     /** SLF4J logging category */
     private final Logger log = (Logger) LoggerFactory.getLogger(AuthenticationServiceImpl.class);
@@ -65,10 +62,13 @@ public class AuthenticationServiceImpl implements AuthenticationService, Initial
     @Autowired(required = true)
     protected EPersonService ePersonService;
 
+    protected AuthenticationServiceImpl()
+    {
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        methodStack = Arrays.asList((AuthenticationMethod[])PluginManager.getPluginSequence("authentication", AuthenticationMethod.class));
+    }
+
+    public List<AuthenticationMethod> getAuthenticationMethodStack() {
+        return Arrays.asList((AuthenticationMethod[])CoreServiceFactory.getInstance().getPluginService().getPluginSequence(AuthenticationMethod.class));
     }
 
     @Override
@@ -104,7 +104,7 @@ public class AuthenticationServiceImpl implements AuthenticationService, Initial
         int bestRet = AuthenticationMethod.BAD_ARGS;
 
         // return on first success, otherwise "best" outcome.
-        for (AuthenticationMethod aMethodStack : methodStack) {
+        for (AuthenticationMethod aMethodStack : getAuthenticationMethodStack()) {
             if (!implicitOnly || aMethodStack.isImplicit()) {
                 int ret = 0;
                 try {
@@ -138,9 +138,9 @@ public class AuthenticationServiceImpl implements AuthenticationService, Initial
                                    String username)
         throws SQLException
     {
-        for (int i = 0; i < methodStack.size(); ++i)
+        for (AuthenticationMethod method : getAuthenticationMethodStack())
         {
-            if (methodStack.get(i).canSelfRegister(context, request, username))
+            if (method.canSelfRegister(context, request, username))
             {
                 return true;
             }
@@ -154,9 +154,9 @@ public class AuthenticationServiceImpl implements AuthenticationService, Initial
                                     String username)
         throws SQLException
     {
-        for (int i = 0; i < methodStack.size(); ++i)
+        for (AuthenticationMethod method : getAuthenticationMethodStack())
         {
-            if (methodStack.get(i).allowSetPassword(context, request, username))
+            if (method.allowSetPassword(context, request, username))
             {
                 return true;
             }
@@ -170,7 +170,7 @@ public class AuthenticationServiceImpl implements AuthenticationService, Initial
                                    EPerson eperson)
         throws SQLException
     {
-        for (AuthenticationMethod method : methodStack)
+        for (AuthenticationMethod method : getAuthenticationMethodStack())
         {
             method.initEPerson(context, request, eperson);
         }
@@ -184,9 +184,9 @@ public class AuthenticationServiceImpl implements AuthenticationService, Initial
         List<Group> result = new ArrayList<>();
         int totalLen = 0;
 
-        for (int i = 0; i < methodStack.size(); ++i)
+        for (AuthenticationMethod method : getAuthenticationMethodStack())
         {
-            List<Group> gl = methodStack.get(i).getSpecialGroups(context, request);
+            List<Group> gl = method.getSpecialGroups(context, request);
             if (gl.size() > 0)
             {
                 result.addAll(gl);
@@ -200,6 +200,6 @@ public class AuthenticationServiceImpl implements AuthenticationService, Initial
     @Override
     public Iterator<AuthenticationMethod> authenticationMethodIterator()
     {
-        return methodStack.iterator();
+        return getAuthenticationMethodStack().iterator();
     }
 }

@@ -19,6 +19,7 @@
 <%@page import="org.dspace.content.service.CommunityService"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ page import="java.util.UUID" %> 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
@@ -34,7 +35,8 @@
 <%
 	CommunityService comServ = ContentServiceFactory.getInstance().getCommunityService();
     Community community = (Community) request.getAttribute("community");
-    int parentID = UIUtil.getIntParameter(request, "parent_community_id");
+	Community parentCommunity = (Community) request.getAttribute("parent");
+    UUID parentID = (parentCommunity != null ? parentCommunity.getID() : null);
     // Is the logged in user a sys admin
     Boolean admin = (Boolean)request.getAttribute("is.admin");
     boolean isAdmin = (admin == null ? false : admin.booleanValue());

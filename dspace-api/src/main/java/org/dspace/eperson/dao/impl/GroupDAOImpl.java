@@ -31,7 +31,12 @@ import java.util.*;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements GroupDAO {
+public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements GroupDAO
+{
+    protected GroupDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public Group findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException
@@ -153,4 +158,13 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         return sqlQuery.list();
     }
 
+    @Override
+    public List<Group> getEmptyGroups(Context context) throws SQLException {
+        return list(createQuery(context, "SELECT g from Group g where g.epeople is EMPTY"));
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Group"));
+    }
 }

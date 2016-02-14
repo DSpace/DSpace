@@ -41,6 +41,11 @@ public class IdentifierServiceImpl implements IdentifierService {
     @Autowired(required = true)
     protected HandleService handleService;
 
+    protected IdentifierServiceImpl()
+    {
+
+    }
+
     @Autowired
    @Required
    public void setProviders(List<IdentifierProvider> providers)

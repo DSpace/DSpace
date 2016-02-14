@@ -23,7 +23,6 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
@@ -34,10 +33,8 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
-import org.dspace.versioning.service.VersioningService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;

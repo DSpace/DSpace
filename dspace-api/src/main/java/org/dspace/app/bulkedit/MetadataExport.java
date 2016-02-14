@@ -50,6 +50,8 @@ public class MetadataExport
      */
     public MetadataExport(Context c, Iterator<Item> toExport, boolean exportAll)
     {
+        itemService = ContentServiceFactory.getInstance().getItemService();
+
         // Store the export settings
         this.toExport = toExport;
         this.exportAll = exportAll;
@@ -64,6 +66,8 @@ public class MetadataExport
      */
     public MetadataExport(Context c, Community toExport, boolean exportAll)
     {
+        itemService = ContentServiceFactory.getInstance().getItemService();
+
         try
         {
             // Try to export the community

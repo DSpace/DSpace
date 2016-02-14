@@ -8,7 +8,6 @@
 package org.dspace.content;
 
 import java.util.Locale;
-import org.dspace.AbstractUnitTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +19,7 @@ import static org.hamcrest.CoreMatchers.*;
  * Tests DCLanguageTest class
  * @author pvillega
  */
-public class DCLanguageTest extends AbstractUnitTest
+public class DCLanguageTest
 {
 
     /**
@@ -37,10 +36,8 @@ public class DCLanguageTest extends AbstractUnitTest
      * but no execution order is guaranteed
      */
     @Before
-    @Override
     public void init()
     {
-        super.init();
         dc = new DCLanguage("");
     }
 
@@ -52,11 +49,9 @@ public class DCLanguageTest extends AbstractUnitTest
      * but no execution order is guaranteed
      */
     @After
-    @Override
     public void destroy()
     {
         dc = null;
-        super.destroy();
     }
 
     /**

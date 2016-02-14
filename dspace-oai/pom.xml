@@ -21,10 +21,6 @@
     </properties>
 
     <build>
-        <filters>
-            <!-- Filter using the properties file defined by dspace-parent POM -->
-            <filter>${filters.file}</filter>
-        </filters>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -34,7 +30,7 @@
                     <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
                     <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
                     <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-                    <!-- Filter the web.xml -->
+                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                 </configuration>
                 <executions>
@@ -162,7 +158,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>13.0</version>
+            <version>19.0</version>
         </dependency>
         <dependency>
             <groupId>com.lyncode</groupId>
@@ -175,7 +171,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
+            <version>1.10.19</version>
         </dependency>
         <dependency>
             <groupId>com.lyncode</groupId>
@@ -197,17 +193,17 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.3.0</version>
+            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.3.3</version>
+            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.3.3</version>
+            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.xmlmatchers</groupId>

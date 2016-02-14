@@ -65,14 +65,14 @@ import org.jdom.transform.XSLTransformer;
  * was modified since it was last loaded.  This lets you edit and test
  * stylesheets without restarting DSpace.
  * <p>
- * You must use the <code>PluginManager</code> to instantiate an
+ * You must use the <code>PluginService</code> to instantiate an
  * XSLT crosswalk plugin, e.g.
- * <pre> IngestionCrosswalk xwalk = PluginManager.getPlugin(IngestionCrosswalk.class, "LOM");</pre>
+ * <pre> IngestionCrosswalk xwalk = CoreServiceFactory.getInstance().getPluginService().getPlugin(IngestionCrosswalk.class, "LOM");</pre>
  * <p>
  * Since there is significant overhead in reading the properties file to
  * configure the crosswalk, and a crosswalk instance may be used any number
  * of times, we recommend caching one instance of the crosswalk for each
- * alias and simply reusing those instances.  The <code>PluginManager</code>
+ * alias and simply reusing those instances.  The <code>PluginService</code>
  * does this automatically.
  *
  * @author Larry Stone
@@ -138,7 +138,7 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin
             String myAlias = getPluginInstanceName();
             if (myAlias == null)
             {
-                log.error("Must use PluginManager to instantiate XSLTCrosswalk so the class knows its name.");
+                log.error("Must use PluginService to instantiate XSLTCrosswalk so the class knows its name.");
                 return null;
             }
             String cmPropName = CONFIG_PREFIX+direction+"."+myAlias+CONFIG_STYLESHEET;

@@ -38,4 +38,6 @@ public interface DBConnection<T> {
     public DataSource getDataSource();
 
     public DatabaseConfigVO getDatabaseConfig() throws SQLException;
+    
+    public void clearCache() throws SQLException;
 }

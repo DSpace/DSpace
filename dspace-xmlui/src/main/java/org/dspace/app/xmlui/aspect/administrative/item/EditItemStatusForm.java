@@ -26,7 +26,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 
 /**
@@ -151,7 +151,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		}
 		else
 		{
-			itemInfo.addItem().addXref(ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle(),ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle());		
+			itemInfo.addItem().addXref(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url") + "/handle/" + item.getHandle(),DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url") + "/handle/" + item.getHandle());
 		}
 		
 		itemInfo.addLabel(T_label_auth);

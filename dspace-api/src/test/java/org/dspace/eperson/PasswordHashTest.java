@@ -10,7 +10,7 @@ package org.dspace.eperson;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import org.apache.commons.codec.DecoderException;
-import org.dspace.AbstractUnitTest;
+import org.dspace.AbstractDSpaceTest;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
  *
  * @author mwood
  */
-public class PasswordHashTest extends AbstractUnitTest
+public class PasswordHashTest extends AbstractDSpaceTest
 {
     public PasswordHashTest()
     {

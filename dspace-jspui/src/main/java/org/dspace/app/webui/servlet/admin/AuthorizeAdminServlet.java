@@ -291,7 +291,9 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             ResourcePolicy policy = resourcePolicyService.find(c, UIUtil
                     .getIntParameter(request, "policy_id"));
 
-            Item item = (Item) policy.getdSpaceObject();
+            Item item = itemService
+                    .find(c, UIUtil.getUUIDParameter(request, "item_id"));
+
 			AuthorizeUtil.authorizeManageItemPolicy(c, item);
             
             // do the remove

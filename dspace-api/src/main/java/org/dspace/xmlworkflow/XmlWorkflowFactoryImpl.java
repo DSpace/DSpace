@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig;
@@ -44,6 +44,11 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
     protected HashMap<String, Workflow> workflowCache;
     protected String path = ConfigurationManager.getProperty("dspace.dir")+"/config/workflow.xml";
 //    private static String pathActions = ConfigurationManager.getProperty("dspace.dir")+"/config/workflow-actions.xml";
+
+    protected XmlWorkflowFactoryImpl()
+    {
+
+    }
 
     @Override
     public Workflow getWorkflow(Collection collection) throws IOException, WorkflowConfigurationException {
@@ -175,12 +180,12 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
     }
      protected UserSelectionActionConfig createUserAssignmentActionConfig(String userSelectionActionID) {
-        return new DSpace().getServiceManager().getServiceByName(userSelectionActionID, UserSelectionActionConfig.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(userSelectionActionID, UserSelectionActionConfig.class);
     }
 
     @Override
     public WorkflowActionConfig createWorkflowActionConfig(String actionID){
-        return new DSpace().getServiceManager().getServiceByName(actionID, WorkflowActionConfig.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(actionID, WorkflowActionConfig.class);
     }
 
     protected LinkedHashMap<String, Role> getRoles(Node workflowNode) throws WorkflowConfigurationException {

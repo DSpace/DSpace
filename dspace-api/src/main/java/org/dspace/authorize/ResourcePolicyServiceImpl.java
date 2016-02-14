@@ -42,10 +42,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
     @Autowired(required = true)
     protected ResourcePolicyDAO resourcePolicyDAO;
 
-    /**
-     * Construct an ResourcePolicy
-     */
-    public ResourcePolicyServiceImpl()
+    protected ResourcePolicyServiceImpl()
     {
     }
 

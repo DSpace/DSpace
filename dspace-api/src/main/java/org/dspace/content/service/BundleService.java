@@ -105,4 +105,6 @@ public interface BundleService extends DSpaceObjectService<Bundle>, DSpaceObject
      * @throws AuthorizeException If the user can't make the changes
      */
     public void setOrder(Context context, Bundle bundle, UUID bitstreamIds[]) throws AuthorizeException, SQLException;
+
+    int countTotal(Context context) throws SQLException;
 }

@@ -42,8 +42,15 @@ import java.util.UUID;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDAO {
+public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDAO
+{
     private static final Logger log = Logger.getLogger(ItemDAOImpl.class);
+
+    protected ItemDAOImpl()
+    {
+        super();
+    }
+
     @Override
     public Iterator<Item> findAll(Context context, boolean archived) throws SQLException {
         Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive");
@@ -245,5 +252,20 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         Query query = createQuery(context, "SELECT i FROM item i WHERE last_modified > :last_modified");
         query.setTimestamp("last_modified", since);
         return iterate(query);
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Item"));
+    }
+
+    @Override
+    public int countNotArchived(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Item i WHERE i.inArchive=false AND i.withdrawn=false"));
+    }
+
+    @Override
+    public int countWithdrawn(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Item i WHERE i.withdrawn=true"));
     }
 }

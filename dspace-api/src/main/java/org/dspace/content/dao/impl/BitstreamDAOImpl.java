@@ -13,6 +13,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -29,7 +30,13 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> implements BitstreamDAO {
+public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> implements BitstreamDAO
+{
+
+    protected BitstreamDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException {
@@ -118,5 +125,32 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
         Criteria criteria = createCriteria(context, Bitstream.class);
         criteria.add(Restrictions.eq("storeNumber", storeNumber));
         return countLong(criteria);
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) from Bitstream"));
+    }
+
+    @Override
+    public int countDeleted(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Bitstream b WHERE b.deleted=true"));
+    }
+
+    @Override
+    public int countWithNoPolicy(Context context) throws SQLException {
+        Query query = createQuery(context,"SELECT count(bit.id) from Bitstream bit where bit.deleted<>true and bit.id not in" +
+                " (select res.dSpaceObject from ResourcePolicy res where res.resourceTypeId = :typeId )" );
+        query.setParameter("typeId", Constants.BITSTREAM);
+        return count(query);
+    }
+
+    @Override
+    public List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException {
+        return list(createQuery(context,"select bit from Bitstream bit where bit.deleted != true" +
+                " and bit.id not in (select bit2.id from Bundle bun join bun.bitstreams bit2)" +
+                " and bit.id not in (select com.logo.id from Community com)" +
+                " and bit.id not in (select col.logo.id from Collection col)" +
+                " and bit.id not in (select bun.primaryBitstream.id from Bundle bun)"));
     }
 }

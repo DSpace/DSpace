@@ -8,6 +8,7 @@
 package org.dspace.rest.common;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -15,6 +16,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.rest.filter.ItemFilterSet;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.SQLException;
@@ -63,12 +65,12 @@ public class FilteredCollection extends DSpaceObject {
      * @throws SQLException
      * @throws WebApplicationException
      */
-    public FilteredCollection(org.dspace.content.Collection collection, String filters, String expand, Context context, Integer limit, Integer offset) throws SQLException, WebApplicationException{
-        super(collection);
-        setup(collection, expand, context, limit, offset, filters);
+    public FilteredCollection(org.dspace.content.Collection collection, ServletContext servletContext, String filters, String expand, Context context, Integer limit, Integer offset) throws SQLException, WebApplicationException{
+        super(collection, servletContext);
+        setup(collection, servletContext, expand, context, limit, offset, filters);
     }
 
-    private void setup(org.dspace.content.Collection collection, String expand, Context context, Integer limit, Integer offset, String filters) throws SQLException{
+    private void setup(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset, String filters) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
@@ -78,7 +80,7 @@ public class FilteredCollection extends DSpaceObject {
             List<org.dspace.content.Community> parentCommunities = collection.getCommunities();
             List<Community> parentCommunityList = new ArrayList<Community>();
             for(org.dspace.content.Community parentCommunity : parentCommunities) {
-                parentCommunityList.add(new Community(parentCommunity, null, context));
+                parentCommunityList.add(new Community(parentCommunity, servletContext, null, context));
             }
             this.setParentCommunityList(parentCommunityList);
         } else {
@@ -87,7 +89,7 @@ public class FilteredCollection extends DSpaceObject {
 
         if(expandFields.contains("parentCommunity") | expandFields.contains("all")) {
             org.dspace.content.Community parentCommunity = collection.getCommunities().get(0);
-            this.setParentCommunity(new Community(parentCommunity, null, context));
+            this.setParentCommunity(new Community(parentCommunity, servletContext, null, context));
         } else {
             this.addExpand("parentCommunity");
         }
@@ -96,7 +98,7 @@ public class FilteredCollection extends DSpaceObject {
             List<org.dspace.content.Community> parentCommunities = collection.getCommunities();
             if (parentCommunities.size() > 0) {
                 org.dspace.content.Community topCommunity = parentCommunities.get(parentCommunities.size()-1);
-                this.setTopCommunity(new Community(topCommunity, null, context));            	
+                this.setTopCommunity(new Community(topCommunity, servletContext, null, context));
             }
         } else {
             this.addExpand("topCommunity");
@@ -110,7 +112,7 @@ public class FilteredCollection extends DSpaceObject {
         this.setNumberItemsProcessed(0);
         if (itemFilters.size() > 0) {
         	Iterator<org.dspace.content.Item> childItems = itemService.findByCollection(context, collection, limit, offset);
-            int numProc = itemFilterSet.processSaveItems(context, childItems, items, reportItems, expand);
+            int numProc = itemFilterSet.processSaveItems(context, servletContext, childItems, items, reportItems, expand);
             this.setNumberItemsProcessed(numProc);
         }       
         

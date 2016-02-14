@@ -13,7 +13,6 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
-import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersioningService;

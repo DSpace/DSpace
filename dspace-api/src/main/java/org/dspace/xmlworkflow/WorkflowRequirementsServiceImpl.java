@@ -53,6 +53,10 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
     @Autowired(required = true)
     protected XmlWorkflowService xmlWorkflowService;
 
+    protected WorkflowRequirementsServiceImpl()
+    {
+
+    }
 
     @Override
     public void addClaimedUser(Context context, XmlWorkflowItem wfi, Step step, EPerson user) throws SQLException, AuthorizeException, IOException {

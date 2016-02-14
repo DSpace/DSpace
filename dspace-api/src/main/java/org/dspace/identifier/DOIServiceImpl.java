@@ -31,6 +31,11 @@ public class DOIServiceImpl implements DOIService {
     @Autowired(required = true)
     protected DOIDAO doiDAO;
 
+    protected DOIServiceImpl()
+    {
+
+    }
+
     @Override
     public void update(Context context, DOI doi) throws SQLException {
         doiDAO.save(context, doi);

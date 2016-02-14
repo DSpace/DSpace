@@ -15,7 +15,7 @@ import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
 import org.apache.commons.lang.StringUtils;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Use the configuration in Dspace.cfg to select paths in sitemap.xmap
@@ -49,7 +49,7 @@ public class ConfigurationMatcher extends AbstractLogEnabled implements Matcher
 			pattern = pattern.substring(1);
 		}
 		String[] expressions = pattern.split(",");
-		String propertyValue = ConfigurationManager.getProperty(expressions[0]);
+		String propertyValue = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(expressions[0]);
 		if (expressions.length == 1) {
 			if (StringUtils.isNotEmpty(propertyValue)) {
 				itMatch = true;

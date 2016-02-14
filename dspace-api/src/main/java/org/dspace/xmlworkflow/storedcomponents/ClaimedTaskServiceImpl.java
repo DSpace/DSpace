@@ -31,6 +31,11 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService
     @Autowired(required = true)
     protected ClaimedTaskDAO claimedTaskDAO;
 
+    protected ClaimedTaskServiceImpl()
+    {
+
+    }
+
     @Override
     public ClaimedTask create(Context context) throws SQLException, AuthorizeException {
         return claimedTaskDAO.create(context, new ClaimedTask());

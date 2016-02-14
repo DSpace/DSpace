@@ -12,6 +12,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.rest.Resource;
 
+import javax.servlet.ServletContext;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -28,8 +29,6 @@ import java.util.UUID;
  */
 @XmlRootElement(name = "dspaceobject")
 public class DSpaceObject {
-    //legacyID
-    private Integer id;
 
     private String uuid;
 
@@ -47,21 +46,13 @@ public class DSpaceObject {
 
     }
 
-    public DSpaceObject(org.dspace.content.DSpaceObject dso) {
-        //setId(); legacyID
+    public DSpaceObject(org.dspace.content.DSpaceObject dso, ServletContext servletContext) {
         setUUID(dso.getID().toString());
         setName(dso.getName());
         setHandle(dso.getHandle());
         DSpaceObjectService dspaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         setType(dspaceObjectService.getTypeText(dso).toLowerCase());
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+        link = createLink(servletContext);
     }
 
     public String getName(){
@@ -81,7 +72,7 @@ public class DSpaceObject {
     }
 
     public String getLink() {
-        return Resource.getServletContextPath() + "/" + English.plural(getType()) + "/" + getId();
+        return link;
     }
 
     public String getType() {
@@ -111,5 +102,9 @@ public class DSpaceObject {
 
     public void setUUID(String uuid) {
         this.uuid = uuid;
+    }
+
+    private String createLink(ServletContext context){
+        return context.getContextPath() + "/" + English.plural(getType()) + "/" + getUUID();
     }
 }

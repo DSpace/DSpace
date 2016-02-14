@@ -37,4 +37,8 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
     public List<Group> findByEPerson(Context context, EPerson ePerson) throws SQLException;
 
     public List getGroup2GroupResults(Context context, boolean flushQueries) throws SQLException;
+
+    List<Group> getEmptyGroups(Context context) throws SQLException;
+
+    int countRows(Context context) throws SQLException;
 }

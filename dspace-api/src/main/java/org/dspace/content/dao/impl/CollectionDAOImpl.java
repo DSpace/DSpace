@@ -20,10 +20,12 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.BasicTransformerAdapter;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Collection object.
@@ -32,7 +34,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> implements CollectionDAO {
+public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> implements CollectionDAO
+{
+    protected CollectionDAOImpl()
+    {
+        super();
+    }
 
     /**
      * Get all collections in the system. These are alphabetically sorted by
@@ -158,6 +165,27 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     }
 
+    @Override
+    public List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException {
+        return list(createQuery(context, "SELECT DISTINCT col FROM Subscription s join  s.collection col"));
+    }
 
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Collection"));
+    }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException {
+        String q = "select col as collection, sum(bit.sizeBytes) as totalBytes from Item i join i.collections col join i.bundles bun join bun.bitstreams bit group by col";
+        Query query = createQuery(context, q);
+        query.setResultTransformer(new BasicTransformerAdapter() {
+            @Override
+            public Object transformTuple(Object[] tuple, String[] aliases) {
+                return new java.util.AbstractMap.SimpleImmutableEntry<>((Collection)tuple[0], (Long)tuple[1]);
+            }
+        });
+        return ((List<Map.Entry<Collection, Long>>)query.list());
+    }
 }

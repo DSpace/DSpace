@@ -21,14 +21,6 @@
         <root.basedir>${basedir}/../../..</root.basedir>
     </properties>
 
-    <build>
-        <filters>
-            <!-- Filter using the properties file defined by dspace-parent POM -->
-            <filter>${filters.file}</filter>
-        </filters>
-
-    </build>
-
     <profiles>
         <profile>
             <id>oracle-support</id>
@@ -59,7 +51,7 @@
                         <artifactId>maven-war-plugin</artifactId>
                         <configuration>
                             <archiveClasses>false</archiveClasses>
-                            <!-- Filter the web.xml -->
+                            <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
                             <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                             <overlays>
                                 <!--
@@ -115,8 +107,6 @@
                         <artifactId>maven-war-plugin</artifactId>
                         <configuration>
                             <archiveClasses>false</archiveClasses>
-                            <!-- Filter the web.xml -->
-                            <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                             <overlays>
                                 <!--
                                    the priority of overlays is determined here

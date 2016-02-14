@@ -40,7 +40,7 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
 
-    public MetadataValueServiceImpl() {
+    protected MetadataValueServiceImpl() {
 
     }
 
@@ -109,5 +109,10 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     {
         return metadataValueDAO.getMinimum(context,
                 metadataFieldId);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return metadataValueDAO.countRows(context);
     }
 }

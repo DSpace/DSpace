@@ -7,7 +7,6 @@
  */
 package org.dspace.app.xmlui.objectmanager;
 
-import org.dspace.app.util.MetadataExposureServiceImpl;
 import org.dspace.app.util.Util;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.MetadataExposureService;
@@ -24,7 +23,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.jdom.Element;
@@ -397,7 +396,7 @@ public class ItemAdapter extends AbstractAdapter
         // we don't really know what the document describes, so we
         // but it in its own dmd group.
 
-        Boolean include = ConfigurationManager.getBooleanProperty("xmlui.bitstream.mods");
+        Boolean include = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.bitstream.mods");
         if (include && dmdTypes.contains("MODS"))
         {
                 // Generate a second group id for any extra metadata added.
@@ -690,7 +689,7 @@ public class ItemAdapter extends AbstractAdapter
         List<Bundle> bundles = findEnabledBundles();
 
         // Suppress license?
-        Boolean showLicense = ConfigurationManager.getBooleanProperty("webui.licence_bundle.show");
+        Boolean showLicense = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.licence_bundle.show");
         
         // Loop over all requested bundles
         for (Bundle bundle : bundles)
@@ -862,7 +861,7 @@ public class ItemAdapter extends AbstractAdapter
      */
     protected void renderExtraSections() throws SAXException, SQLException, IOException
     {
-        Boolean include = ConfigurationManager.getBooleanProperty("xmlui.bitstream.mets");
+        Boolean include = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.bitstream.mets");
         if (!include)
         {
             return;

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 
 import org.apache.log4j.Logger;
@@ -106,8 +107,8 @@ public class ItemFilterSet {
      * @throws WebApplicationException
      * @throws SQLException
      */
-    public int processSaveItems(Context context, Iterator<org.dspace.content.Item> childItems, boolean save, String expand) throws WebApplicationException, SQLException {
-    	return processSaveItems(context, childItems, new ArrayList<Item>(), save, expand);
+    public int processSaveItems(Context context, ServletContext servletContext, Iterator<org.dspace.content.Item> childItems, boolean save, String expand) throws WebApplicationException, SQLException {
+    	return processSaveItems(context, servletContext, childItems, new ArrayList<Item>(), save, expand);
     }
 
     /**
@@ -126,14 +127,14 @@ public class ItemFilterSet {
      * @throws WebApplicationException
      * @throws SQLException
      */
-    public int processSaveItems(Context context, Iterator<org.dspace.content.Item> childItems, List<Item> items, boolean save, String expand) throws WebApplicationException, SQLException {
+    public int processSaveItems(Context context, ServletContext servletContext, Iterator<org.dspace.content.Item> childItems, List<Item> items, boolean save, String expand) throws WebApplicationException, SQLException {
     	int count = 0;
         while(childItems.hasNext()) {
         	count++;
             org.dspace.content.Item item = childItems.next();
             log.debug(item.getHandle() + " evaluate.");
             if(authorizeService.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) { 
-                Item restItem = new Item(item, expand, context); 
+                Item restItem = new Item(item, servletContext, expand, context);
                 if(save) {
                     items.add(restItem);
                 }

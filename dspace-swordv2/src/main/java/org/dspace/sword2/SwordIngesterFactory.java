@@ -8,9 +8,9 @@
 package org.dspace.sword2;
 
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Collection;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.UriRegistry;
@@ -44,10 +44,11 @@ public class SwordIngesterFactory
     {
         SwordContentIngester ingester = null;
 
+        PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
+
         // first look to see if there's an intester for the content type
-        ingester = (SwordContentIngester) PluginManager
-                .getNamedPlugin("swordv2-server", SwordContentIngester.class,
-                        deposit.getMimeType());
+        ingester = (SwordContentIngester) pluginService
+                .getNamedPlugin(SwordContentIngester.class, deposit.getMimeType());
         if (ingester != null)
         {
             return ingester;
@@ -55,9 +56,8 @@ public class SwordIngesterFactory
 
         // if no ingester, then 
         // look to see if there's an ingester for the package format
-        ingester = (SwordContentIngester) PluginManager
-                .getNamedPlugin("swordv2-server", SwordContentIngester.class,
-                        deposit.getPackaging());
+        ingester = (SwordContentIngester) pluginService
+                .getNamedPlugin(SwordContentIngester.class, deposit.getPackaging());
         if (ingester == null)
         {
             throw new SwordError(UriRegistry.ERROR_CONTENT,
@@ -70,8 +70,8 @@ public class SwordIngesterFactory
             Deposit deposit, DSpaceObject dso)
             throws DSpaceSwordException, SwordError
     {
-        SwordEntryIngester ingester = (SwordEntryIngester) PluginManager
-                .getSinglePlugin("swordv2-server", SwordEntryIngester.class);
+        SwordEntryIngester ingester = (SwordEntryIngester) CoreServiceFactory.getInstance().getPluginService()
+                .getSinglePlugin(SwordEntryIngester.class);
         if (ingester == null)
         {
             throw new SwordError(UriRegistry.ERROR_CONTENT,

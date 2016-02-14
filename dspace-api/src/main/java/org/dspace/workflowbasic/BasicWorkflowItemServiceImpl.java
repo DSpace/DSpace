@@ -46,6 +46,11 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     protected TaskListItemService taskListItemService;
 
 
+    protected BasicWorkflowItemServiceImpl()
+    {
+
+    }
+
     @Override
     public BasicWorkflowItem create(Context context, Item item, Collection collection) throws SQLException, AuthorizeException {
         if(findByItem(context, item) != null){
@@ -150,5 +155,10 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     @Override
     public List<BasicWorkflowItem> findByOwner(Context context, EPerson ePerson) throws SQLException {
         return workflowItemDAO.findByOwner(context, ePerson);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return workflowItemDAO.countRows(context);
     }
 }

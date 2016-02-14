@@ -19,7 +19,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Community;
 import org.dspace.content.Collection;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.discovery.*;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 import java.io.Serializable;
@@ -78,9 +77,8 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
 
     public BrowseFacet() {
 
-        DSpace dspace = new DSpace();
-        config = dspace.getConfigurationService();
-        searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
+        config = DSpaceServicesFactory.getInstance().getConfigurationService();
+        searchService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
 
     }
 
@@ -185,7 +183,7 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
 
 //        TODO: change this !
         queryArgs.setSortField(
-                ConfigurationManager.getProperty("recent.submissions.sort-option"),
+                DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("recent.submissions.sort-option"),
                 DiscoverQuery.SORT_ORDER.asc
         );
         queryArgs.addFilterQueries(getParameterFacetQueries());

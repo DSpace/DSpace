@@ -13,7 +13,6 @@ import org.dspace.core.Context;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.net.URLEncoder;
@@ -21,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
@@ -34,12 +34,13 @@ import org.jdom.output.XMLOutputter;
 import org.apache.log4j.Logger;
 
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 
 import com.sun.syndication.feed.module.opensearch.OpenSearchModule;
 import com.sun.syndication.feed.module.opensearch.entity.OSQuery;
 import com.sun.syndication.feed.module.opensearch.impl.OpenSearchModuleImpl;
 import com.sun.syndication.io.FeedException;
+import java.util.Arrays;
+import org.dspace.services.ConfigurationService;
 
 /**
  * Utility Class with static methods for producing OpenSearch-compliant search results,
@@ -83,21 +84,19 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
     @Override
     public void afterPropertiesSet() throws Exception
     {
-    	enabled = ConfigurationManager.getBooleanProperty("websvc.opensearch.enable");
-        svcUrl = ConfigurationManager.getProperty("dspace.url") + "/" +
-                 ConfigurationManager.getProperty("websvc.opensearch.svccontext");
-        uiUrl = ConfigurationManager.getProperty("dspace.url") + "/" +
-                ConfigurationManager.getProperty("websvc.opensearch.uicontext");
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+    	enabled = config.getBooleanProperty("websvc.opensearch.enable");
+        svcUrl = config.getProperty("dspace.url") + "/" +
+                 config.getProperty("websvc.opensearch.svccontext");
+        uiUrl = config.getProperty("dspace.url") + "/" +
+                config.getProperty("websvc.opensearch.uicontext");
 
     	// read rest of config info if enabled
     	formats = new ArrayList<String>();
     	if (enabled)
     	{
-    		String fmtsStr = ConfigurationManager.getProperty("websvc.opensearch.formats");
-    		if ( fmtsStr != null )
-    		{
-                Collections.addAll(formats, fmtsStr.split(","));
-    		}
+    		String[] fmts = config.getArrayProperty("websvc.opensearch.formats");
+            formats = Arrays.asList(fmts);
     	}
     }
 
@@ -215,31 +214,33 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
      */
     protected org.jdom.Document getServiceDocument(String scope)
     {
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+
     	Namespace ns = Namespace.getNamespace(osNs);
         Element root = new Element("OpenSearchDescription", ns);
-        root.addContent(new Element("ShortName", ns).setText(ConfigurationManager.getProperty("websvc.opensearch.shortname")));
-        root.addContent(new Element("LongName", ns).setText(ConfigurationManager.getProperty("websvc.opensearch.longname")));
-        root.addContent(new Element("Description", ns).setText(ConfigurationManager.getProperty("websvc.opensearch.description")));
+        root.addContent(new Element("ShortName", ns).setText(config.getProperty("websvc.opensearch.shortname")));
+        root.addContent(new Element("LongName", ns).setText(config.getProperty("websvc.opensearch.longname")));
+        root.addContent(new Element("Description", ns).setText(config.getProperty("websvc.opensearch.description")));
         root.addContent(new Element("InputEncoding", ns).setText("UTF-8"));
         root.addContent(new Element("OutputEncoding", ns).setText("UTF-8"));
         // optional elements
-        String sample = ConfigurationManager.getProperty("websvc.opensearch.samplequery");
+        String sample = config.getProperty("websvc.opensearch.samplequery");
         if (sample != null && sample.length() > 0)
         {
         	Element sq = new Element("Query", ns).setAttribute("role", "example");
         	root.addContent(sq.setAttribute("searchTerms", sample));
         }
-        String tags = ConfigurationManager.getProperty("websvc.opensearch.tags");
+        String tags = config.getProperty("websvc.opensearch.tags");
         if (tags != null && tags.length() > 0)
         {
         	root.addContent(new Element("Tags", ns).setText(tags));
         }
-        String contact = ConfigurationManager.getProperty("mail.admin");
+        String contact = config.getProperty("mail.admin");
         if (contact != null && contact.length() > 0)
         {
         	root.addContent(new Element("Contact", ns).setText(contact));
         }
-        String faviconUrl = ConfigurationManager.getProperty("websvc.opensearch.faviconurl");
+        String faviconUrl = config.getProperty("websvc.opensearch.faviconurl");
         if (faviconUrl != null && faviconUrl.length() > 0)
         {
         	String dim = String.valueOf(16);

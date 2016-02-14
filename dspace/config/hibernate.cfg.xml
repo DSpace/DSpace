@@ -4,28 +4,15 @@
 <hibernate-configuration>
     <session-factory>
         <!--
-         NOTE: If you are looking for the Hibernate database connection info
-         (driver, url, username, pwd), it is initialized in the 'dataSource'
-         bean in [dspace.dir]/config/spring/api/core-hibernate.xml
+         NOTE: If you are looking for the Hibernate database connection info,
+         it is initialized via the beans in
+         [dspace.dir]/config/spring/api/core-hibernate.xml
         -->
 
-        <property name="hibernate.dialect">${db.dialect}</property>
-        <!--
-         Schema name - if your database contains multiple schemas, you can avoid
-         problems with retrieving the definitions of duplicate object names by
-         specifying the schema name that is used for DSpace.
-         ORACLE USAGE NOTE: In Oracle, schema is equivalent to "username". This means
-         specifying a "db.schema" is often unnecessary (i.e. you can leave it blank),
-         UNLESS your Oracle DB Account (in db.username) has access to multiple schemas.
-        -->
-        <property name="hibernate.default_schema">${db.schema}</property>
         <property name="hibernate.hbm2ddl.auto">validate</property>
         <property name="hibernate.hbm2ddl.import_files_sql_extractor">org.hibernate.tool.hbm2ddl.SingleLineSqlCommandExtractor</property>
         <property name="hibernate.connection.autocommit">false</property>
         <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
-
-
-
 
         <!--Debug property that can be used to display the sql-->
         <property name="show_sql">false</property>

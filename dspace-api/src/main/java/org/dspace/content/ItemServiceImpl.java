@@ -17,7 +17,6 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.service.*;
 import org.dspace.core.Constants;
@@ -75,6 +74,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected VersioningService versioningService;
+
+    protected ItemServiceImpl()
+    {
+        super();
+    }
 
     @Override
     public Thumbnail getThumbnail(Context context, Item item, boolean requireOriginal) throws SQLException {
@@ -414,6 +418,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogManager.getHeader(context, "update_item", "item_id="
                 + item.getID()));
 
+        super.update(context, item);
+
         // Set sequence IDs for bitstreams in item
         int sequence = 0;
         List<Bundle> bunds = item.getBundles();
@@ -747,13 +753,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
                     + " has no default item READ policies");
         }
 
-        // if come from InstallItem: remove all submission/workflow policies
-        authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_SUBMISSION);
-        authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_WORKFLOW);
-
         try {
-            //We just removed all policies so only an admin will be able to add additional policies, ignore the authorizations for now.
+            //ignore the authorizations for now.
             context.turnOffAuthorisationSystem();
+
+            // if come from InstallItem: remove all submission/workflow policies
+            authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_SUBMISSION);
+            authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_WORKFLOW);
+
             // add default policies only if not already in place
             List<ResourcePolicy> policiesToAdd = filterPoliciesToAdd(context, defaultCollectionPolicies, item);
             authorizeService.addPolicies(context, policiesToAdd, item);
@@ -1151,5 +1158,20 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             throws SQLException
     {
         return itemDAO.findByLastModifiedSince(context, last);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return itemDAO.countRows(context);
+    }
+
+    @Override
+    public int getNotArchivedItemsCount(Context context) throws SQLException {
+        return itemDAO.countNotArchived(context);
+    }
+
+    @Override
+    public int countWithdrawnItems(Context context) throws SQLException {
+        return itemDAO.countWithdrawn(context);
     }
 }

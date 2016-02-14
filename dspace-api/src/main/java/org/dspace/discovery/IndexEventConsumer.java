@@ -14,7 +14,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,9 +38,7 @@ public class IndexEventConsumer implements Consumer {
     // handles to delete since IDs are not useful by now.
     private Set<String> handlesToDelete = null;
 
-    DSpace dspace = new DSpace();
-
-    IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
+    IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
 
     @Override
     public void initialize() throws Exception {
@@ -164,7 +162,7 @@ public class IndexEventConsumer implements Consumer {
             // update the changed Items not deleted because they were on create list
             for (DSpaceObject iu : objectsToUpdate) {
                 /* we let all types through here and 
-                 * allow the search DSIndexer to make 
+                 * allow the search indexer to make 
                  * decisions on indexing and/or removal
                  */
                 String hdl = iu.getHandle();

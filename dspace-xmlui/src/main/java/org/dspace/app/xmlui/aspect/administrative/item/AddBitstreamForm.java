@@ -31,7 +31,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bundle;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
@@ -84,7 +84,7 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 
 	public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException
 	{
-            isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+            isAdvancedFormEnabled=DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
             UUID itemID = UUID.fromString(parameters.getParameter("itemID", null));
             org.dspace.content.Item item = itemService.find(context, itemID);
@@ -102,7 +102,7 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 
             // Get the list of bundles to allow the user to upload too. Either use the default
             // or one supplied from the dspace.cfg.
-            String bundleString = ConfigurationManager.getProperty("xmlui.bundle.upload");
+            String bundleString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.bundle.upload");
             if (bundleString == null || bundleString.length() == 0)
             {
                 bundleString = DEFAULT_BUNDLE_LIST;

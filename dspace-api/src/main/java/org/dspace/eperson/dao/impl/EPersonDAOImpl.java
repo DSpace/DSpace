@@ -31,7 +31,12 @@ import java.util.*;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements EPersonDAO {
+public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements EPersonDAO
+{
+    protected EPersonDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public EPerson findByEmail(Context context, String email) throws SQLException
@@ -81,7 +86,14 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     @Override
     public List<EPerson> findAll(Context context, MetadataField metadataSortField, String sortField) throws SQLException {
         String queryString = "SELECT " + EPerson.class.getSimpleName().toLowerCase() + " FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase();
-        Query query = getSearchQuery(context, queryString, null, ListUtils.EMPTY_LIST, Collections.singletonList(metadataSortField), sortField);
+
+        List<MetadataField> sortFields = ListUtils.EMPTY_LIST;
+
+        if(metadataSortField!=null){
+            sortFields =  Collections.singletonList(metadataSortField);
+        }
+
+        Query query = getSearchQuery(context, queryString, null, ListUtils.EMPTY_LIST, sortFields, sortField);
         return list(query);
 
     }
@@ -144,5 +156,15 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         }
 
         return query;
+    }
+
+    @Override
+    public List<EPerson> findAllSubscribers(Context context) throws SQLException {
+        return list(createQuery(context, "SELECT DISTINCT e from Subscription s join s.ePerson e"));
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM EPerson"));
     }
 }

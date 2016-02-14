@@ -10,12 +10,12 @@ package org.dspace.app.util;
 import java.io.File;
 import java.util.*;
 
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
 import org.dspace.content.MetadataSchema;
-import org.dspace.core.ConfigurationManager;
 
 /**
  * Submission form generator for DSpace. Reads and parses the installation
@@ -53,10 +53,6 @@ public class DCInputsReader
     /** Keyname for storing dropdown value-pair set name */
     static final String PAIR_TYPE_NAME = "value-pairs-name";
 
-    /** The fully qualified pathname of the form definition XML file */
-    private String defsFile = ConfigurationManager.getProperty("dspace.dir")
-            + File.separator + "config" + File.separator + FORM_DEF_FILE;
-
     /**
      * Reference to the collections to forms map, computed from the forms
      * definition file
@@ -91,6 +87,10 @@ public class DCInputsReader
     public DCInputsReader()
          throws DCInputsReaderException
     {
+        // Load from default file
+        String defsFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
+                + File.separator + "config" + File.separator + FORM_DEF_FILE;
+
         buildInputs(defsFile);
     }
 

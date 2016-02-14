@@ -16,6 +16,7 @@ import org.dspace.eperson.Group;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Database Access Object interface class for the Collection object.
@@ -37,4 +38,10 @@ public interface CollectionDAO extends DSpaceObjectLegacySupportDAO<Collection> 
     public List<Collection> findAuthorized(Context context, EPerson ePerson, List<Integer> actions) throws SQLException;
 
     List<Collection> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions) throws SQLException;
+
+    List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException;
+
+    int countRows(Context context) throws SQLException;
+
+    List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
 }

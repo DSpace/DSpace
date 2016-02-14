@@ -18,7 +18,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -93,8 +93,7 @@ public class SelectTargetTransformer extends AbstractDSpaceTransformer
         List targetDetails = main.addList("target_details",List.TYPE_FORM);
 
         Select source = targetDetails.addItem().addSelect("url");
-        String targetsString = ConfigurationManager.getProperty("sword-client", "targets");
-        String[] targets = targetsString.split(",");
+        String[] targets = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("sword-client.targets");
         for (String target : targets)
         {
             if ((urlValue != null) && (urlValue.length() > 0) && (urlValue.equals(target)))

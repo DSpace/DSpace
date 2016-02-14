@@ -21,7 +21,7 @@ import org.dspace.app.webui.search.SearchRequestProcessor;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.PluginConfigurationError;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 
 /**
  * Servlet for producing OpenSearch-compliant search results, and the OpenSearch
@@ -49,7 +49,7 @@ public class OpenSearchServlet extends DSpaceServlet
 
         try
         {
-            internalLogic = (SearchRequestProcessor) PluginManager
+            internalLogic = (SearchRequestProcessor) CoreServiceFactory.getInstance().getPluginService()
                     .getSinglePlugin(SearchRequestProcessor.class);
         }
         catch (PluginConfigurationError e)

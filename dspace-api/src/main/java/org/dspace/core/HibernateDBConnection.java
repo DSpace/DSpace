@@ -107,4 +107,9 @@ public class HibernateDBConnection implements DBConnection<Session> {
         }
         return databaseConfigVO;
     }
+
+	@Override
+	public void clearCache() throws SQLException {
+		this.getSession().clear();
+	}
 }

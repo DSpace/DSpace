@@ -47,9 +47,9 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.*;
 import org.dspace.discovery.configuration.*;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.util.MultiFormatDateParser;
-import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -123,11 +123,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     private HttpSolrServer solr = null;
 
 
+    protected SolrServiceImpl()
+    {
+
+    }
+
     protected HttpSolrServer getSolr()
     {
         if ( solr == null)
         {
-            String solrService = new DSpace().getConfigurationService().getProperty("discovery.search.server");
+            String solrService = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.search.server");
 
             UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
             if (urlValidator.isValid(solrService)||ConfigurationManager.getBooleanProperty("discovery","solr.url.validation.enabled",true))
@@ -389,10 +394,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
         try {
             Iterator<Item> items = null;
+            int itemCount = 0;
             for (items = itemService.findAllUnfiltered(context); items.hasNext();)
             {
                 Item item = items.next();
                 indexContent(context, item, force);
+                if (itemCount++ >= 1000) {
+                	context.clearCache();
+                	itemCount = 0;
+                }
             }
 
             List<Collection> collections = collectionService.findAll(context);
@@ -771,7 +781,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.title", title);
 
         //Do any additional indexing, depends on the plugins
-        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = new DSpace().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
+        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
         for (SolrServiceIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
         {
             solrServiceIndexPlugin.additionalIndex(context, community, doc);
@@ -827,7 +837,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
 
         //Do any additional indexing, depends on the plugins
-        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = new DSpace().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
+        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
         for (SolrServiceIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
         {
             solrServiceIndexPlugin.additionalIndex(context, collection, doc);
@@ -958,7 +968,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
 
             List<String> toProjectionFields = new ArrayList<String>();
-            String projectionFieldsString = new DSpace().getConfigurationService().getProperty("discovery.index.projection");
+            String projectionFieldsString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.index.projection");
             if(projectionFieldsString != null){
                 if(projectionFieldsString.indexOf(",") != -1){
                     for (int i = 0; i < projectionFieldsString.split(",").length; i++) {
@@ -1008,12 +1018,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 if (isAuthorityControlled && meta.getAuthority() != null
                         && meta.getConfidence() >= minConfidence)
                 {
-                    boolean ignoreAuthority = new DSpace()
-                            .getConfigurationService()
+                    boolean ignoreAuthority = DSpaceServicesFactory.getInstance().getConfigurationService()
                             .getPropertyAsType(
                                     "discovery.index.authority.ignore." + field,
-                                    new DSpace()
-                                            .getConfigurationService()
+                                    DSpaceServicesFactory.getInstance().getConfigurationService()
                                             .getPropertyAsType(
                                                     "discovery.index.authority.ignore",
                                                     new Boolean(false)), true);
@@ -1021,13 +1029,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     {
                         authority = meta.getAuthority();
 
-                        boolean ignorePrefered = new DSpace()
-                                .getConfigurationService()
+                        boolean ignorePrefered = DSpaceServicesFactory.getInstance().getConfigurationService()
                                 .getPropertyAsType(
                                         "discovery.index.authority.ignore-prefered."
                                                 + field,
-                                        new DSpace()
-                                                .getConfigurationService()
+                                        DSpaceServicesFactory.getInstance().getConfigurationService()
                                                 .getPropertyAsType(
                                                         "discovery.index.authority.ignore-prefered",
                                                         new Boolean(false)),
@@ -1039,13 +1045,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                     .getLabel(meta, meta.getLanguage());
                         }
 
-                        boolean ignoreVariants = new DSpace()
-                                .getConfigurationService()
+                        boolean ignoreVariants = DSpaceServicesFactory.getInstance().getConfigurationService()
                                 .getPropertyAsType(
                                         "discovery.index.authority.ignore-variants."
                                                 + field,
-                                        new DSpace()
-                                                .getConfigurationService()
+                                        DSpaceServicesFactory.getInstance().getConfigurationService()
                                                 .getPropertyAsType(
                                                         "discovery.index.authority.ignore-variants",
                                                         new Boolean(false)),
@@ -1070,7 +1074,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     for (DiscoverySearchFilter searchFilter : searchFilterConfigs)
                     {
                         Date date = null;
-                        String separator = new DSpace().getConfigurationService().getProperty("discovery.solr.facets.split.char");
+                        String separator = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.solr.facets.split.char");
                         if(separator == null)
                         {
                             separator = FILTER_SEPARATOR;
@@ -1387,7 +1391,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
 
         //Do any additional indexing, depends on the plugins
-        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = new DSpace().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
+        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
         for (SolrServiceIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
         {
             solrServiceIndexPlugin.additionalIndex(context, item, doc);
@@ -1725,7 +1729,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
 
         //Add any configured search plugins !
-        List<SolrServiceSearchPlugin> solrServiceSearchPlugins = new DSpace().getServiceManager().getServicesByType(SolrServiceSearchPlugin.class);
+        List<SolrServiceSearchPlugin> solrServiceSearchPlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrServiceSearchPlugin.class);
         for (SolrServiceSearchPlugin searchPlugin : solrServiceSearchPlugins)
         {
             searchPlugin.additionalSearchParameters(context, discoveryQuery, solrQuery);
@@ -2206,7 +2210,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
           || field.endsWith("_acid"))
         {
             //We have a filter make sure we split !
-            String separator = new DSpace().getConfigurationService().getProperty("discovery.solr.facets.split.char");
+            String separator = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.solr.facets.split.char");
             if(separator == null)
             {
                 separator = FILTER_SEPARATOR;
@@ -2239,7 +2243,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 || field.endsWith("_acid"))
         {
             //We have a filter make sure we split !
-            String separator = new DSpace().getConfigurationService().getProperty("discovery.solr.facets.split.char");
+            String separator = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.solr.facets.split.char");
             if(separator == null)
             {
                 separator = FILTER_SEPARATOR;
@@ -2274,7 +2278,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 || field.endsWith("_acid"))
         {
             //We have a filter make sure we split !
-            String separator = new DSpace().getConfigurationService().getProperty("discovery.solr.facets.split.char");
+            String separator = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.solr.facets.split.char");
             if(separator == null)
             {
                 separator = FILTER_SEPARATOR;

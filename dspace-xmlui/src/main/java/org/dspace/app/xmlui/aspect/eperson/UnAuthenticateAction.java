@@ -20,7 +20,7 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -73,9 +73,9 @@ public class UnAuthenticateAction extends AbstractAction
         context.setCurrentUser(eperson);
         
         // Forward the user to the home page.
-        if((ConfigurationManager.getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure())) {
+        if((DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure())) {
 				StringBuffer location = new StringBuffer("http://");
-				location.append(ConfigurationManager.getProperty("dspace.hostname")).append(
+				location.append(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname")).append(
 						httpRequest.getContextPath());
 				httpResponse.sendRedirect(location.toString());
 			

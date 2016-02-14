@@ -59,6 +59,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Autowired(required = true)
     protected BitstreamStorageService bitstreamStorageService;
 
+    protected BitstreamServiceImpl()
+    {
+        super();
+    }
 
     @Override
     public Bitstream find(Context context, UUID id) throws SQLException {
@@ -215,7 +219,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         log.info(LogManager.getHeader(context, "update_bitstream",
                 "bitstream_id=" + bitstream.getID()));
-
+        super.update(context, bitstream);
         if (bitstream.isModified())
         {
             context.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null, getIdentifiers(context, bitstream)));
@@ -402,6 +406,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
+    public int countTotal(Context context) throws SQLException {
+        return bitstreamDAO.countRows(context);
+    }
+
+    @Override
     public Bitstream findByIdOrLegacyId(Context context, String id) throws SQLException {
         if(StringUtils.isNumeric(id))
         {
@@ -417,5 +426,20 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     public Bitstream findByLegacyId(Context context, int id) throws SQLException {
         return bitstreamDAO.findByLegacyId(context, id, Bitstream.class);
 
+    }
+
+    @Override
+    public int countDeletedBitstreams(Context context) throws SQLException {
+        return bitstreamDAO.countDeleted(context);
+    }
+
+    @Override
+    public int countBitstreamsWithoutPolicy(Context context) throws SQLException {
+        return bitstreamDAO.countWithNoPolicy(context);
+    }
+
+    @Override
+    public List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException {
+        return bitstreamDAO.getNotReferencedBitstreams(context);
     }
 }

@@ -18,12 +18,11 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.rest.exceptions.ContextException;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 
 /**
  * Superclass of all resource classes in REST API. It has methods for creating
@@ -37,19 +36,16 @@ import org.dspace.utils.DSpace;
 public class Resource
 {
 
-    @javax.ws.rs.core.Context public static ServletContext servletContext;
+    @javax.ws.rs.core.Context public ServletContext servletContext;
 
     private static Logger log = Logger.getLogger(Resource.class);
 
     private static final boolean writeStatistics;
     static
     {
-        writeStatistics = ConfigurationManager.getBooleanProperty("rest", "stats", false);
+        writeStatistics = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("rest.stats", false);
     }
 
-    static public String getServletContextPath() {
-        return servletContext.getContextPath();
-    }
     /**
      * Create context to work with DSpace database. It can create context
      * with or without a logged in user (parameter user is null). Throws
@@ -104,11 +100,11 @@ public class Resource
 
         if ((user_ip == null) || (user_ip.length() == 0))
         {
-            new DSpace().getEventService().fireEvent(new UsageEvent(action, request, context, dspaceObject));
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(new UsageEvent(action, request, context, dspaceObject));
         }
         else
         {
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
                     new UsageEvent(action, user_ip, user_agent, xforwardedfor, context, dspaceObject));
         }
 

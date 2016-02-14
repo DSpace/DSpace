@@ -26,18 +26,13 @@
    </properties>
 
    <build>
-       <filters>
-           <!-- Filter using the properties file defined by dspace-parent POM -->
-           <filter>${filters.file}</filter>
-       </filters>
       <plugins>
-
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
             <configuration>
                <archiveClasses>false</archiveClasses>
-               <!-- Filter the web.xml -->
+               <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
                <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
             </configuration>
             <executions>

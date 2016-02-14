@@ -201,4 +201,8 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     public List<String> getDeleteConstraints(Context context, EPerson ePerson) throws SQLException;
 
     public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException;
+
+    List<EPerson> findEPeopleWithSubscription(Context context) throws SQLException;
+
+    int countTotal(Context context) throws SQLException;
 }

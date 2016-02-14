@@ -17,11 +17,10 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.service.PluginService;
 import org.dspace.embargo.service.EmbargoService;
-import org.springframework.beans.factory.InitializingBean;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -42,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Larry Stone
  * @author Richard Rodgers
  */
-public class EmbargoServiceImpl implements EmbargoService, InitializingBean
+public class EmbargoServiceImpl implements EmbargoService
 {
 
     /** log4j category */
@@ -67,6 +66,17 @@ public class EmbargoServiceImpl implements EmbargoService, InitializingBean
 
     @Autowired(required = true)
     protected ItemService itemService;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+
+    @Autowired(required = true)
+    protected PluginService pluginService;
+
+    protected EmbargoServiceImpl()
+    {
+
+    }
 
     @Override
     public void setEmbargo(Context context, Item item)
@@ -156,14 +166,18 @@ public class EmbargoServiceImpl implements EmbargoService, InitializingBean
     }
 
 
-    // initialize - get plugins and MD field settings from config
-    @Override
-    public void afterPropertiesSet() throws Exception
+    /**
+     * Initialize the bean (after dependency injection has already taken place).
+     * Ensures the configurationService is injected, so that we can
+     * get plugins and MD field settings from config.
+     * Called by "init-method" in Spring config.
+     */
+    public void init() throws Exception
     {
         if (terms_schema == null)
         {
-            String terms = ConfigurationManager.getProperty("embargo.field.terms");
-            String lift = ConfigurationManager.getProperty("embargo.field.lift");
+            String terms = configurationService.getProperty("embargo.field.terms");
+            String lift = configurationService.getProperty("embargo.field.lift");
             if (terms == null || lift == null)
             {
                 throw new IllegalStateException("Missing one or more of the required DSpace configuration properties for EmbargoManager, check your configuration file.");
@@ -175,12 +189,12 @@ public class EmbargoServiceImpl implements EmbargoService, InitializingBean
             lift_element = getElementOf(lift);
             lift_qualifier = getQualifierOf(lift);
 
-            setter = (EmbargoSetter)PluginManager.getSinglePlugin(EmbargoSetter.class);
+            setter = (EmbargoSetter)pluginService.getSinglePlugin(EmbargoSetter.class);
             if (setter == null)
             {
                 throw new IllegalStateException("The EmbargoSetter plugin was not defined in DSpace configuration.");
             }
-            lifter = (EmbargoLifter)PluginManager.getSinglePlugin(EmbargoLifter.class);
+            lifter = (EmbargoLifter)pluginService.getSinglePlugin(EmbargoLifter.class);
             if (lifter == null)
             {
                 throw new IllegalStateException("The EmbargoLifter plugin was not defined in DSpace configuration.");

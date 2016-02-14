@@ -25,7 +25,6 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
-import org.dspace.app.sfx.SFXFileReaderServiceImpl;
 import org.dspace.app.sfx.factory.SfxServiceFactory;
 import org.dspace.app.sfx.service.SFXFileReaderService;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -48,14 +47,13 @@ import org.dspace.app.util.GoogleMetadata;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.core.PluginManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.app.xmlui.wing.element.Metadata;
-import org.dspace.utils.DSpace;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +88,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 	/** XHTML crosswalk instance */
 	private DisseminationCrosswalk xHTMLHeadCrosswalk = null;
 
-	private final String sfxFile = ConfigurationManager.getProperty("dspace.dir")
+	private final String sfxFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
             + File.separator + "config" + File.separator + "sfx.xml";
 
 	private String sfxQuery = null;
@@ -192,7 +190,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addTrail().addContent(T_trail);
 
         // Add SFX link
-        String sfxserverUrl = ConfigurationManager.getProperty("sfx.server.url");
+        String sfxserverUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.url");
         if (sfxserverUrl != null && sfxserverUrl.length() > 0)
         {
             sfxQuery = "";
@@ -213,7 +211,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         /* Temporarily switch to using metadata directly.
          * FIXME Proper fix is to have IdentifierService handle all durable
          * identifiers, whether minted here or elsewhere.
-        List<IdentifierProvider> idPs = new DSpace().getServiceManager()
+        List<IdentifierProvider> idPs = DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServicesByType(IdentifierProvider.class);
         for (IdentifierProvider idP : idPs)
         {
@@ -241,7 +239,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
         */
-        String identifierField = new DSpace().getConfigurationService()
+        String identifierField = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getPropertyAsType("altmetrics.field", "dc.identifier.uri");
         for (MetadataValue uri : ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getMetadataByMetadataString(dso, identifierField))
         {
@@ -268,13 +266,13 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             md.addContent(idValue);
         }
 
-        String sfxserverImg = ConfigurationManager.getProperty("sfx.server.image_url");
+        String sfxserverImg = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.image_url");
         if (sfxserverImg != null && sfxserverImg.length() > 0)
         {
             pageMeta.addMetadata("sfx","image_url").addContent(sfxserverImg);
         }
 
-        boolean googleEnabled = ConfigurationManager.getBooleanProperty(
+        boolean googleEnabled = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
             "google-metadata.enable", false);
 
         if (googleEnabled)
@@ -291,7 +289,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         // Metadata for <head> element
         if (xHTMLHeadCrosswalk == null)
         {
-            xHTMLHeadCrosswalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(
+            xHTMLHeadCrosswalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
               DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
         }
 

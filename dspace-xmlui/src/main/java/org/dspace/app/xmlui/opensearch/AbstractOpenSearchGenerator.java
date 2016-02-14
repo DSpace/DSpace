@@ -7,12 +7,6 @@
  */
 package org.dspace.app.xmlui.opensearch;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URLDecoder;
-import java.sql.SQLException;
-import java.util.Map;
-
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -24,17 +18,22 @@ import org.apache.cocoon.generation.AbstractGenerator;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.ExpiresValidity;
-import org.dspace.app.util.OpenSearchServiceImpl;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URLDecoder;
+import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * This class provides the common attributes and methods for parameter parsing,
@@ -126,7 +125,7 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
     {
         if (this.validity == null)
         {
-            long expiry = ConfigurationManager
+            long expiry = DSpaceServicesFactory.getInstance().getConfigurationService()
                     .getLongProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
                 this.validity = new ExpiresValidity(expiry);
         }

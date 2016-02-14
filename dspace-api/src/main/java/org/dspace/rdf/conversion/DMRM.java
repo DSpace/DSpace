@@ -68,7 +68,7 @@ public class DMRM {
     /** <p>The object of a DSpace metadata RDF mapping result.</p> */
     public static final Property object = m_model.createProperty( NS + "object" );
     
-    /** <p>The name of the metadata to convert (g.e. dc.title).</p> */
+    /** <p>The name of the metadata to convert (e.g. dc.title).</p> */
     public static final Property metadataName = m_model.createProperty( NS + "metadataName" );
     
     /** <p>A regex that the metadata value has to fulfill if the mapping should become active.</p> */

@@ -7,6 +7,7 @@
  */
 package org.dspace.authenticate;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -14,7 +15,16 @@ import java.util.List;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.*;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.StartTlsRequest;
+import javax.naming.ldap.StartTlsResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -404,6 +414,8 @@ public class LDAPAuthentication
         String ldap_surname_field = ConfigurationManager.getProperty("authentication-ldap", "surname_field");
         String ldap_phone_field = ConfigurationManager.getProperty("authentication-ldap", "phone_field");
         String ldap_group_field = ConfigurationManager.getProperty("authentication-ldap", "login.groupmap.attribute"); 
+        
+        boolean useTLS = ConfigurationManager.getBooleanProperty("authentication-ldap", "starttls", false);
 
         SpeakerToLDAP(Logger thelog)
         {
@@ -432,29 +444,50 @@ public class LDAPAuthentication
             }
 
             // Set up environment for creating initial context
-            Hashtable env = new Hashtable(11);
+            Hashtable<String, String> env = new Hashtable<String, String>();
             env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
             env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
+            
+            LdapContext ctx = null;
+            StartTlsResponse startTLSResponse = null;
 
-            if ((adminUser != null) && (!adminUser.trim().equals("")) &&
-                (adminPassword != null) && (!adminPassword.trim().equals("")))
-            {
-                // Use admin credentials for search// Authenticate
-                env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
-                env.put(javax.naming.Context.SECURITY_PRINCIPAL, adminUser);
-                env.put(javax.naming.Context.SECURITY_CREDENTIALS, adminPassword);
-            }
-            else
-            {
-                // Use anonymous authentication
-                env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "none");
-            }
-
-            DirContext ctx = null;
             try
             {
-                // Create initial context
-                ctx = new InitialDirContext(env);
+                if ((adminUser != null) && (!adminUser.trim().equals("")) &&
+                    (adminPassword != null) && (!adminPassword.trim().equals("")))
+                {
+                    if(useTLS)
+                    {
+                        ctx = new InitialLdapContext(env, null);
+                        // start TLS
+                        startTLSResponse = (StartTlsResponse) ctx
+                                .extendedOperation(new StartTlsRequest());
+        
+                        startTLSResponse.negotiate();
+        
+                        // perform simple client authentication
+                        ctx.addToEnvironment(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
+                        ctx.addToEnvironment(javax.naming.Context.SECURITY_PRINCIPAL,
+                                adminUser);
+                        ctx.addToEnvironment(javax.naming.Context.SECURITY_CREDENTIALS,
+                                adminPassword);
+                    }
+                    else
+                    {
+                        // Use admin credentials for search// Authenticate
+                        env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
+                        env.put(javax.naming.Context.SECURITY_PRINCIPAL, adminUser);
+                        env.put(javax.naming.Context.SECURITY_CREDENTIALS, adminPassword);
+                        
+                        // Create initial context
+                        ctx = new InitialLdapContext(env, null);
+                    }
+                }
+                else
+                {
+                    // Use anonymous authentication
+                    env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "none");
+                }
 
                 Attributes matchAttrs = new BasicAttributes(true);
                 matchAttrs.put(new BasicAttribute(ldap_id_field, netid));
@@ -465,8 +498,17 @@ public class LDAPAuthentication
                     SearchControls ctrls = new SearchControls();
                     ctrls.setSearchScope(ldap_search_scope_value);
 
+                    String searchName = "";
+                    if(useTLS)
+                    {
+                        searchName = ldap_search_context;
+                    }
+                    else
+                    {
+                        searchName = ldap_provider_url + ldap_search_context;
+                    }
                     NamingEnumeration<SearchResult> answer = ctx.search(
-                            ldap_provider_url + ldap_search_context,
+                            searchName,
                             "(&({0}={1}))", new Object[] { ldap_id_field,
                                     netid }, ctrls);
 
@@ -542,7 +584,7 @@ public class LDAPAuthentication
                                         + e));
                 }
             }
-            catch (NamingException e)
+            catch (NamingException | IOException e)
             {
                 log.warn(LogManager.getHeader(context,
                             "ldap_authentication", "type=failed_auth " + e));
@@ -552,12 +594,16 @@ public class LDAPAuthentication
                 // Close the context when we're done
                 try
                 {
+                    if (startTLSResponse != null)
+                    {
+                        startTLSResponse.close();
+                    }
                     if (ctx != null)
                     {
                         ctx.close();
                     }
                 }
-                catch (NamingException e)
+                catch (NamingException | IOException e)
                 {
                 }
             }
@@ -572,38 +618,75 @@ public class LDAPAuthentication
         protected boolean ldapAuthenticate(String netid, String password,
                         Context context) {
             if (!password.equals("")) {
+                
+                LdapContext ctx = null;
+                StartTlsResponse startTLSResponse = null;
+                
+                
                 // Set up environment for creating initial context
                 Hashtable<String, String> env = new Hashtable<String, String>();
                 env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY,
                         "com.sun.jndi.ldap.LdapCtxFactory");
                 env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
 
-                // Authenticate
-                env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "Simple");
-                env.put(javax.naming.Context.SECURITY_PRINCIPAL, netid);
-                env.put(javax.naming.Context.SECURITY_CREDENTIALS, password);
-                env.put(javax.naming.Context.AUTHORITATIVE, "true");
-                env.put(javax.naming.Context.REFERRAL, "follow");
+                try
+                {
+                    if(useTLS)
+                    {
+                        ctx = new InitialLdapContext(env, null);
+                        // start TLS
+                        startTLSResponse = (StartTlsResponse) ctx
+                                .extendedOperation(new StartTlsRequest());
+        
+                        startTLSResponse.negotiate();
+        
+                        // perform simple client authentication
+                        ctx.addToEnvironment(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
+                        ctx.addToEnvironment(javax.naming.Context.SECURITY_PRINCIPAL,
+                                netid);
+                        ctx.addToEnvironment(javax.naming.Context.SECURITY_CREDENTIALS,
+                                password);
+                        ctx.addToEnvironment(javax.naming.Context.AUTHORITATIVE, "true");
+                        ctx.addToEnvironment(javax.naming.Context.REFERRAL, "follow");
+                        // dummy operation to check if authentication has succeeded
+                        ctx.getAttributes("");
+                    }
 
-                DirContext ctx = null;
-                try {
-                    // Try to bind
-                    ctx = new InitialDirContext(env);
-                } catch (NamingException e) {
+                    else if (!useTLS)
+                    {
+                        // Authenticate
+                        env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "Simple");
+                        env.put(javax.naming.Context.SECURITY_PRINCIPAL, netid);
+                        env.put(javax.naming.Context.SECURITY_CREDENTIALS, password);
+                        env.put(javax.naming.Context.AUTHORITATIVE, "true");
+                        env.put(javax.naming.Context.REFERRAL, "follow");
+        
+                        // Try to bind
+                        ctx = new InitialLdapContext(env, null);
+                    }
+                }
+                catch (NamingException | IOException e)
+                {
+                    // something went wrong (like wrong password) so return false
                     log.warn(LogManager.getHeader(context,
                             "ldap_authentication", "type=failed_auth " + e));
                     return false;
-                } finally {
+                } finally 
+                {
                     // Close the context when we're done
                     try {
+                        if (startTLSResponse != null)
+                        {
+                            startTLSResponse.close();
+                        }
                         if (ctx != null)
                         {
                             ctx.close();
                         }
-                    } catch (NamingException e) {
-                    }
+                    } catch (NamingException | IOException e) {}
                 }
-            } else {
+            } else 
+            {
                 return false;
             }
 

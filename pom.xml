@@ -32,16 +32,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
         <java.version>1.7</java.version>
-        <lucene.version>4.10.2</lucene.version>
-        <solr.version>4.10.2</solr.version>
-        <jena.version>2.12.0</jena.version>
-        <slf4j.version>1.6.1</slf4j.version>
+        <solr.version>4.10.4</solr.version>
+        <jena.version>2.13.0</jena.version>
+        <slf4j.version>1.7.14</slf4j.version>
         <!--
             Hibernate version pinned to 4.2, 4.3 does not work with the spring version we are currently using
             Upgrading the spring version will make the XMLUI crash
         -->
-        <hibernate.version>4.2.19.Final</hibernate.version>
-        <spring.version>3.2.14.RELEASE</spring.version>
+        <hibernate.version>4.2.21.Final</hibernate.version>
+        <spring.version>3.2.16.RELEASE</spring.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -99,7 +98,7 @@
                 <version>2.4</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <!-- Filter the web.xml -->
+                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <archive>
                         <manifest>
@@ -116,7 +115,7 @@
                 <configuration>
                     <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                          maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
-                    <argLine>${surefire.argLine}</argLine>
+                    <argLine>${test.argLine}</argLine>
                     <!-- tests whose name starts by Abstract will be ignored -->
                     <excludes>
                         <exclude>**/Abstract*</exclude>
@@ -133,6 +132,9 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
+                   <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
+                        maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
+                   <argLine>${test.argLine}</argLine>
                    <excludes>
                       <exclude>**/Abstract*</exclude>
                    </excludes>
@@ -195,37 +197,6 @@
       <!-- These plugin settings only apply to this single POM and are not inherited
            to any submodules. -->
       <plugins>
-         <!-- Ensure that any *.properties files have UTF-8 chars encoded (e.g. "\u00e9") *before* using them to filter dspace.cfg and other configs -->
-         <plugin>
-           <artifactId>maven-antrun-plugin</artifactId>
-           <executions>
-             <execution>
-               <id>native2ascii-utf8</id>
-               <phase>generate-resources</phase>
-               <configuration>
-                 <target name="Encode any UTF-8 chars in properties">
-                   <!-- Run 'native2ascii' to encode UTF-8 characters in properties files. Place the resulting file(s) in /target -->
-                   <native2ascii encoding="UTF8" src="${root.basedir}" dest="${root.basedir}/target" includes="*.properties" />
-                 </target>
-               </configuration>
-               <goals>
-                 <goal>run</goal>
-               </goals>
-             </execution>
-           </executions>
-           <!-- Required dependencies for native2ascii to function -->
-           <dependencies>
-             <dependency>
-               <groupId>com.sun</groupId>
-               <artifactId>tools</artifactId>
-               <version>${java.version}</version>
-               <scope>system</scope>
-               <!-- Path to tools.jar (containing native2ascii tool) is determined by a profile (see below) -->
-               <systemPath>${toolsjar}</systemPath>
-             </dependency>
-           </dependencies>
-         </plugin>
-
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
             <version>2.5</version>
@@ -258,7 +229,7 @@
                         <exclude>**/src/test/resources/**</exclude>
                         <exclude>**/src/test/data/**</exclude>
                         <exclude>**/src/main/license/**</exclude>
-                        <exclude>**/testEnvironment.properties</exclude>
+                        <exclude>**/test.cfg</exclude>
                         <exclude>**/META-INF/**</exclude>
                         <exclude>**/robots.txt</exclude>
                         <exclude>**/*.LICENSE</exclude>
@@ -266,7 +237,6 @@
                         <exclude>**/README*</exclude>
                         <exclude>**/readme*</exclude>
                         <exclude>**/.gitignore</exclude>
-                        <exclude>**/build.properties*</exclude>
                     </excludes>
                     <mapping> 
                         <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin: 
@@ -296,42 +266,6 @@
    </build>
    
    <profiles>
-
-       <!-- By default the main dspace.cfg file will be filtered during the build
-            using the "build.properties" file. This profile takes effect, unless
-            "-Denv" is passed in (see 'environment' profile below for more info). -->
-       <profile>
-           <id>default</id>
-           <activation>
-               <property>
-                    <name>!env</name>
-                </property>
-           </activation>
-           <properties>
-               <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
-               <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
-               <filters.file>${root.basedir}/target/build.properties</filters.file>
-           </properties>
-       </profile>
-
-       <!-- Users can pass in an environment flag "-Denv" to tell DSpace to use
-            a different properties file during its build process. 
-            For example: "mvn package -Denv=test" would build DSpace using the
-            settings in "test.properties" instead of those in "build.properties" -->
-       <profile>
-           <id>environment</id>
-           <activation>
-                <property>
-                    <name>env</name>
-                </property>
-           </activation>
-           <properties>
-                <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
-                <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
-                <filters.file>${root.basedir}/target/${env}.properties</filters.file>
-           </properties>
-       </profile>
-
        <!-- Skip Unit Tests by default, but allow override on command line
            by setting property "-Dmaven.test.skip=false" -->
        <profile>
@@ -364,19 +298,19 @@
            </properties>
        </profile>
 
-        <!-- Allow for passing extra memory to Unit tests (via maven-surefire-plugin).
+        <!-- Allow for passing extra memory to Unit/Integration tests.
              By default this gives unit tests 512MB of memory (when tests are enabled), 
-             unless tweaked on commandline (e.g. "-Dsurefire.argLine=-Xmx512m"). Since 
-             m-surefire-p forks a new JVM for testing, it ignores MAVEN_OPTS. -->
+             unless tweaked on commandline (e.g. "-Dtest.argLine=-Xmx512m"). Since 
+             m-surefire-p and m-failsafe-p both fork a new JVM for testing, they ignores MAVEN_OPTS. -->
         <profile>
-            <id>surefire-argLine</id>
+            <id>test-argLine</id>
             <activation>
                 <property>
-                    <name>!surefire.argLine</name>
+                    <name>!test.argLine</name>
                 </property>
             </activation>
             <properties>
-                <surefire.argLine>-Xmx512m</surefire.argLine>
+                <test.argLine>-Xmx512m</test.argLine>
             </properties>
         </profile>
 
@@ -415,9 +349,6 @@
                                     <descriptors>
                                         <descriptor>src/main/assembly/testEnvironment.xml</descriptor>
                                     </descriptors>
-                                    <filters>
-                                        <filter>src/main/filters/testEnvironment.properties</filter>
-                                    </filters>
                                 </configuration>
                             </execution>
                         </executions>
@@ -507,34 +438,6 @@
                 </plugins>
             </build>
         </profile>
-
-        <!-- Determine path to Java Tools JAR. This JAR contains the 'native2ascii' tool (required above by maven-antrun-plugin)-->
-        <!-- In most platforms Unix/Windows it's named tools.jar. But, on Mac it's classes.jar (see next profile) -->
-        <profile>
-          <id>default-java-tools</id>
-          <activation>
-            <activeByDefault>true</activeByDefault>
-            <file>
-                <exists>${java.home}/../lib/tools.jar</exists>
-            </file>
-          </activation>
-          <properties>
-            <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
-          </properties>
-        </profile>
-        <profile>
-          <id>mac-java-tools</id>
-          <activation>
-            <activeByDefault>false</activeByDefault>
-            <file>
-                <exists>${java.home}/../Classes/classes.jar</exists>
-            </file>
-          </activation>
-          <properties>
-            <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
-          </properties>
-        </profile>
-
 
         <!--
            These profiles activate the inclusion of various modules into
@@ -966,21 +869,6 @@
             <artifactId>ant</artifactId>
             <version>1.7.0</version>
          </dependency>
-         <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>${lucene.version}</version>
-         </dependency>
-         <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
-            <version>${lucene.version}</version>
-         </dependency>
-         <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-            <version>${lucene.version}</version>
-         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
@@ -1007,21 +895,32 @@
             <artifactId>dspace-tm-extractors</artifactId>
             <version>1.0.1</version>
          </dependency>
+         <!-- Required by Commons Configuration -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.2</version>
+        </dependency>
          <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>1.2</version>
+            <version>1.3.1</version>
          </dependency>
          <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.9</version>
+            <version>1.10</version>
          </dependency>
          <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
+            <version>3.2.2</version>
             <!-- <version>3.1</version> xmlui - wing -->
+         </dependency>
+         <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.10</version>
          </dependency>
          <dependency>
              <groupId>org.apache.commons</groupId>
@@ -1031,17 +930,17 @@
          <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
-            <version>0.2</version>
+            <version>0.5</version>
          </dependency>
          <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
-            <version>1.2.1</version>
+            <version>1.3.1</version>
          </dependency>
          <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.3</version>
+            <version>2.4</version>
          </dependency>
          <dependency>
             <groupId>commons-lang</groupId>
@@ -1052,7 +951,7 @@
          <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
+            <version>1.2</version>
          </dependency>
          <dependency>
             <groupId>org.apache.commons</groupId>
@@ -1062,12 +961,12 @@
           <dependency>
               <groupId>commons-validator</groupId>
               <artifactId>commons-validator</artifactId>
-              <version>1.4.0</version>
+              <version>1.5.0</version>
           </dependency>
          <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>1.4</version>
+            <version>1.4.7</version>
          </dependency>
          <dependency>
             <groupId>javax.servlet</groupId>
@@ -1078,7 +977,7 @@
          <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
-            <version>1.1</version>
+            <version>1.1.6</version>
             <exclusions>
                <exclusion>
                   <artifactId>xom</artifactId>
@@ -1089,7 +988,7 @@
          <dependency>
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
          </dependency>
          <dependency>
             <groupId>log4j</groupId>
@@ -1104,7 +1003,7 @@
          <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>1.8.7</version>
+            <version>1.8.11</version>
          </dependency>
          <dependency>
             <groupId>org.apache.pdfbox</groupId>
@@ -1119,27 +1018,27 @@
          <dependency>
 	        <groupId>org.bouncycastle</groupId>
 	        <artifactId>bcprov-jdk15</artifactId>
-	        <version>1.44</version>
+	        <version>1.46</version>
 	    </dependency>
 	    <dependency>
 	        <groupId>org.bouncycastle</groupId>
 	        <artifactId>bcmail-jdk15</artifactId>
-	        <version>1.44</version>
+	        <version>1.46</version>
 	    </dependency>
          <dependency>
            <groupId>org.apache.poi</groupId>
            <artifactId>poi</artifactId>
-           <version>3.6</version>
+           <version>3.13</version>
          </dependency>
          <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-scratchpad</artifactId>
-            <version>3.6</version>
+            <version>3.13</version>
          </dependency>
          <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>3.6</version>
+            <version>3.13</version>
          </dependency>
          <dependency>
             <groupId>rome</groupId>
@@ -1154,7 +1053,7 @@
          <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>2.7.0</version>
+            <version>2.7.2</version>
          </dependency>
          <dependency>
             <groupId>xerces</groupId>
@@ -1170,44 +1069,44 @@
          <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
-            <version>1.1</version>
+            <version>1.1.1</version>
          </dependency>
 
          <dependency>
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
-            <version>1.5.1</version>
+            <version>1.6.3</version>
          </dependency>
          <dependency>
             <groupId>javax.xml</groupId>
             <artifactId>jaxrpc-api</artifactId>
-            <version>1.1</version>
+            <version>1.3</version>
          </dependency>
          <dependency>
             <groupId>axis</groupId>
             <artifactId>axis</artifactId>
-            <version>1.3</version>
+            <version>1.4</version>
          </dependency>
          <dependency>
             <groupId>axis</groupId>
             <artifactId>axis-ant</artifactId>
-            <version>1.3</version>
+            <version>1.4</version>
             <scope>compile</scope>
          </dependency>
          <dependency>
             <groupId>axis</groupId>
             <artifactId>axis-saaj</artifactId>
-            <version>1.2</version>
+            <version>1.4</version>
          </dependency>
          <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
-            <version>51.1</version>
+            <version>56.1</version>
          </dependency>
          <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.4-1203-jdbc41</version>
+            <version>9.4-1206-jdbc41</version>
          </dependency>
          <dependency>
             <groupId>com.oracle</groupId>
@@ -1217,12 +1116,12 @@
          <dependency>
             <groupId>com.sun.media</groupId>
             <artifactId>jai_imageio</artifactId>
-            <version>1.0_01</version>
+            <version>1.1</version>
          </dependency>
          <dependency>
             <groupId>javax.media</groupId>
             <artifactId>jai_core</artifactId>
-            <version>1.1.2_01</version>
+            <version>1.1.3</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -1232,7 +1131,7 @@
          <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.3.2</version>
+            <version>4.4.4</version>
          </dependency>
          <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -1263,7 +1162,7 @@
          <dependency> <!-- Keep jmockit before junit -->
             <groupId>org.jmockit</groupId>
             <artifactId>jmockit</artifactId>
-            <version>1.10</version>
+            <version>1.21</version>
             <scope>test</scope>
          </dependency>
          <dependency>
@@ -1289,35 +1188,35 @@
          <dependency>
             <groupId>org.databene</groupId>
             <artifactId>contiperf</artifactId>
-            <version>2.2.0</version>
+            <version>2.3.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.2.1</version>
+            <version>2.5</version>
             <scope>compile</scope>
         </dependency>
           <!-- Google Analytics -->
           <dependency>
               <groupId>com.google.apis</groupId>
               <artifactId>google-api-services-analytics</artifactId>
-              <version>v3-rev103-1.19.0</version>
+              <version>v3-rev123-1.21.0</version>
           </dependency>
           <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
-            <version>1.19.1</version>
+            <version>1.21.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client</artifactId>
-            <version>1.19.0</version>
+            <version>1.21.0</version>
         </dependency>
         <dependency>
               <groupId>com.google.http-client</groupId>
               <artifactId>google-http-client-jackson2</artifactId>
-              <version>1.19.0</version>
+              <version>1.21.0</version>
               <exclusions>
                   <exclusion>
                       <artifactId>jackson-core</artifactId>
@@ -1332,19 +1231,19 @@
           <dependency>
               <groupId>com.google.oauth-client</groupId>
               <artifactId>google-oauth-client</artifactId>
-              <version>1.19.0</version>
+              <version>1.21.0</version>
           </dependency>
           <!-- Findbugs annotations -->
           <dependency>
               <groupId>com.google.code.findbugs</groupId>
               <artifactId>jsr305</artifactId>
-              <version>3.0.0</version>
+              <version>3.0.1</version>
               <scope>provided</scope>
           </dependency>
           <dependency>
               <groupId>com.google.code.findbugs</groupId>
               <artifactId>annotations</artifactId>
-              <version>3.0.0</version>
+              <version>3.0.1u2</version>
               <scope>provided</scope>
           </dependency>
       </dependencies>

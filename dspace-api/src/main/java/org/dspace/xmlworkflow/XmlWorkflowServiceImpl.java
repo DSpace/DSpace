@@ -22,8 +22,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageWorkflowEvent;
-import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
@@ -86,6 +86,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     @Autowired(required = true)
     protected GroupService groupService;
 
+    protected XmlWorkflowServiceImpl()
+    {
+
+    }
 
 
     @Override
@@ -410,7 +414,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             usageWorkflowEvent.setEpersonOwners(currentEpersonOwners.toArray(new EPerson[currentEpersonOwners.size()]));
             usageWorkflowEvent.setGroupOwners(currentGroupOwners.toArray(new Group[currentGroupOwners.size()]));
 
-            new DSpace().getEventService().fireEvent(usageWorkflowEvent);
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(usageWorkflowEvent);
         } catch (Exception e) {
             //Catch all errors we do not want our workflow to crash because the logging threw an exception
             log.error(LogManager.getHeader(c, "Error while logging workflow event", "Workflow Item: " + wfi.getID()), e);

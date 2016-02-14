@@ -29,6 +29,10 @@ import java.util.List;
  */
 public class TaskListItemDAOImpl extends AbstractHibernateDAO<TaskListItem> implements TaskListItemDAO
 {
+    protected TaskListItemDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public void deleteByWorkflowItem(Context context, BasicWorkflowItem workflowItem) throws SQLException {

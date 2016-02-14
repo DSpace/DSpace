@@ -75,6 +75,11 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 	 */
 	protected final String REGISTERED_FLAG = "-R";
 
+    protected BitstreamStorageServiceImpl()
+    {
+
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         for(Map.Entry<Integer, BitStoreService> storeEntry : stores.entrySet()) {

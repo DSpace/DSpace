@@ -22,9 +22,10 @@ import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -56,6 +57,7 @@ public class OREDisseminationCrosswalk
     private static final Namespace DS_NS =
     	Namespace.getNamespace("ds","http://www.dspace.org/objectModel/");
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
 
     private static final Namespace namespaces[] = { ATOM_NS, ORE_NS, ORE_ATOM, RDF_NS, DCTERMS_NS, DS_NS };
@@ -86,12 +88,12 @@ public class OREDisseminationCrosswalk
     private Element disseminateItem(Context context, Item item) throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
     	String oaiUrl = null;
-        String dsUrl = ConfigurationManager.getProperty("dspace.url");
+        String dsUrl = configurationService.getProperty("dspace.url");
         
-        String remSource = ConfigurationManager.getProperty("oai", "ore.authoritative.source");
+        String remSource = configurationService.getProperty("oai.ore.authoritative.source");
     	if (remSource == null || remSource.equalsIgnoreCase("oai"))
         {
-            oaiUrl = ConfigurationManager.getProperty("oai", "dspace.oai.url");
+            oaiUrl = configurationService.getProperty("oai.url");
         }
     	else if (remSource.equalsIgnoreCase("xmlui") || remSource.equalsIgnoreCase("manakin"))
         {
@@ -143,7 +145,7 @@ public class OREDisseminationCrosswalk
         
         Element remCreator = new Element("source",ATOM_NS);
         Element remGenerator = new Element("generator",ATOM_NS);
-        remGenerator.addContent(ConfigurationManager.getProperty("dspace.name"));
+        remGenerator.addContent(configurationService.getProperty("dspace.name"));
         remGenerator.setAttribute("uri", oaiUrl);
         remCreator.addContent(remGenerator);
         

@@ -9,7 +9,7 @@ package org.dspace.rest.common;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.rest.filter.ItemFilterDefs;
 import org.dspace.rest.filter.ItemFilterList;
 import org.dspace.rest.filter.ItemFilterTest;
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+
 
 /**
  * Use Case Item Filters that match a specific set of criteria.
@@ -53,7 +54,7 @@ public class ItemFilter {
     
     public static List<ItemFilter> getItemFilters(String filters, boolean saveItems) {
     	LinkedHashMap<String,ItemFilterTest> availableTests = new LinkedHashMap<String,ItemFilterTest>();
-    	for(ItemFilterList plugobj: (ItemFilterList[])PluginManager.getPluginSequence("rest", ItemFilterList.class)) {
+    	for(ItemFilterList plugobj: (ItemFilterList[]) CoreServiceFactory.getInstance().getPluginService().getPluginSequence(ItemFilterList.class)) {
 			for(ItemFilterTest defFilter: plugobj.getFilters()) {
 				availableTests.put(defFilter.getName(), defFilter);
 			}

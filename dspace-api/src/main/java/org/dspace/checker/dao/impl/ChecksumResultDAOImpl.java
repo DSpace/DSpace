@@ -27,6 +27,11 @@ import java.sql.SQLException;
 public class ChecksumResultDAOImpl extends AbstractHibernateDAO<ChecksumResult> implements ChecksumResultDAO
 {
 
+    protected ChecksumResultDAOImpl()
+    {
+        super();
+    }
+
     @Override
     public ChecksumResult findByCode(Context context, ChecksumResultCode code) throws SQLException {
         Criteria criteria = createCriteria(context, ChecksumResult.class);

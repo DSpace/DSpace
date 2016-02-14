@@ -84,10 +84,15 @@ public class ClaimAction extends UserSelectionAction {
     }
 
     @Override
-    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException, AuthorizeException {
+    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException, AuthorizeException, IOException {
         if(roleMembers != null && (roleMembers.getEPersons().size() > 0 || roleMembers.getGroups().size() >0)){
             //Create task for the users left
             XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().createPoolTasks(c, wfi, roleMembers, getParent().getStep(), getParent());
+            if(ConfigurationManager.getBooleanProperty("workflow", "notify.returned.tasks", true))
+            {
+                alertUsersOnActivation(c, wfi, roleMembers);
+            }
+
         }
         else
             log.info(LogManager.getHeader(c, "warning while activating claim action", "No group or person was found for the following roleid: " + getParent().getStep().getId()));

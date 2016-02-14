@@ -20,8 +20,9 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
-import org.dspace.core.PluginManager;
 import org.dspace.app.mediafilter.MediaFilter;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 
 import org.jdom.Element;
 
@@ -199,12 +200,14 @@ public class DSpaceMETSIngester
     // only needed when importing a SIP without canonical DSpace derived file naming.
     private String makeDerivedFilename(String bundleName, String origName)
     {
+        PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
+
         // get the MediaFilter that would create this bundle:
-        String mfNames[] = PluginManager.getAllPluginNames(MediaFilter.class);
+        String mfNames[] = pluginService.getAllPluginNames(MediaFilter.class);
 
         for (int i = 0; i < mfNames.length; ++i)
         {
-            MediaFilter mf = (MediaFilter)PluginManager.getNamedPlugin(MediaFilter.class, mfNames[i]);
+            MediaFilter mf = (MediaFilter)pluginService.getNamedPlugin(MediaFilter.class, mfNames[i]);
             if (bundleName.equals(mf.getBundleName()))
             {
                 return mf.getFilteredName(origName);

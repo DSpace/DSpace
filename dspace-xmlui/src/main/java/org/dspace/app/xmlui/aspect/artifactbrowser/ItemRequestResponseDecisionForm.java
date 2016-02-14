@@ -26,7 +26,7 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -102,7 +102,7 @@ public class ItemRequestResponseDecisionForm extends AbstractDSpaceTransformer
 
 		List form = itemRequest.addList("form", List.TYPE_FORM);
 
-        boolean helpdeskOverridesSubmitter = ConfigurationManager.getBooleanProperty("request.item.helpdesk.override", false);
+        boolean helpdeskOverridesSubmitter = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("request.item.helpdesk.override", false);
         if(helpdeskOverridesSubmitter) {
             form.addItem().addButton("contactRequester").setValue(T_contactRequester);
             form.addItem().addButton("contactAuthor").setValue(T_contactAuthor);

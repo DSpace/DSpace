@@ -204,4 +204,8 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @throws AuthorizeException
      */
     public void initDefaultGroupNames(Context context) throws SQLException, AuthorizeException;
+
+    List<Group> getEmptyGroups(Context context) throws SQLException;
+
+    int countTotal(Context context) throws SQLException;
 }

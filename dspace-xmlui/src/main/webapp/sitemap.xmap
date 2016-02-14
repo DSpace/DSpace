@@ -19,7 +19,6 @@
                         <map:generator name="DSpaceMETSGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceMETSGenerator"/>
                         <map:generator name="DSpaceOREGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceOREGenerator"/>
                         <map:generator name="DescriptionOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.DescriptionOpenSearchGenerator"/>
-                        <map:generator name="StandardOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.StandardOpenSearchGenerator"/>
                         <map:generator name="DiscoveryOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.DiscoveryOpenSearchGenerator"/>
                         <map:generator name="notifying" src="org.apache.cocoon.sitemap.NotifyingGenerator"/>
                         <map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
@@ -191,7 +190,9 @@
                     <map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
                     <map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
                     <map:reader name="MetadataExportReader" src="org.dspace.app.xmlui.cocoon.MetadataExportReader"/>
-
+                    
+                    <map:reader name="SearchMetadataExportReader" src="org.dspace.app.xmlui.cocoon.SearchMetadataExportReader"/>
+					
                     <map:reader name="CSVOutputter" src="org.dspace.app.xmlui.aspect.statisticsElasticSearch.CSVOutputter"/>
 
                     <map:reader name="OpenURLReader" src="org.dspace.app.xmlui.cocoon.OpenURLReader"/>
@@ -388,7 +389,11 @@
                                     <map:parameter name="handle" value="{1}/{2}" />
                                 </map:read>
                         </map:match>
-
+                        
+                        <map:match pattern="discover/search/csv">
+                                <map:read type="SearchMetadataExportReader"/>
+                        </map:match>
+						
                         <map:match pattern="handle/*/*/stats/csv">
                             <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
                                 <map:read type="CSVOutputter"/>
@@ -440,6 +445,9 @@
                         <map:match pattern="JSON/controlled-vocabulary">
                             <map:read type="JSONControlledVocabularyReader"/>
                         </map:match>
+            <map:match pattern="json/submissionLookup">
+                <map:mount check-reload="no" src="aspects/json-lookup.xmap" uri-prefix="json/"/>
+            </map:match>
                 </map:pipeline>
 
                 <!-- new AJAX menu (choices) responses for metadata authority control -->
@@ -542,8 +550,12 @@
 
                     <!-- OpenSearch results document for whole repo or community/collection -->
                     <map:match pattern="open-search/**">
+                       <!-- Prior to DSpace 6.0, "open-search/" was mapped to the StandardOpenSearchGenerator,
+                            which was removed as part of removal of the legacy Lucene search index classes.
+                            This pattern has been removed to DiscoveryOpenSearchGenerator to help ensure
+                            minimal impact from removal of the legacy Lucene search index. -->
                         <map:match pattern="open-search/">
-                            <map:generate type="StandardOpenSearchGenerator"/>
+                            <map:generate type="DiscoveryOpenSearchGenerator"/>
                         </map:match>
 
                         <map:match pattern="open-search/discover">
@@ -750,3 +762,5 @@
                 </map:handle-errors>
         </map:pipelines>
 </map:sitemap>
+
+

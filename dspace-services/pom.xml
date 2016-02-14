@@ -17,6 +17,68 @@
         <root.basedir>${basedir}/..</root.basedir>
     </properties>
 
+    <profiles>
+        <!-- If Unit Testing is enabled, then setup the Unit Test Environment.
+             See also the 'skiptests' profile in Parent POM. -->
+        <profile>
+            <id>test-environment</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>maven.test.skip</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- This plugin allows us to run a Groovy script in our Maven POM
+                         (see: http://gmaven.codehaus.org/Executing+Groovy+Code )
+                         We are generating a OS-agnostic version (agnostic.build.dir) of
+                         the ${project.build.directory} property (full path of target dir).
+                         This is needed by the Surefire plugin (see below) to
+                         initialize the Unit Test environment's dspace.dir setting.
+                         Otherwise, the Unit Test Framework will not work on Windows OS.
+                         This Groovy code was mostly borrowed from:
+                         http://stackoverflow.com/questions/3872355/how-to-convert-file-separator-in-maven
+                    -->
+                    <plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>groovy-maven-plugin</artifactId>
+                        <version>2.0</version>
+                        <executions>
+                            <execution>
+                                <id>setproperty</id>
+                                <phase>generate-test-resources</phase> <!-- XXX I think this should be 'initialize' - MHW -->
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <source>
+                                    project.properties['agnostic.build.dir']=project.build.directory.replace(File.separator,'/');
+                                    println("Initializing Maven property 'agnostic.build.dir' to: " + project.properties['agnostic.build.dir']);
+                                    </source>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Run Unit Testing! This plugin just kicks off the tests (when enabled). -->
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <!-- Specify the dspace.dir to use for test environment -->
+                                <!-- For "dspace-services" we don't need a full test environment, we just need
+                                     a valid "config-definition.xml" which exists in target/test-classes/ -->
+                                <dspace.dir>${agnostic.build.dir}/test-classes/</dspace.dir>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <dependencies>
         <!-- logging -->
         <dependency>
@@ -66,13 +128,13 @@
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty</artifactId>
-            <version>6.1.14</version>
+            <version>6.1.26</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty-servlet-tester</artifactId>
-            <version>6.1.14</version>
+            <version>6.1.26</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -93,6 +155,15 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+        </dependency>
+        <!-- Required by Commons Configuration -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
         </dependency>
     </dependencies>
 

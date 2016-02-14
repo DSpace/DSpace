@@ -40,7 +40,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class manages the handling of RDF data in DSpace. It generates
@@ -68,14 +68,14 @@ public class RDFizer {
     /**
      * Set to remember with DSpaceObject were converted or deleted from the 
      * triplestore already. This set is helpful when converting or deleting 
-     * multiple DSpaceObjects (g.e. Communities with all Subcommunities and
+     * multiple DSpaceObjects (e.g. Communities with all Subcommunities and
      * Items).
      */
     protected Set<UUID> processed;
 
     public RDFizer()
     {
-        this.configurationService = new DSpace().getConfigurationService();
+        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.stdout = false;
         this.verbose = false;
         this.dryrun = false;
@@ -343,7 +343,7 @@ public class RDFizer {
         
         // if this method is used for conversion we should check if we have the
         // permissions to read a DSO before converting all of it decendents
-        // (g.e. check read permission on a community before converting all of
+        // (e.g. check read permission on a community before converting all of
         // its subcommunties and collections).
         // just skip items with missing permissions and report them.
         if (check)

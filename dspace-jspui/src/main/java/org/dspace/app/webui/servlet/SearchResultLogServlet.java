@@ -21,9 +21,9 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
 import org.dspace.usage.UsageSearchEvent;
-import org.dspace.utils.DSpace;
 
 /**
  * Every time a user clicks on a search result he will be redirected through this servlet
@@ -70,7 +70,7 @@ public class SearchResultLogServlet extends DSpaceServlet
             searchEvent.setPage(Integer.parseInt(request.getParameter("page")));
         }
 
-        new DSpace().getEventService().fireEvent(
+        DSpaceServicesFactory.getInstance().getEventService().fireEvent(
                 searchEvent);
 
 

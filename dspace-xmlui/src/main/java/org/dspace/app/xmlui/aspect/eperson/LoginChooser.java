@@ -30,11 +30,10 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -198,13 +197,13 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
             if (loginURL != null && authTitle != null)
             {
 
-                if (ConfigurationManager.getBooleanProperty("xmlui.force.ssl")
+                if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.force.ssl")
                         && !request.isSecure())
                 {
                     StringBuffer location = new StringBuffer("https://");
                     location
                             .append(
-                                    ConfigurationManager
+                                    DSpaceServicesFactory.getInstance().getConfigurationService()
                                             .getProperty("dspace.hostname"))
                             .append(loginURL).append(
                                     request.getQueryString() == null ? ""

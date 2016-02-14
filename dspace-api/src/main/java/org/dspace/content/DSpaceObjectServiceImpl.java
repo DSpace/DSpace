@@ -11,6 +11,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
@@ -50,6 +51,10 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Autowired(required = true)
     protected MetadataAuthorityService metadataAuthorityService;
 
+    public DSpaceObjectServiceImpl()
+    {
+
+    }
 
     @Override
     public String getName(T dso) {
@@ -530,6 +535,44 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         }else{
             return getMDValueByLegacyField(field);
         }
+    }
+
+    @Override
+    public void update(Context context, T dso) throws SQLException, AuthorizeException
+    {
+        if(dso.isMetadataModified())
+        {
+            /*
+            Update the order of the metadata values
+             */
+                // A map created to store the latest place for each metadata field
+                Map<MetadataField, Integer> fieldToLastPlace = new HashMap<>();
+                List<MetadataValue> metadataValues = dso.getMetadata();
+                for (MetadataValue metadataValue : metadataValues)
+                {
+                    //Retrieve & store the place for each metadata value
+                    int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
+                    metadataValue.setPlace(mvPlace);
+                }
+        }
+    }
+
+    /**
+     * Retrieve the place of the metadata value
+     * @param fieldToLastPlace the map containing the latest place of each metadata field
+     * @param metadataValue the metadata value that needs to get a place
+     * @return The new place for the metadata valu
+     */
+    protected int getMetadataValuePlace(Map<MetadataField, Integer> fieldToLastPlace, MetadataValue metadataValue) {
+        MetadataField metadataField = metadataValue.getMetadataField();
+        if(fieldToLastPlace.containsKey(metadataField))
+        {
+            fieldToLastPlace.put(metadataField, fieldToLastPlace.get(metadataField) + 1);
+        }else{
+            // The metadata value place starts at 0
+            fieldToLastPlace.put(metadataField, 0);
+        }
+        return fieldToLastPlace.get(metadataField);
     }
 
     protected String[] getMDValueByLegacyField(String field){

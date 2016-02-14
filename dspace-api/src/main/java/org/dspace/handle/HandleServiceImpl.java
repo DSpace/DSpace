@@ -51,7 +51,7 @@ public class HandleServiceImpl implements HandleService
     protected SiteService siteService;
 
     /** Public Constructor */
-    public HandleServiceImpl()
+    protected HandleServiceImpl()
     {
     }
 
@@ -398,5 +398,10 @@ public class HandleServiceImpl implements HandleService
         String handlePrefix = getPrefix();
 
         return handlePrefix + (handlePrefix.endsWith("/") ? "" : "/") + id;
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return handleDAO.countRows(context);
     }
 }

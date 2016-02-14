@@ -29,7 +29,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflowItem> implements BasicWorkflowItemDAO {
+public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflowItem> implements BasicWorkflowItemDAO
+{
+    protected BasicWorkflowItemDAOImpl()
+    {
+        super();
+    }
 
 
     @Override
@@ -73,5 +78,10 @@ public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflow
         Criteria criteria = createCriteria(context, BasicWorkflowItem.class);
         criteria.add(Restrictions.eq("owner", ePerson));
         return list(criteria);
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM BasicWorkflowItem"));
     }
 }

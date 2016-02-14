@@ -8,7 +8,7 @@
 package org.dspace.app.mediafilter.factory;
 
 import org.dspace.app.mediafilter.service.MediaFilterService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the mediafilter package, use MediaFilterServiceFactory.getInstance() to retrieve an implementation
@@ -20,6 +20,6 @@ public abstract class MediaFilterServiceFactory {
     public abstract MediaFilterService getMediaFilterService();
 
     public static MediaFilterServiceFactory getInstance(){
-        return new DSpace().getServiceManager().getServiceByName("mediaFilterServiceFactory", MediaFilterServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("mediaFilterServiceFactory", MediaFilterServiceFactory.class);
     }
 }

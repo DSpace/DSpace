@@ -106,7 +106,7 @@
 :metadataName
     a rdf:Property ;
     rdfs:label "Metadata name" ;
-    rdfs:comment "The name of the metadata to convert (g.e. dc.title)." ;
+    rdfs:comment "The name of the metadata to convert (e.g. dc.title)." ;
     rdfs:domain :DSpaceMetadataRDFMapping ;
     rdfs:range rdfs:Literal ;
     .

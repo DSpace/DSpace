@@ -19,7 +19,7 @@ import org.dspace.app.webui.json.JSONRequest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 
 public class JSONServlet extends DSpaceServlet
 {
@@ -50,7 +50,7 @@ public class JSONServlet extends DSpaceServlet
             pluginName = pluginName.substring(1);
             pluginName = pluginName.split("/")[0];
         }
-        JSONRequest jsonReq = (JSONRequest) PluginManager.getNamedPlugin(JSONRequest.class, 
+        JSONRequest jsonReq = (JSONRequest) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(JSONRequest.class,
                 pluginName);
         
         if (jsonReq == null)

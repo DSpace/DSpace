@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
 
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 
@@ -68,7 +68,7 @@ public class FlowCurationUtils
     {
         if (map.isEmpty())
         {
-            String statusCodes = ConfigurationManager.getProperty("curate", "ui.statusmessages");
+            String statusCodes = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.statusmessages");
             for (String pair : statusCodes.split(","))
             {
                 String[] parts = pair.split("=");
@@ -152,7 +152,7 @@ public class FlowCurationUtils
      */
     protected static String getUITaskName(String taskID)
     {       
-            String tasksString = ConfigurationManager.getProperty("curate", "ui.tasknames");
+            String tasksString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.tasknames");
             String[] tasks = tasksString.split(",");
             for (String task : tasks)
             {
@@ -222,7 +222,7 @@ public class FlowCurationUtils
         
         Curator curator = FlowCurationUtils.getCurator(task);
         
-        String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+        String taskQueueName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.queuename");
         boolean status = false;
        
         if (objHandle != null)
@@ -270,7 +270,7 @@ public class FlowCurationUtils
     
     public static void setAllTasks() throws WingException, UnsupportedEncodingException
     {
-    	String csvList = ConfigurationManager.getProperty("curate", CURATE_TASK_NAMES);
+    	String csvList = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate." + CURATE_TASK_NAMES);
     	String[] properties = csvList.split(",");
     	for (String property : properties)
     	{
@@ -283,7 +283,7 @@ public class FlowCurationUtils
     
     public static void setGroups() throws WingException, UnsupportedEncodingException
     {
-    	String csvList = ConfigurationManager.getProperty("curate", CURATE_GROUP_NAMES);
+    	String csvList = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate." + CURATE_GROUP_NAMES);
         if (csvList != null)
         {
         	String[] properties = csvList.split(",");
@@ -308,7 +308,7 @@ public class FlowCurationUtils
     		while (iterator.hasNext())
     		{
                 String key = iterator.next();
-                String csvList = ConfigurationManager.getProperty("curate", CURATE_GROUP_PREFIX + "." + key);
+                String csvList = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate." + CURATE_GROUP_PREFIX + "." + key);
                 String[] properties  = csvList.split(",");
                 groupedTasks.put(URLDecoder.decode(key, "UTF-8"), properties);
             }

@@ -19,11 +19,11 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.ObjectCount;
 import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.content.filter.StatisticsFilter;
-import org.dspace.utils.DSpace;
 
 import java.io.File;
 import java.io.IOException;
@@ -166,7 +166,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
 
 
     protected Date getOldestWorkflowItemDate() throws SolrServerException {
-        ConfigurationService configurationService = new DSpace().getConfigurationService();
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String workflowStartDate = configurationService.getProperty("usage-statistics.workflow-start-date");
         if(workflowStartDate == null){
             //Query our solr for it !

@@ -19,7 +19,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.rdf.RDFConfiguration;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  *
@@ -31,9 +31,9 @@ public class RDFConverterImpl implements RDFConverter
     protected List<ConverterPlugin> plugins;
     private static final Logger log = Logger.getLogger(RDFConverterImpl.class);
     
-    public RDFConverterImpl()
+    protected RDFConverterImpl()
     {
-        this.configurationService = new DSpace().getConfigurationService();
+        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.plugins = new ArrayList<ConverterPlugin>();
         
         String pluginNames[] = RDFConfiguration.getConverterPlugins();

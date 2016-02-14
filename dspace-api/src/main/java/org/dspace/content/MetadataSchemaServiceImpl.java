@@ -37,6 +37,11 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
     @Autowired(required = true)
     protected MetadataSchemaDAO metadataSchemaDAO;
 
+    protected MetadataSchemaServiceImpl()
+    {
+
+    }
+
     @Override
     public MetadataSchema create(Context context, String name, String namespace) throws SQLException, AuthorizeException, NonUniqueMetadataException {
                 // Check authorisation: Only admins may create metadata schemas

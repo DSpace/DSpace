@@ -40,7 +40,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
 
@@ -114,7 +114,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
      */
     public Serializable getKey()
     {
-    	boolean full = ConfigurationManager.getBooleanProperty("xmlui.community-list.render.full", true);
+    	boolean full = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.community-list.render.full", true);
         return HashUtil.hash(depth + "-" + excludeCollections + "-" + (full ? "true" : "false"));
     }
 
@@ -143,7 +143,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	                validity.add(context, node.getDSO());
 	                
 	                // If we are configured to use collection strengths (i.e. item counts) then include that number in the validity.
-	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+	                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
 	                if (showCount)
 	        		{
 	                    try
@@ -163,7 +163,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	            }
 	            
 	            // Check if we are configured to assume validity.
-	            String assumeCacheValidity = ConfigurationManager.getProperty("xmlui.community-list.cache");
+	            String assumeCacheValidity = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.community-list.cache");
 	            if (assumeCacheValidity != null)
                 {
                     validity.setAssumedValidityDelay(assumeCacheValidity);
@@ -207,7 +207,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 
         TreeNode root = buildTree(communityService.findAllTop(context));
         
-        boolean full = ConfigurationManager.getBooleanProperty("xmlui.community-list.render.full", true);
+        boolean full = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.community-list.render.full", true);
         
         if (full)
         {

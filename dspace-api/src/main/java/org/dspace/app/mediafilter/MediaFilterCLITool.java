@@ -18,6 +18,7 @@ import org.dspace.core.*;
 import org.dspace.handle.factory.HandleServiceFactory;
 
 import java.util.*;
+import org.dspace.core.factory.CoreServiceFactory;
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
@@ -178,7 +179,7 @@ public class MediaFilterCLITool {
         for(int i=0; i< filterNames.length; i++)
         {
             //get filter of this name & add to list of filters
-            FormatFilter filter = (FormatFilter) PluginManager.getNamedPlugin(FormatFilter.class, filterNames[i]);
+            FormatFilter filter = (FormatFilter) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(FormatFilter.class, filterNames[i]);
             if(filter==null)
             {
                 System.err.println("\nERROR: Unknown MediaFilter specified (either from command-line or in dspace.cfg): '" + filterNames[i] + "'");

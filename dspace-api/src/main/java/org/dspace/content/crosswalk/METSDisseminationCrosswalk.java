@@ -22,7 +22,7 @@ import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -101,7 +101,7 @@ public class METSDisseminationCrosswalk
         }
         
         PackageDisseminator dip = (PackageDisseminator)
-          PluginManager.getNamedPlugin(PackageDisseminator.class, METS_PACKAGER_PLUGIN);
+          CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(PackageDisseminator.class, METS_PACKAGER_PLUGIN);
         if (dip == null)
         {
             throw new CrosswalkInternalException("Cannot find a disseminate plugin for package=" + METS_PACKAGER_PLUGIN);

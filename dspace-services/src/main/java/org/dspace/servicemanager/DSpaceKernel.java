@@ -79,7 +79,11 @@ public final class DSpaceKernel {
         }
     }
 
-    public void start(String dspaceHome) {
+    public void start(String legacyHome) {
+        start();
+    }
+
+    public void start() {
         if (isRunning()) {
             //log.warn("Kernel ("+this+") is already started");
             return;
@@ -90,7 +94,7 @@ public final class DSpaceKernel {
             long startTime = System.currentTimeMillis();
 
             // create the configuration service and get the configuration
-            DSpaceConfigurationService dsConfigService = new DSpaceConfigurationService(dspaceHome);
+            DSpaceConfigurationService dsConfigService = new DSpaceConfigurationService();
             configurationService = dsConfigService;
 
             // startup the service manager

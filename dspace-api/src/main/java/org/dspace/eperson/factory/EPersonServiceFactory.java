@@ -8,7 +8,7 @@
 package org.dspace.eperson.factory;
 
 import org.dspace.eperson.service.*;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the eperson package, use EPersonServiceFactory.getInstance() to retrieve an implementation
@@ -30,6 +30,6 @@ public abstract class EPersonServiceFactory {
     public abstract SupervisorService getSupervisorService();
 
     public static EPersonServiceFactory getInstance(){
-        return new DSpace().getServiceManager().getServiceByName("ePersonServiceFactory", EPersonServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("ePersonServiceFactory", EPersonServiceFactory.class);
     }
 }

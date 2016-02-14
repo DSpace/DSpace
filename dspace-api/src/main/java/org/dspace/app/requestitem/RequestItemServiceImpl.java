@@ -33,6 +33,11 @@ public class RequestItemServiceImpl implements RequestItemService {
     @Autowired(required = true)
     protected RequestItemDAO requestItemDAO;
 
+    protected RequestItemServiceImpl()
+    {
+
+    }
+
     @Override
     public String createRequest(Context context, Bitstream bitstream, Item item, boolean allFiles, String reqEmail, String reqName, String reqMessage) throws SQLException {
         RequestItem requestItem = requestItemDAO.create(context, new RequestItem());
