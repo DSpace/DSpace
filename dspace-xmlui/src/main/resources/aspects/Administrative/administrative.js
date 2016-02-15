@@ -15,6 +15,7 @@ importClass(Packages.org.dspace.content.service.CommunityService)
 importClass(Packages.org.dspace.content.CommunityServiceImpl)
 importClass(Packages.java.util.UUID)
 importClass(Packages.java.lang.Integer)
+importClass(Packages.org.apache.commons.lang.StringUtils)
 
 importClass(Packages.org.dspace.core.Constants);
 importClass(Packages.org.dspace.content.Bitstream);
@@ -2691,7 +2692,7 @@ function doAssignCollectionRoles(collectionID)
 		{
 			result = doDeleteCollectionRole(collectionID, "DEFAULT_READ");
 		}else{
-            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+            if(StringUtils.equals(ConfigurationManager.getProperty("workflow.framework"), "xmlworkflow")){
                 if(workflow == null){
                     var collection = getCollectionService().find(getDSContext(),collectionID);
                     workflow = getXmlWorkflowFactory().getWorkflow(collection);

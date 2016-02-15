@@ -10,6 +10,7 @@ package org.dspace.storage.rdbms.xmlworkflow;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.storage.rdbms.DatabaseUtils;
@@ -53,7 +54,7 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
             throws IOException, SQLException
     {
         // Make sure XML Workflow is enabled in workflow.cfg before proceeding
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")
+        if (StringUtils.equals(ConfigurationManager.getProperty("workflow.framework"), "xmlworkflow")
                 // If your database was upgraded to DSpace 6 prior to enabling XML Workflow, we MUST skip this 5.x migration, as it is incompatible
                 // with a 6.x database. In that scenario the corresponding 6.x XML Workflow migration will create necessary tables.
                 && DatabaseUtils.getCurrentFlywayDSpaceState(connection) < 6)

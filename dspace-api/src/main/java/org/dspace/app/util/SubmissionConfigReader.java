@@ -15,8 +15,7 @@ import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
 import org.apache.log4j.Logger;
-
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Item Submission configuration generator for DSpace. Reads and parses the
@@ -57,7 +56,8 @@ public class SubmissionConfigReader
     private static Logger log = Logger.getLogger(SubmissionConfigReader.class);
 
 	/** The fully qualified pathname of the directory containing the Item Submission Configuration file */
-    private String configDir = ConfigurationManager.getProperty("dspace.dir")
+    private String configDir = DSpaceServicesFactory.getInstance()
+            .getConfigurationService().getProperty("dspace.dir")
             + File.separator + "config" + File.separator;
             
     /**

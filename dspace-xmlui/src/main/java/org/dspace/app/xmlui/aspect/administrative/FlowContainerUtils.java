@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Utility methods to processes actions on Communities and Collections.
@@ -502,7 +503,7 @@ public class FlowContainerUtils
 			collectionService.removeSubmitters(context, collection);
 		}
         else{
-            if(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("workflow.workflow.framework").equals("xmlworkflow"))
+            if(StringUtils.equals(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("workflow.framework"), "xmlworkflow"))
             {
                 WorkflowUtils.deleteRoleGroup(context, collection, roleName);
             }else{
