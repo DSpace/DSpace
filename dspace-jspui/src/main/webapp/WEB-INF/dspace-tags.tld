@@ -520,5 +520,73 @@
     </attribute>
     
   </tag>  
+  
+   <tag>
+      <name>tagcloud</name>
+      <tagclass>org.dspace.app.webui.tagcloud.TagCloudTag</tagclass>
+      <bodycontent>empty</bodycontent>
+      <info>
+        Tag for display tagcloud. 
+      </info>
+      <attribute>
+         <name>parameters</name>
+	  	<required>false</required>
+	  	<rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+	 	<name>index</name>
+	 	<required>true</required>
+	 	<rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+	 	<name>scope</name>
+	 	<required>true</required>
+	 	<rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+	 	<name>data</name>
+	 	<required>true</required>
+	 	<rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+	 	<name>type</name>
+	 	<required>false</required>
+	 	<rtexprvalue>true</rtexprvalue>
+      </attribute>
+  </tag>
+
+  <tag>
+    <name>selectcollection</name>
+    <tagclass>org.dspace.app.webui.jsptag.SelectCollectionTag</tagclass>
+    <bodycontent>empty</bodycontent>
+    <info>
+        Tag for making collection select element with community heading
+    </info>
+
+   <attribute>
+      <name>klass</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+
+   <attribute>
+      <name>id</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+
+   <attribute>
+      <name>name</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+
+   <attribute>
+      <name>collection</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    
+  </tag>  
 
 </taglib>

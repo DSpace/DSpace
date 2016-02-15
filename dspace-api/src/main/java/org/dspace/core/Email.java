@@ -474,8 +474,18 @@ public class Email
         System.out.println(" - To: " + to);
         System.out.println(" - Subject: " + subject);
         System.out.println(" - Server: " + server);
+        boolean disabled = ConfigurationManager.getBooleanProperty("mail.server.disabled", false);
         try
         {
+            if( disabled)
+            {
+                System.err.println("\nError sending email:");
+                System.err.println(" - Error: cannot test email because mail.server.disabled is set to true");
+                System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+                System.err.println("\n");
+                System.exit(1);
+                return;
+            }
             e.send();
         }
         catch (MessagingException me)

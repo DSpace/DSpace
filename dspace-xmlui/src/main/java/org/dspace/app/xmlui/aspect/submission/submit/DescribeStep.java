@@ -41,7 +41,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
@@ -144,6 +144,11 @@ public class DescribeStep extends AbstractSubmissionStep
             super.addPageMeta(pageMeta);
             int collectionID = submission.getCollection().getID();
             pageMeta.addMetadata("choice", "collection").addContent(String.valueOf(collectionID));
+            pageMeta.addMetadata("stylesheet", "screen", "datatables", true).addContent("../../static/Datatables/DataTables-1.8.0/media/css/datatables.css");
+            pageMeta.addMetadata("javascript", "static", "datatables", true).addContent("static/Datatables/DataTables-1.8.0/media/js/jquery.dataTables.min.js");
+            pageMeta.addMetadata("stylesheet", "screen", "person-lookup", true).addContent("../../static/css/authority/person-lookup.css");
+            pageMeta.addMetadata("javascript", null, "person-lookup", true).addContent("../../static/js/person-lookup.js");
+
 
             String jumpTo = submissionInfo.getJumpToField();
             if (jumpTo != null)
@@ -181,9 +186,9 @@ public class DescribeStep extends AbstractSubmissionStep
 
                 // Fetch the document type (dc.type)
                 String documentType = "";
-                if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
+                if( (item.getMetadataByMetadataString("dc.type") != null) && (item.getMetadataByMetadataString("dc.type").length >0) )
                 {
-                    documentType = item.getMetadata("dc.type")[0].value;
+                    documentType = item.getMetadataByMetadataString("dc.type")[0].value;
                 }
                 
                 // Iterate over all inputs and add it to the form.
@@ -208,7 +213,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         String element = dcInput.getElement();
                         String qualifier = dcInput.getQualifier();
 
-                        DCValue[] dcValues = item.getMetadata(schema, element, qualifier, Item.ANY);
+                        Metadatum[] dcValues = item.getMetadata(schema, element, qualifier, Item.ANY);
 
                         String fieldName = FlowUtils.getFieldName(dcInput);
                         String inputType = dcInput.getInputType();
@@ -246,9 +251,9 @@ public class DescribeStep extends AbstractSubmissionStep
                                 // selected we need to search through all the metadata and see
                                 // if any match for another field, if not we assume that this field
                                 // should handle it.
-                                DCValue[] unfiltered = item.getMetadata(dcInput.getSchema(), dcInput.getElement(), Item.ANY, Item.ANY);
-                                ArrayList<DCValue> filtered = new ArrayList<DCValue>();
-                                for (DCValue dcValue : unfiltered)
+                                Metadatum[] unfiltered = item.getMetadata(dcInput.getSchema(), dcInput.getElement(), Item.ANY, Item.ANY);
+                                ArrayList<Metadatum> filtered = new ArrayList<Metadatum>();
+                                for (Metadatum dcValue : unfiltered)
                                 {
                                         String unfilteredFieldName = dcValue.element + "." + dcValue.qualifier;
                                         if ( ! inputSet.isFieldPresent(unfilteredFieldName) )
@@ -257,7 +262,7 @@ public class DescribeStep extends AbstractSubmissionStep
                                         }
                                 }
                                 
-                                renderQualdropField(form, fieldName, dcInput, filtered.toArray(new DCValue[filtered.size()]), readonly);
+                                renderQualdropField(form, fieldName, dcInput, filtered.toArray(new Metadatum[filtered.size()]), readonly);
                         }
                         else if (inputType.equals("textarea"))
                         {
@@ -338,7 +343,7 @@ public class DescribeStep extends AbstractSubmissionStep
 
             String inputType = input.getInputType();
             String pairsName = input.getPairsType();
-            DCValue[] values;
+            Metadatum[] values;
 
             if (inputType.equals("qualdrop_value"))
             {
@@ -351,7 +356,7 @@ public class DescribeStep extends AbstractSubmissionStep
 
             if (values != null && values.length > 0)
             {
-                for (DCValue value : values)
+                for (Metadatum value : values)
                 {
                     String displayValue = null;
                     if (inputType.equals("date"))
@@ -396,7 +401,7 @@ public class DescribeStep extends AbstractSubmissionStep
                             describeSection.addItem(displayValue);
                         }
                     }
-                } // For each DCValue
+                } // For each Metadatum
             } // If values exist
         } // For each input
         
@@ -419,7 +424,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * @param dcValues
          *                      The field's pre-existing values.
          */
-        private void renderNameField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
+        private void renderNameField(List form, String fieldName, DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException
         {
                 // The name field is a composite field containing two text fields, one
                 // for first name the other for last name.
@@ -481,7 +486,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 // Setup the field's values
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
-                        for (DCValue dcValue : dcValues)
+                        for (Metadatum dcValue : dcValues)
                         {
                                 DCPersonName dpn = new DCPersonName(dcValue.value);
                 
@@ -536,7 +541,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * @param dcValues
          *                      The field's pre-existing values.
          */
-        private void renderDateField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
+        private void renderDateField(List form, String fieldName, DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException
         {
                 // The date field consists of three primitive fields: a text field
                 // for the year, followed by a select box of the months, follewed
@@ -599,7 +604,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 // Setup the field's values
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
-                        for (DCValue dcValue : dcValues)
+                        for (Metadatum dcValue : dcValues)
                         {
                                 DCDate dcDate = new DCDate(dcValue.value);
 
@@ -646,7 +651,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * @param dcValues
          *                      The field's pre-existing values.
          */
-        private void renderSeriesField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
+        private void renderSeriesField(List form, String fieldName, DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException
         {
                 // The series field consists of two parts, a series name (text field)
                 // and report or paper number (also a text field).
@@ -694,7 +699,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 // Setup the field's values
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
-                        for (DCValue dcValue : dcValues)
+                        for (Metadatum dcValue : dcValues)
                         {
                                 DCSeriesNumber dcSeriesNumber = new DCSeriesNumber(dcValue.value);
 
@@ -729,7 +734,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * @param dcValues
          *                      The field's pre-existing values.
          */
-        private void renderQualdropField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
+        private void renderQualdropField(List form, String fieldName, DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException
         {
                 Composite qualdrop = form.addItem().addComposite(fieldName,"submit-qualdrop");
                 Select qual = qualdrop.addSelect(fieldName+"_qualifier");
@@ -783,7 +788,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 // Setup the field's values
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
-                        for (DCValue dcValue : dcValues)
+                        for (Metadatum dcValue : dcValues)
                         {
                                 qual.addInstance().setOptionSelected(dcValue.qualifier);
                                 value.addInstance().setValue(dcValue.value);
@@ -810,7 +815,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * @param dcValues
          *                      The field's pre-existing values.
          */
-        private void renderTextArea(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
+        private void renderTextArea(List form, String fieldName, DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException
         {
                 // Plain old Textarea
                 TextArea textArea = form.addItem().addTextArea(fieldName,"submit-textarea");
@@ -863,7 +868,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 // Setup the field's values
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
-                        for (DCValue dcValue : dcValues)
+                        for (Metadatum dcValue : dcValues)
                         {
                                 Instance ti = textArea.addInstance();
                                 ti.setValue(dcValue.value);
@@ -911,7 +916,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * @param dcValues
          *                      The field's pre-existing values.
          */
-        private void renderChoiceSelectField(List form, String fieldName, Collection coll, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
+        private void renderChoiceSelectField(List form, String fieldName, Collection coll, DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException
         {
                 String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
                 if (MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey))
@@ -968,7 +973,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
 
                 // Setup the field's pre-selected values
-                for (DCValue dcValue : dcValues)
+                for (Metadatum dcValue : dcValues)
                 {
                         select.setOptionSelected(dcValue.value);
                 }
@@ -987,7 +992,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * @param dcValues
          *                      The field's pre-existing values.
          */
-        private void renderDropdownField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
+        private void renderDropdownField(List form, String fieldName, DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException
         {
                 // Plain old select list.
                 Select select = form.addItem().addSelect(fieldName,"submit-select");
@@ -1034,7 +1039,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
                 
                 // Setup the field's pre-selected values
-                for (DCValue dcValue : dcValues)
+                for (Metadatum dcValue : dcValues)
                 {
                         select.setOptionSelected(dcValue.value);
                 }
@@ -1058,7 +1063,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * @param dcValues
          *                      The field's pre-existing values.
          */
-        private void renderSelectFromListField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
+        private void renderSelectFromListField(List form, String fieldName, DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException
         {
                 Field listField = null;
                 
@@ -1115,7 +1120,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
                 
                 // Setup the field's pre-selected values
-                for (DCValue dcValue : dcValues)
+                for (Metadatum dcValue : dcValues)
                 {
                         if(listField instanceof CheckBox)
                         {
@@ -1140,7 +1145,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * @param dcValues
          *                      The field's pre-existing values.
          */
-        private void renderOneboxField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
+        private void renderOneboxField(List form, String fieldName, DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException
         {
                 // Both onebox and twobox consist a free form text field
                 // that the user may enter any value. The difference between
@@ -1208,7 +1213,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 // Setup the field's values
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
-                        for (DCValue dcValue : dcValues)
+                        for (Metadatum dcValue : dcValues)
                         {
                                 Instance ti = text.addInstance();
                                 ti.setValue(dcValue.value);

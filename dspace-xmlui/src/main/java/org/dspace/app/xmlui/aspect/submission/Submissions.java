@@ -29,7 +29,7 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.SupervisedItem;
@@ -172,7 +172,7 @@ public class Submissions extends AbstractDSpaceTransformer
 
     	if (unfinishedItems.length <= 0 && supervisedItems.length <= 0)
     	{
-            Collection[] collections = Collection.findAuthorized(context, null, Constants.ADD);
+            Collection[] collections = Collection.findAuthorizedOptimized(context, Constants.ADD);
 
             if (collections.length > 0)
             {
@@ -223,7 +223,7 @@ public class Submissions extends AbstractDSpaceTransformer
         {
             for (WorkspaceItem workspaceItem : unfinishedItems) 
             {
-                DCValue[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
+                Metadatum[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
                 EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
 
                 int workspaceItemID = workspaceItem.getID();
@@ -267,7 +267,7 @@ public class Submissions extends AbstractDSpaceTransformer
         for (WorkspaceItem workspaceItem : supervisedItems) 
         {
 
-            DCValue[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
+            Metadatum[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
             EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
 
             int workspaceItemID = workspaceItem.getID();
@@ -334,7 +334,16 @@ public class Submissions extends AbstractDSpaceTransformer
     {
         // Turn the iterator into a list (to get size info, in order to put in a table)
         List subList = new LinkedList();
-        ItemIterator subs = Item.findBySubmitter(context, context.getCurrentUser());
+
+        Integer limit;
+
+        if(displayAll) {
+            limit = -1;
+        } else {
+            //Set a default limit of 50
+            limit = 50;
+        }
+        ItemIterator subs = Item.findBySubmitterDateSorted(context, context.getCurrentUser(), limit);
 
         //NOTE: notice we are adding each item to this list in *reverse* order...
         // this is a very basic attempt at making more recent submissions float 
@@ -344,7 +353,7 @@ public class Submissions extends AbstractDSpaceTransformer
         {
             while (subs.hasNext())
             {
-                subList.add(0, subs.next());
+                subList.add(subs.next());
             }
         }
         finally
@@ -371,7 +380,6 @@ public class Submissions extends AbstractDSpaceTransformer
         //Limit to showing just 50 archived submissions, unless overridden
         //(This is a saftey measure for Admins who may have submitted 
         // thousands of items under their account via bulk ingest tools, etc.)
-        int limit = 50;
         int count = 0;
 
         // Populate table
@@ -386,9 +394,9 @@ public class Submissions extends AbstractDSpaceTransformer
             Item published = (Item) i.next();
             String collUrl = contextPath+"/handle/"+published.getOwningCollection().getHandle();
             String itemUrl = contextPath+"/handle/"+published.getHandle();
-            DCValue[] titles = published.getMetadata("dc", "title", null, Item.ANY);
+            Metadatum[] titles = published.getMetadata("dc", "title", null, Item.ANY);
             String collectionName = published.getOwningCollection().getMetadata("name");
-            DCValue[] ingestDate = published.getMetadata("dc", "date", "accessioned", Item.ANY);
+            Metadatum[] ingestDate = published.getMetadata("dc", "date", "accessioned", Item.ANY);
 
             Row row = table.addRow();
 
@@ -420,7 +428,7 @@ public class Submissions extends AbstractDSpaceTransformer
         }//end while
 
         //Display limit text & link to allow user to override this default limit
-        if(!displayAll && count>limit)
+        if(!displayAll && count == limit)
         {
             Para limitedList = completedSubmissions.addPara();
             limitedList.addContent(T_c_limit);

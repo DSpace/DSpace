@@ -125,8 +125,17 @@
         <xref target="{@OBJID}" n="community-browser-link">
             <xsl:value-of select="$dim/dim:field[@element='title']"/>
         </xref>
-            <xsl:variable name="description"
-                          select="$dim/dim:field[@element='description'][@qualifier='abstract']"/>
+        <!--Display community strengths (item counts) if they exist-->
+        <xsl:if test="string-length($dim/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+            <span>
+                <xsl:text> [</xsl:text>
+                <xsl:value-of
+                    select="$dim/dim:field[@element='format'][@qualifier='extent'][1]"/>
+                <xsl:text>]</xsl:text>
+            </span>
+        </xsl:if>
+
+        <xsl:variable name="description" select="$dim/dim:field[@element='description'][@qualifier='abstract']"/>
         <xsl:if test="string-length($description/text()) > 0">
             <p rend="hidden-xs">
                 <xsl:value-of select="$description"/>
@@ -227,8 +236,17 @@
         <xref target="{@OBJID}" n="community-browser-link">
             <xsl:value-of select="$dim/dim:field[@element='title']"/>
         </xref>
-            <xsl:variable name="description"
-                          select="$dim/dim:field[@element='description'][@qualifier='abstract']"/>
+        <!--Display community strengths (item counts) if they exist-->
+        <xsl:if test="string-length($dim/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+            <span>
+                <xsl:text> [</xsl:text>
+                <xsl:value-of
+                    select="$dim/dim:field[@element='format'][@qualifier='extent'][1]"/>
+                <xsl:text>]</xsl:text>
+            </span>
+        </xsl:if>
+
+        <xsl:variable name="description" select="$dim/dim:field[@element='description'][@qualifier='abstract']"/>
         <xsl:if test="string-length($description/text()) > 0">
             <p rend="hidden-xs">
                 <xsl:value-of select="$description"/>
@@ -248,7 +266,7 @@
             </xsl:call-template>
         </xsl:variable>
 
-        <xsl:variable name="handle">
+        <xsl:variable name="handle_pre1">
             <xsl:call-template name="string-replace-all">
                 <xsl:with-param name="text" select="$handle_pre"/>
                 <xsl:with-param name="replace" select="'/mets.xml'"/>
@@ -256,9 +274,17 @@
             </xsl:call-template>
         </xsl:variable>
 
+        <xsl:variable name="handle">
+            <xsl:call-template name="string-replace-all">
+                <xsl:with-param name="text" select="$handle_pre1"/>
+                <xsl:with-param name="replace" select="'/'"/>
+                <xsl:with-param name="by" select="'_'"/>
+            </xsl:call-template>
+        </xsl:variable>
+
         <xsl:call-template name="string-replace-all">
             <xsl:with-param name="text" select="$handle"/>
-            <xsl:with-param name="replace" select="'/'"/>
+            <xsl:with-param name="replace" select="'.'"/>
             <xsl:with-param name="by" select="'_'"/>
         </xsl:call-template>
     </xsl:template>

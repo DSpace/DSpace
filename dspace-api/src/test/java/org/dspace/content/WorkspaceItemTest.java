@@ -109,14 +109,12 @@ public class WorkspaceItemTest extends AbstractUnitTest
     @Test
     public void testCreateAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.ADD); result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Collection ADD perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.ADD); result = null;
+        }};
 
         Collection coll = null;
         boolean template = false;
@@ -145,14 +143,12 @@ public class WorkspaceItemTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testCreateNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.ADD); result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow Collection ADD perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.ADD); result = new AuthorizeException();
+        }};
 
         Collection coll = null;
         boolean template = false;
@@ -322,14 +318,12 @@ public class WorkspaceItemTest extends AbstractUnitTest
     @Test
     public void testDeleteWrapperAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Item) any,
-                        Constants.WRITE); result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Item WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Item) any,
+                    Constants.WRITE); result = null;
+        }};
 
         int itemid = wi.getItem().getID();
         int id = wi.getID();
@@ -346,14 +340,12 @@ public class WorkspaceItemTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testDeleteWrapperNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Item) any,
-                        Constants.WRITE); result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow Item WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Item) any,
+                    Constants.WRITE); result = new AuthorizeException();
+        }};
 
         wi.deleteWrapper();
         fail("Exception expected");

@@ -22,7 +22,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.content.WorkspaceItem" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
@@ -97,7 +97,7 @@
     for (int i = 0; i < workspaceItems.length; i++)
     {
         // get title (or "untitled" if none) and submitter of workspace item
-        DCValue[] titleArray = workspaceItems[i].getItem().getDC("title", null, Item.ANY);
+        Metadatum[] titleArray = workspaceItems[i].getItem().getDC("title", null, Item.ANY);
 //        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
         EPerson submitter = workspaceItems[i].getItem().getSubmitter();
 %>

@@ -56,7 +56,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.EtdUnit;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
@@ -469,7 +469,7 @@ public class EtdLoader
     {
 
         // Get the title(s)
-        DCValue dc[] = item.getDC("title", null, Item.ANY);
+        Metadatum dc[] = item.getDC("title", null, Item.ANY);
 
         // Process each title
         for (int i = 0; i < dc.length; i++)
@@ -658,7 +658,7 @@ public class EtdLoader
             sb.append('"');
 
             // Get the title(s)
-            DCValue title[] = item.getDC("title", null, Item.ANY);
+            Metadatum title[] = item.getDC("title", null, Item.ANY);
 
             for (int i = 0; i < title.length; i++)
             {
@@ -673,7 +673,7 @@ public class EtdLoader
             sb.append("\",\"");
 
             // Get the author(s)
-            DCValue author[] = item.getDC("contributor", "author", Item.ANY);
+            Metadatum author[] = item.getDC("contributor", "author", Item.ANY);
 
             for (int i = 0; i < author.length; i++)
             {
@@ -1043,7 +1043,7 @@ public class EtdLoader
             throws Exception
     {
         // Get the title(s)
-        DCValue dc[] = item.getDC("title", null, Item.ANY);
+        Metadatum dc[] = item.getDC("title", null, Item.ANY);
         String strTitle = dc[0].value;
 
         // Get the email recipient
@@ -1082,7 +1082,7 @@ public class EtdLoader
         sb.append("Item loaded: " + strHandle + "\n");
 
         // Title
-        DCValue dc[] = item.getDC("title", null, Item.ANY);
+        Metadatum dc[] = item.getDC("title", null, Item.ANY);
         sb.append("  Title: " + dc[0].value + "\n");
 
         // Collections

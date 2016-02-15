@@ -128,7 +128,7 @@ public class PasswordAuthentication
 		// ensures they are password users
 		try
 		{
-			if (!context.getCurrentUser().getMetadata("password").equals(""))
+			if (context.getCurrentUser().getPasswordHash() != null && !context.getCurrentUser().getPasswordHash().toString().equals(""))
 			{
 				String groupName = ConfigurationManager.getProperty("authentication-password", "login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))

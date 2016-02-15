@@ -39,22 +39,17 @@ import org.dspace.storage.rdbms.TableRowIterator;
 public class Bitstream extends DSpaceObject
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(Bitstream.class);
+    private static final Logger log = Logger.getLogger(Bitstream.class);
 
-    /** Our context */
-    private Context bContext;
 
     /** The row in the table representing this bitstream */
-    private TableRow bRow;
+    private final TableRow bRow;
 
     /** The bitstream format corresponding to this bitstream */
     private BitstreamFormat bitstreamFormat;
 
     /** Flag set when data is modified, for events */
     private boolean modified;
-
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
 
     /**
      * Private constructor for creating a Bitstream object based on the contents
@@ -68,7 +63,12 @@ public class Bitstream extends DSpaceObject
      */
     Bitstream(Context context, TableRow row) throws SQLException
     {
-        bContext = context;
+        super(context);
+
+        // Ensure that my TableRow is typed.
+        if (null == row.getTable())
+            row.setTable("bitstream");
+
         bRow = row;
 
         // Get the bitstream format
@@ -91,7 +91,6 @@ public class Bitstream extends DSpaceObject
         context.cache(this, row.getIntColumn("bitstream_id"));
 
         modified = false;
-        modifiedMetadata = false;
         clearDetails();
     }
 
@@ -211,7 +210,8 @@ public class Bitstream extends DSpaceObject
         Bitstream bitstream = find(context, bitstreamID);
         bitstream.setFormat(null);
 
-        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null));
+        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, 
+                bitstreamID, null, bitstream.getIdentifiers(context)));
 
         return bitstream;
     }
@@ -246,7 +246,8 @@ public class Bitstream extends DSpaceObject
         Bitstream bitstream = find(context, bitstreamID);
         bitstream.setFormat(null);
 
-        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, "REGISTER"));
+        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, 
+                bitstreamID, "REGISTER", bitstream.getIdentifiers(context)));
 
         return bitstream;
     }
@@ -296,9 +297,8 @@ public class Bitstream extends DSpaceObject
      * 
      * @return the name of the bitstream
      */
-    public String getName()
-    {
-        return bRow.getStringColumn("name");
+    public String getName(){
+        return getMetadataFirstValue(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
     }
 
     /**
@@ -307,11 +307,8 @@ public class Bitstream extends DSpaceObject
      * @param n
      *            the new name of the bitstream
      */
-    public void setName(String n)
-    {
-        bRow.setColumn("name", n);
-        modifiedMetadata = true;
-        addDetails("Name");
+    public void setName(String n) {
+        setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "title", null, null, n);
     }
 
     /**
@@ -323,7 +320,7 @@ public class Bitstream extends DSpaceObject
      */
     public String getSource()
     {
-        return bRow.getStringColumn("source");
+        return getMetadataFirstValue(MetadataSchema.DC_SCHEMA, "source", null, Item.ANY);
     }
 
     /**
@@ -332,11 +329,8 @@ public class Bitstream extends DSpaceObject
      * @param n
      *            the new source of the bitstream
      */
-    public void setSource(String n)
-    {
-        bRow.setColumn("source", n);
-        modifiedMetadata = true;
-        addDetails("Source");
+    public void setSource(String n) {
+        setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "source", null, null, n);
     }
 
     /**
@@ -347,7 +341,7 @@ public class Bitstream extends DSpaceObject
      */
     public String getDescription()
     {
-        return bRow.getStringColumn("description");
+        return getMetadataFirstValue(MetadataSchema.DC_SCHEMA, "description", null, Item.ANY);
     }
 
     /**
@@ -356,11 +350,8 @@ public class Bitstream extends DSpaceObject
      * @param n
      *            the new description of the bitstream
      */
-    public void setDescription(String n)
-    {
-        bRow.setColumn("description", n);
-        modifiedMetadata = true;
-        addDetails("Description");
+    public void setDescription(String n) {
+        setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "description", null, null, n);
     }
 
     /**
@@ -401,14 +392,9 @@ public class Bitstream extends DSpaceObject
      *            the user's description of the format
      * @throws SQLException
      */
-    public void setUserFormatDescription(String desc) throws SQLException
-    {
-        // FIXME: Would be better if this didn't throw an SQLException,
-        // but we need to find the unknown format!
+    public void setUserFormatDescription(String desc) throws SQLException {
         setFormat(null);
-        bRow.setColumn("user_format_description", desc);
-        modifiedMetadata = true;
-        addDetails("UserFormatDescription");
+        setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "format", null, null, desc);
     }
 
     /**
@@ -419,7 +405,7 @@ public class Bitstream extends DSpaceObject
      */
     public String getUserFormatDescription()
     {
-        return bRow.getStringColumn("user_format_description");
+        return getMetadataFirstValue(MetadataSchema.DC_SCHEMA, "format", null, Item.ANY);
     }
 
     /**
@@ -433,7 +419,7 @@ public class Bitstream extends DSpaceObject
         if (bitstreamFormat.getShortDescription().equals("Unknown"))
         {
             // Get user description if there is one
-            String desc = bRow.getStringColumn("user_format_description");
+            String desc = getUserFormatDescription();
 
             if (desc == null)
             {
@@ -474,7 +460,7 @@ public class Bitstream extends DSpaceObject
         if (f == null)
         {
             // Use "Unknown" format
-            bitstreamFormat = BitstreamFormat.findUnknown(bContext);
+            bitstreamFormat = BitstreamFormat.findUnknown(ourContext);
         }
         else
         {
@@ -482,7 +468,7 @@ public class Bitstream extends DSpaceObject
         }
 
         // Remove user type description
-        bRow.setColumnNull("user_format_description");
+        clearMetadata(MetadataSchema.DC_SCHEMA,"format",null, Item.ANY);
 
         // Update the ID in the table row
         bRow.setColumn("bitstream_format_id", bitstreamFormat.getID());
@@ -499,24 +485,24 @@ public class Bitstream extends DSpaceObject
     public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(bContext, this, Constants.WRITE);
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
-        log.info(LogManager.getHeader(bContext, "update_bitstream",
+        log.info(LogManager.getHeader(ourContext, "update_bitstream",
                 "bitstream_id=" + getID()));
+
+        DatabaseManager.update(ourContext, bRow);
 
         if (modified)
         {
-            bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null, getIdentifiers(ourContext)));
             modified = false;
         }
         if (modifiedMetadata)
         {
-            bContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, getID(), getDetails()));
-            modifiedMetadata = false;
+            updateMetadata();
             clearDetails();
         }
 
-        DatabaseManager.update(bContext, bRow);
     }
 
     /**
@@ -526,35 +512,34 @@ public class Bitstream extends DSpaceObject
      */
     void delete() throws SQLException
     {
-        boolean oracle = false;
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            oracle = true;
-        }
+        boolean oracle = DatabaseManager.isOracle();
 
         // changed to a check on remove
         // Check authorisation
-        //AuthorizeManager.authorizeAction(bContext, this, Constants.DELETE);
-        log.info(LogManager.getHeader(bContext, "delete_bitstream",
+        //AuthorizeManager.authorizeAction(ourContext, this, Constants.DELETE);
+        log.info(LogManager.getHeader(ourContext, "delete_bitstream",
                 "bitstream_id=" + getID()));
 
-        bContext.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, getID(), String.valueOf(getSequenceID())));
+        ourContext.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, getID(),
+                String.valueOf(getSequenceID()), getIdentifiers(ourContext)));
 
         // Remove from cache
-        bContext.removeCached(this, getID());
+        ourContext.removeCached(this, getID());
 
         // Remove policies
-        AuthorizeManager.removeAllPolicies(bContext, this);
+        AuthorizeManager.removeAllPolicies(ourContext, this);
 
         // Remove references to primary bitstreams in bundle
         String query = "update bundle set primary_bitstream_id = ";
         query += (oracle ? "''" : "Null") + " where primary_bitstream_id = ? ";
-        DatabaseManager.updateQuery(bContext,
+        DatabaseManager.updateQuery(ourContext,
                 query, bRow.getIntColumn("bitstream_id"));
 
         // Remove bitstream itself
-        BitstreamStorageManager.delete(bContext, bRow
+        BitstreamStorageManager.delete(ourContext, bRow
                 .getIntColumn("bitstream_id"));
+
+        removeMetadataFromDatabase();
     }
 
     /**
@@ -566,7 +551,7 @@ public class Bitstream extends DSpaceObject
     boolean isDeleted() throws SQLException
     {
         String query = "select count(*) as mycount from Bitstream where deleted = '1' and bitstream_id = ? ";
-        TableRowIterator tri = DatabaseManager.query(bContext, query, bRow.getIntColumn("bitstream_id"));
+        TableRowIterator tri = DatabaseManager.query(ourContext, query, bRow.getIntColumn("bitstream_id"));
         long count = 0;
 
         try
@@ -598,9 +583,9 @@ public class Bitstream extends DSpaceObject
             AuthorizeException
     {
         // Maybe should return AuthorizeException??
-        AuthorizeManager.authorizeAction(bContext, this, Constants.READ);
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.READ);
 
-        return BitstreamStorageManager.retrieve(bContext, bRow
+        return BitstreamStorageManager.retrieve(ourContext, bRow
                 .getIntColumn("bitstream_id"));
     }
 
@@ -613,11 +598,11 @@ public class Bitstream extends DSpaceObject
     public Bundle[] getBundles() throws SQLException
     {
         // Get the bundle table rows
-        TableRowIterator tri = DatabaseManager.queryTable(bContext, "bundle",
-                "SELECT bundle.* FROM bundle, bundle2bitstream WHERE " + 
-                "bundle.bundle_id=bundle2bitstream.bundle_id AND " +
-                "bundle2bitstream.bitstream_id= ? ",
-                 bRow.getIntColumn("bitstream_id"));
+        TableRowIterator tri = DatabaseManager.queryTable(ourContext, "bundle",
+                "SELECT bundle.* FROM bundle, bundle2bitstream WHERE " +
+                        "bundle.bundle_id=bundle2bitstream.bundle_id AND " +
+                        "bundle2bitstream.bitstream_id= ? ",
+                bRow.getIntColumn("bitstream_id"));
 
         // Build a list of Bundle objects
         List<Bundle> bundles = new ArrayList<Bundle>();
@@ -628,7 +613,7 @@ public class Bitstream extends DSpaceObject
                 TableRow r = tri.next();
 
                 // First check the cache
-                Bundle fromCache = (Bundle) bContext.fromCache(Bundle.class, r
+                Bundle fromCache = (Bundle) ourContext.fromCache(Bundle.class, r
                         .getIntColumn("bundle_id"));
 
                 if (fromCache != null)
@@ -637,7 +622,7 @@ public class Bitstream extends DSpaceObject
                 }
                 else
                 {
-                    bundles.add(new Bundle(bContext, r));
+                    bundles.add(new Bundle(ourContext, r));
                 }
             }
         }
@@ -714,23 +699,23 @@ public class Bitstream extends DSpaceObject
         else
         {
             // is the bitstream a logo for a community or a collection?
-            TableRow qResult = DatabaseManager.querySingle(bContext,
+            TableRow qResult = DatabaseManager.querySingle(ourContext,
                        "SELECT collection_id FROM collection " +
                        "WHERE logo_bitstream_id = ?",getID());
             if (qResult != null) 
             {
-                return Collection.find(bContext,qResult.getIntColumn("collection_id"));
+                return Collection.find(ourContext,qResult.getIntColumn("collection_id"));
             }
             else
             {   
                 // is the bitstream related to a community?
-                qResult = DatabaseManager.querySingle(bContext,
+                qResult = DatabaseManager.querySingle(ourContext,
                         "SELECT community_id FROM community " +
                         "WHERE logo_bitstream_id = ?",getID());
     
                 if (qResult != null)
                 {
-                    return Community.find(bContext,qResult.getIntColumn("community_id"));
+                    return Community.find(ourContext,qResult.getIntColumn("community_id"));
                 }
                 else
                 {
@@ -744,6 +729,6 @@ public class Bitstream extends DSpaceObject
     public void updateLastModified()
     {
         //Also fire a modified event since the bitstream HAS been modified
-        bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null, getIdentifiers(ourContext)));
     }
 }

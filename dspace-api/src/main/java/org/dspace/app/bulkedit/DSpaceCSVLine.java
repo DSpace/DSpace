@@ -7,12 +7,10 @@
  */
 package org.dspace.app.bulkedit;
 
+import org.dspace.authority.AuthorityValue;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Utility class to store a line from a CSV file
@@ -21,11 +19,34 @@ import java.util.Set;
  */
 public class DSpaceCSVLine implements Serializable
 {
+
     /** The item id of the item represented by this line. -1 is for a new item */
     private int id;
 
     /** The elements in this line in a hashtable, keyed by the metadata type */
     private Map<String, ArrayList> items;
+
+    /** ensuring that the order-sensible columns of the csv are processed in the correct order */
+    private final Comparator<? super String> headerComparator = new Comparator<String>() {
+        @Override
+        public int compare(String md1, String md2) {
+            // The metadata coming from an external source should be processed after the others
+            AuthorityValue source1 = MetadataImport.getAuthorityValueType(md1);
+            AuthorityValue source2 = MetadataImport.getAuthorityValueType(md2);
+
+            int compare;
+            if (source1 == null && source2 != null) {
+                compare = -1;
+            }
+            else if (source1 != null && source2 == null) {
+                compare = 1;
+            } else {
+                // the order of the rest does not matter
+                compare = md1.compareTo(md2);
+            }
+            return compare;
+        }
+    };
 
     /**
      * Create a new CSV line
@@ -36,7 +57,8 @@ public class DSpaceCSVLine implements Serializable
     {
         // Store the ID + separator, and initialise the hashtable
         this.id = itemId;
-        items = new HashMap<String, ArrayList>();
+        items = new TreeMap<String, ArrayList>(headerComparator);
+//        this.items = new HashMap<String, ArrayList>();
     }
 
     /**
@@ -46,7 +68,8 @@ public class DSpaceCSVLine implements Serializable
     {
         // Set the ID to be -1, and initialise the hashtable
         this.id = -1;
-        this.items = new HashMap<String, ArrayList>();
+        this.items = new TreeMap<String, ArrayList>(headerComparator);
+//        this.items = new HashMap<String, ArrayList>();
     }
 
     /**

@@ -67,6 +67,10 @@
             <map:transformer name="MetadataImportUpload" src="org.dspace.app.xmlui.aspect.administrative.metadataimport.MetadataImportUpload"/>
             <map:transformer name="MetadataImportConfirm" src="org.dspace.app.xmlui.aspect.administrative.metadataimport.MetadataImportConfirm"/>
 
+            <map:transformer name="BatchImportMain" src="org.dspace.app.xmlui.aspect.administrative.batchimport.BatchImportMain"/>
+            <map:transformer name="BatchImportUpload" src="org.dspace.app.xmlui.aspect.administrative.batchimport.BatchImportUpload"/>
+            <map:transformer name="BatchImportConfirm" src="org.dspace.app.xmlui.aspect.administrative.batchimport.BatchImportConfirm"/>
+
             <map:transformer name="EditCollectionMetadataForm" src="org.dspace.app.xmlui.aspect.administrative.collection.EditCollectionMetadataForm"/>
             <map:transformer name="ToggleCollectionHarvestingForm" src="org.dspace.app.xmlui.aspect.administrative.collection.ToggleCollectionHarvestingForm"/>
             <map:transformer name="SetupCollectionHarvestingForm" src="org.dspace.app.xmlui.aspect.administrative.collection.SetupCollectionHarvestingForm"/>
@@ -239,6 +243,18 @@
 
                     </map:match>
 
+                    <!--
+                                               This is the general entry / resume point for the
+                                               batch metadata editor
+                                       -->
+                    <map:match pattern="admin/batchimport">
+                        <map:match type="request" pattern="administrative-continue">
+                            <map:call continuation="{1}"/>
+                        </map:match>
+
+                        <map:call function="startBatchImport"/>
+
+                    </map:match>
 
 
                     <!--
@@ -794,6 +810,23 @@
                             </map:transform>
                         </map:match>
 
+                        <!-- Batch Metadata Editor -->
+
+                        <map:match pattern="admin/batchimport/main">
+                            <map:transform type="BatchImportMain">
+                            </map:transform>
+                        </map:match>
+
+                        <map:match pattern="admin/batchimport/upload">
+                            <map:transform type="BatchImportUpload">
+                            </map:transform>
+                        </map:match>
+
+                        <map:match pattern="admin/batchimport/confirm">
+                            <map:transform type="BatchImportConfirm">
+                            </map:transform>
+                        </map:match>
+
                         <!-- Collection edit pages -->
 
                         <!-- Main metadata edit form, accessible by the collection admin -->
@@ -1048,6 +1081,9 @@
                         <map:act type="StartAuthentication"/>
                     </map:match>
                     <map:match pattern="admin/metadataimport">
+                        <map:act type="StartAuthentication"/>
+                    </map:match>
+                    <map:match pattern="admin/batchimport">
                         <map:act type="StartAuthentication"/>
                     </map:match>
                     <map:match pattern="admin/collection">

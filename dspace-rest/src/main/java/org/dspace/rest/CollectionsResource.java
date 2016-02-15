@@ -7,172 +7,769 @@
  */
 package org.dspace.rest;
 
-
-import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.rest.common.Collection;
-import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.ServletContext;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
-/*
-The "Path" annotation indicates the URI this class will be available at relative to your base URL.  For
-example, if this web-app is launched at localhost using a context of "hello" and no URL pattern is defined
-in the web.xml servlet mapping section, then the web service will be available at:
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-http://localhost:8080/<webapp>/collections
+import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.browse.BrowseException;
+import org.dspace.content.service.ItemService;
+import org.dspace.rest.common.Collection;
+import org.dspace.rest.common.Item;
+import org.dspace.rest.common.MetadataEntry;
+import org.dspace.rest.exceptions.ContextException;
+import org.dspace.usage.UsageEvent;
+
+/**
+ * This class provides all CRUD operation over collections.
+ * 
+ * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
  */
 @Path("/collections")
-public class CollectionsResource {
+public class CollectionsResource extends Resource
+{
     private static Logger log = Logger.getLogger(CollectionsResource.class);
-    
 
-    @javax.ws.rs.core.Context ServletContext servletContext;
-
-    private static org.dspace.core.Context context;
-    
-    private static final boolean writeStatistics;
-	
-	static{
-		writeStatistics=ConfigurationManager.getBooleanProperty("rest","stats",false);
-	}
-
-    /*
-    The "GET" annotation indicates this method will respond to HTTP Get requests.
-    The "Produces" annotation indicates the MIME response the method will return.
+    /**
+     * Return instance of collection with passed id. You can add more properties
+     * through expand parameter.
+     * 
+     * @param collectionId
+     *            Id of collection in DSpace.
+     * @param expand
+     *            String in which is what you want to add to returned instance
+     *            of collection. Options are: "all", "parentCommunityList",
+     *            "parentCommunity", "items", "license" and "logo". If you want
+     *            to use multiple options, it must be separated by commas.
+     * @param limit
+     *            Limit value for items in list in collection. Default value is
+     *            100.
+     * @param offset
+     *            Offset of start index in list of items of collection. Default
+     *            value is 0.
+     * @param headers
+     *            If you want to access to collection under logged user into
+     *            context. In headers must be set header "rest-dspace-token"
+     *            with passed token from login method.
+     * @return Return instance of collection. It can also return status code
+     *         NOT_FOUND(404) if id of collection is incorrect or status code
+     *         UNATHORIZED(401) if user has no permission to read collection.
+     * @throws WebApplicationException
+     *             It is thrown when was problem with database reading
+     *             (SQLException) or problem with creating
+     *             context(ContextException). It is thrown by NOT_FOUND and
+     *             UNATHORIZED status codes, too.
      */
     @GET
-    @Path("/")
-    @Produces(MediaType.TEXT_HTML)
-    public String listHTML() {
-        StringBuilder everything = new StringBuilder();
-        try {
-            if(context == null || !context.isValid() ) {
-                context = new org.dspace.core.Context();
-                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
-                context.getDBConnection().setAutoCommit(true);
-            }
-
-            org.dspace.content.Collection[] collections = org.dspace.content.Collection.findAll(context);
-            for(org.dspace.content.Collection collection : collections) {
-                //TODO check auth...
-                everything.append("<li><a href='" + servletContext.getContextPath() + "/collections/" + collection.getID() + "'>" + collection.getID() + " - " + collection.getName() + "</a></li>\n");
-            }
-
-            return "<html><title>Hello!</title><body>Collections<br/><ul>" + everything.toString() + "</ul>.</body></html> ";
-
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GET
-    @Path("/")
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.Collection[] list(@QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset) {
-        try {
-            if(context == null || !context.isValid() ) {
-                context = new org.dspace.core.Context();
-                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
-                context.getDBConnection().setAutoCommit(true);
-            }
-
-            org.dspace.content.Collection[] collections;
-
-            //Only support paging if limit/offset are 0 or positive values.
-            if(limit != null && limit >= 0 && offset != null && offset >= 0) {
-                collections = org.dspace.content.Collection.findAll(context, limit, offset);
-            } else {
-                collections = org.dspace.content.Collection.findAll(context);
-            }
-
-            ArrayList<org.dspace.rest.common.Collection> collectionArrayList = new ArrayList<org.dspace.rest.common.Collection>();
-            for(org.dspace.content.Collection collection : collections) {
-                if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
-                    org.dspace.rest.common.Collection restCollection = new org.dspace.rest.common.Collection(collection, null, context, limit, offset);
-                    collectionArrayList.add(restCollection);
-                } // Not showing restricted-access collections
-            }
-
-            return collectionArrayList.toArray(new org.dspace.rest.common.Collection[0]);
-
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GET
     @Path("/{collection_id}")
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.Collection getCollection(@PathParam("collection_id") Integer collection_id, @QueryParam("expand") String expand, 
-    		@QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
-    		@Context HttpHeaders headers, @Context HttpServletRequest request) {
-        try {
-            if(context == null || !context.isValid() ) {
-                context = new org.dspace.core.Context();
-                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
-                context.getDBConnection().setAutoCommit(true);
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public org.dspace.rest.common.Collection getCollection(@PathParam("collection_id") Integer collectionId,
+            @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
+            @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+            @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
+    {
+
+        log.info("Reading collection(id=" + collectionId + ").");
+        org.dspace.core.Context context = null;
+        Collection collection = null;
+
+        try
+        {
+            context = createContext(getUser(headers));
+
+            org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
+            writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
+
+            collection = new Collection(dspaceCollection, expand, context, limit, offset);
+            context.complete();
+
+        }
+        catch (SQLException e)
+        {
+            processException("Could not read collection(id=" + collectionId + "), SQLException. Message: " + e, context);
+        }
+        catch (ContextException e)
+        {
+            processException("Could not read collection(id=" + collectionId + "), ContextException. Message: " + e.getMessage(),
+                    context);
+        }
+        finally
+        {
+            processFinally(context);
+        }
+
+        log.trace("Collection(id=" + collectionId + ") has been successfully read.");
+        return collection;
+    }
+
+    /**
+     * Return array of all collections in DSpace. You can add more properties
+     * through expand parameter.
+     * 
+     * @param expand
+     *            String in which is what you want to add to returned instance
+     *            of collection. Options are: "all", "parentCommunityList",
+     *            "parentCommunity", "items", "license" and "logo". If you want
+     *            to use multiple options, it must be separated by commas.
+     * @param limit
+     *            Limit value for items in list in collection. Default value is
+     *            100.
+     * @param offset
+     *            Offset of start index in list of items of collection. Default
+     *            value is 0.
+     * @param headers
+     *            If you want to access to collections under logged user into
+     *            context. In headers must be set header "rest-dspace-token"
+     *            with passed token from login method.
+     * @return Return array of collection, on which has logged user permission
+     *         to view.
+     * @throws WebApplicationException
+     *             It is thrown when was problem with database reading
+     *             (SQLException) or problem with creating
+     *             context(ContextException).
+     */
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public org.dspace.rest.common.Collection[] getCollections(@QueryParam("expand") String expand,
+            @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            throws WebApplicationException
+    {
+
+        log.info("Reading all collections.(offset=" + offset + ",limit=" + limit + ")");
+        org.dspace.core.Context context = null;
+        List<Collection> collections = new ArrayList<Collection>();
+
+        try
+        {
+            context = createContext(getUser(headers));
+
+            if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
+            {
+                log.warn("Paging was badly set.");
+                limit = 100;
+                offset = 0;
             }
 
-            org.dspace.content.Collection collection = org.dspace.content.Collection.find(context, collection_id);
-            if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
-            	if(writeStatistics){
-    				writeStats(collection_id, user_ip, user_agent, xforwarderfor, headers, request);
-    			}
-                return new org.dspace.rest.common.Collection(collection, expand, context, limit, offset);
-            } else {
+            org.dspace.content.Collection[] dspaceCollections = org.dspace.content.Collection.findAll(context, limit, offset);
+            for(org.dspace.content.Collection dspaceCollection : dspaceCollections)
+            {
+                if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
+                {
+                    Collection collection = new org.dspace.rest.common.Collection(dspaceCollection, null, context, limit,
+                            offset);
+                    collections.add(collection);
+                    writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent,
+                            xforwardedfor, headers, request, context);
+                }
+            }
+            context.complete();
+        }
+        catch (SQLException e)
+        {
+            processException("Something went wrong while reading collections from database. Message: " + e, context);
+        }
+        catch (ContextException e)
+        {
+            processException("Something went wrong while reading collections, ContextError. Message: " + e.getMessage(), context);
+        }
+        finally
+        {
+            processFinally(context);
+        }
+
+        log.trace("All collections were successfully read.");
+        return collections.toArray(new org.dspace.rest.common.Collection[0]);
+    }
+
+    /**
+     * Return array of items in collection. You can add more properties to items
+     * with expand parameter.
+     * 
+     * @param collectionId
+     *            Id of collection in DSpace.
+     * @param expand
+     *            String which define, what additional properties will be in
+     *            returned item. Options are separeted by commas and are: "all",
+     *            "metadata", "parentCollection", "parentCollectionList",
+     *            "parentCommunityList" and "bitstreams".
+     * @param limit
+     *            Limit value for items in array. Default value is 100.
+     * @param offset
+     *            Offset of start index in array of items of collection. Default
+     *            value is 0.
+     * @param headers
+     *            If you want to access to collection under logged user into
+     *            context. In headers must be set header "rest-dspace-token"
+     *            with passed token from login method.
+     * @return Return array of items, on which has logged user permission to
+     *         read. It can also return status code NOT_FOUND(404) if id of
+     *         collection is incorrect or status code UNATHORIZED(401) if user
+     *         has no permission to read collection.
+     * @throws WebApplicationException
+     *             It is thrown when was problem with database reading
+     *             (SQLException) or problem with creating
+     *             context(ContextException). It is thrown by NOT_FOUND and
+     *             UNATHORIZED status codes, too.
+     */
+    @GET
+    @Path("/{collection_id}/items")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public org.dspace.rest.common.Item[] getCollectionItems(@PathParam("collection_id") Integer collectionId,
+            @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
+            @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+            @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
+    {
+
+        log.info("Reading collection(id=" + collectionId + ") items.");
+        org.dspace.core.Context context = null;
+        List<Item> items = null;
+
+        try
+        {
+            context = createContext(getUser(headers));
+
+            org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
+            writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
+
+            items = new ArrayList<Item>();
+            org.dspace.content.ItemIterator dspaceItems = dspaceCollection.getItems();
+            for (int i = 0; (dspaceItems.hasNext()) && (i < (limit + offset)); i++)
+            {
+                if (i >= offset)
+                {
+                    org.dspace.content.Item dspaceItem = dspaceItems.next();
+                    if (ItemService.isItemListedForUser(context, dspaceItem))
+                    {
+                        items.add(new Item(dspaceItem, expand, context));
+                        writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
+                                headers, request, context);
+                    }
+                } else {
+                    //Advance the iterator to offset.
+                    dspaceItems.nextID();
+                }
+            }
+
+            context.complete();
+        }
+        catch (SQLException e)
+        {
+            processException("Could not read collection items, SQLException. Message: " + e, context);
+        }
+        catch (ContextException e)
+        {
+            processException("Could not read collection items, ContextException. Message: " + e.getMessage(), context);
+        }
+        finally
+        {
+            processFinally(context);
+        }
+
+        log.trace("All items in collection(id=" + collectionId + ") were successfully read.");
+        return items.toArray(new Item[0]);
+    }
+
+    /**
+     * Create item in collection. Item can be without filled metadata.
+     * 
+     * @param collectionId
+     *            Id of collection in which will be item created.
+     * @param item
+     *            Item filled only with metadata, other variables are ignored.
+     * @param headers
+     *            If you want to access to collection under logged user into
+     *            context. In headers must be set header "rest-dspace-token"
+     *            with passed token from login method.
+     * @return Return status code with item. Return status (OK)200 if item was
+     *         created. NOT_FOUND(404) if id of collection does not exists.
+     *         UNAUTHORIZED(401) if user have not permission to write items in
+     *         collection.
+     * @throws WebApplicationException
+     *             It is thrown when was problem with database reading or
+     *             writing (SQLException) or problem with creating
+     *             context(ContextException) or problem with authorization to
+     *             collection or IOException or problem with index item into
+     *             browse index. It is thrown by NOT_FOUND and UNATHORIZED
+     *             status codes, too.
+     * 
+     */
+    @POST
+    @Path("/{collection_id}/items")
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Item addCollectionItem(@PathParam("collection_id") Integer collectionId, Item item,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            throws WebApplicationException
+    {
+
+        log.info("Create item in collection(id=" + collectionId + ").");
+        org.dspace.core.Context context = null;
+        Item returnItem = null;
+
+        try
+        {
+            context = createContext(getUser(headers));
+            org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
+                    org.dspace.core.Constants.WRITE);
+
+            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
+
+            log.trace("Creating item in collection(id=" + collectionId + ").");
+            org.dspace.content.WorkspaceItem workspaceItem = org.dspace.content.WorkspaceItem.create(context, dspaceCollection,
+                    false);
+            org.dspace.content.Item dspaceItem = workspaceItem.getItem();
+
+            log.trace("Adding metadata to item(id=" + dspaceItem.getID() + ").");
+            if (item.getMetadata() != null)
+            {
+                for (MetadataEntry entry : item.getMetadata())
+                {
+                    String data[] = mySplit(entry.getKey());
+                    dspaceItem.addMetadata(data[0], data[1], data[2], entry.getLanguage(), entry.getValue());
+                }
+            }
+            workspaceItem.update();
+
+            // Index item to browse.
+            org.dspace.browse.IndexBrowse browse = new org.dspace.browse.IndexBrowse(context);
+            browse.indexItem(dspaceItem);
+
+            log.trace("Installing item to collection(id=" + collectionId + ").");
+            dspaceItem = org.dspace.content.InstallItem.installItem(context, workspaceItem);
+
+            returnItem = new Item(dspaceItem, "", context);
+
+            context.complete();
+
+        }
+        catch (SQLException e)
+        {
+            processException("Could not add item into collection(id=" + collectionId + "), SQLException. Message: " + e, context);
+        }
+        catch (AuthorizeException e)
+        {
+            processException("Could not add item into collection(id=" + collectionId + "), AuthorizeException. Message: " + e,
+                    context);
+        }
+        catch (IOException e)
+        {
+            processException("Could not add item into collection(id=" + collectionId + "), IOException. Message: " + e, context);
+        }
+        catch (BrowseException e)
+        {
+            processException("Could not add item into browse index, BrowseException. Message: " + e, context);
+        }
+        catch (ContextException e)
+        {
+            processException(
+                    "Could not add item into collection(id=" + collectionId + "), ContextException. Message: " + e.getMessage(),
+                    context);
+        }
+        finally
+        {
+            processFinally(context);
+        }
+
+        log.info("Item successfully created in collection(id=" + collectionId + "). Item handle=" + returnItem.getHandle());
+        return returnItem;
+    }
+
+    /**
+     * Update collection. It replace all properties.
+     * 
+     * @param collectionId
+     *            Id of collection in DSpace.
+     * @param collection
+     *            Collection which will replace properties of actual collection.
+     * @param headers
+     *            If you want to access to collection under logged user into
+     *            context. In headers must be set header "rest-dspace-token"
+     *            with passed token from login method.
+     * @return Return response 200 if was everything all right. Otherwise 400
+     *         when id of community was incorrect or 401 if was problem with
+     *         permission to write into collection.
+     * @throws WebApplicationException
+     *             It is thrown when was problem with database reading or
+     *             writing. Or problem with authorization to collection. Or
+     *             problem with creating context.
+     */
+    @PUT
+    @Path("/{collection_id}")
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Response updateCollection(@PathParam("collection_id") Integer collectionId,
+            org.dspace.rest.common.Collection collection, @QueryParam("userIP") String user_ip,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+            @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
+    {
+
+        log.info("Updating collection(id=" + collectionId + ").");
+        org.dspace.core.Context context = null;
+
+        try
+        {
+            context = createContext(getUser(headers));
+            org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
+                    org.dspace.core.Constants.WRITE);
+
+            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
+
+            dspaceCollection.setMetadata("name", collection.getName());
+            dspaceCollection.setLicense(collection.getLicense());
+            // dspaceCollection.setLogo(collection.getLogo()); // TODO Add this option.
+            dspaceCollection.setMetadata(org.dspace.content.Collection.COPYRIGHT_TEXT, collection.getCopyrightText());
+            dspaceCollection.setMetadata(org.dspace.content.Collection.INTRODUCTORY_TEXT, collection.getIntroductoryText());
+            dspaceCollection.setMetadata(org.dspace.content.Collection.SHORT_DESCRIPTION, collection.getShortDescription());
+            dspaceCollection.setMetadata(org.dspace.content.Collection.SIDEBAR_TEXT, collection.getSidebarText());
+            dspaceCollection.update();
+
+            context.complete();
+
+        }
+        catch (ContextException e)
+        {
+            processException("Could not update collection(id=" + collectionId + "), ContextException. Message: " + e.getMessage(),
+                    context);
+        }
+        catch (SQLException e)
+        {
+            processException("Could not update collection(id=" + collectionId + "), SQLException. Message: " + e, context);
+        }
+        catch (AuthorizeException e)
+        {
+            processException("Could not update collection(id=" + collectionId + "), AuthorizeException. Message: " + e, context);
+        }
+        finally
+        {
+            processFinally(context);
+        }
+
+        log.info("Collection(id=" + collectionId + ") successfully updated.");
+        return Response.ok().build();
+    }
+
+    /**
+     * Delete collection.
+     * 
+     * @param collectionId
+     *            Id of collection which will be deleted.
+     * @param headers
+     *            If you want to access to collection under logged user into
+     *            context. In headers must be set header "rest-dspace-token"
+     *            with passed token from login method.
+     * @return Return response code OK(200) if was everything all right.
+     *         Otherwise return NOT_FOUND(404) if was id of community or
+     *         collection incorrect. Or (UNAUTHORIZED)401 if was problem with
+     *         permission to community or collection.
+     * @throws WebApplicationException
+     *             It is throw when was problem with creating context or problem
+     *             with database reading or writing. Or problem with deleting
+     *             collection caused by IOException or authorization.
+     */
+    @DELETE
+    @Path("/{collection_id}")
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Response deleteCollection(@PathParam("collection_id") Integer collectionId, @QueryParam("userIP") String user_ip,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+            @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
+    {
+
+        log.info("Delete collection(id=" + collectionId + ").");
+        org.dspace.core.Context context = null;
+
+        try
+        {
+            context = createContext(getUser(headers));
+            org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
+                    org.dspace.core.Constants.DELETE);
+
+            writeStats(dspaceCollection, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
+
+            org.dspace.content.Community community = (org.dspace.content.Community) dspaceCollection.getParentObject();
+            community.removeCollection(dspaceCollection);
+
+            context.complete();
+
+        }
+        catch (ContextException e)
+        {
+            processException(
+                    "Could not delete collection(id=" + collectionId + "), ContextExcpetion. Message: " + e.getMessage(), context);
+        }
+        catch (SQLException e)
+        {
+            processException("Could not delete collection(id=" + collectionId + "), SQLException. Message: " + e, context);
+        }
+        catch (AuthorizeException e)
+        {
+            processException("Could not delete collection(id=" + collectionId + "), AuthorizeException. Message: " + e, context);
+        }
+        catch (IOException e)
+        {
+            processException("Could not delete collection(id=" + collectionId + "), IOException. Message: " + e, context);
+        }
+        finally {
+            processFinally(context);
+        }
+
+        log.info("Collection(id=" + collectionId + ") was successfully deleted.");
+        return Response.ok().build();
+    }
+
+    /**
+     * Delete item in collection.
+     * 
+     * @param collectionId
+     *            Id of collection which will be deleted.
+     * 
+     * @param itemId
+     *            Id of item in colletion.
+     * @return It returns status code: OK(200). NOT_FOUND(404) if item or
+     *         collection was not found, UNAUTHORIZED(401) if user is not
+     *         allowed to delete item or permission to write into collection.
+     * @throws WebApplicationException
+     *             It can be thrown by: SQLException, when was problem with
+     *             database reading or writting. AuthorizeException, when was
+     *             problem with authorization to item or collection.
+     *             IOException, when was problem with removing item.
+     *             ContextException, when was problem with creating context of
+     *             DSpace.
+     */
+    @DELETE
+    @Path("/{collection_id}/items/{item_id}")
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Response deleteCollectionItem(@PathParam("collection_id") Integer collectionId, @PathParam("item_id") Integer itemId,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            throws WebApplicationException
+    {
+
+        log.info("Delete item(id=" + itemId + ") in collection(id=" + collectionId + ").");
+        org.dspace.core.Context context = null;
+
+        try
+        {
+            context = createContext(getUser(headers));
+            org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
+                    org.dspace.core.Constants.WRITE);
+
+            org.dspace.content.Item item = null;
+            org.dspace.content.ItemIterator dspaceItems = dspaceCollection.getItems();
+            while (dspaceItems.hasNext())
+            {
+                org.dspace.content.Item dspaceItem = dspaceItems.next();
+                if (dspaceItem.getID() == itemId)
+                {
+                    item = dspaceItem;
+                }
+            }
+
+            if (item == null)
+            {
+                context.abort();
+                log.warn("Item(id=" + itemId + ") was not found!");
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
+            else if (!AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.REMOVE))
+            {
+                context.abort();
+                if (context.getCurrentUser() != null)
+                {
+                    log.error("User(" + context.getCurrentUser().getEmail() + ") has not permission to delete item!");
+                }
+                else
+                {
+                    log.error("User(anonymous) has not permission to delete item!");
+                }
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+
+            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
+            writeStats(item, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers, request, context);
+
+            dspaceCollection.removeItem(item);
+
+            context.complete();
+
         }
+        catch (ContextException e)
+        {
+            processException("Could not delete item(id=" + itemId + ") in collection(id=" + collectionId
+                    + "), ContextException. Message: " + e.getMessage(), context);
+        }
+        catch (SQLException e)
+        {
+            processException("Could not delete item(id=" + itemId + ") in collection(id=" + collectionId
+                    + "), SQLException. Message: " + e, context);
+        }
+        catch (AuthorizeException e)
+        {
+            processException("Could not delete item(id=" + itemId + ") in collection(id=" + collectionId
+                    + "), AuthorizeException. Message: " + e, context);
+        }
+        catch (IOException e)
+        {
+            processException("Could not delete item(id=" + itemId + ") in collection(id=" + collectionId
+                    + "), IOException. Message: " + e, context);
+        }
+        finally {
+            processFinally(context);
+        }
+
+        log.info("Item(id=" + itemId + ") in collection(id=" + collectionId + ") was successfully deleted.");
+        return Response.ok().build();
     }
-    
-    private void writeStats(Integer collection_id, String user_ip, String user_agent,
-			String xforwarderfor, HttpHeaders headers,
-			HttpServletRequest request) {
-		
-    	try{
-    		DSpaceObject collection = DSpaceObject.find(context, Constants.COLLECTION, collection_id);
-    		
-    		if(user_ip==null || user_ip.length()==0){
-    			new DSpace().getEventService().fireEvent(
-	                     new UsageEvent(
-	                                     UsageEvent.Action.VIEW,
-	                                     request,
-	                                     context,
-	                                     collection));
-    		} else{
-	    		new DSpace().getEventService().fireEvent(
-	                     new UsageEvent(
-	                                     UsageEvent.Action.VIEW,
-	                                     user_ip,
-	                                     user_agent,
-	                                     xforwarderfor,
-	                                     context,
-	                                     collection));
-    		}
-    		log.debug("fired event");
-    		
-		} catch(SQLException ex){
-			log.error("SQL exception can't write usageEvent \n" + ex);
-		}
-    		
-	}
+
+    /**
+     * Search for first collection with passed name.
+     * 
+     * @param name
+     *            Name of collection.
+     * @param headers
+     *            If you want to access to collection under logged user into
+     *            context. In headers must be set header "rest-dspace-token"
+     *            with passed token from login method.
+     * @return It returns null if collection was not found. Otherwise returns
+     *         first founded collection.
+     * @throws WebApplicationException
+     */
+    @POST
+    @Path("/find-collection")
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Collection findCollectionByName(String name, @Context HttpHeaders headers) throws WebApplicationException
+    {
+        log.info("Searching for first collection with name=" + name + ".");
+        org.dspace.core.Context context = null;
+        Collection collection = null;
+
+        try
+        {
+            context = createContext(getUser(headers));
+            org.dspace.content.Collection[] dspaceCollections;
+
+            dspaceCollections = org.dspace.content.Collection.findAll(context);
+
+            for (org.dspace.content.Collection dspaceCollection : dspaceCollections)
+            {
+                if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
+                {
+                    if (dspaceCollection.getName().equals(name))
+                    {
+                        collection = new Collection(dspaceCollection, "", context, 100, 0);
+                        break;
+                    }
+                }
+            }
+
+            context.complete();
+
+        }
+        catch (SQLException e)
+        {
+            processException("Something went wrong while searching for collection(name=" + name + ") from database. Message: "
+                    + e, context);
+        }
+        catch (ContextException e)
+        {
+            processException("Something went wrong while searching for collection(name=" + name + "), ContextError. Message: "
+                    + e.getMessage(), context);
+        }
+        finally
+        {
+            processFinally(context);
+        }
+
+        if (collection == null)
+        {
+            log.info("Collection was not found.");
+        }
+        else
+        {
+            log.info("Collection was found with id(" + collection.getId() + ").");
+        }
+        return collection;
+    }
+
+    /**
+     * Find collection from DSpace database. It is encapsulation of method
+     * org.dspace.content.Collection.find with checking if item exist and if
+     * user logged into context has permission to do passed action.
+     * 
+     * @param context
+     *            Context of actual logged user.
+     * @param id
+     *            Id of collection in DSpace.
+     * @param action
+     *            Constant from org.dspace.core.Constants.
+     * @return It returns DSpace collection.
+     * @throws WebApplicationException
+     *             Is thrown when item with passed id is not exists and if user
+     *             has no permission to do passed action.
+     */
+    private org.dspace.content.Collection findCollection(org.dspace.core.Context context, int id, int action)
+            throws WebApplicationException
+    {
+        org.dspace.content.Collection collection = null;
+        try
+        {
+            collection = org.dspace.content.Collection.find(context, id);
+
+            if (collection == null)
+            {
+                context.abort();
+                log.warn("Collection(id=" + id + ") was not found!");
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
+            else if (!AuthorizeManager.authorizeActionBoolean(context, collection, action))
+            {
+                context.abort();
+                if (context.getCurrentUser() != null)
+                {
+                    log.error("User(" + context.getCurrentUser().getEmail() + ") has not permission to "
+                            + getActionString(action) + " collection!");
+                }
+                else
+                {
+                    log.error("User(anonymous) has not permission to " + getActionString(action) + " collection!");
+                }
+                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            }
+
+        }
+        catch (SQLException e)
+        {
+            processException("Something get wrong while finding collection(id=" + id + "). SQLException, Message: " + e, context);
+        }
+        return collection;
+    }
 }

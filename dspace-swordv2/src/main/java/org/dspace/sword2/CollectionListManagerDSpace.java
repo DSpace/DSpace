@@ -13,7 +13,7 @@ import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.WorkspaceItem;
@@ -180,14 +180,14 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI implements Colle
 			return null;
 		}
 
-		DCValue[] dcvs = item.getMetadata(field);
+		Metadatum[] dcvs = item.getMetadataByMetadataString(field);
 		if (dcvs == null)
 		{
 			return null;
 		}
 
 		StringBuilder md = new StringBuilder();
-		for (DCValue dcv : dcvs)
+		for (Metadatum dcv : dcvs)
 		{
 			if (md.length() > 0)
 			{

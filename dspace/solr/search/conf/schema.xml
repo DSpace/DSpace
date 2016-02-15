@@ -478,7 +478,7 @@
               <filter class="solr.StopFilterFactory" ignoreCase="true"
                       words="stopwords.txt"/>
               <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
-              ￼￼￼￼￼  </analyzer>
+          </analyzer>
       </fieldType>
  </types>
 
@@ -526,16 +526,16 @@
    <field name="search.resourcetype" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
 
     <!-- All object placed in Discovery must have an unique id (for standard DSpaceObject it is resourceID-resourceTypeID) -->
-   <field name="search.uniqueid" type="string" indexed="true" stored="true" required="true" omitNorms="true" />
+   <field name="search.uniqueid" type="string" indexed="true" stored="true" required="true" omitNorms="true" docValues="true"/>
    
     <!-- All Items/Communities/Collections placed in Discovery should have an handle -->
-   <field name="handle" type="string" indexed="true" stored="true" omitNorms="true" />
+   <field name="handle" type="string" indexed="true" stored="true" omitNorms="true" docValues="true" />
 
-   <field name="withdrawn" type="string" indexed="true" stored="true" omitNorms="true" />
+   <field name="withdrawn" type="string" indexed="true" stored="true" omitNorms="true" docValues="true" />
 
-   <field name="discoverable" type="string" indexed="true" stored="true" omitNorms="true" />
+   <field name="discoverable" type="string" indexed="true" stored="true" omitNorms="true" docValues="true" />
       
-   <field name="read" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" />
+   <field name="read" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
    
     <!-- Community and collection hierarchy of the Item of interest (candidate for hierarchical facetting ) -->
    <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
@@ -544,6 +544,7 @@
 
     <field name="a_spell" type="textSpell" />
     <copyField source="fulltext" dest="a_spell" />
+    <copyField source="fulltext" dest="fulltext_hl" />
 
     <!-- used by the DSpace Discovery Solr Indexer to track the last time a document was indexed -->
    <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
@@ -580,7 +581,7 @@
 
      <!--Date matching-->
     <dynamicField name="*.year" type="sint" indexed="true" stored="true" multiValued="true" omitNorms="true" />
-    <dynamicField name="*_dt" type="date" indexed="true" stored="true" multiValued="false" omitNorms="true" />
+    <dynamicField name="*_dt" type="date" indexed="true" stored="true" multiValued="false" omitNorms="true"  docValues="true"/>
 
 
     <!--Used for matching on all other fields -->
@@ -597,21 +598,21 @@
         EXAMPLE:  name="*_i" will match any field ending in _i (like myid_i, z_i)
         Longer patterns will be matched first.  if equal size patterns
         both match, the first appearing in the schema will be used.  -->
-   <dynamicField name="*_i"  type="int"    indexed="true"  stored="true"/>
-   <dynamicField name="*_s"  type="string"  indexed="true"  stored="true"/>
-   <dynamicField name="*_l"  type="long"   indexed="true"  stored="true"/>
-   <dynamicField name="*_t"  type="text"    indexed="true"  stored="true"/>
-   <dynamicField name="*_b"  type="boolean" indexed="true"  stored="true"/>
-   <dynamicField name="*_f"  type="float"  indexed="true"  stored="true"/>
-   <dynamicField name="*_d"  type="double" indexed="true"  stored="true"/>
+   <dynamicField name="*_i"  type="int"    indexed="true"  stored="true" docValues="true"/>
+   <dynamicField name="*_s"  type="string"  indexed="true"  stored="true" docValues="true"/>
+   <dynamicField name="*_l"  type="long"   indexed="true"  stored="true" docValues="true"/>
+   <dynamicField name="*_t"  type="text"    indexed="true"  stored="true" />
+   <dynamicField name="*_b"  type="boolean" indexed="true"  stored="true" />
+   <dynamicField name="*_f"  type="float"  indexed="true"  stored="true" docValues="true"/>
+   <dynamicField name="*_d"  type="double" indexed="true"  stored="true" docValues="true"/>
    <!--<dynamicField name="*_dt" type="date"    indexed="true"  stored="true"/>-->
 
    <!-- some trie-coded dynamic fields for faster range queries -->
-   <dynamicField name="*_ti" type="tint"    indexed="true"  stored="true"/>
-   <dynamicField name="*_tl" type="tlong"   indexed="true"  stored="true"/>
-   <dynamicField name="*_tf" type="tfloat"  indexed="true"  stored="true"/>
-   <dynamicField name="*_td" type="tdouble" indexed="true"  stored="true"/>
-   <dynamicField name="*_tdt" type="tdate"  indexed="true"  stored="true"/>
+   <dynamicField name="*_ti" type="tint"    indexed="true"  stored="true" docValues="true"/>
+   <dynamicField name="*_tl" type="tlong"   indexed="true"  stored="true" docValues="true"/>
+   <dynamicField name="*_tf" type="tfloat"  indexed="true"  stored="true" docValues="true"/>
+   <dynamicField name="*_td" type="tdouble" indexed="true"  stored="true" docValues="true"/>
+   <dynamicField name="*_tdt" type="tdate"  indexed="true"  stored="true" docValues="true"/>
 
    <dynamicField name="*_pi"  type="pint"    indexed="true"  stored="true"/>
 

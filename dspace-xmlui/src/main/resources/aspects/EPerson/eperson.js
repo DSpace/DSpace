@@ -111,7 +111,7 @@ function doRegister()
                 } 
                 catch (error) 
                 {
-                    // If any errors occured while trying to send the email set the field in error.
+                    // If any errors occurred while trying to send the email set the field in error.
                     errors = new Array("email");
                     continue;
                 }

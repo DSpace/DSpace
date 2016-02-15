@@ -16,7 +16,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Bitstream;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
@@ -77,9 +79,8 @@ public class ReporterDAO extends DAOSupport
      */
     public static final String FIND_UNKNOWN_BITSTREAMS = "select bitstream.deleted, bitstream.store_number, bitstream.size_bytes, "
             + "bitstreamformatregistry.short_description, bitstream.bitstream_id,  "
-            + "bitstream.user_format_description, bitstream.internal_id, "
-            + "bitstream.source, bitstream.checksum_algorithm, bitstream.checksum, "
-            + "bitstream.name, bitstream.description "
+            + "bitstream.internal_id, "
+            + "bitstream.checksum_algorithm, bitstream.checksum "
             + "from bitstream left outer join bitstreamformatregistry on "
             + "bitstream.bitstream_format_id = bitstreamformatregistry.bitstream_format_id "
             + "where not exists( select 'x' from most_recent_checksum "
@@ -180,7 +181,7 @@ public class ReporterDAO extends DAOSupport
             // create the connection and execute the statement
             conn = DatabaseManager.getConnection();
 
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            if (DatabaseManager.isOracle())
             {
                 prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE);
             }
@@ -224,7 +225,7 @@ public class ReporterDAO extends DAOSupport
      * 
      * @return a List of DSpaceBitstreamInfo objects
      */
-    public List<DSpaceBitstreamInfo> getUnknownBitstreams()
+    public List<DSpaceBitstreamInfo> getUnknownBitstreams(Context context)
     {
         List<DSpaceBitstreamInfo> unknownBitstreams = new LinkedList<DSpaceBitstreamInfo>();
 
@@ -244,16 +245,15 @@ public class ReporterDAO extends DAOSupport
             // add the bitstream history objects
             while (rs.next())
             {
+                Bitstream bitstream = Bitstream.find(context, rs.getInt("bitstream_id"));
                 unknownBitstreams.add(new DSpaceBitstreamInfo(rs
                         .getBoolean("deleted"), rs.getInt("store_number"), rs
                         .getInt("size_bytes"), rs
                         .getString("short_description"), rs
-                        .getInt("bitstream_id"), rs
-                        .getString("user_format_description"), rs
-                        .getString("internal_id"), rs.getString("source"), rs
+                        .getInt("bitstream_id"), bitstream.getFormatDescription(), rs
+                        .getString("internal_id"), bitstream.getSource(), rs
                         .getString("checksum_algorithm"), rs
-                        .getString("checksum"), rs.getString("name"), rs
-                        .getString("description")));
+                        .getString("checksum"), bitstream.getName(), bitstream.getDescription()));
             }
         }
         catch (SQLException e)

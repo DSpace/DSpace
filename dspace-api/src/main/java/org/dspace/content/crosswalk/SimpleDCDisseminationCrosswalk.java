@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -91,7 +91,7 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
         }
 
         Item item = (Item)dso;
-        DCValue[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);
+        Metadatum[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);
 
         List<Element> dcl = new ArrayList<Element>(allDC.length);
 

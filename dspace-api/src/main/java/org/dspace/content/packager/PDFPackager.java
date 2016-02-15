@@ -180,7 +180,7 @@ public class PDFPackager
     /**
      * IngestAll() cannot be implemented for a PDF ingester, because there's only one PDF to ingest
      */
-    public List<DSpaceObject> ingestAll(Context context, DSpaceObject parent, File pkgFile,
+    public List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
                                 PackageParameters params, String license)
         throws PackageException, UnsupportedOperationException,
                CrosswalkException, AuthorizeException,
@@ -205,7 +205,7 @@ public class PDFPackager
     /**
      * ReplaceAll() cannot be implemented for a PDF ingester, because there's only one PDF to ingest
      */
-    public List<DSpaceObject> replaceAll(Context context, DSpaceObject dso,
+    public List<String> replaceAll(Context context, DSpaceObject dso,
                                 File pkgFile, PackageParameters params)
         throws PackageException, UnsupportedOperationException,
                CrosswalkException, AuthorizeException,

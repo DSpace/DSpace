@@ -110,6 +110,10 @@ public class DSpaceKernelServletContextListenerTest {
         } catch (IllegalStateException e) {
             assertNotNull(e.getMessage());
         }
+        
+        tester = null;
+        request = null;
+        response = null;
     }
 
     @Test

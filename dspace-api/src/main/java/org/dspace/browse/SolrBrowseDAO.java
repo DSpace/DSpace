@@ -31,7 +31,10 @@ import org.dspace.utils.DSpace;
 /**
  * 
  * @author Andrea Bollini (CILEA)
- *
+ * @author Adán Román Ruiz at arvo.es (bugfix)
+ * @author Panagiotis Koutsourakis (National Documentation Centre) (bugfix)
+ * @author Kostas Stamatis (National Documentation Centre) (bugfix)
+ * 
  */
 public class SolrBrowseDAO implements BrowseDAO
 {
@@ -155,7 +158,7 @@ public class SolrBrowseDAO implements BrowseDAO
             }
             else
             {
-                query.setMaxResults(limit > 0 ? limit : 20);
+                query.setMaxResults(limit/* > 0 ? limit : 20*/);
                 if (offset > 0)
                 {
                     query.setStart(offset);
@@ -253,7 +256,7 @@ public class SolrBrowseDAO implements BrowseDAO
         List<FacetResult> facet = resp.getFacetResult(facetField);
         int count = doCountQuery();
         int start = offset > 0 ? offset : 0;
-        int max = limit > 0 ? limit : 20;
+        int max = limit > 0 ? limit : count; //if negative, return everything
         List<String[]> result = new ArrayList<String[]>();
         if (ascending)
         {
@@ -335,18 +338,36 @@ public class SolrBrowseDAO implements BrowseDAO
         addStatusFilter(query);
         query.setMaxResults(0);
         query.addFilterQueries("search.resourcetype:" + Constants.ITEM);
+
+        // We need to take into account the fact that we may be in a subset of the items
+        if (authority != null)
+        {
+            query.addFilterQueries("{!field f="+facetField + "_authority_filter}"
+                    + authority);
+        }
+        else if (this.value != null && !valuePartial)
+        {
+            query.addFilterQueries("{!field f="+facetField + "_value_filter}" + this.value);
+        }
+        else if (valuePartial)
+        {
+            query.addFilterQueries("{!field f="+facetField + "_partial}" + this.value);
+        }
+
         if (isAscending)
         {
-            query.setQuery("bi_"+column + "_sort" + ": [* TO \"" + value + "\"]");
+            query.setQuery("bi_"+column + "_sort" + ": [* TO \"" + value + "\"}");
         }
         else
         {
-            query.setQuery("bi_" + column + "_sort" + ": [\"" + value + "\" TO *]");
+            query.setQuery("bi_" + column + "_sort" + ": {\"" + value + "\" TO *]");
+	        query.addFilterQueries("-(bi_" + column + "_sort" + ":" + value + "*)");
         }
+	    boolean includeUnDiscoverable = itemsWithdrawn || !itemsDiscoverable;
         DiscoverResult resp = null;
         try
         {
-            resp = searcher.search(context, query);
+            resp = searcher.search(context, query, includeUnDiscoverable);
         }
         catch (SearchServiceException e)
         {

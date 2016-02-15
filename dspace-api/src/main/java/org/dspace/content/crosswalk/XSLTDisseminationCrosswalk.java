@@ -20,7 +20,7 @@ import java.util.List;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -296,7 +296,7 @@ public class XSLTDisseminationCrosswalk
      *
      * @param dso The dspace object to build a representation of.
      */
-    public static Element createDIM(DSpaceObject dso, DCValue[] dcvs)
+    public static Element createDIM(DSpaceObject dso, Metadatum[] dcvs)
     {
         Element dim = new Element("dim", DIM_NS);
         String type = Constants.typeText[dso.getType()];
@@ -304,7 +304,7 @@ public class XSLTDisseminationCrosswalk
 
         for (int i = 0; i < dcvs.length; i++)
         {
-            DCValue dcv = dcvs[i];
+            Metadatum dcv = dcvs[i];
             Element field =
             createField(dcv.schema, dcv.element, dcv.qualifier,
                         dcv.language, dcv.value, dcv.authority, dcv.confidence);

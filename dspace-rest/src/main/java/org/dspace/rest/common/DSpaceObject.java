@@ -8,9 +8,11 @@
 package org.dspace.rest.common;
 
 import org.atteo.evo.inflector.English;
+import org.dspace.rest.Resource;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +28,7 @@ public class DSpaceObject {
     private Integer id;
 
     private String name;
-
     private String handle;
-
     private String type;
 
     @XmlElement(name = "link", required = true)
@@ -42,17 +42,17 @@ public class DSpaceObject {
     }
 
     public DSpaceObject(org.dspace.content.DSpaceObject dso) {
-        setID(dso.getID());
+        setId(dso.getID());
         setName(dso.getName());
         setHandle(dso.getHandle());
         setType(dso.getTypeText().toLowerCase());
     }
 
-    public Integer getID() {
+    public Integer getId() {
         return id;
     }
 
-    public void setID(Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -73,8 +73,7 @@ public class DSpaceObject {
     }
 
     public String getLink() {
-        //TODO, get actual contextPath of /rest/
-        return "/rest/" + English.plural(getType()) + "/" + getID();
+        return Resource.getServletContextPath() + "/" + English.plural(getType()) + "/" + getId();
     }
 
     public String getType() {

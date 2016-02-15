@@ -1,18 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace.modules</groupId>
     <artifactId>xmlui-mirage2</artifactId>
     <packaging>war</packaging>
-    <name>DSpace Mirage2 :: local customisations</name>
+    <name>DSpace XML-UI Mirage2 Theme :: Local Customisations</name>
     <description>
-        This project generates an overlay war for inclusion in XMLUI using the overlay mechanism.
+        This project allows you to overlay your own local Mirage2 Theme customizations
+        on top of the default Mirage2 Theme provided with DSpace.
     </description>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>modules</artifactId>
-        <version>4.1-6-SNAPSHOT</version>
+        <version>5.4-0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -22,6 +22,11 @@
         <grunt.environment>prod</grunt.environment>
         <grunt.color.scheme>classic_mirage_color_scheme</grunt.color.scheme>
         <mirage2.deps.included>true</mirage2.deps.included>
+        <!-- Versions of build dependencies to be auto-installed when "mirage2.deps.included=true" -->
+        <sass.version>3.3.14</sass.version>
+        <compass.version>1.0.1</compass.version>
+        <node.version>0.10.31</node.version>
+        <npm.version>1.4.23</npm.version>
     </properties>
 
     <build>
@@ -29,11 +34,21 @@
             <!-- Filter using the properties file defined by dspace-parent POM -->
             <filter>${filters.file}</filter>
         </filters>
+        <!-- Centrally manage the versions of all plugins used below -->
+        <pluginManagement>
+            <plugins>
+                <!-- This iterator plugin is used by all build <profiles> below -->
+                <plugin>
+                    <groupId>com.soebes.maven.plugins</groupId>
+                    <artifactId>iterator-maven-plugin</artifactId>
+                    <version>0.3</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.8</version>
                 <executions>
                     <execution>
                         <id>unpack-dependencies</id>
@@ -56,7 +71,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
                 <executions>
                     <execution>
                         <goals>
@@ -106,7 +120,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.1</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -115,29 +128,18 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <echoproperties>
-                                </echoproperties>
-                                <echo>${env.PATH}</echo>
-                                <echo>${env.GEM_PATH}</echo>
-                                <echo>${env.GEM_HOME}</echo>
-                                <echo>${mirage2.deps.included}</echo>
-                                <echo>${grunt.color.scheme}</echo>
-                                <echo>${grunt.environment}</echo>
-                                <echo>${basedir}/src/main/webapp/themes/</echo>
+                                <echo>PATH=${env.PATH}</echo>
+                                <echo>GEM_PATH=${env.GEM_PATH}</echo>
+                                <echo>GEM_HOME=${env.GEM_HOME}</echo>
+                                <echo>mirage2.deps.included=${mirage2.deps.included}</echo>
+                                <echo>grunt.color.scheme=${grunt.color.scheme}</echo>
+                                <echo>grunt.environment=${grunt.environment}</echo>
+                                <echo>source=${basedir}/src/main/webapp/themes/</echo>
                             </tasks>
                         </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant</artifactId>
-                        <version>1.9.2</version>
-                    </dependency>
-                </dependencies>
             </plugin>
-
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -186,21 +188,11 @@
                     </execution>
                 </executions>
             </plugin>
-			<plugin>
-				<groupId>com.googlecode.mavenfilesync</groupId>
-				<artifactId>maven-filesync-plugin</artifactId>
-				<configuration>
-					<mappings>
-						<mapping>
-							<sourceFolder>src/main/webapp/themes/Mirage2</sourceFolder>
-							<destinationFolder>/apps/drum/webapps/xmlui/themes/Mirage2</destinationFolder>
-						</mapping>
-					</mappings>
-				</configuration>
-			</plugin>
         </plugins>
     </build>
 
+    <!-- Faster build profile (enable with -Dmirage2.deps.included=true).
+         However you must manually install dependencies on your machine for this to work. -->
     <profiles>
         <profile>
             <id>mirage2-deps-preinstalled-fast</id>
@@ -211,11 +203,20 @@
                 </property>
             </activation>
             <build>
+                <!-- Centrally manage the versions of all plugins used by this profile -->
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>exec-maven-plugin</artifactId>
+                            <version>1.3.1</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
                 <plugins>
                     <plugin>
                         <groupId>com.soebes.maven.plugins</groupId>
                         <artifactId>iterator-maven-plugin</artifactId>
-                        <version>0.3</version>
                         <executions>
                             <execution>
                                 <phase>prepare-package</phase>
@@ -229,7 +230,6 @@
                                             <plugin>
                                                 <groupId>org.apache.maven.plugins</groupId>
                                                 <artifactId>maven-resources-plugin</artifactId>
-                                                <version>2.6</version>
                                             </plugin>
                                             <goal>copy-resources</goal>
                                             <configuration>
@@ -250,7 +250,6 @@
                                             <plugin>
                                                 <groupId>org.apache.maven.plugins</groupId>
                                                 <artifactId>maven-resources-plugin</artifactId>
-                                                <version>2.6</version>
                                             </plugin>
                                             <goal>copy-resources</goal>
                                             <configuration>
@@ -271,7 +270,6 @@
                                             <plugin>
                                                 <groupId>org.codehaus.mojo</groupId>
                                                 <artifactId>exec-maven-plugin</artifactId>
-                                                <version>1.3.1</version>
                                             </plugin>
                                             <goal>exec</goal>
                                             <configuration>
@@ -290,7 +288,6 @@
                                             <plugin>
                                                 <groupId>org.codehaus.mojo</groupId>
                                                 <artifactId>exec-maven-plugin</artifactId>
-                                                <version>1.3.1</version>
                                             </plugin>
                                             <goal>exec</goal>
                                             <configuration>
@@ -317,6 +314,10 @@
                 </plugins>
             </build>
         </profile>
+
+        <!-- DEFAULT profile. Automatically installs all necessary dependencies (Node.js, etc.)
+             to a temp location EVERY time project is built. This results in a slower build, but
+             it doesn't require that you install these dependencies yourself. -->
         <profile>
             <id>mirage2-deps-included-slow</id>
             <activation>
@@ -336,22 +337,36 @@
                 <dependency>
                     <groupId>rubygems</groupId>
                     <artifactId>sass</artifactId>
-                    <version>3.2.6</version>
+                    <version>${sass.version}</version>
                     <type>gem</type>
                 </dependency>
                 <dependency>
                     <groupId>rubygems</groupId>
                     <artifactId>compass</artifactId>
-                    <version>0.12.2</version>
+                    <version>${compass.version}</version>
                     <type>gem</type>
                 </dependency>
             </dependencies>
             <build>
+                <!-- Centrally manage the versions of all plugins used by this profile -->
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>de.saumya.mojo</groupId>
+                            <artifactId>gem-maven-plugin</artifactId>
+                            <version>1.0.6</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.github.eirslett</groupId>
+                            <artifactId>frontend-maven-plugin</artifactId>
+                            <version>0.0.23</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
                 <plugins>
                     <plugin>
                         <groupId>de.saumya.mojo</groupId>
                         <artifactId>gem-maven-plugin</artifactId>
-                        <version>1.0.0-rc</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -363,7 +378,6 @@
                     <plugin>
                         <groupId>com.soebes.maven.plugins</groupId>
                         <artifactId>iterator-maven-plugin</artifactId>
-                        <version>0.3</version>
                         <executions>
                             <execution>
                                 <phase>prepare-package</phase>
@@ -378,7 +392,6 @@
                                             <plugin>
                                                 <groupId>org.apache.maven.plugins</groupId>
                                                 <artifactId>maven-resources-plugin</artifactId>
-                                                <version>2.6</version>
                                             </plugin>
                                             <goal>copy-resources</goal>
                                             <configuration>
@@ -399,7 +412,7 @@
                                             <plugin>
                                                 <groupId>org.apache.maven.plugins</groupId>
                                                 <artifactId>maven-resources-plugin</artifactId>
-                                                <version>2.6</version>
+
                                             </plugin>
                                             <goal>copy-resources</goal>
                                             <configuration>
@@ -421,14 +434,13 @@
                                             <plugin>
                                                 <groupId>com.github.eirslett</groupId>
                                                 <artifactId>frontend-maven-plugin</artifactId>
-                                                <version>0.0.14</version>
                                             </plugin>
                                             <goal>install-node-and-npm</goal>
                                             <!--<phase>process-resources</phase>-->
                                             <configuration>
                                                 <workingDirectory>${project.build.directory}/themes/@item@</workingDirectory>
-                                                <nodeVersion>v0.10.18</nodeVersion>
-                                                <npmVersion>1.3.8</npmVersion>
+                                                <nodeVersion>v${node.version}</nodeVersion>
+                                                <npmVersion>${npm.version}</npmVersion>
                                             </configuration>
                                         </pluginExecutor>
                                         <pluginExecutor>
@@ -436,7 +448,6 @@
                                             <plugin>
                                                 <groupId>com.github.eirslett</groupId>
                                                 <artifactId>frontend-maven-plugin</artifactId>
-                                                <version>0.0.14</version>
                                             </plugin>
                                             <goal>npm</goal>
                                             <!--<phase>prepare-package</phase>-->
@@ -450,7 +461,6 @@
                                             <plugin>
                                                 <groupId>com.github.eirslett</groupId>
                                                 <artifactId>frontend-maven-plugin</artifactId>
-                                                <version>0.0.14</version>
                                             </plugin>
                                             <goal>grunt</goal>
                                             <!--<phase>prepare-package</phase>-->
@@ -464,7 +474,6 @@
                                             <plugin>
                                                 <groupId>de.saumya.mojo</groupId>
                                                 <artifactId>gem-maven-plugin</artifactId>
-                                                <version>1.0.0-rc</version>
                                             </plugin>
                                             <goal>exec</goal>
                                             <configuration>

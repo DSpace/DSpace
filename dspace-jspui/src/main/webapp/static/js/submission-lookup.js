@@ -81,7 +81,7 @@ submissionLookupSearch = function(){
 submissionLookupDetails = function(button, suffixID){
 	var uuid = j(button).data('uuid');
 	var mydata = new Object();
-	var suuidID = 'suuid' + suffixID
+	var suuidID = 'suuid' + suffixID;
 	mydata['s_uuid'] = j('#'+suuidID).val();
 	mydata['type'] = 'details';
 	mydata['i_uuid'] = uuid;
@@ -174,7 +174,6 @@ submissionLookupShowDetails = function(info){
 	modalbody.append(detailsDiv);
 	
 	modalbody.append(j('#select-collection-div'));
-	j('#select-collection').val(info.collection);
 
 	var modalfooter = j('#loading-details .modal-footer');
 	var start = j('<button class="btn btn-success" type="button">');
