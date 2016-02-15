@@ -5,9 +5,9 @@
 <head>MOspace Institutional Repository Help</head>
 
 <div id="top" n="top">
-<body>
+<head>
 About the MOspace Institutional Repository
-</body>
+</head>
 	<list n="toc" id="file.help.list.toc" type="bulleted">
 		<item><xref target="#what_is_mospace">What is MOspace?</xref></item>
 		<item><xref target="#why_is_mospace_important">Why is MOspace important?</xref></item>
@@ -16,18 +16,18 @@ About the MOspace Institutional Repository
 		<item><xref target="#what_types_of_works">What types of works can be included in MOspace?</xref></item>
 		<item><xref target="#how_are_works_collected">How are works collected for MOspace?</xref></item>
 	</list>
-<body>
+<head>
 Submitting content to the MOspace Institutional Repository
-</body>
+</head>
 	<list n="toc" id="file.help.list.toc" type="bulleted">
 		<item><xref target="#who_can_submit">Who can submit works to MOspace?</xref></item>
 		<item><xref target="#benefits_of_submitting">What are the benefits of submitting works to MOspace?</xref></item>
 		<item><xref target="#what_are_the_copyright_implications">What are the copyright implications of submitting to MOspace?</xref></item>
 		<item><xref target="#how_to_submit">How can I submit works to MOspace?</xref></item>
 	</list>
-<body>
+<head>
 Using the MOspace Institutional Repository
-</body>
+</head>
 	<list n="toc" id="file.help.list.toc" type="bulleted">
 		<item><xref target="#how_to_cite">How do I cite something I find in MOspace?</xref></item>
 		<item><xref target="#search">How do I SEARCH MOspace?</xref></item>
@@ -44,7 +44,7 @@ Using the MOspace Institutional Repository
 About the MOspace Institutional Repository
 </head>
 <div id="what.is.mospace" n="whatis">
-<head>What is MOspace?</head>
+<p rend="bold">What is MOspace?</p>
 <p>
 The MOspace Institutional Repository is an online repository for creative and scholarly works and other resources created by faculty, students, and staff at the University of Missouri—Columbia and the University of Missouri—Kansas City.  MOspace makes these resources freely available on the web and assures their preservation for the future.
 </p>
@@ -52,7 +52,7 @@ The MOspace Institutional Repository is an online repository for creative and sc
 </div>
 
 <div id="why.is.mospace.important" n="whyimportant">
-<head>Why is MOspace important?</head>
+<p rend="bold">Why is MOspace important?</p>
 <p>
 The MOspace Institutional Repository acts as a preservation tool and contributes to the international open access movement.  MOspace is our part of the international open access movement.  For more information on open access, see <xref target="http://www.sparc.arl.org/issues/open-access">the SPARC website</xref>.
 </p>
@@ -63,7 +63,7 @@ An important part of the MOspace effort is encouraging authors not to sign away 
 </div>
 
 <div id="how.is.mospace.different" n="howdifferent">
-<head>How is MOspace different from a personal website?</head>
+<p rend="bold">How is MOspace different from a personal website?</p>
 <p>
 MOspace allows the library to preserve and provide open access to the items in a more permanent way than posting to a website. The use of DSpace software, an open source product developed at MIT, provides permanent URLs for resources.
 </p>
@@ -71,7 +71,7 @@ MOspace allows the library to preserve and provide open access to the items in a
 </div>
 
 <div id="who.can.access.mospace" n="whoaccess">
-<head>Who can access MOspace?</head>
+<p rend="bold">Who can access MOspace?</p>
 <p>
 MOspace is open access, meaning anyone can view it from the open web. By providing free access to a rich body of work, MOspace promotes research and knowledge produced by the University of Missouri.
 </p>
@@ -82,7 +82,7 @@ Use of resources is guided by a license for each item.  The MOspace default lice
 </div>
 
 <div id="what.types.of.works" n="typesofworks">
-<head>What types of works can be included in MOspace?</head>
+<p rend="bold">What types of works can be included in MOspace?</p>
 <p>
 MOspace includes, but is not limited to, the following content types:
 <list n="filetypes" id="file.help.list.filetypes" type="bulleted">
@@ -107,7 +107,7 @@ MOspace includes, but is not limited to, the following content types:
 </div>
 
 <div id="how.are.works.collected" n="howcollected">
-<head>How are works collected for MOspace?</head>
+<p rend="bold">How are works collected for MOspace?</p>
 <p>
 We download items from websites or upload items directly via author submission.
 </p>
@@ -117,7 +117,7 @@ We download items from websites or upload items directly via author submission.
 Submitting content to the MOspace Institutional Repository
 </head>
 <div id="who.can.submit" n="whosubmit">
-<head>Who can submit works to MOspace?</head>
+<p rend="bold">Who can submit works to MOspace?</p>
 <p>
 Faculty, students, staff, and other individuals or entities associated with the University of Missouri—Columbia, the University of Missouri—Kansas City, and the University of Missouri System are encouraged to submit works to MOspace.  Co-authors need not be affiliated with the University of Missouri. 
 </p>
@@ -125,7 +125,7 @@ Faculty, students, staff, and other individuals or entities associated with the 
 </div>
 
 <div id="benefits.of.submitting" n="benefits">
-<head>What are the benefits of submitting works to MOspace?</head>
+<p rend="bold">What are the benefits of submitting works to MOspace?</p>
 <p>
 <hi rend="bold">For Faculty, Students, and Staff</hi>
 
@@ -142,7 +142,8 @@ Submitting scholarly work to MOspace offers many benefits:
 	<item>Processing by library employees</item>
 </list>
 </p>
-MOspace allows the library to preserve and provide open access to items in a more permanent way than posting to a website.  The Libraries are committed to this ongoing effort as part of the next generation of library collections.
+<p>
+MOspace allows the library to preserve and provide open access to items in a more permanent way than posting to a website.  The Libraries are committed to this ongoing effort as part of the next generation of library collections.</p>
 <p>
 <hi rend="bold">For Users Worldwide</hi>
 </p>
@@ -153,7 +154,7 @@ For the most part, MOspace resources are available for use to any web user.  The
 </div>
 
 <div id="what.are.the.copyright.implications" n="copyright">
-<head>What are the copyright implications of submitting to MOspace?</head>
+<p rend="bold">What are the copyright implications of submitting to MOspace?</p>
 <p>
 MOspace encourages authors not to sign away rights to their own works, as often happens when they publish in commercial journals.  Retaining the copyright allows content to be made available to students and scholars without huge subscription fees.  In MOspace, if you are the copyright holder, you retain the copyright in all cases, so that you can publish elsewhere, providing that the publisher allows such publishing.  See this <xref target="http://www.arl.org/sparc/author/completeonline.shtml">author's addendum</xref> on the SPARC website for an example addendum to a publisher's contract.  For items not commercially published, author permission is all that is needed to allow us to add it to MOspace.
 </p>
@@ -164,7 +165,7 @@ The default license used in MOspace is a Creative Commons Attribution-NonCommerc
 </div>
 
 <div id="how.to.submit" n="howtosubmit">
-<head>How can I submit works to MOspace?</head>
+<p rend="bold">How can I submit works to MOspace?</p>
 <p>
 See <xref target="https://mospace.umsystem.edu/xmlui/pages/add">Submitting Content to MOspace</xref>. 
 </p>
@@ -172,7 +173,7 @@ See <xref target="https://mospace.umsystem.edu/xmlui/pages/add">Submitting Conte
 </div>
 
 <div id="how.to.cite" n="howtocite">
-<head>How do I cite something I find in MOspace?</head>
+<p rend="bold">How do I cite something I find in MOspace?</p>
 <p>
 Each item in MOspace has been assigned a "<xref target="https://irsandbox.lso.umsystem.edu/xmlui/pages/help#handles">handle</xref>," a persistent URL you can use when citing the item in publications or other communications. In most citation styles, you'll treat the MOspace item as an electronic publication.
 </p>
@@ -197,7 +198,7 @@ For example:
 Using the MOspace Institutional Repository
 </head>
 <div id="search" n="search">
-<head>How do I search MOspace?</head>
+<p rend="bold">How do I search MOspace?</p>
 <p>
 You have more than one option. You may use a keyword search, which will search for the words you enter anywhere in the indexed fields. If you have a specific title or author, try a browse search.  The word(s) you enter will be searched from the beginning of indexed fields.  Keyword searches are a useful way to start if you don’t have a specific author or title in mind or aren’t sure of the author’s name or the exact title. These two types of searches are discussed in more detail below.
 </p>
@@ -208,7 +209,7 @@ To limit your search to a specific community or collection, navigate to that com
 </div>
 
 <div id="browse" n="browse">
-<head>What do the BROWSE options do?</head>
+<p rend="bold">What do the BROWSE options do?</p>
 <p>
 Browse allows you to retrieve a list of items in alphabetical or numerical order.  The words you enter in the search box are searched from the beginning from fields in MOspace and in the order you enter them.  From the browse results screen you can jump to a spot in the list by typing in the first few letters of your text string or by choosing an option in the menu of letters of the alphabet.  
 </p>
@@ -231,7 +232,7 @@ Browse options are available for:
 </div>
 
 <div id="what.is.searched" n="whatissearched">
-<head>What is searched in the general keyword SEARCH?</head>
+<p rend="bold">What is searched in the general keyword SEARCH?</p>
 <p>
 With a keyword search, the words you enter will be found where ever they appear in a field.  The word(s) you enter in the search box will be searched against the following metadata fields:
 <list n="filetypes" id="file.help.list.filetypes" type="bulleted">
@@ -255,7 +256,7 @@ With a keyword search, the words you enter will be found where ever they appear 
 </div>
 
 <div id="advanced.search" n="advancedsearch">
-<head>How do I use ADVANCED SEARCH?</head>
+<p rend="bold">How do I use ADVANCED SEARCH?</p>
 <p>
 You will find three options on the Advanced Search page.  All of these allow you to search for a single word or multiple words.  Your options:
 <list n="filetypes" id="file.help.list.filetypes" type="numbered">
@@ -284,7 +285,7 @@ You will find three options on the Advanced Search page.  All of these allow you
 </div>
 
 <div id="what.is.not.searched" n="whatissearched">
-<head>What words are NOT searched in a keyword search (Stop Words)?</head>
+<p rend="bold">What words are NOT searched in a keyword search (Stop Words)?</p>
 <p>
 The search engine ignores certain words that occur frequently in English, but do not add value to the search. These are:
 <list n="filetypes" id="file.help.list.filetypes" type="bulleted">
@@ -295,9 +296,9 @@ The search engine ignores certain words that occur frequently in English, but do
 </div>
 
 <div id="other.search.options" n="otheroptions">
-<head>How do I limit search results and use facets</head>
-
-<p>MOspace uses facets to modify search results in the institutional repository.  You will see the different enabled facets displayed in a "Discover" section in your sidebar, by default, right below the Browse options. Applying a facet normally reduces the original search results. Many facets can be applied on the home page but generally they are applied after an initial search. Facets show counts for each value and allow the user to "drill down" or further restrict their search results based on those facets</p>
+<p rend="bold">How do I limit search results and use facets</p>
+<p>
+MOspace uses facets to modify search results in the institutional repository.  You will see the different enabled facets displayed in a "Discover" section in your sidebar, by default, right below the Browse options. Applying a facet normally reduces the original search results. Many facets can be applied on the home page but generally they are applied after an initial search. Facets show counts for each value and allow the user to "drill down" or further restrict their search results based on those facets</p>
 <p>Our sidebar facets are:
 <list n="filetypes" id="file.help.list.filetypes" type="bulleted">
 	<item>Format</item>
@@ -323,7 +324,7 @@ When using a keyword search in Advanced Search, you can limit your search result
 </div>
 
 <div id="communities" n="communities">
-<head>What are Communities and Collections?</head>
+<p rend="bold">What are Communities and Collections?</p>
 <p>
 MOspace content is organized around Communities and Sub-communities which correspond to administrative units such as schools, departments, labs, and research centers. Content in these are organized under collections. Communities, Sub-communities, and Collections have an entry page that may include information on that community or collection.  
 </p>
@@ -332,7 +333,7 @@ Collections can be organized around a topic, or by type of information (such as 
 </p>
 
 <div id="handles" n="handles">
-<head>What are Handles?</head>
+<p rend="bold">What are Handles?</p>
 <p>
 MOspace items have persistent URLs.  There URLs are considered persistent, because they are registered with the <xref target="http://www.handle.net/">Handle System</xref>, a comprehensive system for assigning, managing, and resolving persistent identifiers. The use of handles means that, unlike most URLs, this identifier will not have to be changed when the system migrates to new hardware, or when changes are made to the system. 
 </p>
