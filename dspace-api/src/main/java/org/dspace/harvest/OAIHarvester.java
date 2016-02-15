@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -37,7 +38,6 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -50,6 +50,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.harvest.service.HarvestedItemService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -170,14 +171,14 @@ public class OAIHarvester {
 		String ORESeialKey = null;
 		String oreString = "oai.harvester.oreSerializationFormat.";
 
-        Enumeration pe = ConfigurationManager.propertyNames("oai");
+		Enumeration pe = Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys("oai"));
 
         while (pe.hasMoreElements())
         {
             String key = (String)pe.nextElement();
             if (key.startsWith(oreString)) {
             	ORESeialKey = key.substring(oreString.length());
-            	ORESerializationString = ConfigurationManager.getProperty("oai", key);
+            	ORESerializationString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key);
 
                 return Namespace.getNamespace(ORESeialKey, ORESerializationString);
             }
@@ -197,14 +198,14 @@ public class OAIHarvester {
 		String metadataString = null;
         String metaString = "oai.harvester.metadataformats.";
 
-        Enumeration pe = ConfigurationManager.propertyNames("oai");
+		Enumeration pe = Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys("oai"));
 
         while (pe.hasMoreElements())
         {
             String key = (String)pe.nextElement();
 
             if (key.startsWith(metaString) && key.substring(metaString.length()).equals((metadataKey))) {
-            	metadataString = ConfigurationManager.getProperty("oai", key);
+	            metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key);
             	String namespacePiece;
             	if (metadataString.indexOf(',') != -1)
                 {
@@ -296,7 +297,7 @@ public class OAIHarvester {
 			harvestedCollection.update(ourContext, harvestRow);
 
 			// expiration timer starts
-			int expirationInterval = ConfigurationManager.getIntProperty("oai", "harvester.threadTimeout");
+			int expirationInterval = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("oai.harvester.threadTimeout");
 	    	if (expirationInterval == 0)
             {
                 expirationInterval = 24;
@@ -613,13 +614,13 @@ public class OAIHarvester {
      */
     protected String extractHandle(Item item)
     {
-    	String acceptedHandleServersString = ConfigurationManager.getProperty("oai", "harvester.acceptedHandleServer");
+    	String acceptedHandleServersString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("oai.harvester.acceptedHandleServer");
     	if (acceptedHandleServersString == null)
         {
             acceptedHandleServersString = "hdl.handle.net";
         }
 
-    	String rejectedHandlePrefixString = ConfigurationManager.getProperty("oai", "harvester.rejectedHandlePrefix");
+    	String rejectedHandlePrefixString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("oai.harvester.rejectedHandlePrefix");
     	if (rejectedHandlePrefixString == null)
         {
             rejectedHandlePrefixString = "123456789";
@@ -667,7 +668,7 @@ public class OAIHarvester {
    	 * @return a string in the format 'yyyy-mm-ddThh:mm:ssZ' and converted to UTC timezone
    	 */
     private String processDate(Date date) {
-    	Integer timePad = ConfigurationManager.getIntProperty("oai", "harvester.timePadding");
+    	Integer timePad = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("oai.harvester.timePadding");
 
     	if (timePad == 0) {
     		timePad = 120;
@@ -748,7 +749,7 @@ public class OAIHarvester {
     protected void alertAdmin(int status, Exception ex)
     {
     	try {
-			String recipient = ConfigurationManager.getProperty("alert.recipient");
+			String recipient = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("alert.recipient");
 
 			if (StringUtils.isNotBlank(recipient)) {
 				Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "harvesting_error"));
