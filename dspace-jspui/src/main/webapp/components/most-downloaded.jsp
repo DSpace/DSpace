@@ -1,3 +1,12 @@
+<%--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+--%>
 <% if(mostViewedBitstream != null && mostViewedBitstream.getItems().size()!=0){ %>
         <div class="panel panel-primary vertical-carousel" data-itemstoshow="3">        
         <div class="panel-heading">

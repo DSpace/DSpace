@@ -5,6 +5,7 @@
 --
 -- http://www.dspace.org/license/
 --
+
 BEGIN
 	EXECUTE IMMEDIATE
     'create table cris_metrics
