@@ -33,7 +33,6 @@ jQuery(document).ready(
                     '<p  style="" ><input type="submit" style="margin: 20px 2px" name="submit" value="Sign in" /></p>' +
                     '</form>';
             instance.target = instance.target + "shibboleth-login";
-            instance.textHelpMore = "First check You are searching under the right country.\nIt is possible that our service is not connected with Your identity provider. Please contact us at <a href='mailto:lindat-help@ufal.mff.cuni.cz'>lindat-help@ufal.mff.cuni.cz</a>. We'll try to solve it with Your provider or create an account for You.";
             return instance;
         })();
         if (!("aai" in window)) {
