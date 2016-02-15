@@ -298,8 +298,7 @@ update_lindat_common:
 	    echo "Checking lindat common theme into $(DIR_LINDAT_COMMON_THEME)... "; \
 	    test -d $(DIR_LINDAT_COMMON_THEME)/.git || git clone $(URL_LINDAT_COMMON_GIT) --branch releases $(DIR_LINDAT_COMMON_THEME); \
 	    cd $(DIR_LINDAT_COMMON_THEME) && $(LINDAT_COMMON_THEME_FETCH); \
-	    rm -rf $(DIR_LINDAT_THEME_IN_WEBAPPS); \
-	    ln -s $(DIR_LINDAT_COMMON_THEME) $(DIR_LINDAT_THEME_IN_WEBAPPS); \
+	    ln -sf $(DIR_LINDAT_COMMON_THEME) $(DIR_LINDAT_THEME_IN_WEBAPPS); \
     fi
 
 #======================================================

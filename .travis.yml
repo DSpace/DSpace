@@ -18,12 +18,13 @@ before_install:
   - pwd
   - mvn help:system
   - export FS=`pwd`
+  - rm -rf /tmp/dspace
 
 install: |
    echo "Update settings" &&
    cd $FS/utilities/project_helpers &&
    sed -i'' 's/tomcat.(TOMCAT_VERSION)/travis/' ./config/variable.makefile.example &&
-   sed -i'' 's/DIR_LINDAT_COMMON_THEME.*/DIR_LINDAT_COMMON_THEME :=\/tmp\/dspace/' ./config/variable.makefile.example &&
+   sed -i'' 's#DIR_LINDAT_COMMON_THEME.*#DIR_LINDAT_COMMON_THEME :=/tmp/dspace/lindat-common#' ./config/variable.makefile.example &&
    sed -i'' 's/dspace.install.dir = /dspace.install.dir = \/tmp\/dspace/' ./config/local.conf.dist &&
    cd $FS/utilities/project_helpers/config &&
    cp local.conf.dist ../sources/local.properties &&
