@@ -138,11 +138,9 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
             {
             	supportedLocales = new ArrayList<Locale>();
             	
-                String supportedLocalesConfig = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.supported.locales");
-                
-                String[] parts = supportedLocalesConfig.split(",");
-                
-                for (String part : parts)
+                String[] supportedLocalesConfig = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.supported.locales");
+
+                for (String part : supportedLocalesConfig)
                 {	
                 	Locale supportedLocale = I18nUtils.parseLocale(part.trim(), null);
                 	if (supportedLocale != null)
