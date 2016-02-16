@@ -37,4 +37,13 @@ public interface NewsService {
      *
      */
     public String getNewsFilePath();
+
+    /**
+     * Check if the newsName is a valid one
+     * 
+     * @param newsName
+     * @return true 
+     * 				if the newsName is valid
+     */
+    public boolean validate(String newsName);
 }
