@@ -19,6 +19,8 @@ before_install:
   - export FS=`pwd`
   - rm -rf /tmp/dspace
 
+# see https://github.com/travis-ci/travis-ci/issues/1066 for the && signs
+# yaml format: "When a string contains line breaks, you can use the literal style, indicated by the pipe (|), to indicate that the string will span several lines. In literals, newlines are preserved" (might not be necessary)
 install: |
    echo "Update settings" &&
    cd $FS/utilities/project_helpers &&
