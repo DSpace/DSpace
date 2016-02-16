@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.List;
+
 import org.dspace.core.service.NewsService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
@@ -30,12 +32,21 @@ public class NewsServiceImpl implements NewsService
 {
     private final Logger log = LoggerFactory.getLogger(NewsServiceImpl.class);
 
+	private List<String> acceptableFilenames;
+	
+	public void setAcceptableFilenames(List<String> acceptableFilenames) {
+		this.acceptableFilenames = acceptableFilenames;
+	}
+
     /** Not instantiable. */
     protected NewsServiceImpl() {}
 
     @Override
     public String readNewsFile(String newsFile)
     {
+    	if (!validate(newsFile)) {
+    		throw new IllegalArgumentException("The file "+ newsFile + " is not a valid news file");
+    	}
         String fileName = getNewsFilePath();
 
         fileName += newsFile;
@@ -71,6 +82,9 @@ public class NewsServiceImpl implements NewsService
     @Override
     public String writeNewsFile(String newsFile, String news)
     {
+    	if (!validate(newsFile)) {
+    		throw new IllegalArgumentException("The file "+ newsFile + " is not a valid news file");
+    	}
         String fileName = getNewsFilePath();
 
         fileName += newsFile;
@@ -99,4 +113,12 @@ public class NewsServiceImpl implements NewsService
                 + File.separator + "config" + File.separator;
         return filePath;
     }
+    
+	@Override
+	public boolean validate(String newsName) {
+		if (acceptableFilenames != null) {
+			return acceptableFilenames.contains(newsName);
+		}
+		return false;
+	}
 }
