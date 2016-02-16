@@ -2,7 +2,7 @@ language: java
 jdk:
   - oraclejdk7
   - oraclejdk8
-sudo: false
+sudo: true
 
 addons:
   postgresql: "9.4"
