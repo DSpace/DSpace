@@ -14,6 +14,8 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -31,6 +33,10 @@ class ActionTarget {
     private ActionTarget up;
 
     public static final String POLICY = "POLICY";
+
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private MetadataFieldService mdService = ContentServiceFactory.getInstance().getMetadataFieldService();
+    private MetadataValueService mdValService = ContentServiceFactory.getInstance().getMetadataValueService();
 
     ActionTarget(Context contxt, ActionTarget container, DSpaceObject o) {
         assert (o != null);
@@ -141,10 +147,9 @@ class ActionTarget {
 
     private List<String> getMetadateValue(String field) {
         if (obj.getType() == Constants.ITEM) {
-            ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-            String[] md = MetadataField.fromString(field);
+            String[] md = mdService.fromString(field);
             List<MetadataValue> dcValues = itemService.getMetadata((Item) obj, md[0], md[1], md[2], Item.ANY);
-            return MetadataValue.collectValues(dcValues);
+            return mdValService.collectValues(dcValues);
         }
         return null;
     }

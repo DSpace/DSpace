@@ -266,12 +266,4 @@ public class MetadataValue
         return hash;
     }
 
-    public static List<String> collectValues(List<MetadataValue> vals) {
-        ArrayList<String> list = new ArrayList<String>();
-        for (MetadataValue v : vals) {
-            list.add(v.getValue());
-        }
-        return list;
-    }
-
 }

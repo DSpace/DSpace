@@ -93,4 +93,12 @@ public interface MetadataValueService {
             throws SQLException;
 
     int countTotal(Context context) throws SQLException;
+
+    /**
+     * collect values from given list of  MetaDataValues
+     * @param vals
+     * @return list of metadata values
+     */
+    public List<String> collectValues(List<MetadataValue> vals) ;
+
 }

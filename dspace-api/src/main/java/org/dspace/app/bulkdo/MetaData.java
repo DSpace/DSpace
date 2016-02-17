@@ -16,6 +16,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
 
 import java.io.OutputStreamWriter;
@@ -32,6 +33,9 @@ public class MetaData {
      * log4j logger
      */
     private static Logger log = Logger.getLogger(MetaData.class);
+
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private MetadataValueService mdValService = ContentServiceFactory.getInstance().getMetadataValueService();
 
     MetaDataArguments args;
 
@@ -50,13 +54,12 @@ public class MetaData {
             p.addKey(beforeKey);
         p.addKey(changedKey);
 
-        ItemService itemService = ContentServiceFactory.getInstance().getItemService();
         Lister lister = new Lister(args.getContext(), args.getRoot(), args.getType());
         ArrayList<ActionTarget> targets = lister.getTargets(args.getType(), args.getWorkflowItemsOnly());
         for (ActionTarget at : targets) {
             Item item = (Item) at.getObject();
             List<MetadataValue> vals = itemService.getMetadata(item, args.schema, args.element, args.qualifier, null);
-            at.put(beforeKey, MetadataValue.collectValues(vals));
+            at.put(beforeKey, mdValService.collectValues(vals));
             at.put(changedKey, false);
             switch (args.getAction()) {
                 case Arguments.DO_ADD:
