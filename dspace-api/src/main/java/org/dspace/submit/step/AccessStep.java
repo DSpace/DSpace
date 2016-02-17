@@ -19,7 +19,6 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -167,7 +166,7 @@ public class AccessStep extends AbstractProcessingStep
 
 
         // if arrive here Next, Previous or Save has been pressed
-        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled= configurationService.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
         // if it is a simple form we should create the policy for Anonymous
         // if Anonymous does not have right on this collection, create policies for any other groups with

@@ -31,7 +31,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.curate.Curator;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -99,7 +98,7 @@ public class UploadStep extends AbstractProcessingStep
     private static Logger log = Logger.getLogger(UploadStep.class);
 
     /** is the upload required? */
-    protected boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
+    protected boolean fileRequired = configurationService.getBooleanProperty("webui.submit.upload.required", true);
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
@@ -587,7 +586,7 @@ public class UploadStep extends AbstractProcessingStep
                 }
 
                 // Check for virus
-                if (ConfigurationManager.getBooleanProperty("submission-curation", "virus-scan"))
+                if (configurationService.getBooleanProperty("submission-curation.virus-scan"))
                 {
                     Curator curator = new Curator();
                     curator.addTask("vscan").curate(item);

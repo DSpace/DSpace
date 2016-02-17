@@ -19,7 +19,6 @@ import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.license.CCLookup;
 import org.dspace.license.LicenseMetadataValue;
@@ -133,13 +132,13 @@ public class CCLicenseStep extends AbstractProcessingStep
 	        {
         	    //CreativeCommons.setItemMetadata(item, licenseURI, "dc", "rights", "uri", ConfigurationManager.getProperty("default.locale"));
 	        	uriField.removeItemValue(context, item, licenseUri);
-                if (ConfigurationManager.getBooleanProperty("cc.submit.setname"))
+                if (configurationService.getBooleanProperty("cc.submit.setname"))
                 {
                 	String licenseName = nameField.keyedItemValue(item, licenseUri);
                 	nameField.removeItemValue(context, item, licenseName);
-                	//CreativeCommons.setItemMetadata(item, CreativeCommons.getRightsName(item, "dc", "rights", null, Item.ANY), "dc", "rights", null, ConfigurationManager.getProperty("default.locale"));
+                	//CreativeCommons.setItemMetadata(item, CreativeCommons.getRightsName(item, "dc", "rights", null, Item.ANY), "dc", "rights", null, configurationService.getProperty("default.locale"));
                 }
-                if (ConfigurationManager.getBooleanProperty("cc.submit.addBitstream"))
+                if (configurationService.getBooleanProperty("cc.submit.addBitstream"))
                 {
                     creativeCommonsService.removeLicense(context, item);
                 }
@@ -239,7 +238,7 @@ public class CCLicenseStep extends AbstractProcessingStep
         HttpSession session = request.getSession();
     	Map<String, String> map = new HashMap<String, String>();
     	String licenseclass = (request.getParameter("licenseclass_chooser") != null) ? request.getParameter("licenseclass_chooser") : "";
-    	String jurisdiction = (ConfigurationManager.getProperty("cc.license.jurisdiction") != null) ? ConfigurationManager.getProperty("cc.license.jurisdiction") : "";
+    	String jurisdiction = (configurationService.getProperty("cc.license.jurisdiction") != null) ? configurationService.getProperty("cc.license.jurisdiction") : "";
     	if (licenseclass.equals("standard")) {
     		map.put("commercial", request.getParameter("commercial_chooser"));
     		map.put("derivatives", request.getParameter("derivatives_chooser"));
@@ -250,7 +249,7 @@ public class CCLicenseStep extends AbstractProcessingStep
     	CCLookup ccLookup = new CCLookup();
     	LicenseMetadataValue uriField = creativeCommonsService.getCCField("uri");
     	LicenseMetadataValue nameField = creativeCommonsService.getCCField("name");
-    	ccLookup.issue(licenseclass, map, ConfigurationManager.getProperty("cc.license.locale"));
+    	ccLookup.issue(licenseclass, map, configurationService.getProperty("cc.license.locale"));
     	Item item = subInfo.getSubmissionItem().getItem();
     	if (licenseclass.equals("xmlui.Submission.submit.CCLicenseStep.no_license")) 
     	{
@@ -258,12 +257,12 @@ public class CCLicenseStep extends AbstractProcessingStep
     		String licenseUri = uriField.ccItemValue(item);
     		if (licenseUri != null) {
     			uriField.removeItemValue(context, item, licenseUri);
-    			if (ConfigurationManager.getBooleanProperty("cc.submit.setname"))
+    			if (configurationService.getBooleanProperty("cc.submit.setname"))
                 {
                 	String licenseName = nameField.keyedItemValue(item, licenseUri);
                 	nameField.removeItemValue(context, item, licenseName);
                 }
-                if (ConfigurationManager.getBooleanProperty("cc.submit.addBitstream"))
+                if (configurationService.getBooleanProperty("cc.submit.addBitstream"))
                 {
                     creativeCommonsService.removeLicense(context, item);
                 }
@@ -281,10 +280,10 @@ public class CCLicenseStep extends AbstractProcessingStep
     	else if (ccLookup.isSuccess()) 
     	{
     		uriField.addItemValue(context, item, ccLookup.getLicenseUrl());
-    		if (ConfigurationManager.getBooleanProperty("cc.submit.addbitstream")) {
+    		if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
                 creativeCommonsService.setLicenseRDF(context, item, ccLookup.getRdf());
     		}	
-    		if (ConfigurationManager.getBooleanProperty("cc.submit.setname")) {
+    		if (configurationService.getBooleanProperty("cc.submit.setname")) {
     			nameField.addItemValue(context, item, ccLookup.getLicenseName());
     		}
             itemService.update(context, item);

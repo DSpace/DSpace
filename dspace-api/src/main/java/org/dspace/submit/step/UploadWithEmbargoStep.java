@@ -35,7 +35,6 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.curate.Curator;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -484,7 +483,7 @@ public class UploadWithEmbargoStep extends UploadStep
                 }
 
                 // Check for virus
-                if (ConfigurationManager.getBooleanProperty("submission-curation", "virus-scan"))
+                if (configurationService.getBooleanProperty("submission-curation.virus-scan"))
                 {
                     Curator curator = new Curator();
                     curator.addTask("vscan").curate(item);
@@ -528,7 +527,7 @@ public class UploadWithEmbargoStep extends UploadStep
 
     private void processAccessFields(Context context, HttpServletRequest request, SubmissionInfo subInfo, Bitstream b) throws SQLException, AuthorizeException {
         // ResourcePolicy Management
-        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled= configurationService.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         // if it is a simple form we should create the policy for Anonymous
         // if Anonymous does not have right on this collection, create policies for any other groups with
         // DEFAULT_ITEM_READ specified.

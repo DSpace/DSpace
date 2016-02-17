@@ -16,7 +16,6 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.importer.external.MetadataSourceException;
 import org.dspace.importer.external.datamodel.ImportRecord;
@@ -78,7 +77,7 @@ public class XMLUIStartSubmissionLookupStep extends AbstractProcessingStep {
 
     public String getPublicationUrl(){
         if(publicationUrl==null){
-            publicationUrl=ConfigurationManager.getProperty("publication-lookup","publication.url");
+            publicationUrl=configurationService.getProperty("publication-lookup.publication.url");
         }
         return publicationUrl;
     }
