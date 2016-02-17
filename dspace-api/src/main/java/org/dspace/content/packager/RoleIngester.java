@@ -356,7 +356,7 @@ public class RoleIngester implements PackageIngester
                 }
 
                 // Always set the name:  parent.createBlop() is guessing
-                groupObj.setName(context, name);
+                groupService.setName(context, groupObj, name);
 
                 log.info("Created Group {}.", groupObj.getName());
             }

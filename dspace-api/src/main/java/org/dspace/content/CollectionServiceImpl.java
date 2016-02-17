@@ -318,7 +318,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             Group g = groupService.create(context);
             context.restoreAuthSystemState();
 
-            g.setName(context, "COLLECTION_" + collection.getID() + "_WORKFLOW_STEP_" + step);
+            groupService.setName(context, g,
+                    "COLLECTION_" + collection.getID() + "_WORKFLOW_STEP_" + step);
             groupService.update(context, g);
             setWorkflowGroup(collection, step, g);
 
@@ -395,7 +396,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             submitters = groupService.create(context);
             context.restoreAuthSystemState();
 
-            submitters.setName(context, "COLLECTION_" + collection.getID() + "_SUBMIT");
+            groupService.setName(context, submitters,
+                    "COLLECTION_" + collection.getID() + "_SUBMIT");
             groupService.update(context, submitters);
         }
 
@@ -435,7 +437,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             admins = groupService.create(context);
             context.restoreAuthSystemState();
 
-            admins.setName(context, "COLLECTION_" + collection.getID() + "_ADMIN");
+            groupService.setName(context, admins, "COLLECTION_" + collection.getID() + "_ADMIN");
             groupService.update(context, admins);
         }
 

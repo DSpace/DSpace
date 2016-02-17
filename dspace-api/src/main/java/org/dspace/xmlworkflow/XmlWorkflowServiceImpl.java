@@ -131,9 +131,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                     authorizeService.authorizeAction(context, collection, Constants.WRITE);
                     roleGroup = groupService.create(context);
                     if(role.getScope() == Role.Scope.COLLECTION){
-                        roleGroup.setName(context, "COLLECTION_" + collection.getID().toString() + "_WORKFLOW_ROLE_" + roleName);
+                        groupService.setName(context, roleGroup,
+                                "COLLECTION_" + collection.getID().toString()
+                                        + "_WORKFLOW_ROLE_" + roleName);
                     }else{
-                        roleGroup.setName(context,  role.getName());
+                        groupService.setName(context, roleGroup,  role.getName());
                     }
                     groupService.update(context, roleGroup);
                     authorizeService.addPolicy(context, collection, Constants.ADD, roleGroup);

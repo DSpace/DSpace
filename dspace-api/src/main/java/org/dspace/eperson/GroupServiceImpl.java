@@ -8,7 +8,6 @@
 package org.dspace.eperson;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -29,9 +28,11 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service implementation for the Group object.
@@ -42,7 +43,7 @@ import java.util.*;
  */
 public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements GroupService
 {
-    private static final Logger log = Logger.getLogger(GroupServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(GroupServiceImpl.class);
 
     @Autowired(required = true)
     protected GroupDAO groupDAO;
@@ -93,7 +94,14 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public void setName(Context context, Group group, String name) throws SQLException {
-        setMetadataSingleValue(context, group, MetadataSchema.DC_SCHEMA, "title", null, null, name);
+        if (group.isPermanent())
+        {
+            log.error("Attempt to rename permanent Group {} to {}.",
+                    group.getName(), name);
+            throw new SQLException("Attempt to rename a permanent Group");
+        }
+        else
+            group.setName(context, name);
     }
 
     @Override
@@ -165,7 +173,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public List<Group> allMemberGroups(Context context, EPerson ePerson) throws SQLException {
-        Set<Group> groups = new HashSet<Group>();
+        Set<Group> groups = new HashSet<>();
 
         if (ePerson != null)
         {
@@ -210,7 +218,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         // Get all groups which are a member of this group
         List<Group2GroupCache> group2GroupCaches = group2GroupCacheDAO.findByParent(c, g);
-        Set<Group> groups = new HashSet<Group>();
+        Set<Group> groups = new HashSet<>();
         for (Group2GroupCache group2GroupCache : group2GroupCaches) {
             groups.add(group2GroupCache.getChild());
         }
@@ -296,7 +304,14 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public void delete(Context context, Group group) throws SQLException {
-        context.addEvent(new Event(Event.DELETE, Constants.GROUP, group.getID(), group.getName(), getIdentifiers(context, group)));
+        if (group.isPermanent())
+        {
+            log.error("Attempt to delete permanent Group $", group.getName());
+            throw new SQLException("Attempt to delete a permanent Group");
+        }
+
+        context.addEvent(new Event(Event.DELETE, Constants.GROUP, group.getID(),
+                group.getName(), getIdentifiers(context, group)));
 
         //Remove the supervised group from any workspace items linked to us.
         group.getSupervisedItems().clear();
@@ -339,7 +354,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public boolean isEmpty(Group group)
     {
         // the only fast check available is on epeople...
-        boolean hasMembers = (group.getMembers().size() != 0);
+        boolean hasMembers = (!group.getMembers().isEmpty());
 
         if (hasMembers)
         {
@@ -367,6 +382,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         {
             anonymousGroup = groupService.create(context);
             anonymousGroup.setName(context, Group.ANONYMOUS);
+            anonymousGroup.setPermanent(true);
             groupService.update(context, anonymousGroup);
         }
 
@@ -377,6 +393,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         {
             adminGroup = groupService.create(context);
             adminGroup.setName(context, Group.ADMIN);
+            adminGroup.setPermanent(true);
             groupService.update(context, adminGroup);
         }
     }

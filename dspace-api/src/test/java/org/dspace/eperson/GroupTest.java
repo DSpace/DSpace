@@ -190,8 +190,8 @@ public class GroupTest extends AbstractUnitTest {
 
         // Add all group names to two arraylists (arraylists are unsorted)
         // NOTE: we use lists here because we don't want duplicate names removed
-        List<String> names = new ArrayList<String>();
-        List<String> sortedNames = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
+        List<String> sortedNames = new ArrayList<>();
         for (Group group : groups) {
             names.add(group.getName());
             sortedNames.add(group.getName());
@@ -374,6 +374,28 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
+    public void isPermanent()
+            throws SQLException
+    {
+        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        assertTrue("Anonymous group should be 'permanent'", anonymousGroup.isPermanent());
+        assertFalse("topGroup should *not* be 'permanent'", topGroup.isPermanent());
+    }
+
+    @Test
+    public void setPermanent()
+            throws SQLException, AuthorizeException, IOException
+    {
+        Group permaGroup = new Group();
+        permaGroup.setPermanent(true);
+        assertTrue("setPermanent(true) should be reflected in the group's state",
+                permaGroup.isPermanent());
+        permaGroup.setPermanent(false);
+        assertFalse("setPermanent(false) should be reflected in the group's state",
+                permaGroup.isPermanent());
+    }
+
+    @Test
     public void removeMemberEPerson() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
         EPerson ePerson = null;
         try {
@@ -429,7 +451,7 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void allMembers() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
-        List<EPerson> allEPeopleAdded = new ArrayList<EPerson>();
+        List<EPerson> allEPeopleAdded = new ArrayList<>();
         try {
             context.turnOffAuthorisationSystem();
             allEPeopleAdded.add(createEPersonAndAddToGroup("allMemberGroups1@dspace.org", topGroup));
