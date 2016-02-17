@@ -20,6 +20,11 @@ public class ItemFilterDefs implements ItemFilterList {
 	public static final String CAT_ITEM = "Item Property Filters";
 	public static final String CAT_BASIC = "Basic Bitstream Filters";
 	public static final String CAT_MIME = "Bitstream Filters by MIME Type";
+	
+	public static final String[] MIMES_PDF = {"application/pdf"};
+    public static final String[] MIMES_JPG = {"image/jpeg"};
+	
+	
 	private enum EnumItemFilterDefs implements ItemFilterTest {
 	    is_item("Is Item - always true", null, CAT_ITEM) {
 	        public boolean testItem(Context context, Item item) {
@@ -99,12 +104,12 @@ public class ItemFilterDefs implements ItemFilterList {
 	    },
 	    has_pdf_original("Item has a PDF Original Bitstream", null, CAT_MIME) {
 	        public boolean testItem(Context context, Item item) {
-	        	return ItemFilterUtil.countOriginalBitstreamMime(context, item, "application/pdf".split(",")) > 0;
+	        	return ItemFilterUtil.countOriginalBitstreamMime(context, item, MIMES_PDF) > 0;
 	        }        
 	    },
 	    has_jpg_original("Item has JPG Original Bitstream", null, CAT_MIME) {
 	        public boolean testItem(Context context, Item item) {
-	        	return ItemFilterUtil.countOriginalBitstreamMime(context, item, "image/jpeg".split(",")) > 0;
+	        	return ItemFilterUtil.countOriginalBitstreamMime(context, item, MIMES_JPG) > 0;
 	        }        
 	    },
 	    ;

@@ -66,12 +66,12 @@ public class ItemFilterDefsMisc implements ItemFilterList {
 	    },
 	    has_small_pdf("Has unusually small PDF", null, ItemFilterDefs.CAT_MIME) {
 	        public boolean testItem(Context context, Item item) {
-	        	return ItemFilterUtil.countBitstreamSmallerThanMinSize(context, BundleName.ORIGINAL, item, "application/pdf".split(","), "rest.report-pdf-min-size") > 0;
+	        	return ItemFilterUtil.countBitstreamSmallerThanMinSize(context, BundleName.ORIGINAL, item, ItemFilterDefs.MIMES_PDF, "rest.report-pdf-min-size") > 0;
 	        }        
 	    },
 	    has_large_pdf("Has unusually large PDF", null, ItemFilterDefs.CAT_MIME) {
 	        public boolean testItem(Context context, Item item) {
-	        	return ItemFilterUtil.countBitstreamLargerThanMaxSize(context, BundleName.ORIGINAL,  item, "application/pdf".split(","), "rest.report-pdf-max-size") > 0;
+	        	return ItemFilterUtil.countBitstreamLargerThanMaxSize(context, BundleName.ORIGINAL,  item, ItemFilterDefs.MIMES_PDF, "rest.report-pdf-max-size") > 0;
 	        }        
 	    },
 	    has_unsupported_bundle("Has bitstream in an unsuppored bundle", null, CAT_MISC) {
@@ -82,7 +82,7 @@ public class ItemFilterDefsMisc implements ItemFilterList {
 	    },
 	    has_small_thumbnail("Has unusually small thumbnail", null, CAT_MISC) {
 	        public boolean testItem(Context context, Item item) {
-	        	return ItemFilterUtil.countBitstreamSmallerThanMinSize(context, BundleName.THUMBNAIL, item, "image/jpeg".split(","), "rest.report-thumbnail-min-size") > 0;
+	        	return ItemFilterUtil.countBitstreamSmallerThanMinSize(context, BundleName.THUMBNAIL, item, ItemFilterDefs.MIMES_JPG, "rest.report-thumbnail-min-size") > 0;
 	        }        
 	    },
 	    has_doc_without_text("Has document bitstream without TEXT item", null, ItemFilterDefs.CAT_MIME) {
