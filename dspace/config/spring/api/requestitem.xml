@@ -32,7 +32,7 @@
 	</bean>
 
     <!-- HelpDesk to instead get RequestItem emails-->
-    <!--<bean class="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"
-        id="org.dspace.app.requestitem.RequestItemAuthorExtractor"></bean>-->
+    <bean class="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"
+        id="org.dspace.app.requestitem.RequestItemAuthorExtractor"></bean>
 
 </beans>
