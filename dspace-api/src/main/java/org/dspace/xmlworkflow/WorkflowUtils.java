@@ -209,13 +209,14 @@ public class WorkflowUtils extends Util{
         ass.update();
     }
     /*
-     * Deletes a role group linked to a given role and a collection
+     * Deletes a role group linked to a given role and a collection (unless it's a permanent group)
      */
     public static void deleteRoleGroup(Context context, Collection collection, String roleID) throws SQLException, IOException, WorkflowConfigurationException {
         Workflow workflow = WorkflowFactory.getWorkflow(collection);
         Role role = workflow.getRoles().get(roleID);
         if(role.getScope() == Role.Scope.COLLECTION){
             CollectionRole ass = CollectionRole.find(context, collection.getID(), roleID);
+            //TODO check to see if this group is a permanent group
             ass.delete();
         }
     }

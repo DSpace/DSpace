@@ -68,6 +68,8 @@ public class Group extends DSpaceObject
     /** is this just a stub, or is all data loaded? */
     private boolean isDataLoaded = false;
 
+    /** is this group very very special? */
+    public boolean isPermanent = false;
 
     /**
      * Construct a Group from a given context and tablerow
@@ -177,6 +179,9 @@ public class Group extends DSpaceObject
                         tri.close();
                     }
                 }
+
+                // TODO: are we an extra-special permanent-type group?
+                
 
             }
             catch (Exception e)

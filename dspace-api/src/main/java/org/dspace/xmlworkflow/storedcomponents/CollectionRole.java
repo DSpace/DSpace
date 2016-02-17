@@ -13,6 +13,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.Group;
+// TODO eperon.Group needs a isPermanent method, the delete method needs to check it before it tries to delete
 
 import java.sql.SQLException;
 import java.util.ArrayList;
