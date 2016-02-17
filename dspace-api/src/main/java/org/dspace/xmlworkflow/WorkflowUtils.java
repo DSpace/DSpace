@@ -217,7 +217,7 @@ public class WorkflowUtils extends Util{
         if(role.getScope() == Role.Scope.COLLECTION){
             CollectionRole ass = CollectionRole.find(context, collection.getID(), roleID);
             //TODO check to see if this group is a permanent group
-            ass.delete();
+            //ass.delete();
         }
     }
 
