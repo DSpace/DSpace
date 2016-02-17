@@ -73,7 +73,7 @@
               </plugin>
               <plugin>
                   <artifactId>maven-compiler-plugin</artifactId>
-                  <version>3.1</version>
+                  <version>3.5.1</version>
                   <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -82,7 +82,7 @@
               <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.6</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -95,7 +95,7 @@
               <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.6</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
@@ -111,7 +111,7 @@
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
+                <version>2.19.1</version>
                 <configuration>
                     <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                          maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
@@ -130,7 +130,7 @@
              </plugin>
              <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.18.1</version>
+                <version>2.19.1</version>
                 <configuration>
                    <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                         maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
@@ -170,26 +170,26 @@
              </plugin>
              <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
+                <version>1.8</version>
              </plugin>
              <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.5</version>
+                <version>2.6</version>
              </plugin>
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.8</version>
+                <version>2.10</version>
              </plugin>
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.7</version>
               </plugin>
              <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.11</version>
              </plugin>
           </plugins>
       </pluginManagement>
@@ -199,7 +199,7 @@
       <plugins>
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
-            <version>2.5</version>
+            <version>2.5.3</version>
             <configuration>
                 <!-- During release:perform, enable the "release" profile (see below) -->
                 <releaseProfiles>release</releaseProfiles>
