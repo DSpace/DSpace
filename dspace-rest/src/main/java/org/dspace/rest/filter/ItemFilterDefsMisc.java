@@ -66,23 +66,23 @@ public class ItemFilterDefsMisc implements ItemFilterList {
 	    },
 	    has_small_pdf("Has unusually small PDF", null, ItemFilterDefs.CAT_MIME) {
 	        public boolean testItem(Context context, Item item) {
-	        	return ItemFilterUtil.countBitstreamSmallerThanMinSize(context, BundleName.ORIGINAL, item, "application/pdf", "rest.report-pdf-min-size") > 0;
+	        	return ItemFilterUtil.countBitstreamSmallerThanMinSize(context, BundleName.ORIGINAL, item, ItemFilterDefs.MIMES_PDF, "rest.report-pdf-min-size") > 0;
 	        }        
 	    },
 	    has_large_pdf("Has unusually large PDF", null, ItemFilterDefs.CAT_MIME) {
 	        public boolean testItem(Context context, Item item) {
-	        	return ItemFilterUtil.countBitstreamLargerThanMaxSize(context, BundleName.ORIGINAL,  item, "application/pdf", "rest.report-pdf-max-size") > 0;
+	        	return ItemFilterUtil.countBitstreamLargerThanMaxSize(context, BundleName.ORIGINAL,  item, ItemFilterDefs.MIMES_PDF, "rest.report-pdf-max-size") > 0;
 	        }        
 	    },
 	    has_unsupported_bundle("Has bitstream in an unsuppored bundle", null, CAT_MISC) {
 	        public boolean testItem(Context context, Item item) {
-	        	String bundleList = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-supp-bundles");
+	        	String[] bundleList = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("rest.report-supp-bundles");
 	        	return ItemFilterUtil.hasUnsupportedBundle(item, bundleList);
 	        }        
 	    },
 	    has_small_thumbnail("Has unusually small thumbnail", null, CAT_MISC) {
 	        public boolean testItem(Context context, Item item) {
-	        	return ItemFilterUtil.countBitstreamSmallerThanMinSize(context, BundleName.THUMBNAIL, item, "image/jpeg", "rest.report-thumbnail-min-size") > 0;
+	        	return ItemFilterUtil.countBitstreamSmallerThanMinSize(context, BundleName.THUMBNAIL, item, ItemFilterDefs.MIMES_JPG, "rest.report-thumbnail-min-size") > 0;
 	        }        
 	    },
 	    has_doc_without_text("Has document bitstream without TEXT item", null, ItemFilterDefs.CAT_MIME) {
@@ -122,7 +122,7 @@ public class ItemFilterDefsMisc implements ItemFilterList {
 	    },
 	    has_non_generated_thumb("Has non generated thumbnail", null, CAT_MISC) {
 	        public boolean testItem(Context context, Item item) {
-	        	String generatedThumbDesc = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-gen-thumbnail-desc");
+	        	String[] generatedThumbDesc = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("rest.report-gen-thumbnail-desc");
 	        	int countThumb = ItemFilterUtil.countBitstream(BundleName.THUMBNAIL, item);
 	        	if (countThumb == 0) {
 	        		return false;
