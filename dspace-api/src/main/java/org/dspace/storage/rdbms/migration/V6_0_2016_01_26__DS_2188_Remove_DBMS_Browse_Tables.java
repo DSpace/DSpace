@@ -51,10 +51,18 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables implements JdbcM
     private void removeDBMSBrowseTables(Connection connection)
 		throws BrowseException
     {
-        BrowseIndex[] bis = BrowseIndex.getBrowseIndices();
+        // Browse index tables start at index=1
+        int i = 1;
         
-        // Loop through the configured browse indices
-        for(int i = 1; i <= bis.length; i++)
+        // Keep looping (incrementing our index by 1) until we've hit three index
+        // tables that have not been found.
+        // We don't actually know how many index tables will be in each database,
+        // and there are no guarrantees it'll match the highest index of the site's 
+        // existing "webui.browse.index.#" settings.
+        // Since that's the case, we'll just keep searching for index tables,
+        // until we encounter a total of three that are not found.
+        int countTablesNotFound = 0;
+        while(countTablesNotFound < 3)
         {
             String tableName = BrowseIndex.getTableName(i, false, false, false, false);
             String distinctTableName = BrowseIndex.getTableName(i, false, false, true, false);
@@ -86,6 +94,11 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables implements JdbcM
                 // Drop Community View
                 dropView(connection, comViewName); 
             }
+            else
+            {
+                // increment our "not found" count
+                countTablesNotFound++;
+            }
             
             // Check for existence of "distinct table"
             if (DatabaseUtils.tableExists(connection, distinctTableName, false))
@@ -110,6 +123,9 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables implements JdbcM
                 // Drop Community View
                 dropView(connection, distinctComViewName);
             }
+            
+            // increment our table index
+            i++;
         }
 
         // Drop all Item browse index tables
