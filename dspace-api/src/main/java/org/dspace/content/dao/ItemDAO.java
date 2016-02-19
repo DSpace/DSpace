@@ -56,7 +56,31 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
 
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
+    /**
+     * Count number of items in a given collection
+     * @param context
+     * @param collection the collection
+     * @param includeArchived whether to include archived items in count
+     * @param includeWithdrawn whether to include withdrawn items in count
+     * @return item count
+     * @throws SQLException 
+     */
     public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
+    
+    /**
+     * Count number of unique items across several collections at once.
+     * This method can be used with 
+     * {@link org.dspace.content.service.CommunityService#getAllCollections(Context,Community)}
+     * to determine the unique number of items in a Community.
+     * 
+     * @param context
+     * @param collections the list of collections
+     * @param includeArchived whether to include archived items in count
+     * @param includeWithdrawn whether to include withdrawn items in count
+     * @return item count
+     * @throws SQLException 
+     */
+    public int countItems(Context context, List<Collection> collections, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
 
     /**
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
@@ -71,9 +95,22 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
             boolean withdrawn, boolean discoverable, Date lastModified)
             throws SQLException;
 
+    /**
+     * Count total number of items (rows in item table)
+     * @param context
+     * @return total count
+     * @throws SQLException 
+     */
     int countRows(Context context) throws SQLException;
 
-    int countNotArchived(Context context) throws SQLException;
-
-    int countWithdrawn(Context context) throws SQLException;
+    /**
+     * Count number of items based on specific status flags
+     * @param context
+     * @param includeArchived whether to include archived items in count
+     * @param includeWithdrawn whether to include withdrawn items in count
+     * @return count of items
+     * @throws SQLException 
+     */
+    int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
+    
 }

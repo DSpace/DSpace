@@ -453,7 +453,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     public Iterator<Item> findByLastModifiedSince(Context context, Date last)
             throws SQLException;
 
-/**
+    /**
      * counts items in the given community
      *
      * @return total items
@@ -462,7 +462,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
 
     int countTotal(Context context) throws SQLException;
 
-    int getNotArchivedItemsCount(Context context) throws SQLException;
+    int countNotArchivedItems(Context context) throws SQLException;
 
     int countWithdrawnItems(Context context) throws SQLException;
 }

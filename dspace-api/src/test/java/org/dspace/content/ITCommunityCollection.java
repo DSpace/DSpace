@@ -96,38 +96,75 @@ public class ITCommunityCollection extends AbstractIntegrationTest
         assertThat("testCreateTree 2", (Community) collectionService.getParentObject(context, col1), equalTo(child1));
         assertThat("testCreateTree 3", (Community) collectionService.getParentObject(context, col2), equalTo(child1));
     }
-
-     /**
-      * Tests that count items works as expected
-      */
+    
+    /**
+     * Tests the creation of items in a community/collection tree
+     */
     @Test
-    @PerfTest(invocations = 50, threads = 1)
-    @Required(percentile95 = 2000, average= 1800)
-    public void testCountItems() throws SQLException, AuthorizeException, IOException {
-        //make it an even number, not too high to reduce time during testing
-        int totalitems = 4;
-
+    @PerfTest(invocations = 25, threads = 1)
+    @Required(percentile95 = 1200, average = 700, throughput = 1)
+    public void testCreateItems() throws SQLException, AuthorizeException
+    {
         //we create the structure
         context.turnOffAuthorisationSystem();
         Community parent = communityService.create(null, context);
         Community child1 = communityService.create(parent, context);
-
+        
         Collection col1 = collectionService.create(context, child1);
         Collection col2 = collectionService.create(context, child1);
-
-        for(int count = 0; count < totalitems/2; count++)
-        {
-
-            Item item1 = installItemService.installItem(context, workspaceItemService.create(context, col1, false));
-            Item item2 = installItemService.installItem(context, workspaceItemService.create(context, col2, false));
-        }
+        
+        Item item1 = installItemService.installItem(context, workspaceItemService.create(context, col1, false));
+        Item item2 = installItemService.installItem(context, workspaceItemService.create(context, col2, false));
 
         context.restoreAuthSystemState();
 
         //verify it works as expected
-        assertThat("testCountItems 0", itemService.countItems(context, col1), equalTo(totalitems/2));
-        assertThat("testCountItems 1", itemService.countItems(context, col2), equalTo(totalitems/2));
-        assertThat("testCountItems 2", communityService.countItems(context, child1), equalTo(totalitems));
-        assertThat("testCountItems 3", communityService.countItems(context, parent), equalTo(totalitems));
+        assertThat("testCreateItems 0", (Collection) itemService.getParentObject(context, item1), equalTo(col1));
+        assertThat("testCreateItems 1", (Collection) itemService.getParentObject(context, item2), equalTo(col2));
+    }
+
+     /**
+      * Tests that count items works as expected
+      * NOTE: Counts are currently expensive (take a while)
+      */
+    @Test
+    @PerfTest(invocations = 10, threads = 1)
+    @Required(percentile95 = 2000, average= 1800)
+    public void testCountItems() throws SQLException, AuthorizeException, IOException {
+        int items_per_collection = 2;
+
+        //we create the structure
+        context.turnOffAuthorisationSystem();
+        Community parentCom = communityService.create(null, context);
+        Community childCom = communityService.create(parentCom, context);
+
+        Collection col1 = collectionService.create(context, childCom);
+        Collection col2 = collectionService.create(context, childCom);
+
+        // Add same number of items to each collection
+        for(int count = 0; count < items_per_collection; count++)
+        {
+            Item item1 = installItemService.installItem(context, workspaceItemService.create(context, col1, false));
+            Item item2 = installItemService.installItem(context, workspaceItemService.create(context, col2, false));
+        }
+        
+        // Finally, let's throw in a small wrench and add a mapped item
+        // Add it to collection 1
+        Item item3 = installItemService.installItem(context, workspaceItemService.create(context, col1, false));
+        // Map it into collection 2
+        collectionService.addItem(context, col2, item3);
+        
+        // Our total number of items should be
+        int totalitems = items_per_collection*2 + 1;
+        // Our collection counts should be
+        int collTotalItems = items_per_collection + 1;
+
+        context.restoreAuthSystemState();
+
+        //verify it works as expected
+        assertThat("testCountItems 0", itemService.countItems(context, col1), equalTo(collTotalItems));
+        assertThat("testCountItems 1", itemService.countItems(context, col2), equalTo(collTotalItems));
+        assertThat("testCountItems 2", itemService.countItems(context, childCom), equalTo(totalitems));
+        assertThat("testCountItems 3", itemService.countItems(context, parentCom), equalTo(totalitems));
     }
 }
