@@ -46,33 +46,4 @@ public class BrowseDAOFactory
             throw new BrowseException("The configuration for browseDAO is invalid: "+className, e);
         }
 	}
-	
-	/**
-	 * Get an instance of the relevant Write Only DAO class, which will
-	 * conform to the BrowseCreateDAO interface
-	 * 
-	 * @param context	the DSpace context
-	 * @return			the relevant DAO
-	 * @throws BrowseException
-	 */
-	public static BrowseCreateDAO getCreateInstance(Context context)
-		throws BrowseException
-	{
-	    String className = ConfigurationManager.getProperty("browseCreateDAO.class");
-        if (className == null)
-        {
-            // SOLR implementation is the default since DSpace 4.0
-			return new SolrBrowseCreateDAO(context);
-        }
-        try
-        {
-            return (BrowseCreateDAO) Class
-                    .forName(ConfigurationManager.getProperty("browseCreateDAO.class"))
-                    .getConstructor(Context.class).newInstance(context);
-        }
-        catch (Exception e)
-        {
-            throw new BrowseException("The configuration for browseCreateDAO is invalid: "+className, e);
-        }
-	}
 }

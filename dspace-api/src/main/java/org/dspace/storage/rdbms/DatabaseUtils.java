@@ -273,7 +273,7 @@ public class DatabaseUtils
                 try (Connection connection = dataSource.getConnection();)
                 {
                     System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
-                    System.out.println("Attempting to repair any previously failed migrations via FlywayDB... (Check dspace logs for details)");
+                    System.out.println("Attempting to repair any previously failed migrations (or mismatched checksums) via FlywayDB... (Check dspace logs for details)");
                     flyway.repair();
                     System.out.println("Done.");
                 }
@@ -346,7 +346,7 @@ public class DatabaseUtils
                 System.out.println(" - test          = Performs a test connection to database to validate connection settings");
                 System.out.println(" - info / status = Describe basic info/status about database, including validating the compatibility of this database");
                 System.out.println(" - migrate       = Migrate the database to the latest version");
-                System.out.println(" - repair        = Attempt to repair any previously failed database migrations (via Flyway repair)");
+                System.out.println(" - repair        = Attempt to repair any previously failed database migrations or checksum mismatches (via Flyway repair)");
                 System.out.println(" - clean         = DESTROY all data and tables in database (WARNING there is no going back!)");
                 System.out.println("");
             }

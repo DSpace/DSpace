@@ -5,102 +5,80 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.browse;
+package org.dspace.discovery;
 
-import java.util.*;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import java.util.HashSet;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
-import org.dspace.content.authority.service.ChoiceAuthorityService;
-import org.dspace.content.authority.service.MetadataAuthorityService;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SolrServiceImpl;
-import org.dspace.discovery.SolrServiceIndexPlugin;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Set;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.sort.OrderFormat;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 
 /**
+ * A Solr Indexing plugin for the "metadata" browse index type.
+ * <p>
+ * For Example:
+ *    webui.browse.index.2 = author:metadata:dc.contributor.*\,dc.creator:text
+ *    OR
+ *    webui.browse.index.4 = subject:metadata:dc.subject.*:text
+ * <p>
+ * This plugin was based heavily on the old (DSpace 5.x or below), SolrBrowseCreateDAO
+ * class, specifically its "additionalIndex()" method, which used to perform this function.
  * 
- * @author Andrea Bollini (CILEA)
- *
+ * @author Tim Donohue
  */
-public class SolrBrowseCreateDAO implements BrowseCreateDAO,
-        SolrServiceIndexPlugin
-{
-    private static final String INFO_NOSQL_TO_RUN = "No SQL to run: data are stored in the SOLR Search Core. PLEASE NOTE THAT YOU MUST UPDATE THE DISCOVERY INDEX AFTER ANY CHANGES TO THE BROWSE CONFIGURATION";
-
-    // reference to a DBMS BrowseCreateDAO needed to remove old tables when
-    // switching from DBMS to SOLR
-    protected BrowseCreateDAO dbCreateDAO;
-    
-    protected final ItemService itemService;
-    
-    protected final ChoiceAuthorityService choiceAuthorityService;
-    protected final MetadataAuthorityService metadataAuthorityService;
+public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndexPlugin {
 
     private static final Logger log = Logger
-            .getLogger(SolrBrowseCreateDAO.class);
-
-    private BrowseIndex[] bis;
-
-    public SolrBrowseCreateDAO()
-    {
-        try
-        {
-            bis = BrowseIndex.getBrowseIndices();
-        }
-        catch (BrowseException e)
-        {
-            log.error(e.getMessage(), e);
-            throw new IllegalStateException(e);
-        }
-
-        itemService = ContentServiceFactory.getInstance().getItemService();
-        choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
-        metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
-        for (BrowseIndex bi : bis)
-            bi.generateMdBits();
-    }
-
-    public SolrBrowseCreateDAO(Context context) throws BrowseException
-    {
-        try
-        {
-            bis = BrowseIndex.getBrowseIndices();
-        }
-        catch (BrowseException e)
-        {
-            log.error(e.getMessage(), e);
-            throw new IllegalStateException(e);
-        }
-
-        for (BrowseIndex bi : bis)
-            bi.generateMdBits();
-        itemService = ContentServiceFactory.getInstance().getItemService();
-        choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
-        metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
-
-    }
+            .getLogger(SolrServiceMetadataBrowseIndexingPlugin.class);
+    
+    @Autowired(required = true)
+    protected ItemService itemService;
+    
+    @Autowired(required = true)
+    protected MetadataAuthorityService metadataAuthorityService;
+    
+    @Autowired(required = true)
+    protected ChoiceAuthorityService choiceAuthorityService;
 
     @Override
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument doc)
+    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document)
     {
+        // Only works for Items
         if (!(dso instanceof Item))
         {
             return;
         }
         Item item = (Item) dso;
 
-        // faceting for metadata browsing. It is different than search facet
+        // Get the currently configured browse indexes
+        BrowseIndex[] bis;
+        try
+        {
+            bis = BrowseIndex.getBrowseIndices();
+        }
+        catch (BrowseException e)
+        {
+            log.error(e.getMessage(), e);
+            throw new IllegalStateException(e);
+        }
+        
+        // Faceting for metadata browsing. It is different than search facet
         // because if there are authority with variants support we want all the
         // variants to go in the facet... they are sorted by count so just the
         // prefered label is relevant
@@ -109,8 +87,12 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
             log.debug("Indexing for item " + item.getID() + ", for index: "
                     + bi.getTableName());
 
+            // ONLY perform indexing for "metadata" type indices
             if (bi.isMetadataIndex())
             {
+                // Generate our bits of metadata (so getMdBits() can be used below)
+                bi.generateMdBits();
+
                 // values to show in the browse list
                 Set<String> distFValues = new HashSet<String>();
                 // value for lookup without authority
@@ -281,20 +263,20 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
 
                 for (String facet : distFValues)
                 {
-                    doc.addField(bi.getDistinctTableName() + "_filter", facet);
+                    document.addField(bi.getDistinctTableName() + "_filter", facet);
                 }
                 for (String facet : distFAuths)
                 {
-                    doc.addField(bi.getDistinctTableName()
+                    document.addField(bi.getDistinctTableName()
                             + "_authority_filter", facet);
                 }
                 for (String facet : distValuesForAC)
                 {
-                    doc.addField(bi.getDistinctTableName() + "_partial", facet);
+                    document.addField(bi.getDistinctTableName() + "_partial", facet);
                 }
                 for (String facet : distFVal)
                 {
-                    doc.addField(bi.getDistinctTableName()+"_value_filter", facet);
+                    document.addField(bi.getDistinctTableName()+"_value_filter", facet);
                 }
             }
         }
@@ -310,7 +292,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                     String nValue = OrderFormat
                             .makeSortString(dcvalue.get(0).getValue(),
                                     dcvalue.get(0).getLanguage(), so.getType());
-                    doc.addField("bi_sort_" + so.getNumber() + "_sort", nValue);
+                    document.addField("bi_sort_" + so.getNumber() + "_sort", nValue);
                 }
             }
         }
@@ -320,186 +302,4 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
-    @Override
-    public void deleteByItemID(String table, UUID itemID) throws BrowseException
-    {
-    }
-
-    @Override
-    public void deleteCommunityMappings(UUID itemID) throws BrowseException
-    {
-    }
-
-    @Override
-    public void updateCommunityMappings(UUID itemID) throws BrowseException
-    {
-    }
-
-    @Override
-    public void insertIndex(String table, UUID itemID, Map sortCols)
-            throws BrowseException
-    {
-		// this is required to be sure that communities2item will be cleaned
-		// after the switch to SOLRBrowseDAOs. See DS-1619
-    	dbCreateDAO.deleteCommunityMappings(itemID);
-    }
-
-    @Override
-    public boolean updateIndex(String table, UUID itemID, Map sortCols)
-            throws BrowseException
-    {
-        return false;
-    }
-
-    @Override
-    public int getDistinctID(String table, String value, String authority,
-            String sortValue) throws BrowseException
-    {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public int insertDistinctRecord(String table, String value,
-            String authority, String sortValue) throws BrowseException
-    {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public String dropIndexAndRelated(String table, boolean execute)
-            throws BrowseException
-    {
-        return dbCreateDAO.dropIndexAndRelated(table, execute);
-    }
-
-    @Override
-    public String dropSequence(String sequence, boolean execute)
-            throws BrowseException
-    {
-        return dbCreateDAO.dropSequence(sequence, execute);
-    }
-
-    @Override
-    public String dropView(String view, boolean execute) throws BrowseException
-    {
-        return dbCreateDAO.dropView(view, execute);
-    }
-
-    @Override
-    public String createSequence(String sequence, boolean execute)
-            throws BrowseException
-    {
-        return INFO_NOSQL_TO_RUN;
-    }
-
-    @Override
-    public String createPrimaryTable(String table, List sortCols,
-            boolean execute) throws BrowseException
-    {
-        return INFO_NOSQL_TO_RUN;
-    }
-
-    @Override
-    public String[] createDatabaseIndices(String table, List<Integer> sortCols,
-            boolean value, boolean execute) throws BrowseException
-    {
-        return new String[] { INFO_NOSQL_TO_RUN };
-    }
-
-    @Override
-    public String[] createMapIndices(String disTable, String mapTable,
-            boolean execute) throws BrowseException
-    {
-        return new String[] { INFO_NOSQL_TO_RUN };
-    }
-
-    @Override
-    public String createCollectionView(String table, String view,
-            boolean execute) throws BrowseException
-    {
-        return INFO_NOSQL_TO_RUN;
-    }
-
-    @Override
-    public String createCommunityView(String table, String view, boolean execute)
-            throws BrowseException
-    {
-        return INFO_NOSQL_TO_RUN;
-    }
-
-    @Override
-    public String createDistinctTable(String table, boolean execute)
-            throws BrowseException
-    {
-        return INFO_NOSQL_TO_RUN;
-    }
-
-    @Override
-    public String createDistinctMap(String table, String map, boolean execute)
-            throws BrowseException
-    {
-        return INFO_NOSQL_TO_RUN;
-    }
-
-    @Override
-    public MappingResults updateDistinctMappings(String table, UUID itemID,
-            Set<Integer> distinctIDs) throws BrowseException
-    {
-        return new MappingResults()
-        {
-
-            @Override
-            public List<Integer> getRetainedDistinctIds()
-            {
-                return new ArrayList<Integer>();
-            }
-
-            @Override
-            public List<Integer> getRemovedDistinctIds()
-            {
-                return new ArrayList<Integer>();
-            }
-
-            @Override
-            public List<Integer> getAddedDistinctIds()
-            {
-                return new ArrayList<Integer>();
-            }
-        };
-    }
-
-    @Override
-    public boolean testTableExistence(String table) throws BrowseException
-    {
-        return dbCreateDAO.testTableExistence(table);
-    }
-
-    @Override
-    public List<Integer> deleteMappingsByItemID(String mapTable, UUID itemID)
-            throws BrowseException
-    {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public void pruneExcess(String table, boolean withdrawn)
-            throws BrowseException
-    {
-    }
-
-    @Override
-    public void pruneMapExcess(String map, boolean withdrawn,
-            List<Integer> distinctIds) throws BrowseException
-    {
-    }
-
-    @Override
-    public void pruneDistinct(String table, String map,
-            List<Integer> distinctIds) throws BrowseException
-    {
-    }
-
 }

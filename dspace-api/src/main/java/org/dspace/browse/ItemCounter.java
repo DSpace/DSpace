@@ -11,13 +11,11 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Community;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.content.DSpaceObject;
 
 import java.sql.SQLException;
-import java.util.List;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -47,25 +45,8 @@ public class ItemCounter
     /** DSpace Context */
     private Context context;
 
-    protected CommunityService communityService;
     protected ItemService itemService;
     protected ConfigurationService configurationService;
-
-    /**
-     * method invoked by CLI which will result in the number of items
-     * in each community and collection being cached.  These counts will
-     * not update themselves until this is run again.
-     * 
-     * @param args
-     */
-    public static void main(String[] args)
-            throws ItemCountException, SQLException
-    {
-        Context context = new Context();
-        ItemCounter ic = new ItemCounter(context);
-        ic.buildItemCounts();
-        context.complete();
-    }
 	
     /**
      * Construct a new item counter which will use the give DSpace Context
@@ -79,35 +60,10 @@ public class ItemCounter
     {
         this.context = context;
         this.dao = ItemCountDAOFactory.getInstance(this.context);
-        this.communityService = ContentServiceFactory.getInstance().getCommunityService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     }
-	
-    /**
-     * This method does the grunt work of drilling through and iterating
-     * over all of the communities and collections in the system and 
-     * obtaining and caching the item counts for each one.
-     * 
-     * @throws ItemCountException
-     */
-    public void buildItemCounts()
-            throws ItemCountException
-    {
-        try
-        {
-            List<Community> tlc = communityService.findAllTop(context);
-            for (Community aTlc : tlc) {
-                count(aTlc);
-            }
-        }
-        catch (SQLException e)
-        {
-                log.error("caught exception: ", e);
-                throw new ItemCountException(e);
-        }
-    }
-	
+
     /**
      * Get the count of the items in the given container.  If the configuration
      * value webui.strengths.cache is equal to 'true' this will return the
@@ -151,78 +107,5 @@ public class ItemCounter
         }
 
         return 0;
-    }
-	
-    /**
-     * Remove any cached data for the given container
-     * 
-     * @param dso
-     * @throws ItemCountException
-     */
-    public void remove(DSpaceObject dso)
-            throws ItemCountException
-    {
-        dao.remove(dso);
-    }
-	
-    /**
-     * count and cache the number of items in the community.  This
-     * will include all sub-communities and collections in the
-     * community.  It will also recurse into sub-communities and
-     * collections and call count() on them also.
-     * 
-     * Therefore, the count the contents of the entire system, it is
-     * necessary just to call this method on each top level community
-     * 
-     * @param community
-     * @throws ItemCountException
-     */
-    protected void count(Community community)
-            throws ItemCountException
-    {
-        try
-        {
-            // first count the community we are in
-            int count = itemService.countItems(context, community);
-            dao.communityCount(community, count);
-
-            // now get the sub-communities
-            List<Community> scs = community.getSubcommunities();
-            for (Community sc : scs) {
-                count(sc);
-            }
-
-            // now get the collections
-            List<Collection> cols = community.getCollections();
-            for (Collection col : cols) {
-                count(col);
-            }
-        }
-        catch (SQLException e)
-        {
-            log.error("caught exception: ", e);
-            throw new ItemCountException(e);
-        }
-    }
-
-    /**
-     * count and cache the number of items in the given collection
-     * 
-     * @param collection
-     * @throws ItemCountException
-     */
-    protected void count(Collection collection)
-            throws ItemCountException
-    {
-        try
-        {
-            int ccount = itemService.countItems(context, collection);
-            dao.collectionCount(collection, ccount);
-        }
-        catch (SQLException e)
-        {
-            log.error("caught exception: ", e);
-            throw new ItemCountException(e);
-        }
     }
 }

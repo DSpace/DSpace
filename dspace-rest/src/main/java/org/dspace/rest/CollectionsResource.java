@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.browse.BrowseException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
@@ -366,10 +365,6 @@ public class CollectionsResource extends Resource
                 }
             }
 
-            // Index item to browse.
-            org.dspace.browse.IndexBrowse browse = new org.dspace.browse.IndexBrowse();
-            browse.indexItem(dspaceItem);
-
             log.trace("Installing item to collection(id=" + collectionId + ").");
             dspaceItem = installItemService.installItem(context, workspaceItem);
             workspaceItemService.update(context, workspaceItem);
@@ -387,10 +382,6 @@ public class CollectionsResource extends Resource
         {
             processException("Could not add item into collection(id=" + collectionId + "), AuthorizeException. Message: " + e,
                     context);
-        }
-        catch (BrowseException e)
-        {
-            processException("Could not add item into browse index, BrowseException. Message: " + e, context);
         }
         catch (ContextException e)
         {

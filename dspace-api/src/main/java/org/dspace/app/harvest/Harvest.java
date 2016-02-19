@@ -19,7 +19,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.IndexBrowse;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -370,13 +369,11 @@ public class Harvest
 
             ItemService itemService = ContentServiceFactory.getInstance().getItemService();
             Iterator<Item> it = itemService.findByCollection(context, collection);
-    		IndexBrowse ib = new IndexBrowse(context);
     		int i=0;
     		while (it.hasNext()) {
     			i++;
     			Item item = it.next();
     			System.out.println("Deleting: " + item.getHandle());
-    			ib.itemRemoved(item);
                 collectionService.removeItem(context, collection, item);
     			// Dispatch events every 50 items
     			if (i%50 == 0) {
