@@ -94,11 +94,6 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables implements JdbcM
                 // Drop Community View
                 dropView(connection, comViewName); 
             }
-            else
-            {
-                // increment our "not found" count
-                countTablesNotFound++;
-            }
             
             // Check for existence of "distinct table"
             if (DatabaseUtils.tableExists(connection, distinctTableName, false))
@@ -122,6 +117,11 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables implements JdbcM
                 
                 // Drop Community View
                 dropView(connection, distinctComViewName);
+            }
+            else
+            {
+                // increment our "not found" count
+                countTablesNotFound++;
             }
             
             // increment our table index

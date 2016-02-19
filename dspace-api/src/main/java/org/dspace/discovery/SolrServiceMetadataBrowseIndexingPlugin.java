@@ -90,6 +90,9 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
             // ONLY perform indexing for "metadata" type indices
             if (bi.isMetadataIndex())
             {
+                // Generate our bits of metadata (so getMdBits() can be used below)
+                bi.generateMdBits();
+
                 // values to show in the browse list
                 Set<String> distFValues = new HashSet<String>();
                 // value for lookup without authority
