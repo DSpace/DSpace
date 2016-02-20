@@ -52,17 +52,15 @@ public class SendFeedbackAction extends AbstractAction
         String fromPage = request.getHeader("Referer");
         // Prevent spammers and splogbots from poisoning the feedback page
         String host = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname");
-        String allowedReferrersString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("mail.allowed.referrers");
+        String[] allowedReferrers = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("mail.allowed.referrers");
 
-        String[] allowedReferrersSplit = null;
         boolean validReferral = false;
 
-        if((allowedReferrersString != null) && (allowedReferrersString.length() > 0))
+        if(allowedReferrers != null)
         {
-            allowedReferrersSplit = allowedReferrersString.trim().split("\\s*,\\s*");
-            for(int i = 0; i < allowedReferrersSplit.length; i++)
+            for(String allowedReferrer : allowedReferrers)
             {
-                if(fromPage.indexOf(allowedReferrersSplit[i]) != -1)
+                if(fromPage.contains(allowedReferrer))
                 {
                     validReferral = true;
                     break;

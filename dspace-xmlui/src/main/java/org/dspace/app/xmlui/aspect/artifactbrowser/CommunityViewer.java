@@ -198,10 +198,10 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         HandleUtil.buildHandleTrail(context, community, pageMeta,contextPath);
         
         // Add RSS links if available
-        String formats = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.feed.formats");
+        String[] formats = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.formats");
 		if ( formats != null )
 		{
-			for (String format : formats.split(","))
+			for (String format : formats)
 			{
 				// Remove the protocol number, i.e. just list 'rss' or' atom'
 				String[] parts = format.split("_");

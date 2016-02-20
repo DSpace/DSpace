@@ -115,15 +115,14 @@ public class RDFConfiguration {
     
     public static String[] getDSOTypesToConvert()
     {
-        String dsoTypes = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(
-                CONVERTER_DSOTYPES_KEY);
-        if (StringUtils.isEmpty(dsoTypes))
+        String[] dsoTypes = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty(CONVERTER_DSOTYPES_KEY);
+        if (dsoTypes == null)
         {
             log.warn("Property rdf." + CONVERTER_DSOTYPES_KEY + " was not found "
                     + "or is empty. Will convert all type of DSpace Objects.");
             return Constants.typeText;
         }
-        return dsoTypes.split(",\\s*");
+        return dsoTypes;
     }
     
     public static boolean isConvertType(int type)

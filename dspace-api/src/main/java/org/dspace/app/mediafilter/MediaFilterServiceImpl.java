@@ -79,10 +79,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        String publicPermissionFilters = configurationService.getProperty("filter.org.dspace.app.mediafilter.publicPermission");
+        String[] publicPermissionFilters = configurationService.getArrayProperty("filter.org.dspace.app.mediafilter.publicPermission");
+
         if(publicPermissionFilters != null) {
-            String[] publicPermisionFiltersArray = publicPermissionFilters.split(",");
-            for(String filter : publicPermisionFiltersArray) {
+            for(String filter : publicPermissionFilters) {
                 publicFiltersClasses.add(filter.trim());
             }
         }
