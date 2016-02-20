@@ -1,0 +1,2607 @@
+<?xml version="1.0"?>
+<!DOCTYPE input-forms >
+
+
+<input-forms>
+
+ <!-- The form-map maps collection handles to forms. DSpace does not       -->
+ <!-- require that a collection's name be unique, even within a community .-->
+ <!-- DSpace does however insure that each collection's handle is unique.  -->
+ <!-- Form-map provides the means to associate a unique collection name    -->
+ <!-- with a form. The form-map also provides the special handle "default" -->
+ <!-- (which is never a collection), here mapped to "traditional". Any     -->
+ <!-- collection which does not appear in this map will be associated with -->
+ <!-- the mapping for handle "default".                                    -->
+
+ <form-map>
+   <name-map collection-handle="${col.handle.restricted}" form-name="restricted" />
+   <name-map collection-handle="${col.handle.vocabulary}" form-name="vocabulary" />
+   <name-map collection-handle="${openaire.coleccion.evaluaciones}" form-name="openaire" />
+   <name-map collection-handle="${openaire.coleccion.juicios}" form-name="openaireJuicio" />
+   <name-map collection-handle="default" form-name="traditional" />
+ </form-map>
+
+
+ <!-- The form-definitions map lays out the detailed definition of all the -->
+ <!-- submission forms.Each separate form set has a unique name as an      -->
+ <!-- attribute. This name matches one of the names in the form-map. One   -->
+ <!-- named form set has the name "traditional"; as this name suggests,    -->
+ <!-- it is the old style and is also the default, which gets used when    -->
+ <!-- the specified collection has no correspondingly named form set.      -->
+ <!--                                                                      -->
+ <!-- Each form set contains an ordered set of pages; each page defines    -->
+ <!-- one submission metadata entry screen. Each page has an ordered list  -->
+ <!-- of field definitions, Each field definition corresponds to one       -->
+ <!-- metatdata entry (a so-called row), which has a DC element name, a    -->
+ <!-- displayed label, a text string prompt which is called a hint , and   -->
+ <!-- an input-type. Each field also may hold optional elements: DC        -->
+ <!-- qualifier name, a repeatable flag, and a text string whose presence  -->
+ <!-- serves as a 'this field is required' flag.                           -->
+
+ <form-definitions>
+
+   <form name="openaire">
+     <page number="1">
+       <field>
+	 <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Author</label>
+         <input-type>name</input-type>
+         <hint>Enter the name of review author.</hint>
+         <required>Youn must enter the name of review author.</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>language</dc-element>
+         <dc-qualifier>iso</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Language</label>
+         <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+         <hint>Select the language.</hint>
+         <required>You must select the language.</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>rights</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Copyright, use and reproduction.</label>
+         <input-type value-pairs-name="common_rights">dropdown</input-type>
+         <hint>Copyright, use and reproduction.</hint>
+         <required>Copyright, use and reproduction.</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>rights</dc-element>
+         <dc-qualifier>uri</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Link to terms of use and reproduction.</label>
+         <input-type value-pairs-name="common_uri_rights">dropdown</input-type>
+         <hint>Link to terms of use and reproduction.</hint>
+         <required>Link to terms of use and reproduction.</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Type</label>
+         <input-type value-pairs-name="common_revision_types">dropdown</input-type>
+         <hint>Type</hint>
+         <required>Type</required>
+       </field>
+
+       <field>
+	 <dc-schema>oprm</dc-schema>
+         <dc-element>eje1</dc-element>
+         <dc-qualifier>value</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Scientific standard</label>
+         <input-type value-pairs-name="common_value_eje1s">dropdown</input-type>
+         <hint>Has this article reached scientific standards (option 1) or needs revisions (option 0)? Scientific standards refer to various relevant parameters, such as the methodology employed, the clarity of presentation, the use of language, the inclusion of important references, etc.</hint>
+         <required>You must select option 0 or option 1.</required>
+       	</field>
+
+       	<field>
+	 <dc-schema>oprm</dc-schema>
+         <dc-element>eje2</dc-element>
+         <dc-qualifier>value</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Importance of this article for its field.</label>
+         <input-type value-pairs-name="common_value_eje2s">dropdown</input-type>
+         <hint>Rate in a scale from 0-100 the importance of this article for its specific academic field.</hint>
+         <required>You must rate the importance of this article.</required>
+       	</field>
+
+       	<field>
+	 <dc-schema>oprm</dc-schema>
+         <dc-element>eje3</dc-element>
+         <dc-qualifier>value</dc-qualifier>
+         <repeatable></repeatable>
+         <label>General interest of this article for other academic fields.</label>
+         <input-type value-pairs-name="common_value_eje3s">dropdown</input-type>
+         <hint>Rate in a scale from 0-100 how interesting is this article for other academic fields.</hint>
+         <required>You must rate the general interest of this article.</required>
+       	</field>
+       	
+       <field>
+	 <dc-schema>oprm</dc-schema>
+         <dc-element>eje4</dc-element>
+         <dc-qualifier>value</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Importance of this article for society in general</label>
+         <input-type value-pairs-name="common_value_eje4s">dropdown</input-type>
+         <hint>Rate in a scale from 0-100 the importance of this article for society in general (social value: how relevant is this research for solving contemporary problems).</hint>
+         <required>You must rate the importance of this article.</required>
+       	</field>
+
+        <field>
+	 <dc-schema>oprm</dc-schema>
+         <dc-element>opinion</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Opinion about the article</label>
+         <input-type>textarea</input-type>
+         <hint>Please provide below your detailed opinion about the article, including all necessary information to help its authors improve their work. Try to be constructive in your criticism. If you need to submit formatted text with figures, equations, etc., you will later have the opportunity to attach one or more additional files.</hint>
+         <required>You must write your opinion about the article.</required>
+       	</field>
+
+        <field>
+	 <dc-schema>oprm</dc-schema>
+         <dc-element>clasificacion</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Global classification of the article</label>
+         <input-type value-pairs-name="common_value_clasificaciones">dropdown</input-type>
+         <hint>Rate in a scale from 0-100 the article globally.</hint>
+         <required>You must rate the article globally.</required>
+       	</field>
+      </page>
+    </form>
+    
+    <form name="openaireJuicio">
+     <page number="1">
+       <field>
+	 <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Author</label>
+         <input-type>name</input-type>
+         <hint>Enter the name of review author.</hint>
+         <required>Youn must enter the name of review author.</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>language</dc-element>
+         <dc-qualifier>iso</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Language</label>
+         <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+         <hint>Select the language.</hint>
+         <required>You must select the language.</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>rights</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Copyright, use and reproduction.</label>
+         <input-type value-pairs-name="common_rights">dropdown</input-type>
+         <hint>Copyright, use and reproduction.</hint>
+         <required>Copyright, use and reproduction.</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>rights</dc-element>
+         <dc-qualifier>uri</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Link to terms of use and reproduction.</label>
+         <input-type value-pairs-name="common_uri_rights">dropdown</input-type>
+         <hint>Link to terms of use and reproduction.</hint>
+         <required>Link to terms of use and reproduction.</required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Type</label>
+         <input-type value-pairs-name="common_revision_types">dropdown</input-type>
+         <hint>Type</hint>
+         <required>Type</required>
+       </field>
+
+        <field>
+	 <dc-schema>oprm</dc-schema>
+         <dc-element>opinion</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Opinion about the article</label>
+         <input-type>textarea</input-type>
+         <hint>Please provide below your detailed opinion about the article, including all necessary information to help its authors improve their work. Try to be constructive in your criticism. If you need to submit formatted text with figures, equations, etc., you will later have the opportunity to attach one or more additional files.</hint>
+         <required>You must write your opinion about the article.</required>
+       	</field>
+
+        <field>
+	 <dc-schema>oprm</dc-schema>
+         <dc-element>clasificacion</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Global classification of the article</label>
+         <input-type value-pairs-name="common_value_clasificaciones">dropdown</input-type>
+         <hint>Rate in a scale from 0-100 the article globally.</hint>
+         <required>You must rate the article globally.</required>
+       	</field>
+      </page>
+    </form>
+    
+   <form name="traditional">
+     <page number="1">
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Tipo (*)</label>
+         <input-type value-pairs-name="common_types">dropdown</input-type>
+         <hint>Seleccione el tipo de contenido del recurso (dc.type). En Driver 2.0 "http://www.driver-support.eu/documents/DRIVER_2_0_Guidelines_Spanish.pdf", tiene información sobre ellos.</hint>
+         <required>Debe seleccionar el tipo de recurso.</required>
+       </field>
+     </page>
+
+     <page number="2">
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>typesipi</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Tipo SIPI (*)</label>
+         <type-bind>article</type-bind>
+         <input-type value-pairs-name="common_article_types">dropdown</input-type>
+         <hint>Seleccione el tipo de contenido SIPI (dc.typesipi).</hint>
+         <required>Debe seleccionar el tipo SIPI.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>typesipi</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Tipo SIPI (*)</label>
+         <type-bind>report</type-bind>
+         <input-type value-pairs-name="common_conferenceObject_types">dropdown</input-type>
+         <hint>Seleccione el tipo de contenido SIPI (dc.typesipi).</hint>
+         <required>Debe seleccionar el tipo SIPI.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Autores (*)</label>
+         <input-type>name</input-type>
+         <hint>Introduzca el nombre de los autores de este recurso (dc.contributor.author) teniendo en cuenta que el primer autor debe ser introducido en primer lugar,  siguiendo las Directrices DRIVER 2.0 que puede consultar en "http://www.driver-support.eu/documents/DRIVER_2_0_Guidelines_Spanish.pdf". El nombre y apellidos de un autor irán siempre de igual forma (sin olvidar tildes, guiones... sin espacios donde no deban ir...), para que en el listado de autores no aparezca como si fueran autores distintos. Si el primer apellido comienza con partículas (ej. María Luisa de-la-Costa-Hernández), estas deberán ponerse en minúscula, al final de la casilla del nombre y unidas por un guión (ej. Costa-Hernández, M.L. (María Luisa) de-la). Incluya un autor en cada dos casillas y pulse Lookup &amp; Add para rellenar las casillas del autor siguiente.</hint>
+         <required>Debe introducir el nombre de los autores.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>other</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Colaboradores</label>
+         <input-type>name</input-type>
+         <hint>Introduzca las entidades (personas, organizaciones...) responsables de hacer colaboraciones al contenido del recurso (dc.contributor.other), siguiendo las mismas pautas que las indicadas para los autores.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>editor</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Editor</label>
+         <input-type>name</input-type>
+         <hint>Introduzca los nombres de los editores de este recurso (dc.contributor.editor) siguiendo las mismas pautas que las indicadas para los autores.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Título (*)</label>
+         <type-bind>acousticalRecording,animation,annotation,article,bachelorThesis,book,bookPart,conferenceObject,contributionToPeriodical,dataset,doctoralThesis,image,image3D,learningObject,lecture,manual,masterThesis,musicalRecording,musicalScore,oralRecording,other,patent,poster,postprint,preprint,project,report,review,software,video,workingPaper</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Rellene el título principal de este recurso (dc.title).</hint>
+         <required>Debe escribir el título principal.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier>alternative</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Otros Títulos</label>
+         <type-bind>acousticalRecording,animation,annotation,article,bachelorThesis,book,bookPart,conferenceObject,contributionToPeriodical,dataset,doctoralThesis,image,image3D,learningObject,lecture,manual,masterThesis,musicalRecording,musicalScore,oralRecording,other,patent,poster,postprint,preprint,project,report,review,software,video,workingPaper</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Si el recurso tiene un título alternativo, o desea incluir el título traducido a otro idioma, añádalo (dc.title.alternative).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>journal</dc-element>
+         <dc-qualifier>title</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Título de revista (*)</label>
+         <type-bind>article,contributionToPeriodical,preprint,postprint</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el título de la revista a la que pertenece el recurso (dc.journal.title).</hint>
+         <required>Debe introducir el título de la revista.</required>
+       </field>
+       
+        <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>journal</dc-element>
+         <dc-qualifier>title</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Título de revista</label>
+         <type-bind>conferenceObject,poster</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el título de la revista a la que pertenece el recurso (dc.journal.title).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>book</dc-element>
+         <dc-qualifier>title</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Título del libro (*)</label>
+         <type-bind>bookPart</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el título del libro al que pertenece este capítulo (dc.book.title).</hint>
+         <required>Debe introducir el título del libro.</required>
+       </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>relation</dc-element>
+       <dc-qualifier>ispartofseries</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Serie (*)</label>
+       <type-bind>map</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca la serie de este recurso (dc.relation.ispartofseries).</hint>
+       <required>Debe introducir la serie.</required>
+    </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>publisher</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Editorial (*)</label>
+         <type-bind>book,bookPart,map,doctoralThesis,masterThesis,bachelorThesis</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la editorial de este recurso (dc.publisher).</hint>
+         <required>Debe introducir la editorial.</required>
+       </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>page</dc-element>
+       <dc-qualifier>denomination</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Denominación hoja (*)</label>
+       <type-bind>map</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca la denominación de hoja de este recurso (dc.page.denomination).</hint>
+       <required>Debe introducir la denominación de hoja.</required>
+    </field>
+
+     <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>sheet</dc-element>
+       <dc-qualifier>number</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Número de hoja (*)</label>
+       <type-bind>map</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca el número de hoja de este recurso (dc.page.number).</hint>
+       <required>Debe introducir el número de hoja.</required>
+    </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>scale</dc-element>
+       <dc-qualifier></dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Escala (*)</label>
+       <type-bind>map</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca la escala de este recurso (dc.scale).</hint>
+       <required>Debe introducir la escala.</required>
+    </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>conference</dc-element>
+         <dc-qualifier>title</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Congreso, Simposio o Grupo de Trabajo (*)</label>
+         <type-bind>conferenceObject,poster,report,workingPaper</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el nombre del Congreso, Simposio o Grupo de Trabajo del que deriva este recurso (dc.conference.title).</hint>
+         <required>Debe introducir el nombre del Congreso, Simposio o Grupo de Trabajo.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>spatial</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Ciudad (País) (*)</label>
+         <type-bind>book,bookPart,conferenceObject,map,poster,report,workingPaper</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la localización, preferiblemente en formato 'Ciudad (País)' (dc.coverage.spatial).</hint>
+         <required>Debe introducir la localización.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>spatial</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Ciudad (País)</label>
+         <type-bind>accousticalRecording,animation,annotation,article,bachelorThesis,contributionToPeriodical,dataset,doctoralThesis,image,image3D,learningObject,lecture,manual,masterThesis,musicalRecording,musicalScore,oralRecording,other,patent,postprint,preprint,project,review,software,video</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la localización, preferiblemente en formato 'Ciudad (País)' (dc.coverage.spatial).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>spatialStudy</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Cobertura espacial</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la zona de estudio (dc.coverage.spatialStudy).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>temporal</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Cobertura temporal</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el periodo de estudio (dc.coverage.temporal).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>version</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Situación</label>
+         <type-bind>article,contributionToPeriodical,book,bookPart,map,postprint,preprint</type-bind>
+         <input-type value-pairs-name="common_version_descriptions">dropdown</input-type>
+         <hint>Indique en qué situación se encuentra el recurso (dc.description.version).</hint>
+         <required></required>
+       </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>tool</dc-element>
+       <dc-qualifier></dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Herramienta de desarrollo (*)</label>
+       <type-bind>software</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca la herramienta de desarrollo de este recurso (dc.tool).</hint>
+       <required>Debe introducir la herramienta de desarrollo.</required>
+    </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>bbdd</dc-element>
+       <dc-qualifier></dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Base de datos (*)</label>
+       <type-bind>software</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca la base de datos de este recurso (dc.bbdd).</hint>
+       <required>Debe introducir la base de datos.</required>
+    </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>  
+         <dc-qualifier>issued</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Fecha de publicación (*)</label>
+         <input-type>date</input-type>
+         <hint>Introduzca la fecha de publicación de este recurso (dc.date.issued).</hint>
+         <required>Debe introducir como mínimo el año.</required>
+       </field>
+
+     <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>date</dc-element>
+       <dc-qualifier>production</dc-qualifier>
+       <repeatable></repeatable>
+       <label>Fecha de puesta en producción (*)</label>
+       <type-bind>software</type-bind>
+       <input-type>date</input-type>
+       <hint>Introduzca la fecha de puesta en producción de este recurso (dc.date.production).</hint>
+       <required>Debe introducir la fecha de puesta en producción.</required>
+    </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <dc-qualifier>review</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Evaluado</label>
+         <type-bind>article,contributionToPeriodical,preprint,postprint</type-bind>
+         <input-type value-pairs-name="common_review_types">dropdown</input-type>
+         <hint>Indique si el recurso ha sido evaluado por pares, peer reviewed, o no (dc.type.review).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>volume</dc-element>
+         <dc-qualifier>number</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Número de tomo (*)</label>
+         <type-bind>article,contributionToPeriodical,preprint,postprint</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el número de tomo de este recurso (dc.number).</hint>
+         <required>Debe introducir el número de tomo.</required>
+       </field>
+       
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>volume</dc-element>
+         <dc-qualifier>number</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Número de tomo</label>
+         <type-bind>conferenceObject,poster</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el número de tomo de este recurso (dc.number).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>page</dc-element>
+         <dc-qualifier>initial</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Página inicial (*)</label>
+         <type-bind>article,bookPart,contributionToPeriodical,preprint,postprint</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la página inicial de este recurso (dc.page.initial).</hint>
+         <required>Debe introducir la página inicial.</required>
+       </field>
+       
+        <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>page</dc-element>
+         <dc-qualifier>initial</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Página inicial</label>
+         <type-bind>conferenceObject,poster</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la página inicial de este recurso (dc.page.initial).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>page</dc-element>
+         <dc-qualifier>final</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Página final (*)</label>
+         <type-bind>article,bookPart,contributionToPeriodical,preprint,postprint</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la página final de este recurso (dc.page.final).</hint>
+         <required>Debe introducir la página final.</required>
+       </field>
+       
+        <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>page</dc-element>
+         <dc-qualifier>final</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Página final</label>
+         <type-bind>conferenceObject,poster</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la página final de este recurso (dc.page.final).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>page</dc-element>
+         <dc-qualifier>total</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Número de páginas (*)</label>
+         <type-bind>book,bookPart,doctoralThesis,masterThesis,bachelorThesis</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el número de páginas (dc.page.total).</hint>
+         <required>Debe introducir el número de páginas.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>initial</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Fecha de inicio (*)</label>
+         <type-bind>conferenceObject,poster,report,workingPaper</type-bind>
+         <input-type>date</input-type>
+         <hint>Introduzca la fecha de inicio del Congreso, Simposio o Grupo de Trabajo (dc.date.initial).</hint>
+         <required>Debe introducir la fecha de inicio.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>final</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Fecha de finalización (*)</label>
+         <type-bind>conferenceObject,poster,report,workingPaper</type-bind>
+         <input-type>date</input-type>
+         <hint>Introduzca la fecha de finalización del Congreso, Simposio o Grupo de Trabajo (dc.date.final).</hint>
+         <required>Debe introducir la fecha de finalización.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>issn</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>ISSN</label>
+         <type-bind>book,bookPart,doctoralThesis,masterThesis,bachelorThesis</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Si el recurso tiene ISSN, introdúzcalo en este campo (dc.identifier.issn).</hint>
+         <required></required>
+       </field>
+
+      <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>isbn</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>ISBN</label>
+         <type-bind>book,bookPart,map,doctoralThesis,masterThesis,bachelorThesis</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Si el recurso tiene ISBN, introdúzcalo en este campo (dc.identifier.isbn).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>doi</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>DOI</label>
+         <type-bind>article,book,bookPart,contributionToPeriodical,doctoralThesis,masterThesis,bachelorThesis,preprint,postprint</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Si el recurso tiene DOI, introdúzcalo en este campo (dc.identifier.doi). </hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>conferenceObject</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Identificador (*)</label>
+         <type-bind>conferenceObject,poster,report,workingPaper</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Si el recurso tiene número identificativo o código asociado, introdúzcalo en este campo (dc.identifier.conferenceObject).</hint>
+         <required>Debe introducir el identificador.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+         <repeatable>true</repeatable>
+         <label>Identificadores</label>
+         <type-bind>animation,dataset,acousticalRecording,oralRecording,MusicalRecording,image,image3D,report,manual,annotation,learningObject,patent,project,postprint,preprint,musicalScore,review,software,video,other</type-bind>
+         <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+         <hint>Si el recurso tiene números identificativos o códigos asociados, rellene los tipos y números o códigos.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>bibliographicCitation</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Citar como</label>
+         <type-bind>acousticalRecording,animation,annotation,dataset,image,image3D,learningObject,lecture,manual,musicalRecording,musicalScore,oralRecording,other,patent,project,review,video</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Rellene la cita estándar para este archivo (dc.identifier.bibliographicCitation). Si desea consultar el estándar de citas, acceda a "http://www.ub.es/biblio/citae-e.htm", "http://www.lib.berkeley.edu/instruct/guides/citations.html" o "http://writing.wisc.edu/Handbook/Documentation.html".</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Recurso relacionado</label>
+         <input-type>onebox</input-type>
+         <hint>Indique en este metadato (dc.relation) de qué manera se relaciona el contenido de este trabajo con otros recursos anteriores, por ejemplo: Versión 2; 2ª edición; adaptación...</hint>
+         <required></required>
+       </field>
+       
+        <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>source</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Recurso fuente</label>
+         <input-type>textarea</input-type>
+         <hint>Introduzca en este metadato (dc.source) el título del recurso fuente, si existe, del cual deriva el presente recurso.</hint>
+         <required></required>
+       </field>
+       
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier>isversionof</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Es versión del</label>
+         <input-type>onebox</input-type>
+         <hint>Incluya en este metadato (dc.relacion.isversionof) el URI del recurso fuente.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier>projectID</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Proyecto</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el identificador del proyecto (dc.relation.projectID). En caso de que el recurso esté vinculado a un proyecto de la CE, debe introducirlo en formato 'info:eu-repo/grantAgreement/EC/FP7/12345'.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>language</dc-element>
+         <dc-qualifier>iso</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Idioma (*)</label>
+         <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+         <hint>Seleccione el idioma principal del recurso (dc.language.iso). Si no tiene idioma (por ejemplo, si es una imagen) marque la opción 'Sin idioma'.</hint>
+         <required>Debe introducir el idioma.</required>
+       </field>
+     </page>
+
+     <page number="3">
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>subject</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <!-- An input-type of twobox MUST be marked as repeatable -->
+         <repeatable>true</repeatable>
+         <label>Palabras clave / Keywords</label>
+         <input-type>twobox</input-type>
+         <hint>Rellene las palabras clave y keywords (dc.subject), una en cada casilla y pulse Add para icluir la siguiente.</hint>
+         <required></required>
+         <vocabulary></vocabulary>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>abstract</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Resumen</label>
+         <input-type>textarea</input-type>
+         <hint>Rellene el resumen/abstract de este recurso (dc.description.abstract). Si desea incluir el resumen en otro idioma añada otro campo.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>sponsorship</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Patrocinadores</label>
+         <input-type>onebox</input-type>
+         <hint>Rellene los nombres de los patrocinadores y/o los códigos de financiación (dc.description.sponsorship).</hint>
+         <required></required>
+       </field>
+
+       <field>
+		 <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Descripción</label>
+         <input-type>textarea</input-type>
+         <hint>Introduzca una descripción del recurso (dc.description).</hint>
+         <required></required>
+       </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>relation</dc-element>
+       <dc-qualifier>publisherversion</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Versión del editor</label>
+       <input-type>onebox</input-type>
+       <hint>Indique el enlace a la versión del editor (dc.relation.publisherversion) de su artículo en caso de que el editor así lo exija para permitir el acceso abierto. En este caso, el fichero que deberá subir en el paso siguiente de este proceso será el VersionEditor.pdf http://hdl.handle.net/10508/510. Si quiere, además, adjuntar el pdf de su artículo para que el IEO lo custodie y quede oculto, en el metadato Embargo, que está a continuación, siga las instrucciones indicadas.</hint>
+       <required></required>
+    </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>date</dc-element>
+       <dc-qualifier>embargoEndDate</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Embargo</label>
+       <input-type>onebox</input-type>
+       <hint>Rellene el metadato embargo (dc.date.embargoEndDate) solo si la editorial determina un tiempo de carencia, en el que su archivo no deba estar visible, o si no tiene permiso del editor para colocar el archivo de su trabajo en abierto y quiere almacenarlo no visible. En el primer caso, la fecha de embargo deberá rellenarla con formato 'yyyy-mm-dd'; en el segundo, la casilla la rellenará con la palabra 'indefinido', en minúscula. El fichero de su trabajo quedará custodiado, para siempre, por el IEO. Cumplimentado el embargo, aparecerá, automáticamente, un candado desde el que cualquier usuario podrá solicitarle, pulsándolo, una copia electrónica de su archivo, que usted decidirá si enviar o no. Legalmente, podría enviar hasta 30 copias de un trabajo publicado que no tenga permiso para depósito en abierto. Si lo prefiere, puede almacenar un fichero sin el trabajo, en el que se indica únicamente que el texto completo no se encuentra disponible por no existir versión digital o por restricciones de copyright. En este caso, el fichero que deberá subir será el AccesoRestringido.pdf http://hdl.handle.net/10508/508. La fecha de embargo deberá ser, lógicamente, posterior a la actual, si no, al terminar de subir el archivo, el programa mostrará un error interno.</hint>
+       <required></required>
+    </field>
+
+     <field>
+	 <dc-schema>dc</dc-schema>
+         <dc-element>rights</dc-element>
+         <dc-qualifier>accessRights</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Derechos de acceso (*)</label>
+         <input-type value-pairs-name="common_accessRights_rights">dropdown</input-type>
+         <hint>Introduzca información sobre los derechos de acceso del recurso (dc.rights.accessRights).</hint>
+         <required>Debe introducir los derechos de acceso del recurso.</required>
+       </field>
+    
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>description</dc-element>
+       <dc-qualifier>provenance</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Responsable</label>
+       <input-type>onebox</input-type>
+       <hint>Responsable de la subida de este recurso (dc.description.provenance) </hint>
+       <required></required>
+    </field>
+     </page>
+
+     <page number="4">
+      <field>
+	 <dc-schema>oprm</dc-schema>
+         <dc-element>revisor</dc-element>
+         <dc-qualifier>bbdd</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Invite reviewers among registered authors</label>
+         <input-type>onebox</input-type>
+         <hint>Select one or more reviewers. They will receive an email with the invitation to review your publication.</hint>
+         <required></required>
+         <vocabulary></vocabulary>
+       </field>
+       
+       <field>
+	 <dc-schema>oprm</dc-schema>
+         <dc-element>revisor</dc-element>
+         <dc-qualifier>mail</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Invite non-registered reviewers introducing their personal email</label>
+         <input-type>onebox</input-type>
+         <hint>Select one or more reviewers. They will receive an email with the invitation to review your publication.</hint>
+         <required></required>
+         <vocabulary></vocabulary>
+       </field>
+       </page>
+   </form>
+
+   <form name="vocabulary">
+     <page number="1">
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Tipo (*)</label>
+         <input-type value-pairs-name="common_types">dropdown</input-type>
+         <hint>Seleccione el tipo de contenido del recurso (dc.type). En Driver 2.0 "http://www.driver-support.eu/documents/DRIVER_2_0_Guidelines_Spanish.pdf", tiene información sobre ellos.</hint>
+         <required>Debe seleccionar el tipo de recurso.</required>
+       </field>
+     </page>
+
+     <page number="2">
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>typesipi</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Tipo SIPI (*)</label>
+         <type-bind>article</type-bind>
+         <input-type value-pairs-name="common_article_types">dropdown</input-type>
+         <hint>Seleccione el tipo de contenido SIPI (dc.typesipi).</hint>
+         <required>Debe seleccionar el tipo SIPI.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>typesipi</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Tipo SIPI (*)</label>
+         <type-bind>report</type-bind>
+         <input-type value-pairs-name="common_conferenceObject_types">dropdown</input-type>
+         <hint>Seleccione el tipo de contenido SIPI (dc.typesipi).</hint>
+         <required>Debe seleccionar el tipo SIPI.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Autores (*)</label>
+         <input-type>name</input-type>
+         <hint>Introduzca el nombre de los autores de este recurso (dc.contributor.author) teniendo en cuenta que el primer autor debe ser introducido en primer lugar,  siguiendo las Directrices DRIVER 2.0 que puede consultar en "http://www.driver-support.eu/documents/DRIVER_2_0_Guidelines_Spanish.pdf". El nombre y apellidos de un autor irán siempre de igual forma (sin olvidar tildes, guiones... sin espacios donde no deban ir...), para que en el listado de autores no aparezca como si fueran autores distintos. Si el primer apellido comienza con partículas (ej. María Luisa de-la-Costa-Hernández), estas deberán ponerse en minúscula, al final de la casilla del nombre y unidas por un guión (ej. Costa-Hernández, M.L. (María Luisa) de-la). Incluya un autor en cada dos casillas y pulse Lookup &amp; Add para rellenar las casillas del autor siguiente.</hint>
+         <required>Debe introducir el nombre de los autores.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>other</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Colaboradores</label>
+         <input-type>name</input-type>
+         <hint>Introduzca las entidades (personas, organizaciones...) responsables de hacer colaboraciones al contenido del recurso (dc.contributor.other), siguiendo las mismas pautas que las indicadas para los autores.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>editor</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Editor</label>
+         <input-type>name</input-type>
+         <hint>Introduzca los nombres de los editores de este recurso (dc.contributor.editor) siguiendo las mismas pautas que las indicadas para los autores.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Título (*)</label>
+         <type-bind>acousticalRecording,animation,annotation,article,bachelorThesis,book,bookPart,conferenceObject,contributionToPeriodical,dataset,doctoralThesis,image,image3D,learningObject,lecture,manual,masterThesis,musicalRecording,musicalScore,oralRecording,other,patent,poster,postprint,preprint,project,report,review,software,video,workingPaper</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Rellene el título principal de este recurso (dc.title).</hint>
+         <required>Debe escribir el título principal.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier>alternative</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Otros Títulos</label>
+         <type-bind>acousticalRecording,animation,annotation,article,bachelorThesis,book,bookPart,conferenceObject,contributionToPeriodical,dataset,doctoralThesis,image,image3D,learningObject,lecture,manual,masterThesis,musicalRecording,musicalScore,oralRecording,other,patent,poster,postprint,preprint,project,report,review,software,video,workingPaper</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Si el recurso tiene un título alternativo, o desea incluir el título traducido a otro idioma, añádalo (dc.title.alternative).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>journal</dc-element>
+         <dc-qualifier>title</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Título de revista (*)</label>
+         <type-bind>article,contributionToPeriodical,preprint,postprint</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el título de la revista a la que pertenece el recurso (dc.journal.title).</hint>
+         <required>Debe introducir el título de la revista.</required>
+       </field>
+       
+        <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>journal</dc-element>
+         <dc-qualifier>title</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Título de revista</label>
+         <type-bind>conferenceObject,poster</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el título de la revista a la que pertenece el recurso (dc.journal.title).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>book</dc-element>
+         <dc-qualifier>title</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Título del libro (*)</label>
+         <type-bind>bookPart</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el título del libro al que pertenece este capítulo (dc.book.title).</hint>
+         <required>Debe introducir el título del libro.</required>
+       </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>relation</dc-element>
+       <dc-qualifier>ispartofseries</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Serie (*)</label>
+       <type-bind>map</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca la serie de este recurso (dc.relation.ispartofseries).</hint>
+       <required>Debe introducir la serie.</required>
+    </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>publisher</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Editorial (*)</label>
+         <type-bind>book,bookPart,map,doctoralThesis,masterThesis,bachelorThesis</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la editorial de este recurso (dc.publisher).</hint>
+         <required>Debe introducir la editorial.</required>
+       </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>page</dc-element>
+       <dc-qualifier>denomination</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Denominación hoja (*)</label>
+       <type-bind>map</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca la denominación de hoja de este recurso (dc.page.denomination).</hint>
+       <required>Debe introducir la denominación de hoja.</required>
+    </field>
+
+     <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>sheet</dc-element>
+       <dc-qualifier>number</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Número de hoja (*)</label>
+       <type-bind>map</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca el número de hoja de este recurso (dc.page.number).</hint>
+       <required>Debe introducir el número de hoja.</required>
+    </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>scale</dc-element>
+       <dc-qualifier></dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Escala (*)</label>
+       <type-bind>map</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca la escala de este recurso (dc.scale).</hint>
+       <required>Debe introducir la escala.</required>
+    </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>conference</dc-element>
+         <dc-qualifier>title</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Congreso, Simposio o Grupo de Trabajo (*)</label>
+         <type-bind>conferenceObject,poster,report,workingPaper</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el nombre del Congreso, Simposio o Grupo de Trabajo del que deriva este recurso (dc.conference.title).</hint>
+         <required>Debe introducir el nombre del Congreso, Simposio o Grupo de Trabajo.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>spatial</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Ciudad (País) (*)</label>
+         <type-bind>book,bookPart,conferenceObject,map,poster,report,workingPaper</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la localización, preferiblemente en formato 'Ciudad (País)' (dc.coverage.spatial).</hint>
+         <required>Debe introducir la localización.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>spatial</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Ciudad (País)</label>
+         <type-bind>accousticalRecording,animation,annotation,article,bachelorThesis,contributionToPeriodical,dataset,doctoralThesis,image,image3D,learningObject,lecture,manual,masterThesis,musicalRecording,musicalScore,oralRecording,other,patent,postprint,preprint,project,review,software,video</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la localización, preferiblemente en formato 'Ciudad (País)' (dc.coverage.spatial).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>spatialStudy</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Cobertura espacial</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la zona de estudio (dc.coverage.spatialStudy).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>temporal</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Cobertura temporal</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el periodo de estudio (dc.coverage.temporal).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>version</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Situación</label>
+         <type-bind>article,contributionToPeriodical,book,bookPart,map,postprint,preprint</type-bind>
+         <input-type value-pairs-name="common_version_descriptions">dropdown</input-type>
+         <hint>Indique en qué situación se encuentra el recurso (dc.description.version).</hint>
+         <required></required>
+       </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>tool</dc-element>
+       <dc-qualifier></dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Herramienta de desarrollo (*)</label>
+       <type-bind>software</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca la herramienta de desarrollo de este recurso (dc.tool).</hint>
+       <required>Debe introducir la herramienta de desarrollo.</required>
+    </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>bbdd</dc-element>
+       <dc-qualifier></dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Base de datos (*)</label>
+       <type-bind>software</type-bind>
+       <input-type>onebox</input-type>
+       <hint>Introduzca la base de datos de este recurso (dc.bbdd).</hint>
+       <required>Debe introducir la base de datos.</required>
+    </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>  
+         <dc-qualifier>issued</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Fecha de publicación (*)</label>
+         <input-type>date</input-type>
+         <hint>Introduzca la fecha de publicación de este recurso (dc.date.issued).</hint>
+         <required>Debe introducir como mínimo el año.</required>
+       </field>
+
+     <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>date</dc-element>
+       <dc-qualifier>production</dc-qualifier>
+       <repeatable></repeatable>
+       <label>Fecha de puesta en producción (*)</label>
+       <type-bind>software</type-bind>
+       <input-type>date</input-type>
+       <hint>Introduzca la fecha de puesta en producción de este recurso (dc.date.production).</hint>
+       <required>Debe introducir la fecha de puesta en producción.</required>
+    </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <dc-qualifier>review</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Evaluado</label>
+         <type-bind>article,contributionToPeriodical,preprint,postprint</type-bind>
+         <input-type value-pairs-name="common_review_types">dropdown</input-type>
+         <hint>Indique si el recurso ha sido evaluado por pares, peer reviewed, o no (dc.type.review).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>volume</dc-element>
+         <dc-qualifier>number</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Número de tomo (*)</label>
+         <type-bind>article,contributionToPeriodical,preprint,postprint</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el número de tomo de este recurso (dc.number).</hint>
+         <required>Debe introducir el número de tomo.</required>
+       </field>
+       
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>volume</dc-element>
+         <dc-qualifier>number</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Número de tomo</label>
+         <type-bind>conferenceObject,poster</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el número de tomo de este recurso (dc.number).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>page</dc-element>
+         <dc-qualifier>initial</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Página inicial (*)</label>
+         <type-bind>article,bookPart,contributionToPeriodical,preprint,postprint</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la página inicial de este recurso (dc.page.initial).</hint>
+         <required>Debe introducir la página inicial.</required>
+       </field>
+       
+        <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>page</dc-element>
+         <dc-qualifier>initial</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Página inicial</label>
+         <type-bind>conferenceObject,poster</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la página inicial de este recurso (dc.page.initial).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>page</dc-element>
+         <dc-qualifier>final</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Página final (*)</label>
+         <type-bind>article,bookPart,contributionToPeriodical,preprint,postprint</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la página final de este recurso (dc.page.final).</hint>
+         <required>Debe introducir la página final.</required>
+       </field>
+       
+        <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>page</dc-element>
+         <dc-qualifier>final</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Página final</label>
+         <type-bind>conferenceObject,poster</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la página final de este recurso (dc.page.final).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>page</dc-element>
+         <dc-qualifier>total</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Número de páginas (*)</label>
+         <type-bind>book,bookPart,doctoralThesis,masterThesis,bachelorThesis</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el número de páginas (dc.page.total).</hint>
+         <required>Debe introducir el número de páginas.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>initial</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Fecha de inicio (*)</label>
+         <type-bind>conferenceObject,poster,report,workingPaper</type-bind>
+         <input-type>date</input-type>
+         <hint>Introduzca la fecha de inicio del Congreso, Simposio o Grupo de Trabajo (dc.date.initial).</hint>
+         <required>Debe introducir la fecha de inicio.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>final</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Fecha de finalización (*)</label>
+         <type-bind>conferenceObject,poster,report,workingPaper</type-bind>
+         <input-type>date</input-type>
+         <hint>Introduzca la fecha de finalización del Congreso, Simposio o Grupo de Trabajo (dc.date.final).</hint>
+         <required>Debe introducir la fecha de finalización.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>issn</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>ISSN</label>
+         <type-bind>book,bookPart,doctoralThesis,masterThesis,bachelorThesis</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Si el recurso tiene ISSN, introdúzcalo en este campo (dc.identifier.issn).</hint>
+         <required></required>
+       </field>
+
+      <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>isbn</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>ISBN</label>
+         <type-bind>book,bookPart,map,doctoralThesis,masterThesis,bachelorThesis</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Si el recurso tiene ISBN, introdúzcalo en este campo (dc.identifier.isbn).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>doi</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>DOI</label>
+         <type-bind>article,book,bookPart,contributionToPeriodical,doctoralThesis,masterThesis,bachelorThesis,preprint,postprint</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Si el recurso tiene DOI, introdúzcalo en este campo (dc.identifier.doi). </hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>conferenceObject</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Identificador (*)</label>
+         <type-bind>conferenceObject,poster,report,workingPaper</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Si el recurso tiene número identificativo o código asociado, introdúzcalo en este campo (dc.identifier.conferenceObject).</hint>
+         <required>Debe introducir el identificador.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+         <repeatable>true</repeatable>
+         <label>Identificadores</label>
+         <type-bind>animation,dataset,acousticalRecording,oralRecording,MusicalRecording,image,image3D,report,manual,annotation,learningObject,patent,project,postprint,preprint,musicalScore,review,software,video,other</type-bind>
+         <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+         <hint>Si el recurso tiene números identificativos o códigos asociados, rellene los tipos y números o códigos.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>bibliographicCitation</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Citar como</label>
+         <type-bind>acousticalRecording,animation,annotation,dataset,image,image3D,learningObject,lecture,manual,musicalRecording,musicalScore,oralRecording,other,patent,project,review,video</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Rellene la cita estándar para este archivo (dc.identifier.bibliographicCitation). Si desea consultar el estándar de citas, acceda a "http://www.ub.es/biblio/citae-e.htm", "http://www.lib.berkeley.edu/instruct/guides/citations.html" o "http://writing.wisc.edu/Handbook/Documentation.html".</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Recurso relacionado</label>
+         <input-type>onebox</input-type>
+         <hint>Indique en este metadato (dc.relation) de qué manera se relaciona el contenido de este trabajo con otros recursos anteriores, por ejemplo: Versión 2; 2ª edición; adaptación...</hint>
+         <required></required>
+       </field>
+       
+        <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>source</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Recurso fuente</label>
+         <input-type>textarea</input-type>
+         <hint>Introduzca en este metadato (dc.source) el título del recurso fuente, si existe, del cual deriva el presente recurso.</hint>
+         <required></required>
+       </field>
+       
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier>isversionof</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Es versión del</label>
+         <input-type>onebox</input-type>
+         <hint>Incluya en este metadato (dc.relacion.isversionof) el URI del recurso fuente.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier>projectID</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Proyecto</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el identificador del proyecto (dc.relation.projectID). En caso de que el recurso esté vinculado a un proyecto de la CE, debe introducirlo en formato 'info:eu-repo/grantAgreement/EC/FP7/12345'.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>language</dc-element>
+         <dc-qualifier>iso</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Idioma (*)</label>
+         <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+         <hint>Seleccione el idioma principal del recurso (dc.language.iso). Si no tiene idioma (por ejemplo, si es una imagen) marque la opción 'Sin idioma'.</hint>
+         <required>Debe introducir el idioma.</required>
+       </field>
+     </page>
+
+     <page number="3">
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>subject</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <!-- An input-type of twobox MUST be marked as repeatable -->
+         <repeatable>true</repeatable>
+         <label>Palabras clave / Keywords</label>
+         <input-type>twobox</input-type>
+         <hint>Rellene las palabras clave y keywords (dc.subject), una en cada casilla y pulse Add para icluir la siguiente.</hint>
+         <required></required>
+         <vocabulary></vocabulary>
+       </field>
+
+   <!--     <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>subject</dc-element>
+         <dc-qualifier>agriocean</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Vocabulario Agriocean</label>
+         <input-type>onebox</input-type>
+         <hint></hint>
+         <required></required>
+         <vocabulary></vocabulary>
+       </field>
+ -->
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>abstract</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Resumen</label>
+         <input-type>textarea</input-type>
+         <hint>Rellene el resumen/abstract de este recurso (dc.description.abstract). Si desea incluir el resumen en otro idioma añada otro campo.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>sponsorship</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Patrocinadores</label>
+         <input-type>onebox</input-type>
+         <hint>Rellene los nombres de los patrocinadores y/o los códigos de financiación (dc.description.sponsorship).</hint>
+         <required></required>
+       </field>
+
+       <field>
+		 <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Descripción</label>
+         <input-type>textarea</input-type>
+         <hint>Introduzca una descripción del recurso (dc.description).</hint>
+         <required></required>
+       </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>relation</dc-element>
+       <dc-qualifier>publisherversion</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Versión del editor</label>
+       <input-type>onebox</input-type>
+       <hint>Indique el enlace a la versión del editor (dc.relation.publisherversion) de su artículo en caso de que el editor así lo exija para permitir el acceso abierto. En este caso, el fichero que deberá subir en el paso siguiente de este proceso será el VersionEditor.pdf http://hdl.handle.net/10508/510. Si quiere, además, adjuntar el pdf de su artículo para que el IEO lo custodie y quede oculto, en el metadato Embargo, que está a continuación, siga las instrucciones indicadas.</hint>
+       <required></required>
+    </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>date</dc-element>
+       <dc-qualifier>embargoEndDate</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Embargo</label>
+       <input-type>onebox</input-type>
+       <hint>Rellene el metadato embargo (dc.date.embargoEndDate) solo si la editorial determina un tiempo de carencia, en el que su archivo no deba estar visible, o si no tiene permiso del editor para colocar el archivo de su trabajo en abierto y quiere almacenarlo no visible. En el primer caso, la fecha de embargo deberá rellenarla con formato 'yyyy-mm-dd'; en el segundo, la casilla la rellenará con la palabra 'indefinido', en minúscula. El fichero de su trabajo quedará custodiado, para siempre, por el IEO. Cumplimentado el embargo, aparecerá, automáticamente, un candado desde el que cualquier usuario podrá solicitarle, pulsándolo, una copia electrónica de su archivo, que usted decidirá si enviar o no. Legalmente, podría enviar hasta 30 copias de un trabajo publicado que no tenga permiso para depósito en abierto. Si lo prefiere, puede almacenar un fichero sin el trabajo, en el que se indica únicamente que el texto completo no se encuentra disponible por no existir versión digital o por restricciones de copyright. En este caso, el fichero que deberá subir será el AccesoRestringido.pdf http://hdl.handle.net/10508/508. La fecha de embargo deberá ser, lógicamente, posterior a la actual, si no, al terminar de subir el archivo, el programa mostrará un error interno.</hint>
+       <required></required>
+    </field>
+
+     <field>
+	 <dc-schema>dc</dc-schema>
+         <dc-element>rights</dc-element>
+         <dc-qualifier>accessRights</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Derechos de acceso (*)</label>
+         <input-type value-pairs-name="common_accessRights_rights">dropdown</input-type>
+         <hint>Introduzca información sobre los derechos de acceso del recurso (dc.rights.accessRights).</hint>
+         <required>Debe introducir los derechos de acceso del recurso.</required>
+       </field>
+    
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>description</dc-element>
+       <dc-qualifier>provenance</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Responsable</label>
+       <input-type>onebox</input-type>
+       <hint>Responsable de la subida de este recurso (dc.description.provenance) </hint>
+       <required></required>
+    </field>
+
+     </page>
+   </form>
+
+   <form name="restricted">
+     <page number="1">
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>area</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Area del IEO (*)</label>
+         <input-type value-pairs-name="common_areas">dropdown</input-type>
+         <hint>Seleccione el área del IEO a la que pertenece el recurso (dc.area).</hint>
+         <required>Debe seleccionar el área.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>publisher</dc-element>
+         <dc-qualifier>centre</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Centro Oceanográfico (*)</label>
+         <input-type value-pairs-name="common_centre_publishers">dropdown</input-type>
+         <hint>Seleccione el Centro Oceanográfico al que pertenece el recurso (dc.publisher.centre).</hint>
+         <required>Debe seleccionar el Centro.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>typesipi</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable></repeatable>
+         <label>Tipo SIPI (*)</label>
+         <input-type value-pairs-name="common_report_types">dropdown</input-type>
+         <hint>Seleccione el tipo de contenido SIPI (dc.typesipi).</hint>
+         <required>Debe seleccionar el tipo SIPI.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Autores (*)</label>
+         <input-type>name</input-type>
+         <hint>Introduzca el nombre de los autores de este recurso (dc.contributor.author) teniendo en cuenta que el primer autor debe ser introducido en primer lugar,  siguiendo las Directrices DRIVER 2.0 que puede consultar en "http://www.driver-support.eu/documents/DRIVER_2_0_Guidelines_Spanish.pdf". El nombre y apellidos de un autor irán siempre de igual forma (sin olvidar tildes, guiones... sin espacios donde no deban ir...), para que en el listado de autores no aparezca como si fueran autores distintos. Si el primer apellido comienza con partículas (ej. María Luisa de-la-Costa-Hernández), estas deberán ponerse en minúscula, al final de la casilla del nombre y unidas por un guión (ej. Costa-Hernández, M.L. (María Luisa) de-la). Incluya un autor en cada dos casillas y pulse Lookup &amp; Add para rellenar las casillas del autor siguiente.</hint>
+         <required>Debe introducir el nombre de los autores.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>responsability</dc-element>
+         <dc-qualifier>level</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Nivel de responsabilidad (*)</label>
+         <input-type value-pairs-name="common_level_responsabilities">dropdown</input-type>
+         <hint>Indique si el orden de los autores se corresponde con el nivel de responsabilidad en el informe (dc.responsability.level).</hint>
+         <required>Debe indicar si el orden de los autores se corresponde con el nivel de responsabilidad.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>other</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Colaboradores</label>
+         <input-type>name</input-type>
+         <hint>Introduzca las entidades (personas, organizaciones...) responsables de hacer colaboraciones al contenido del recurso (dc.contributor.other), siguiendo las mismas pautas que las indicadas para los autores.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>editor</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Editor</label>
+         <input-type>name</input-type>
+         <hint>Introduzca los nombres de los editores de este recurso (dc.contributor.editor) siguiendo las mismas pautas que las indicadas para los autores.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>requester</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Peticionario inmediato</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el peticionario inmediato (dc.requester) de este recurso (Director IEO, Subdirector IEO, Director CO, etc).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>destiny</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Destino final</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el destino final (dc.destiny) de este recurso si se conoce (Secretaría del Mar, D.G. Medio Ambiente, Consejería de Pesca de una CC.AA, etc).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Título (*)</label>
+         <input-type>onebox</input-type>
+         <hint>Rellene el título principal de este recurso (dc.title).</hint>
+         <required>Debe escribir el título principal.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier>alternative</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Otros Títulos</label>
+         <input-type>onebox</input-type>
+         <hint>Si el recurso tiene un título alternativo, o desea incluir el título traducido a otro idioma, añádalo (dc.title.alternative).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>conference</dc-element>
+         <dc-qualifier>title</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Congreso, Simposio o Grupo de Trabajo</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el nombre del Congreso, Simposio o Grupo de Trabajo del que deriva este recurso (dc.conference.title).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>spatial</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Ciudad (País) (*)</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la localización, en formato 'Ciudad (País)' (dc.coverage.spatial).</hint>
+         <required>Debe introducir la localización.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>spatialStudy</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Cobertura espacial</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca la zona de estudio (dc.coverage.spatialStudy).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>temporal</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Cobertura temporal</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el periodo de estudio (dc.coverage.temporal).</hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>  
+         <dc-qualifier>issued</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Fecha de publicación (*)</label>
+         <input-type>date</input-type>
+         <hint>Introduzca la fecha de publicación de este recurso (dc.date.issued).</hint>
+         <required>Debe introducir como mínimo el año.</required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>initial</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Fecha de inicio</label>
+         <input-type>date</input-type>
+         <hint>Introduzca la fecha de inicio del Congreso, Simposio o Grupo de Trabajo (dc.date.initial).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>final</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Fecha de finalización</label>
+         <input-type>date</input-type>
+         <hint>Introduzca la fecha de finalización del Congreso, Simposio o Grupo de Trabajo (dc.date.final).</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+         <repeatable>true</repeatable>
+         <label>Identificadores</label>
+         <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+         <hint>Si el recurso tiene números identificativos o códigos asociados, rellene los tipos y números o códigos.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Recurso relacionado</label>
+         <input-type>onebox</input-type>
+         <hint>Indique en este metadato (dc.relation) de qué manera se relaciona el contenido de este trabajo con otros recursos anteriores, por ejemplo: Versión 2; 2ª edición; adaptación...</hint>
+         <required></required>
+       </field>
+       
+        <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>source</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Recurso fuente</label>
+         <input-type>textarea</input-type>
+         <hint>Introduzca en este metadato (dc.source) el título del recurso fuente, si existe, del cual deriva el presente recurso.</hint>
+         <required></required>
+       </field>
+       
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier>isversionof</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Es versión del</label>
+         <input-type>onebox</input-type>
+         <hint>Incluya en este metadato (dc.relacion.isversionof) el URI del recurso fuente.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier>projectID</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Proyecto</label>
+         <input-type>onebox</input-type>
+         <hint>Introduzca el identificador del proyecto (dc.relation.projectID). En caso de que el recurso esté vinculado a un proyecto de la CE, debe introducirlo en formato 'info:eu-repo/grantAgreement/EC/FP7/12345'.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>language</dc-element>
+         <dc-qualifier>iso</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Idioma (*)</label>
+         <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+         <hint>Seleccione el idioma principal del recurso (dc.language.iso). Si no tiene idioma (por ejemplo, si es una imagen) marque la opción 'Sin idioma'.</hint>
+         <required>Debe introducir el idioma.</required>
+       </field>
+     </page>
+
+     <page number="2">
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>subject</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <!-- An input-type of twobox MUST be marked as repeatable -->
+         <repeatable>true</repeatable>
+         <label>Palabras clave / Keywords</label>
+         <input-type>twobox</input-type>
+         <hint>Rellene las palabras clave y keywords (dc.subject), una en cada casilla y pulse Add para icluir la siguiente.</hint>
+         <required></required>
+         <vocabulary></vocabulary>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>abstract</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Resumen</label>
+         <input-type>textarea</input-type>
+         <hint>Rellene el resumen/abstract de este recurso (dc.description.abstract). Si desea incluir el resumen en otro idioma añada otro campo.</hint>
+         <required></required>
+       </field>
+
+       <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>sponsorship</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Patrocinadores</label>
+         <input-type>onebox</input-type>
+         <hint>Rellene los nombres de los patrocinadores y/o los códigos de financiación (dc.description.sponsorship).</hint>
+         <required></required>
+       </field>
+
+       <field>
+		 <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Descripción</label>
+         <input-type>textarea</input-type>
+         <hint>Introduzca una descripción del recurso (dc.description).</hint>
+         <required></required>
+       </field>
+
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>relation</dc-element>
+       <dc-qualifier>publisherversion</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Versión del editor</label>
+       <input-type>onebox</input-type>
+       <hint>Indique el enlace a la versión del editor (dc.relation.publisherversion) de su artículo en caso de que el editor así lo exija para permitir el acceso abierto. En este caso, el fichero que deberá subir en el paso siguiente de este proceso será el VersionEditor.pdf http://hdl.handle.net/10508/510. Si quiere, además, adjuntar el pdf de su artículo para que el IEO lo custodie y quede oculto, en el metadato Embargo, que está a continuación, siga las instrucciones indicadas.</hint>
+       <required></required>
+    </field>
+
+     <field>
+	 <dc-schema>dc</dc-schema>
+         <dc-element>rights</dc-element>
+         <dc-qualifier>accessRights</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Derechos de acceso (*)</label>
+         <input-type value-pairs-name="common_accessRights_rights">dropdown</input-type>
+         <hint>Introduzca información sobre los derechos de acceso del recurso (dc.rights.accessRights).</hint>
+         <required>Debe introducir los derechos de acceso del recurso.</required>
+       </field>
+
+     <field>
+	  <dc-schema>dc</dc-schema>
+         <dc-element>confidenciality</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Confidencialidad (*)</label>
+         <input-type value-pairs-name="common_confidencialities">dropdown</input-type>
+         <hint>Indique si el recurso es confidencial o no (dc.confidenciality).</hint>
+         <required>Debe indicar la confidencialidad.</required>
+       </field>
+    
+    <field>
+       <dc-schema>dc</dc-schema>
+       <dc-element>description</dc-element>
+       <dc-qualifier>provenance</dc-qualifier>
+       <repeatable>false</repeatable>
+       <label>Responsable</label>
+       <input-type>onebox</input-type>
+       <hint>Responsable de la subida de este recurso (dc.description.provenance) </hint>
+       <required></required>
+    </field>
+
+     </page>
+   </form>
+
+   <form name="one">
+     <page number="1">
+       <field>
+		 <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Autor</label>
+                 <input-type>name</input-type>
+         <hint>Rellene los nombres de los autores de este archivo.</hint>
+         <required></required>
+       </field>
+      </page>
+    </form>
+ </form-definitions>
+
+
+ <!-- form-value-pairs populate dropdown and qualdrop-value lists.          -->
+ <!-- The form-value-pairs element holds child elements named 'value-pairs' -->
+ <!-- A 'value-pairs' element has a value-pairs-name and a dc-term          -->
+ <!-- attribute. The dc-term attribute specifies which to which Dublin Core -->
+ <!-- Term this set of value-pairs applies.                                 -->
+ <!--     Current dc-terms are: identifier-pairs, type-pairs, and           -->
+ <!--     language_iso-pairs. The name attribute matches a name             -->
+ <!--     in the form-map, above.                                           -->
+ <!-- A value-pair contains one 'pair' for each value displayed in the list -->
+ <!-- Each pair contains a 'displayed-value' element and a 'stored-value'   -->
+ <!-- element. A UI list displays the displayed-values, but the program     -->
+ <!-- stores the associated stored-values in the database.                  -->
+
+ <form-value-pairs>
+   <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
+     <pair>
+       <displayed-value>ISSN</displayed-value>
+       <stored-value>issn</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>ISBN</displayed-value>
+       <stored-value>isbn</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>ISMN</displayed-value>
+       <stored-value>ismn</stored-value>
+     </pair>
+    <pair>
+       <displayed-value>DOI</displayed-value>
+       <stored-value>doi</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Otro</displayed-value>
+       <stored-value>other</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_review_types" dc-term="type">
+     <pair>
+       <displayed-value>SI</displayed-value>
+       <stored-value>SI</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>NO</displayed-value>
+       <stored-value>NO</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_areas" dc-term="area">
+     <pair>
+       <displayed-value>Apoyo a la Investigación</displayed-value>
+       <stored-value>Apoyo a la Investigación</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Acuicultura</displayed-value>
+       <stored-value>Acuicultura</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Medio Marino</displayed-value>
+       <stored-value>Medio Marino</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Pesquerías</displayed-value>
+       <stored-value>Pesquerías</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Gabinete de Prensa</displayed-value>
+       <stored-value>Gabinete de Prensa</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_centre_publishers" dc-term="publisher">
+     <pair>
+       <displayed-value>Centro Oceanográfico de A Coruña</displayed-value>
+       <stored-value>Centro Oceanográfico de A Coruña</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Centro Oceanográfico de Baleares</displayed-value>
+       <stored-value>Centro Oceanográfico de Baleares</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Centro Oceanográfico de Cádiz</displayed-value>
+       <stored-value>Centro Oceanográfico de Cádiz</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Centro Oceanográfico de Canarias</displayed-value>
+       <stored-value>Centro Oceanográfico de Canarias</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Centro Oceanográfico de Gijón</displayed-value>
+       <stored-value>Centro Oceanográfico de Gijón</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Centro Oceanográfico de Málaga</displayed-value>
+       <stored-value>Centro Oceanográfico de Málaga</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Centro Oceanográfico de Murcia</displayed-value>
+       <stored-value>Centro Oceanográfico de Murcia</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Centro Oceanográfico de Santander</displayed-value>
+       <stored-value>Centro Oceanográfico de Santander</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Centro Oceanográfico de Vigo</displayed-value>
+       <stored-value>Centro Oceanográfico de Vigo</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Sede Central IEO</displayed-value>
+       <stored-value>Sede Central IEO</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_types" dc-term="type">
+     <pair> 
+       <displayed-value>acousticalRecording</displayed-value> 
+       <stored-value>acousticalRecording</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>animation</displayed-value> 
+       <stored-value>animation</stored-value> 
+     </pair>
+     <pair> 
+       <displayed-value>annotation</displayed-value> 
+       <stored-value>annotation</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>article</displayed-value> 
+       <stored-value>article</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>bachelorThesis</displayed-value> 
+       <stored-value>bachelorThesis</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>book</displayed-value> 
+       <stored-value>book</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>bookPart</displayed-value> 
+       <stored-value>bookPart</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>conferenceObject</displayed-value> 
+       <stored-value>conferenceObject</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>contributionToPeriodical</displayed-value> 
+       <stored-value>contributionToPeriodical</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>dataset</displayed-value> 
+       <stored-value>dataset</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>doctoralThesis</displayed-value> 
+       <stored-value>doctoralThesis</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>image</displayed-value> 
+       <stored-value>image</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>image3D</displayed-value> 
+       <stored-value>image3D</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>learningObject</displayed-value> 
+       <stored-value>learningObject</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>lecture</displayed-value> 
+       <stored-value>lecture</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>manual</displayed-value> 
+       <stored-value>manual</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>map</displayed-value> 
+       <stored-value>map</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>masterThesis</displayed-value> 
+       <stored-value>masterThesis</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>musicalRecording</displayed-value> 
+       <stored-value>musicalRecording</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>musicalScore</displayed-value> 
+       <stored-value>musicalScore</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>oralRecording</displayed-value> 
+       <stored-value>oralRecording</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>other</displayed-value> 
+       <stored-value>other</stored-value> 
+     </pair>
+     <pair> 
+       <displayed-value>patent</displayed-value> 
+       <stored-value>patent</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>poster</displayed-value> 
+       <stored-value>poster</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>postprint</displayed-value> 
+       <stored-value>postprint</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>preprint</displayed-value> 
+       <stored-value>preprint</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>project</displayed-value> 
+       <stored-value>project</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>report</displayed-value> 
+       <stored-value>report</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>review</displayed-value> 
+       <stored-value>review</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>software</displayed-value> 
+       <stored-value>software</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>video</displayed-value> 
+       <stored-value>video</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>workingPaper</displayed-value> 
+       <stored-value>workingPaper</stored-value> 
+     </pair> 
+   </value-pairs>
+
+   <!-- default language order: (from dspace 1.2.1)
+        "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
+     -->
+   <value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">
+     <pair>
+       <displayed-value>Inglés</displayed-value>
+       <stored-value>eng</stored-value>
+      </pair>
+     <pair>
+       <displayed-value>Español</displayed-value>
+       <stored-value>spa</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Gallego</displayed-value>
+       <stored-value>glg</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Catalán</displayed-value>
+       <stored-value>cat</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Eusquera</displayed-value>
+       <stored-value>eus</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Alemán</displayed-value>
+       <stored-value>deu</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Francés</displayed-value>
+       <stored-value>fra</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Italiano</displayed-value>
+       <stored-value>ita</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Japonés</displayed-value>
+       <stored-value>jpn</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Chino</displayed-value>
+       <stored-value>zho</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_accessRights_rights" dc-term="rights_accessRights">
+     <pair>
+       <displayed-value>Abierto</displayed-value>
+       <stored-value>openAccess</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Embargado</displayed-value>
+       <stored-value>embargoedAccess</stored-value>
+     </pair>	
+     <pair>
+       <displayed-value>Restringido</displayed-value>
+       <stored-value>restrictedAccess</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Cerrado</displayed-value>
+       <stored-value>closedAccess</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_version_descriptions" dc-term="description_version">
+     <pair>
+       <displayed-value>En prensa</displayed-value>
+       <stored-value>En prensa</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Preprint</displayed-value>
+       <stored-value>Preprint</stored-value>
+     </pair>	
+     <pair>
+       <displayed-value>Postprint</displayed-value>
+       <stored-value>Postprint</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Versión del editor</displayed-value>
+       <stored-value>Versión del editor</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_article_types" dc-term="type">
+     <pair>
+       <displayed-value>Artículos Científicos en Revistas</displayed-value>
+       <stored-value>Artículos Científicos en Revistas</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Artículos Científicos en Colecciones de las OROP</displayed-value>
+       <stored-value>Artículos Científicos en Colecciones de las OROP</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_conferenceObject_types" dc-term="description_version">
+     <pair>
+       <displayed-value>Informes de Grupos de Trabajo, talleres, etc., de las OROP</displayed-value>
+       <stored-value>Informes de Grupos de Trabajo, talleres, etc., de las OROP</stored-value>
+     </pair>	
+     <pair>
+       <displayed-value>Informes de Grupos de Trabajo de diversos Organismos</displayed-value>
+       <stored-value>Informes de Grupos de Trabajo de diversos Organismos</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_report_types" dc-term="type_report"> 
+     <pair> 
+       <displayed-value>Asesoramiento a la Administración Central (Ministerios, etc)</displayed-value> 
+       <stored-value>Asesoramiento a la Administración Central (Ministerios, etc)</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>Asesoramiento a la Administración autonómica (Consejerías, etc)</displayed-value> 
+       <stored-value>Asesoramiento a la Administración autonómica (Consejerías, etc)</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>Asesoramiento a la Unión Europea o algunos de sus departamentos</displayed-value> 
+       <stored-value>Asesoramiento a la Unión Europea o algunos de sus departamentos</stored-value> 
+     </pair> 
+    <pair> 
+       <displayed-value>Asesoramiento a las Administraciones locales (Ayuntamientos, etc)</displayed-value> 
+       <stored-value>Asesoramiento a las Administraciones locales (Ayuntamientos, etc)</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>Asesoramiento a organismos internacionales (ICES, COI, NAFO, etc)</displayed-value> 
+       <stored-value>Asesoramiento a organismos internacionales (ICES, COI, NAFO, etc)</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>Científico-técnicos de finales de proyecto, convenios, encomiendas, etc.</displayed-value> 
+       <stored-value>Científico-técnicos de finales de proyecto, convenios, encomiendas, etc.</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>Evaluaciones de artículos para revistas científicas relevantes</displayed-value> 
+       <stored-value>Evaluaciones de artículos para revistas científicas relevantes</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>Informes de evaluación de proyectos en agencias de evaluación (ANEP o similares)</displayed-value> 
+       <stored-value>Informes de evaluación de proyectos en agencias de evaluación (ANEP o similares)</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>Otros</displayed-value> 
+       <stored-value>Otros</stored-value> 
+     </pair> 
+     <pair> 
+       <displayed-value>Relevantes a otras entidades (Universidades, Fundaciones, etc)</displayed-value> 
+       <stored-value>Relevantes a otras entidades (Universidades, Fundaciones, etc)</stored-value> 
+     </pair> 
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_level_responsabilities" dc-term="responsability_level">
+     <pair>
+       <displayed-value>SI</displayed-value>
+       <stored-value>SI</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>NO</displayed-value>
+       <stored-value>NO</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_confidencialities" dc-term="confidenciality">
+     <pair>
+       <displayed-value>SI</displayed-value>
+       <stored-value>SI</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>NO</displayed-value>
+       <stored-value>NO</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_rights" dc-term="rights">
+     <pair>
+       <displayed-value>Atribución-NoComercial-SinDerivadas 3.0 España</displayed-value>
+       <stored-value>Atribución-NoComercial-SinDerivadas 3.0 España</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_uri_rights" dc-term="rights_uri">
+     <pair>
+       <displayed-value>http://creativecommons.org/licenses/by-nc-nd/3.0/es/</displayed-value>
+       <stored-value>http://creativecommons.org/licenses/by-nc-nd/3.0/es/</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_revision_types" dc-term="type">
+     <pair>
+       <displayed-value>Revisión</displayed-value>
+       <stored-value>review</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_value_eje1s" dc-term="eje1">
+     <pair>
+       <displayed-value>0</displayed-value>
+       <stored-value>0</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>1</displayed-value>
+       <stored-value>1</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_value_eje2s" dc-term="eje2">
+     <pair>
+       <displayed-value>0</displayed-value>
+       <stored-value>0</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>10</displayed-value>
+       <stored-value>10</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>20</displayed-value>
+       <stored-value>20</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>30</displayed-value>
+       <stored-value>30</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>40</displayed-value>
+       <stored-value>40</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>50</displayed-value>
+       <stored-value>50</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>60</displayed-value>
+       <stored-value>60</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>70</displayed-value>
+       <stored-value>70</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>80</displayed-value>
+       <stored-value>80</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>90</displayed-value>
+       <stored-value>90</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>100</displayed-value>
+       <stored-value>100</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_value_eje3s" dc-term="eje3">
+     <pair>
+       <displayed-value>0</displayed-value>
+       <stored-value>0</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>10</displayed-value>
+       <stored-value>10</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>20</displayed-value>
+       <stored-value>20</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>30</displayed-value>
+       <stored-value>30</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>40</displayed-value>
+       <stored-value>40</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>50</displayed-value>
+       <stored-value>50</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>60</displayed-value>
+       <stored-value>60</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>70</displayed-value>
+       <stored-value>70</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>80</displayed-value>
+       <stored-value>80</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>90</displayed-value>
+       <stored-value>90</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>100</displayed-value>
+       <stored-value>100</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_value_eje4s" dc-term="eje4">
+     <pair>
+       <displayed-value>0</displayed-value>
+       <stored-value>0</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>10</displayed-value>
+       <stored-value>10</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>20</displayed-value>
+       <stored-value>20</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>30</displayed-value>
+       <stored-value>30</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>40</displayed-value>
+       <stored-value>40</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>50</displayed-value>
+       <stored-value>50</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>60</displayed-value>
+       <stored-value>60</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>70</displayed-value>
+       <stored-value>70</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>80</displayed-value>
+       <stored-value>80</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>90</displayed-value>
+       <stored-value>90</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>100</displayed-value>
+       <stored-value>100</stored-value>
+     </pair>
+   </value-pairs>
+
+   <value-pairs value-pairs-name="common_value_clasificaciones" dc-term="clasificacion">
+     <pair>
+       <displayed-value>0</displayed-value>
+       <stored-value>0</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>10</displayed-value>
+       <stored-value>10</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>20</displayed-value>
+       <stored-value>20</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>30</displayed-value>
+       <stored-value>30</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>40</displayed-value>
+       <stored-value>40</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>50</displayed-value>
+       <stored-value>50</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>60</displayed-value>
+       <stored-value>60</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>70</displayed-value>
+       <stored-value>70</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>80</displayed-value>
+       <stored-value>80</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>90</displayed-value>
+       <stored-value>90</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>100</displayed-value>
+       <stored-value>100</stored-value>
+     </pair>
+   </value-pairs>
+
+ </form-value-pairs>
+
+</input-forms>

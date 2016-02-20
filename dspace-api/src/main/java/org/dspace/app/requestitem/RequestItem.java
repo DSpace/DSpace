@@ -132,7 +132,10 @@ public class RequestItem {
     public String getToken() {
         return token;
     }
-
+    // Para Envio de items a revisores
+    public void setToken(String token) {
+        this.token= token;
+    }
     public int getItemID() {
         return itemID;
     }

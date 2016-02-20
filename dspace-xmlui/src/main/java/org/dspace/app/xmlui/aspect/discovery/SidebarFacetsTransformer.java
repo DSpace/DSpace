@@ -7,9 +7,12 @@
  */
 package org.dspace.app.xmlui.aspect.discovery;
 
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
@@ -20,10 +23,13 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
+import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.*;
@@ -71,6 +77,9 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
     private static final Message T_FILTER_HEAD = message("xmlui.discovery.AbstractFiltersTransformer.filters.head");
     private static final Message T_VIEW_MORE = message("xmlui.discovery.AbstractFiltersTransformer.filters.view-more");
 
+    protected java.util.List<DiscoverResult.FacetResult> authorProfileResults = null;
+
+
     protected SearchService getSearchService()
     {
         DSpace dspace = new DSpace();
@@ -78,6 +87,52 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
 
         return manager.getServiceByName(SearchService.class.getName(),SearchService.class);
+    }
+
+    @Override
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
+        super.setup(resolver, objectModel, src, parameters);
+        try {
+            performSearch();
+        } catch (Exception e) {
+            log.error("Error while searching for sidebar facets", e);
+        }
+
+    }
+
+    @Override
+    public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
+        super.addPageMeta(pageMeta);
+        ArrayList<DiscoverFilterQuery> fqs = new ArrayList<DiscoverFilterQuery>();
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        fqs.addAll(DiscoveryUIUtils.getFilterDiscoveryQueries(request, context));
+
+        if (authorProfileResults != null)
+            for (DiscoverResult.FacetResult apFR : authorProfileResults) {
+
+                pageMeta.addMetadata("authorprofile", apFR.getDisplayedValue(), null, false).addContent(apFR.getAsFilterQuery().replace("author_filter:", ""));
+                for(DiscoverFilterQuery fq:fqs)
+                if (fq.getFilterQuery().contains(apFR.getAsFilterQuery().replace("author_keyword:", ""))||fq.getDisplayedValue().contains(apFR.getDisplayedValue())) {
+                    pageMeta.addMetadata("currentauthorprofile", apFR.getDisplayedValue(), null, false).addContent(apFR.getAsFilterQuery().replace("author_filter:", ""));
+                } else {
+                    DiscoverQuery query=new DiscoverQuery();
+                    query.setQuery("search.resourcetype:" + Constants.AUTHOR_PROFILE + " AND "+fq.getFilterQuery());
+                    query.addFacetField(new DiscoverFacetField("author", DiscoveryConfigurationParameters.TYPE_TEXT, -1, DiscoveryConfigurationParameters.SORT.VALUE));
+                    query.setFacetMinCount(1);
+                    DiscoverResult apResult = null;
+                    try {
+                        apResult = SearchUtils.getSearchService().search(context, query);
+                        for (DiscoverResult.FacetResult apFR2 : apResult.getFacetResult("author"))
+                            pageMeta.addMetadata("currentauthorprofile", apFR2.getDisplayedValue(), null, false).addContent(apFR2.getAsFilterQuery().replace("author_filter:", ""));
+                    } catch (SearchServiceException e) {
+                        log.error(e.getMessage(), e);
+                    }
+
+                }
+
+
+            }
+
     }
 
     /**
@@ -113,6 +168,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
             try {
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+                Request request=ObjectModelHelper.getRequest(objectModel);
                 DSpaceValidity val = new DSpaceValidity();
 
                 // Retrieve any facet results to add to the validity key
@@ -138,7 +194,20 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                         val.add(facetField + facetValue.getAsFilterQuery() + facetValue.getCount());
                     }
                 }
+                for (DiscoverResult.FacetResult apfr : authorProfileResults) {
+                    val.add(apfr.getAsFilterQuery() + apfr.getCount());
+                }
+                val.add("filtertype:"+request.getParameter("filtertype"));
+                val.add("filter:"+request.getParameter("filter"));
 
+                if (request.getParameterValues("fq") != null) {
+                    for (int i = 0; i < request.getParameterValues("fq").length; i++) {
+                        String fq = request.getParameterValues("fq")[i];
+                        val.add("fq:"+fq);
+                    }
+                }
+
+                val.add(context.getCurrentUser());
                 this.validity = val.complete();
             }
             catch (Exception e) {
@@ -157,26 +226,22 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         //If we are on a search page performing a search a query may be used
         String query = request.getParameter("query");
         if(query != null && !"".equals(query)){
-            queryArgs.setQuery(query);
+            queryArgs.setQuery(StringUtils.replace(query, "\r", ""));
         }
 
         //We do not need to retrieve any dspace objects, only facets
         queryArgs.setMaxResults(0);
         queryResults =  getSearchService().search(context, dso,  queryArgs);
+
+        if (queryResults != null) {
+            authorProfileResults = AuthorProfileUtil.getAuthorFacets(context, queryResults);
+        }
     }
 
     @Override
     public void addOptions(Options options) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
 
         Request request = ObjectModelHelper.getRequest(objectModel);
-
-        try {
-            performSearch();
-        }catch (Exception e){
-            log.error("Error while searching for sidebar facets", e);
-
-            return;
-        }
 
         if (this.queryResults != null) {
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -237,16 +302,13 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                 } else {
                                     String paramsQuery = retrieveParameters(request);
 
-                                    filterValsList.addItem().addXref(
-                                            contextPath +
-                                                    (dso == null ? "" : "/handle/" + dso.getHandle()) +
-                                                    "/discover?" +
-                                                    paramsQuery +
-                                                    "filtertype=" + field.getIndexFieldName() +
-                                                    "&filter_relational_operator="+ filterType  +
-                                                    "&filter=" + encodeForURL(filterQuery),
-                                            displayedValue + " (" + value.getCount() + ")"
+                                    Item listItem = filterValsList.addItem();
+                                    listItem.addXref(
+                                            getFacetFilterUrl(dso, field, filterQuery, filterType, paramsQuery),
+                                            displayedValue
                                     );
+                                    listItem.addContent(" (" + value.getCount() + ")");
+
                                 }
                             }
                             //Show a "view more" url should there be more values, unless we have a date
@@ -258,6 +320,16 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                 }
             }
         }
+    }
+
+    protected String getFacetFilterUrl(DSpaceObject dso, DiscoverySearchFilterFacet field, String filterQuery, String filterType, String paramsQuery) throws UIException, SQLException {
+        return contextPath +
+                (dso == null ? "" : "/handle/" + dso.getHandle()) +
+                "/discover?" +
+                paramsQuery +
+                "filtertype=" + field.getIndexFieldName() +
+                "&filter_relational_operator="+ filterType  +
+                "&filter=" + encodeForURL(filterQuery);
     }
 
     /**

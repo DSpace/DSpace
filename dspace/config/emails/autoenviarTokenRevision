@@ -1,0 +1,32 @@
+# Email sent to DSpace reviewers users.
+#
+# Parameters: 			{0} Título
+#				{1} Autores
+#				{2} Handle
+#				{3} Token de revisión
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Solicitud de revisión de publicación
+Estimado/a Sr/a,
+ 
+Ha solicitado emitir una revisión del artículo titulado {0}.
+ 
+Revisar abiertamente manuscritos publicados en repositorios antes (en estado preprint), o incluso después de su publicación en revistas académicas, ayuda a los autores a mejorar sus contribuciones y abre nuevas vías de colaboración entre científicos. Además, en este modelo de revisión abierta, el revisor es reconocido por su contribución, ya que su revisión se convierte en un ítem citable que puede incluir en su currículum académico. Para obtener más información sobre este modelo innovador que está siendo implementado por primera vez a nivel internacional desde el repositorio del Instituto Español de Oceanografía, puede leer el artículo: Defining and Characterizing Open Peer Review: A review of the literature. Url: http://pdxscholar.library.pdx.edu/cgi/viewcontent.cgi?article=1000&context=ulib_fac
+ 
+Los datos del artículo que ha sido invitado/a a revisar:
+
+Título: {0}
+Autores: {1}
+Handle: {2}
+
+Se adjuntan los documentos asociados a la publicación, en caso de que disponga de ellos.
+ 
+Cuando quiera revisar el artículo puede acceder al siguiente enlace:
+
+{3}
+
+El token anterior no caduca, pero es de un único uso. Si lo desea, puede guardar el envío y continuar el proceso más tarde, pero una vez utilice el enlace, dejará de estar operativo.
+ 
+ 
+Si necesita ayuda, por favor contacte con el administrador del repositorio.

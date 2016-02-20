@@ -36,7 +36,7 @@ public class IndexEventConsumer implements Consumer {
     private Set<DSpaceObject> objectsToUpdate = null;
 
     // handles to delete since IDs are not useful by now.
-    private Set<String> handlesToDelete = null;
+    private Set<String> objectsToDelete = null;
 
     DSpace dspace = new DSpace();
 
@@ -57,12 +57,12 @@ public class IndexEventConsumer implements Consumer {
 
         if (objectsToUpdate == null) {
             objectsToUpdate = new HashSet<DSpaceObject>();
-            handlesToDelete = new HashSet<String>();
+            objectsToDelete = new HashSet<String>();
         }
 
         int st = event.getSubjectType();
         if (!(st == Constants.ITEM || st == Constants.BUNDLE
-                || st == Constants.COLLECTION || st == Constants.COMMUNITY)) {
+                || st == Constants.COLLECTION || st == Constants.COMMUNITY || st == Constants.AUTHOR_PROFILE)) {
             log
                     .warn("IndexConsumer should not have been given this kind of Subject in an event, skipping: "
                             + event.toString());
@@ -136,7 +136,7 @@ public class IndexEventConsumer implements Consumer {
                 }
                 else {
                     log.debug("consume() adding event to delete queue: " + event.toString());
-                    handlesToDelete.add(detail);
+                    objectsToDelete.add(indexer.getUniqueId(event.getSubjectType(), event.getSubjectID()));
                 }
                 break;
             default:
@@ -156,7 +156,7 @@ public class IndexEventConsumer implements Consumer {
      */
     public void end(Context ctx) throws Exception {
 
-        if (objectsToUpdate != null && handlesToDelete != null) {
+        if (objectsToUpdate != null && objectsToDelete != null) {
 
             // update the changed Items not deleted because they were on create list
             for (DSpaceObject iu : objectsToUpdate) {
@@ -164,14 +164,14 @@ public class IndexEventConsumer implements Consumer {
                  * allow the search DSIndexer to make 
                  * decisions on indexing and/or removal
                  */
-                String hdl = iu.getHandle();
-                if (hdl != null && !handlesToDelete.contains(hdl)) {
+                String uniqueId = indexer.getUniqueId(iu);
+                if (uniqueId != null && !objectsToDelete.contains(uniqueId)) {
                     try {
                         indexer.indexContent(ctx, iu, true);
                         log.debug("Indexed "
                                 + Constants.typeText[iu.getType()]
                                 + ", id=" + String.valueOf(iu.getID())
-                                + ", handle=" + hdl);
+                                + ", uniqueId=" + uniqueId);
                     }
                     catch (Exception e) {
                         log.error("Failed while indexing object: ", e);
@@ -179,16 +179,16 @@ public class IndexEventConsumer implements Consumer {
                 }
             }
 
-            for (String hdl : handlesToDelete) {
+            for (String uniqueId : objectsToDelete) {
                 try {
-                    indexer.unIndexContent(ctx, hdl, true);
+                    indexer.unIndexContent(ctx, uniqueId, true);
                     if (log.isDebugEnabled())
                     {
-                        log.debug("UN-Indexed Item, handle=" + hdl);
+                        log.debug("UN-Indexed Item, uniqueId=" + uniqueId);
                     }
                 }
                 catch (Exception e) {
-                    log.error("Failed while UN-indexing object: " + hdl, e);
+                    log.error("Failed while UN-indexing object: " + uniqueId, e);
                 }
 
             }
@@ -197,7 +197,7 @@ public class IndexEventConsumer implements Consumer {
 
         // "free" the resources
         objectsToUpdate = null;
-        handlesToDelete = null;
+        objectsToDelete = null;
     }
 
     public void finish(Context ctx) throws Exception {

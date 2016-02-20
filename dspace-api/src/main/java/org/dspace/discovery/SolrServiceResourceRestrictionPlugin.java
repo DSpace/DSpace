@@ -7,17 +7,21 @@
  */
 package org.dspace.discovery;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.handle.HandleManager;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -78,7 +82,47 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 resourceQuery.append(")");
                 
                 solrQuery.addFilterQuery(resourceQuery.toString());
+                // colecciones/comunidades ocultas:
+                boolean allowedAllCollections=false;
+        	Group[] groups;
+        	groups = Group.allMemberGroups(context, context.getCurrentUser());
+        	String configAllowedGroups=ConfigurationManager.getProperty("grupos.busqueda.completa");
+        	if(StringUtils.isNotEmpty(configAllowedGroups)){
+        		String[] allowedGroups=configAllowedGroups.split(",");
+        		for(int i=0;i<allowedGroups.length;i++){
+        		    for(int j=0;j<groups.length;j++){
+        			if(allowedGroups[i].equalsIgnoreCase(groups[j].getName())){
+        			    allowedAllCollections=true;
+        			}
+        		    }
+        		}
+        	}
+        	if(!allowedAllCollections){
+        	    String comunidadesColeccionesPrivadas=ConfigurationManager.getProperty("comunidades.colecciones.privadas");
+        	    if(StringUtils.isNotBlank(comunidadesColeccionesPrivadas)){
+        		String[] privs=comunidadesColeccionesPrivadas.split(",");
+        		for(int i=0;i<privs.length;i++){
+        		    try {
+        			DSpaceObject dso = HandleManager.resolveToObject(context, privs[i]);
+        			if(dso!=null && dso instanceof Community){
+        			    solrQuery.addFilterQuery("NOT(location.comm:"+dso.getID()+")");    
+        			    solrQuery.addFilterQuery("NOT(handle:"+ privs[i]+")");
+        			}else if(dso!=null && dso instanceof org.dspace.content.Collection){
+        			    solrQuery.addFilterQuery("NOT(location.coll:"+dso.getID()+")");
+        			    solrQuery.addFilterQuery("NOT(handle:"+ privs[i]+")");
+        			}
+        		    } catch (IllegalStateException e) {
+        			// TODO Auto-generated catch block
+        			e.printStackTrace();
+        		    } catch (SQLException e) {
+        			// TODO Auto-generated catch block
+        			e.printStackTrace();
+        		    }
+        		}
+        	    }
+        	}
             }
+            
         } catch (SQLException e) {
             log.error(LogManager.getHeader(context, "Error while adding resource policy information to query", ""), e);
         }

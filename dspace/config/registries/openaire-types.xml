@@ -1,0 +1,88 @@
+<dspace-dc-types>
+
+  <dspace-header>
+    <title>DSpace openaire</title>
+    <contributor.author>Adán Román</contributor.author>
+  </dspace-header>
+
+  <dc-schema>
+      <name>oprm</name>
+      <namespace>oprm</namespace>
+  </dc-schema>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>isrelatedtoItem</qualifier>
+  </dc-type>
+  
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>isrelatedtoRevision</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>relation</element>
+    <qualifier>isrelatedtoJuicio</qualifier>
+  </dc-type>
+  
+  <dc-type>
+	<schema>oprm</schema>
+    <element>revisor</element>
+    <qualifier>mail</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>oprm</schema>
+    <element>revisor</element>
+    <qualifier>bbdd</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>oprm</schema>
+    <element>eje1</element>
+    <qualifier>value</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>oprm</schema>
+    <element>eje2</element>
+    <qualifier>value</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>oprm</schema>
+    <element>eje3</element>
+    <qualifier>value</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>oprm</schema>
+    <element>eje4</element>
+    <qualifier>value</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>oprm</schema>
+    <element>opinion</element>
+  </dc-type>
+
+  <dc-type>
+	<schema>oprm</schema>
+    <element>item</element>
+    <qualifier>hasRevision</qualifier>
+  </dc-type>  
+  
+    <dc-type>
+	<schema>oprm</schema>
+    <element>reputacion</element>
+  </dc-type>
+  
+      <dc-type>
+	<schema>oprm</schema>
+    <element>clasificacion</element>
+  </dc-type>
+  
+</dspace-dc-types>

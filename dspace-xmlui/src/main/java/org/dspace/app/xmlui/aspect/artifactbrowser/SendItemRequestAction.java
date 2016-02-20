@@ -150,7 +150,7 @@ public class SendItemRequestAction extends AbstractAction
      * @return
      * @throws SQLException
      */
-    protected String getLinkTokenEmail(Context context, RequestItem requestItem)
+    public String getLinkTokenEmail(Context context, RequestItem requestItem)
             throws SQLException
     {
         String base = ConfigurationManager.getProperty("dspace.url");

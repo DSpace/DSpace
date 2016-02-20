@@ -358,8 +358,6 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        	hi.addContent(".");
 	        }
         }
-        
-        
         Item buttons = identity.addItem();
         if (admin)
         {

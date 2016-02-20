@@ -34,6 +34,7 @@
     
     <map:selectors>
       <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
+      <map:selector name="AuthenticatedOrTokenSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedOrTokenSelector"/>
     </map:selectors>
     
     <map:matchers default="wildcard">
@@ -57,7 +58,7 @@
     <map:pipeline>
     
       <!-- Make sure the user is atleast logged in -->
-      <map:select type="AuthenticatedSelector">
+      <map:select type="AuthenticatedOrTokenSelector">
         <map:when test="eperson">
           
           <!--

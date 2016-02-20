@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.dspace.browse.BrowseItem;
+import org.dspace.content.AuthorProfile;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -359,6 +360,13 @@ public class DSpaceValidity implements SourceValidity
             
             validityKey.append(group.getID());
             validityKey.append(group.getName());
+        }
+        else if (dso instanceof AuthorProfile){
+        	AuthorProfile author = (AuthorProfile) dso;
+        	validityKey.append("AuthorProfile:");
+        	validityKey.append(author.getID());
+        	validityKey.append(author.getName());
+        	validityKey.append(author.getHandle());
         }
         else
         {

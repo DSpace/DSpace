@@ -108,7 +108,7 @@ public class IndexClient {
 
         if (line.hasOption("r")) {
             log.info("Removing " + line.getOptionValue("r") + " from Index");
-            indexer.unIndexContent(context, line.getOptionValue("r"));
+            indexer.unIndexContentByHandle(context, line.getOptionValue("r"));
         } else if (line.hasOption("c")) {
             log.info("Cleaning Index");
             indexer.cleanIndex(line.hasOption("f"));

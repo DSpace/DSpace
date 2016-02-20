@@ -50,7 +50,11 @@ public class SearchUtils {
         if(dso == null){
             result = configurationService.getMap().get("site");
         }else{
-            result = configurationService.getMap().get(dso.getHandle());
+            if(dso instanceof AuthorProfile){
+                result = configurationService.getMap().get("author-profile");
+            } else {
+                result = configurationService.getMap().get(dso.getHandle());
+            }
         }
 
         if(result == null){

@@ -9,25 +9,25 @@
 -->
 
 <xsl:stylesheet
-    xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
-    xmlns:dri="http://di.tamu.edu/DRI/1.0/"
-    xmlns:mets="http://www.loc.gov/METS/"
-    xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
-    xmlns:xlink="http://www.w3.org/TR/xlink/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-    xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:xalan="http://xml.apache.org/xalan"
-    xmlns:encoder="xalan://java.net.URLEncoder"
-    xmlns:stringescapeutils="org.apache.commons.lang3.StringEscapeUtils"
-    xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
-    exclude-result-prefixes="xalan encoder i18n dri mets dim  xlink xsl util stringescapeutils">
+        xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+        xmlns:dri="http://di.tamu.edu/DRI/1.0/"
+        xmlns:mets="http://www.loc.gov/METS/"
+        xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
+        xmlns:xlink="http://www.w3.org/TR/xlink/"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:xalan="http://xml.apache.org/xalan"
+        xmlns:encoder="xalan://java.net.URLEncoder"
+        xmlns:stringescapeutils="org.apache.commons.lang3.StringEscapeUtils"
+        xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
+        exclude-result-prefixes="xalan encoder i18n dri mets dim  xlink xsl util stringescapeutils">
 
     <xsl:output indent="yes"/>
 
-<!--
-    These templates are devoted to rendering the search results for discovery.
-    Since discovery used hit highlighting seperate templates are required !
--->
+    <!--
+        These templates are devoted to rendering the search results for discovery.
+        Since discovery used hit highlighting seperate templates are required !
+    -->
 
 
     <xsl:template match="dri:list[@type='dsolist']" priority="2">
@@ -41,27 +41,27 @@
     </xsl:template>
 
     <xsl:template match="dri:list/dri:list/dri:list" mode="dsoList" priority="8">
-            <!--
-                Retrieve the type from our name, the name contains the following format:
-                    {handle}:{metadata}
-            -->
-            <xsl:variable name="handle">
-                <xsl:value-of select="substring-before(@n, ':')"/>
-            </xsl:variable>
-            <xsl:variable name="type">
-                <xsl:value-of select="substring-after(@n, ':')"/>
-            </xsl:variable>
-            <xsl:variable name="externalMetadataURL">
-                <xsl:text>cocoon://metadata/handle/</xsl:text>
-                <xsl:value-of select="$handle"/>
-                <xsl:text>/mets.xml</xsl:text>
-                <!-- Since this is a summary only grab the descriptive metadata, and the thumbnails -->
-                <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
-                <!-- An example of requesting a specific metadata standard (MODS and QDC crosswalks only work for items)->
-                <xsl:if test="@type='DSpace Item'">
-                    <xsl:text>&amp;dmdTypes=DC</xsl:text>
-                </xsl:if>-->
-            </xsl:variable>
+        <!--
+            Retrieve the type from our name, the name contains the following format:
+                {handle}:{metadata}
+        -->
+        <xsl:variable name="handle">
+            <xsl:value-of select="substring-before(@n, ':')"/>
+        </xsl:variable>
+        <xsl:variable name="type">
+            <xsl:value-of select="substring-after(@n, ':')"/>
+        </xsl:variable>
+        <xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon://metadata/handle/</xsl:text>
+            <xsl:value-of select="$handle"/>
+            <xsl:text>/mets.xml</xsl:text>
+            <!-- Since this is a summary only grab the descriptive metadata, and the thumbnails -->
+            <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
+            <!-- An example of requesting a specific metadata standard (MODS and QDC crosswalks only work for items)->
+            <xsl:if test="@type='DSpace Item'">
+                <xsl:text>&amp;dmdTypes=DC</xsl:text>
+            </xsl:if>-->
+        </xsl:variable>
 
 
         <xsl:choose>
@@ -123,12 +123,12 @@
                 </xsl:if>
             </a>
             <div class="artifact-info">
-            <xsl:if test="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item">
-                <p>
-                    <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1]"/>
-                </p>
-            </xsl:if>
-        </div>
+                <xsl:if test="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item">
+                    <p>
+                        <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1]"/>
+                    </p>
+                </xsl:if>
+            </div>
 
         </div>
     </xsl:template>
@@ -240,7 +240,7 @@
                                 <i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
                             </xsl:otherwise>
                         </xsl:choose>
-                        </small></span>
+                    </small></span>
                     <xsl:text> </xsl:text>
                     <xsl:if test="dri:list[@n=(concat($handle, ':dc.date.issued'))]">
                         <span class="publisher-date h4">   <small>
@@ -256,7 +256,7 @@
                                         select="substring(dri:list[@n=(concat($handle, ':dc.date.issued'))]/dri:item,1,10)"/>
                             </span>
                             <xsl:text>)</xsl:text>
-                            </small></span>
+                        </small></span>
                     </xsl:if>
                     <xsl:choose>
                         <xsl:when test="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item/dri:hi">
@@ -279,10 +279,10 @@
                             </div>
                         </xsl:when>
                         <xsl:when test="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item">
-                        <div class="abstract">
+                            <div class="abstract">
                                 <xsl:value-of select="util:shortenString(dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1], 220, 10)"/>
-                        </div>
-                    </xsl:when>
+                            </div>
+                        </xsl:when>
                     </xsl:choose>
                 </div>
             </div>
@@ -373,6 +373,28 @@
         <xsl:apply-templates/>
     </xsl:template>
 
+    <xsl:template match="dri:div[@rend='deceive-discovery']">
+        <script type="text/javascript">
+            <xsl:text>
+                if (!window.DSpace) {
+                    window.DSpace = {};
+                }
+                if (!window.DSpace.discovery) {
+                    window.DSpace.discovery = {};
+                }
+                if (!window.DSpace.discovery.filters) {
+                    window.DSpace.discovery.filters = [];
+                }
+                            if (!window.DSpace.i18n) {
+                window.DSpace.i18n = {};
+            }
+            if (!window.DSpace.i18n.discovery) {
+                window.DSpace.i18n.discovery = {};
+            }
+            </xsl:text>
+        </script>
+    </xsl:template>
+
     <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.discovery-filters']/dri:row">
         <script type="text/javascript">
             <xsl:text>
@@ -447,7 +469,7 @@
             </xsl:call-template>
 
             <div>
-                    <xsl:apply-templates/>
+                <xsl:apply-templates/>
             </div>
         </div>
     </xsl:template>
@@ -595,6 +617,92 @@
                 <xsl:apply-templates select="$other_content_besides_gear"/>
             </div>
         </xsl:if>
+
+    </xsl:template>
+
+    <xsl:template
+            match="dri:options/dri:list[@id='aspect.discovery.Navigation.list.discovery']/dri:list[@id='aspect.discovery.SidebarFacetsTransformer.list.author' or @id='aspect.authorprofile.SidebarFacetsAuthorPageTransformer.list.author']/dri:item"
+            priority="4">
+        <li class="clearfix list-group-item">
+            <div class="row">
+
+                <xsl:variable name="last" select="substring-before(dri:xref/text(),',')"/>
+                <xsl:variable name="first" select="normalize-space(substring-after(dri:xref/text(),','))"/>
+                <xsl:choose>
+
+                    <xsl:when test="count(dri:xref)>0">
+                        <div class="col-xs-10 author-discover-item">
+                            <xsl:apply-templates select="dri:xref"/>
+                        </div>
+                        <div class="col-xs-2">
+                            <xsl:call-template name="author-decorate">
+
+                                <xsl:with-param name="currAuthor" select="dri:xref/text()" />
+                                <xsl:with-param name="pageMeta" select="$pagemeta"/>
+                                <xsl:with-param name="context-path" select="$context-path"/>
+
+                            </xsl:call-template>
+                        </div>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <div class="col-xs-10">
+                            <xsl:value-of select="normalize-space(substring-before(./text(),'('))"/>
+                        </div>
+                        <div class="col-xs-2">
+                            <xsl:call-template name="author-decorate">
+
+                                <xsl:with-param name="currAuthor" select="normalize-space(substring-before(./text(),'('))" />
+                                <xsl:with-param name="pageMeta" select="$pagemeta"/>
+                                <xsl:with-param name="context-path" select="$context-path"/>
+
+                            </xsl:call-template>
+                        </div>
+                    </xsl:otherwise>
+                </xsl:choose>
+
+            </div>
+        </li>
+    </xsl:template>
+
+    <xsl:template match="dri:xref[@rend='author-profile']">
+        <td>
+            <a class="author-profile">
+                <xsl:attribute name="href">
+                    <xsl:value-of select="@target"/>
+                </xsl:attribute>
+                <i class="glyphicon glyphicon-user"/>
+            </a>
+        </td>
+    </xsl:template>
+
+    <xsl:template name="author-decorate">
+        <xsl:param name="currAuthor"/>
+        <xsl:param name="pageMeta"/>
+        <xsl:param name="context-path"/>
+        <xsl:choose>
+            <xsl:when test="count($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor])>0 and count($pageMeta/dri:metadata[@element='currentauthorprofile' and @qualifier=$currAuthor])&lt;=0">
+                <a class="author-profile">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="$context-path"/>
+                        <xsl:text>/author-page?author=</xsl:text>
+                        <xsl:value-of
+                                select="encoder:encode($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor],'UTF-8')"/>
+                    </xsl:attribute>
+                    <i class="glyphicon glyphicon-user"></i>
+                </a>
+            </xsl:when>
+            <xsl:when test="count($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor])>0 and count($pageMeta/dri:metadata[@element='currentauthorprofile' and @qualifier=$currAuthor])>0">
+                <a class="author-profile-current">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="$context-path"/>
+                        <xsl:text>/author-page?author=</xsl:text>
+                        <xsl:value-of
+                                select="encoder:encode($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor],'UTF-8')"/>
+                    </xsl:attribute>
+                    <i class="glyphicon glyphicon-user"/>
+                </a>
+            </xsl:when>
+        </xsl:choose>
 
     </xsl:template>
 

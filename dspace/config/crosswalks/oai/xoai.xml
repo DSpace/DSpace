@@ -82,6 +82,23 @@
                 This contexts complies with OpenAIRE rules.
             </Description>
         </Context>
+
+        <!--
+            OPRM
+         -->
+        <Context baseurl="oprm" name="OPRM Context">
+            <!-- Date format, field prefixes, etc are ensured by the transformer -->
+            <Transformer ref="oprmTransformer"/>
+            <!-- OpenAIRE filter -->
+            <Filter ref="oprmFilter"/>
+            <!-- Just an alias, in fact it returns all items within the driver context -->
+            <Set ref="oprmSet"/>
+            <!-- Metadata Formats -->
+            <Format ref="oaidc"/>
+            <Description>
+                This contexts complies with OPRM rules.
+            </Description>
+        </Context>
     </Contexts>
 
 
@@ -176,6 +193,9 @@
         <Transformer id="openaireTransformer">
             <XSLT>transformers/openaire.xsl</XSLT>
         </Transformer>
+	<Transformer id="oprmTransformer">
+            <XSLT>transformers/oprm.xsl</XSLT>
+        </Transformer>
     </Transformers>
 
 
@@ -241,6 +261,33 @@
             </Definition>
         </Filter>
 
+        <Filter id="oprmFilter">
+            <Definition>
+                <And>
+                    <LeftCondition>
+                        <And>
+                            <LeftCondition>
+                                <Custom ref="titleExistsCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="authorExistsCondition"/>
+                            </RightCondition>
+                        </And>
+                    </LeftCondition>
+                    <RightCondition>
+                        <And>
+                            <LeftCondition>
+                                <Custom ref="clasificacionExistsCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="opinionExistsCondition"/>
+                            </RightCondition>
+                        </And>
+                    </RightCondition>
+                </And>
+            </Definition>
+        </Filter>
+
         <Filter id="uketdDcFilter">
             <Definition>
                 <Custom ref="thesisDocumentTypeCondition"/>
@@ -273,6 +320,20 @@
             <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
             <Configuration>
                 <string name="field">dc.title</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="clasificacionExistsCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <string name="field">oprm.clasificacion</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="opinionExistsCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <string name="field">oprm.opinion</string>
             </Configuration>
         </CustomCondition>
 
@@ -337,6 +398,11 @@
         <Set id="openaireSet">
             <Spec>ec_fundedresources</Spec>
             <Name>EC_fundedresources set</Name>
+            <!-- Just an alias -->
+        </Set>
+        <Set id="oprmSet">
+            <Spec>oprm</Spec>
+            <Name>OPRM set</Name>
             <!-- Just an alias -->
         </Set>
     </Sets>

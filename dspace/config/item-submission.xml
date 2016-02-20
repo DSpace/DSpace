@@ -17,7 +17,10 @@
  <!-- which does not appear in this map will be associated with the mapping-->
  <!-- for handle "default".                                                -->
  <submission-map>
-   <name-map collection-handle="default" submission-name="traditional" />
+  <!--  <name-map collection-handle="${openaire.coleccion.evaluaciones}" submission-name="openaire" />-->
+  <name-map collection-handle="${openaire.coleccion.evaluaciones}" submission-name="openaire" />
+  <name-map collection-handle="${openaire.coleccion.juicios}" submission-name="openaireJuicio" />
+  <name-map collection-handle="default" submission-name="traditional" />
  </submission-map>
 
 
@@ -108,7 +111,7 @@
      <!-- a special step, it is currently NEVER editable in a workflow.      -->                               
      <step id="complete">
        <heading>submit.progressbar.complete</heading>
-       <processing-class>org.dspace.submit.step.CompleteStep</processing-class>
+       <processing-class>es.arvo.dspace.submit.step.CompleteStep</processing-class>
        <jspui-binding>org.dspace.app.webui.submit.step.JSPCompleteStep</jspui-binding>
        <workflow-editable>false</workflow-editable>
      </step>
@@ -271,7 +274,196 @@
 
      
    </submission-process>
+   
+   
+   <submission-process name="openaire">
+     
+     <!--Uncommment to display the SAMPLE step as your first step-->
+     <!--<step id="sample"/>-->
+          
+     <!--Step 1 will be to gather initial information
+	  <step>
+	    <heading>submit.progressbar.initial-questions</heading>
+		<processing-class>org.dspace.submit.step.InitialQuestionsStep</processing-class>
+		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>   	    
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
+	    <workflow-editable>true</workflow-editable>
+	  </step>-->
+	
+	<!--If you disable the initial questions step you should insert the -->
+	<!--SkipInitialQuestionsStep below, to enable proper processing of  -->
+	<!--input-forms configuration                                       -->
+	<!--  --> 
+	<step>
+		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
+	</step>
+    
+      
+      <!--Step 2 will be to Describe the item.-->
+      <step>
+        <heading>submit.progressbar.revision</heading>
+        <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPDescribeStep</jspui-binding>
+		<xmlui-binding>es.arvo.dspace.app.xmlui.aspect.submission.submit.DescribeRevisionStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>
 
+       <!--Step 3 will be to Manage Item access.
+       <step>
+           <heading>submit.progressbar.access</heading>
+           <processing-class>org.dspace.submit.step.AccessStep</processing-class>
+           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.AccessStep</xmlui-binding>
+           <workflow-editable>true</workflow-editable>
+       </step>
+       -->
+
+      <!--Step 4 will be to Upload the item-->
+      <!-- ARVO: Deshabilitamos la subida de ficheros especial ( si eras de bbdd no era obligatorio y si eras de mail si)
+      	Quiza en un futuro vuelvan a quererla -->
+     <!--  <step>
+        <heading>submit.progressbar.upload</heading>
+        <processing-class>es.arvo.dspace.submit.step.UploadStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
+		<xmlui-binding>es.arvo.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>
+ -->
+       <!-- Step 4 Upload Item with Embargo Features (not supported in JSPUI)
+            to enable this step, please make sure to comment-out the previous step "UploadStep"
+       <step>
+           <heading>submit.progressbar.upload</heading>
+           <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
+           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadWithEmbargoStep</xmlui-binding>
+           <workflow-editable>true</workflow-editable>
+       </step>
+        -->
+
+ 	  <!--Step 5 will be to Verify/Review everything -->
+ 	  <step>
+        <heading>submit.progressbar.verify</heading>
+        <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
+ 	    <jspui-binding>org.dspace.app.webui.submit.step.JSPVerifyStep</jspui-binding>
+		<xmlui-binding>es.arvo.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
+		<workflow-editable>true</workflow-editable>
+      </step>
+
+      <!--Step 6 will be to select a Creative Commons License-->
+      <!-- Uncomment this step to allow the user to select a Creative Commons license 
+       
+      <step>
+        <heading>submit.progressbar.CClicense</heading>
+        <processing-class>org.dspace.submit.step.CustomCCLicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.CustomCCLicenseStep</xmlui-binding>
+		<workflow-editable>false</workflow-editable>
+      </step>-->
+     
+
+      <!--Step 7 will be to Sign off on the License
+      <step>
+        <heading>submit.progressbar.license</heading>
+        <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
+		<workflow-editable>false</workflow-editable>
+      </step>-->
+
+
+     
+   </submission-process>
+
+<submission-process name="openaireJuicio">
+     
+     <!--Uncommment to display the SAMPLE step as your first step-->
+     <!--<step id="sample"/>-->
+          
+     <!--Step 1 will be to gather initial information
+	  <step>
+	    <heading>submit.progressbar.initial-questions</heading>
+		<processing-class>org.dspace.submit.step.InitialQuestionsStep</processing-class>
+		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>   	    
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
+	    <workflow-editable>true</workflow-editable>
+	  </step>-->
+	
+	<!--If you disable the initial questions step you should insert the -->
+	<!--SkipInitialQuestionsStep below, to enable proper processing of  -->
+	<!--input-forms configuration                                       -->
+	<!--  --> 
+	<step>
+		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
+	</step>
+    
+      
+      <!--Step 2 will be to Describe the item.-->
+      <step>
+        <heading>submit.progressbar.juicio</heading>
+        <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPDescribeStep</jspui-binding>
+		<xmlui-binding>es.arvo.dspace.app.xmlui.aspect.submission.submit.DescribeJuicioStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>
+
+       <!--Step 3 will be to Manage Item access.
+       <step>
+           <heading>submit.progressbar.access</heading>
+           <processing-class>org.dspace.submit.step.AccessStep</processing-class>
+           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.AccessStep</xmlui-binding>
+           <workflow-editable>true</workflow-editable>
+       </step>
+       -->
+
+      <!--Step 4 will be to Upload the item
+      <step>
+        <heading>submit.progressbar.upload</heading>
+        <processing-class>es.arvo.dspace.submit.step.UploadStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
+		<xmlui-binding>es.arvo.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>-->
+
+       <!-- Step 4 Upload Item with Embargo Features (not supported in JSPUI)
+            to enable this step, please make sure to comment-out the previous step "UploadStep"
+       <step>
+           <heading>submit.progressbar.upload</heading>
+           <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
+           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadWithEmbargoStep</xmlui-binding>
+           <workflow-editable>true</workflow-editable>
+       </step>
+        -->
+
+ 	  <!--Step 5 will be to Verify/Review everything -->
+ 	  <step>
+        <heading>submit.progressbar.verify</heading>
+        <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
+ 	    <jspui-binding>org.dspace.app.webui.submit.step.JSPVerifyStep</jspui-binding>
+		<xmlui-binding>es.arvo.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
+		<workflow-editable>true</workflow-editable>
+      </step>
+
+      <!--Step 6 will be to select a Creative Commons License-->
+      <!-- Uncomment this step to allow the user to select a Creative Commons license 
+       
+      <step>
+        <heading>submit.progressbar.CClicense</heading>
+        <processing-class>org.dspace.submit.step.CustomCCLicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.CustomCCLicenseStep</xmlui-binding>
+		<workflow-editable>false</workflow-editable>
+      </step>-->
+     
+
+      <!--Step 7 will be to Sign off on the License
+      <step>
+        <heading>submit.progressbar.license</heading>
+        <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
+		<workflow-editable>false</workflow-editable>
+      </step>-->
+    
+   </submission-process>
+   
  </submission-definitions>
 
 </item-submission>
