@@ -138,14 +138,19 @@ public interface BitstreamStorageService {
      * which are more than 1 hour old and marked deleted. The deletions cannot
      * be undone.
      *
-     * @param deleteDbRecords if true deletes the database records otherwise it
-     * 	           only deletes the files and directories in the assetstore
-     * @exception IOException
+     * @param deleteDbRecords if true deletes the files and the database records;
+     *              otherwise it only deletes the files and directories in the assetstore.
+     * @param verbose show each operation as it is done.
+     *
+     * @throws IOException
      *                If a problem occurs while cleaning up
-     * @exception SQLException
+     * @throws SQLException
      *                If a problem occurs accessing the RDBMS
+     * @throws AuthorizeException
+     *                If the user is not authorized.
      */
-    public void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException, AuthorizeException;
+    public void cleanup(boolean deleteDbRecords, boolean verbose)
+            throws SQLException, IOException, AuthorizeException;
 
     public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException;
 
