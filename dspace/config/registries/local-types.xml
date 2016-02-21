@@ -93,5 +93,18 @@
         <qualifier>pmltq</qualifier>
         <scope_note>Links to data in PML-TQ</scope_note>
     </dc-type>
+	<dc-type>
+        <schema>local</schema>
+        <element>bitstream</element>
+        <qualifier>file</qualifier>
+        <scope_note>Files inside a bitstream if an archive</scope_note>
+    </dc-type>
+	<dc-type>
+        <schema>local</schema>
+        <element>bitstream</element>
+        <qualifier>info</qualifier>
+        <scope_note>Arbitrary info seprated key and value with |</scope_note>
+    </dc-type>
 </dspace-dc-types>
+
 

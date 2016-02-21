@@ -23,9 +23,7 @@ import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
@@ -192,15 +190,28 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		userFormat.setHelp(T_user_help);
 		userFormat.setValue(bitstream.getUserFormatDescription());
 
-
+		// Local fields
+		List localMetadata = edit.addList("localMetadata");
+		//localMetadata.setLabel("Local metadata");
+		localMetadata.setHead("Local Metadata");
+		for (Metadatum m : bitstream.getMetadata("local", "bitstream", Item.ANY, Item.ANY)) {
+			String title = "local_bitstream_" + ((null != m.qualifier) ? m.qualifier : "");
+			Text t = localMetadata.addItem().addText(title);
+			t.setValue(m.value);
+			t.setSize(50);
+			t.setHelp(title);
+		}
+		localMetadata.addLabel("List of additional metadata in local.bitstream.*");
 
 
 		// ITEM: form actions
 		org.dspace.app.xmlui.wing.element.Item actions = edit.addItem();
 		actions.addButton("submit_save").setValue(T_submit_save);
 		actions.addButton("submit_cancel").setValue(T_submit_cancel);
+		actions.addButton("submit_clear_local_metadata").setValue("Clear Local Metadata");
 
 		div.addHidden("administrative-continue").setValue(knot.getId()); 
 
 	}
 }
+
