@@ -107,11 +107,10 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
             {
                 List<String> prefixes = new ArrayList<String>();
                 prefixes.add(handleService.getPrefix());
-                String additionalPrefixes = DSpaceServicesFactory.getInstance().getConfigurationService()
-                        .getProperty("handle.additional.prefixes");
-                if (StringUtils.isNotBlank(additionalPrefixes))
+                String[] additionalPrefixes = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("handle.additional.prefixes");
+                if (additionalPrefixes != null)
                 {
-                    for (String apref : additionalPrefixes.split(","))
+                    for (String apref : additionalPrefixes)
                     {
                         prefixes.add(apref.trim());
                     }

@@ -152,8 +152,8 @@ public class FlowCurationUtils
      */
     protected static String getUITaskName(String taskID)
     {       
-            String tasksString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.tasknames");
-            String[] tasks = tasksString.split(",");
+            String[] tasks = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("curate.ui.tasknames");
+
             for (String task : tasks)
             {
                 //retrieve keyValuePair (format [taskID]=[UI Task Name])

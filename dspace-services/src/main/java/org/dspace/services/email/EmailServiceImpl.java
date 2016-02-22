@@ -108,12 +108,11 @@ public class EmailServiceImpl
             }
 
             // Set extra configuration properties
-            String extras = cfg.getProperty("mail.extraproperties");
-            if ((extras != null) && (!"".equals(extras.trim())))
+            String[] extras = cfg.getArrayProperty("mail.extraproperties");
+            if (extras != null)
             {
-                String arguments[] = extras.split(",");
                 String key, value;
-                for (String argument : arguments)
+                for (String argument : extras)
                 {
                     key = argument.substring(0, argument.indexOf('=')).trim();
                     value = argument.substring(argument.indexOf('=') + 1).trim();
