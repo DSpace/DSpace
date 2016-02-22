@@ -44,6 +44,14 @@ public class ResumableUploadStep extends UploadStep{
     private static final Message T_deleteunmatch_message =
             message("xmlui.Submission.submit.ResumableUploadStep.dialog.deleteunmatch");
 
+    private static final Message T_primary_help =
+            message("xmlui.Submission.submit.ResumableUploadStep.primary_help");
+    private static final Message T_select_help =
+            message("xmlui.Submission.submit.ResumableUploadStep.select_help");
+    private static final Message T_info_help =
+            message("xmlui.Submission.submit.ResumableUploadStep.info_help");
+
+    
     private static final Message T_upload_error =
             message("xmlui.Submission.submit.ResumableUploadStep.error");
 
@@ -141,6 +149,9 @@ public class ResumableUploadStep extends UploadStep{
         messages.addHidden("text-delete-msg").setValue(T_delete_message);
         messages.addHidden("text-delete-sf").setValue(T_deletesf_message);
         messages.addHidden("text-delete-unmatch").setValue(T_deleteunmatch_message);
+        messages.addHidden("text-primary-help").setValue(T_primary_help);
+        messages.addHidden("text-select-help").setValue(T_select_help);
+        messages.addHidden("text-info-help").setValue(T_info_help);
         
         uploadDiv.addPara("error-message", "alert alert-danger hide").addContent(T_upload_error);
         
