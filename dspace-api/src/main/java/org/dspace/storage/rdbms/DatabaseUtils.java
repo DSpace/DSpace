@@ -31,6 +31,7 @@ import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
@@ -406,14 +407,9 @@ public class DatabaseUtils
                 // NOTE: this also loads migrations from any sub-package
                 scriptLocations.add("classpath:org.dspace.storage.rdbms.migration");
 
-                // Special scenario: If XMLWorkflows are enabled, we need to run its migration(s)
-                // as it REQUIRES database schema changes. XMLWorkflow uses Java migrations
-                // which first check whether the XMLWorkflow tables already exist
-                String framework = config.getProperty("workflow.framework");
-                if (framework!=null && framework.equals("xmlworkflow"))
-                {
-                    scriptLocations.add("classpath:org.dspace.storage.rdbms.xmlworkflow");
-                }
+                //Add all potential workflow migration paths
+                List<String> workflowFlywayMigrationLocations = WorkflowServiceFactory.getInstance().getWorkflowService().getFlywayMigrationLocations();
+                scriptLocations.addAll(workflowFlywayMigrationLocations);
 
                 // Now tell Flyway which locations to load SQL / Java migrations from
                 log.info("Loading Flyway DB migrations from: " + StringUtils.join(scriptLocations, ", "));

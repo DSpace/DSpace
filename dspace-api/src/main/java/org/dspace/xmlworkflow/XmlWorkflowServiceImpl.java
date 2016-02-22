@@ -151,6 +151,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     }
 
     @Override
+    public List<String> getFlywayMigrationLocations() {
+        return Collections.singletonList("classpath:org.dspace.storage.rdbms.xmlworkflow");
+    }
+
+    @Override
     public XmlWorkflowItem start(Context context, WorkspaceItem wsi) throws SQLException, AuthorizeException, IOException, WorkflowException {
         try {
             Item myitem = wsi.getItem();

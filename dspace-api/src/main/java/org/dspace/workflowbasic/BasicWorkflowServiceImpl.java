@@ -1089,4 +1089,9 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
 		}
         return roleGroup;
     }
+
+    @Override
+    public List<String> getFlywayMigrationLocations() {
+        return Collections.emptyList();
+    }
 }

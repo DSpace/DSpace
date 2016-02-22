@@ -10,12 +10,13 @@ package org.dspace.storage.rdbms.xmlworkflow;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.storage.rdbms.DatabaseUtils;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 import org.flywaydb.core.internal.util.scanner.classpath.ClassPathResource;
 
 import java.sql.Connection;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -30,8 +31,8 @@ public class V6_0_2015_09_01__DS_2701_Enable_XMLWorkflow_Migration implements Jd
 
     @Override
     public void migrate(Connection connection) throws Exception {
-                // Make sure XML Workflow is enabled in workflow.cfg before proceeding
-        if (StringUtils.equals(ConfigurationManager.getProperty("workflow.framework"), "xmlworkflow"))
+        // Make sure XML Workflow is enabled, shouldn't even be needed since this class is only loaded if the service is enabled.
+        if (WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService)
         {
             // Now, check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
             // If XMLWorkflow Table does NOT exist in this database, then lets do the migration!
