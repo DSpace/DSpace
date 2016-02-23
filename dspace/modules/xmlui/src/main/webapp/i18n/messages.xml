@@ -853,9 +853,6 @@
 	<message key="xmlui.Submission.submit.ResumableUploadStep.info">Info</message>
 	<message key="xmlui.Submission.submit.ResumableUploadStep.delete">Delete</message>
 	<message key="xmlui.Submission.submit.ResumableUploadStep.clickdrop">Click or drag and drop here to upload files</message>
-	<message key="xmlui.Submission.submit.ResumableUploadStep.primary_help">Choose primary bitstream of item</message>
-	<message key="xmlui.Submission.submit.ResumableUploadStep.select_help">Select files to be deleted</message>
-	<message key="xmlui.Submission.submit.ResumableUploadStep.info_help">Click to show further information on file</message>
 	<message key="xmlui.Submission.submit.ResumableUploadStep.dialog.delete">Are you sure you want to delete</message>
 	<message key="xmlui.Submission.submit.ResumableUploadStep.dialog.deletesf">selected files</message>
 	<message key="xmlui.Submission.submit.ResumableUploadStep.dialog.deleteunmatch">The file that will be deleted does not match the one you selected, Do you want to continue</message>

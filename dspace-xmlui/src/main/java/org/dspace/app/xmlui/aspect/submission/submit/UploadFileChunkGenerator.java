@@ -17,8 +17,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class UploadFileChunkGenerator extends AbstractGenerator
-{
+public class UploadFileChunkGenerator extends AbstractGenerator{
     private static final Logger log = Logger.getLogger(UploadFileChunkGenerator.class);
     private Bitstream bitstream;
     private String error;
@@ -39,28 +38,50 @@ public class UploadFileChunkGenerator extends AbstractGenerator
             
             this.error = par.getParameter("error");
         }
-        catch(ParameterException ex){}
+        catch(ParameterException ex){
+            log.warn(ex);
+        }
         catch(SQLException ex){
             log.error(ex);
         }
     } 
     
     @Override
-    public void generate() throws IOException, SAXException, ProcessingException
-    {
+    public void generate() throws IOException, SAXException, ProcessingException {
         contentHandler.startDocument();
+        
         contentHandler.startElement("", "upload", "upload", new AttributesImpl());
         
-        if(this.bitstream != null)
-        {
-            this.addElement(contentHandler, "bitstreamId", String.valueOf(this.bitstream.getID()));
-            this.addElement(contentHandler, "size", Long.toString(this.bitstream.getSize()));
-            this.addElement(contentHandler, "format", this.bitstream.getFormat().getShortDescription());
-            this.addElement(contentHandler, "checksum", this.bitstream.getChecksumAlgorithm() + ":" + this.bitstream.getChecksum());
-            this.addElement(contentHandler, "sequenceId", String.valueOf(this.bitstream.getSequenceID()));
+        if(this.bitstream != null){
+            contentHandler.startElement("", "bitstreamId", "bitstreamId", emptyAttr);
+            String id = String.valueOf(this.bitstream.getID());
+            contentHandler.characters(id.toCharArray(), 0, id.length());
+            contentHandler.endElement("","bitstreamId", "bitstreamId");
+
+            contentHandler.startElement("", "size", "size", emptyAttr);
+            String size = Long.toString(this.bitstream.getSize());
+            contentHandler.characters(size.toCharArray(), 0, size.length());
+            contentHandler.endElement("","size", "size");
+
+            contentHandler.startElement("", "format", "format", emptyAttr);
+            String format = this.bitstream.getFormat().getShortDescription();
+            contentHandler.characters(format.toCharArray(), 0, format.length());
+            contentHandler.endElement("","format", "format");
+
+            contentHandler.startElement("", "checksum", "checksum", emptyAttr);
+            String checksum = this.bitstream.getChecksumAlgorithm() + ":" + this.bitstream.getChecksum(); 
+            contentHandler.characters(checksum.toCharArray(), 0, checksum.length());
+            contentHandler.endElement("","checksum", "checksum");
+            
+            contentHandler.startElement("", "sequenceId", "sequenceId", emptyAttr);
+            String sId = String.valueOf(this.bitstream.getSequenceID()); 
+            contentHandler.characters(sId.toCharArray(), 0, sId.length());
+            contentHandler.endElement("","sequenceId", "sequenceId");
         }
         
+        log.info("* "  + this.error);
         if(this.error != null && this.error.length() > 0){
+            log.info("**");
             this.addElement(contentHandler, "errorkey", this.error);
         }
 

@@ -48,16 +48,14 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 
-public class UploadFileChunk extends AbstractAction
-{
+public class UploadFileChunk extends AbstractAction{
     private static final Logger log = Logger.getLogger(UploadFileChunk.class);
     
     private static String tempDir;    
     private String submissionDir;
     private String chunkDir;
     
-    static
-    {
+    static{
         if (ConfigurationManager.getProperty("upload.temp.dir") != null)
         {
             tempDir = ConfigurationManager.getProperty("upload.temp.dir");
@@ -67,8 +65,7 @@ public class UploadFileChunk extends AbstractAction
         }
     }
     
-    private void init(Request request)
-    {
+    private void init(Request request){
         // parent directory containing all bitstreams related to a submission
         this.submissionDir = tempDir + File.separator + request.getParameter("submissionId");
         
@@ -77,16 +74,13 @@ public class UploadFileChunk extends AbstractAction
         
         // create upload directories if required
         File uploadDir = new File(this.submissionDir);
-        if(!uploadDir.exists())
-        {
+        if (!uploadDir.exists()) {
             uploadDir.mkdir();
         }
         
-        if(this.chunkDir != null && this.chunkDir.length() > 0)
-        { 
+        if(this.chunkDir != null && this.chunkDir.length() > 0){ 
             File finalDir = new File(this.chunkDir);
-            if (!finalDir.exists())
-            {
+            if (!finalDir.exists()) {
                 finalDir.mkdir();
             }
         }
@@ -114,37 +108,31 @@ public class UploadFileChunk extends AbstractAction
         
         if(request.getMethod().equals("GET"))
         {
-            if(doGetResumable(request, response))
-            {
+            if(doGetResumable(request, response)){
                 log.info("ok");
             }
             
             returnValues = new HashMap<String, String>();
         }
-        else if(request.getMethod().equals("POST"))
-        {
+        else if(request.getMethod().equals("POST")){
             returnValues = new HashMap<String, String>();
             File completedFile = doPostResumable(request);
             
-            if(completedFile != null)
-            {
+            if(completedFile != null){
                 SubmissionInfo si = FlowUtils.obtainSubmissionInfo(objectModel, 'S' + request.getParameter("submissionId"));
                 Item item = si.getSubmissionItem().getItem();
                 Context context = ContextUtil.obtainContext(objectModel);
                 Bitstream b = this.createBitstream(context, completedFile, item);
 
                 // delete upload 
-                if(!deleteDirectory(new File(this.submissionDir)))
-                {
+                if (!deleteDirectory(new File(this.submissionDir))){
                     log.warn("Coudln't delete submission upload path " + this.submissionDir + ", ignoring it.");
                 }
 
-                if(b == null)
-                {
+                if(b == null){
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 }
-                else
-                {
+                else{
                     log.info("bitstream created " + b.getID());
                     log.info(b.getBundles().length);
 
@@ -152,15 +140,12 @@ public class UploadFileChunk extends AbstractAction
                     returnValues.put("bitstream", String.valueOf(b.getID()));
                 }
             }
-            else
-            {
+            else{
                 returnValues.put("status", "200");
             }
         }
-        else if(request.getMethod().equals("DELETE"))
-        {
-            if(this.doDeleteResumable(request, objectModel))
-            {
+        else if(request.getMethod().equals("DELETE")){
+            if(this.doDeleteResumable(request, objectModel)){
                 returnValues = new HashMap<String, String>();
                 returnValues.put("status", "200");
             }
@@ -181,23 +166,19 @@ public class UploadFileChunk extends AbstractAction
                 Long.valueOf(request.getParameter("resumableCurrentChunkSize"));
 
         String chunkPath;
-        if(resumableTotalChunks == 1)
-        {
+        if(resumableTotalChunks == 1){
             // there is only one chunk give it the name of the file
             chunkPath = this.submissionDir + File.separator + request.getParameter("resumableFilename").toString(); 
         }
-        else
-        {
+        else{
             // use the String "part" and the chunkNumber as filename of a chunk
             chunkPath = this.chunkDir + File.separator + "part" + request.getParameter("resumableChunkNumber").toString();
         }
         
         File chunkFile = new File(chunkPath);
         // if the chunk was uploaded already, we send a status code of 200
-        if(chunkFile.exists())
-        {
-            if(chunkFile.length() == resumableCurrentChunkSize)
-            {
+        if (chunkFile.exists()) {
+            if (chunkFile.length() == resumableCurrentChunkSize) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 exists = true;
             }
@@ -221,19 +202,17 @@ public class UploadFileChunk extends AbstractAction
             throws FileSizeLimitExceededException, IOException, ServletException 
     {
         File completedFile = null;
-        
+                
+        long resumableTotalSize = Long.valueOf(request.get("resumableTotalSize").toString());
         int resumableTotalChunks = Integer.parseInt(request.get("resumableTotalChunks").toString());
-        int resumableChunkNumber = Integer.parseInt(request.get("resumableChunkNumber").toString());
         
         // determine name of chunk
         String chunkPath;
-        if(resumableTotalChunks == 1)
-        {
+        if(resumableTotalChunks == 1){
             // there is only one chunk give it the name of the file
             chunkPath = this.submissionDir + File.separator + request.get("resumableFilename").toString(); 
         }
-        else
-        {
+        else{
             chunkPath = this.chunkDir + File.separator + "part" + request.get("resumableChunkNumber").toString();
         }
         
@@ -241,39 +220,36 @@ public class UploadFileChunk extends AbstractAction
         // now move it to temporary directory
         File chunkOrg = ((PartOnDisk)request.get("file")).getFile();
         File chunk = new File(chunkPath);
-        chunkOrg.renameTo(chunk);
+        chunkOrg.renameTo(new File(chunkPath));
         
         log.info("rename file " + ((PartOnDisk)request.get("file")).getFile() + " to " + chunkPath);
         
-        boolean foundAll = false;
+        boolean foundAll = true;
+        long currentSize = 0l;
         
-        if(resumableTotalChunks > 1)
-        {
-        	if(resumableChunkNumber == resumableTotalChunks)
-        	{
-        		if(new File(this.chunkDir).listFiles().length == resumableTotalChunks)
-        		{
-        		    foundAll = true;
-        		}
-        		else
-        		{
-        		    throw new RuntimeException("Missing chunks");
-        		}        	
+        if (resumableTotalChunks > 1){
+            for (int p = 1; p <= resumableTotalChunks; p++){
+                File file = new File(this.chunkDir + File.separator + "part" + Integer.toString(p));
+                if (!file.exists()) 
+                {
+                    foundAll = false;
+                    break;
+                }
+                
+                currentSize += file.length();
             }
             
-            if (foundAll) 
+            if (foundAll && currentSize >= resumableTotalSize) 
             {
-                try
-                {
+                log.info("*");
+                try {
                     // assemble the file from it chunks.
                     File file = makeFileFromChunks(request);
-                    if (file != null)
-                    {
+                    log.info("** " + file);
+                    if (file != null){
                         completedFile = file;
                     }
-                }
-                catch (IOException ex)
-                {
+                } catch (IOException ex) {
                     log.error("* error * " + ex);
                     // if the assembling of a file results in an IOException a
                     // retransmission has to be triggered. Throw the IOException
@@ -282,8 +258,7 @@ public class UploadFileChunk extends AbstractAction
                 }
             }
         }
-        else
-        {
+        else{
             log.info(chunkPath + " Uploaded");
             
             completedFile = chunk;
@@ -292,8 +267,7 @@ public class UploadFileChunk extends AbstractAction
         return completedFile;
     }    
     
-    protected boolean doDeleteResumable(Request request, @SuppressWarnings("rawtypes") Map objectModel)
-    {
+    protected boolean doDeleteResumable(Request request, @SuppressWarnings("rawtypes") Map objectModel){
         boolean success = false;
         
         try
@@ -301,16 +275,14 @@ public class UploadFileChunk extends AbstractAction
             Context context = ContextUtil.obtainContext(objectModel);
             String sBid = request.getParameter("bitstreamId");
             
-            if(sBid != null && sBid.length() > 0)
-            {
+            if(sBid != null && sBid.length() > 0){
                 // delete bitstream from dspace item
                 int bid = Integer.parseInt(sBid);
 
                 //request.get("resumableFilename").toString();
                 Bitstream bitstream = Bitstream.find(context, bid);
 
-                if(bitstream != null)
-                {
+                if(bitstream != null){
                     log.info("delete " + bitstream.getID());
 
                     // remove bitstream from bundle..
@@ -320,7 +292,7 @@ public class UploadFileChunk extends AbstractAction
                     Bitstream[] bitstreams = bundles[0].getBitstreams();
 
                     // remove bundle if it's now empty
-                    if(bitstreams.length < 1)
+                    if (bitstreams.length < 1)
                     {
                         SubmissionInfo si = FlowUtils.obtainSubmissionInfo(objectModel, 'S' + request.getParameter("submissionId"));
                         Item item = si.getSubmissionItem().getItem();
@@ -331,16 +303,14 @@ public class UploadFileChunk extends AbstractAction
 
                     success = true;
                 }
-                else
-                {
+                else{
+                    
                     log.error("Bitstream " + bid + " not found. Can't delete");
                 }
             }
-            else
-            {
+            else{
                 // delete incomplete upload from disk
-                if(!deleteDirectory(new File(this.chunkDir)))
-                {
+                if(!deleteDirectory(new File(this.chunkDir))){
                     log.warn("Could not delete incomplete upload: " + chunkDir);
                 }
                 else{
@@ -353,12 +323,10 @@ public class UploadFileChunk extends AbstractAction
         {
             log.error("Invalid bitstream id " + request.getParameter("bitstreamId") + " Can't delete");
         }
-        catch(SQLException ex)
-        {
+        catch(SQLException ex){
             log.error(ex);
         }
-        catch(AuthorizeException ex)
-        {
+        catch(AuthorizeException ex){
             log.error(ex);
         }
         catch(IOException ex){
@@ -379,6 +347,7 @@ public class UploadFileChunk extends AbstractAction
 
         String destFilePath = this.submissionDir + File.separator + resumableFilename;
         destFile = new File(destFilePath);
+        InputStream is = null;
         OutputStream os = null;
 
         try {
@@ -390,7 +359,7 @@ public class UploadFileChunk extends AbstractAction
                 File fi = new File(chunkPath.concat(Integer.toString(i)));
                 try 
                 {
-                    InputStream is = new FileInputStream(fi);
+                    is = new FileInputStream(fi);
 
                     byte[] buffer = new byte[1024];
 
@@ -400,13 +369,7 @@ public class UploadFileChunk extends AbstractAction
                     {
                         os.write(buffer, 0, length);
                     }
-                    
-                    try 
-                    {
-                        is.close();
-                    } 
-                    catch (IOException ex){}
-                }
+                } 
                 catch (IOException e) 
                 {
                     log.warn(e);
@@ -427,6 +390,17 @@ public class UploadFileChunk extends AbstractAction
         {
             try 
             {
+                if (is != null) 
+                {
+                    is.close();
+                }
+            } 
+            catch (IOException ex) 
+            {
+                // nothing to do here
+            }
+            try 
+            {
                 if (os != null) 
                 {
                     os.close();
@@ -436,6 +410,8 @@ public class UploadFileChunk extends AbstractAction
             {
                 // nothing to do here
             }
+            
+            //this.deleteBitstreamDirectory();
         }
         
         return destFile;
@@ -445,24 +421,18 @@ public class UploadFileChunk extends AbstractAction
     {
         Bitstream b = null;
         int status = Curator.CURATE_SUCCESS;
-        String scan = ConfigurationManager.getProperty("submission-curation", "virus-scan");
-        if(!scan.equalsIgnoreCase("false"))
-        {
+        if(ConfigurationManager.getBooleanProperty("submission-curation", "virus-scan")){
             status = this.virusCheck(file);
         }
         
-        if(status == Curator.CURATE_ERROR)
-        {
+        if(status == Curator.CURATE_ERROR){
             log.error("Problem with virus checker");
         }
-        else if (status == Curator.CURATE_FAIL)
-        {
+        else if (status == Curator.CURATE_FAIL){
             log.warn(file + " failed virus check");
         }
-        else
-        {
-            try
-            {
+        else{
+            try{
                 FileInputStream fis = new FileInputStream(file);
 
                 // do we already have a bundle?
@@ -490,16 +460,13 @@ public class UploadFileChunk extends AbstractAction
                 b.update();
                 item.update();
             }
-            catch(FileNotFoundException ex)
-            {
-                log.error("Can't find file " + file + ": " + ex);
-            }
-            catch(SQLException ex)
-            {
+            catch(FileNotFoundException ex){
                 log.error(ex);
             }
-            catch(AuthorizeException ex)
-            {
+            catch(SQLException ex){
+                log.error(ex);
+            }
+            catch(AuthorizeException ex){
                 log.error(ex);
             }
             catch(IOException ex){
