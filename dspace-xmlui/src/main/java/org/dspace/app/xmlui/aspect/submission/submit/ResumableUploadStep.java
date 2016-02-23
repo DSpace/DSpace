@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
 import java.io.IOException;
@@ -16,12 +23,21 @@ import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.elasticsearch.index.mapper.ContentPath;
 import org.xml.sax.SAXException;
 
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 public class ResumableUploadStep extends UploadStep{
     
     //private static final Logger log = Logger.getLogger(ResumableUploadStep.class);
@@ -47,6 +63,10 @@ public class ResumableUploadStep extends UploadStep{
     private static final Message T_upload_error =
             message("xmlui.Submission.submit.ResumableUploadStep.error");
 
+    /*
+     * (non-Javadoc)
+     * @see org.dspace.app.xmlui.aspect.submission.submit.UploadStep#addBody(org.dspace.app.xmlui.wing.element.Body)
+     */
     public void addBody(Body body) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
     {
@@ -54,13 +74,20 @@ public class ResumableUploadStep extends UploadStep{
         
         Item item = submission.getItem();
         Collection collection = submission.getCollection();
-        String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue?resumable=true";
-        Division div = body.addInteractiveDivision("resumable-upload", actionURL, Division.METHOD_POST, "primary submission");
+        
+        String actionURL = contextPath + "/handle/" + collection.getHandle() +
+                "/submit/" + knot.getId() + ".continue?" +
+                org.dspace.submit.step.ResumableUploadStep.RESUMABLE_PARAM + "=true";
+        Division div = body.addInteractiveDivision(
+                "resumable-upload",
+                actionURL,
+                Division.METHOD_POST,
+                "primary submission");
         div.setHead(T_submission_head);
         addSubmissionProgressList(div);
         
         Division uploadDiv = div.addDivision("submit-file-upload");
-        
+                
         // click / drag and drop area
         Division drop = uploadDiv.addDivision("resumable-drop", "col-md-12");
         drop.addPara();
@@ -70,7 +97,7 @@ public class ResumableUploadStep extends UploadStep{
         uploadDiv.addDivision("progress-button");
         Division progressDiv = uploadDiv.addDivision("progress");
         progressDiv.addDivision("progress-bar");
-                
+        
         List upload = div.addList("submit-upload-new-list", List.TYPE_SIMPLE);
         submission.getID();
         
@@ -148,6 +175,10 @@ public class ResumableUploadStep extends UploadStep{
         addControlButtons(upload);
     }
     
+    /*
+     * (non-Javadoc)
+     * @see org.dspace.app.xmlui.aspect.submission.AbstractStep#addPageMeta(org.dspace.app.xmlui.wing.element.PageMeta)
+     */
     public void addPageMeta(PageMeta pageMeta) throws WingException,
         SAXException, SQLException, AuthorizeException, IOException
     {
@@ -155,6 +186,10 @@ public class ResumableUploadStep extends UploadStep{
         pageMeta.addMetadata("javascript", "static").addContent("static/js/upload-resumable.js");
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.dspace.app.xmlui.aspect.submission.submit.UploadStep#addReviewSection(org.dspace.app.xmlui.wing.element.List)
+     */
     @Override
     public List addReviewSection(List reviewList)
             throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {

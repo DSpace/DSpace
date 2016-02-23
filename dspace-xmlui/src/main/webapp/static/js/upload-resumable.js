@@ -10,46 +10,37 @@ var href = window.location.href;
 var params = href.split('/');
 var url = '/handle/' + params[4] + '/' + params[5] + '/upload';
 
+// get submission id
+var sId = $('input[name="submit-id"]').val();
 
-var r = new Resumable({
-    target: url,
-    chunkSize: 1024 * 1024,
-    simultaneousUploads: 1,
-    testChunks: true,
-    throttleProgressCallbacks: 1,
-    method: "multipart",
-    query:{"submissionId": $('input[name="submit-id"]').val()}
-});
+var doResumable = false;
+var r;
 
-if(r.support){
+
+if(sId > 0){
+    r = new Resumable({
+        target: url,
+        chunkSize: 1024 * 1024,
+        simultaneousUploads: 1,
+        testChunks: true,
+        throttleProgressCallbacks: 1,
+        method: "multipart",
+        query:{"submissionId": $('input[name="submit-id"]').val()}
+    });
+
+
+    if(r.support){
+        doResumable = true;
+    }
+}
+
+if(doResumable){
     $.ajaxSetup({
         // Disable caching of AJAX responses
         cache: false
     });
 
-    // resumable is supported hide standard form
-    $('#aspect_submission_StepTransformer_div_submit-upload').hide();
-
     var sid = $('input[name="submit-id"]').val();
-    // var html = '\
-    //   <div id="resumable-upload">\
-    //     <div id="resumable-drop" class="col-md-12"">\
-    //       <span class="glyphicon glyphicon-upload"></span>\
-    //       <a class="resumable-browse">Click or drag and drop files here</a>\
-    //     </div>\
-    //   </div>\
-    /*  <div class="resumable-progress">\
-        <table>\
-          <tr>\
-            <td width="100%"><div class="progress-container"><div class="progress-bar"></div></div></td>\
-            <td class="progress-text" nowrap="nowrap"></td>\
-            <td class="progress-pause" nowrap="nowrap">\
-              <a id="progress-resume-link"><img title="Resume upload" /></a>\
-              <a id="progress-pause-link"><img title="Pause upload" /></a>\
-            </td>\
-          </tr>\
-        </table>\
-      </div>\*/
     var html = '\
       <div id="dialog-confirm" style="display: none;" title="Delete File(s)?">\
         <p><span id="delete-icon" class="ui-icon ui-icon-alert" ></span><span id="delete-text">?</span></p>\
@@ -73,6 +64,10 @@ if(r.support){
     $('#progress-pause-link img').attr('src', themePath + "images/pause.png");
     $('#progress-resume-link, #progress-pause-link').hide();
 
+    $('.file-primary').attr('title', $('input[name=text-primary-help]').val())
+    $('.file-select').attr('title', $('input[name=text-select-help]').val())
+    $('.file-info').attr('title', $('input[name=text-info-help]').val())
+
     $('#' + rdId).on('dragenter', function(e){
         $(this).addClass('resumable-dragover');
     });
@@ -82,6 +77,19 @@ if(r.support){
     $('#' + rdId).on('dragdrop', function(e){
         $(this).removeClass('resumable-dragover');
     });
+
+
+    $('#aspect_submission_StepTransformer_div_resumable-upload').after(
+        '<div id="switch-upload" title="This can be used to switch upload interface"><a href="#">Switch Interface</a></div>'
+    );
+
+    if(localStorage.getItem('resumable') === '0'){
+        $('#aspect_submission_StepTransformer_div_resumable-upload').hide();
+    }
+    else{
+        // resumable is supported hide standard form
+        $('#aspect_submission_StepTransformer_div_submit-upload').hide();
+    }
 
     // Handle file add event
     r.on('fileAdded', function(file){
@@ -179,12 +187,8 @@ if(r.support){
     });
 
     r.on('fileError', function(file, message){
-        console.log();
         $('.alert').removeClass('hide');
-
         r.removeFile(file);
-
-        //r.upload();
     });
 
     $(document).on('click', '.file-delete', function(e){
