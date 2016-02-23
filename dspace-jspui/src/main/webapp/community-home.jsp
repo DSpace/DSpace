@@ -27,6 +27,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
@@ -34,8 +35,9 @@
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.ItemCounter" %>
 <%@ page import="org.dspace.content.*" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.services.ConfigurationService" %>
+<%@ page import="org.dspace.services.factory.DSpaceServicesFactory" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%
@@ -66,11 +68,16 @@
     String sidebar = comServ.getMetadata(community, "side_bar_text");
     Bitstream logo = community.getLogo();
     
-    boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
+    ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    
+    boolean feedEnabled = configurationService.getBooleanProperty("webui.feed.enable");
     String feedData = "NONE";
     if (feedEnabled)
     {
-        feedData = "comm:" + ConfigurationManager.getProperty("webui.feed.formats");
+        // FeedData is expected to be a comma separated list
+        String[] formats = configurationService.getArrayProperty("webui.feed.formats");
+        String allFormats = StringUtils.join(formats, ",");
+        feedData = "comm:" + allFormats;
     }
     
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
@@ -83,7 +90,7 @@
 	<div class="col-md-8">
         <h2><%= name %>
         <%
-            if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+            if(configurationService.getBooleanProperty("webui.strengths.show"))
             {
 %>
                 : [<%= ic.getCount(community) %>]
@@ -239,7 +246,7 @@
 	
 <div class="row">
 <%
-	boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.community-home.logos", true);
+	boolean showLogos = configurationService.getBooleanProperty("jspui.community-home.logos", true);
 	if (subcommunities.size() != 0)
     {
 %>
@@ -267,7 +274,7 @@
 	      <h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= subcommunities.get(j).getHandle() %>">
 	                <%= subcommunities.get(j).getName() %></a>
 <%
-                if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+                if (configurationService.getBooleanProperty("webui.strengths.show"))
                 {
 %>
                     [<%= ic.getCount(subcommunities.get(j)) %>]
@@ -323,7 +330,7 @@
 	      <h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= collections.get(i).getHandle() %>">
 	      <%= collections.get(i).getName() %></a>
 <%
-            if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+            if(configurationService.getBooleanProperty("webui.strengths.show"))
             {
 %>
                 [<%= ic.getCount(collections.get(i)) %>]
