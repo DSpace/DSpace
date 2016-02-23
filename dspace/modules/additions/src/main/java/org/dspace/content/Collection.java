@@ -304,6 +304,8 @@ public class Collection extends DSpaceObject
         return c;
     }
 
+    // BEGIN UMD CUSTOM CODE
+
     /**
      * Find the collections that match the search query
      * 
@@ -340,8 +342,12 @@ public class Collection extends DSpaceObject
     {
         String params = "%" + query.toLowerCase() + "%";
         StringBuffer queryBuf = new StringBuffer();
-        queryBuf.append("SELECT * FROM collection WHERE collection_id = ? OR ");
-        queryBuf.append("LOWER(name) LIKE LOWER(?) ORDER BY name ASC ");
+        queryBuf.append("SELECT c.* FROM collection c "
+                + "LEFT JOIN metadatavalue m ON ("
+                + "m.resource_id = c.collection_id AND "
+                + "m.resource_type_id = ? AND " + "m.metadata_field_id = ?"
+                + ")" + " WHERE c.collection_id = ? OR ");
+        queryBuf.append("LOWER(m.text_value) LIKE LOWER(?) ORDER BY m.text_value ASC ");
 
         // Add offset and limit restrictions - Oracle requires special code
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
@@ -401,20 +407,29 @@ public class Collection extends DSpaceObject
             int_param = Integer.valueOf(-1);
         }
 
+        Integer resType = Constants.COLLECTION;
+        Integer fieldId = MetadataField.findByElement(
+                context,
+                MetadataSchema.find(context, MetadataSchema.DC_SCHEMA)
+                        .getSchemaID(), "title", null).getFieldID();
+
         // Create the parameter array, including limit and offset if part of the
         // query
-        Object[] paramArr = new Object[] { int_param, params };
+        Object[] paramArr = new Object[] { resType, fieldId, int_param, params };
         if (limit > 0 && offset > 0)
         {
-            paramArr = new Object[] { int_param, params, limit, offset };
+            paramArr = new Object[] { resType, fieldId, int_param, params,
+                    limit, offset };
         }
         else if (limit > 0)
         {
-            paramArr = new Object[] { int_param, params, limit };
+            paramArr = new Object[] { resType, fieldId, int_param, params,
+                    limit };
         }
         else if (offset > 0)
         {
-            paramArr = new Object[] { int_param, params, offset };
+            paramArr = new Object[] { resType, fieldId, int_param, params,
+                    offset };
         }
 
         // Get all the collections that match the query
@@ -485,11 +500,22 @@ public class Collection extends DSpaceObject
             int_param = Integer.valueOf(-1);
         }
 
+        Integer resType = Constants.COLLECTION;
+        Integer fieldId = MetadataField.findByElement(
+                context,
+                MetadataSchema.find(context, MetadataSchema.DC_SCHEMA)
+                        .getSchemaID(), "title", null).getFieldID();
+
         // Get all the collection that match the query
         TableRow row = DatabaseManager.querySingle(context,
-                "SELECT count(*) as clcount FROM collection WHERE collection_id = ? OR "
-                        + "LOWER(name) LIKE LOWER(?)", new Object[] {
-                        int_param, dbquery });
+                "SELECT count(c.*) as clcount FROM collection c "
+                        + "LEFT JOIN metadatavalue m ON ("
+                        + "m.resource_id = c.collection_id AND "
+                        + "m.resource_type_id = ? AND "
+                        + "m.metadata_field_id = ?" + ")"
+                        + " WHERE c.collection_id = ? OR "
+                        + "LOWER(m.text_value) LIKE LOWER(?)", new Object[] {
+                        resType, fieldId, int_param, dbquery });
 
         // use getIntColumn for Oracle count data
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
@@ -504,6 +530,8 @@ public class Collection extends DSpaceObject
 
         return count.intValue();
     }
+
+    // END UMD CUSTOM CODE
 
     /**
      * Get all collections in the system. These are alphabetically sorted by
