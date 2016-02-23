@@ -126,9 +126,13 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
         if (unitID >= 0)
         {
             unit = Unit.find(context, unitID);
-        }
-        boolean facultyOnlyValue = unit.getFacultyOnly();
 
+        }
+        boolean facultyOnlyValue = true;
+        if (unit != null)
+        {
+            facultyOnlyValue = unit.getFacultyOnly();
+        }
         // Get list of member groups from url
         List<Integer> memberGroupIDs = new ArrayList<Integer>();
         String memberGroupIDsString = parameters.getParameter("memberGroupIDs",
