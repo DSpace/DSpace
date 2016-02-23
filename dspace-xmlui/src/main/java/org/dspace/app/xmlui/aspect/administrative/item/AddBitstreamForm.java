@@ -102,13 +102,12 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 
             // Get the list of bundles to allow the user to upload too. Either use the default
             // or one supplied from the dspace.cfg.
-            String bundleString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.bundle.upload");
-            if (bundleString == null || bundleString.length() == 0)
+            String[] bundles = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("xmlui.bundle.upload");
+            if (bundles == null || bundles.length == 0)
             {
-                bundleString = DEFAULT_BUNDLE_LIST;
+                bundles = DEFAULT_BUNDLE_LIST.split(",");
             }
-            String[] parts = bundleString.split(",");
-            for (String part : parts)
+            for (String part : bundles)
             {
                 if (addBundleOption(item, select, part.trim()))
                 {
