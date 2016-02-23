@@ -23,8 +23,8 @@ import javax.script.ScriptException;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * TaskResolver takes a logical name of a curation task and attempts to deliver 
@@ -71,13 +71,14 @@ public class TaskResolver
 	
 	// base directory of task scripts & catalog name
 	protected static final String CATALOG = "task.catalog";
-	protected static final String scriptDir = ConfigurationManager.getProperty("curate", "script.dir");
+	protected final String scriptDir;
 	
 	// catalog of script tasks
 	protected Properties catalog;
 	
 	public TaskResolver()
 	{
+            scriptDir = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.script.dir");
 	}
 		
 	/**

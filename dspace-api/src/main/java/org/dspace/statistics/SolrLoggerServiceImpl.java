@@ -11,7 +11,6 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.maxmind.geoip.Location;
 import com.maxmind.geoip.LookupService;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -39,11 +38,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.statistics.util.DnsLookup;
 import org.dspace.statistics.util.LocationUtils;
@@ -90,6 +89,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
+    @Autowired(required = true)
+    private ConfigurationService configurationService;
 
     public static enum StatisticsType {
    		VIEW ("view"),
@@ -114,20 +115,20 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void afterPropertiesSet() throws Exception
     {
-        log.info("solr-statistics.spidersfile:" + ConfigurationManager.getProperty("solr-statistics", "spidersfile"));
-        log.info("solr-statistics.server:" + ConfigurationManager.getProperty("solr-statistics", "server"));
-        log.info("usage-statistics.dbfile:" + ConfigurationManager.getProperty("usage-statistics", "dbfile"));
+        log.info("solr-statistics.spidersfile:" + configurationService.getProperty("solr-statistics.spidersfile"));
+        log.info("solr-statistics.server:" + configurationService.getProperty("solr-statistics.server"));
+        log.info("usage-statistics.dbfile:" + configurationService.getProperty("usage-statistics.dbfile"));
     	
         HttpSolrServer server = null;
         
-        if (ConfigurationManager.getProperty("solr-statistics", "server") != null)
+        if (configurationService.getProperty("solr-statistics.server") != null)
         {
             try
             {
-                server = new HttpSolrServer(ConfigurationManager.getProperty("solr-statistics", "server"));
+                server = new HttpSolrServer(configurationService.getProperty("solr-statistics.server"));
 
                 //Attempt to retrieve all the statistic year cores
-                File solrDir = new File(ConfigurationManager.getProperty("dspace.dir") + "/solr/");
+                File solrDir = new File(configurationService.getProperty("dspace.dir") + File.separator + "solr" + File.separator);
                 File[] solrCoreFiles = solrDir.listFiles(new FileFilter() {
 
                     @Override
@@ -158,7 +159,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         LookupService service = null;
         // Get the db file for the location
-        String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
+        String dbfile = configurationService.getProperty("usage-statistics.dbfile");
         if (dbfile != null)
         {
             try
@@ -181,15 +182,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
         locationService = service;
 
-        if ("true".equals(ConfigurationManager.getProperty("useProxies")))
-        {
-            useProxies = true;
-        }
-        else
-        {
-            useProxies = false;
-        }
-
+        useProxies = configurationService.getBooleanProperty("useProxies");
         log.info("useProxies=" + useProxies);
     }
 
@@ -287,7 +280,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     protected SolrInputDocument getCommonSolrDoc(DSpaceObject dspaceObject, HttpServletRequest request, EPerson currentUser) throws SQLException {
         boolean isSpiderBot = request != null && SpiderDetector.isSpider(request);
         if(isSpiderBot &&
-                !ConfigurationManager.getBooleanProperty("usage-statistics", "logBots", true))
+                !configurationService.getBooleanProperty("usage-statistics.logBots", true))
         {
             return null;
         }
@@ -381,7 +374,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     protected SolrInputDocument getCommonSolrDoc(DSpaceObject dspaceObject, String ip, String userAgent, String xforwardedfor, EPerson currentUser) throws SQLException {
         boolean isSpiderBot = SpiderDetector.isSpider(ip);
         if(isSpiderBot &&
-                !ConfigurationManager.getBooleanProperty("usage-statistics", "logBots", true))
+                !configurationService.getBooleanProperty("usage-statistics.logBots", true))
         {
             return null;
         }
@@ -1088,14 +1081,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         // not be influenced
 
         // Choose to filter by the Legacy spider IP list (may get too long to properly filter all IP's
-        if(ConfigurationManager.getBooleanProperty("solr-statistics", "query.filter.spiderIp",false))
+        if(configurationService.getBooleanProperty("solr-statistics.query.filter.spiderIp",false))
         {
             solrQuery.addFilterQuery(getIgnoreSpiderIPs());
         }
 
         // Choose to filter by isBot field, may be overriden in future
         // to allow views on stats based on bots.
-        if(ConfigurationManager.getBooleanProperty("solr-statistics", "query.filter.isBot",true))
+        if(configurationService.getBooleanProperty("solr-statistics.query.filter.isBot",true))
         {
             solrQuery.addFilterQuery("-isBot:true");
         }
@@ -1104,8 +1097,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             solrQuery.setSortField(sort, (ascending ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc));
         }
 
-        String bundles;
-        if((bundles = ConfigurationManager.getProperty("solr-statistics", "query.filter.bundles")) != null && 0 < bundles.length()){
+        String[] bundles = configurationService.getArrayProperty("solr-statistics.query.filter.bundles");
+        if(bundles != null && bundles.length > 0){
 
             /**
              * The code below creates a query that will allow only records which do not have a bundlename
@@ -1114,11 +1107,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             StringBuffer bundleQuery = new StringBuffer();
             //Also add the possibility that if no bundle name is there these results will also be returned !
             bundleQuery.append("-(bundleName:[* TO *]");
-            String[] split = bundles.split(",");
-            for (int i = 0; i < split.length; i++) {
-                String bundle = split[i].trim();
+            for (int i = 0; i < bundles.length; i++) {
+                String bundle = bundles[i].trim();
                 bundleQuery.append("-bundleName:").append(bundle);
-                if(i != split.length - 1){
+                if(i != bundles.length - 1){
                     bundleQuery.append(" AND ");
                 }
             }
@@ -1207,7 +1199,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         yearRangeQuery.add(FacetParams.FACET_MINCOUNT, String.valueOf(1));
 
         //Create a temp directory to store our files in !
-        File tempDirectory = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator);
+        File tempDirectory = new File(configurationService.getProperty("dspace.dir") + File.separator + "temp" + File.separator);
         tempDirectory.mkdirs();
 
 
@@ -1292,7 +1284,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     protected HttpSolrServer createCore(HttpSolrServer solr, String coreName) throws IOException, SolrServerException {
-        String solrDir = ConfigurationManager.getProperty("dspace.dir") + File.separator + "solr" +File.separator;
+        String solrDir = configurationService.getProperty("dspace.dir") + File.separator + "solr" +File.separator;
         String baseSolrUrl = solr.getBaseURL().replace("statistics", "");
         CoreAdminRequest.Create create = new CoreAdminRequest.Create();
         create.setCoreName(coreName);
@@ -1320,7 +1312,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             addAdditionalSolrYearCores(query);
             long totalRecords = solr.query(query).getResults().getNumFound();
 
-            File tempDirectory = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator);
+            File tempDirectory = new File(configurationService.getProperty("dspace.dir") + File.separator + "temp" + File.separator);
             tempDirectory.mkdirs();
             List<File> tempCsvFiles = new ArrayList<File>();
             for(int i = 0; i < totalRecords; i+=10000){
@@ -1432,7 +1424,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     public void exportHits() throws Exception {
         Context context = new Context();
 
-        File tempDirectory = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator);
+        File tempDirectory = new File(configurationService.getProperty("dspace.dir") + File.separator + "temp" + File.separator);
         tempDirectory.mkdirs();
 
         try {

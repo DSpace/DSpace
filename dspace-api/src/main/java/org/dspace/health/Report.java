@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * @author LINDAT/CLARIN dev team
@@ -70,7 +71,7 @@ public class Report {
     // create check list
     public static LinkedHashMap<String, Check> checks() {
         LinkedHashMap<String, Check> checks = new LinkedHashMap<>();
-        String check_names[] = ConfigurationManager.getProperty("healthcheck", "checks").split(",");
+        String check_names[] = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("healthcheck.checks");
         PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
         for ( String check_name : check_names ) {
             Check check = (Check) pluginService.getNamedPlugin(
