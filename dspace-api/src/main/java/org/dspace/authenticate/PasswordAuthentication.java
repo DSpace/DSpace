@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -137,7 +138,9 @@ public class PasswordAuthentication
 		// ensures they are password users
 		try
 		{
-			if (EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()) != null && !EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()).toString().equals(""))
+            if (context.getCurrentUser() != null &&
+                (EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()) != null &&
+                StringUtils.isNotBlank(EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()).toString())))
 			{
 				String groupName = ConfigurationManager.getProperty("authentication-password", "login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
@@ -158,7 +161,7 @@ public class PasswordAuthentication
 			}
 		}
 		catch (Exception e) {
-			// The user is not a password user, so we don't need to worry about them
+            log.error(LogManager.getHeader(context,"getSpecialGroups",""),e);
 		}
 		return ListUtils.EMPTY_LIST;
     }
