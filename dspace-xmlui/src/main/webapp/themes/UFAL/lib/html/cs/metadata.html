@@ -1,0 +1,166 @@
+<div id="faq-like">
+
+	<h2 id="ufal-point-faq">O metadatech</h2>
+	<p>Tato stránka poskytuje informace o tom, jaká metadata používáme (a tedy požadujeme po vkladatelích dat) a jak je zpřístupňujeme. Metadata jsou volně přístupná a jsou distribuována ve veřejné doméně pod <a href="http://creativecommons.org/about/cc0">CC0</a>. Vyhrazujeme si ale právo být na naší <a class="helpdesk-tolink" href="#">Lince podpory</a> informováni o komerčním využití všech metadat z LINDAT/CLARIN repozitáře, včetně podrobného popisu jejich použití.</p>
+
+    <hr />
+	<ul id="faqs-list">
+		<li><a href="#formats">Formáty metadat</a></li>	
+		<li><a href="#metadata">Vložená metadata</a></li>	
+		<li><a href="#mapping">Mapování metadat</a></li>	
+	</ul>
+    <hr />
+	<div>
+		<h3 id="formats">Formáty metadat</h3>
+		<p>
+			Během procesu vkládání příspěvku musí vkladatelé vyplnit také metadata, která jsou nedílnou součástí vloženého příspěvku (dat, nástrojů nebo služeb). Jsme schopni šířit metadata v různých formátech, včetně (a nejenom) <a href="http://clarin.eu/cmdi">CMDI</a> a <a href="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">oai_dc</a>. Viz <a href="https://lindat.mff.cuni.cz/repository/oai/request?verb=ListMetadataFormats">úplný seznam podporovaných formátů</a>. Je třeba mít na paměti, že některé formáty nemusí být použitelné pro všechny položky. Různé formáty nám pomáhají zpřístupnit tato metadata (a tedy "zviditelnit" příslušné položky) ve velkém množství agregátorů, specializovaných portálů i běžných vyhledávačů.	
+		</p>
+		<h4>CMDI</h4>
+		<p>
+			Podívejte se na úvod do CLARINovských <a href="http://clarin.eu/cmdi">komponent metadat</a>, kde získáte více informací k tomuto tématu.
+		</p>
+		<p>
+			Naše současné příspěvky dodržují <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:p_1403526079380">clarin.eu:cr1:p_1403526079380</a> schéma. Část starších příspěvků (v podstatě všechny ty, které byly vloženy před zářím/říjnem 2014) používá jiné schéma <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:p_1349361150622">clarin.eu:cr1:p_1349361150622</a>. Nové schéma jsme vytvořili proto, abychom vkladatelům zjednodušili a zpřehlednili postup vyplňování metadat. Původní schéma kombinovalo složku OLAC a MetaShare. Toto schéma nás nutilo zvládat duplicity a také nás činilo závislými na cizím schématu matadat a jeho sémantice, které jsme nemohli ani ovlivnit, ani měnit.
+		</p>
+		<p>
+			Obě schémata jsou poměrně dobře pokryta odkazy na registr konceptů (základních pojmů a definic). Nyní zastaralé odkazy <a href="http://www.isocat.org">ISOcat DCR</a> byly přesměrovány na <a href="https://www.clarin.eu/conceptregistry/">CCR</a> a odkazy na schémata komponentů OLAC byly přesměrovány na <a href="http://purl.org/dc/terms">DCMI terms</a> schémata (např. odkaz na abstrakty je na <a href="http://purl.org/dc/terms/abstract">http://purl.org/dc/terms/abstract</a>). <a href="https://vlo.clarin.eu/">VLO</a> nepoužívá tato specifická schémata při svých <a href="https://lux17.mpi.nl/isocat/clarin/vlo/mapping/index.html">mapováních</a> a spíše mapuje cesty uvnitř jednoho konkrétního <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:p_1288172614026">schématu</a>. Jen pro některé specifické položky bylo toto mapování cest rozšířeno, aby fungovalo také s  <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:c_1349361150621">komponentou</a> tohoto schématu. Dalším důvodem pro vytvoření vlastního schématu byla skutečnost, že DC (Dublin Core) koncepty byly stále příliš široké.
+		</p>
+		<p>Podporujeme příspěvky s libovolnými CMDI soubory metadat, které se používají v OAI-PMH, pokud je pro metadata požadováno schéma CMDI.</p>
+		<p>Požadavky ve výše uvedených odstavcích by vás mohly odradit od opakovaného použití <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:p_1349361150622">clarin.eu:cr1:p_1349361150622</a>. Pro opakované použití jeho specifických komponent ale nezapomínejte, co již bylo o mapování VLO řečeno. <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:p_1403526079380">clarin.eu:cr1:p_1403526079380</a> s mapováním VLO již počítal při svém vzniku (i když to se může změnit), ale dosud stále odráží náš pohled na svět (jazykových zdrojů) a konkrétní případy použití. Pokud nemáte specifické potřeby, může být toto schéma pro vás dostačující, nebo může být základem pro vaše vlastní schéma.</p>
+		<h4>oai_dc</h4>
+		<p>oai_dc je formát, který je vyžadován schématy <a href="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">OAI-PMH</a>. Mapování našich příspěvků na tento formát vysvětlujeme v <a href="#mapping">sekci o mapování</a>.</p>
+	</div>	
+	<br/>
+	<div>
+		<h3 id="metadata">Vložená metadata</h3>
+		<p>Následující seznam je výčtem polí, která požadujeme v průběhu vkládání příspěvků (v seznamu může v budoucnu dojít ke sporadickým změnám).
+    Metadata jsou ukládána v angličtině.  Existují jemné rozdíly v závislosti na typu zdroje, který je ukládán do repozitáře. Ne všechna pole se týkají všech formátů. Některá pole jsou generována automaticky (např. jména jazyků čitelná pro člověka obsahují ve skutečnosti iso kódy, jiné mohou obsahovat identifikátory a jiné údaje).</p>
+		<table class="table-bordered">
+			<thead>
+				<tr><th>Jméno pole</th><th>Popis</th><th>Status</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><strong>Typ</strong></td>
+					<td>Typ zdroje: "Korpus" odkazuje k textovým, mluveným a multimodálním korpusům.
+          "Lexikální koncepční zdroj" zahrnuje lexikony, ontologie, slovníky, seznamy slov apod.
+          "Popis jazyka" pokrývá jazykové modely a gramatiky.
+          "Technologie / nástroje / služby" se používá pro nástroje, systémy, systémové komponenty atd.</td>
+					<td><span class="label label-info">vyžadováno</span></td>
+				</tr>
+				<tr>
+					<td><strong>Název</strong></td>
+					<td>Hlavní název položky.</td>
+					<td><span class="label label-info">vyžadováno</span></td>
+				</tr>
+				<tr>
+					<td><strong>URL projektu</strong></td>
+					<td>URL zdroje/projektu vztahující se ke vkládané položce (např. stránka projektu). Specifikováno reg. výrazy (začíná písmeny http/https)</td>
+					<td><span class="label label-info">specifikováno reg. výrazy</span></td>
+				</tr>
+				<tr>
+					<td><strong>URL demoverze</strong></td>
+					<td>Ukázky, vzorky nebo (v případě nástrojů) např. URL vzorku výstupu. Specifikováno reg. výrazy (začíná písmeny http/https)</td>
+					<td><span class="label label-info">specifikováno reg. výrazy</span></td>
+				</tr>
+				<tr>
+					<td><strong>Datum vydání</strong></td>
+					<td>Datum vydání příspěvku, pokud existuje, např. 2014-01-21 nebo alespoň rok.</td>
+					<td><span class="label label-info">vyžadováno</span></td>
+				</tr>
+				<tr>
+					<td><strong>Autor</strong></td>
+					<td>Jména autorů položky. U kolekcí (např. korpusů nebo jiných větších databází textu nebo u jiných velkých databází textu) obvykle chcete uvádět jména všech osob zapojených do sestavování kolekce, ne autory jednotlivých částí. Jméno osoby je uloženo jako příjmení, čárka, další jména nebo části jména (např. "Smith, John Jr.").</td>
+					<td><span class="label label-info">vyžadováno</span><span class="label label-info"> opakovatelně</span></td>
+				</tr>
+				<tr>
+					<td><strong>Vydavatel</strong></td>
+					<td>Název organizace/subjektu, která publikovala předchozí verzi(-e) dané položky, nebo název vaší domovské instituce.</td>
+					<td><span class="label label-info">vyžadováno</span><span class="label label-info"> opakovatelně</span></td>
+				</tr>
+				<tr>
+					<td><strong>Kontaktní osoba</strong></td>
+					<td>Osoba, kterou je možné kontaktovat v případě problémů s příspěvkem. Někdo, kdo je schopen podat informaci o zdroji, např. jeden z jeho autorů nebo "vkladatel" příspěvku. Tento údaj je uložen jako strukturovaný řetězec obsahující jméno, příjmení, e-mail a domácí organizaci.</td>
+					<td><span class="label label-info">vyžadováno</span><span class="label label-info"> opakovatelně</span></td>
+				</tr>
+				<tr>
+					<td><strong>Financování</strong></td>
+					<td>Sponzoři a financování podporující vkládaný příspěvek
+          Tento údaj je uložen jako strukturovaný řetězec obsahující jméno projektu, kód projektu, organizaci provádějící financování, typ financování (vlastní/národní/EU/...) a OpenAIRE identifikátor (který je uložen také v dc.relation)</td>
+					<td><span class="label label-info">opakovatelně</span></td>
+				</tr>
+				<tr>
+					<td><strong>Popis</strong></td>
+					<td>Textový popis příspěvku (celé položky).</td>
+					<td><span class="label label-info">vyžadováno</span></td>
+				</tr>
+				<tr>
+					<td><strong>Jazyk</strong></td>
+					<td>Jazyk(y) hlavního obsahu položky. Uloženo jako ISO 639-3  kód. Vyžadováno pro korpusy, lexikální koncepční zdroje a popisy jazyka.</td>
+					<td><span class="label label-info">opakovatelně</span><span class="label label-info"> vyžadováno v závislosti na typu položky</span></td>
+				</tr>
+				<tr>
+					<td><strong>Klíčová slova</strong></td>
+					<td>Klíčová slova nebo fráze týkající se předmětu položky.</td>
+					<td><span class="label label-info">opakovatelně</span><span class="label label-info"> vyžadováno</span></td>
+				</tr>
+				<tr>
+					<td><strong>Velikost</strong></td>
+					<td>Rozsah předložených údajů, např. počet tokenů, nebo počet souborů.</td>
+					<td><span class="label label-info">opakovatelně</span></td>
+				</tr>
+				<tr>
+					<td><strong>Typ média</strong></td>
+					<td>Typ média hlavního obsahu položky, např. text nebo zvuk. Rozevíratelý (dropdown) výběr, vyžadováno pro korpusy, lexikální koncepční zdroje a popisy jazyka.</td>
+					<td><span class="label label-info">rozevíratelý (dropdown) výběr</span><span class="label label-info"> vyžadováno v závislosti na typu položky</span></td>
+				</tr>
+				<tr>
+					<td><strong>Detailní typ</strong></td>
+					<td>Další klasifikace zdroje. Rozevíratelý (dropdown) výběr, vyžadováno pro korpusy, lexikální koncepční zdroje a popisy jazyka.</td>
+					<td><span class="label label-info">rozevíratelý (dropdown) výběr</span><span class="label label-info"> vyžadováno v závislosti na typu položky</span></td>
+				</tr>
+				<tr>
+					<td><strong>Jazykově závislé</strong></td>
+					<td>Logická hodnota indikující, zda popsané nástroje/služby  jsou jazykově závislé nebo ne. Povinné pro nástroje.</td>
+					<td><span class="label label-info"> vyžadováno v závislosti na typu položky</span></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<br/>
+	<div>
+		<h3 id="mapping">Mapování metadat</h3>
+		<p>Následující tabulky obsahují mapování příspěvků mezi oai_dc, a uvádějí také některé z důležitých automaticky generovaných polí.</p>
+		<table class="table-bordered">
+			<thead>
+				<tr><th>Pole příspěvku</th><th>Namapované pole</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>Typ</td><td>dc.type</td></tr>
+				<tr><td>Název</td><td>dc.title</td></tr>
+				<tr><td>URL projektu</td><td>dc.source</td></tr>
+				<tr><td>URL demoverze</td><td>nemapováno</td></tr>
+				<tr><td>Datum vydání</td><td>dc.date</td></tr>
+				<tr><td>Autor</td><td>dc.creator</td></tr>
+				<tr><td>Vydavatel</td><td>dc.publisher</td></tr>
+				<tr><td>Kontaktní osoba</td><td>nemapováno</td></tr>
+				<tr><td>Financování</td><td>nemapováno</td></tr>
+				<tr><td>Popis</td><td>dc.description</td></tr>
+				<tr><td>Jazyk</td><td>dc.language</td></tr>
+				<tr><td>Klíčová slova</td><td>dc.subject</td></tr>
+				<tr><td>Velikost</td><td>nemapováno</td></tr>
+				<tr><td>Typ média</td><td>nemapováno</td></tr>
+				<tr><td>Detailní typ</td><td>nemapováno</td></tr>
+			</tbody>
+		</table>
+		<table class="table-bordered">
+			<thead>
+				<tr><th>Generované pole</th><th>Popis</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>dc.identifikátor</td><td>PID (v současnosti systém handle) zdroje.</td></tr>
+				<tr><td>dc.práva</td><td>Opakovatelné pole může obsahovat název licence, pod kterou je zdroj distribuován, URL odkaz k plnému textu licence a takzvaný obecný licenční typ (PUB, ACA, RES)</td></tr>
+			</tbody>
+		</table>
+	</div>
+</div>
