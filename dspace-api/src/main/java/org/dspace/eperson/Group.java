@@ -7,6 +7,7 @@
  */
 package org.dspace.eperson;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.content.MetadataSchema;
@@ -47,6 +48,9 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     /** This Group may not be deleted or renamed. */
     @Column
     private Boolean permanent = false;
+
+    @Column
+    private String name;
 
     /** lists of epeople and groups in the group */
     @ManyToMany(fetch = FetchType.LAZY)
@@ -197,14 +201,20 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     @Override
     public String getName()
     {
-        return getGroupService().getName(this);
+        return name;
     }
 
     /** Change the name of this Group. */
     void setName(Context context, String name) throws SQLException
     {
-        getGroupService().setMetadataSingleValue(context, this,
-                MetadataSchema.DC_SCHEMA, "title", null, null, name);
+        if(!StringUtils.equals(this.name, name)) {
+            this.name = name;
+            groupsChanged = true;
+
+            //Also update the name in the metadata
+            getGroupService().setMetadataSingleValue(context, this,
+                    MetadataSchema.DC_SCHEMA, "title", null, null, name);
+        }
     }
 
     public boolean isGroupsChanged() {

@@ -26,13 +26,12 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 import java.util.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Service implementation for the Group object.
@@ -247,7 +246,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             return null;
         }
 
-        return groupDAO.findByMetadataField(context, name, metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null));
+        return groupDAO.findByName(context, name);
     }
 
     @Override

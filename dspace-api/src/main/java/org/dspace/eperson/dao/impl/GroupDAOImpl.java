@@ -79,6 +79,16 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         return list(query);
     }
 
+    public Group findByName(final Context context, final String name) throws SQLException {
+        Query query = createQuery(context,
+                "select g from Group g " +
+                "where g.name = :name ");
+
+        query.setParameter("name", name);
+
+        return uniqueResult(query);
+    }
+
     @Override
     public List<Group> search(Context context, String query, List<MetadataField> queryFields, int offset, int limit) throws SQLException {
         String groupTableName = "g";
@@ -167,4 +177,5 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) FROM Group"));
     }
+
 }

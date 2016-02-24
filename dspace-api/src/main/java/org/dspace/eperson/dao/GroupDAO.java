@@ -41,4 +41,6 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
     List<Group> getEmptyGroups(Context context) throws SQLException;
 
     int countRows(Context context) throws SQLException;
+
+    Group findByName(Context context, String name) throws SQLException;
 }
