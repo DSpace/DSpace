@@ -309,6 +309,17 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     }
 
     @Override
+    public List<Community> getAllParents(Context context, Collection collection) throws SQLException {
+        List<Community> result = new ArrayList<>();
+        List<Community> communities = collection.getCommunities();
+        result.addAll(communities);
+        for (Community community : communities) {
+            result.addAll(getAllParents(context, community));
+        }
+        return result;
+    }
+
+    @Override
     public List<Collection> getAllCollections(Context context, Community community) throws SQLException {
         List<Collection> collectionList = new ArrayList<Collection>();
         List<Community> subCommunities = community.getSubcommunities();

@@ -232,11 +232,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         List<Community> result = new ArrayList<>();
         List<Collection> collections = item.getCollections();
         for (Collection collection : collections) {
-            List<Community> owningCommunities = collection.getCommunities();
-            for (Community community : owningCommunities) {
-                result.add(community);
-                result.addAll(communityService.getAllParents(context, community));
-            }
+            result.addAll(communityService.getAllParents(context, collection));
         }
 
         return result;

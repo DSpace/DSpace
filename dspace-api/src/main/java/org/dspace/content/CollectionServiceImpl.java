@@ -614,7 +614,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void canEdit(Context context, Collection collection, boolean useInheritance) throws SQLException, AuthorizeException {
-        List<Community> parents = collection.getCommunities();
+        List<Community> parents = communityService.getAllParents(context, collection);
         for (Community parent : parents) {
             if (authorizeService.authorizeActionBoolean(context, parent,
                     Constants.WRITE, useInheritance)) {
@@ -787,7 +787,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         List<Community> communities = collection.getCommunities();
         if (CollectionUtils.isNotEmpty(communities))
         {
-            community = communities.iterator().next();
+            community = communities.get(0);
         }
 
         switch (action)
@@ -820,7 +820,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     public DSpaceObject getParentObject(Context context, Collection collection) throws SQLException {
         List<Community> communities = collection.getCommunities();
         if(CollectionUtils.isNotEmpty(communities)){
-            return communities.iterator().next();
+            return communities.get(0);
         }else{
             return null;
         }

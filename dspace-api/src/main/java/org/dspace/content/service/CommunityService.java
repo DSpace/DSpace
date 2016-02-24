@@ -162,6 +162,13 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
     public List<Community> getAllParents(Context context, Community community) throws SQLException;
 
     /**
+     * Return an array of parent communities of this collection.
+     *
+     * @return an array of parent communities
+     */
+    public List<Community> getAllParents(Context context, Collection collection) throws SQLException;
+
+    /**
      * Return an array of collections of this community and its subcommunities
      *
      * @return an array of collections
