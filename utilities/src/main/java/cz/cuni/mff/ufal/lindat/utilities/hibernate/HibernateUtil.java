@@ -49,7 +49,6 @@ public class HibernateUtil {
 			sessionFactory = cfg.configure().buildSessionFactory();
 			HibernateUtil test = new HibernateUtil();
 			test.openSession();
-			test.clone();
 			initialized = true;
 
 		} catch (Exception e) {
