@@ -1088,7 +1088,7 @@ public class Item extends DSpaceObject
     {
         // Check authorisation
         // only do write authorization if user is not an editor
-        if (!canEdit())
+        if (!canEdit() && !canEditMetadata())
         {
             AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
         }
