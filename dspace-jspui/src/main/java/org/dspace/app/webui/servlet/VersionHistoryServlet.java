@@ -25,6 +25,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -62,6 +63,14 @@ public class VersionHistoryServlet extends DSpaceServlet
         	throw new IllegalArgumentException("Item is null");
         }
         
+        // using configurationService.getPropertyAsType instead of getBooleanProperty
+        // to get an instance of java.lang.Boolean instead of the primary type boolean.
+        // Doing this prevents to rely on Javas auto boxing and unboxing feature.
+        Boolean show_submitter = new DSpace()
+                .getConfigurationService()
+                .getPropertyAsType("versioning.item.history.include.submitter",
+                        Boolean.FALSE);
+
         if(!authorizeService.isAdmin(context,
                 item.getOwningCollection()))
         {
@@ -71,9 +80,12 @@ public class VersionHistoryServlet extends DSpaceServlet
             {
                 throw new AuthorizeException();
             }
-
+        } else {
+            // if user is Admin override show_submitter
+            show_submitter = Boolean.TRUE;
         }
-
+        request.setAttribute("showSubmitter", show_submitter);
+        
         // manage if versionID is not came by request
         VersionHistory history = VersionUtil.retrieveVersionHistory(context,
                 item);
