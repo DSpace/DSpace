@@ -386,14 +386,14 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                         //Render our community !
                         org.dspace.app.xmlui.wing.element.List communityMetadata = commCollWingList.addList(dso.getHandle() + ":community");
 
-                        genericRender((Community) dso, highlightedResults, communityMetadata);
+                        renderDSO((Community) dso, highlightedResults, communityMetadata);
                     }else
                     if(dso.getType() == Constants.COLLECTION)
                     {
                         //Render our collection !
                         org.dspace.app.xmlui.wing.element.List collectionMetadata = commCollWingList.addList(dso.getHandle() + ":collection");
 
-                        genericRender((Collection) dso, highlightedResults, collectionMetadata);
+                        renderDSO((Collection) dso, highlightedResults, collectionMetadata);
                     }
                 }
             }
@@ -409,7 +409,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 for (Item resultDso : itemList)
                 {
                     DiscoverResult.DSpaceObjectHighlightResult highlightedResults = queryResults.getHighlightedResults(resultDso);
-                    genericRender( resultDso, highlightedResults,itemWingList);
+                    renderDSO( resultDso, highlightedResults,itemWingList);
                 }
             }
 
@@ -448,7 +448,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * @throws WingException
      * @throws SQLException 
      */
-    protected void genericRender(DSpaceObject dso, DiscoverResult.DSpaceObjectHighlightResult highlightedResults, org.dspace.app.xmlui.wing.element.List dsoMetadata) throws WingException, SQLException 
+    protected void renderDSO(DSpaceObject dso, DiscoverResult.DSpaceObjectHighlightResult highlightedResults, org.dspace.app.xmlui.wing.element.List dsoMetadata) throws WingException, SQLException 
     {    		
     	
 		if(dso.getType() == Constants.ITEM)
