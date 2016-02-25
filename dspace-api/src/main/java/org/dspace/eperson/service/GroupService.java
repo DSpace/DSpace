@@ -106,6 +106,18 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     public boolean isMember(Context context, Group group) throws SQLException;
 
     /**
+     * fast check to see if an eperson is a member called with eperson id, does
+     * database lookup without instantiating all of the epeople objects and is
+     * thus a static method
+     *
+     * @param context
+     *            context
+     * @param groupName
+     *            the name of the group to check
+     */
+    public boolean isMember(Context context, String groupName) throws SQLException;
+
+    /**
      * Get all of the groups that an eperson is a member of.
      *
      * @param context

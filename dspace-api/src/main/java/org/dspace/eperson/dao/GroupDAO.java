@@ -7,6 +7,7 @@
  */
 package org.dspace.eperson.dao;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.MetadataField;
 import org.dspace.content.dao.DSpaceObjectDAO;
 import org.dspace.content.dao.DSpaceObjectLegacySupportDAO;
@@ -16,6 +17,7 @@ import org.dspace.eperson.Group;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Database Access Object interface class for the Group object.
@@ -26,21 +28,23 @@ import java.util.List;
  */
 public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupportDAO<Group> {
 
-    public Group findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException;
+    Group findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException;
 
-    public List<Group> search(Context context, String query, List<MetadataField> queryFields, int offset, int limit) throws SQLException;
+    List<Group> search(Context context, String query, List<MetadataField> queryFields, int offset, int limit) throws SQLException;
 
-    public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException;
+    int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException;
 
-    public List<Group> findAll(Context context, List<MetadataField> metadataFields, String sortColumn) throws SQLException;
+    List<Group> findAll(Context context, List<MetadataField> metadataFields, String sortColumn) throws SQLException;
 
-    public List<Group> findByEPerson(Context context, EPerson ePerson) throws SQLException;
+    List<Group> findByEPerson(Context context, EPerson ePerson) throws SQLException;
 
-    public List getGroup2GroupResults(Context context, boolean flushQueries) throws SQLException;
+    List<Pair<UUID, UUID>> getGroup2GroupResults(Context context, boolean flushQueries) throws SQLException;
 
     List<Group> getEmptyGroups(Context context) throws SQLException;
 
     int countRows(Context context) throws SQLException;
 
     Group findByName(Context context, String name) throws SQLException;
+
+    Group findByNameAndEPerson(Context context, String groupName, EPerson ePerson) throws SQLException;
 }

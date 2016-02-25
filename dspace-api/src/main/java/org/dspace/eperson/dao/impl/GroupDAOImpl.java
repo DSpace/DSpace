@@ -10,16 +10,14 @@ package org.dspace.eperson.dao.impl;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.MetadataField;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDSODAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.GroupDAO;
-import org.hibernate.FlushMode;
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.type.StandardBasicTypes;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -76,17 +74,48 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     public List<Group> findByEPerson(Context context, EPerson ePerson) throws SQLException {
         Query query = createQuery(context, "from Group where (from EPerson e where e.id = :eperson_id) in elements(epeople)");
         query.setParameter("eperson_id", ePerson.getID());
+        query.setCacheable(true);
+
         return list(query);
     }
 
+    @Override
     public Group findByName(final Context context, final String name) throws SQLException {
         Query query = createQuery(context,
-                "select g from Group g " +
+                "SELECT g from Group g " +
                 "where g.name = :name ");
 
         query.setParameter("name", name);
+        query.setCacheable(true);
 
         return uniqueResult(query);
+    }
+
+    @Override
+    public Group findByNameAndEPerson(Context context, String groupName, EPerson ePerson) throws SQLException {
+        if(groupName == null || ePerson == null) {
+            return null;
+        } else {
+            Query query = createQuery(context,
+                    "SELECT DISTINCT g FROM Group g " +
+                            "LEFT JOIN g.epeople p " +
+                            "WHERE g.name = :name AND " +
+                            "(p.id = :eperson_id OR " +
+                            "EXISTS ( " +
+                                "SELECT 1 FROM Group2GroupCache gc " +
+                                "JOIN gc.parent p " +
+                                "JOIN gc.child c " +
+                                "JOIN c.epeople cp " +
+                                "WHERE p.id = g.id AND cp.id = :eperson_id " +
+                                ") " +
+                            ")");
+
+            query.setParameter("name", groupName);
+            query.setParameter("eperson_id", ePerson.getID());
+            query.setCacheable(true);
+
+            return uniqueResult(query);
+        }
     }
 
     @Override
@@ -157,15 +186,15 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
 
 
     @Override
-    public List getGroup2GroupResults(Context context, boolean flushQueries) throws SQLException {
-        SQLQuery sqlQuery = getHibernateSession(context).createSQLQuery("SELECT parent_id, child_id FROM Group2Group");
-        sqlQuery.addScalar("parent_id", StandardBasicTypes.UUID_BINARY);
-        sqlQuery.addScalar("child_id", StandardBasicTypes.UUID_BINARY);
-        if(flushQueries){
-            //Optional, flush queries when executing, could be usefull since you are using native queries & these sometimes require this option.
-            sqlQuery.setFlushMode(FlushMode.ALWAYS);
-        }
-        return sqlQuery.list();
+    public List<Pair<UUID, UUID>> getGroup2GroupResults(Context context, boolean flushQueries) throws SQLException {
+
+        Query query = createQuery(context, "SELECT new org.apache.commons.lang3.tuple.ImmutablePair(g.id, c.id) " +
+                "FROM Group g " +
+                "JOIN g.groups c ");
+
+        @SuppressWarnings("unchecked")
+        List<Pair<UUID, UUID>> results = query.list();
+        return results;
     }
 
     @Override

@@ -7,7 +7,9 @@
  */
 package org.dspace.eperson;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -159,15 +161,38 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public boolean isMember(Context context, Group group) throws SQLException {
+        return isMember(context, group.getName());
+    }
+
+    @Override
+    public boolean isMember(final Context context, final String groupName) throws SQLException {
         // special, everyone is member of group 0 (anonymous)
-        if (group.getName().equals(Group.ANONYMOUS))
+        if (StringUtils.equals(groupName, Group.ANONYMOUS))
         {
             return true;
+        } else if(context.getCurrentUser() != null) {
+            EPerson currentUser = context.getCurrentUser();
+
+            //First check the special groups
+            boolean found = false;
+            List<Group> specialGroups = context.getSpecialGroups();
+            if(CollectionUtils.isNotEmpty(specialGroups)) {
+                Iterator<Group> it = specialGroups.iterator();
+                while (it.hasNext() && !found) {
+                    Group next = it.next();
+                    found = StringUtils.equals(next.getName(), groupName);
+                }
+            }
+
+            if(found) {
+                return true;
+            } else {
+                //lookup eperson in normal groups and subgroups
+                return epersonInGroup(context, groupName, currentUser);
+            }
+        } else {
+            return false;
         }
-
-        EPerson currentuser = context.getCurrentUser();
-
-        return epersonInGroup(context, group, currentuser);
     }
 
     @Override
@@ -432,12 +457,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
 
 
-    protected boolean epersonInGroup(Context c, Group group, EPerson e)
+    protected boolean epersonInGroup(Context context, String groupName, EPerson ePerson)
             throws SQLException
     {
-        List<Group> groups = allMemberGroups(c, e);
-
-        return groups.contains(group);
+        return groupDAO.findByNameAndEPerson(context, groupName, ePerson) != null;
     }
 
 
@@ -450,11 +473,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         Map<UUID, Set<UUID>> parents = new HashMap<>();
 
-        List<Object[]> group2groupResults = groupDAO.getGroup2GroupResults(context, flushQueries);
-        for (Object[] group2groupResult : group2groupResults) {
-            //We cannot use UUID.nameUUIDFromBytes(), because it only generated "type 3 UUIDs"
-            UUID parent = (UUID) group2groupResult[0];
-            UUID child = (UUID) group2groupResult[1];
+        List<Pair<UUID, UUID>> group2groupResults = groupDAO.getGroup2GroupResults(context, flushQueries);
+        for (Pair<UUID, UUID> group2groupResult : group2groupResults) {
+            UUID parent = group2groupResult.getLeft();
+            UUID child = group2groupResult.getRight();
 
             // if parent doesn't have an entry, create one
             if (!parents.containsKey(parent)) {

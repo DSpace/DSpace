@@ -49,7 +49,7 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     @Column
     private Boolean permanent = false;
 
-    @Column
+    @Column(length = 250, unique = true)
     private String name;
 
     /** lists of epeople and groups in the group */
