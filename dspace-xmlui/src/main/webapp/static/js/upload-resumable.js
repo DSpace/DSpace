@@ -78,7 +78,6 @@ if(doResumable){
         $(this).removeClass('resumable-dragover');
     });
 
-
     $('#aspect_submission_StepTransformer_div_resumable-upload').after(
         '<div id="switch-upload" title="This can be used to switch upload interface"><a href="#">Switch Interface</a></div>'
     );
@@ -152,38 +151,70 @@ if(doResumable){
     });
 
     r.on('fileSuccess', function(file, message){
-        var xml = $.parseXML(message);
+        var TIMEOUT = 300000; // 5 mins
+        var INTERVAL = 3000;  // 3 seconds
+        var attempts = 0;
 
-        var bId = $($(xml).find("bitstreamId")[0]).text();
-        var bytes = $($(xml).find("size")[0]).text();
-        var format = $($(xml).find("format")[0]).text();
-        var fullChecksum = $($(xml).find("checksum")[0]).text();
-        var sequenceId = $($(xml).find("sequenceId")[0]).text();
-        var checksum = fullChecksum.split(':');
-        var href = '/bitstream/item/' + sid + '/' + file.fileName + '?sequence=' + sequenceId;
-        var fAnchor = '<a href="' + href + '">' + file.fileName + '</a>';
+        // last chunk has been up loaded fetch details of completed bistream,
+        // for large files this can take sometime
+        var intId = setInterval(function(){
+            $.ajax({
+                type: "GET",
+                url: url + "?submissionId=" + sid + "&complete=true&resumableIdentifier=" + file.uniqueIdentifier,
+                cache: false,
+                success: function(data){
+                    var xml = $.parseXML(data);
 
-        $('#primary-'          + file.uniqueIdentifier).removeAttr('disabled');
-        $('#primary-'          + file.uniqueIdentifier).attr('value', bId);
-        $('#select-'           + file.uniqueIdentifier).removeAttr('disabled');
-        $('#select-'           + file.uniqueIdentifier).attr('value', bId);
-        $('#file-name-'        + file.uniqueIdentifier).empty();
-        $('#file-name-'        + file.uniqueIdentifier).append(fAnchor);
-        $('#file-description-' + file.uniqueIdentifier).removeAttr('disabled');
-        $('#file-description-' + file.uniqueIdentifier).attr('name', 'description-' + bId);
-        $('#file-status-'      + file.uniqueIdentifier).text('');
-        $('#file-status-'      + file.uniqueIdentifier).attr('class', 'file-status-success');
-        $('#file-info-'        + file.uniqueIdentifier).attr('class', 'file-info');
-        $('#file-delete-'      + file.uniqueIdentifier).attr('class', 'file-delete');
+                    var bId = $($(xml).find("bitstreamId")[0]).text();
+                    if(bId.length > 0){
+                        clearInterval(intId);
 
-        // give the successful upload a new id
-        $('#file-delete-' + file.uniqueIdentifier).parent().attr('id', 'aspect_submission_StepTransformer_row_bitstream-' + bId);
+                        var bytes = $($(xml).find("size")[0]).text();
+                        var format = $($(xml).find("format")[0]).text();
+                        var fullChecksum = $($(xml).find("checksum")[0]).text();
+                        var sequenceId = $($(xml).find("sequenceId")[0]).text();
+                        var checksum = fullChecksum.split(':');
+                        var href = '/bitstream/item/' + sid + '/' + file.fileName + '?sequence=' + sequenceId;
+                        var fAnchor = '<a href="' + href + '">' + file.fileName + '</a>';
 
-        var extra = '<input name="file-extra-bytes" type="hidden" value="' + bytes + '"></input>\
-                     <input name="file-extra-format" type="hidden" value="' + format + '"></input>\
-                     <input name="file-extra-algorithm" type="hidden" value="' + checksum[0] + '"></input>\
-                     <input name="file-extra-checksum" type="hidden" value="' + checksum[1] + '"></input>';
-        $('#file-info-' + file.uniqueIdentifier).append(extra);
+                        $('#primary-'          + file.uniqueIdentifier).removeAttr('disabled');
+                        $('#primary-'          + file.uniqueIdentifier).attr('value', bId);
+                        $('#select-'           + file.uniqueIdentifier).removeAttr('disabled');
+                        $('#select-'           + file.uniqueIdentifier).attr('value', bId);
+                        $('#file-name-'        + file.uniqueIdentifier).empty();
+                        $('#file-name-'        + file.uniqueIdentifier).append(fAnchor);
+                        $('#file-description-' + file.uniqueIdentifier).removeAttr('disabled');
+                        $('#file-description-' + file.uniqueIdentifier).attr('name', 'description-' + bId);
+                        $('#file-status-'      + file.uniqueIdentifier).text('');
+                        $('#file-status-'      + file.uniqueIdentifier).attr('class', 'file-status-success');
+                        $('#file-info-'        + file.uniqueIdentifier).attr('class', 'file-info');
+                        $('#file-delete-'      + file.uniqueIdentifier).attr('class', 'file-delete');
+
+                        // give the successful upload a new id
+                        $('#file-delete-' + file.uniqueIdentifier).parent().attr('id', 'aspect_submission_StepTransformer_row_bitstream-' + bId);
+
+                        var extra = '<input name="file-extra-bytes" type="hidden" value="' + bytes + '"></input>\
+                                     <input name="file-extra-format" type="hidden" value="' + format + '"></input>\
+                                     <input name="file-extra-algorithm" type="hidden" value="' + checksum[0] + '"></input>\
+                                     <input name="file-extra-checksum" type="hidden" value="' + checksum[1] + '"></input>';
+                        $('#file-info-' + file.uniqueIdentifier).append(extra);
+
+                    }
+                    else{
+                        ++attempts;
+                        if(attempts > (TIMEOUT / INTERVAL)){
+                            console.warn("Creation of file timed out after " + TIMEOUT / 1000 + " seconds");
+                            clearInterval(intId);
+                        }
+                    }
+                },
+                error: function(jqXHR, status, error){
+                    console.error(error);
+                    clearInterval(intId);
+                }
+            });
+
+        }, INTERVAL);
     });
 
     r.on('fileError', function(file, message){
