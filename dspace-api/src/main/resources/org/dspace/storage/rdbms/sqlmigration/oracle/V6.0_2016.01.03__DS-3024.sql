@@ -21,5 +21,5 @@ UPDATE epersongroup SET permanent = 1
 	   WHERE s.short_id = 'dc'
 	     AND f.element = 'title'
 	     AND f.qualifier IS NULL
-	     AND v.text_value IN ('Administrator', 'Anonymous')
+	     AND dbms_lob.compare(v.text_value, 'Administrator') = 0 OR dbms_lob.compare(v.text_value,'Anonymous') = 0
        );
