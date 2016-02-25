@@ -16,7 +16,7 @@
 ---------------------------------------------------------------
 
 ALTER TABLE epersongroup
-ADD name NVARCHAR2(250);
+ADD name VARCHAR2(250);
 
 CREATE UNIQUE INDEX epersongroup_unique_idx_name on epersongroup(name);
 
