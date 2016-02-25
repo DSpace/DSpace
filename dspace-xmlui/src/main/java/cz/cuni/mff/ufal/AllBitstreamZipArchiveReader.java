@@ -31,6 +31,7 @@ import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream.UnicodeExtraFieldPolicy;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.BitstreamReader;
@@ -58,12 +59,6 @@ public class AllBitstreamZipArchiveReader extends AbstractReader implements Recy
     private static Logger log = cz.cuni.mff.ufal.Logger.getLogger(BitstreamReader.class);
 
 
-    /**
-     * How big of a buffer should we use when reading from the bitstream before
-     * writting to the HTTP response?
-     */
-    protected static final int BUFFER_SIZE = 8192;
-
     /** Limit of ZIP format **/
     protected static final long ZIP_LIMIT_SIZE = 4294967295l;
 
@@ -89,13 +84,6 @@ public class AllBitstreamZipArchiveReader extends AbstractReader implements Recy
 
     /** Item containing the Bitstreams */
     private Item item = null;
-
-    /** The zip file */
-    protected InputStream zipInputStream;
-
-    /** The zip file size */
-    protected long zipFileSize;
-
 
     protected boolean needsZip64 = false;
 
@@ -237,17 +225,42 @@ public class AllBitstreamZipArchiveReader extends AbstractReader implements Recy
 
          try
             {
+                Bundle[] originals = item.getBundles("ORIGINAL");
+                for (Bundle original : originals){
+                    Bitstream[] bss = original.getBitstreams();
+                    for (Bitstream bitstream : bss)
+                    {
+                        //throw AuthorizeException before we start putting the zip together
+                        bitstream.contextCanRead();
+                    }
 
-                // first write everything to a temp file
-                String tempDir = ConfigurationManager.getProperty("upload.temp.dir");
-                String fn = tempDir + File.separator + "SWORD." + item.getID() + "." + UUID.randomUUID().toString() + ".zip";
-                OutputStream outStream = new FileOutputStream(new File(fn));
-                ZipArchiveOutputStream zip = new ZipArchiveOutputStream(outStream);
+                }
+
+                response.setDateHeader("Last-Modified", item.getLastModified().getTime());
+
+                // Try and make the download file name formated for each browser.
+                try {
+                    String agent = request.getHeader("USER-AGENT");
+                    if (agent != null && agent.contains("MSIE"))
+                    {
+                        name = URLEncoder.encode(name, "UTF8");
+                    }
+                    else if (agent != null && agent.contains("Mozilla"))
+                    {
+                        name = MimeUtility.encodeText(name, "UTF8", "B");
+                    }
+                }
+                catch (UnsupportedEncodingException see)
+                {
+                    name = "item_" + item.getID() + ".zip";
+                }
+                response.setHeader("Content-Disposition", String.format("attachment;filename=\"%s\"",name));
+                response.setContentType("application/zip");
+
+                ZipArchiveOutputStream zip = new ZipArchiveOutputStream(out);
                 zip.setCreateUnicodeExtraFields(UnicodeExtraFieldPolicy.ALWAYS);
                 zip.setLevel(Deflater.NO_COMPRESSION);
                 ConcurrentMap<String, AtomicInteger> usedFilenames = new ConcurrentHashMap<String, AtomicInteger>();
-
-                Bundle[] originals = item.getBundles("ORIGINAL");
                 if(needsZip64) {
                     zip.setUseZip64(Zip64Mode.Always);
                 }
@@ -261,17 +274,14 @@ public class AllBitstreamZipArchiveReader extends AbstractReader implements Recy
                         ZipArchiveEntry ze = new ZipArchiveEntry(uniqueName);
                         zip.putArchiveEntry(ze);
                         InputStream is = bitstream.retrieve();
-                        Utils.copy(is, zip);
+                        IOUtils.copy(is, zip);
                         zip.closeArchiveEntry();
                         is.close();
                     }
                 }
                 zip.close();
+                out.flush();
 
-                File file = new File(fn);
-                zipFileSize = file.length();
-
-                zipInputStream = new TempFileInputStream(file);
             } catch (AuthorizeException e) {
                 log.error(e.getMessage(), e);
                 throw new ProcessingException("You do not have permissions to access one or more files.");
@@ -280,66 +290,27 @@ public class AllBitstreamZipArchiveReader extends AbstractReader implements Recy
                 throw new ProcessingException("Could not create ZIP, please download the files one by one. " +
                         "The error has been stored and will be solved by our technical team.");
             }
+            finally
+            {
+                 try
+                 {
+                     if ( out != null ) {
+                         out.close();
+                     }
+                 }
+                 catch (IOException ioe)
+                 {
+                     // Closing the stream threw an IOException but do we want this to propagate up to Cocoon?
+                     // No point since the user has already got the file contents.
+                     log.warn("Caught IO exception when closing a stream: " + ioe.getMessage());
+                 }
+            }
 
             // Log download statistics
             for (int bitstreamID : bitstreamIDs)
             {
                 DSpaceApi.updateFileDownloadStatistics(userID, bitstreamID);
             }
-
-            response.setDateHeader("Last-Modified", item.getLastModified().getTime());
-
-            // Try and make the download file name formated for each browser.
-            try {
-                    String agent = request.getHeader("USER-AGENT");
-                    if (agent != null && agent.contains("MSIE"))
-                    {
-                        name = URLEncoder.encode(name, "UTF8");
-                    }
-                    else if (agent != null && agent.contains("Mozilla"))
-                    {
-                        name = MimeUtility.encodeText(name, "UTF8", "B");
-                    }
-            }
-            catch (UnsupportedEncodingException see)
-            {
-                name = "item_" + item.getID() + ".zip";
-            }
-            response.setHeader("Content-Disposition", String.format("attachment;filename=\"%s\"",name));
-            response.setContentType("application/zip");
-
-            byte[] buffer = new byte[BUFFER_SIZE];
-            int length = -1;
-
-            try
-            {
-                response.setHeader("Content-Length", String.valueOf(this.zipFileSize));
-
-                while ((length = this.zipInputStream.read(buffer)) > -1)
-                {
-                    out.write(buffer, 0, length);
-                }
-                out.flush();
-            }
-            finally
-            {
-                try
-                {
-                    if ( this.zipInputStream != null ) {
-                        this.zipInputStream.close();
-                    }
-                    if ( out != null ) {
-                        out.close();
-                    }
-                }
-                catch (IOException ioe)
-                {
-                    // Closing the stream threw an IOException but do we want this to propagate up to Cocoon?
-                    // No point since the user has already got the file contents.
-                    log.warn("Caught IO exception when closing a stream: " + ioe.getMessage());
-                }
-            }
-
 
     }
 
@@ -349,8 +320,6 @@ public class AllBitstreamZipArchiveReader extends AbstractReader implements Recy
     public void recycle() {
         this.response = null;
         this.request = null;
-        this.zipFileSize = 0;
-        this.zipInputStream = null;
         this.bitstreamIDs = null;
         this.userID = 0;
     }

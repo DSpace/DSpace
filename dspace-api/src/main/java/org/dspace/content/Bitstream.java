@@ -744,4 +744,8 @@ public class Bitstream extends DSpaceObject
     public String get_internal_id(){
     	return bRow.getStringColumn("internal_id");
     }
+
+    public void contextCanRead() throws AuthorizeException, SQLException{
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.READ);
+    }
 }

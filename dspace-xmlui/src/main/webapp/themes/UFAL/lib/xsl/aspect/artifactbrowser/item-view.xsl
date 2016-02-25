@@ -1037,7 +1037,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <!-- direct download of smaller files -->
-                        <xsl:attribute name="href"><xsl:value-of select="$download-all-url" /></xsl:attribute>
+                        <xsl:attribute name="data-href"><xsl:value-of select="$download-all-url" /></xsl:attribute>
                     </xsl:otherwise>
                 </xsl:choose>
                 <i class="fa fa-download">&#160;</i>
@@ -1051,7 +1051,7 @@
 			<button type="button" class="close" onclick="$('#download_all_alert').hide();">&#215;</button>
 			<p>Large Size</p>
 			<p style="margin-bottom: 10px;"><small class="text-warning">The requested files are being packed into one large file. This process can take some time, please be patient.</small></p>			
-          				<a href="{$download-all-url}" style="text-decoration: none;"><button class="btn btn-warning btn-sm">Continue</button></a>
+          				<a data-href="{$download-all-url}" style="text-decoration: none;"><button class="btn btn-warning btn-sm">Continue</button></a>
           				<button type="button" class="btn btn-default btn-sm" onclick="javascript:$('#download_all_alert').hide();">Cancel</button>
             </div>
 
