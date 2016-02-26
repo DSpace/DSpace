@@ -272,7 +272,7 @@ public class ShibAuthentication implements AuthenticationMethod {
      *
      * The values extracted (a user may have multiple roles) will be used to look
      * up which groups to place the user into. The groups are defined as
-     * {@code authentication.shib.role.<role-name>} which is a comma separated list of
+     * {@code authentication-shibboleth.role.<role-name>} which is a comma separated list of
      * DSpace groups.
      *
      * @param context A valid DSpace context.
@@ -314,8 +314,8 @@ public class ShibAuthentication implements AuthenticationMethod {
                 throw new IllegalStateException(
                     "Both config parameters for ignoring an roll attributes scope and value are turned on, this is " +
                         "not a permissable configuration. (Note: ignore-scope defaults to true) The configuration " +
-                        "parameters are: 'authentication.shib.role-header.ignore-scope' and 'authentication.shib" +
-                        ".role-header.ignore-value'");
+                        "parameters are: 'authentication-shibboleth.role-header.ignore-scope' and " +
+                        "'authentication-shibboleth.role-header.ignore-value'");
             }
 
             // Get the Shib supplied affiliation or use the default affiliation
@@ -362,8 +362,8 @@ public class ShibAuthentication implements AuthenticationMethod {
                     if (groupNames == null) {
                         log.debug(
                             "Unable to find role mapping for the value, '" + affiliation + "', there should be a " +
-                                "mapping in config/modules/authentication-shibboleth.cfg:  role." + affiliation + " =" +
-                                " <some group name>");
+                                "mapping in config/modules/authentication-shibboleth.cfg: " +
+                                "authentication-shibboleth.role." + affiliation + " = <some group name>");
                         continue;
                     } else {
                         log.debug(
@@ -966,14 +966,14 @@ public class ShibAuthentication implements AuthenticationMethod {
 
         // Bail out if not set, returning an empty map.
         if (mappingString == null || mappingString.length == 0) {
-            log.debug("No additional eperson metadata mapping found: authentication.shib.eperson.metadata");
+            log.debug("No additional eperson metadata mapping found: authentication-shibboleth.eperson.metadata");
 
             metadataHeaderMap = map;
             return;
         }
 
-        log.debug("Loading additional eperson metadata from: 'authentication.shib.eperson.metadata' = '" + StringUtils
-            .join(mappingString, ",") + "'");
+        log.debug("Loading additional eperson metadata from: 'authentication-shibboleth.eperson.metadata' = '" +
+            StringUtils.join(mappingString, ",") + "'");
 
 
         for (String metadataString : mappingString) {
