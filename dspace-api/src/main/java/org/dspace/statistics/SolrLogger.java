@@ -372,6 +372,8 @@ public class SolrLogger
             if (request.getHeader("User-Agent") != null)
                 doc1.addField("userAgent", request.getHeader("User-Agent"));
             
+            doc1.addField("isBot",isSpiderBot);
+            
             try
             {
                 String dns = DnsLookup.reverseDns(ip);
@@ -453,6 +455,8 @@ public class SolrLogger
         {
         	doc1.addField("userAgent", userAgent);
         }
+        
+        doc1.addField("isBot",isSpiderBot);
         
         if (dns != null)
         {
