@@ -621,8 +621,14 @@ public class HandleManager
             throw new IllegalArgumentException("Handle is null");
         }
 
-        return DatabaseManager
-                .findByUnique(context, "Handle", "handle", handle);
+        if (!ConfigurationManager.getBooleanProperty("handle.caseSensitive", true)){
+            return DatabaseManager
+                    .findByUniqueNonCaseSensitive(context, "Handle", "handle", handle);
+        }else {
+
+            return DatabaseManager
+                    .findByUnique(context, "Handle", "handle", handle);
+        }
     }
 
     /**
