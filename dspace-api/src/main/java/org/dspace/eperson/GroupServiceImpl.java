@@ -28,6 +28,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
+import org.dspace.util.UUIDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -293,37 +294,47 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
-    public List<Group> search(Context context, String query) throws SQLException {
-        return search(context, query, -1, -1);
+    public List<Group> search(Context context, String groupIdentifier) throws SQLException {
+        return search(context, groupIdentifier, -1, -1);
     }
 
     @Override
-    public List<Group> search(Context context, String query, int offset, int limit) throws SQLException
+    public List<Group> search(Context context, String groupIdentifier, int offset, int limit) throws SQLException
     {
-        try {
-            List<Group> groups = new ArrayList<>();
-            Group group = find(context, UUID.fromString(query));
+        List<Group> groups = new ArrayList<>();
+        UUID uuid = UUIDUtils.fromString(groupIdentifier);
+        if(uuid == null) {
+            //Search by group name
+            groups = groupDAO.findByNameLike(context, groupIdentifier, offset, limit);
+        } else {
+            //Search by group id
+            Group group = find(context, uuid);
             if(group != null)
             {
                 groups.add(group);
             }
-            return groups;
-        } catch(IllegalArgumentException e) {
-            MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
-            if(StringUtils.isBlank(query)) query = null;
-            return groupDAO.search(context, query, Arrays.asList(nameField), offset, limit);
         }
+
+        return groups;
     }
 
     @Override
-    public int searchResultCount(Context context, String query) throws SQLException {
-        try {
-            return find(context, UUID.fromString(query)) != null ? 1 : 0;
-        } catch(IllegalArgumentException e) {
-            MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
-            if (StringUtils.isBlank(query)) query = null;
-            return groupDAO.searchResultCount(context, query, Arrays.asList(nameField));
+    public int searchResultCount(Context context, String groupIdentifier) throws SQLException {
+        int result = 0;
+        UUID uuid = UUIDUtils.fromString(groupIdentifier);
+        if(uuid == null && StringUtils.isNotBlank(groupIdentifier)) {
+            //Search by group name
+            result = groupDAO.countByNameLike(context, groupIdentifier);
+        } else {
+            //Search by group id
+            Group group = find(context, uuid);
+            if(group != null)
+            {
+                result = 1;
+            }
         }
+
+        return result;
     }
 
     @Override
@@ -648,7 +659,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
         else
         {
-            return find(context, UUID.fromString(id));
+            return find(context, UUIDUtils.fromString(id));
         }
     }
 

@@ -7,9 +7,7 @@
  */
 package org.dspace.eperson.dao.impl;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.MetadataField;
 import org.dspace.core.AbstractHibernateDSODAO;
@@ -20,7 +18,9 @@ import org.dspace.eperson.dao.GroupDAO;
 import org.hibernate.Query;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Group object.
@@ -119,61 +119,30 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public List<Group> search(Context context, String query, List<MetadataField> queryFields, int offset, int limit) throws SQLException {
-        String groupTableName = "g";
-        String queryString = "SELECT " + groupTableName + " FROM Group as " + groupTableName;
-        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, ListUtils.EMPTY_LIST, null);
+    public List<Group> findByNameLike(final Context context, final String groupName, final int offset, final int limit) throws SQLException {
+        Query query = createQuery(context,
+                "SELECT g FROM Group g WHERE lower(g.name) LIKE lower(:name)");
+        query.setParameter("name", "%" + StringUtils.trimToEmpty(groupName) + "%");
 
         if(0 <= offset)
         {
-            hibernateQuery.setFirstResult(offset);
+            query.setFirstResult(offset);
         }
         if(0 <= limit)
         {
-            hibernateQuery.setMaxResults(limit);
+            query.setMaxResults(limit);
         }
-        return list(hibernateQuery);
+
+        return list(query);
     }
 
     @Override
-    public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException {
-        String groupTableName = "g";
-        String queryString = "SELECT count(*) FROM Group as " + groupTableName;
-        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, ListUtils.EMPTY_LIST, null);
+    public int countByNameLike(final Context context, final String groupName) throws SQLException {
+        Query query = createQuery(context,
+                "SELECT count(*) FROM Group g WHERE lower(g.name) LIKE lower(:name)");
+        query.setParameter("name", "%" + groupName + "%");
 
-        return count(hibernateQuery);
-    }
-
-    protected Query getSearchQuery(Context context, String queryString, String queryParam, List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField) throws SQLException {
-
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append(queryString);
-        Set<MetadataField> metadataFieldsToJoin = new LinkedHashSet<>();
-        metadataFieldsToJoin.addAll(queryFields);
-        if(CollectionUtils.isNotEmpty(sortFields))
-        {
-            metadataFieldsToJoin.addAll(sortFields);
-        }
-
-        if(!CollectionUtils.isEmpty(metadataFieldsToJoin)) {
-            addMetadataLeftJoin(queryBuilder, "g", metadataFieldsToJoin);
-        }
-        if(queryParam != null) {
-            addMetadataValueWhereQuery(queryBuilder, queryFields, "like", null);
-        }
-        if(!CollectionUtils.isEmpty(sortFields)) {
-            addMetadataSortQuery(queryBuilder, sortFields, Collections.singletonList(sortField));
-        }
-
-        Query query = createQuery(context, queryBuilder.toString());
-        if(StringUtils.isNotBlank(queryParam)) {
-            query.setParameter("queryParam", "%"+queryParam+"%");
-        }
-        for (MetadataField metadataField : metadataFieldsToJoin) {
-            query.setParameter(metadataField.toString(), metadataField.getFieldID());
-        }
-
-        return query;
+        return count(query);
     }
 
     @Override

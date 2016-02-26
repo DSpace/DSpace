@@ -78,9 +78,6 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     @Transient
     private boolean groupsChanged;
 
-    @Transient
-    private transient GroupService groupService;
-
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.eperson.service.GroupService#create(Context)}
@@ -210,10 +207,6 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
         if(!StringUtils.equals(this.name, name)) {
             this.name = name;
             groupsChanged = true;
-
-            //Also update the name in the metadata
-            getGroupService().setMetadataSingleValue(context, this,
-                    MetadataSchema.DC_SCHEMA, "title", null, null, name);
         }
     }
 
@@ -232,14 +225,6 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
 
     public List<WorkspaceItem> getSupervisedItems() {
         return supervisedItems;
-    }
-
-    private GroupService getGroupService() {
-        if(groupService == null)
-        {
-            groupService = EPersonServiceFactory.getInstance().getGroupService();
-        }
-        return groupService;
     }
 
     /**

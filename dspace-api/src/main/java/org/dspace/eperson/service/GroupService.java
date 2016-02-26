@@ -168,20 +168,20 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      *
      * @param context
      *            DSpace context
-     * @param query
-     *            The search string
+     * @param groupIdentifier
+     *            The group name or group ID
      *
      * @return array of Group objects
      */
-    public List<Group> search(Context context, String query) throws SQLException;
+    public List<Group> search(Context context, String groupIdentifier) throws SQLException;
 
     /**
      * Find the groups that match the search query across eperson_group_id or name
      *
      * @param context
      *            DSpace context
-     * @param query
-     *            The search string
+     * @param groupIdentifier
+     *            The group name or group ID
      * @param offset
      *            Inclusive offset
      * @param limit
@@ -189,7 +189,7 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      *
      * @return array of Group objects
      */
-    public List<Group> search(Context context, String query, int offset, int limit) throws SQLException;
+    public List<Group> search(Context context, String groupIdentifier, int offset, int limit) throws SQLException;
 
     /**
      * Returns the total number of groups returned by a specific query, without the overhead

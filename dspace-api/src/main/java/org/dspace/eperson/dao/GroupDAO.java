@@ -30,10 +30,6 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
 
     Group findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException;
 
-    List<Group> search(Context context, String query, List<MetadataField> queryFields, int offset, int limit) throws SQLException;
-
-    int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException;
-
     List<Group> findAll(Context context, List<MetadataField> metadataFields, String sortColumn) throws SQLException;
 
     List<Group> findByEPerson(Context context, EPerson ePerson) throws SQLException;
@@ -47,4 +43,8 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
     Group findByName(Context context, String name) throws SQLException;
 
     Group findByNameAndEPerson(Context context, String groupName, EPerson ePerson) throws SQLException;
+
+    List<Group> findByNameLike(Context context, String groupIdentifier, int offset, int limit) throws SQLException;
+
+    int countByNameLike(Context context, String groupIdentifier) throws SQLException;
 }
