@@ -89,7 +89,7 @@
     boolean scopusEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.elsevier.scopus.enabled",false);
     boolean wosEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.thomsonreuters.wos.enabled",false);
     String doi = item.getMetadata("dc.identifier.doi");
-    boolean scholarEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.google.scholar.enabled",false) && StringUtils.isNotBlank(doi);
+    boolean scholarEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.google.scholar.enabled",false);
     boolean altMetricEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.altmetric.enabled",false) && StringUtils.isNotBlank(doi);
     
     Boolean versioningEnabledBool = (Boolean)request.getAttribute("versioning.enabled");
@@ -121,54 +121,17 @@
 <script type="text/javascript"><!--
 var j = jQuery.noConflict();
 
-	ajaxGoogleCitedBy = function(args) {
-	var dataFromServer;  //
-	var googleScholarCallback = function(data){
-		try {
-	        var item = data.data[0].scholarData[0];
-	        //console.log(item);
-	        if (item.hasOwnProperty('numCitations')) {	        	
-	        	j('#googleCitedResult > .metric-counter').html(
-						'<a target="_blank" href="'+item.citedByUrl+'">' + item.numCitations
-								+ ' <i class="fa fa-info-circle" data-toggle="tooltip" title="Get updated citations from database"></i></a>');	        	
-	        } else {
-	        	j('#googleCitedResult > .metric-counter').html(
-						'<a target="_blank" href="'+item.citedByUrl+'">0 <i class="fa fa-info-circle" data-toggle="tooltip" title="Get updated citations from database"></i></a>');
-	        }
-	    }
-	    catch (e) {
-			j('#googleCitedResult > .metric-counter').html(
-				'N/A');
-	    }
-	    jQuery('[data-toggle="tooltip"]').tooltip();
-	}
-	var ajaxurlgs =  "https://www.googleapis.com/scribe/v1/research?query="+encodeURIComponent(args);
-		j.ajax({
-			url : ajaxurlgs,
-			crossDomain : true,
-			data: {
-				key: 'AIzaSyDqVYORLCUXxSv7zneerIgC2UYMnxvPeqQ',
-				submit: 'fetch'	
-			},
-			dataType: 'jsonp',
-			jsonpCallback: "googleScholarCallback",
-			success: googleScholarCallback ,		
-		    error: function(jqXHR, textStatus, errorThrown) { 
-		    	console.log(errorThrown); console.log(textStatus); 
-		    },
-		    beforeSend: function (request)
-            {
-                request.setRequestHeader("Access-Control-Allow-Origin", "*");
-                request.overrideMimeType( "application/html; charset=UTF-8" );
-            },
-        });
-
 }
 
 j(document).ready(function() {
-    <% if(scholarEnabled) { %>
-    	ajaxGoogleCitedBy('<%= doi %>');
-<% } %>
+
+	<% if(altMetricEnabled) { %>
+	j(function () {
+	    j('div.altmetric-embed').on('altmetric:hide ', function () {
+	    	j('div.altmetric').hide();
+	    });
+	});
+	<% } %>
 });
 --></script>
 </c:set>
@@ -420,7 +383,9 @@ j(document).ready(function() {
 	</div>
 	<div id="googleCitedResult" class="media-body text-center">
 		<h4 class="media-heading"><fmt:message key="jsp.display-item.citation.google"/></h4>
-			<span class="metric-counter"><fmt:message key="jsp.display-item.citation.google.loading"/></span>
+		
+		
+   		    <span class="metric-counter"><a data-toggle="tooltip" target="_blank" title="<fmt:message key="jsp.display-item.citation.google.tooltip"/>" href="https://scholar.google.com/scholar?as_q=&as_epq=<%= title %>&as_occt=any"><fmt:message key="jsp.display-item.citation.google.check"/></a></span>
 	</div>
 </div>	
 </div>
