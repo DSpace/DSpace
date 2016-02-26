@@ -36,11 +36,11 @@ public class AdditionalInfoCheck extends Check {
             "Statistics:       %s/statistics?date=%s\n", url,
             new SimpleDateFormat("yyyy-M").format(ri.till()));
         ret +=
-            "Project info:     http://svn.ms.mff.cuni.cz/redmine/projects/dspace-modifications\n";
+            "Project info:     https://github.com/ufal/lindat-dspace\n";
         ret +=
-            "QA monitoring:    http://ufal-point-dev.ms.mff.cuni.cz/nagios3/\n";
+            "QA monitoring:    https://lindat.mff.cuni.cz/en/monitoring\n";
         ret +=
-            "QA testing:       http://ufal-point-dev.ms.mff.cuni.cz:8083/\n";
+            "QA testing:       https://travis-ci.org/ufal/lindat-dspace/\n";
         ret += String.format(
             "GA stats:         %s/statistics-google\n", url);
         ret += String.format(
@@ -52,9 +52,7 @@ public class AdditionalInfoCheck extends Check {
         ret +=
             "Clarin VLO:       http://www.clarin.eu/vlo\n";
         ret +=
-            "Clarin centers:   https://centerregistry-clarin.esc.rzg.mpg.de/centers/\n";
-        ret +=
-            "INL harvest:      https://portal.clarin.inl.nl/imdiportal/BC?virtpath=/TST-LRs/External%20Resources/OLAC%20Metadata%20Providers/Providers/Charles_University_Prague\n";
+            "Clarin centers:   https://centres.clarin.eu/\n";
 
         ret += IOUtils.run(
             new File(ConfigurationManager.getProperty("dspace.dir")),

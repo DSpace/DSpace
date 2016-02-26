@@ -4,7 +4,7 @@
 	<groupId>cz.cuni.mff.ufal.lindat</groupId>
 	<artifactId>utilities</artifactId>
 	<name>UFAL Utilities</name>
-	<url>https://svn.ms.mff.cuni.cz/redmine/projects/dspace-modifications</url>
+	<url>https://github.com/ufal/lindat-dspace</url>
 
 	<parent>
 		<groupId>org.dspace</groupId>
