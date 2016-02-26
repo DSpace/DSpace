@@ -615,12 +615,19 @@ public class ApplicationService extends ExtendedTabService
 			Element element = cacheByCrisID.getQuiet(crisID);
 			if (element != null) {
 				T crisObject = (T) element.getValue();
-				if (!isExpiredCache(className, element, crisObject.getId(), crisObject)) {
-					return crisObject;
-				}
-				else if (crisObject != null) {
-					return get(className, crisObject.getId(), false);
-				}
+                //the element retrieved by cache is consistent with the className passed as parameter? (add safety check)
+                if(className.isAssignableFrom(crisObject.getClass())) {
+    				if (!isExpiredCache(className, element, crisObject.getId(), crisObject)) {
+    					return crisObject;
+    				}
+    				else if (crisObject != null) {
+    					return get(className, crisObject.getId(), false);
+    				}
+                }
+                else {
+                    //return null because the caller method working on different class object e.g. I searching for a Journal but the primary logic in the caller method see first in ResearcherPage table  
+                    return null;
+                }
 			}
 		}
 
@@ -654,11 +661,21 @@ public class ApplicationService extends ExtendedTabService
 			Element element = cacheBySource.getQuiet(sourceRef + "-" + sourceID);
 			if (element != null) {
 				T crisObject = (T) element.getValue();
-				if (!isExpiredCache(className, element, crisObject.getId(), crisObject)) {
-					return crisObject;
+				//the element retrieved by cache is consistent with the className passed as parameter? (add safety check)
+				if(className.isAssignableFrom(crisObject.getClass())) {
+                    if (!isExpiredCache(className, element, crisObject.getId(),
+                            crisObject))
+                    {
+                        return crisObject;
+                    }
+                    else if (crisObject != null)
+                    {
+                        return get(className, crisObject.getId(), false);
+                    }
 				}
-				else if (crisObject != null) {
-					return get(className, crisObject.getId(), false);
+				else {
+				    //return null because the caller method working on different class object e.g. I searching for a Journal but the primary logic in the caller method see first in ResearcherPage table  
+				    return null;
 				}
 			}
 		}
