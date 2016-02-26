@@ -129,8 +129,12 @@ public class CrisRefDisplayStrategy implements IDisplayMetadataValueStrategy
                 {
 					// perhaps this is to avoid a lazyloader exception?
 					ACrisObject rp = applicationService.getEntityByCrisId(authority, crisObject.getClass());
-					String type = rp.getMetadata(ConfigurationManager.getProperty("cris",
-							"researcher.cris." + publicPath + ".ref.display.strategy.metadata.icon"));
+					String metadataIcon = ConfigurationManager.getProperty("cris",
+                            "researcher.cris." + publicPath + ".ref.display.strategy.metadata.icon");
+					if(StringUtils.isBlank(metadataIcon)) {
+					    throw new RuntimeException("No metadata configuration to retrieve icon for object: " + publicPath);
+					}
+					String type = rp.getMetadata(metadataIcon);
 					String status = ""; 
 					if (rp == null || !rp.getStatus()) {
 						startLink = "";
@@ -163,27 +167,35 @@ public class CrisRefDisplayStrategy implements IDisplayMetadataValueStrategy
                 }
                 catch (Exception e)
                 {
-	                log.error(
-	                            "Error when build icon (perhaps missing this configuration: on cris module key:researcher.cris."
-	                                    + publicPath
-	                                    + ".ref.display.strategy.metadata.icon)",
-	                        e);
+                    log.warn(
+                            "Error when build icon (perhaps missing this configuration: on cris module key:researcher.cris."
+                                    + publicPath
+                                    + ".ref.display.strategy.metadata.icon, " + e.getMessage());                            
                     try
                     {
                         icon = I18nUtil.getMessage("ItemCrisRefDisplayStrategy."
                                 + publicPath + ".icon", true);
+                        log.info(
+                                "Retrieved for "
+                                        + publicPath
+                                        + "ItemCrisRefDisplayStrategy."
+                                                + publicPath + ".icon");      
                     }
                     catch (MissingResourceException e2)
                     {
                         icon = I18nUtil.getMessage(
                                 "ItemCrisRefDisplayStrategy.default.icon");
-	                }
-	            }
-	            metadata = startLink;
-	            metadata += Utils.addEntities(metadataArray[0].value);
-	            metadata += "&nbsp;";
-	            metadata += icon;
-	            metadata += endLink;
+                        log.info(
+                                "Retrieved for "
+                                        + publicPath
+                                        + "ItemCrisRefDisplayStrategy.default.icon");
+                    }
+                }
+                metadata = startLink;
+                metadata += Utils.addEntities(metadataArray[0].value);
+                metadata += "&nbsp;";
+                metadata += icon;
+                metadata += endLink;
             }
             catch (Exception ex)
             {
