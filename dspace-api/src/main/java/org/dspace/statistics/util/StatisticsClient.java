@@ -13,6 +13,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.taskdefs.Get;
 import org.dspace.core.ConfigurationManager;
@@ -61,6 +62,7 @@ public class StatisticsClient
                         ConfigurationManager.getProperty("dspace.dir") + "/config/spiders");
 
         options.addOption("m", "mark-spiders", false, "Update isBot Flag in Solr");
+        options.addOption("a", "mark-spiders-by-useragent", true, "Update isBot Flag in Solr By User Agent");
         options.addOption("f", "delete-spiders-by-flag", false, "Delete Spiders in Solr By isBot Flag");
         options.addOption("i", "delete-spiders-by-ip", false, "Delete Spiders in Solr By IP Address");
         options.addOption("o", "optimize", false, "Run maintenance on the SOLR index");
@@ -90,6 +92,16 @@ public class StatisticsClient
         else if (line.hasOption('m'))
         {
             statsService.markRobotsByIP();
+        }
+        else if (line.hasOption('a'))
+        {
+            if(StringUtils.isNotBlank(line.getOptionValue('a'))) {
+                statsService.markRobotByUserAgent(line.getOptionValue('a'));
+            }
+            else {
+                System.err.println("Missing user agent parameter!!!");
+                System.exit(0);
+            }
         }
         else if(line.hasOption('f'))
         {
