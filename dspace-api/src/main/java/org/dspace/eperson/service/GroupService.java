@@ -43,7 +43,7 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @param name
      *            new group name
      */
-    public void setName(Context context, Group group, String name) throws SQLException;
+    public void setName(Group group, String name) throws SQLException;
 
     /**
      * add an eperson member

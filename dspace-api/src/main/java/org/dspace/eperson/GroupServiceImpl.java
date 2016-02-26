@@ -91,7 +91,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
-    public void setName(Context context, Group group, String name) throws SQLException {
+    public void setName(Group group, String name) throws SQLException {
         if (group.isPermanent())
         {
             log.error("Attempt to rename permanent Group {} to {}.",
@@ -99,7 +99,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             throw new SQLException("Attempt to rename a permanent Group");
         }
         else
-            group.setName(context, name);
+            group.setName(name);
     }
 
     @Override
@@ -415,7 +415,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         if(anonymousGroup==null)
         {
             anonymousGroup = groupService.create(context);
-            anonymousGroup.setName(context, Group.ANONYMOUS);
+            anonymousGroup.setName(Group.ANONYMOUS);
             anonymousGroup.setPermanent(true);
             groupService.update(context, anonymousGroup);
         }
@@ -426,7 +426,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         if(adminGroup == null)
         {
             adminGroup = groupService.create(context);
-            adminGroup.setName(context, Group.ADMIN);
+            adminGroup.setName(Group.ADMIN);
             adminGroup.setPermanent(true);
             groupService.update(context, adminGroup);
         }

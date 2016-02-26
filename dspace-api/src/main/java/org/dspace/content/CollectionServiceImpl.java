@@ -318,7 +318,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             Group g = groupService.create(context);
             context.restoreAuthSystemState();
 
-            groupService.setName(context, g,
+            groupService.setName(g,
                     "COLLECTION_" + collection.getID() + "_WORKFLOW_STEP_" + step);
             groupService.update(context, g);
             setWorkflowGroup(collection, step, g);
@@ -396,7 +396,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             submitters = groupService.create(context);
             context.restoreAuthSystemState();
 
-            groupService.setName(context, submitters,
+            groupService.setName(submitters,
                     "COLLECTION_" + collection.getID() + "_SUBMIT");
             groupService.update(context, submitters);
         }
@@ -437,7 +437,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             admins = groupService.create(context);
             context.restoreAuthSystemState();
 
-            groupService.setName(context, admins, "COLLECTION_" + collection.getID() + "_ADMIN");
+            groupService.setName(admins, "COLLECTION_" + collection.getID() + "_ADMIN");
             groupService.update(context, admins);
         }
 
@@ -689,6 +689,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         Group g = collection.getWorkflowStep1();
         if (g != null)
         {
+            collection.setWorkflowStep1(null);
             groupService.delete(context, g);
         }
 
@@ -696,6 +697,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (g != null)
         {
+            collection.setWorkflowStep2(null);
             groupService.delete(context, g);
         }
 
@@ -703,6 +705,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (g != null)
         {
+            collection.setWorkflowStep3(null);
             groupService.delete(context, g);
         }
 
@@ -711,6 +714,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (g != null)
         {
+            collection.setAdmins(null);
             groupService.delete(context, g);
         }
 
@@ -719,6 +723,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (g != null)
         {
+            collection.setSubmitters(null);
             groupService.delete(context, g);
         }
 

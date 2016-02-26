@@ -141,10 +141,23 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void setGroupName() throws SQLException, AuthorizeException {
-        topGroup.setName(context, "new name");
+        topGroup.setName("new name");
         groupService.update(context, topGroup);
         assertThat("setGroupName 1", topGroup.getName(), notNullValue());
         assertEquals("setGroupName 2", topGroup.getName(), "new name");
+    }
+
+    @Test
+    public void setGroupNameOnPermanentGroup() throws SQLException, AuthorizeException {
+        topGroup.setPermanent(true);
+
+        topGroup.setName("new name");
+        groupService.update(context, topGroup);
+        assertThat("setGroupName 1", topGroup.getName(), notNullValue());
+        assertEquals("setGroupName 2", topGroup.getName(), "topGroup");
+
+        topGroup.setPermanent(false);
+        groupService.update(context, topGroup);
     }
 
     @Test
@@ -491,7 +504,7 @@ public class GroupTest extends AbstractUnitTest {
     protected Group createGroup(String name) throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         Group group = groupService.create(context);
-        group.setName(context, name);
+        group.setName(name);
         groupService.update(context, group);
         context.restoreAuthSystemState();
         return group;
