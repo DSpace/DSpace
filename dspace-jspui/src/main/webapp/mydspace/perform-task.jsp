@@ -79,22 +79,24 @@
     <form action="<%= request.getContextPath() %>/mydspace" method="post">
         <input type="hidden" name="workflow_id" value="<%= workflowItem.getID() %>"/>
         <input type="hidden" name="step" value="<%= MyDSpaceServlet.PERFORM_TASK_PAGE %>"/>
+        <ul class="list-group">
 <%
     
     if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP1 ||
         workflowItem.getState() == WorkflowManager.WFSTATE_STEP2)
     {
 %>
-                    <div class="input-group">
+                <li class="list-group-item">
                     <%-- <input type="submit" name="submit_approve" value="Approve"> --%>
-					<span class="input-group-addon">
-					<input style="width:150px;" class="btn btn-success" type="submit" name="submit_approve" value="<fmt:message key="jsp.mydspace.general.approve"/>" />
-					</span>
-                    <span class="form-control">
+					<div class="row">
+					<input class="btn btn-success col-md-2" type="submit" name="submit_approve" value="<fmt:message key="jsp.mydspace.general.approve"/>" />
+					
+                    <span class="col-md-10">
                     <%-- If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve". --%>
 					<fmt:message key="jsp.mydspace.perform-task.instruct1"/>
 					</span>
-                    </div>
+					</div>
+                </li>
 <%
     }
     else
@@ -102,17 +104,17 @@
         // Must be an editor (step 3)
 %>
                     
-                    <div class="input-group">
-					<span class="input-group-addon">
+                 <li class="list-group-item">
 					<%-- <input type="submit" name="submit_approve" value="Commit to Archive"> --%>
-					<input style="width:150px;" class="btn btn-success" type="submit" name="submit_approve" value="<fmt:message key="jsp.mydspace.perform-task.commit.button"/>" />
-					</span>
-                    <span class="form-control">					
+					<div class="row">
+					<input class="btn btn-success col-md-2" type="submit" name="submit_approve" value="<fmt:message key="jsp.mydspace.perform-task.commit.button"/>" />
                     <%-- Once you've edited the item, use this option to commit the
                     item to the archive. --%>
-					<fmt:message key="jsp.mydspace.perform-task.instruct2"/>
+                    <span class="col-md-10">
+						<fmt:message key="jsp.mydspace.perform-task.instruct2"/>
 					</span>
-                    </div>
+					</div>
+                 </li>
 <%
     }
 
@@ -120,18 +122,19 @@
         workflowItem.getState() == WorkflowManager.WFSTATE_STEP2)
     {
 %>
-				<div class="input-group">
-					<span class="input-group-addon">
-                    <input style="width:150px;" class="btn btn-danger" type="submit" name="submit_reject" value="<fmt:message key="jsp.mydspace.general.reject"/>"/>
-                    </span>
-                    <span class="form-control">
+				<li class="list-group-item">
+					<div class="row">
+                    <input class="btn btn-danger col-md-2" type="submit" name="submit_reject" value="<fmt:message key="jsp.mydspace.general.reject"/>"/>
+                   	
                     <%-- If you have reviewed the item and found it is <strong>not</strong> suitable
                     for inclusion in the collection, select "Reject".  You will then be asked 
                     to enter a message indicating why the item is unsuitable, and whether the
                     submitter should change something and re-submit. --%>
-					<fmt:message key="jsp.mydspace.perform-task.instruct3"/>
-	        		</span>
-	        	</div>	
+                    <span class="col-md-10">
+						<fmt:message key="jsp.mydspace.perform-task.instruct3"/>
+					</span>
+					</div>
+	        	</li>
 	        		
 <%
     }
@@ -140,36 +143,37 @@
         workflowItem.getState() == WorkflowManager.WFSTATE_STEP3)
     {
 %>
-				<div class="input-group">
-					<span class="input-group-addon">
-                    <input style="width:150px;" class="btn btn-primary" type="submit" name="submit_edit" value="<fmt:message key="jsp.mydspace.perform-task.edit.button"/>" />
-                    </span>
-                    <span class="form-control">
+				<li class="list-group-item">
+					<div class="row">
+                    <input class="btn btn-primary col-md-2" type="submit" name="submit_edit" value="<fmt:message key="jsp.mydspace.perform-task.edit.button"/>" />
                     <%-- Select this option to correct, amend or otherwise edit the item's metadata. --%>
-					<fmt:message key="jsp.mydspace.perform-task.instruct4"/>
+                    <span class="col-md-10">
+						<fmt:message key="jsp.mydspace.perform-task.instruct4"/>
 					</span>
-				</div>	
+					</div>
+				</li>
 			
 <%
     }
 %>
-				<div class="input-group">
-					<span class="input-group-addon">
-                    <input style="width:150px;" class="btn btn-default" type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.perform-task.later.button"/>" />
-                    </span>
-                    <span class="form-control">
+				<li class="list-group-item">
+					<div class="row">
+                    <input class="btn btn-default col-md-2" type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.perform-task.later.button"/>" />
                     <%-- If you wish to leave this task for now, and return to your "My DSpace", use this option. --%>
-                    <fmt:message key="jsp.mydspace.perform-task.instruct5"/>
+                    <span class="col-md-10">
+                    	<fmt:message key="jsp.mydspace.perform-task.instruct5"/>
                     </span>
-                </div>
-                <div class="input-group">
-					<span class="input-group-addon">
-                    <input style="width:150px;" class="btn btn-default" type="submit" name="submit_pool" value="<fmt:message key="jsp.mydspace.perform-task.return.button"/>" />
-                    </span>
-                    <span class="form-control">
+                    </div>
+                </li>
+                <li class="list-group-item">
+                	<div class="row">
+                    <input class="btn btn-default col-md-2" type="submit" name="submit_pool" value="<fmt:message key="jsp.mydspace.perform-task.return.button"/>" />
                     <%-- To return the task to the pool so that another user can perform the task, use this option. --%>
-                    <fmt:message key="jsp.mydspace.perform-task.instruct6"/>
+                    <span class="col-md-10">
+                    	<fmt:message key="jsp.mydspace.perform-task.instruct6"/>
                     </span>
-                </div>
+                    </div>
+                </li>
+        </ul>   
     </form>
 </dspace:layout>
