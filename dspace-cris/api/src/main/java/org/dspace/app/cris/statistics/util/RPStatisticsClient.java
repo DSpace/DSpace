@@ -138,8 +138,7 @@ public class RPStatisticsClient
         }
         else if (line.hasOption('b'))
         {
-            if (line.getOptionValue('b') != null)
-                indexer.markRobotByUserAgent(line.getOptionValue('b'));
+            indexer.markRobotByUserAgent(line.getOptionValue('b'));
         }
         else
         {
