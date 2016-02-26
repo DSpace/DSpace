@@ -85,13 +85,18 @@ public abstract class CheckItem {
                     log.warn("Error retrieving required nodes from the response: "+output);
                     return articleAccess;
                 }else{
-                    hostingAllowedNode = XMLUtils.getNode(hostingNode, "hosting-platform[@type='non-commercial']/document-version[journal_article_version/text()='AM']/hosting-allowed");
+                    hostingAllowedNode = XMLUtils.getNode(hostingNode, "hosting-platform[@type='institutional_repository']/document-version[journal_article_version/text()='AM']/hosting-allowed[@audience='Public']");
                 }
                 if (hostingAllowedNode != null) {
                     NamedNodeMap attributes = hostingAllowedNode.getAttributes();
 
-                    articleAccess.setAudience(attributes.getNamedItem("audience").getTextContent());
-                    articleAccess.setStartDate(attributes.getNamedItem("start_date").getTextContent());
+                    Node audience = attributes.getNamedItem("audience");
+                    Node start_date = attributes.getNamedItem("start_date");
+                    articleAccess.setAudience(audience.getTextContent());
+
+                    if(start_date !=null){
+                       articleAccess.setStartDate(start_date.getTextContent());
+                    }
                 }
             } catch (XPathExpressionException e) {
                 log.error("Error", e);
