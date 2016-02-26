@@ -48,6 +48,7 @@
         <entry key-ref="elsevier.issue.identifier" value-ref="scidirIssueIdentifierContrib"/>
         <entry key-ref="elsevier.issue.name" value-ref="scidirIssueNameContrib"/>
         <entry key-ref="elsevier.coverdate" value-ref="scidirCoverdateContrib"/>
+        <entry key-ref="dc.date.issued" value-ref="scidirCoverdateContrib"/>
         <entry key-ref="elsevier.coverdisplaydate" value-ref="scidirCoverdisplaydateContrib"/>
         <entry key-ref="elsevier.startingpage" value-ref="scidirStartingpageContrib"/>
         <entry key-ref="elsevier.endingpage" value-ref="scidirEndingpageContrib"/>

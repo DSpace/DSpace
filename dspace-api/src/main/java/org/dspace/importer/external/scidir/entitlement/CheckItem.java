@@ -75,14 +75,14 @@ public abstract class CheckItem {
                 Node hostingAllowedNode;
                 if(hostingNode==null){
                     // If the hostingNode == null
-                    // -> Log the response and return the initially created articelAcces object since it's no use continuing the processing
+                    // -> Log the response and return the initially created articleAcces object since it's no use continuing the processing
                     TransformerFactory tf = TransformerFactory.newInstance();
                     Transformer transformer = tf.newTransformer();
                     transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
                     StringWriter writer = new StringWriter();
                     transformer.transform(new DOMSource(response), new StreamResult(writer));
                     String output = writer.getBuffer().toString().replaceAll("\n|\r", "");
-                    log.warn("Error retrieving required nodes from the response: "+output);
+                    log.warn("Error retrieving required nodes from the response, please verify whether your ScienceDirect API key has sufficient permissions: "+output);
                     return articleAccess;
                 }else{
                     hostingAllowedNode = XMLUtils.getNode(hostingNode, "hosting-platform[@type='institutional_repository']/document-version[journal_article_version/text()='AM']/hosting-allowed[@audience='Public']");
