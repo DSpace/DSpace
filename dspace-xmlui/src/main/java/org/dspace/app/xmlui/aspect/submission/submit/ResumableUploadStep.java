@@ -100,7 +100,6 @@ public class ResumableUploadStep extends UploadStep{
             progressDiv.addDivision("progress-bar");
 
             List upload = div.addList("submit-upload-new-list", List.TYPE_SIMPLE);
-            submission.getID();
 
             div.addHidden("submit-id").setValue(submission.getID());
 
