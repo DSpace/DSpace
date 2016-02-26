@@ -16,7 +16,6 @@ var sId = $('input[name="submit-id"]').val();
 var doResumable = false;
 var r;
 
-
 if(sId > 0){
     r = new Resumable({
         target: url,
