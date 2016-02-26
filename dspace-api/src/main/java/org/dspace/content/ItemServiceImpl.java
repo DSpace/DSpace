@@ -1172,7 +1172,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public int countWithdrawnItems(Context context) throws SQLException {
-       // return count of items that are in archive and withdrawn
-       return itemDAO.countItems(context, true, true);
+       // return count of items that are not in archive and withdrawn
+       return itemDAO.countItems(context, false, true);
     }
 }
