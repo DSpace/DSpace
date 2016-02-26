@@ -16,7 +16,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
@@ -49,9 +48,6 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Autowired(required = true)
     protected GroupDAO groupDAO;
-
-//    @Autowired(required = true)
-//    protected Group2GroupDAO group2GroupDAO;
 
     @Autowired(required = true)
     protected Group2GroupCacheDAO group2GroupCacheDAO;
@@ -275,22 +271,25 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         return groupDAO.findByName(context, name);
     }
 
+    /** DEPRECATED: Please use findAll(Context context, List<MetadataField> metadataSortFields) instead */
     @Override
-    public List<Group> findAll(Context context, int sortField) throws SQLException
-    {
-        List<MetadataField> metadataFieldsSort = new ArrayList<>();
-        switch (sortField)
-        {
-            case NAME:
-                metadataFieldsSort.add(metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null));
-
-                break;
-
-            default:
-                metadataFieldsSort.add(metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null));
+    @Deprecated
+    public List<Group> findAll(Context context, int sortField) throws SQLException {
+        if(sortField == GroupService.NAME) {
+            return findAll(context, null);
+        } else {
+            throw new UnsupportedOperationException("You can only find all groups sorted by name with this method");
         }
+    }
 
-        return groupDAO.findAll(context, metadataFieldsSort, null);
+    @Override
+    public List<Group> findAll(Context context, List<MetadataField> metadataSortFields) throws SQLException
+    {
+        if(CollectionUtils.isEmpty(metadataSortFields)) {
+            return groupDAO.findAll(context);
+        } else {
+            return groupDAO.findAll(context, metadataSortFields);
+        }
     }
 
     @Override
@@ -671,5 +670,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     public int countTotal(Context context) throws SQLException {
         return groupDAO.countRows(context);
+    }
+
+    @Override
+    public List<Group> findByMetadataField(final Context context, final String searchValue, final MetadataField metadataField) throws SQLException {
+        return groupDAO.findByMetadataField(context, searchValue, metadataField);
     }
 }

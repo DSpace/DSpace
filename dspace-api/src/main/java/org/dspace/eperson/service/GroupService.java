@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.MetadataField;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -155,13 +156,16 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      *
      * @param context
      *            DSpace context
-     * @param sortField
-     *            field to sort by -- Group.ID or Group.NAME
+     * @param metadataSortFields
+     *            metadata fields to sort by, leave empty to sort by Name
      *
      * @return array of all groups in the site
      */
-    public List<Group> findAll(Context context, int sortField) throws SQLException;
+    public List<Group> findAll(Context context, List<MetadataField> metadataSortFields) throws SQLException;
 
+    /** DEPRECATED: Please use findAll(Context context, List<MetadataField> metadataFieldsSort) instead */
+    @Deprecated
+    public List<Group> findAll(Context context, int sortField) throws SQLException;
 
     /**
      * Find the groups that match the search query across eperson_group_id or name
@@ -219,7 +223,29 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      */
     public void initDefaultGroupNames(Context context) throws SQLException, AuthorizeException;
 
+    /**
+     * Find all empty groups in DSpace
+     * @param context The DSpace context
+     * @return All empty groups
+     * @throws SQLException
+     */
     List<Group> getEmptyGroups(Context context) throws SQLException;
 
+    /**
+     * Count the total number of groups in DSpace
+     * @param context The DSpace context
+     * @return The total number of groups
+     * @throws SQLException
+     */
     int countTotal(Context context) throws SQLException;
+
+    /**
+     * Look up groups based on their value for a certain metadata field (NOTE: name is not stored as metadata)
+     * @param context The DSpace context
+     * @param searchValue The value to match
+     * @param metadataField The metadata field to search in
+     * @return The groups that have a matching value for specified metadata field
+     * @throws SQLException
+     */
+    List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException;
 }

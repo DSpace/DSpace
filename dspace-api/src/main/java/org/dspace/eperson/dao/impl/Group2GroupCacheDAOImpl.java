@@ -38,6 +38,8 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
     public List<Group2GroupCache> findByParent(Context context, Group group) throws SQLException {
         Criteria criteria = createCriteria(context, Group2GroupCache.class);
         criteria.add(Restrictions.eq("parent", group));
+        criteria.setCacheable(true);
+
         return list(criteria);
     }
 
@@ -52,6 +54,8 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
         }
 
         criteria.add(orDisjunction);
+        criteria.setCacheable(true);
+
         return list(criteria);
     }
 
@@ -60,6 +64,7 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
         Criteria criteria = createCriteria(context, Group2GroupCache.class);
         criteria.add(Restrictions.eq("parent", parent));
         criteria.add(Restrictions.eq("child", child));
+        criteria.setCacheable(true);
         return uniqueResult(criteria);
     }
 

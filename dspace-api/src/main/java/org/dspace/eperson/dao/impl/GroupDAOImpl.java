@@ -37,7 +37,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public Group findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException
+    public List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException
     {
         StringBuilder queryBuilder = new StringBuilder();
         String groupTableName = "g";
@@ -50,23 +50,32 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         query.setParameter(metadataField.toString(), metadataField.getFieldID());
         query.setParameter("queryParam", searchValue);
 
-        return uniqueResult(query);
+        return list(query);
     }
 
     @Override
-    public List<Group> findAll(Context context, List<MetadataField> sortFields, String sortColumn) throws SQLException
+    public List<Group> findAll(Context context, List<MetadataField> sortMetadataFields) throws SQLException
     {
         StringBuilder queryBuilder = new StringBuilder();
         String groupTableName = "g";
         queryBuilder.append("SELECT ").append(groupTableName).append(" FROM Group as ").append(groupTableName);
 
-        addMetadataLeftJoin(queryBuilder, groupTableName, sortFields);
-        addMetadataSortQuery(queryBuilder, sortFields, Collections.singletonList(sortColumn));
+        addMetadataLeftJoin(queryBuilder, groupTableName, sortMetadataFields);
+        addMetadataSortQuery(queryBuilder, sortMetadataFields, null);
 
         Query query = createQuery(context, queryBuilder.toString());
-        for (MetadataField sortField : sortFields) {
+        for (MetadataField sortField : sortMetadataFields) {
             query.setParameter(sortField.toString(), sortField.getFieldID());
         }
+        return list(query);
+    }
+
+    @Override
+    public List<Group> findAll(Context context) throws SQLException {
+        Query query = createQuery(context,
+                "SELECT g FROM Group g ORDER BY g.name ASC");
+        query.setCacheable(true);
+
         return list(query);
     }
 

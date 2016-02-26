@@ -157,7 +157,7 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void findAll() throws SQLException {
-        List<Group> groups = groupService.findAll(context, GroupService.NAME);
+        List<Group> groups = groupService.findAll(context, null);
         assertThat("findAll 1", groups, notNullValue());
         System.out.println("TEST GROUP OUTPUT " + groups);
         assertTrue("findAll 2", 0 < groups.size());
@@ -184,7 +184,7 @@ public class GroupTest extends AbstractUnitTest {
     @Test
     public void findAllNameSort() throws SQLException {
         // Retrieve groups sorted by name
-        List<Group> groups = groupService.findAll(context, GroupService.NAME);
+        List<Group> groups = groupService.findAll(context, null);
 
         assertThat("findAllNameSort 1", groups, notNullValue());
 

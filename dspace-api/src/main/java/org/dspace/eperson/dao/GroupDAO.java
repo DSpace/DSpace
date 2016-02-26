@@ -28,23 +28,104 @@ import java.util.UUID;
  */
 public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupportDAO<Group> {
 
-    Group findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException;
+    /**
+     * Look up groups based on their value for a certain metadata field (NOTE: name is not stored as metadata)
+     * @param context The DSpace context
+     * @param searchValue The value to match
+     * @param metadataField The metadata field to search in
+     * @return The groups that have a matching value for specified metadata field
+     * @throws SQLException
+     */
+    List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException;
 
-    List<Group> findAll(Context context, List<MetadataField> metadataFields, String sortColumn) throws SQLException;
+    /**
+     * Find all groups ordered by the specified metadata fields ascending
+     * @param context The DSpace context
+     * @param sortMetadataFields The metadata fields to sort on
+     * @return A list of all groups, ordered by metadata fields
+     * @throws SQLException
+     */
+    List<Group> findAll(Context context, List<MetadataField> sortMetadataFields) throws SQLException;
 
+    /**
+     * Find all groups ordered by name ascending
+     * @param context The DSpace context
+     * @return A list of all groups, ordered by name
+     * @throws SQLException
+     */
+    List<Group> findAll(Context context) throws SQLException;
+
+    /**
+     * Find all groups that the given ePerson belongs to
+     * @param context The DSpace context
+     * @param ePerson The EPerson to match
+     * @return A list of all groups to which the given EPerson belongs
+     * @throws SQLException
+     */
     List<Group> findByEPerson(Context context, EPerson ePerson) throws SQLException;
 
+    /**
+     * Get a list of all direct parent - child group relations in the database
+     * @param context The DSpace context
+     * @param flushQueries Flush all pending queries
+     * @return A list of pairs indicating parent - child
+     * @throws SQLException
+     */
     List<Pair<UUID, UUID>> getGroup2GroupResults(Context context, boolean flushQueries) throws SQLException;
 
+    /**
+     * Return all empty groups
+     * @param context The DSpace context
+     * @return All empty groups
+     * @throws SQLException
+     */
     List<Group> getEmptyGroups(Context context) throws SQLException;
 
+    /**
+     * Count the number of groups in DSpace
+     * @param context The DSpace context
+     * @return The number of groups
+     * @throws SQLException
+     */
     int countRows(Context context) throws SQLException;
 
+    /**
+     * Find a group by its name (exact match)
+     * @param context The DSpace context
+     * @param name The name of the group to look for
+     * @return The group with the specified name
+     * @throws SQLException
+     */
     Group findByName(Context context, String name) throws SQLException;
 
+    /**
+     * Find a group by its name (fuzzy match)
+     * @param context The DSpace context
+     * @param groupName Part of the group's name to search for
+     * @param offset Offset to use for pagination (-1 to disable)
+     * @param limit The maximum number of results to return (-1 to disable)
+     * @return Groups matching the query
+     * @throws SQLException
+     */
+    List<Group> findByNameLike(Context context, String groupName, int offset, int limit) throws SQLException;
+
+    /**
+     * Count the number of groups that have a name that contains the given string
+     * @param context The DSpace context
+     * @param groupName Part of the group's name to search for
+     * @return The number of matching groups
+     * @throws SQLException
+     */
+    int countByNameLike(Context context, String groupName) throws SQLException;
+
+    /**
+     * Find a group by its name and the membership of the given EPerson
+     * @param context The DSpace context
+     * @param groupName The name of the group to look for
+     * @param ePerson The EPerson which has to be a member
+     * @return The group with the specified name
+     * @throws SQLException
+     */
     Group findByNameAndEPerson(Context context, String groupName, EPerson ePerson) throws SQLException;
 
-    List<Group> findByNameLike(Context context, String groupIdentifier, int offset, int limit) throws SQLException;
-
-    int countByNameLike(Context context, String groupIdentifier) throws SQLException;
 }

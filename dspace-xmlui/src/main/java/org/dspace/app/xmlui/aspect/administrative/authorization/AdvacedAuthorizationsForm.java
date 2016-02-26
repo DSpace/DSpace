@@ -7,10 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.authorization;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -24,6 +20,10 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * @author Alexey Maslov
@@ -145,7 +145,7 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
         if (errors.contains("groupIDs")){
             groupSelect.addError(T_error_groupIds);
         }
-        for (Group group : groupService.findAll(context, GroupService.NAME))
+        for (Group group : groupService.findAll(context, null))
         {
             if(wasElementSelected(group.getID().toString(), groupIDs)){
                 groupSelect.addOption(true, group.getID().toString(), group.getName());
