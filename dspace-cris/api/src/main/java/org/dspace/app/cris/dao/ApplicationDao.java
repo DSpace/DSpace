@@ -51,7 +51,7 @@ public class ApplicationDao extends it.cilea.osd.common.dao.impl.ApplicationDao
         return query.list();
     }
    
-
+    @Deprecated
     public <C extends ACrisObject> C uniqueByUUID(String uuid)
     {
         Query query = getSessionFactory().getCurrentSession().createQuery(
