@@ -32,3 +32,120 @@
 .submission .ds-add-button {
     min-width: 100%;
 }
+
+
+/*************************** resumable upload *******************************/
+
+@import "../vendor/jquery-ui/themes/base/jquery.ui.dialog.css";
+
+#aspect_submission_StepTransformer_div_submit-file-upload{
+    padding-top: 0.5em;
+}
+
+#aspect_submission_StepTransformer_div_resumable-drop {
+    padding-: 1em;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    background-color: #5b4b4b;
+    opacity: 0.65;
+    margin-top: 0.4em;
+    margin-bottom: 0.2em;
+    z-index: 1;
+    height: 12em;
+    top: 50%;
+    vertical-align: middle !important;
+    min-height: 6em;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+#aspect_submission_StepTransformer_div_resumable-drop p {
+    padding: 0;
+    font-size: 1.4em;
+}
+
+#aspect_submission_StepTransformer_div_resumable-drop .glyphicon-upload{
+    padding-top: 0.5em;
+    font-size: 3.2em;
+    width: 2em;
+    height: 2em;
+    margin: 0;
+}
+
+#aspect_submission_StepTransformer_div_progress-button img{
+    width: 0.8em;
+    height: 0.8em;
+}
+
+#aspect_submission_StepTransformer_div_progress-button{
+    clear: left;
+    width: 5%;
+    cursor: pointer;
+    padding-bottom: 0.2em;
+}
+
+#aspect_submission_StepTransformer_div_progress{
+    height: 1em;
+    background-color: #95d195;
+}
+
+#aspect_submission_StepTransformer_div_progress-bar{
+    width: 0%;
+    float: left;
+    background-color: #5cb85c;
+    height: 1em;
+}
+
+#aspect_submission_StepTransformer_div_submit-file-upload h3{
+    clear: both;
+}
+
+.resumable-dragover{
+    color: #555;
+    background-color: #ddd;
+    border:1px solid #999;
+    opacity: 1;
+}
+
+.resumable-files {
+   display: none;
+}
+
+.file-primary {
+    cursor: pointer;
+}
+
+.file-select {
+    cursor: pointer;
+}
+
+.file-status-success{
+    background-image: url("../images/upload-success.png");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.file-info{
+    background-image: url("../images/upload-info.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+}
+
+.file-delete {
+    background-image: url("../images/upload-delete.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+}
+
+.file-uploading div{
+    padding-top: 0.5em;
+    padding-left: 0.5em;
+}
+
+#delete-icon{
+    float: left;
+    margin: 0 7px 20px 0;
+}

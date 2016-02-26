@@ -448,9 +448,9 @@
                         <map:match pattern="handle/*/*/upload">
                             <map:select type="AuthenticatedSelector">
                                 <map:when test="eperson">
-                                    <map:act type="UploadFileChunk">
+                                    <map:act type="ResumableUpload">
                                       <map:parameter name="handle" value="{1}/{2}"/>
-                                      <map:generate type="UploadFileChunkGenerator">
+                                      <map:generate type="ResumableUploadGenerator">
                                         <map:parameter name="bitstream_id" value="{bitstream}"/>
                                       </map:generate>
                                       <map:serialize type="xhtml"/>
