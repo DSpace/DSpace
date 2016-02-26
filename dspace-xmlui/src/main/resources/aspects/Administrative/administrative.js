@@ -2356,7 +2356,7 @@ function doEditPolicy(objectType,objectID,policyID)
     var result;
     var query= "-1";
     var groupID;
-    var actionID;
+    var actionID = -1;
     var page = 0;
     var name;
     var description;
