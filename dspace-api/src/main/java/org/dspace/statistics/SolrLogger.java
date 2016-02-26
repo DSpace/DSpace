@@ -689,7 +689,7 @@ public class SolrLogger
                 params.put(ShardParams.SHARDS, StringUtils.join(statisticYearCores.iterator(), ','));
             }
             MapSolrParams solrParams = new MapSolrParams(params);
-            QueryResponse response = solr.query(solrParams);
+            QueryResponse response = getSolr().query(solrParams);
             
             long numbFound = response.getResults().getNumFound();
 
@@ -701,14 +701,14 @@ public class SolrLogger
             {
                 params.put("start", String.valueOf(i));
                 solrParams = new MapSolrParams(params);
-                response = solr.query(solrParams);
+                response = getSolr().query(solrParams);
                 process(response.getResults());
             }
 
         }
 
         public void commit() throws IOException, SolrServerException {
-            solr.commit();
+            getSolr().commit();
         }
 
         /**
