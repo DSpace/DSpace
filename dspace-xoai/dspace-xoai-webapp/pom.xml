@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>dspace-xoai</artifactId>
+		<groupId>org.dspace</groupId>
+		<version>1.8.2</version>
+	</parent>
+
+	<artifactId>dspace-xoai-webapp</artifactId>
+	<packaging>war</packaging>
+
+	<name>Lyncode XOAI :: Web Application Resources</name>
+	<description>Webapp</description>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<archiveClasses>false</archiveClasses>
+					<!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
+					<packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+					<warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+					<webResources>
+						<resource>
+							<filtering>false</filtering>
+							<directory>${basedir}/src/main/webapp</directory>
+							<includes>
+								<include>WEB-INF/web.xml</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<activation>
+				<property>
+					<name>dspace.config</name>
+				</property>
+			</activation>
+			<build>
+				<filters>
+					<filter>${dspace.config}</filter>
+				</filters>
+			</build>
+		</profile>
+		<profile>
+			<id>oracle-support</id>
+			<activation>
+				<property>
+					<name>db.name</name>
+					<value>oracle</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle</groupId>
+					<artifactId>ojdbc6</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>postgres-support</id>
+			<activation>
+				<property>
+					<name>!db.name</name>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>postgresql</groupId>
+					<artifactId>postgresql</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-xoai-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<developers>
+		<developer>
+			<name>DSpace @ Lyncode</name>
+			<email>dspace@lyncode.com</email>
+			<organization>Lyncode</organization>
+			<organizationUrl>http://www.lyncode.com</organizationUrl>
+		</developer>
+	</developers>
+</project>

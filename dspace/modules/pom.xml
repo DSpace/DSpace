@@ -32,6 +32,7 @@
         <module>xmlui</module>
         <module>bagit</module>
         <module>oai</module>
+        <module>xoai</module>
         <module>solr</module>
         <module>api-stats</module>
         <module>doi</module>
