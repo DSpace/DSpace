@@ -1439,6 +1439,11 @@ table.discovery-filters th.new-filter-header
     color: #ffffff;
 }
 
+.gray{
+    background-color: #aaaaaa;
+    color: #000000;
+}
+
 .sherpaMoreInfo{
     font-size: 75%;
 }
