@@ -104,6 +104,9 @@
                 <xsl:if test="contains(@rend,'green')">
                     <xsl:text>label label-success</xsl:text>
                 </xsl:if>
+                <xsl:if test="contains(@rend,'gray')">
+                    <xsl:text>label label-default</xsl:text>
+                </xsl:if>
 
             </xsl:attribute>
 
