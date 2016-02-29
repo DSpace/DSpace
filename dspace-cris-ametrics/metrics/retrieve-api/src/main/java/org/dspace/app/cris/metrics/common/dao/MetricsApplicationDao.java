@@ -21,7 +21,7 @@ public class MetricsApplicationDao
         extends it.cilea.osd.common.dao.impl.ApplicationDao
 {
 
-    private final String query = "select cm1.uuid as uuid, subq.resourceid as resourceid, subq.resourcetypeid as resourcetypeid, subq.limitsx as startdate, subq.limitdx as enddate, case when (cm1.metriccount - cm2.metriccount) < 0 then 0 else (cm1.metriccount - cm2.metriccount) end as metriccount"
+    private final String query = "select cm1.uuid as uuid, subq.resourceid as resourceid, subq.resourcetypeid as resourcetypeid, subq.limitsx as startdate, subq.limitdx as enddate, case when (cm2.metriccount - cm1.metriccount) < 0 then 0 else (cm2.metriccount - cm1.metriccount) end as metriccount"
             + " from"
             + " (select cm1.resourceid, cm1.resourcetypeid, max(cm1.enddate) as limitsx, min(cm2.enddate) as limitdx, cm1.metrictype"
             + " from cris_metrics cm1 join cris_metrics cm2"
@@ -34,6 +34,8 @@ public class MetricsApplicationDao
             + " join cris_metrics cm2"
             + " on cm2.resourceid = subq.resourceid and subq.metrictype = cm2.metrictype and cm2.resourcetypeid = subq.resourcetypeid and subq.limitdx = cm2.enddate";
 
+    private final String queryUpdateLast = "update cris_metrics set last = false where metrictype = ? and last = true and resourcetypeid = ? and resourceid = ? and timestampcreated < ?";
+    
     public void buildPeriodMetrics(Context context, String suffixNewType,
             String type, long rangeLimitSx, long rangeLimitDx)
                     throws SQLException
@@ -48,20 +50,34 @@ public class MetricsApplicationDao
             {
                 TableRow rowSelect = tri.next();
                 TableRow row = DatabaseManager.row("cris_metrics");
-                row.setColumn("timestampcreated", new Date());
-                row.setColumn("timestampLastModified", new Date());
+                
+                String metrictype = type + suffixNewType;
+                Date currentTimestamp = new Date();
+                int resourceId = rowSelect.getIntColumn("resourceid");
+                int resourceTypeId = rowSelect.getIntColumn("resourcetypeid");
+                //just set false the column last
+                DatabaseManager.updateQuery(context, queryUpdateLast, metrictype, resourceTypeId, resourceId, new Timestamp(currentTimestamp.getTime()));
+                
+                //build the new one
+                row.setColumn("timestampcreated", currentTimestamp);
+                row.setColumn("timestampLastModified", currentTimestamp);
+                
                 row.setColumn("startdate", new Timestamp(
                         rowSelect.getDateColumn("startdate").getTime()));
                 row.setColumn("enddate", new Timestamp(
                         rowSelect.getDateColumn("enddate").getTime()));
                 row.setColumn("metriccount",
                         rowSelect.getDoubleColumn("metriccount"));
+                
                 row.setColumn("resourceid",
-                        rowSelect.getIntColumn("resourceid"));
+                        resourceId);                
                 row.setColumn("resourcetypeid",
-                        rowSelect.getIntColumn("resourcetypeid"));
+                        resourceTypeId);
                 row.setColumn("uuid", rowSelect.getStringColumn("uuid"));
-                row.setColumn("metrictype", type + suffixNewType);
+                
+                row.setColumn("metrictype", metrictype);
+                row.setColumn("last", true);
+                
                 DatabaseManager.insert(context, row);
             }
         }
