@@ -16,6 +16,9 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
+import java.util.List;
+import org.dspace.versioning.Version;
+import org.hibernate.criterion.Order;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the VersionHistory object.
@@ -39,6 +42,7 @@ public class VersionHistoryDAOImpl extends AbstractHibernateDAO<VersionHistory> 
         Criteria criteria = createCriteria(context, VersionHistory.class);
         criteria.createAlias("versions", "v");
         criteria.add(Restrictions.eq("v.item", item));
+        criteria.addOrder(Order.desc("v.versionNumber"));
         return singleResult(criteria);
     }
 }

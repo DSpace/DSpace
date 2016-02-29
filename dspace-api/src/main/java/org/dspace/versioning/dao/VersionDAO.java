@@ -13,6 +13,8 @@ import org.dspace.core.GenericDAO;
 import org.dspace.versioning.Version;
 
 import java.sql.SQLException;
+import java.util.List;
+import org.dspace.versioning.VersionHistory;
 
 /**
  * Database Access Object interface class for the Version object.
@@ -24,4 +26,17 @@ import java.sql.SQLException;
 public interface VersionDAO extends GenericDAO<Version>
 {
     public Version findByItem(Context context, Item item) throws SQLException;
+    
+    /**
+     * This method returns all versions of an version history that have items
+     * assigned. We do not delete versions to keep version numbers stable. To
+     * remove a version we set the item, date, summary and eperson null. This
+     * method returns only versions that aren't soft deleted and have items
+     * assigned.
+     */
+    public List<Version> findVersionsWithItems(Context context, VersionHistory versionHistory)
+            throws SQLException;
+
+    public int getNextVersionNumber(Context c, VersionHistory vh) throws SQLException;
+    
 }

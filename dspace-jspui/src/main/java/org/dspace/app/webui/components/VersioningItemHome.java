@@ -28,104 +28,113 @@ import org.dspace.plugin.ItemHomeProcessor;
 import org.dspace.plugin.PluginException;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 
 public class VersioningItemHome implements ItemHomeProcessor {
 
-	/** log4j category */
-	private static Logger log = Logger.getLogger(VersioningItemHome.class);
+    /** log4j category */
+    private static Logger log = Logger.getLogger(VersioningItemHome.class);
 
-	private ItemService itemService;
-	
-	private HandleService handleService; 
-	
-	public VersioningItemHome() {
-		handleService = HandleServiceFactory.getInstance().getHandleService();
-		itemService = ContentServiceFactory.getInstance().getItemService();
-	}
-	
-	@Override
-	public void process(Context context, HttpServletRequest request,
-			HttpServletResponse response, Item item) throws PluginException,
-			AuthorizeException {
-		boolean versioningEnabled = ConfigurationManager.getBooleanProperty(
-				"versioning", "enabled");
-		boolean newVersionAvailable = false;
-		boolean showVersionWorkflowAvailable = false;
-		boolean hasVersionButton = false;
-		boolean hasVersionHistory = false;
-		
-		VersionHistory history = null;
-		List<Version> historyVersions = new ArrayList<Version>();
-		String latestVersionHandle = null;
-		String latestVersionURL = null;
-		if (versioningEnabled) {
-			try {
-				if(itemService.canEdit(context, item)) {
-					if (VersionUtil.isLatest(context, item) && item.isArchived()) {
-						hasVersionButton = true;
-					}
-				}
-				if (VersionUtil.hasVersionHistory(context, item)) {
-					hasVersionHistory = true;
-					history = VersionUtil.retrieveVersionHistory(context, item);
-					for(Version versRow : history.getVersions()) {  
-						//Skip items currently in submission
-						if(VersionUtil.isItemInSubmission(context, versRow.getItem()))
-						{
-						    continue;
-						}
-						else {
-							historyVersions.add(versRow);
-						}
-					}
-				}
-			} catch (SQLException e) {
-				throw new PluginException(e.getMessage());
-			}
+    private ItemService itemService;
 
-			// Check if we have a history for the item
-			Version latestVersion;
-			try {
-				latestVersion = VersionUtil.checkLatestVersion(context, item);
-			} catch (SQLException e) {
-				throw new PluginException(e.getMessage());
-			}
+    private HandleService handleService;
+    
+    private VersionHistoryService versionHistoryService;
+    
+    private VersioningService versioningService;
 
-			if (latestVersion != null && latestVersion.getItem() != null
-					&& !latestVersion.getItem().getID().equals(item.getID())) {
-				// We have a newer version
-				Item latestVersionItem = latestVersion.getItem();
-				if (latestVersionItem.isArchived()) {
-					// Available, add a link for the user alerting him that
-					// a new version is available
-					newVersionAvailable = true;
-					try {
-						latestVersionURL = handleService.resolveToURL(
-								context, latestVersionItem.getHandle());
-					} catch (SQLException e) {
-						throw new PluginException(e.getMessage());
-					}
-					latestVersionHandle = latestVersionItem.getHandle();
-				} else {
-					// We might be dealing with a workflow/workspace item
-					showVersionWorkflowAvailable = true;
-				}
-			}
-		}
+    public VersioningItemHome() {
+        handleService = HandleServiceFactory.getInstance().getHandleService();
+        itemService = ContentServiceFactory.getInstance().getItemService();
+        versioningService = VersionServiceFactory.getInstance().getVersionService();
+        versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
+    }
 
-		request.setAttribute("versioning.enabled", versioningEnabled);
-		request.setAttribute("versioning.hasversionbutton", hasVersionButton);
-		request.setAttribute("versioning.hasversionhistory", hasVersionHistory);
-		request.setAttribute("versioning.history", history);
-		request.setAttribute("versioning.historyversions", historyVersions);
-		request.setAttribute("versioning.newversionavailable",
-				newVersionAvailable);
-		request.setAttribute("versioning.showversionwfavailable",
-				showVersionWorkflowAvailable);
-		request.setAttribute("versioning.latestversionhandle",
-				latestVersionHandle);
-		request.setAttribute("versioning.latestversionurl", latestVersionURL);
+    @Override
+    public void process(Context context, HttpServletRequest request,
+            HttpServletResponse response, Item item) throws PluginException,
+            AuthorizeException {
+        boolean versioningEnabled = ConfigurationManager.getBooleanProperty(
+                "versioning", "enabled");
+        boolean newVersionAvailable = false;
+        boolean showVersionWorkflowAvailable = false;
+        boolean hasVersionButton = false;
+        boolean hasVersionHistory = false;
 
-	}
+        VersionHistory history = null;
+        List<Version> historyVersions = new ArrayList<Version>();
+        String latestVersionHandle = null;
+        String latestVersionURL = null;
+        if (versioningEnabled) {
+            try {
+                if (itemService.canEdit(context, item)) {
+                    if (versionHistoryService.isLastVersion(context, item) 
+                            && item.isArchived()) {
+                        hasVersionButton = true;
+                    }
+                }
+                if (versionHistoryService.hasVersionHistory(context, item)) {
+                    hasVersionHistory = true;
+                    history = versionHistoryService.findByItem(context, item);
+                    for (Version versRow : versioningService.getVersionsByHistory(context, history)) {
+                        //Skip items currently in submission
+                        if (VersionUtil.isItemInSubmission(context, versRow.getItem())) {
+                            continue;
+                        }
+                        historyVersions.add(versRow);
+                    }
+                }
+            } catch (SQLException e) {
+                throw new PluginException(e.getMessage());
+            }
+
+            // Check if we have a history for the item
+            Version latestVersion;
+            try {
+                latestVersion = VersionUtil.checkLatestVersion(context, item);
+            } catch (SQLException e) {
+                throw new PluginException(e.getMessage());
+            }
+            
+            if (latestVersion != null) {
+                if (latestVersion.getItem() != null
+                        && !latestVersion.getItem().getID().equals(item.getID())) {
+                    // We have a newer version
+                    Item latestVersionItem = latestVersion.getItem();
+                    if (latestVersionItem.isArchived()) {
+			// Available, add a link for the user alerting him that
+                        // a new version is available
+                        newVersionAvailable = true;
+                        try {
+                            latestVersionURL = handleService.resolveToURL(
+                                    context, latestVersionItem.getHandle());
+                        } catch (SQLException e) {
+                            throw new PluginException(e.getMessage());
+                        }
+                        latestVersionHandle = latestVersionItem.getHandle();
+                    } else {
+                        // We might be dealing with a workflow/workspace item
+                        showVersionWorkflowAvailable = true;
+                    }
+                }
+            }
+        }
+
+        request.setAttribute("versioning.enabled", versioningEnabled);
+        request.setAttribute("versioning.hasversionbutton", hasVersionButton);
+        request.setAttribute("versioning.hasversionhistory", hasVersionHistory);
+        request.setAttribute("versioning.history", history);
+        request.setAttribute("versioning.historyversions", historyVersions);
+        request.setAttribute("versioning.newversionavailable",
+                newVersionAvailable);
+        request.setAttribute("versioning.showversionwfavailable",
+                showVersionWorkflowAvailable);
+        request.setAttribute("versioning.latestversionhandle",
+                latestVersionHandle);
+        request.setAttribute("versioning.latestversionurl", latestVersionURL);
+
+    }
 
 }

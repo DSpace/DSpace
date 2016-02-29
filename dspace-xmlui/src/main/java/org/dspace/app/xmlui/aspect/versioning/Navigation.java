@@ -51,6 +51,7 @@ import java.util.UUID;
  * @author Fabio Bolognesi (fabio at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
+ * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
  */
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
@@ -172,14 +173,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             if(authorizeService.isAdmin(this.context, item.getOwningCollection()))
             {
                 boolean headAdded=false;
-                if(isLatest(item) && item.isArchived())
+                if(versionHistoryService.isLastVersion(this.context, item) && item.isArchived())
                 {
                     context.setHead(T_context_head);
                     headAdded=true;
                     context.addItem().addXref(contextPath+"/item/version?itemID="+item.getID(), T_context_create_version);
                 }
 
-                if(hasVersionHistory(item))
+                if(versionHistoryService.hasVersionHistory(this.context, item))
                 {
                     if(!headAdded)
                     {
@@ -211,19 +212,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     {
         this.validity = null;
         super.recycle();
-    }
-
-    private boolean isLatest(Item item) throws SQLException
-    {
-        org.dspace.versioning.VersionHistory history = versionHistoryService.findByItem(context, item);
-        return (history==null || versionHistoryService.getLatestVersion(history).getItem().equals(item));
-    }
-
-
-    private boolean hasVersionHistory(Item item) throws SQLException
-    {
-        org.dspace.versioning.VersionHistory history = versionHistoryService.findByItem(context, item);
-        return (history!=null);
     }
 
 }

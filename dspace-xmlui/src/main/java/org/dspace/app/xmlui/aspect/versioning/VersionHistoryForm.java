@@ -32,6 +32,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 import java.sql.SQLException;
 import java.util.*;
+import org.dspace.versioning.service.VersionHistoryService;
 
 /**
  *
@@ -57,6 +58,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
+    protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected WorkflowItemService workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
@@ -84,7 +86,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
 
 
-        VersionHistory versionHistory = retrieveVersionHistory(item);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
         if(versionHistory!=null)
         {
             Division main = createMain(body);
@@ -125,12 +127,6 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
     }
 
-    private VersionHistory retrieveVersionHistory(Item item) throws WingException, SQLException
-    {
-        return versioningService.findVersionHistory(context, item);
-    }
-
-
     private Division createMain(Body body) throws WingException
     {
         Division main = body.addInteractiveDivision("view-verion-history", contextPath+"/item/versionhistory", Division.METHOD_POST, "view version history");
@@ -160,10 +156,9 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
         if(history != null)
         {
-            for(Version version : history.getVersions())
+            for(Version version : versioningService.getVersionsByHistory(context, history))
             {
-
-                //Skip items currently in submission
+                // Skip items currently in submission
                 if(isItemInSubmission(version.getItem()))
                 {
                     continue;
@@ -226,10 +221,13 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
         }
     }
 
-    private void addButtons(Division main, VersionHistory history) throws WingException {
+    private void addButtons(Division main, VersionHistory history)
+            throws WingException, SQLException
+    {
         Para actions = main.addPara();
 
-        if(history!=null && history.getVersions().size() > 0)
+        if(history!=null 
+                && versioningService.getVersionsByHistory(context, history).size() > 0)
         {
             actions.addButton("submit_delete").setValue(T_submit_delete);
         }
