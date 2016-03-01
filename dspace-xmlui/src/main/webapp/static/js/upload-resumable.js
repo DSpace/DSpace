@@ -391,6 +391,19 @@ if(doResumable){
     $('#progress-pause-link').on('click', function(e){
         r.pause();
     });
+
+    $('#switch-upload').on('click', function(e){
+        if($('#aspect_submission_StepTransformer_div_resumable-upload').is(':visible')){
+            localStorage.setItem('resumable', 0);
+        }
+        else{
+            localStorage.setItem('resumable', 1);
+        }
+
+        $('#aspect_submission_StepTransformer_div_resumable-upload').toggle();
+        $('#aspect_submission_StepTransformer_div_submit-upload').toggle();
+    });
+
 }
 else{
     // resumable not supported hide resumable form

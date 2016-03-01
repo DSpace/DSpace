@@ -54,6 +54,10 @@ public class ResumableUploadGenerator extends AbstractGenerator
                 Context context = ContextUtil.obtainContext(objectModel);
                 this.bitstream = Bitstream.find(context, Integer.parseInt(bId));
             }
+            else
+            {
+                this.bitstream = null;
+            }
             
             this.error = par.getParameter("error");
         }
