@@ -400,14 +400,7 @@
 			<xsl:variable name="itemWithdrawn" select="mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/@withdrawn" />
 
 			<xsl:variable name="href">
-				<xsl:choose>
-					<xsl:when test="$itemWithdrawn">
-						<xsl:value-of select="@OBJEDIT" />
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="@OBJID" />
-					</xsl:otherwise>
-				</xsl:choose>
+				<xsl:value-of select="@OBJID" />
 			</xsl:variable>
 
 			<xsl:choose>
