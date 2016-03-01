@@ -7,7 +7,6 @@
  */
 package org.dspace.app.cris.integration;
 
-import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.OrganizationUnit;
 
