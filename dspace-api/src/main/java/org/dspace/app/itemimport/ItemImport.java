@@ -733,7 +733,7 @@ public class ItemImport
                 {
                     clist = mycollections;
                 }
-                addItem(c, mycollections, sourceDir, dircontents[i], mapOut, template);
+                addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
                 System.out.println(i + " " + dircontents[i]);
                 c.clearCache();
             }
