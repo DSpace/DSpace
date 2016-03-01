@@ -147,7 +147,7 @@ public class BatchImportServlet extends DSpaceServlet
 
         				return;
     				}
-    				else if (owningCollection==null){
+    				else if (owningCollection==null && !"safupload".equals(inputType)){
     					request.setAttribute("has-error", "true");
     					Locale locale = request.getLocale();
     					ResourceBundle msgs = ResourceBundle.getBundle("Messages", locale);
