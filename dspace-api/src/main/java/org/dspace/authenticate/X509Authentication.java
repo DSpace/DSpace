@@ -140,7 +140,7 @@ public class X509Authentication implements AuthenticationMethod
         loginPageTitle = configurationService
                 .getProperty("authentication-x509.chooser.title.key");
         loginPageURL = configurationService
-                .getProperty("authentication-x509.hooser.uri");
+                .getProperty("authentication-x509.chooser.uri");
 
         String keystorePath = configurationService
                 .getProperty("authentication-x509.keystore.path");
