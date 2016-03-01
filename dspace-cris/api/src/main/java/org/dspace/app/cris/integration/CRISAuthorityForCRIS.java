@@ -183,16 +183,102 @@ public abstract class CRISAuthorityForCRIS<T extends ACrisObject> implements Cho
      * This authority doesn't actual implements this method, an empty choices
      * object is always returned. This method is used by unattended submssion
      * only, interactive submission will use the
-     * {@link CRISAuthorityForCRIS#getMatches(String, String, int, int, int, String)}.
+     * {@link CRISAuthority#getMatches(String, String, int, int, int, String)}.
+     * 
+     * The confidence value of the returned Choices will be
+     * {@link Choices#CF_UNCERTAIN} if there is only an object that match with the
+     * lookup string or {@link Choices#CF_AMBIGUOUS} if there are more objects.
      * 
      * {@link ChoiceAuthority#getMatches(String, String, int, int, int, String)}
+     * 
+     * @param field
+     *            (not used by this Authority)
+     * @param text
+     *            the lookup string
+     * @param collection
+     *            (not used by this Authority)
+     * @param locale
+     *            (not used by this Authority)
+     *            
+     * @return a Choices of CrisObject that have an exact string match between a name
+     *         forms and the text lookup string
      * 
      * @return an empty Choices
      */
     public Choices getBestMatch(String field, String text, int collection,
             String locale)
     {
-        return new Choices(false);
+        try
+        {
+            init();
+            List<Choice> choiceList = new ArrayList<Choice>();
+            int totalResult = 0;
+            if (text != null && text.length() > 2)
+            {
+                text = text.replaceAll("\\.", "");
+                DiscoverQuery discoverQuery = new DiscoverQuery();
+                discoverQuery.setDSpaceObjectFilter(getCRISTargetTypeID());
+                String filter = configurationService.getProperty("cris."
+                        + getPluginName() + ((field!=null && !field.isEmpty())?"." + field:"") + ".filter");
+                if (filter != null)
+                {
+                    discoverQuery.addFilterQueries(filter);
+                }
+                else {
+                    if(field.contains("_authority_") && getPluginName().equals(DOAuthority.class.getSimpleName())) {
+                        filter = configurationService.getProperty("cris."
+                                + getPluginName()
+                                + ".dc_authority_default.filter");
+                        if(filter==null) {
+                            throw new RuntimeException("You have to define a default dc_authority_default filter");
+                        }
+                        discoverQuery.addFilterQueries(MessageFormat.format(filter,  field.substring(field.lastIndexOf("_") + 1)));
+                    }
+                }
+
+                discoverQuery
+                        .setQuery("{!lucene q.op=AND df=crisauthoritylookup}\""
+                                + ClientUtils.escapeQueryChars(text.trim())
+                                + "\"");
+                discoverQuery.setMaxResults(50);
+                DiscoverResult result = searchService.search(null,
+                        discoverQuery, true);
+                totalResult = (int) result.getTotalSearchResults();
+                for (DSpaceObject dso : result.getDspaceObjects())
+                {
+                    T cris = (T) dso;
+                    choiceList.add(new Choice(ResearcherPageUtils
+                            .getPersistentIdentifier(cris), cris.getName(),
+                            getDisplayEntry(cris)));
+                }
+            }
+
+            Choice[] results = new Choice[choiceList.size()];
+            if (choiceList.size() > 0)
+            {
+                results = choiceList.toArray(results);
+
+                if (totalResult == 1)
+                {
+                    return new Choices(results, 0, totalResult,
+                            Choices.CF_UNCERTAIN, false, 0);
+                }
+                else
+                {
+                    return new Choices(results, 0, totalResult,
+                            Choices.CF_AMBIGUOUS, false, 0);
+                }
+            }
+            else
+            {
+                return new Choices(false);
+            }
+        }
+        catch (Exception e)
+        {
+            log.error("Error quering the CRISAuthority - " + e.getMessage(), e);
+            return new Choices(true);
+        }
     }
 
     /**
