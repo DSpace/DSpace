@@ -229,7 +229,7 @@ public class RPAuthority extends CRISAuthority implements
         }
         catch (Exception e)
         {
-            log.error("Error quering the HKUAuthority - " + e.getMessage(), e);
+            log.error("Error quering the CRISAuthority - " + e.getMessage(), e);
             return new Choices(true);
         }
     }
