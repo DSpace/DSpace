@@ -391,13 +391,10 @@
 	</bean>
 	
 	<bean id="redirectDetailsResearcherController"
-		class="org.dspace.app.webui.cris.controller.RedirectEntityDetailsController">
-		<property name="applicationService">
-			<ref bean="applicationService" />
+		class="org.dspace.app.webui.cris.controller.RedirectResearcherPageDetailsController">
+		<property name="searchService" >
+			<ref bean="crisSearchService" />
 		</property>		
-		<constructor-arg index="0">
-			<value>org.dspace.app.cris.model.ResearcherPage</value>
-		</constructor-arg>
 				<property name="viewName">
 			<value>researcherDetailsPage</value>
 		</property>		

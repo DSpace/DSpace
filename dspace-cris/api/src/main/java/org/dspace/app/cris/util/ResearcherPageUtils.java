@@ -295,12 +295,12 @@ return decorator.generateDisplayValue(alternativeName, rp);
      *            the staffno
      * @return the rp identifier of the ResearcherPage or null
      */
-    public static String getRPIdentifierByStaffno(String staffno)
+    public static String getRPIdentifierByStaffno(String staffno, String sourceref)
     {
         if (staffno != null)
         {
             ResearcherPage rp = applicationService
-                    .getResearcherPageByStaffNo(staffno);
+                    .getEntityBySourceId(sourceref,  staffno, ResearcherPage.class);
             if (rp != null)
             {
                 return getPersistentIdentifier(rp);
