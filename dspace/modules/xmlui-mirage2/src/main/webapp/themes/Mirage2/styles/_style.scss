@@ -107,10 +107,20 @@ header .navbar-brand img {
     list-style-type: none;
 }
 
+
 /*************************** menu *******************************/
 .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
     background-color: #d40032;
     border-color: #d40032;
+}
+
+
+/*************************** menu *******************************/
+#aspect_viewArtifacts_Navigation_list_browse a:nth-child(3),
+#aspect_viewArtifacts_Navigation_list_browse a:nth-child(4),
+#aspect_browseArtifacts_CommunityBrowse_div_community-browse,
+#aspect_browseArtifacts_CollectionBrowse_div_collection-browse{
+    display: none;
 }
 
 
@@ -233,6 +243,7 @@ input[name='lookup_dc_subject_classification']{
     display: none;
 }
 
+
 /*************************** item view *******************************/
 .item-summary-view-metadata h5{
     font-weight: bold;
@@ -242,6 +253,8 @@ input[name='lookup_dc_subject_classification']{
     padding-bottom: 0.6em;
 }
 
+
+/*************************** misc *******************************/
 .glyphicon-lock {
     color: #FF9900;
 }
