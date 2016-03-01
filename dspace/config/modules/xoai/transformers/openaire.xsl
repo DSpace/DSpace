@@ -16,6 +16,8 @@
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:doc="http://www.lyncode.com/xoai">
 	<xsl:output indent="yes" method="xml" omit-xml-declaration="yes" />
 
+  <xsl:include href="dryad.xsl"/>
+
 	<xsl:template match="@*|node()">
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()" />

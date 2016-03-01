@@ -72,6 +72,9 @@ public class XOAI
     
     private boolean _clean;
 
+    private static final String pfxCom = ConfigurationManager.getProperty("xoai", "set.community.prefix");
+    private static final String pfxCol = ConfigurationManager.getProperty("xoai", "set.collection.prefix");
+
     private static List<String> getFileFormats(Item item)
     {
         List<String> formats = new ArrayList<String>();
@@ -255,14 +258,18 @@ public class XOAI
         String handle = item.getHandle();
         doc.addField("item.handle", handle);
         doc.addField("item.lastmodified", item.getLastModified());
-        doc.addField("item.submitter", item.getSubmitter().getEmail());
+        try {
+            doc.addField("item.submitter", item.getSubmitter().getEmail());
+        } catch (NullPointerException e) {
+            log.error("Item has no submitter value: " + item.getHandle());
+        }
         doc.addField("item.deleted", item.isWithdrawn() ? "true" : "false");
         for (Collection col : item.getCollections())
             doc.addField("item.collections",
-                    "col_" + col.getHandle().replace("/", "_"));
+                    pfxCol + col.getHandle().replace("/", "_"));
         for (Community com : XOAIDatabaseManager.flatParentCommunities(item))
             doc.addField("item.communities",
-                    "com_" + com.getHandle().replace("/", "_"));
+                    pfxCom + com.getHandle().replace("/", "_"));
 
         DCValue[] allData = item.getMetadata(Item.ANY, Item.ANY, Item.ANY,
                 Item.ANY);

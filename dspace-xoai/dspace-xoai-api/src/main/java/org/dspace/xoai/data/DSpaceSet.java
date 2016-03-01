@@ -11,6 +11,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 
 import com.lyncode.xoai.dataprovider.core.Set;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * 
@@ -19,6 +20,10 @@ import com.lyncode.xoai.dataprovider.core.Set;
 public class DSpaceSet extends Set
 {
 	private static final String DefaultName = "undefined";
+
+    private static final String pfxCom = ConfigurationManager.getProperty("xoai", "set.community.prefix");
+    private static final String pfxCol = ConfigurationManager.getProperty("xoai", "set.collection.prefix");
+
 	public static String checkName (String name) {
 		if (name == null || name.trim().equals(""))
 			return DefaultName;
@@ -28,21 +33,21 @@ public class DSpaceSet extends Set
     public static Set newDSpaceCommunitySet(String handle, String name)
     {
     	
-        return new Set("com_" + handle.replace('/', '_'), checkName(name));
+        return new Set(pfxCom + handle.replace('/', '_'), checkName(name));
     }
 
     public static Set newDSpaceCollectionSet(String handle, String name)
     {
-        return new Set("col_" + handle.replace('/', '_'), checkName(name));
+        return new Set(pfxCol + handle.replace('/', '_'), checkName(name));
     }
 
     public DSpaceSet(Community c)
     {
-        super("com_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
+        super(pfxCom + c.getHandle().replace('/', '_'), checkName(c.getName()));
     }
 
     public DSpaceSet(Collection c)
     {
-        super("col_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
+        super(pfxCol + c.getHandle().replace('/', '_'), checkName(c.getName()));
     }
 }

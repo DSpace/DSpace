@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
 
     The contents of this file are subject to the license and copyright
     detailed in the LICENSE and NOTICE files at the root of the source
@@ -27,11 +27,11 @@
 			<Format refid="qdc" />
 			<Format refid="marc" />
 			<Format refid="uketd_dc" />
-		</Context> 
+		</Context>
 		
 		<!--
 			Driver Guidelines:
-		 
+		
 			- http://www.driver-support.eu/documents/DRIVER_Guidelines_v2_Final_2008-11-13.pdf
 			
 			Page 57 - 58
@@ -41,23 +41,35 @@
 			<Transformer refid="driverTransformer"/>
 			<!-- Title : Mandatory -->
 			<Filter refid="titleexistsFilter" />
-			<!-- Author : Mandatory -->
+			<!-- Author : Mandatory
 			<Filter refid="authorexistsFilter"/>
-			<!-- Possible Document Type -->
+            -->
+			<!-- Possible Document Type
 			<Filter refid="driverdocumenttypeFilter"/>
-			<!-- dc.rights must contain openAccess token -->
+            -->
+			<!-- dc.rights must contain openAccess token
 			<Filter refid="driveraccessFilter"/>
+            -->
 			<!-- Open Access (Downloadable) -->
 			<Filter refid="bitstreamaccessFilter"/>
 			<!-- Just an alias, if fact it returns all items within the driver context -->
 			<Set refid="driverSet" />
 			<!-- Metadata Formats -->
-			<Format refid="oaidc"/>
+			<Format refid="oaidc" />
 			<Format refid="mets" />
+			<Format refid="xoai" />
 			<Format refid="didl" />
+			<Format refid="dim" />
+			<Format refid="ore" />
+			<Format refid="rdf" />
+			<Format refid="etdms" />
+			<Format refid="mods" />
+			<Format refid="qdc" />
+			<Format refid="marc" />
+			<Format refid="uketd_dc" />
 		</Context>
 		
-		<!-- 
+		<!--
 			OpenAIRE Guidelines 1.1:
 			
 			- http://www.openaire.eu/en/component/attachments/download/79%E2%8C%A9=en

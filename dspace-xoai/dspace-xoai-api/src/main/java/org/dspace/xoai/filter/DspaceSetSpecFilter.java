@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 import java.sql.SQLException;
@@ -39,15 +40,18 @@ public class DspaceSetSpecFilter extends DSpaceFilter
         _setSpec = spec;
     }
 
+    private static final String pfxCom = ConfigurationManager.getProperty("xoai", "set.community.prefix");
+    private static final String pfxCol = ConfigurationManager.getProperty("xoai", "set.collection.prefix");
+
     @Override
     public DatabaseFilterResult getWhere(Context context)
     {
-        if (_setSpec.startsWith("col_"))
+        if (_setSpec.startsWith(pfxCol))
         {
             try
             {
                 DSpaceObject dso = HandleManager.resolveToObject(context,
-                        _setSpec.replace("col_", ""));
+                        _setSpec.replace(pfxCol, ""));
                 return new DatabaseFilterResult(
                         "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.item_id=i.item_id AND collection_id = ?)",
                         dso.getID());
@@ -57,12 +61,12 @@ public class DspaceSetSpecFilter extends DSpaceFilter
                 log.error(ex.getMessage(), ex);
             }
         }
-        else if (_setSpec.startsWith("com_"))
+        else if (_setSpec.startsWith(pfxCom))
         {
             try
             {
                 DSpaceObject dso = HandleManager.resolveToObject(context,
-                        _setSpec.replace("com_", ""));
+                        _setSpec.replace(pfxCom, ""));
                 List<Integer> list = XOAIDatabaseManager.getAllSubCollections(
                         context, dso.getID());
                 String subCollections = StringUtils.join(list.iterator(), ",");
@@ -84,17 +88,17 @@ public class DspaceSetSpecFilter extends DSpaceFilter
         try
         {
             Item dsitem = item.getItem();
-            if (_setSpec.startsWith("col_"))
+            if (_setSpec.startsWith(pfxCol))
             {
-                String handle = _setSpec.replace("col_", "");
+                String handle = _setSpec.replace(pfxCol, "");
                 for (Collection c : dsitem.getCollections())
                     if (c.getHandle().replace('/', '_').equals(handle))
                         return true;
                 return false;
             }
-            else if (_setSpec.startsWith("com_"))
+            else if (_setSpec.startsWith(pfxCom))
             {
-                String handle = _setSpec.replace("com_", "");
+                String handle = _setSpec.replace(pfxCom, "");
                 for (Community c : XOAIDatabaseManager
                         .flatParentCommunities(dsitem))
                     if (c.getHandle().replace('/', '_').equals(handle))
@@ -113,7 +117,7 @@ public class DspaceSetSpecFilter extends DSpaceFilter
     @Override
     public SolrFilterResult getQuery()
     {
-        if (_setSpec.startsWith("col_"))
+        if (_setSpec.startsWith(pfxCol))
         {
             try
             {
@@ -125,7 +129,7 @@ public class DspaceSetSpecFilter extends DSpaceFilter
                 log.error(ex.getMessage(), ex);
             }
         }
-        else if (_setSpec.startsWith("com_"))
+        else if (_setSpec.startsWith(pfxCom))
         {
             try
             {

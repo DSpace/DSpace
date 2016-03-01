@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.xoai.filter.DSpaceFilter;
 import org.dspace.xoai.filter.SolrFilterResult;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
@@ -39,6 +40,9 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
 {
     private static Logger log = LogManager.getLogger(DSpaceItemSolrRepository.class);
 
+    private static String handlePfx = ConfigurationManager.getProperty("xoai", "identifier.handle.prefix");
+    private static String doiPfx    = ConfigurationManager.getProperty("xoai", "identifier.doi.prefix");
+
     public DSpaceItemSolrRepository()
     {
     }
@@ -47,12 +51,23 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
     public AbstractItem getItem(String identifier)
             throws IdDoesNotExistException
     {
-        String parts[] = identifier.split(Pattern.quote(":"));
+        String parts[] = identifier.split(Pattern.quote(":"), 3);
         if (parts.length == 3)
         {
             try
             {
-                SolrQuery params = new SolrQuery("item.handle:" + parts[2]);
+                String queryField = null;
+                String queryVal = null;
+                if (parts[2].subSequence(0, handlePfx.length()).equals(handlePfx)) {
+                    queryField = "item.handle";
+                    queryVal = parts[2];
+                } else if (parts[2].subSequence(0, doiPfx.length()).equals(doiPfx)) {
+                    queryField = "metadata.dc.identifier";
+                    queryVal = parts[2].replace(":","\\:");
+                } else {
+                    throw new IdDoesNotExistException("Unhandled identifier type.");
+                }
+                SolrQuery params = new SolrQuery(queryField + ":" + queryVal);
                 return new DSpaceSolrItem(DSpaceSolrSearch.querySingle(params));
             }
             catch (SolrSearchEmptyException ex)

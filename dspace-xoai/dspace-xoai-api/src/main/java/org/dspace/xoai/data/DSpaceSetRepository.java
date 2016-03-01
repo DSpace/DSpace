@@ -43,6 +43,9 @@ public class DSpaceSetRepository extends AbstractSetRepository
         _context = context;
     }
 
+    private static final String pfxCom = ConfigurationManager.getProperty("xoai", "set.community.prefix");
+    private static final String pfxCol = ConfigurationManager.getProperty("xoai", "set.collection.prefix");
+
     private int getCommunityCount()
     {
         String query = "SELECT COUNT(*) as count FROM community";
@@ -200,12 +203,12 @@ public class DSpaceSetRepository extends AbstractSetRepository
     @Override
     public boolean exists(String setSpec)
     {
-        if (setSpec.startsWith("col_"))
+        if (setSpec.startsWith(pfxCol))
         {
             try
             {
                 DSpaceObject dso = HandleManager.resolveToObject(_context,
-                        setSpec.replace("col_", "").replace("_", "/"));
+                        setSpec.replace(pfxCol, "").replace("_", "/"));
                 if (dso == null || !(dso instanceof Collection))
                     return false;
                 return true;
@@ -215,12 +218,12 @@ public class DSpaceSetRepository extends AbstractSetRepository
                 log.error(ex.getMessage(), ex);
             }
         }
-        else if (setSpec.startsWith("com_"))
+        else if (setSpec.startsWith(pfxCom))
         {
             try
             {
                 DSpaceObject dso = HandleManager.resolveToObject(_context,
-                        setSpec.replace("com_", "").replace("_", "/"));
+                        setSpec.replace(pfxCom, "").replace("_", "/"));
                 if (dso == null || !(dso instanceof Community))
                     return false;
                 return true;
