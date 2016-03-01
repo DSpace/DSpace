@@ -163,7 +163,7 @@
     <script>
 	    $( "#import-type" ).change(function() {
 	    	var index = $("#import-type").prop("selectedIndex");
-	    	if (index == 1){
+	    	if (index <= 1){
 	    		$( "#input-file" ).hide();
 	    		$( "#input-url" ).show();
 	    		$( "#owning-collection-info" ).show();
