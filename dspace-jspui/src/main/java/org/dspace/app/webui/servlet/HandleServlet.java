@@ -54,9 +54,9 @@ import org.dspace.plugin.CommunityHomeProcessor;
 import org.dspace.plugin.ItemHomeProcessor;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.jdom.Element;
-import org.jdom.Text;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Element;
+import org.jdom2.Text;
+import org.jdom2.output.XMLOutputter;
 
 /**
  * Servlet for handling requests within a community or collection. The Handle is

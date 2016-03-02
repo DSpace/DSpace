@@ -16,8 +16,8 @@ import org.dspace.core.Context;
 import org.dspace.content.DSpaceObject;
 import org.dspace.authorize.AuthorizeException;
 
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 
 /**
  * Crosswalk descriptive metadata to and from DIM (DSpace Intermediate

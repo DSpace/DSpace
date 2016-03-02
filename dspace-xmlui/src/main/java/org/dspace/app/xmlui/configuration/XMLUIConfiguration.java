@@ -14,11 +14,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.xpath.XPathFactory;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.filter.Filters;
+
 
 /**
  * This class reads the XMLUI configuration file.
@@ -97,13 +100,10 @@ public class XMLUIConfiguration
         SAXBuilder builder = new SAXBuilder();
         Document config = builder.build(configFile);
 
-        @SuppressWarnings("unchecked") // This cast is correct
-        List<Element> aspectElements = XPath.selectNodes(config,
-                "//xmlui/aspects/aspect");
-
-        @SuppressWarnings("unchecked") // This cast is correct
-        List<Element> themeElements = XPath.selectNodes(config,
-                "//xmlui/themes/theme");
+        XPathExpression<Element> xpath_aspect = XPathFactory.instance().compile("//xmlui/aspects/aspect", Filters.element());
+        XPathExpression<Element> xpath_theme = XPathFactory.instance().compile("//xmlui/themes/theme", Filters.element());
+        List<Element> aspectElements = xpath_aspect.evaluate(config);
+        List<Element> themeElements = xpath_theme.evaluate(config);
 
         for (Element aspectElement : aspectElements)
         {

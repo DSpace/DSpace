@@ -26,9 +26,9 @@ import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.output.SAXOutputter;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.output.SAXOutputter;
 import org.xml.sax.SAXException;
 
 /**

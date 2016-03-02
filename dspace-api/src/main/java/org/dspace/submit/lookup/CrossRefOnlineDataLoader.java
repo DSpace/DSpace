@@ -20,7 +20,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.HttpException;
 import org.dspace.core.Context;
-import org.jdom.JDOMException;
+import org.jdom2.JDOMException;
 import org.xml.sax.SAXException;
 
 /**

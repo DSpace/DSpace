@@ -39,7 +39,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 import org.dspace.handle.factory.HandleServiceFactory;
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * Configuration and mapping for Google Scholar output metadata

@@ -29,10 +29,10 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.input.SAXBuilder;
 
 /**
  * Configurable QDC Crosswalk
@@ -301,7 +301,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
                 element2qdc.put(makeQualifiedTagName(element), qdc);
                 log.debug("Building Maps: qdc=\""+qdc+"\", element=\""+element.toString()+"\"");
             }
-            catch (org.jdom.JDOMException je)
+            catch (org.jdom2.JDOMException je)
             {
                 throw new CrosswalkInternalException("Failed parsing XML fragment in properties file: \""+prolog+val+postlog+"\": "+je.toString(), je);
             }

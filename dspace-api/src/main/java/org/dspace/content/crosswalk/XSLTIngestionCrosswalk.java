@@ -31,13 +31,13 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.transform.XSLTransformException;
-import org.jdom.transform.XSLTransformer;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.XSLTransformException;
+import org.jdom2.transform.XSLTransformer;
 
 /**
  * Configurable XSLT-driven ingestion Crosswalk
@@ -138,7 +138,7 @@ public class XSLTIngestionCrosswalk
         }
         try
         {
-            List dimList = xform.transform(metadata);
+            List<Element> dimList = xform.transform(metadata);
             ingestDIM(context, dso, dimList, createMissingMetadataFields);
         }
         catch (XSLTransformException e)
@@ -305,7 +305,7 @@ public class XSLTIngestionCrosswalk
         Document inDoc = builder.build(new FileInputStream(argv[i+1]));
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         Document dimDoc = null;
-        List dimList = null;
+        List<Element> dimList = null;
         if (list)
         {
             dimList = xform.transform(inDoc.getRootElement().getChildren());

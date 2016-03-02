@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.jdom.JDOMException;
+import org.jdom2.JDOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
