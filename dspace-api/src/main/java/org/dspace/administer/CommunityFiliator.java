@@ -17,6 +17,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -179,7 +180,7 @@ public class CommunityFiliator
         // check that a valid filiation would be established
         // first test - proposed child must currently be an orphan (i.e.
         // top-level)
-        Community childDad = child.getParentCommunities() != null ? child.getParentCommunities().iterator().next() : null;
+        Community childDad = CollectionUtils.isNotEmpty(child.getParentCommunities()) ? child.getParentCommunities().iterator().next() : null;
 
         if (childDad != null)
         {
