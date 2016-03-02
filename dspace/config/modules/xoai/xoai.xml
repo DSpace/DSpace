@@ -15,6 +15,7 @@
 
 	<Contexts>
 		<Context baseurl="request">
+		  <Transformer refid="dryadTransformer"/>
 			<Format refid="oaidc" />
 			<Format refid="mets" />
 			<Format refid="xoai" />
@@ -41,15 +42,12 @@
 			<Transformer refid="driverTransformer"/>
 			<!-- Title : Mandatory -->
 			<Filter refid="titleexistsFilter" />
-			<!-- Author : Mandatory
+			<!-- Author : Mandatory -->
 			<Filter refid="authorexistsFilter"/>
-            -->
-			<!-- Possible Document Type
+			<!-- Possible Document Type -->
 			<Filter refid="driverdocumenttypeFilter"/>
-            -->
-			<!-- dc.rights must contain openAccess token
+      <!-- dc.rights must contain openAccess token -->
 			<Filter refid="driveraccessFilter"/>
-            -->
 			<!-- Open Access (Downloadable) -->
 			<Filter refid="bitstreamaccessFilter"/>
 			<!-- Just an alias, if fact it returns all items within the driver context -->
@@ -85,7 +83,7 @@
 			<Filter refid="titleexistsFilter" />
 			<!-- Author : Mandatory -->
 			<Filter refid="authorexistsFilter"/>
-			<!-- Possible Document Type (same as Driver)-->
+			<!-- Possible Document Type (same as Driver) -->
 			<Filter refid="driverdocumenttypeFilter"/>
 			<!-- dc.relation must has the specified prefix -->
 			<Filter refid="openairerelationFilter" />
@@ -176,14 +174,18 @@
 	
 	<Transformers>
 		<Transformer id="driverTransformer">
-			<XSLT>transformers/driver.xsl</XSLT>
+			<!--<XSLT>transformers/driver.xsl</XSLT>-->
+		  <XSLT>transformers/dryad/driver.xsl</XSLT>
 		</Transformer>
 		<Transformer id="openaireTransformer">
-			<XSLT>transformers/openaire.xsl</XSLT>
+			<!--<XSLT>transformers/openaire.xsl</XSLT>-->
+		  <XSLT>transformers/dryad/openaire.xsl</XSLT>
+		</Transformer>
+		<Transformer id="dryadTransformer">
+		  <XSLT>transformers/dryad/request.xsl</XSLT>
 		</Transformer>
 	</Transformers>
 	
-
 	<Filters>
 		<Filter id="authorexistsFilter">
 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
