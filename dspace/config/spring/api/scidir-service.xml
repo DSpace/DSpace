@@ -48,7 +48,7 @@
         <entry key-ref="elsevier.issue.identifier" value-ref="scidirIssueIdentifierContrib"/>
         <entry key-ref="elsevier.issue.name" value-ref="scidirIssueNameContrib"/>
         <entry key-ref="elsevier.coverdate" value-ref="scidirCoverdateContrib"/>
-        <entry key-ref="dc.date.issued" value-ref="scidirCoverdateContrib"/>
+        <entry key-ref="dc.date.issued" value-ref="scidirDateIssuedContrib"/>
         <entry key-ref="elsevier.coverdisplaydate" value-ref="scidirCoverdisplaydateContrib"/>
         <entry key-ref="elsevier.startingpage" value-ref="scidirStartingpageContrib"/>
         <entry key-ref="elsevier.endingpage" value-ref="scidirEndingpageContrib"/>
@@ -250,6 +250,11 @@
 
     <bean id="scidirCoverdateContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="elsevier.coverdate"/>
+        <property name="query" value="prism:coverDate"/>
+    </bean>
+
+    <bean id="scidirDateIssuedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.date.issued"/>
         <property name="query" value="prism:coverDate"/>
     </bean>
 

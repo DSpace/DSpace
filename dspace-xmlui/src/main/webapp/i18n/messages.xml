@@ -2530,7 +2530,7 @@
     <message key="xmlui.scidir.live-import-result.no-fields-error">You must fill in one of the fields before starting the import.</message>
     <message key="xmlui.scidir.live-import-result.records-found">{0} records found, now showing {1} to {2}</message>
     <message key="xmlui.scidir.live-import-result.no-records-found">No records found</message>
-    <message key="xmlui.scidir.live-import-result.records-selected">{0} records selected</message>
+    <message key="xmlui.scidir.live-import-result.records-selected">{0} records selected on all pages (will be updated when switching the page)</message>
 
     <message key="xmlui.scidir.live-import-selected.records-selected">{0} records selected:</message>
     <message key="xmlui.scidir.live-import-selected.import-action-workspace">Send imported items to workspace</message>
