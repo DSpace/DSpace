@@ -8,8 +8,6 @@
 
     http://www.dspace.org/license/
 	Developed by DSpace @ Lyncode <dspace@lyncode.com>
-	
-	> http://www.openarchives.org/OAI/2.0/oai_dc.xsd
 
  -->
 <xsl:stylesheet 
@@ -19,73 +17,100 @@
 	<xsl:output omit-xml-declaration="yes" method="xml" indent="yes" />
 	
 	<xsl:template match="/">
-		<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
-			xmlns:dc="http://purl.org/dc/elements/1.1/" 
+		<thesis xmlns="http://www.ndltd.org/standards/metadata/etdms/1.0/" 
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-			xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+			xsi:schemaLocation="http://www.ndltd.org/standards/metadata/etdms/1.0/ http://www.ndltd.org/standards/metadata/etdms/1.0/etdms.xsd">
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='title']/doc:element/doc:field[@name='value']">
-				<dc:title><xsl:value-of select="." /></dc:title>
+				<title><xsl:value-of select="." /></title>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='author']/doc:element/doc:field[@name='value']">
-				<dc:creator><xsl:value-of select="." /></dc:creator>
+				<creator><xsl:value-of select="." /></creator>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name!='author']/doc:element/doc:field[@name='value']">
-				<dc:contributor><xsl:value-of select="." /></dc:contributor>
+				<contributor><xsl:value-of select="." /></contributor>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='subject']/doc:element/doc:field[@name='value']">
-				<dc:subject><xsl:value-of select="." /></dc:subject>
+				<subject><xsl:value-of select="." /></subject>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='description']/doc:element/doc:field[@name='value']">
-				<dc:description><xsl:value-of select="." /></dc:description>
+				<description><xsl:value-of select="." /></description>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='description']/doc:element[@name='abstract']/doc:element/doc:field[@name='value']">
-				<dc:description><xsl:value-of select="." /></dc:description>
+				<description><xsl:value-of select="." /></description>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:date><xsl:value-of select="." /></dc:date>
+				<date><xsl:value-of select="substring(.,0,11)" /></date>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field[@name='value']">
-				<dc:type><xsl:value-of select="." /></dc:type>
+				<type><xsl:value-of select="." /></type>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:identifier><xsl:value-of select="." /></dc:identifier>
+				<identifier><xsl:value-of select="." /></identifier>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:language><xsl:value-of select="." /></dc:language>
+				<language><xsl:value-of select="." /></language>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:relation><xsl:value-of select="." /></dc:relation>
+				<relation><xsl:value-of select="." /></relation>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element/doc:field[@name='value']">
-				<dc:relation><xsl:value-of select="." /></dc:relation>
+				<relation><xsl:value-of select="." /></relation>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:rights><xsl:value-of select="." /></dc:rights>
+				<rights><xsl:value-of select="." /></rights>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']">
-				<dc:rights><xsl:value-of select="." /></dc:rights>
+				<rights><xsl:value-of select="." /></rights>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='bitstreams']/doc:element[@name='bitstream']/doc:field[@name='format']">
-				<dc:format><xsl:value-of select="." /></dc:format>
+				<format><xsl:value-of select="." /></format>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='covarage']/doc:element/doc:field[@name='value']">
-				<dc:covarage><xsl:value-of select="." /></dc:covarage>
+				<covarage><xsl:value-of select="." /></covarage>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='covarage']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:covarage><xsl:value-of select="." /></dc:covarage>
+				<covarage><xsl:value-of select="." /></covarage>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='publisher']/doc:element/doc:field[@name='value']">
-				<dc:publisher><xsl:value-of select="." /></dc:publisher>
+				<publisher><xsl:value-of select="." /></publisher>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='publisher']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:publisher><xsl:value-of select="." /></dc:publisher>
+				<publisher><xsl:value-of select="." /></publisher>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='source']/doc:element/doc:field[@name='value']">
-				<dc:source><xsl:value-of select="." /></dc:source>
+				<source><xsl:value-of select="." /></source>
 			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='source']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:source><xsl:value-of select="." /></dc:source>
+				<source><xsl:value-of select="." /></source>
 			</xsl:for-each>
-		</oai_dc:dc>
+			<xsl:if test="doc:metadata/doc:element[@name='thesis']">
+			<degree>
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='name']/doc:element/doc:field[@name='value']">
+				<name><xsl:value-of select="." /></name>
+			</xsl:for-each>
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='name']/doc:element/doc:element/doc:field[@name='value']">
+				<name><xsl:value-of select="." /></name>
+			</xsl:for-each>
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='level']/doc:element/doc:field[@name='value']">
+				<level><xsl:value-of select="." /></level>
+			</xsl:for-each>
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='level']/doc:element/doc:element/doc:field[@name='value']">
+				<level><xsl:value-of select="." /></level>
+			</xsl:for-each>
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='discipline']/doc:element/doc:field[@name='value']">
+				<discipline><xsl:value-of select="." /></discipline>
+			</xsl:for-each>
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='discipline']/doc:element/doc:element/doc:field[@name='value']">
+				<discipline><xsl:value-of select="." /></discipline>
+			</xsl:for-each>
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='grantor']/doc:element/doc:field[@name='value']">
+				<grantor><xsl:value-of select="." /></grantor>
+			</xsl:for-each>
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='grantor']/doc:element/doc:element/doc:field[@name='value']">
+				<grantor><xsl:value-of select="." /></grantor>
+			</xsl:for-each>
+			</degree>
+			</xsl:if>
+		</thesis>
 	</xsl:template>
 </xsl:stylesheet>

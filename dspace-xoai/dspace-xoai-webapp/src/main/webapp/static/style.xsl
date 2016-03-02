@@ -13,7 +13,7 @@
     xmlns:oai="http://www.openarchives.org/OAI/2.0/"
     xmlns:lyn="http://www.lyncode.com/fakeNamespace"
     xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
-    xmlns:dc="http://purl.org/dc/doc:elements/1.1/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
     exclude-result-prefixes="oai lyn oai_dc dc"
 >
 

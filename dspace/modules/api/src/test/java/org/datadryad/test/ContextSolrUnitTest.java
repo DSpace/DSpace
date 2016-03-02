@@ -3,7 +3,7 @@ package org.datadryad.test;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.common.util.NamedList;
 import org.junit.After;
 import org.junit.Before;
@@ -20,14 +20,14 @@ import static org.mockito.Mockito.*;
  * @author Nathan Day
  */
 public class ContextSolrUnitTest extends ContextUnitTest {
-    protected CommonsHttpSolrServer mockSolrStatsServer;
+    protected SolrServer mockSolrStatsServer;
     public ContextSolrUnitTest() {
         super();
     }
     @Before
     public void setUp() {
         super.setUp();
-        mockSolrStatsServer = mock(CommonsHttpSolrServer.class);
+        mockSolrStatsServer = mock(SolrServer.class);
     }
     @After
     public void tearDown() {
@@ -44,6 +44,9 @@ public class ContextSolrUnitTest extends ContextUnitTest {
         QueryResponse response = makeResponse(path, enc);
         when(mockSolrStatsServer.query(
             any(SolrQuery.class), any(SolrRequest.METHOD.class)
+        )).thenReturn(response);
+        when(mockSolrStatsServer.query(
+            any(SolrQuery.class)
         )).thenReturn(response);
     }
 

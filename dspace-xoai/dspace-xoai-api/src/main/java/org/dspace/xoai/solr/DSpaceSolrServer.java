@@ -27,6 +27,12 @@ public class DSpaceSolrServer
 
     private static SolrServer _server = null;
 
+    // setter for solr server for mocking during tests
+    public static void setServer(SolrServer server)
+    {
+        _server = server;
+    }
+
     public static SolrServer getServer() throws SolrServerException
     {
         if (_server == null)

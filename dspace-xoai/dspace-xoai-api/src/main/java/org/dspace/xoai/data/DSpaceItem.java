@@ -27,6 +27,10 @@ import com.lyncode.xoai.dataprovider.xml.xoai.Element.Field;
  */
 public abstract class DSpaceItem extends AbstractItem
 {
+
+    private static final String itemIdMd = ConfigurationManager.getProperty("xoai","identifier.metadata");
+    private static final String itemIdPfx = ConfigurationManager.getProperty("xoai", "identifier.prefix");
+
 	private static List<Element> filter (List<Element> input, String name) {
     	return Lists.newArrayList(Collections2.filter(input, new MetadataNamePredicate(name)));
     }
@@ -62,15 +66,17 @@ public abstract class DSpaceItem extends AbstractItem
     	return values(filter(flat(filter(flat(filter(metadata, schema)), element)), qualifier));
     }
 
-    
-    private static String _prefix = null;
-    public static String buildIdentifier (String handle) {
-        if (_prefix == null)
-        {
-            _prefix = ConfigurationManager.getProperty("xoai",
-                    "identifier.prefix");
+    public String buildIdentifier (String handle) {
+        String itemIdStr = null;
+        if (itemIdMd != null) {
+            List<String> mds = getMetadata(itemIdMd);
+            if (mds.size() > 0)
+                itemIdStr = mds.get(0);
         }
-        return "oai:" + _prefix + ":" + handle;
+        if (itemIdStr == null) {
+            itemIdStr = handle;
+        }
+        return "oai:" + itemIdPfx + ":" + itemIdStr;
     }
     public static String parseHandle (String oaiIdentifier) {
     	String[] parts = oaiIdentifier.split(Pattern.quote(":"));

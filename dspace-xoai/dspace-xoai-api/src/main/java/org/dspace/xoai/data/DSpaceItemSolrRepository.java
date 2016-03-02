@@ -40,8 +40,8 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
 {
     private static Logger log = LogManager.getLogger(DSpaceItemSolrRepository.class);
 
-    private static String handlePfx = ConfigurationManager.getProperty("xoai", "identifier.handle.prefix");
-    private static String doiPfx    = ConfigurationManager.getProperty("xoai", "identifier.doi.prefix");
+    private static String queryField = ConfigurationManager.getProperty("xoai", "item.query.field");
+    private static String queryFieldDefault = "item.handle";
 
     public DSpaceItemSolrRepository()
     {
@@ -56,18 +56,9 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
         {
             try
             {
-                String queryField = null;
-                String queryVal = null;
-                if (parts[2].subSequence(0, handlePfx.length()).equals(handlePfx)) {
-                    queryField = "item.handle";
-                    queryVal = parts[2];
-                } else if (parts[2].subSequence(0, doiPfx.length()).equals(doiPfx)) {
-                    queryField = "metadata.dc.identifier";
-                    queryVal = parts[2].replace(":","\\:");
-                } else {
-                    throw new IdDoesNotExistException("Unhandled identifier type.");
-                }
-                SolrQuery params = new SolrQuery(queryField + ":" + queryVal);
+                String qf = queryField != null ? queryField : queryFieldDefault;
+                String queryVal = parts[2].replace(":","\\:");
+                SolrQuery params = new SolrQuery(qf + ":" + queryVal);
                 return new DSpaceSolrItem(DSpaceSolrSearch.querySingle(params));
             }
             catch (SolrSearchEmptyException ex)

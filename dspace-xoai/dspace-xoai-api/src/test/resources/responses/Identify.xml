@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="static/style.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2016-04-08T17:45:24Z</responseDate>
+  <request verb="Identify">http://192.168.111.223:9999/xoai/request</request>
+  <Identify>
+    <repositoryName>Dryad Data Repository</repositoryName>
+    <baseURL></baseURL>
+    <protocolVersion>2.0</protocolVersion>
+    <adminEmail></adminEmail>
+    <earliestDatestamp>2007-12-06T20:55:28Z</earliestDatestamp>
+    <deletedRecord>persistent</deletedRecord>
+    <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
+    <description>
+      <XOAIDescription xmlns="http://www.lyncode.com/XOAIConfiguration">XOAI: OAI-PMH Java Toolkit</XOAIDescription>
+    </description>
+  </Identify>
+</OAI-PMH>
