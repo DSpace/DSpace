@@ -203,7 +203,7 @@ Common usage:
         <!--
         Copy files that are absent in target
         -->
-        <copy todir="${dspace.dir}/config" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/config" preservelastmodified="true">
             <fileset dir="config-temp" includes="**/*">
                 <present present="srconly" targetdir="${dspace.dir}/config" />
             </fileset>
@@ -212,7 +212,7 @@ Common usage:
         <!--
         Copy files that are different in target to *.old suffix
         -->
-        <copy todir="${dspace.dir}/config" preservelastmodified="true" overwrite="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/config" preservelastmodified="true" overwrite="true">
                 <fileset dir="${dspace.dir}/config">
                    <and>
                     <different targetdir="config-temp" ignoreFileTimes="true" />
@@ -226,7 +226,7 @@ Common usage:
         <!--
         Force overwrite of whats left
         -->
-        <copy todir="${dspace.dir}/config" preservelastmodified="true" overwrite="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/config" preservelastmodified="true" overwrite="true">
             <fileset dir="config-temp">
                 <different targetdir="${dspace.dir}/config" ignoreFileTimes="true" />
                 <type type="file" />
@@ -275,7 +275,7 @@ Common usage:
         <!--
         Copy files that are absent in target
         -->
-        <copy todir="${dspace.dir}/config" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/config" preservelastmodified="true">
             <fileset dir="config-temp" includes="**/*">
                 <present present="srconly" targetdir="${dspace.dir}/config" />
             </fileset>
@@ -284,7 +284,7 @@ Common usage:
         <!--
         Copy files that are different to target to *.new suffix
         -->
-        <copy todir="${dspace.dir}/config" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/config" preservelastmodified="true">
             <fileset dir="config-temp">
                 <different targetdir="${dspace.dir}/config" ignoreFileTimes="true" />
                 <type type="file" />
@@ -338,12 +338,12 @@ Common usage:
         <!--
         Copy designated dspace.cfg
         -->
-        <copy file="${config}" tofile="config-temp/dspace.cfg" preservelastmodified="true" />
+        <copy encoding="UTF-8" file="${config}" tofile="config-temp/dspace.cfg" preservelastmodified="true" />
 
         <!--
         If designated config isn't the one in config/dspace.cfg then lets put a copy of that next to it
         -->
-        <copy todir="config-temp" preservelastmodified="true" overwrite="true" >
+        <copy encoding="UTF-8" todir="config-temp" preservelastmodified="true" overwrite="true" >
             <fileset dir="config" includes="dspace.cfg">
                 <different targetdir="${dspace.dir}/config" ignoreFileTimes="true" />
             </fileset>
@@ -353,13 +353,13 @@ Common usage:
         <!--
         Prepare properly filtered files
         -->
-        <copy todir="config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
+        <copy encoding="UTF-8" todir="config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
             <fileset dir="config" excludes="dspace.cfg,openaire-cache.list,GeoLiteCity.dat,*.old" />
             <filterchain>
                 <expandproperties />
             </filterchain>
         </copy>
-	<copy file="config/openaire-cache.list" tofile="config-temp/openaire-cache.list" preservelastmodified="true" overwrite="true" failonerror="false"/>
+	<copy encoding="UTF-8" file="config/openaire-cache.list" tofile="config-temp/openaire-cache.list" preservelastmodified="true" overwrite="true" failonerror="false"/>
         <echo file='config-temp/ant.properties' message='ant.version = ${ant.version}'/>
 
     </target>
@@ -369,7 +369,7 @@ Common usage:
         <!--
         Copy files that are absent in target
         -->
-        <copy todir="${dspace.dir}/solr" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/solr" preservelastmodified="true">
             <fileset dir="solr-config-temp" includes="**/*">
                 <and>
                    <present present="srconly" targetdir="${dspace.dir}/solr" />
@@ -382,7 +382,7 @@ Common usage:
         <!--
         Copy files that are different in target to *.old suffix
         -->
-        <copy todir="${dspace.dir}/solr" preservelastmodified="true" overwrite="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/solr" preservelastmodified="true" overwrite="true">
                 <fileset dir="${dspace.dir}/solr">
                    <and>
                     <different targetdir="solr-config-temp" ignoreFileTimes="true" />
@@ -398,7 +398,7 @@ Common usage:
         <!--
         Force overwrite of whats left
         -->
-        <copy todir="${dspace.dir}/solr" preservelastmodified="true" overwrite="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/solr" preservelastmodified="true" overwrite="true">
             <fileset dir="solr-config-temp">
                 <and>
                     <different targetdir="${dspace.dir}/solr" ignoreFileTimes="true" />
@@ -451,7 +451,7 @@ Common usage:
         <!--
         Copy files that are absent in target
         -->
-        <copy todir="${dspace.dir}/solr" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/solr" preservelastmodified="true">
             <fileset dir="solr-config-temp" includes="**/*">
                 <and>
                     <present present="srconly" targetdir="${dspace.dir}/solr"/>
@@ -464,7 +464,7 @@ Common usage:
         <!--
         Copy files that are different to target to *.new suffix
         -->
-        <copy todir="${dspace.dir}/solr" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/solr" preservelastmodified="true">
             <fileset dir="solr-config-temp">
                 <and>
                     <different targetdir="${dspace.dir}/solr" ignoreFileTimes="true"/>
@@ -522,7 +522,7 @@ Common usage:
         <!--
         Prepare properly filtered files
         -->
-        <copy todir="solr-config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
+        <copy encoding="UTF-8" todir="solr-config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
             <fileset dir="solr">
                 <!-- exclude all "data" directories from being overwritten -->
                 <exclude name="**/data/**"/>
@@ -549,7 +549,7 @@ Common usage:
             </fileset>
         </move>
 
-        <copy todir="${dspace.dir}/bin" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/bin" preservelastmodified="true">
             <fileset dir="bin" />
         </copy>
 
@@ -561,7 +561,7 @@ Common usage:
             </fileset>
         </move>
 
-        <copy todir="${dspace.dir}/lib" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/lib" preservelastmodified="true">
             <fileset dir="lib" />
         </copy>
 
@@ -571,11 +571,11 @@ Common usage:
             </fileset>
         </move>
 
-        <copy todir="${dspace.dir}/etc" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/etc" preservelastmodified="true">
             <fileset dir="etc" />
         </copy>
 
-    	<copy todir="${dspace.dir}/solr" preservelastmodified="true">
+    	<copy encoding="UTF-8" todir="${dspace.dir}/solr" preservelastmodified="true">
     	     <fileset dir="solr"/>
     	</copy>
 
@@ -658,7 +658,7 @@ Common usage:
     <target name="copy_webapps">
 
         <!-- Copy webapp files to /webapps (excluding any filtered files) -->
-        <copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
+        <copy encoding="UTF-8" todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
             <fileset dir="webapps">
                 <exclude name="**/web.xml" />
                 <exclude name="**/robots.txt" />
@@ -666,7 +666,7 @@ Common usage:
         </copy>
 
         <!-- Ensure specific webapp files (web.xml, robots.txt) are filtered -->
-        <copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
+        <copy encoding="UTF-8" todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
             <fileset dir="webapps">
                 <include name="**/web.xml" />
                 <include name="**/robots.txt" />
@@ -777,15 +777,15 @@ Common usage:
        file present for the initial run of "install-configs". -->
     <target name="init_configs" depends="init_installation">
 
-        <copy todir="${dspace.dir}/config" preservelastmodified="true" failonerror="false">
+        <copy encoding="UTF-8" todir="${dspace.dir}/config" preservelastmodified="true" failonerror="false">
             <fileset dir="config" excludes="dspace.cfg,openaire-cache.list" />
             <filterchain>
                 <expandproperties />
             </filterchain>
         </copy>
 
-	<copy file="config/openaire-cache.list" tofile="${dspace.dir}/config/openaire-cache.list" preservelastmodified="true" overwrite="true" failonerror="false"/>
-        <copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
+	<copy encoding="UTF-8" file="config/openaire-cache.list" tofile="${dspace.dir}/config/openaire-cache.list" preservelastmodified="true" overwrite="true" failonerror="false"/>
+        <copy encoding="UTF-8" file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
 
         <echo file='${dspace.dir}/config/ant.properties' message='ant.version = ${ant.version}'/>
 
@@ -819,7 +819,7 @@ Common usage:
             <fileset dir="${dspace.dir}/bin" includes="**/*" />
         </delete>
 
-        <copy todir="${dspace.dir}/bin" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/bin" preservelastmodified="true">
             <fileset dir="bin" />
         </copy>
 
@@ -829,7 +829,7 @@ Common usage:
             <fileset dir="${dspace.dir}/lib" includes="**/*" />
         </delete>
 
-        <copy todir="${dspace.dir}/lib" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/lib" preservelastmodified="true">
             <fileset dir="lib" />
         </copy>
 
@@ -840,11 +840,11 @@ Common usage:
             <fileset dir="${dspace.dir}/etc" includes="**/*" />
         </delete>
 
-        <copy todir="${dspace.dir}/etc" preservelastmodified="true">
+        <copy encoding="UTF-8" todir="${dspace.dir}/etc" preservelastmodified="true">
             <fileset dir="etc" />
         </copy>
 
-    	<copy todir="${dspace.dir}/solr" preservelastmodified="true">
+    	<copy encoding="UTF-8" todir="${dspace.dir}/solr" preservelastmodified="true">
     	    <fileset dir="solr" />
     	</copy>
 

@@ -26,6 +26,7 @@ collections / items / and bitstreams.
             <map:transformer name="ConfigurableBrowse" src="org.dspace.app.xmlui.aspect.artifactbrowser.ConfigurableBrowse"/>
             <map:transformer name="StaticPage" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.browseArtifacts.StaticPage"/>
             <map:transformer name="LicensePage" src="cz.cuni.mff.ufal.LicensePage"/>
+            <map:transformer name="ContractPage" src="cz.cuni.mff.ufal.ContractPage"/>
         </map:transformers>
 
         <map:matchers default="wildcard">
@@ -65,6 +66,11 @@ collections / items / and bitstreams.
             <map:match pattern="page/licenses">
                 <map:transform type="LicensePage"/>
                 <map:serialize type="xml"/>
+            </map:match>
+
+            <map:match pattern="page/contract">
+                <map:transform type="ContractPage" />
+                <map:serialize type="xml" />
             </map:match>
 
             <map:match pattern="page/*">

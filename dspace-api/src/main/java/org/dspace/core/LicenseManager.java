@@ -72,6 +72,7 @@ public class LicenseManager
         InputStream is = null;
         InputStreamReader ir = null;
         BufferedReader br = null;
+        String license;
         try
         {
             is = new FileInputStream(licenseFile);

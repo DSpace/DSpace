@@ -3203,5 +3203,12 @@
 	<message key="input_forms.complex_definitions.funding.3_projname.label">Funding project name</message>
 	<message key="input_forms.complex_definitions.funding.5_openaire_id.label">EU Project Identifier (OpenAIRE)</message>
 	<message key="input_forms.complex_definitions.sizeInfo.2_unit.label">Unit</message>
+
+	<!-- cz.cuni.mff.ufal.ContractPage -->
+	<message key="xmlui.ContractPage.title">Deposition contract</message>
+	<message key="xmlui.ContractPage.trail">Deposition contract</message>
+	<message key="xmlui.ContractPage.head">Deposition contract</message>
+	<message key="xmlui.ContractPage.collection_name">{0}</message>
+
 </catalogue>
 
