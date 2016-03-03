@@ -86,6 +86,7 @@ public class RestIndex {
                   		"<li>POST /collections/{collectionId}/items - Create an item in the specified collection. You must post an item.</li>" +
                   		"<li>POST /collections/find-collection - Find a collection by name.</li>" +
                   		"<li>PUT /collections/{collectionId} </li> - Update the specified collection. You must post a collection." +
+                  		"<li>PUT /collections/{collectionId}/items </li> - Update collection by adding the specified item. You must post an item." +
                   		"<li>DELETE /collections/{collectionId} - Delete the specified collection from DSpace.</li>" +
                   		"<li>DELETE /collections/{collectionId}/items/{itemId} - Delete the specified item (itemId) in the specified collection (collectionId). </li>" +
                   	"</ul>" +

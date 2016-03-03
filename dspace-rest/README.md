@@ -97,6 +97,9 @@ Find collection by name
 Update collection
 - PUT http://localhost:8080/rest/collections/:ID
 
+Add item in collection
+- PUT http://localhost:8080/rest/collections/:ID/items
+
 Delete collection
 - DELETE http://localhost:8080/rest/collections/:ID
 
@@ -108,7 +111,7 @@ Delete item in collection
 View the list of items
 - GET http://localhost:8080/rest/items[?expand={metadata,parentCollection,parentcollectionList,parentCommunityList,bitstreams,all}]
 
-View speciific item
+View specific item
 - GET http://localhost:8080/rest/items/:ID[?expand={metadata,parentCollection,parentcollectionList,parentCommunityList,bitstreams,all}]
 
 View an Item and view its bitstreams
