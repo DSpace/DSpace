@@ -174,7 +174,7 @@ public class ItemListTag extends TagSupport
 
         // get the elements to display
         String[] browseFields  = null;
-        String[] browseWidths = null;;
+        String[] browseWidths = null;
 
         if (sortOption != null)
         {

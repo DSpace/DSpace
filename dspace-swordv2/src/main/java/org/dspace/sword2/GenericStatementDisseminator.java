@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 public abstract class GenericStatementDisseminator
@@ -179,7 +180,7 @@ public abstract class GenericStatementDisseminator
     {
         String[] bundles = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getArrayProperty("swordv2-server.statement.bundles");
-        if (bundles == null || bundles.length==0)
+        if (ArrayUtils.isEmpty(bundles))
         {
             bundles = new String[] {"ORIGINAL", "SWORD"};
         }

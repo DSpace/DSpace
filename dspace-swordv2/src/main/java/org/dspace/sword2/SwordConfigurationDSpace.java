@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -108,7 +109,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
         String[] acceptsFormats = configurationService
                 .getArrayProperty("swordv2-server.accepts");
         swordaccepts = new ArrayList<String>();
-        if (acceptsFormats == null)
+        if (ArrayUtils.isEmpty(acceptsFormats))
         {
             acceptsFormats = new String[]{"application/zip"};
         }
