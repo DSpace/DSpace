@@ -23,6 +23,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
+import org.apache.commons.lang.ArrayUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -41,10 +42,11 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.sort.SortOption;
 
 /**
@@ -84,10 +86,10 @@ public class ItemListTag extends TagSupport
     private boolean disableCrossLinks = false;
 
     /** The default fields to be displayed when listing items */
-    private static final String DEFAULT_LIST_FIELDS;
+    private static final String[] DEFAULT_LIST_FIELDS;
 
     /** The default widths for the columns */
-    private static final String DEFAULT_LIST_WIDTHS;
+    private static final String[] DEFAULT_LIST_WIDTHS;
 
     /** The default field which is bound to the browse by date */
     private static String dateField = "dc.date.issued";
@@ -111,6 +113,9 @@ public class ItemListTag extends TagSupport
 
     private final transient BitstreamService bitstreamService
             = ContentServiceFactory.getInstance().getBitstreamService();
+    
+    private final transient ConfigurationService configurationService
+             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     static
     {
@@ -118,29 +123,29 @@ public class ItemListTag extends TagSupport
 
         if (showThumbs)
         {
-            DEFAULT_LIST_FIELDS = "thumbnail, dc.date.issued(date), dc.title, dc.contributor.*";
-            DEFAULT_LIST_WIDTHS = "*, 130, 60%, 40%";
+            DEFAULT_LIST_FIELDS = new String[] {"thumbnail", "dc.date.issued(date)", "dc.title", "dc.contributor.*"};
+            DEFAULT_LIST_WIDTHS = new String[] {"*", "130", "60%", "40%"};
         }
         else
         {
-            DEFAULT_LIST_FIELDS = "dc.date.issued(date), dc.title, dc.contributor.*";
-            DEFAULT_LIST_WIDTHS = "130, 60%, 40%";
+            DEFAULT_LIST_FIELDS = new String[] {"dc.date.issued(date)", "dc.title", "dc.contributor.*"};
+            DEFAULT_LIST_WIDTHS = new String[] {"130", "60%", "40%"};
         }
 
         // get the date and title fields
-        String dateLine = ConfigurationManager.getProperty("webui.browse.index.date");
+        String dateLine = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.browse.index.date");
         if (dateLine != null)
         {
             dateField = dateLine;
         }
 
-        String titleLine = ConfigurationManager.getProperty("webui.browse.index.title");
+        String titleLine = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.browse.index.title");
         if (titleLine != null)
         {
             titleField = titleLine;
         }
 
-        String authorLine = ConfigurationManager.getProperty("webui.browse.author-field");
+        String authorLine = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.browse.author-field");
         if (authorLine != null)
         {
             authorField = authorLine;
@@ -168,96 +173,62 @@ public class ItemListTag extends TagSupport
         }
 
         // get the elements to display
-        String configLine = null;
-        String widthLine  = null;
+        String[] browseFields  = null;
+        String[] browseWidths = null;
 
         if (sortOption != null)
         {
-            if (configLine == null)
+            if (ArrayUtils.isEmpty(browseFields))
             {
-                configLine = ConfigurationManager.getProperty("webui.itemlist.sort." + sortOption.getName() + ".columns");
-                widthLine  = ConfigurationManager.getProperty("webui.itemlist.sort." + sortOption.getName() + ".widths");
+                browseFields = configurationService.getArrayProperty("webui.itemlist.sort." + sortOption.getName() + ".columns");
+                browseWidths  = configurationService.getArrayProperty("webui.itemlist.sort." + sortOption.getName() + ".widths");
             }
 
-            if (configLine == null)
+            if (ArrayUtils.isEmpty(browseFields))
             {
-                configLine = ConfigurationManager.getProperty("webui.itemlist." + sortOption.getName() + ".columns");
-                widthLine  = ConfigurationManager.getProperty("webui.itemlist." + sortOption.getName() + ".widths");
+                browseFields = configurationService.getArrayProperty("webui.itemlist." + sortOption.getName() + ".columns");
+                browseWidths  = configurationService.getArrayProperty("webui.itemlist." + sortOption.getName() + ".widths");
             }
         }
 
-        if (configLine == null)
+        if (ArrayUtils.isEmpty(browseFields))
         {
-            configLine = ConfigurationManager.getProperty("webui.itemlist.columns");
-            widthLine  = ConfigurationManager.getProperty("webui.itemlist.widths");
+            browseFields = configurationService.getArrayProperty("webui.itemlist.columns");
+            browseWidths  = configurationService.getArrayProperty("webui.itemlist.widths");
         }
 
         // Have we read a field configration from dspace.cfg?
-        if (configLine != null)
+        if (ArrayUtils.isNotEmpty(browseFields))
         {
             // If thumbnails are disabled, strip out any thumbnail column from the configuration
-            if (!showThumbs && configLine.contains("thumbnail"))
+            if (!showThumbs)
             {
-                // Ensure we haven't got any nulls
-                configLine = configLine  == null ? "" : configLine;
-                widthLine  = widthLine   == null ? "" : widthLine;
-
-                // Tokenize the field and width lines
-                StringTokenizer llt = new StringTokenizer(configLine,  ",");
-                StringTokenizer wlt = new StringTokenizer(widthLine, ",");
-
-                StringBuilder newLLine = new StringBuilder();
-                StringBuilder newWLine = new StringBuilder();
-                while (llt.hasMoreTokens() || wlt.hasMoreTokens())
+                // check if it contains a thumbnail entry
+                // If so, remove it, and the width associated with it
+                int thumbnailIndex = ArrayUtils.indexOf(browseFields, "thumbnail");
+                if(thumbnailIndex>=0)
                 {
-                    String listTok  = llt.hasMoreTokens() ? llt.nextToken() : null;
-                    String widthTok = wlt.hasMoreTokens() ? wlt.nextToken() : null;
-
-                    // Only use the Field and Width tokens, if the field isn't 'thumbnail'
-                    if (listTok == null || !listTok.trim().equals("thumbnail"))
+                    browseFields = (String[]) ArrayUtils.remove(browseFields, thumbnailIndex);
+                    if(ArrayUtils.isNotEmpty(browseWidths))
                     {
-                        if (listTok != null)
-                        {
-                            if (newLLine.length() > 0)
-                            {
-                                newLLine.append(",");
-                            }
-
-                            newLLine.append(listTok);
-                        }
-
-                        if (widthTok != null)
-                        {
-                            if (newWLine.length() > 0)
-                            {
-                                newWLine.append(",");
-                            }
-
-                            newWLine.append(widthTok);
-                        }
+                       browseWidths = (String[]) ArrayUtils.remove(browseWidths, thumbnailIndex);
                     }
                 }
-
-                // Use the newly built configuration file
-                configLine  = newLLine.toString();
-                widthLine = newWLine.toString();
             }
         }
         else
         {
-            configLine = DEFAULT_LIST_FIELDS;
-            widthLine = DEFAULT_LIST_WIDTHS;
+            browseFields = DEFAULT_LIST_FIELDS;
+            browseWidths = DEFAULT_LIST_WIDTHS;
         }
 
         // Arrays used to hold the information we will require when outputting each row
-        String[] fieldArr  = configLine == null ? new String[0] : configLine.split("\\s*,\\s*");
-        String[] widthArr  = widthLine  == null ? new String[0] : widthLine.split("\\s*,\\s*");
-        boolean isDate[]   = new boolean[fieldArr.length];
-        boolean emph[]     = new boolean[fieldArr.length];
-        boolean isAuthor[] = new boolean[fieldArr.length];
-        boolean viewFull[] = new boolean[fieldArr.length];
-        String[] browseType = new String[fieldArr.length];
-        String[] cOddOrEven = new String[fieldArr.length];
+        boolean isDate[]   = new boolean[browseFields.length];
+        boolean emph[]     = new boolean[browseFields.length];
+        boolean isAuthor[] = new boolean[browseFields.length];
+        boolean viewFull[] = new boolean[browseFields.length];
+        String[] browseType = new String[browseFields.length];
+        String[] cOddOrEven = new String[browseFields.length];
 
         try
         {
@@ -265,11 +236,11 @@ public class ItemListTag extends TagSupport
             CrossLinks cl = new CrossLinks();
 
             // Get a width for the table
-            String tablewidth = ConfigurationManager.getProperty("webui.itemlist.tablewidth");
+            String tablewidth = configurationService.getProperty("webui.itemlist.tablewidth");
 
             // If we have column widths, output a fixed layout table - faster for browsers to render
             // but not if we have to add an 'edit item' button - we can't know how big it will be
-            if (widthArr.length > 0 && widthArr.length == fieldArr.length && !linkToEdit)
+            if (ArrayUtils.isNotEmpty(browseWidths) && browseWidths.length == browseFields.length && !linkToEdit)
             {
                 // If the table width has been specified, we can make this a fixed layout
                 if (!StringUtils.isEmpty(tablewidth))
@@ -285,18 +256,18 @@ public class ItemListTag extends TagSupport
                 // Output the known column widths
                 out.print("<colgroup>");
 
-                for (int w = 0; w < widthArr.length; w++)
+                for (int w = 0; w < browseWidths.length; w++)
                 {
                     out.print("<col width=\"");
 
                     // For a thumbnail column of width '*', use the configured max width for thumbnails
-                    if (fieldArr[w].equals("thumbnail") && widthArr[w].equals("*"))
+                    if (browseFields[w].equals("thumbnail") && browseWidths[w].equals("*"))
                     {
                         out.print(thumbItemListMaxWidth);
                     }
                     else
                     {
-                        out.print(StringUtils.isEmpty(widthArr[w]) ? "*" : widthArr[w]);
+                        out.print(StringUtils.isEmpty(browseWidths[w]) ? "*" : browseWidths[w]);
                     }
 
                     out.print("\" />");
@@ -316,9 +287,9 @@ public class ItemListTag extends TagSupport
             // Output the table headers
             out.println("<tr>");
 
-            for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
+            for (int colIdx = 0; colIdx < browseFields.length; colIdx++)
             {
-                String field = fieldArr[colIdx].toLowerCase().trim();
+                String field = browseFields[colIdx].toLowerCase().trim();
                 cOddOrEven[colIdx] = (((colIdx + 1) % 2) == 0 ? "Odd" : "Even");
 
                 // find out if the field is a date
@@ -329,7 +300,7 @@ public class ItemListTag extends TagSupport
                 }
 
                 // Cache any modifications to field
-                fieldArr[colIdx] = field;
+                browseFields[colIdx] = field;
 
                 // find out if this is the author column
                 if (field.equals(authorField))
@@ -393,9 +364,9 @@ public class ItemListTag extends TagSupport
                 // now prepare the XHTML frag for this division
             	out.print("<tr>"); 
 
-                for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
+                for (int colIdx = 0; colIdx < browseFields.length; colIdx++)
                 {
-                    String field = fieldArr[colIdx];
+                    String field = browseFields[colIdx];
 
                     // get the schema and the element qualifier pair
                     // (Note, the schema is not used for anything yet)
@@ -741,31 +712,34 @@ public class ItemListTag extends TagSupport
     /* get the required thumbnail config items */
     private static void getThumbSettings()
     {
-        showThumbs = ConfigurationManager
+        ConfigurationService configurationService =
+                DSpaceServicesFactory.getInstance().getConfigurationService();
+        
+        showThumbs = configurationService
                 .getBooleanProperty("webui.browse.thumbnail.show");
 
         if (showThumbs)
         {
-            thumbItemListMaxHeight = ConfigurationManager
+            thumbItemListMaxHeight = configurationService
                     .getIntProperty("webui.browse.thumbnail.maxheight");
 
             if (thumbItemListMaxHeight == 0)
             {
-                thumbItemListMaxHeight = ConfigurationManager
+                thumbItemListMaxHeight = configurationService
                         .getIntProperty("thumbnail.maxheight");
             }
 
-            thumbItemListMaxWidth = ConfigurationManager
+            thumbItemListMaxWidth = configurationService
                     .getIntProperty("webui.browse.thumbnail.maxwidth");
 
             if (thumbItemListMaxWidth == 0)
             {
-                thumbItemListMaxWidth = ConfigurationManager
+                thumbItemListMaxWidth = configurationService
                         .getIntProperty("thumbnail.maxwidth");
             }
         }
 
-        String linkBehaviour = ConfigurationManager
+        String linkBehaviour = configurationService
                 .getProperty("webui.browse.thumbnail.linkbehaviour");
 
         if ("bitstream".equals(linkBehaviour))

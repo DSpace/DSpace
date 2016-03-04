@@ -12,7 +12,7 @@ import java.util.*;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Implements MARC 21 standards to disregard initial
@@ -278,18 +278,15 @@ public class MARC21InitialArticleWord extends InitialArticleWord
         }
 
         // Setup default stop words for null languages
-        String defaultLangs = ConfigurationManager.getProperty("marc21wordfilter.defaultlang");
-        if (!StringUtils.isEmpty(defaultLangs))
+        String[] defaultLangs = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("marc21wordfilter.defaultlang");
+        if (ArrayUtils.isNotEmpty(defaultLangs))
         {
-            String[] langArr = defaultLangs.split("[, ]+");
-            if (langArr != null && langArr.length > 0)
-            {
                 int wordCount = 0;
-                ArticlesForLang[] afl = new ArticlesForLang[langArr.length];
+                ArticlesForLang[] afl = new ArticlesForLang[defaultLangs.length];
 
                 for (int idx = 0; idx < afl.length; idx++)
                 {
-                    Language l = Language.getLanguage(langArr[idx]);
+                    Language l = Language.getLanguage(defaultLangs[idx]);
                     if (l != null && ianaArticleMap.containsKey(l.IANA))
                     {
                         afl[idx] = ianaArticleMap.get(l.IANA);
@@ -313,7 +310,6 @@ public class MARC21InitialArticleWord extends InitialArticleWord
                         }
                     }
                 }
-            }
         }
     }
 

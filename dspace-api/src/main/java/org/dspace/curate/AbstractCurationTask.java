@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.content.Collection;
@@ -22,11 +22,12 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * AbstractCurationTask encapsulates a few common patterns of task use,
@@ -40,14 +41,12 @@ public abstract class AbstractCurationTask implements CurationTask
     protected Curator curator = null;
     // curator-assigned taskId
     protected String taskId = null;
-    // optional task configuration properties
-    private Properties taskProps = null;
     // logger
     private static Logger log = Logger.getLogger(AbstractCurationTask.class);
     protected CommunityService communityService;
     protected ItemService itemService;
     protected HandleService handleService;
-
+    protected ConfigurationService configurationService;
 
     @Override
     public void init(Curator curator, String taskId) throws IOException
@@ -57,6 +56,7 @@ public abstract class AbstractCurationTask implements CurationTask
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
+        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     }
 
     @Override
@@ -235,29 +235,15 @@ public abstract class AbstractCurationTask implements CurationTask
      */
     protected String taskProperty(String name)
     {
-    	if (taskProps == null)
-    	{
-    		// load properties
-    		taskProps = new Properties();
-    		StringBuilder modName = new StringBuilder();
-    		for (String segment : taskId.split("\\."))
-    		{
-    			// load property segments if present
-    			modName.append(segment);
-    			Properties modProps = ConfigurationManager.getProperties(modName.toString());
-    			if (modProps != null)
-    			{
-    				taskProps.putAll(modProps);
-    			}
-    			modName.append(".");
-    		}
-        	// warn if *no* properties found
-        	if (taskProps.size() == 0)
-        	{
-        		log.warn("Warning: No configuration properties found for task: " + taskId);
-        	}
+        // If a taskID/Name is specified, prepend it on the configuration name
+        if(StringUtils.isNotBlank(taskId))
+        {
+            return configurationService.getProperty(taskId + "." + name);
     	}
-    	return taskProps.getProperty(name);
+        else
+        {
+            return configurationService.getProperty(name);
+        }
     }
     
     /**
@@ -274,20 +260,15 @@ public abstract class AbstractCurationTask implements CurationTask
      */
     protected int taskIntProperty(String name, int defaultValue)
     {
-    	int intVal = defaultValue;
-    	String strVal = taskProperty(name);
-    	if (strVal != null)
-    	{
-    		try
-    		{
-    			intVal = Integer.parseInt(strVal.trim());
-    		}
-    		catch(NumberFormatException nfE)
-    		{
-    			log.warn("Warning: Number format error in module: " + taskId + " property: " + name);
-    		}
+        // If a taskID/Name is specified, prepend it on the configuration name
+    	if(StringUtils.isNotBlank(taskId))
+        {
+            return configurationService.getIntProperty(taskId + "." + name, defaultValue);
     	}
-    	return intVal;
+        else
+        {
+            return configurationService.getIntProperty(name, defaultValue);
+        }
     } 
     
     /**
@@ -304,20 +285,15 @@ public abstract class AbstractCurationTask implements CurationTask
      */
     protected long taskLongProperty(String name, long defaultValue)
     {
-    	long longVal = defaultValue;
-    	String strVal = taskProperty(name);
-    	if (strVal != null)
-    	{
-    		try
-    		{
-    			longVal = Long.parseLong(strVal.trim());
-    		}
-    		catch(NumberFormatException nfE)
-    		{
-    			log.warn("Warning: Number format error in module: " + taskId + " property: " + name);
-    		}
+        // If a taskID/Name is specified, prepend it on the configuration name
+    	if(StringUtils.isNotBlank(taskId))
+        {
+            return configurationService.getLongProperty(taskId + "." + name, defaultValue);
     	}
-    	return longVal;
+        else
+        {
+            return configurationService.getLongProperty(name, defaultValue);
+        }
     }  
     
     /**
@@ -334,13 +310,37 @@ public abstract class AbstractCurationTask implements CurationTask
      */
     protected boolean taskBooleanProperty(String name, boolean defaultValue)
     {
-    	String strVal = taskProperty(name);
-    	if (strVal != null)
-    	{
-    		strVal = strVal.trim();
-    	    return strVal.equalsIgnoreCase("true") ||
-    	           strVal.equalsIgnoreCase("yes");
+        // If a taskID/Name is specified, prepend it on the configuration name
+    	if(StringUtils.isNotBlank(taskId))
+        {
+            return configurationService.getBooleanProperty(taskId + "." + name, defaultValue);
     	}
-    	return defaultValue;
-    }  
+        else
+        {
+            return configurationService.getBooleanProperty(name, defaultValue);
+        }
+    }
+    
+    /**
+     * Returns task configuration Array property value for passed name, else
+     * <code>null</code> if no properties defined or no value for passed key.
+     * 
+     * @param name
+     *        the property name
+     * @return value
+     *        the property value, or null
+     * 
+     */
+    protected String[] taskArrayProperty(String name)
+    {
+        // If a taskID/Name is specified, prepend it on the configuration name
+        if(StringUtils.isNotBlank(taskId))
+        {
+            return configurationService.getArrayProperty(taskId + "." + name);
+    	}
+        else
+        {
+            return configurationService.getArrayProperty(name);
+        }
+    }
 }

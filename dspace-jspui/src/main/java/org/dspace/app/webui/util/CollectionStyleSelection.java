@@ -8,13 +8,14 @@
 package org.dspace.app.webui.util;
 
 import java.sql.SQLException;
-import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This is the standard (until 1.4.x) configuration mode based on owning collection handle
@@ -27,14 +28,18 @@ import org.dspace.core.ConfigurationManager;
 public class CollectionStyleSelection extends AKeyBasedStyleSelection
 {
     /** Hashmap of collection Handles to styles to use, from dspace.cfg */
-    private static java.util.Map<String, String> styles;
+    private java.util.Map<String, String> styles;
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(CollectionStyleSelection.class);
     
+    private final transient ConfigurationService configurationService
+             = DSpaceServicesFactory.getInstance().getConfigurationService();
+    
     /**
      * Get the style using the owning collection handle
      */
+    @Override
     public String getStyleForItem(Item item) throws SQLException
     {
         Collection c = item.getOwningCollection();
@@ -57,20 +62,17 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
     {
         styles = new HashMap<String, String>();
 
-        Enumeration<String> e = (Enumeration<String>)ConfigurationManager.propertyNames();
-
-        while (e.hasMoreElements())
+        // Get all properties starting with "webui.itemdisplay"
+        List<String> keys = configurationService.getPropertyKeys("webui.itemdisplay");
+       
+        for(String key: keys)
         {
-            String key = e.nextElement();
-
-            if (key.startsWith("webui.itemdisplay.")
-                    && key.endsWith(".collections"))
+            if (key.endsWith(".collections"))
             {
                 String styleName = key.substring("webui.itemdisplay.".length(),
                         key.length() - ".collections".length());
 
-                String[] collections = ConfigurationManager.getProperty(key)
-                        .split(",");
+                String[] collections = configurationService.getArrayProperty(key);
 
                 for (int i = 0; i < collections.length; i++)
                 {

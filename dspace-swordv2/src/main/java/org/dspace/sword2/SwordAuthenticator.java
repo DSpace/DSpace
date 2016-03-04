@@ -7,10 +7,8 @@
  */
 package org.dspace.sword2;
 
-import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -18,17 +16,17 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.LogManager;
 import org.dspace.core.Constants;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.apache.log4j.Logger;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
@@ -38,6 +36,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * This class offers a thin wrapper for the default DSpace
@@ -68,6 +67,9 @@ public class SwordAuthenticator
 
     protected ItemService itemService = ContentServiceFactory.getInstance()
             .getItemService();
+    
+    protected ConfigurationService configurationService = DSpaceServicesFactory
+            .getInstance().getConfigurationService();
 
     /**
      * Does the given username and password authenticate for the
@@ -155,14 +157,14 @@ public class SwordAuthenticator
 
         // smooth out the OnBehalfOf request, so that empty strings are
         // treated as null
-        if ("".equals(obo))
+        if (StringUtils.isBlank(obo))
         {
             obo = null;
         }
 
         // first find out if we support on-behalf-of deposit
-        boolean mediated = ConfigurationManager
-                .getBooleanProperty("swordv2-server", "on-behalf-of.enable");
+        boolean mediated = configurationService
+                .getBooleanProperty("swordv2-server.on-behalf-of.enable", false);
         if (!mediated && obo != null)
         {
             // user is trying to do a mediated deposit on a repository which does not support it
@@ -1002,9 +1004,9 @@ public class SwordAuthenticator
     private boolean allowedToMediate(Context context)
     {
         // get the configuration
-        String mediatorCfg = ConfigurationManager
-                .getProperty("swordv2-server", "on-behalf-of.update.mediators");
-        if (mediatorCfg == null)
+        String[] mediators = configurationService
+                .getArrayProperty("swordv2-server.on-behalf-of.update.mediators");
+        if (mediators == null || mediators.length==0)
         {
             // if there's no explicit list of mediators, then anyone can mediate
             return true;
@@ -1019,7 +1021,6 @@ public class SwordAuthenticator
         String email = eperson.getEmail();
         String netid = eperson.getNetid();
 
-        String[] mediators = mediatorCfg.split(",");
         for (String mediator : mediators)
         {
             String m = mediator.trim();

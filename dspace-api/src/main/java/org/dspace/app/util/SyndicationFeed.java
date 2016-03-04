@@ -50,6 +50,8 @@ import com.sun.syndication.io.SyndFeedOutput;
 import com.sun.syndication.io.FeedException;
 
 import org.apache.log4j.Logger;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Invoke ROME library to assemble a generic model of a syndication
@@ -83,38 +85,43 @@ public class SyndicationFeed
     protected  String defaultTitleField = "dc.title";
     protected  String defaultAuthorField = "dc.contributor.author";
     protected  String defaultDateField = "dc.date.issued";
-    private static  String defaultDescriptionFields = "dc.description.abstract, dc.description, dc.title.alternative, dc.title";
+    private static final String[] defaultDescriptionFields = new String[]{"dc.description.abstract", "dc.description", "dc.title.alternative", "dc.title"};
     protected  String defaultExternalMedia = "dc.source.uri";
 
+    private final ConfigurationService configurationService = 
+            DSpaceServicesFactory.getInstance().getConfigurationService();
+
     // metadata field for Item title in entry:
-    protected  String titleField =
-        getDefaultedConfiguration("webui.feed.item.title", defaultTitleField);
+    protected String titleField = 
+            configurationService.getProperty("webui.feed.item.title", defaultTitleField);
 
     // metadata field for Item publication date in entry:
-    protected  String dateField =
-        getDefaultedConfiguration("webui.feed.item.date", defaultDateField);
+    protected String dateField =
+            configurationService.getProperty("webui.feed.item.date", defaultDateField);
 
     // metadata field for Item description in entry:
-    private static String descriptionFields[] =
-        getDefaultedConfiguration("webui.feed.item.description", defaultDescriptionFields).split("\\s*,\\s*");
-
-    protected  String authorField =
-        getDefaultedConfiguration("webui.feed.item.author", defaultAuthorField);
+    private static final String descriptionFields[] =
+            DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.item.description", defaultDescriptionFields);
+    
+    protected String authorField =
+            configurationService.getProperty("webui.feed.item.author", defaultAuthorField);
 
     // metadata field for Podcast external media source url
-    protected  String externalSourceField = getDefaultedConfiguration("webui.feed.podcast.sourceuri", defaultExternalMedia);
+    protected String externalSourceField = 
+            configurationService.getProperty("webui.feed.podcast.sourceuri", defaultExternalMedia);
 
     // metadata field for Item dc:creator field in entry's DCModule (no default)
-    protected  String dcCreatorField = ConfigurationManager.getProperty("webui.feed.item.dc.creator");
+    protected String dcCreatorField = configurationService.getProperty("webui.feed.item.dc.creator");
 
     // metadata field for Item dc:date field in entry's DCModule (no default)
-    protected  String dcDateField = ConfigurationManager.getProperty("webui.feed.item.dc.date");
+    protected String dcDateField = configurationService.getProperty("webui.feed.item.dc.date");
 
     // metadata field for Item dc:author field in entry's DCModule (no default)
-    protected  String dcDescriptionField = ConfigurationManager.getProperty("webui.feed.item.dc.description");
+    protected String dcDescriptionField = configurationService.getProperty("webui.feed.item.dc.description");
 
     // List of available mimetypes that we'll add to podcast feed. Multiple values separated by commas
-    protected  String podcastableMIMETypes = getDefaultedConfiguration("webui.feed.podcast.mimetypes", "audio/x-mpeg");
+    protected String[] podcastableMIMETypes =
+            configurationService.getArrayProperty("webui.feed.podcast.mimetypes", new String[]{"audio/x-mpeg"});
 
     // -------- Instance variables:
 
@@ -374,7 +381,7 @@ public class SyndicationFeed
                             List<Bitstream> bits = bunds.get(0).getBitstreams();
                             for (Bitstream bit : bits) {
                                 String mime = bit.getFormat(context).getMIMEType();
-                                if (podcastableMIMETypes.contains(mime)) {
+                                if (ArrayUtils.contains(podcastableMIMETypes,mime)) {
                                     SyndEnclosure enc = new SyndEnclosureImpl();
                                     enc.setType(bit.getFormat(context).getMIMEType());
                                     enc.setLength(bit.getSize());

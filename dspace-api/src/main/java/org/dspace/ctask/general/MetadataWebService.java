@@ -48,7 +48,6 @@ import org.xml.sax.SAXException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
@@ -167,7 +166,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     @Override
     public void init(Curator curator, String taskId) throws IOException {
     	super.init(curator, taskId);
-    	lang = ConfigurationManager.getProperty("default.language");
+    	lang = configurationService.getProperty("default.language");
         String fldSep = taskProperty("separator");
         fieldSeparator = (fldSep != null) ? fldSep : " ";
     	urlTemplate = taskProperty("template");
@@ -177,7 +176,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     	lookupField = parsed[0];
     	lookupTransform = parsed[1];
     	dataList = new ArrayList<DataInfo>();
-    	for (String entry : taskProperty("datamap").split(",")) {
+    	for (String entry : taskArrayProperty("datamap")) {
     		entry = entry.trim();
     		String src = entry;
     		String mapping = null;

@@ -32,7 +32,8 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 
 /**
@@ -45,9 +46,9 @@ public class CCLookup {
         /** log4j logger */
         private static Logger log = Logger.getLogger(CCLookup.class);
 
-	private static String cc_root = ConfigurationManager.getProperty("cc.api.rooturl");
-	private static String jurisdiction; 
-	private static List<String> lcFilter = new ArrayList<String>();
+	private String cc_root;
+	private String jurisdiction; 
+	private List<String> lcFilter = new ArrayList<String>();
 	
 	private Document license_doc        = null;
 	private String rdfString            = null;
@@ -57,18 +58,6 @@ public class CCLookup {
 	private SAXBuilder parser           = new SAXBuilder();
 	private List<CCLicense> licenses    = new ArrayList<CCLicense>();
 	private List<CCLicenseField> licenseFields = new ArrayList<CCLicenseField>();
-	
-	static {
-		String jurisProp = ConfigurationManager.getProperty("cc.license.jurisdiction");
-		jurisdiction = (jurisProp != null) ? jurisProp : "";
-		
-		String filterList = ConfigurationManager.getProperty("cc.license.classfilter");
-		if (filterList != null) {
-			for (String name: filterList.split(",")) {
-				lcFilter.add(name.trim());
-			}
-		}
-	}
 
 	/**
 	 * Constructs a new instance with the default web services root.
@@ -76,6 +65,20 @@ public class CCLookup {
 	 */
 	public CCLookup() {
 		super();
+                
+                ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+                
+                cc_root = configurationService.getProperty("cc.api.rooturl");
+                
+                String jurisProp = configurationService.getProperty("cc.license.jurisdiction");
+		jurisdiction = (jurisProp != null) ? jurisProp : "";
+		
+		String[] filters = configurationService.getArrayProperty("cc.license.classfilter");
+		if (filters != null) {
+			for (String name: filters) {
+				lcFilter.add(name.trim());
+			}
+		}
 	}
 
 	/**
