@@ -16,6 +16,14 @@
 
 
 	<!-- Components -->
+	<bean id="rpStatComponentsService" class="org.dspace.app.cris.integration.CrisComponentsService">
+		<property name="components">
+			<map>
+
+				<entry key="dspaceitems" value-ref="publicationlist" />			</map>
+		</property>
+	</bean>
+	
 	<bean id="rpComponentsService" class="org.dspace.app.cris.integration.CrisComponentsService">
 		<property name="components">
 			<map>
@@ -33,6 +41,7 @@
 		<property name="relationConfiguration" ref="relationRPVSItemConfiguration" />
 		<property name="commonFilter"><util:constant static-field="org.dspace.app.webui.cris.util.RelationPreferenceUtil.HIDDEN_FILTER" /></property>				
 		<property name="target" value="org.dspace.app.cris.model.ResearcherPage" />
+		<property name="facets" ref="facetsItemConfiguration" />
 		<property name="types">
 			<map>
 				<entry key="selected" value-ref="selectedComponent" />
@@ -114,6 +123,7 @@
 		class="org.dspace.app.webui.cris.components.CRISPJConfigurerComponent">
 		<property name="relationConfiguration" ref="relationRPVSPJConfiguration" />		
 		<property name="target" value="org.dspace.app.cris.model.ResearcherPage" />
+		<property name="facets" ref="facetsPJConfiguration" />
 		<property name="types">
 			<map>
 				<entry key="selectedproject" value-ref="selectedProjectComponent" />
@@ -341,6 +351,7 @@
 		class="org.dspace.app.webui.cris.components.CRISOUConfigurerComponent">
 		<property name="relationConfiguration" ref="relationOUVSOUConfiguration" />
 		<property name="target" value="org.dspace.app.cris.model.OrganizationUnit" />
+		<property name="facets" ref="facetsOUConfiguration"/>
 		<property name="types">
 			<map>
 				<entry key="organizations" value-ref="organizationsForOUComponent" />				
@@ -373,6 +384,7 @@
 		<property name="relationConfiguration" ref="relationPJVSItemConfiguration" />
 		<property name="commonFilter"><util:constant static-field="org.dspace.app.webui.cris.util.RelationPreferenceUtil.HIDDEN_FILTER" /></property>		
 		<property name="target" value="org.dspace.app.cris.model.Project" />
+		<property name="facets" ref="facetsItemConfiguration"/>
 		<property name="types">
 			<map>
 				<entry key="selected" value-ref="selectedPublicationForProjectComponent" />				
@@ -415,6 +427,7 @@
 		<property name="relationConfiguration" ref="relationJOURNALVSItemConfiguration" />
 		<property name="commonFilter"><util:constant static-field="org.dspace.app.webui.cris.util.RelationPreferenceUtil.HIDDEN_FILTER" /></property>		
 		<property name="target" value="org.dspace.app.cris.model.ResearchObject" />
+		<property name="facets" ref="facetsItemConfiguration"/>		
 		<property name="types">
 			<map>
 				<entry key="selected" value-ref="selectedPublicationForJournalComponent" />				

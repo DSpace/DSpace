@@ -264,7 +264,7 @@ public class ResearcherTagLibraryFunctions
 
                     for (String compp : comp.keySet())
                     {
-                        if (component.count(comp.get(compp)
+                        if (component.count(null, comp.get(compp)
                                 .getComponentIdentifier(), anagrafica.getId()) > 0)
                         {
                             return false;
@@ -298,7 +298,7 @@ public class ResearcherTagLibraryFunctions
 
                     for (String compp : comp.keySet())
                     {
-                        if (component.count(comp.get(compp)
+                        if (component.count(null, comp.get(compp)
                                 .getComponentIdentifier(), anagrafica.getId()) > 0)
                         {
                             return false;
@@ -331,7 +331,7 @@ public class ResearcherTagLibraryFunctions
 
                     for (String compp : comp.keySet())
                     {
-                        if (component.count(comp.get(compp)
+                        if (component.count(null, comp.get(compp)
                                 .getComponentIdentifier(), anagrafica.getId()) > 0)
                         {
                             return false;
@@ -364,7 +364,7 @@ public class ResearcherTagLibraryFunctions
 
                     for (String compp : comp.keySet())
                     {
-                        if (component.count(comp.get(compp)
+                        if (component.count(null, comp.get(compp)
                                 .getComponentIdentifier(), anagrafica.getId()) > 0)
                         {
                             return false;

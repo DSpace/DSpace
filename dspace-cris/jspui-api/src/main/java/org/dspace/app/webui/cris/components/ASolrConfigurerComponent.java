@@ -7,6 +7,7 @@
  */
 package org.dspace.app.webui.cris.components;
 
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.configuration.RelationConfiguration;
 import org.dspace.app.cris.discovery.CrisSearchService;
@@ -25,15 +27,18 @@ import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.webui.cris.dto.ComponentInfoDTO;
+import org.dspace.app.webui.discovery.DiscoverUtility;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.SearchUtils;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.dspace.utils.DSpace;
@@ -104,7 +109,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         ACrisObject cris = getCrisObject(request);
         // Get the query from the box name
         String type = getType(request);
-        List<String[]> activeTypes = addActiveTypeInRequest(request);
+        List<String[]> activeTypes = addActiveTypeInRequest(request, type);
 
         int start = 0;
 
@@ -139,7 +144,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
 
             // Perform the search
 
-            docs = search(context, type, cris, start, rpp, orderfield,
+            docs = search(context, request, type, cris, start, rpp, orderfield,
                     ascending, extraFields);
             if (docs != null)
             {
@@ -158,7 +163,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
             etAl = getEtAl(request, type);
             orderfield = getOrderField(sortBy);
             ascending = SortOption.ASCENDING.equalsIgnoreCase(order);
-            docs = search(context, type, cris, start, rpp, orderfield,
+            docs = search(context, request, type, cris, start, rpp, orderfield,
                     ascending, extraFields);
             if (docs != null)
             {
@@ -232,7 +237,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
 	}
 
     protected abstract List<String[]> addActiveTypeInRequest(
-            HttpServletRequest request) throws Exception;
+            HttpServletRequest request, String currentType) throws Exception;
 
     private ComponentInfoDTO<T> buildComponentInfo(DiscoverResult docs,
             Context context, String type, int start, String order, int rpp,
@@ -267,7 +272,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
     protected abstract T[] getObjectFromSolrResult(DiscoverResult docs,
             Context context) throws Exception;
 
-    public DiscoverResult search(Context context, String type,
+    public DiscoverResult search(Context context, HttpServletRequest request, String type,
             ACrisObject cris, int start, int rpp, String orderfield,
             boolean ascending, List<String> extraFields) throws SearchServiceException
     {
@@ -282,10 +287,10 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
                 .getQuery(), authority, uuid);
         List<String> filters = getFilters(type);
 
-        DiscoverQuery solrQuery = new DiscoverQuery();
+        DiscoverQuery discoveryQuery = new DiscoverQuery();
         try
         {
-            solrQuery.addFilterQueries("NOT(withdrawn:true)",
+            discoveryQuery.addFilterQueries("NOT(withdrawn:true)",
                     getTypeFilterQuery());
         }
         catch (InstantiationException e)
@@ -296,37 +301,63 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         {
             log.error(e.getMessage(), e);
         }
-        solrQuery.setQuery(query);
-        solrQuery.addSearchField("search.resourceid");
-        solrQuery.addSearchField("search.resourcetype");
+        discoveryQuery.setQuery(query);
+        discoveryQuery.addSearchField("search.resourceid");
+        discoveryQuery.addSearchField("search.resourcetype");
         if (extraFields != null) {
         	for (String f : extraFields) {
-        		solrQuery.addSearchField(f);
+        	    discoveryQuery.addSearchField(f);
         	}
         }
-        solrQuery.setStart(start);
-        solrQuery.setMaxResults(rpp);
+        discoveryQuery.setStart(start);
+        discoveryQuery.setMaxResults(rpp);
         if (orderfield == null)
         {
             orderfield = "score";
         }
-        solrQuery.setSortField(orderfield, ascending ? SORT_ORDER.asc
+        discoveryQuery.setSortField(orderfield, ascending ? SORT_ORDER.asc
                 : SORT_ORDER.desc);
 
         if (filters != null)
         {
             for (String filter : filters)
             {
-                solrQuery.addFilterQueries(MessageFormat.format(filter,
+                discoveryQuery.addFilterQueries(MessageFormat.format(filter,
                         authority, uuid));
             }
         }
+        if (request != null)
+        {
+            List<String[]> httpfilters = DiscoverUtility.getFilters(request);
+            for (String[] f : httpfilters)
+            {
+                try
+                {
+                    String newFilterQuery = SearchUtils.getSearchService()
+                            .toFilterQuery(context, f[0], f[1], f[2])
+                            .getFilterQuery();
+                    if (StringUtils.isNotBlank(newFilterQuery))
+                    {
+                        discoveryQuery.addFilterQueries(newFilterQuery);
+                    }
+                }
+                catch (SQLException e)
+                {
+                    log.error(
+                            LogManager.getHeader(context,
+                                    "Error in discovery while setting up user facet query",
+                                    "filter_field: " + f[0] + ",filter_type:"
+                                            + f[1] + ",filer_value:" + f[2]),
+                            e);
+                }
 
-        return getSearchService().search(context, solrQuery);
+            }
+        }
+        return getSearchService().search(context, discoveryQuery);
 
     }
 
-    private String getType(HttpServletRequest request)
+    protected String getType(HttpServletRequest request)
     {
         String type = request.getParameter("open");
         if (type == null)
@@ -381,7 +412,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         return sortBy;
     }
 
-    private List<String> getFilters(String type)
+    protected List<String> getFilters(String type)
     {
         return getTypes().get(type).getFilters();
     }

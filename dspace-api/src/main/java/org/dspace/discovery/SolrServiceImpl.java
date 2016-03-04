@@ -2079,6 +2079,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         	DiscoverResult.FacetResult facetResult = getDiscoveryFacet(
 									context, facetField, facetValue);
                             result.addFacetResult(field, facetResult);
+                            result.addFacetFieldResult(field, facetResult);
                         }
                     }
                 }
@@ -2116,6 +2117,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     if(0 < count)
                     {
                         result.addFacetResult(facetField, new DiscoverResult.FacetResult(filter, name, null, name, count));
+                        result.addFacetQueryResult(name, new DiscoverResult.FacetResult(facetField, name, null, name, count));
                     }
                 }
             }

@@ -545,7 +545,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor {
 		DiscoverySearchFilterFacet globalFacet = new DiscoverySearchFilterFacet();
 		globalFacet.setIndexFieldName(discoveryConfiguration.getCollapsingConfiguration().getGroupIndexFieldName());
 
-		request.setAttribute("facetGlobalConfig", globalFacet != null ? globalFacet : null);
+		request.setAttribute("facetGlobalConfig", globalFacet);
 
 		String query = queryArgs.getQuery();
 

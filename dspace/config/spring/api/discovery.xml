@@ -621,7 +621,7 @@
 			 Default: Tag.NameComparatorAsc  -->
 		<!-- <property name="ordering" value="Tag.NameComparatorAsc"/>-->	
     </bean>
-    
+				
 	<bean id="itemConfiguration"
 		class="org.dspace.discovery.configuration.DiscoveryConfiguration"
 		scope="prototype">
@@ -629,14 +629,7 @@
 		<property name="id" value="itemConfiguration" />
 		
 		<!--Which sidebar facets are to be displayed -->
-		<property name="sidebarFacets">
-			<list>
-				<ref bean="searchFilterAuthor" />
-				<ref bean="searchFilterSubject" />
-				<ref bean="searchFilterIssued" />
-				<ref bean="searchFilterType" />
-			</list>
-		</property>
+		<property name="sidebarFacets" ref="facetsItemConfiguration"/>
 		<!--The search filters which can be used on the discovery search page -->
 		<property name="searchFilters">
 			<list>
@@ -743,14 +736,7 @@
 		<property name="id" value="thesisConfiguration" />
 		
 		<!--Which sidebar facets are to be displayed -->
-		<property name="sidebarFacets">
-			<list>
-				<ref bean="searchFilterAuthor" />
-				<ref bean="searchFilterSubject" />
-				<ref bean="searchFilterIssued" />
-				
-			</list>
-		</property>
+		<property name="sidebarFacets" ref="facetsThesisConfiguration"/>
 		<!--The search filters which can be used on the discovery search page -->
 		<property name="searchFilters">
 			<list>
@@ -855,14 +841,7 @@
 		<property name="id" value="patentsConfiguration" />
 		
 		<!--Which sidebar facets are to be displayed -->
-		<property name="sidebarFacets">
-			<list>
-				<ref bean="searchFilterAuthor" />
-				<ref bean="searchFilterSubject" />
-				<ref bean="searchFilterIssued" />
-				
-			</list>
-		</property>
+		<property name="sidebarFacets"	ref="facetsPatentConfiguration"/>
 		<!--The search filters which can be used on the discovery search page -->
 		<property name="searchFilters">
 			<list>
@@ -967,15 +946,7 @@
 		<property name="id" value="conferencePaperConfiguration" />
 		
 		<!--Which sidebar facets are to be displayed -->
-		<property name="sidebarFacets">
-			<list>
-				<ref bean="searchFilterAuthor" />
-				<ref bean="searchFilterSubject" />
-				<ref bean="searchFilterIssued" />
-				<ref bean="searchFilterType" />
-				
-			</list>
-		</property>
+		<property name="sidebarFacets" ref="facetsConferencePaperConfiguration"/>
 		<!--The search filters which can be used on the discovery search page -->
 		<property name="searchFilters">
 			<list>
@@ -1082,14 +1053,7 @@
 		<property name="id" value="datasetConfiguration" />
 		
 		<!--Which sidebar facets are to be displayed -->
-		<property name="sidebarFacets">
-			<list>
-				<ref bean="searchFilterAuthor" />
-				<ref bean="searchFilterSubject" />
-				<ref bean="searchFilterIssued" />
-				
-			</list>
-		</property>
+		<property name="sidebarFacets" ref="facetsDatasetConfiguration"/>
 		<!--The search filters which can be used on the discovery search page -->
 		<property name="searchFilters">
 			<list>
@@ -1200,12 +1164,7 @@
 		<property name="id" value="crisRPConfiguration" />
 		
 		<!--Which sidebar facets are to be displayed -->
-		<property name="sidebarFacets">
-			<list>
-				<ref bean="searchFilterRPDept" />
-				<ref bean="searchFilterRPWorkgroup" />
-			</list>
-		</property>
+		<property name="sidebarFacets" ref="facetsRPConfiguration"/>
 		<!--The search filters which can be used on the discovery search page -->
 		<property name="searchFilters">
 			<list>
@@ -1292,13 +1251,7 @@
 		<property name="id" value="crisPJConfiguration" />
 		
 		<!--Which sidebar facets are to be displayed -->
-		<property name="sidebarFacets">
-			<list>
-				<ref bean="searchFilterProjectFunders" />
-				<ref bean="searchFilterProjectPrincipalDept" />
-				<ref bean="searchFilterStartDate" />
-			</list>
-		</property>
+		<property name="sidebarFacets"	ref="facetsPJConfiguration"/>
 		<!--The search filters which can be used on the discovery search page -->
 		<property name="searchFilters">
 			<list>
@@ -1387,12 +1340,7 @@
 		<property name="id" value="crisOUConfiguration" />
 		
 		<!--Which sidebar facets are to be displayed -->
-		<property name="sidebarFacets">
-			<list>
-				<ref bean="searchFilterObjectName" />
-				<ref bean="searchFilterStartDate" />
-			</list>
-		</property>
+		<property name="sidebarFacets" ref="facetsOUConfiguration"/>
 		<!--The search filters which can be used on the discovery search page -->
 		<property name="searchFilters">
 			<list>
@@ -1800,6 +1748,89 @@
 	<bean id="sortOUName"
 		class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
 		<property name="metadataField" value="crisou.name" />
+	</bean>
+
+
+	
+	<!-- Facets configuration -->
+	<bean id="facetsItemConfiguration" class="java.util.ArrayList">
+		<constructor-arg>
+		<list>
+				<ref bean="searchFilterAuthor" />
+				<ref bean="searchFilterSubject" />
+				<ref bean="searchFilterIssued" />
+				<ref bean="searchFilterType" />
+		</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="facetsPatentConfiguration" class="java.util.ArrayList">
+		<constructor-arg>
+		<list>
+				<ref bean="searchFilterAuthor" />
+				<ref bean="searchFilterSubject" />
+				<ref bean="searchFilterIssued" />
+		</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="facetsThesisConfiguration" class="java.util.ArrayList">
+		<constructor-arg>
+		<list>
+				<ref bean="searchFilterAuthor" />
+				<ref bean="searchFilterSubject" />
+				<ref bean="searchFilterIssued" />
+		</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="facetsRPConfiguration" class="java.util.ArrayList">
+		<constructor-arg>
+		<list>
+				<ref bean="searchFilterRPDept" />
+				<ref bean="searchFilterRPWorkgroup" />
+		</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="facetsPJConfiguration" class="java.util.ArrayList">
+		<constructor-arg>
+		<list>
+				<ref bean="searchFilterProjectFunders" />
+				<ref bean="searchFilterProjectPrincipalDept" />
+				<ref bean="searchFilterStartDate" />
+		</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="facetsOUConfiguration" class="java.util.ArrayList">
+		<constructor-arg>
+		<list>
+				<ref bean="searchFilterObjectName" />
+				<ref bean="searchFilterStartDate" />
+		</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="facetsConferencePaperConfiguration" class="java.util.ArrayList">
+		<constructor-arg>
+		<list>
+				<ref bean="searchFilterAuthor" />
+				<ref bean="searchFilterSubject" />
+				<ref bean="searchFilterIssued" />
+				<ref bean="searchFilterType" />
+		</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="facetsDatasetConfiguration" class="java.util.ArrayList">
+		<constructor-arg>
+		<list>
+				<ref bean="searchFilterAuthor" />
+				<ref bean="searchFilterSubject" />
+				<ref bean="searchFilterIssued" />
+		</list>
+		</constructor-arg>
 	</bean>
 
 
