@@ -5,7 +5,11 @@ env:
 cache:
     directories:
     - $HOME/.m2
+sudo: required # for setting hostname
+addons:
+  hostname: localhost 
 before_install:
+- cat /etc/hosts
 - ./test/bin/travis-install-maven.sh
 - export PATH="$TRAVIS_BUILD_DIR/apache-maven-2.2.1/bin:$PATH"
 - export DRYAD_CODE_DIR=$TRAVIS_BUILD_DIR
