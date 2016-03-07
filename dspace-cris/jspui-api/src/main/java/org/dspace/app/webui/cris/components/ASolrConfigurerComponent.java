@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,8 +35,11 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
+import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
@@ -108,7 +113,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
     {
         ACrisObject cris = getCrisObject(request);
         // Get the query from the box name
-        String type = getType(request);
+        String type = getType(request, cris.getId());
         List<String[]> activeTypes = addActiveTypeInRequest(request, type);
 
         int start = 0;
@@ -225,6 +230,27 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
             // Set a variable to create admin buttons
             request.setAttribute("admin_button", new Boolean(true));
         }
+        request.setAttribute(
+                "facetsConfig" + getRelationConfiguration().getRelationName(),
+                getFacets() != null ? getFacets()
+                        : new ArrayList<DiscoverySearchFilterFacet>());
+        request.setAttribute(
+                "qResults" + getRelationConfiguration().getRelationName(),
+                docs);
+        List<String[]> appliedFilters = DiscoverUtility.getFilters(request);
+        request.setAttribute(
+                "appliedFilters" + getRelationConfiguration().getRelationName(),
+                appliedFilters);
+        List<String> appliedFilterQueries = new ArrayList<String>();
+        for (String[] filter : appliedFilters)
+        {
+            appliedFilterQueries
+                    .add(filter[0] + "::" + filter[1] + "::" + filter[2]);
+        }
+        request.setAttribute(
+                "appliedFilterQueries"
+                        + getRelationConfiguration().getRelationName(),
+                appliedFilterQueries);
     }
 
 	private String getOrderField(int sortBy) throws SortException {
@@ -301,9 +327,9 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         {
             log.error(e.getMessage(), e);
         }
+        
         discoveryQuery.setQuery(query);
-        discoveryQuery.addSearchField("search.resourceid");
-        discoveryQuery.addSearchField("search.resourcetype");
+        
         if (extraFields != null) {
         	for (String f : extraFields) {
         	    discoveryQuery.addSearchField(f);
@@ -326,6 +352,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
                         authority, uuid));
             }
         }
+        List<String> userFilters = new ArrayList<String>();
         if (request != null)
         {
             List<String[]> httpfilters = DiscoverUtility.getFilters(request);
@@ -339,6 +366,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
                     if (StringUtils.isNotBlank(newFilterQuery))
                     {
                         discoveryQuery.addFilterQueries(newFilterQuery);
+                        userFilters.add(("{!tag=dt}"+newFilterQuery));
                     }
                 }
                 catch (SQLException e)
@@ -353,16 +381,291 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
 
             }
         }
+        
+        discoveryQuery.setFacetMinCount(1);
+        for (DiscoverySearchFilterFacet facet : getFacets()) {
+            
+            if (facet.getType().equals(
+                    DiscoveryConfigurationParameters.TYPE_DATE))
+            {
+                String dateFacet = facet.getIndexFieldName() + ".year";
+                List<String> filterQueriesList = discoveryQuery
+                        .getFilterQueries();
+                String[] filterQueries = new String[0];
+                if (filterQueriesList != null)
+                {
+                    filterQueries = new String[filterQueries.length];
+                    filterQueries = filterQueriesList
+                            .toArray(filterQueries);
+                }
+                try
+                {
+                    // Get a range query so we can create facet
+                    // queries
+                    // ranging from out first to our last date
+                    // Attempt to determine our oldest & newest year
+                    // by
+                    // checking for previously selected filters
+                    int oldestYear = -1;
+                    int newestYear = -1;
+
+                    for (String filterQuery : filterQueries)
+                    {
+                        if (filterQuery.startsWith(dateFacet + ":"))
+                        {
+                            // Check for a range
+                            Pattern pattern = Pattern
+                                    .compile("\\[(.*? TO .*?)\\]");
+                            Matcher matcher = pattern.matcher(filterQuery);
+                            boolean hasPattern = matcher.find();
+                            if (hasPattern)
+                            {
+                                filterQuery = matcher.group(0);
+                                // We have a range
+                                // Resolve our range to a first &
+                                // endyear
+                                int tempOldYear = Integer
+                                        .parseInt(filterQuery.split(" TO ")[0]
+                                                .replace("[", "").trim());
+                                int tempNewYear = Integer
+                                        .parseInt(filterQuery.split(" TO ")[1]
+                                                .replace("]", "").trim());
+
+                                // Check if we have a further filter
+                                // (or
+                                // a first one found)
+                                if (tempNewYear < newestYear
+                                        || oldestYear < tempOldYear
+                                        || newestYear == -1)
+                                {
+                                    oldestYear = tempOldYear;
+                                    newestYear = tempNewYear;
+                                }
+
+                            }
+                            else
+                            {
+                                if (filterQuery.indexOf(" OR ") != -1)
+                                {
+                                    // Should always be the case
+                                    filterQuery = filterQuery.split(" OR ")[0];
+                                }
+                                // We should have a single date
+                                oldestYear = Integer.parseInt(filterQuery
+                                        .split(":")[1].trim());
+                                newestYear = oldestYear;
+                                // No need to look further
+                                break;
+                            }
+                        }
+                    }
+                    // Check if we have found a range, if not then
+                    // retrieve our first & last year by using solr
+                    if (oldestYear == -1 && newestYear == -1)
+                    {
+
+                        DiscoverQuery yearRangeQuery = new DiscoverQuery();
+                        yearRangeQuery.setFacetMinCount(1);
+                        yearRangeQuery.setMaxResults(1);
+                        // Set our query to anything that has this
+                        // value
+                        yearRangeQuery.addFieldPresentQueries(dateFacet);
+                        // Set sorting so our last value will appear
+                        // on
+                        // top
+                        yearRangeQuery.setSortField(dateFacet + "_sort",
+                                DiscoverQuery.SORT_ORDER.asc);
+                        yearRangeQuery.addFilterQueries(filterQueries);
+                        yearRangeQuery.addSearchField(dateFacet);
+                        DiscoverResult lastYearResult = SearchUtils
+                                .getSearchService().search(context, cris,
+                                        yearRangeQuery);
+
+                        if (0 < lastYearResult.getDspaceObjects().size())
+                        {
+                            java.util.List<DiscoverResult.SearchDocument> searchDocuments = lastYearResult
+                                    .getSearchDocument(lastYearResult
+                                            .getDspaceObjects().get(0));
+                            if (0 < searchDocuments.size()
+                                    && 0 < searchDocuments
+                                            .get(0)
+                                            .getSearchFieldValues(dateFacet)
+                                            .size())
+                            {
+                                oldestYear = Integer
+                                        .parseInt(searchDocuments
+                                                .get(0)
+                                                .getSearchFieldValues(
+                                                        dateFacet).get(0));
+                            }
+                        }
+                        // Now get the first year
+                        yearRangeQuery.setSortField(dateFacet + "_sort",
+                                DiscoverQuery.SORT_ORDER.desc);
+                        DiscoverResult firstYearResult = SearchUtils
+                                .getSearchService().search(context, cris,
+                                        yearRangeQuery);
+                        if (0 < firstYearResult.getDspaceObjects().size())
+                        {
+                            java.util.List<DiscoverResult.SearchDocument> searchDocuments = firstYearResult
+                                    .getSearchDocument(firstYearResult
+                                            .getDspaceObjects().get(0));
+                            if (0 < searchDocuments.size()
+                                    && 0 < searchDocuments
+                                            .get(0)
+                                            .getSearchFieldValues(dateFacet)
+                                            .size())
+                            {
+                                newestYear = Integer
+                                        .parseInt(searchDocuments
+                                                .get(0)
+                                                .getSearchFieldValues(
+                                                        dateFacet).get(0));
+                            }
+                        }
+                        // No values found!
+                        if (newestYear == -1 || oldestYear == -1)
+                        {
+                            continue;
+                        }
+
+                    }
+
+                    int gap = 1;
+                    // Attempt to retrieve our gap by the algorithm
+                    // below
+                    int yearDifference = newestYear - oldestYear;
+                    if (yearDifference != 0)
+                    {
+                        while (10 < ((double) yearDifference / gap))
+                        {
+                            gap *= 10;
+                        }
+                    }
+                    // We need to determine our top year so we can
+                    // start
+                    // our count from a clean year
+                    // Example: 2001 and a gap from 10 we need the
+                    // following result: 2010 - 2000 ; 2000 - 1990
+                    // hence
+                    // the top year
+                    int topYear = (int) (Math.ceil((float) (newestYear)
+                            / gap) * gap);
+
+                    if (gap == 1)
+                    {
+                        // We need a list of our years
+                        // We have a date range add faceting for our
+                        // field
+                        // The faceting will automatically be
+                        // limited to
+                        // the 10 years in our span due to our
+                        // filterquery
+                        discoveryQuery.addFacetField(new DiscoverFacetField(
+                                facet.getIndexFieldName(), facet.getType(),
+                                10, facet.getSortOrder(),false));
+                    }
+                    else
+                    {
+                        java.util.List<String> facetQueries = new ArrayList<String>();
+                        // Create facet queries but limit then to 11
+                        // (11
+                        // == when we need to show a show more url)
+                        for (int year = topYear; year > oldestYear
+                                && (facetQueries.size() < 11); year -= gap)
+                        {
+                            // Add a filter to remove the last year
+                            // only
+                            // if we aren't the last year
+                            int bottomYear = year - gap;
+                            // Make sure we don't go below our last
+                            // year
+                            // found
+                            if (bottomYear < oldestYear)
+                            {
+                                bottomYear = oldestYear;
+                            }
+
+                            // Also make sure we don't go above our
+                            // newest year
+                            int currentTop = year;
+                            if ((year == topYear))
+                            {
+                                currentTop = newestYear;
+                            }
+                            else
+                            {
+                                // We need to do -1 on this one to
+                                // get a
+                                // better result
+                                currentTop--;
+                            }
+                            facetQueries.add(dateFacet + ":[" + bottomYear
+                                    + " TO " + currentTop + "]");
+                        }
+                        for (String facetQuery : facetQueries)
+                        {
+                            discoveryQuery.addFacetQuery(facetQuery);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    log.error(
+                            LogManager
+                                    .getHeader(
+                                            context,
+                                            "Error in discovery while setting up date facet range",
+                                            "date facet: " + dateFacet), e);
+                }
+            }
+            else
+            {
+                int facetLimit = facet.getFacetLimit();
+
+                int facetPage = UIUtil.getIntParameter(request,
+                        facet.getIndexFieldName() + "_page");
+                if (facetPage < 0)
+                {
+                    facetPage = 0;
+                }
+                // at most all the user filters belong to this facet
+                int alreadySelected = userFilters.size();
+        
+                // Add one to our facet limit to make sure that if
+                // we
+                // have more then the shown facets that we show our
+                // show
+                // more url
+                // add the already selected facet so to have a full
+                // top list
+                // if possible
+                discoveryQuery.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(),
+                        facet.getType(), facetLimit + 1 + alreadySelected, facet
+                                .getSortOrder(), facetPage * facetLimit, false));
+            }
+
+        }
+        
         return getSearchService().search(context, discoveryQuery);
 
     }
 
-    protected String getType(HttpServletRequest request)
+    protected String getType(HttpServletRequest request, Integer id)
     {
         String type = request.getParameter("open");
         if (type == null)
         {
             type = types.keySet().iterator().next();
+            for (String t : types.keySet())
+            {
+
+                if (count(request, t, id) > 0)
+                {
+                    type = t;
+                    break;
+                }
+            }
         }
         return type;
     }
@@ -491,4 +794,6 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
     {
         this.relationObjectType = relationObjectType;
     }
+    
+    public abstract List<DiscoverySearchFilterFacet> getFacets();
 }

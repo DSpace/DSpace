@@ -12,6 +12,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,8 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.ACrisObject;
-import org.dspace.app.cris.model.CrisConstants;
-import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.webui.discovery.DiscoverUtility;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.DSpaceObject;
@@ -30,14 +30,12 @@ import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
-import org.dspace.discovery.DiscoverResult.FacetResult;
 import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.DiscoverResult.FacetResult;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
-import org.dspace.discovery.configuration.SidebarFacetConfiguration;
-import org.dspace.discovery.configuration.DiscoveryConfigurationParameters.SORT;
 
 public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
         extends ASolrConfigurerComponent<T, ICrisBeanComponent> implements
@@ -63,7 +61,8 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
         {
             for (String type : docs.getFacetQueryResults().keySet())
             {
-                Long size = docs.getFacetQueryResults().get(type).get(0)
+                FacetResult facetResult = docs.getFacetQueryResults().get(type).get(0);
+                Long size = facetResult
                         .getCount();
                 String message = "";
                 try
@@ -91,28 +90,6 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
         request.setAttribute(
                 "activeTypes" + getRelationConfiguration().getRelationName(),
                 subLinks);
-        
-        request.setAttribute(
-                "facetsConfig" + getRelationConfiguration().getRelationName(),
-                getFacets() != null ? getFacets()
-                        : new ArrayList<DiscoverySearchFilterFacet>());
-        request.setAttribute(
-                "qResults" + getRelationConfiguration().getRelationName(),
-                docs);
-        List<String[]> appliedFilters = DiscoverUtility.getFilters(request);
-        request.setAttribute(
-                "appliedFilters" + getRelationConfiguration().getRelationName(),
-                appliedFilters);
-        List<String> appliedFilterQueries = new ArrayList<String>();
-        for (String[] filter : appliedFilters)
-        {
-            appliedFilterQueries
-                    .add(filter[0] + "::" + filter[1] + "::" + filter[2]);
-        }
-        request.setAttribute(
-                "appliedFilterQueries"
-                        + getRelationConfiguration().getRelationName(),
-                appliedFilterQueries);
 
         return subLinks;
     }
@@ -163,13 +140,15 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
             discoveryQuery.addFacetQuery("{!ex=dt key="+facetComponent.getComponentIdentifier()+"}"+format);
             discoveryQuery.getNamedFacetQueries().put(facetComponent.getComponentIdentifier(), format);
         }
-        
+
         for (DiscoverySearchFilterFacet facet : getFacets()) {
-            discoveryQuery.addFacetField(
-                    new DiscoverFacetField(facet.getIndexFieldName(),
-                            facet.getType(), facet.getFacetLimit(), facet.getSortOrder(), false));
+
+            discoveryQuery.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(),
+                    facet.getType(), facet.getFacetLimit(), facet.getSortOrder(), false));
         }
         
+        
+        List<String> userFilters = new ArrayList<String>();
         if (request != null)
         {
             List<String[]> filters = DiscoverUtility.getFilters(request);
@@ -183,6 +162,7 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
                     if (StringUtils.isNotBlank(newFilterQuery))
                     {
                         discoveryQuery.addFilterQueries("{!tag=dt}"+newFilterQuery);
+                        userFilters.add(("{!tag=dt}"+newFilterQuery));
                     }
                 }
                 catch (SQLException e)
@@ -196,6 +176,7 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
                 }
 
             }
+
         }
         
         if(getCommonFilter()!=null) {            
@@ -226,7 +207,14 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
                 .getAttribute("activeTypes"+getRelationConfiguration().getRelationName());
         if (subLinks == null)
         {
-            return addActiveTypeInRequest(request, getType(request));
+            ACrisObject t = getCrisObject(request);
+            if(t!=null) {
+                return addActiveTypeInRequest(request, getType(request, t.getId()));    
+            }
+            else {
+                return addActiveTypeInRequest(request, getType(request, null));
+            }
+            
         }
         return subLinks;
     }
@@ -239,7 +227,7 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
         {
             context = new Context();
             ACrisObject cris = getApplicationService().get(getTarget(), id);
-            List<FacetResult> facetresults = search(context, request, type, cris, 0, 0, null, true).getFacetResult(type);
+            List<FacetResult> facetresults = search(context, request, type, cris, 0, 0, null, true).getFacetQueryResult(type);
             if(facetresults.isEmpty()) {
                 return 0;    
             }
@@ -262,7 +250,10 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
 
     public List<DiscoverySearchFilterFacet> getFacets()
     {
-        return facets;
+        if(this.facets == null) {
+            this.facets = new ArrayList<DiscoverySearchFilterFacet>();
+        }
+        return this.facets;
     }
 
     public void setFacets(List<DiscoverySearchFilterFacet> facets)

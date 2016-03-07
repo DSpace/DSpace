@@ -38,6 +38,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="jdynatags" prefix="dyna"%>
+
 <c:set var="root"><%=request.getContextPath()%></c:set>
 <c:set var="info" value="${componentinfomap}" scope="page" />
 <%
@@ -65,9 +66,10 @@
 	
 	if (info.getItems().length > 0) {
 %>
+
 <c:set var="info" value="<%= info %>" scope="request" />
 
-<% if(subLinks!=null && subLinks.size()>1) {
+<% if(subLinks!=null && subLinks.size()>0) {
 
     boolean brefine = false;
     List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig"+info.getRelationName());
@@ -103,38 +105,59 @@
 	%>
 	
 	<div id="collapseFacet" class="collapse">
+		<div class="panel panel-default">
+		<a href="#" data-toggle="collapse" data-target="#collapseFacet" aria-expanded="false" aria-controls="collapseFacet">
+			<span class="pull-right">
+	  			<i class="fa fa-times"></i>
+	  		</span>
+			</a>		
+		<div class="panel-body">
 		<div id="containerFacetSubtype" class="facetsBox">
-	    <div id="facetSubType" class="panel panel-primary">
-		    <div class="panel-heading"><fmt:message key="jsp.components.button.seealso" /></div>
-			    <ul class="list-group"><%
-				for (String[] sub : subLinks )
-			    { 
-			    %>
-			        <li class="list-group-item <%= (info.getType().equals(sub[0]))?"active":"" %>"><span class="badge"><%= sub[2] %></span> <a href="?open=<%= sub[0] %>"><%= StringUtils.abbreviate(sub[1],36) %></a></li>
-		        <%
-			    }
-			    %></ul>
+			<%  if(subLinks.size()>1) {%>
+		    <div id="facetSubType" class="panel panel-primary">
+			    <div class="panel-heading"><fmt:message key="jsp.components.button.seealso" /></div>
+				    <ul class="list-group"><%
+					for (String[] sub : subLinks )
+				    { 
+				    %>
+				        <li class="list-group-item <%= (info.getType().equals(sub[0]))?"active":"" %>"><span class="badge"><%= sub[2] %></span> <a href="?open=<%= sub[0] %>"><%= StringUtils.abbreviate(sub[1],36) %></a></li>
+			        <%
+				    }
+				    %></ul>
+		    </div>	    
+		    <% } %>	    
+		    <% if (appliedFilters.size() > 0 ) { %> 
+		    <hr>                               
+			<div class="discovery-search-appliedFilters">
+			<span><fmt:message key="jsp.search.filter.applied" /></span>
+			<br/>
+			<%
+				int idx = 1;
+				for (String[] filter : appliedFilters)
+				{
+				    %>			    
+				    <% if(idx%2==0) { %>
+				    <span class="tag label label-info">
+				    <% } else { %>
+				    <span class="tag label label-default">
+				    <% } %>
+	  					<span><%= Utils.addEntities(filter[0]) %>::
+				    <%= Utils.addEntities(filter[1]) %>::
+				    <%= Utils.addEntities(filter[2]) %></span>
+	  					<a href="?open=<%=info.getType()							
+				                + httpFilters
+				                + "&amp;submit_filter_remove_"+ idx +"="+Utils.addEntities(filter[2]) %>"><i class="remove fa fa-times"></i></a> 
+				    
+				    </span>
+					<%
+					idx++;
+				}
+			%>
+			<hr>
+			</div>
+			<% } %>	    
 	    </div>
-	    <% if (appliedFilters.size() > 0 ) { %>                                
-		<div class="discovery-search-appliedFilters">
-		<span><fmt:message key="jsp.search.filter.applied" /></span>
-		<%
-			int idx = 1;
-			for (String[] filter : appliedFilters)
-			{
-			    %>
-			    <%= Utils.addEntities(filter[2]) %>
-				<input type="hidden" id="filter_value_<%=idx %>" name="filter_value_<%=idx %>" value="<%= Utils.addEntities(filter[2]) %>"/>
-				<input class="btn btn-default" type="submit" id="submit_filter_remove_<%=idx %>" name="submit_filter_remove_<%=idx %>" value="X" />
-				<br/>
-				<%
-				idx++;
-			}
-		%>
-		</div>
-	<% } %>	    
-	    </div>
-	    <div id="facets" class="facetsBox">
+	    <div class="panel-group" id="facets" class="facetsBox" role="tablist">
 			<%
 				for (DiscoverySearchFilterFacet facetConf : facetsConf)
 				{
@@ -149,51 +172,62 @@
 				    int limit = facetConf.getFacetLimit()+1;
 				    
 				    String fkey = "jsp.search.facet.refine."+f;
-				    %><div id="facet_<%= f %>" class="panel panel-success">
-				    <div class="panel-heading"><fmt:message key="<%= fkey %>" /></div>
-				    <ul class="list-group"><%
-				    int idx = 1;
-				    int currFp = UIUtil.getIntParameter(request, f+"_page");
-				    if (currFp < 0)
-				    {
-				        currFp = 0;
-				    }
-				    for (FacetResult fvalue : facet)
-				    { 
-				        if (idx != limit && !appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
-				        {
-				        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="?open=<%=info.getType()							
-			                + httpFilters
-			                + "&amp;filtername="+URLEncoder.encode(f,"UTF-8")
-			                + "&amp;filterquery="+URLEncoder.encode(fvalue.getAsFilterQuery(),"UTF-8")
-			                + "&amp;filtertype="+URLEncoder.encode(fvalue.getFilterType(),"UTF-8") %>"
-			                title="<fmt:message key="jsp.search.facet.narrow"><fmt:param><%=fvalue.getDisplayedValue() %></fmt:param></fmt:message>">
-			                <%= StringUtils.abbreviate(fvalue.getDisplayedValue(),36) %></a></li><%
-			                idx++;
-				        }
-				        if (idx > limit)
-				        {
-				            break;
-				        }
-				    }
-				    if (currFp > 0 || idx == limit)
-				    {
-				        %><li class="list-group-item"><span style="visibility: hidden;">.</span>
-				        <% if (currFp > 0) { %>
-				        <a class="pull-left" href="?open=<%=info.getType() + httpFilters
-			                + "&amp;"+f+"_page="+(currFp-1) %>"><fmt:message key="jsp.search.facet.refine.previous" /></a>
-			            <% } %>
-			            <% if (idx == limit) { %>
-			            <a href="?open=<%=info.getType() + httpFilters
-			                + "&amp;"+f+"_page="+(currFp+1) %>"><span class="pull-right"><fmt:message key="jsp.search.facet.refine.next" /></span></a>
-			            <%
-			            }
-			            %></li><%
-				    }
-				    %></ul></div><%
+				    %>
+				    <div id="facet_<%= f %>" class="panel panel-default">
+						    <div class="panel-heading" role="tab" id="heading<%= f %>">
+						    <h4 class="panel-title">
+	          					<fmt:message key="<%= fkey %>" />
+		        			</h4>
+						    </div>
+		      				<div class="panel-body">
+						    <ul class="list-group"><%
+						    int idx = 1;
+						    int currFp = UIUtil.getIntParameter(request, f+"_page");
+						    if (currFp < 0)
+						    {
+						        currFp = 0;
+						    }
+						    for (FacetResult fvalue : facet)
+						    { 
+						        if (idx != limit && !appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
+						        {
+						        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="?open=<%=info.getType()							
+					                + httpFilters
+					                + "&amp;filtername="+URLEncoder.encode(f,"UTF-8")
+					                + "&amp;filterquery="+URLEncoder.encode(fvalue.getAsFilterQuery(),"UTF-8")
+					                + "&amp;filtertype="+URLEncoder.encode(fvalue.getFilterType(),"UTF-8") %>"
+					                title="<fmt:message key="jsp.search.facet.narrow"><fmt:param><%=fvalue.getDisplayedValue() %></fmt:param></fmt:message>">
+					                <%= fvalue.getDisplayedValue() %></a></li><%
+					                idx++;
+						        }
+						        if (idx > limit)
+						        {
+						            break;
+						        }
+						    }
+						    if (currFp > 0 || idx == limit)
+						    {
+						        %><li class="list-group-item"><span style="visibility: hidden;">.</span>
+						        <% if (currFp > 0) { %>
+						        <a class="pull-left" href="?open=<%=info.getType() + httpFilters
+					                + "&amp;"+f+"_page="+(currFp-1) %>"><fmt:message key="jsp.search.facet.refine.previous" /></a>
+					            <% } %>
+					            <% if (idx == limit) { %>
+					            <a href="?open=<%=info.getType() + httpFilters
+					                + "&amp;"+f+"_page="+(currFp+1) %>"><span class="pull-right"><fmt:message key="jsp.search.facet.refine.next" /></span></a>
+					            <%
+					            }
+					            %></li><%
+						    }
+						    %></ul>
+					    
+							</div>
+					</div><%
 				}
 			
 			%>
+			</div>
+			</div>
 	    </div>
 	</div>
 <% } %>	
@@ -206,9 +240,9 @@
           			${holder.title} <fmt:message
 				key="jsp.layout.dspace.detail.fieldset-legend.component.boxtitle.${info[holder.shortName].type}"/>
         		</a></h4>
-        		<% if(subLinks!=null && subLinks.size()>1) {%>
-					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseFacet" aria-expanded="false" aria-controls="collapseFacet">
-  						<fmt:message key="jsp.components.button.seealso.button" />
+        		<% if(subLinks!=null && subLinks.size()>0) {%>
+					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseFacet" aria-expanded="false" aria-controls="collapseFacet" title="<fmt:message key="jsp.components.button.seealso.button" />">
+  						<i class="fa fa-angle-double-up animated"></i>
 					</button>
 				<% } %>	
     	</div>
@@ -277,6 +311,18 @@ if (info.getPagetotal() > 1)
 <form id="sortform<%= info.getType() %>" action="#<%= info.getType() %>" method="get">
 	   <input id="sort_by<%= info.getType() %>" type="hidden" name="sort_by<%= info.getType() %>" value=""/>
        <input id="order<%= info.getType() %>" type="hidden" name="order<%= info.getType() %>" value="<%= info.getOrder() %>" />
+       <% if (appliedFilters != null && appliedFilters.size() >0 ) 
+   		{
+	   	    int idx = 1;
+	   	    for (String[] filter : appliedFilters)
+	   	    { %>
+	   	    	<input id="filter_field_<%= idx %>" type="hidden" name="filter_field_<%= idx %>" value="<%= filter[0]%>"/>
+	   	    	<input id="filter_type_<%= idx %>" type="hidden" name="filter_type_<%= idx %>" value="<%= filter[1]%>"/>
+	   	    	<input id="filter_value_<%= idx %>" type="hidden" name="filter_value_<%= idx %>" value="<%= filter[2] %>"/>
+	   	      <%  
+	   	        idx++;
+	   	    }
+   		} %>
 	   <input type="hidden" name="open" value="<%= info.getType() %>" />
 </form>
 <div class="row">
