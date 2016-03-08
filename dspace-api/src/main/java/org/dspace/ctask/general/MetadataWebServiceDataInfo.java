@@ -1,11 +1,17 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.ctask.general;
 
 import javax.xml.xpath.XPathExpression;
 
 /**
- * User: kevin (kevin at atmire.com)
- * Date: 25/11/15
- * Time: 12:11
+ * @author kevinvandevelde at atmire.com
+ *
  */
 public class MetadataWebServiceDataInfo {
     private XPathExpression expr; // compiled XPath espression for data
