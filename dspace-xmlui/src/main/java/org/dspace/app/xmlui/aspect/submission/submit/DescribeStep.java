@@ -500,7 +500,7 @@ public class DescribeStep extends AbstractSubmissionStep
                                 "blank";
                             org.dspace.app.xmlui.wing.element.Item authItem =
                                 describeSection.addItem("submit-review-field-with-authority", "ds-authority-confidence cf-"+confidence);
-                            authItem.addContent(displayValue);
+                            authItem.addContent(message(displayValue));
                         }
                         else
                         {
@@ -511,7 +511,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         			describeSection.addItem().addHighlight("label label-default").addContent(fVal);
                         		}*/
                         	} //else{                        	
-                            describeSection.addItem(displayValue);
+                            describeSection.addItem(message(displayValue));
                         	//}
                         }
                     }

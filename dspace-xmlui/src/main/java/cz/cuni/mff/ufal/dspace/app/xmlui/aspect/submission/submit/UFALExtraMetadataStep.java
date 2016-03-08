@@ -521,11 +521,11 @@ public class UFALExtraMetadataStep extends DescribeStep
                                 "blank";
                             org.dspace.app.xmlui.wing.element.Item authItem =
                             		reviewSection.addItem("submit-review-field-with-authority", "ds-authority-confidence cf-"+confidence);
-                            authItem.addContent(displayValue);
+                            authItem.addContent(message(displayValue));
                         }
                         else
                         {
-                        	reviewSection.addItem(displayValue);
+                        	reviewSection.addItem(message(displayValue));
                         }
                     }
                 } // For each Metadatum
