@@ -396,7 +396,7 @@
          }
          if (readonly)
          {
-             sb.append("\" readonly=\"readonly\");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\"><option value=\"-1\"")
             .append((dateIssued.getMonth() == -1 ? " selected=\"selected\"" : ""))
@@ -425,7 +425,7 @@
             sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" readonly=\"readonly\");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
                  .append((dateIssued.getDay() > 0 ?
@@ -439,7 +439,7 @@
             sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" readonly=\"readonly\");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" size=\"4\" maxlength=\"4\" value=\"")
             .append((dateIssued.getYear() > 0 ?
@@ -506,7 +506,7 @@
            sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" readonly=\"readonly\");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" placeholder=\"")
            .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.seriesname").replaceAll("\"", "&quot;"));
@@ -519,7 +519,7 @@
            sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" readonly=\"readonly\");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" placeholder=\"")
            .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.paperno").replaceAll("\"", "&quot;"));
@@ -1071,7 +1071,7 @@
            sb.append("_").append(j+1);
          if (readonly)
          {
-             sb.append("\" readonly=\"readonly\");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\">");
          for (int i = 0; i < qualMap.size(); i+=2)
@@ -1095,7 +1095,7 @@
            sb.append("_").append(j+1);
          if (readonly)
          {
-             sb.append("\" readonly=\"readonly\");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" size=\"34\" value=\"")
            .append(currentVal.replaceAll("\"", "&quot;"))
