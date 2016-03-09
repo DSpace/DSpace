@@ -75,4 +75,6 @@ public interface WorkflowService<T extends WorkflowItem> {
     public List<String> getEPersonDeleteConstraints(Context context, EPerson ePerson) throws SQLException;
 
     public Group getWorkflowRoleGroup(Context context, Collection collection, String roleName, Group roleGroup) throws SQLException, IOException, WorkflowConfigurationException, AuthorizeException, WorkflowException;
+
+    public List<String> getFlywayMigrationLocations();
 }
