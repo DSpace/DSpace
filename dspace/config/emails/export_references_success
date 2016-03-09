@@ -1,0 +1,15 @@
+# Email sent to DSpace users when they successfully export an item or collection.
+#
+# Parameters: {0} is expanded to a special URL
+#             {1} configurable time (hours) an export file will be kept
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: DSpace - The bibliographic description for the Item export requested is ready for download
+The bibliographic description for the Item export you requested from the repository is now ready for download.
+
+You may find this as attachment of this email. 
+
+
+The DSpace Team
+

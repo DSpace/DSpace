@@ -126,6 +126,7 @@ div.carousel-inner div.item div.list-group-item div.list-group-item-heading h4.t
 }
 
 #collapseFacet { background-color: whitesmoke;}
+#export-biblio-panel { background-color: whitesmoke;}
 
 i.animated {
     -webkit-animation-name: pulse;

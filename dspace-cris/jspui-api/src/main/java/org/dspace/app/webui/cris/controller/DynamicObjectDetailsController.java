@@ -92,12 +92,20 @@ public class DynamicObjectDetailsController
         }
 
         Context context = UIUtil.obtainContext(request);
-        EPerson currentUser = context.getCurrentUser();
+        
+        EPerson currUser = context.getCurrentUser();
+        if(currUser != null) {
+            model.put("isLoggedIn", new Boolean(true));    
+        }
+        else {
+            model.put("isLoggedIn", new Boolean(false));
+        }
+        
         if ((dyn.getStatus() == null || dyn.getStatus().booleanValue() == false)
                 && !AuthorizeManager.isAdmin(context))
         {
             
-            if (currentUser != null
+            if (currUser != null
                     || Authenticate.startAuthentication(context, request,
                             response))
             {
@@ -135,7 +143,7 @@ public class DynamicObjectDetailsController
         
         if (subscribeService != null)
         {
-            boolean subscribed = subscribeService.isSubscribed(currentUser,
+            boolean subscribed = subscribeService.isSubscribed(currUser,
                     dyn);
             model.put("subscribed", subscribed);            
         }

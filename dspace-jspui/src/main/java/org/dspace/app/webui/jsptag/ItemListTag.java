@@ -331,7 +331,7 @@ public class ItemListTag extends TagSupport {
 			if (inputName != null) { // cilea, add the checkbox column
 				out.println("<th>");
 				if (!radioButton) { // add a "checkall" button
-					out.print("<input type=\"checkbox\" onclick=\"");
+					out.print("<input name=\""+inputName+"checker\" id=\""+inputName+"checker\" type=\"checkbox\" onclick=\"");
 					out.print("javascript:changeAll('" + inputName
 							+ "', this)\" />");
 				}

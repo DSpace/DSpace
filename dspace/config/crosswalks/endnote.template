@@ -1,0 +1,17 @@
+%0 @virtual.reftype.endnote@
+%A @virtual.bibauthors.author@
+%T @dc.title@
+%D @dc.date.issued@
+%I @dc.publisher.name@
+%C @dc.publisher.place@
+%J @dc.relation.ispartof@
+%V @dc.relation.volume@
+%N @dc.relation.issue@
+%7 @dc.relation.edition@
+%B @dc.relation.booktitle@
+%X @dc.description.abstract@
+%K @virtual.keywords.single@
+%U @dc.identifier.url@
+%R doi:@dc.identifier.doi@
+%P @dc.virtual.fullpage@
+%G @dc.language.iso@

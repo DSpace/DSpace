@@ -567,15 +567,25 @@
 	    <servlet-name>request-item</servlet-name>
 	    <servlet-class>org.dspace.app.webui.servlet.RequestItemServlet</servlet-class>
 	</servlet>
-	  
+	
+	<!-- EXPORT BIBLIO -->
+  	<servlet>
+    	<servlet-name>references</servlet-name>
+    	<servlet-class>org.dspace.app.webui.servlet.ReferencesServlet</servlet-class>
+  	</servlet>  
+
+	<!-- Servlet Mappings -->
+
+  	<servlet-mapping>
+    	<servlet-name>references</servlet-name>
+    	<url-pattern>/references</url-pattern>
+  	</servlet-mapping>
+    
 	<servlet-mapping>
 		<servlet-name>shibboleth-login</servlet-name>
 		<url-pattern>/shibboleth-login</url-pattern>
 	</servlet-mapping>
-
-
-	<!-- Servlet Mappings -->
-
+	
 	<servlet-mapping>
 		<servlet-name>authorize</servlet-name>
 		<url-pattern>/tools/authorize</url-pattern>

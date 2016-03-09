@@ -91,13 +91,19 @@ public class ProjectDetailsController
 
         Context context = UIUtil.obtainContext(request);
 
-        EPerson currentUser = context.getCurrentUser();
+        EPerson currUser = context.getCurrentUser();
+        if(currUser != null) {
+            model.put("isLoggedIn", new Boolean(true));    
+        }
+        else {
+            model.put("isLoggedIn", new Boolean(false));
+        }
         
         if ((grant.getStatus() == null || grant.getStatus().booleanValue() == false)
                 && !AuthorizeManager.isAdmin(context))
         {
             
-            if (currentUser != null
+            if (currUser != null
                     || Authenticate.startAuthentication(context, request,
                             response))
             {
@@ -135,7 +141,7 @@ public class ProjectDetailsController
         
         if (subscribeService != null)
         {
-            boolean subscribed = subscribeService.isSubscribed(currentUser,
+            boolean subscribed = subscribeService.isSubscribed(currUser,
                     grant);
             model.put("subscribed", subscribed);
            

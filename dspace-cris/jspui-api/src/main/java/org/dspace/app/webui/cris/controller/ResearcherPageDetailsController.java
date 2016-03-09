@@ -124,7 +124,13 @@ public class ResearcherPageDetailsController
 
         Context context = UIUtil.obtainContext(request);
         EPerson currUser = context.getCurrentUser();
-
+        if(currUser != null) {
+            model.put("isLoggedIn", new Boolean(true));    
+        }
+        else {
+            model.put("isLoggedIn", new Boolean(false));
+        }
+        
         boolean isAdmin = AuthorizeManager.isAdmin(context);
       
         if (isAdmin

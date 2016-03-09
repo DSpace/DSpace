@@ -32,6 +32,7 @@
 <%@page import="org.dspace.discovery.DiscoverResult.DSpaceObjectHighlightResult"%>
 <%@page import="org.dspace.discovery.DiscoverResult"%>
 <%@page import="org.dspace.core.Utils"%>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
@@ -42,6 +43,10 @@
 <c:set var="root"><%=request.getContextPath()%></c:set>
 <c:set var="info" value="${componentinfomap}" scope="page" />
 <%
+	
+	boolean exportBiblioEnabled =  ConfigurationManager.getBooleanProperty("exportcitation.list.enabled", false);
+	String cfg = (String)request.getAttribute("exportscitations");
+	Boolean isLoggedIn = (Boolean)request.getAttribute("isLoggedIn");
 	
 	Box holder = (Box)request.getAttribute("holder");
 	ComponentInfoDTO info = ((Map<String, ComponentInfoDTO>)(request.getAttribute("componentinfomap"))).get(holder.getShortName());
@@ -327,16 +332,76 @@ if (info.getPagetotal() > 1)
 </form>
 <div class="row">
 <div class="table-responsive">
-<dspace:itemlist itemStart="<%=info.getStart()+1%>" items="<%= (Item[])info.getItems() %>" sortOption="<%= info.getSo() %>" authorLimit="<%= info.getEtAl() %>" order="<%= info.getOrder() %>" config="${info[holder.shortName].type}" />
+
+<%  
+	if (exportBiblioEnabled && isLoggedIn) {
+%>
+
+		<form target="blank" class="form-inline"  id="exportform" action="<%= request.getContextPath() %>/references">
+
+		<div id="export-biblio-panel">
+	<%		
+		if (cfg == null)
+		{
+			cfg = "refman, endnote, bibtex, refworks";
+		}
+		String[] cfgSplit = cfg.split("\\s*,\\s*");
+		for (String format : cfgSplit) {
+	%>
+		<c:set var="format"><%= format %></c:set>	    
+		<label class="radio-inline">
+    		  <input id="${format}" type="radio" name="format" value="${format}" <c:if test="${format=='bibtex'}"> checked="checked"</c:if>/><fmt:message key="exportcitation.option.${format}" />
+	    </label>
+
+		
+	<% } %>
+		<label class="checkbox-inline">
+			<input type="checkbox" id="email" name="email" value="true"/><fmt:message key="exportcitation.option.email" />
+		</label>
+			<input class="btn btn-default" type="submit" name="submit_export" value="<fmt:message key="exportcitation.option.submitexport" />" disabled/>
+		</div>	
+		<dspace:itemlist itemStart="<%=info.getStart()+1%>" items="<%= (Item[])info.getItems() %>" sortOption="<%= info.getSo() %>" authorLimit="<%= info.getEtAl() %>" order="<%= info.getOrder() %>" config="${info[holder.shortName].type}" radioButton="false" inputName="item_id"/>
+		</form>
+<% } else { %>
+<dspace:itemlist itemStart="<%=info.getStart()+1%>" items="<%= (Item[])info.getItems() %>" sortOption="<%= info.getSo() %>" authorLimit="<%= info.getEtAl() %>" order="<%= info.getOrder() %>" config="${info[holder.shortName].type}"/>
+<% } %>
 </div>
 </div>
+
 <script type="text/javascript"><!--
     function sortBy(sort_by, order) {
         j('#sort_by<%= info.getType() %>').val(sort_by);
         j('#order<%= info.getType() %>').val(order);
         j('#sortform<%= info.getType() %>').submit();        
     }
---></script>
+    
+	function changeAll(var1,var2) {
+		var inputbutton = j(var2).prop('id');
+		var inputstatus = j('#'+inputbutton).prop( "checked");
+	    j("input[name*='"+var1+"']").prop('checked', inputstatus);
+	}
+	
+	var checkboxes = j("input[type='checkbox']"), submitButt = j("input[type='submit']"), radio = j("input[type='radio']");
+
+	radio.click(function() {
+		if('refworks'==j(this).prop('id')) {
+			j('#email').attr("checked", false);
+			j('#email').attr("disabled", true);
+		} else {
+			j('#email').attr("disabled", false);
+		}
+	});
+	
+	checkboxes.click(function() {
+		if('email'==j(this).prop('id')) {
+			//NOTHING TO DO	
+		}
+		else {
+			submitButt.attr("disabled", !checkboxes.is(":checked"));	
+		}		
+	});		
+	-->
+</script>
 
 <%-- show pagination controls at bottom --%>
 <%
