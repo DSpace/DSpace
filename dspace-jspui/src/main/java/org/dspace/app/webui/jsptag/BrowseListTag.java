@@ -113,6 +113,19 @@ public class BrowseListTag extends TagSupport
 
     private transient BrowseInfo browseInfo;
 
+    /**
+     * Specify if the user can select one or more items (checkbox or radio
+     * button). The html input element is included only if the inputName
+     * attribute is used
+     */
+    private boolean radioButton = false;
+
+    /**
+     * The name of the checkbox/radio html input to include in any row for
+     * select the item
+     */
+    private String inputName;
+    
     private static final long serialVersionUID = 8091584920304256107L;
 
     static
@@ -443,6 +456,16 @@ public class BrowseListTag extends TagSupport
             // Output the table headers
             out.println("<tr>");
 
+            if (inputName != null) { // cilea, add the checkbox column
+                out.println("<th>");
+                if (!radioButton) { // add a "checkall" button
+                    out.print("<input name=\""+inputName+"checker\" id=\""+inputName+"checker\" type=\"checkbox\" onclick=\"");
+                    out.print("javascript:changeAll('" + inputName
+                            + "', this)\" />");
+                }
+                out.print("</th>");
+            }
+            
             for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
             {
                 String field = fieldArr[colIdx].toLowerCase().trim();
@@ -640,6 +663,15 @@ public class BrowseListTag extends TagSupport
                     rOddOrEven = ((i & 1) == 1 ? "odd" : "even");
                 }
 
+                if (inputName != null) {
+                    out.print("<td align=\"right\" class=\"oddRowOddCol\">");
+                    out.print("<input type=\""
+                            + (radioButton ? "radio" : "checkbox")
+                            + "\" name=\"");
+                    out.print(inputName + "\" value=\"" + items[i].getID()
+                            + "\" />");
+                    out.print("</td>");
+                }                
                 for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
                 {
                     String field = fieldArr[colIdx];
@@ -773,23 +805,34 @@ public class BrowseListTag extends TagSupport
                 {
                     String id = "t" + Integer.toString(cOddOrEven.length + 1);
 
-                    out.print("<td headers=\""
-                            + id
-                            + "\" class=\""
-                            + rOddOrEven
-                            + "Row"
-                            + cOddOrEven[cOddOrEven.length - 2]
-                            + "Col\" nowrap>"
-                            + "<form method=\"get\" action=\""
-                            + hrq.getContextPath()
-                            + "/tools/edit-item\">"
-                            + "<input type=\"hidden\" name=\"handle\" value=\""
-                            + items[i].getHandle()
-                            + "\" />"
-                            + "<input type=\"submit\" value=\"Edit Item\" /></form>"
-                            + "</td>");
+                    if (inputName != null)
+                    { // subform is not allowed in html
+                        // so we need to use a
+                        // javascript on the onclick...
+                        out.print("<td headers=\"" + id + "\" class=\""
+                                + rOddOrEven + "Row"
+                                + cOddOrEven[cOddOrEven.length - 2]
+                                + "Col\" nowrap>"
+                                + "<input type=\"button\" value=\"Edit Item\" onclick=\"javascript:self.location='"
+                                + hrq.getContextPath()
+                                + "/tools/edit-item?handle="
+                                + items[i].getHandle() + "'\"" + "/>"
+                                + "</td>");                
+                    }
+                    else
+                    {
+                        out.print("<td headers=\"" + id + "\" class=\""
+                                + rOddOrEven + "Row"
+                                + cOddOrEven[cOddOrEven.length - 2]
+                                + "Col\" nowrap>"
+                                + "<form method=\"get\" action=\""
+                                + hrq.getContextPath() + "/tools/edit-item\">"
+                                + "<input type=\"hidden\" name=\"handle\" value=\""
+                                + items[i].getHandle() + "\" />"
+                                + "<input type=\"submit\" value=\"Edit Item\" /></form>"
+                                + "</td>");
+                    }
                 }
-
                 out.println("</tr>");
             }
 
@@ -952,8 +995,17 @@ public class BrowseListTag extends TagSupport
         highlightRow = -1;
         emphColumn = null;
         items = null;
+        inputName = null;
+        radioButton = false;
         sortBy = null;
         order = null;
     }
 
+    public void setInputName(String inputName) {
+        this.inputName = inputName;
+    }
+
+    public void setRadioButton(boolean radioButton) {
+        this.radioButton = radioButton;
+    }
 }

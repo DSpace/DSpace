@@ -319,6 +319,16 @@
         <required>false</required>
         <rtexprvalue>true</rtexprvalue>
     </attribute>
+    <attribute>
+        <name>radioButton</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+        <name>inputName</name>
+        <required>false</required>
+        <rtexprvalue>true</rtexprvalue>
+      </attribute>
   </tag>
 
 
