@@ -273,7 +273,7 @@ h1.ds-option-set-head {
 }
 .ds-div-head {
     font-size: 20px;
-    height: 25px;
+    min-height: 25px;
     overflow: visible;
 }
 /* remove some style for nested boxes */
@@ -2667,5 +2667,10 @@ h2.pricing-plan {
 
 .orcid-error{
     color:red;
+}
+
+
+#journal-logo {
+    float: right;
 }
 

@@ -2,16 +2,18 @@
  */
 package org.datadryad.test;
 
-import java.sql.SQLException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
-import static org.junit.Assert.*;
+
+import java.sql.SQLException;
+
+import static org.junit.Assert.fail;
 
 /**
  *

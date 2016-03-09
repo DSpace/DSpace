@@ -82,7 +82,7 @@ jQuery(document).ready(function() {
     // NOTE: This logic supports multiple sets of tabs on a page.
     // NOTE: For now, we're only using this on the Home page!
     if (jQuery('#aspect_discovery_RecentlyAdded_div_Home').length === 1 ||
-        jQuery('#aspect_journal_landing_Banner_div_journal-landing-banner-outer').length === 1)
+        jQuery('#aspect_journal_landing_JournalStats_div_journal-landing-banner-outer').length === 1)
     {
         var jQuerytabButtons = jQuery('.tab-buttons a');
         jQuerytabButtons.unbind('click').click(function() {
@@ -341,7 +341,40 @@ function updateOrder(){
 
 /* JS behavior (currency conversion) for Pricing and Integrated Journal pages */
 jQuery(document).ready(function() {
+    if (!document.getElementById('journal-policies')) return;
     // initialize dataTable scroller
+    var journal_data = document.location.protocol + '//' + document.location.host + '/static/json/journal-lookup.json';
+    var columns = [
+        { "data" : "title"      }
+      , { "data" : "integrated" }
+      , { "data" : "submission" }
+      , { "data" : "embargo"    }
+      , { "data" : "hidden"     }
+      , { "data" : "sponsor"    }
+      , { "data" : "issn"       }
+    ];
+    var columnDefs = [{
+        "targets"    : [6] // issn
+      , "visible"    : false
+      , "searchable" : true
+    }];
+    var apply_cell_markup = function(row, data, index) {
+      // add link to /journal/nnnn-nnnn page if issn is available
+      if (data.issn) {
+        var $link = $('<a></a>');
+        $link.attr('href', '/journal/' + data.issn);
+        $link.text(data.title);
+        $('td:eq(0)', row).text('');
+        $('td:eq(0)', row).append($link);
+      }
+      // apply markup for the currency selector
+      if (data.sponsor.match(/^\$/)) {
+        var $span = $('<span class="msg-DPC_pay_on_submission"></span>');
+        $span.text(data.sponsor);
+        $('td:eq(5)', row).text('');
+        $('td:eq(5)', row).append($span);
+      }
+    };
     jQuery('#journal-policies').dataTable({
           "autoWidth" : false
         , "ordering"  : false   //
@@ -349,6 +382,10 @@ jQuery(document).ready(function() {
         , "scrollY"   : 500     // px tbody height
         , "scrollX"   : false   //
         , "searching" : true    //
+        , "ajax"      : journal_data
+        , "columns"   : columns
+        , "columnDefs": columnDefs
+        , "rowCallback" : apply_cell_markup
     });
     var $currencySelector = jQuery('select[name=displayed-currency]');
     // in this case, we just want to update a few displayed values wherever

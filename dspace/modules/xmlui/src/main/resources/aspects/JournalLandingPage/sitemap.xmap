@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+    <map:components>
+        <map:actions>
+            <map:action name="ValidateRequest"       src="org.dspace.app.xmlui.aspect.journal.landing.ValidateRequest"/>
+        </map:actions>
+        <map:transformers>
+            <map:transformer name="JournalStats"     src="org.dspace.app.xmlui.aspect.journal.landing.JournalStats"/>
+            <map:transformer name="ReferenceHandler" src="org.dspace.app.xmlui.aspect.journal.landing.ReferenceHandler"/>
+            <map:transformer name="cinclude"         src="org.apache.cocoon.transformation.CIncludeTransformer"/>
+        </map:transformers>
+        <map:matchers default="wildcard"/>
+        <map:selectors/>
+    </map:components>
+
+    <map:pipelines>
+
+        <map:pipeline type="noncaching">
+            <map:generate/>
+
+            <map:match type="wildcard" pattern="journal/debug/base/*">
+                <map:act type="ValidateRequest">
+                    <map:parameter name="journalISSN" value="{1}"/>
+                    <map:transform type="JournalStats">
+                        <map:parameter name="journalISSN" value="{journalISSN}"/>
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
+                </map:act>
+            </map:match>
+
+            <map:match type="wildcard" pattern="journal/debug/cinclude/*">
+                <map:act type="ValidateRequest">
+                    <map:parameter name="journalISSN" value="{1}"/>
+                    <map:transform type="JournalStats">
+                        <map:parameter name="journalISSN" value="{journalISSN}"/>
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
+                    <map:transform src="solr-cinclude.xsl" type="xslt"/>
+                </map:act>
+            </map:match>
+
+            <map:match type="wildcard" pattern="journal/debug/postprocess/*">
+                <map:act type="ValidateRequest">
+                    <map:parameter name="journalISSN" value="{1}"/>
+                    <map:transform type="JournalStats">
+                        <map:parameter name="journalISSN" value="{journalISSN}"/>
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
+                    <map:transform src="solr-cinclude.xsl" type="xslt"/>
+                </map:act>
+                <map:transform src="solr-postprocess.xsl" type="xslt"/>
+            </map:match>
+
+            <map:match type="wildcard" pattern="journal/debug/references/*">
+                <map:act type="ValidateRequest">
+                    <map:parameter name="journalISSN" value="{1}"/>
+                    <map:transform type="JournalStats">
+                        <map:parameter name="journalISSN" value="{journalISSN}"/>
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
+                    <map:transform src="solr-cinclude.xsl" type="xslt"/>
+                </map:act>
+                <map:transform src="solr-postprocess.xsl" type="xslt"/>
+                <map:transform type="ReferenceHandler"/>
+            </map:match>
+
+            <!--
+                Return a journal landing page for requests: /journal/nnnn-nnnn
+            -->
+            <map:match type="wildcard" pattern="journal/*">
+                <map:act type="ValidateRequest">
+                    <map:parameter name="journalISSN" value="{1}"/>
+                    <map:transform type="JournalStats">
+                        <map:parameter name="journalISSN" value="{journalISSN}"/>
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
+                    <map:transform src="solr-cinclude.xsl" type="xslt"/>
+                    <map:transform type="cinclude">
+                        <map:parameter name="parallel" value="true"/>
+                    </map:transform>
+                    <map:transform src="solr-postprocess.xsl" type="xslt"/>
+                    <map:transform type="ReferenceHandler"/>
+                </map:act>
+            </map:match>
+
+            <map:serialize/>
+
+        </map:pipeline>
+
+    </map:pipelines>
+
+</map:sitemap>
+

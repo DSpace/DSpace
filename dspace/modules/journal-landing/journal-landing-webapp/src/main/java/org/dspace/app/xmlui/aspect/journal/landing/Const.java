@@ -7,7 +7,9 @@
  */
 package org.dspace.app.xmlui.aspect.journal.landing;
 
-import org.apache.solr.client.solrj.SolrQuery;
+import org.dspace.app.xmlui.wing.Message;
+
+import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
 
 /**
  * @author Nathan Day
@@ -15,8 +17,10 @@ import org.apache.solr.client.solrj.SolrQuery;
 public class Const {
 
     // parameters added to model during request validation action
+    public static final String PARAM_JOURNAL_ISSN = "journalISSN";
     public static final String PARAM_JOURNAL_NAME = "journalName";
     public static final String PARAM_JOURNAL_ABBR = "journalAbbr";
+    public static final String PARAM_CONCEPT_ID   = "conceptID";
 
     // banner
     public static final String BANNER_DIV_OUTER = "journal-landing-banner-outer";
@@ -42,18 +46,32 @@ public class Const {
     public static final String VALS = "vals";
     public static final String TABLIST = "tablist";
 
-    public static enum QueryType { DOWNLOADS, DEPOSITS };
+    public enum QueryType { DOWNLOADS, DEPOSITS, SOLR_RESULTS };
 
     public static final String fmtDateView = "yyyy-MM-dd";
-    public static final String solrDatePastMonth = "time:[NOW-1MONTH TO NOW]";
-    public static final String solrDatePastYear = "time:[NOW-1YEAR TO NOW]";
-    public static final String solrDateAllTime = "time:[* TO NOW]";
-    public static final int displayCount = 10;
-    public static final String depositsDisplayField = "dc.date.accessioned_dt";
-    public static final String depositsDisplaySortField = "dc.date.accessioned_dt";
     public static final String dcDateAccessioned = "dc.date.accessioned";
-    public static final SolrQuery.ORDER depositsDisplaySortOrder = SolrQuery.ORDER.desc;
-    public static final String facetQueryId = "id";
-    public static final String facetQueryOwningId = "owningItem";
-    public static final String facetQueryCountryCode = "countryCode";
+    public static final String CINCLUDE_META = "cinclude";
+    public static final String CINCLUDE_SOLR_BASE = "solr-base-url";
+    public static final String SPACE = " ";
+    public static final String URL_SPACE = "%20";
+
+    // DryadJournal
+    public static final String archivedDataFilesQuery    = "SELECT * FROM ArchivedPackageDataFileItemIdsByJournal(?)";
+    public static final String archivedDataFilesQueryCol =               "archivedpackagedatafileitemidsbyjournal";
+
+    public static final String archivedDataPackageIds    = "SELECT * FROM ArchivedPackageItemIdsByJournal(?,?);";
+    public static final String archivedDataPackageIdsCol =               "archivedpackageitemidsbyjournal";
+
+    public static final String archivedPackageCount      = "SELECT * FROM ArchivedPackageCountByJournal(?)";
+    public static final String archivedPackageCountCol   =               "archivedpackagecountbyjournal";
+
+    public static final Message T_div_head         = message("xmlui.JournalLandingPage.JournalStats.panel_head");
+    public static final Message T_mostRecent       = message("xmlui.JournalLandingPage.JournalStats.empty");
+    public static final Message T_date             = message("xmlui.JournalLandingPage.JournalStats.date");
+    public static final Message T_btnRecPub        = message("xmlui.JournalLandingPage.JournalStats.rec_pub");
+    public static final Message T_btn_month        = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.month");
+    public static final Message T_btn_year         = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year");
+    public static final Message T_btn_alltime      = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime");
+    public static final Message T_ref_head         = message("xmlui.JournalLandingPage.JournalStats.val_head");
+    public static final Message T_empty            = message("xmlui.JournalLandingPage.JournalStats.empty");
 }

@@ -108,14 +108,6 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
-            <!-- This is required to get the base classes for tests -->
-            <groupId>org.dspace.modules</groupId>
-            <artifactId>api</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
             <version>${pom.version}</version>
@@ -150,6 +142,33 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-stats</artifactId>
             <version>${pom.version}</version>
+        </dependency>
+
+        <!-- TESTS -->
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom2</artifactId>
+            <version>2.0.6</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

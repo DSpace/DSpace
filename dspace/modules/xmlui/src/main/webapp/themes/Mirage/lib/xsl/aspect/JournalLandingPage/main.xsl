@@ -15,38 +15,64 @@
     <xsl:variable name="upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
     <xsl:variable name="lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
     <xsl:variable name="landing-placeholder" select="'&#x2013;'"/>
+    <xsl:variable name="space"      select="' '"/>
+    <xsl:variable name="space-esc"  select="'\ '"/>
+    <xsl:variable name="field-sep"  select="':'"/>
+    <xsl:variable name="field-join" select="'|||'"/>
+    <xsl:variable name="field"      select="'prism.publicationName_filter'"/>
+    <xsl:variable name="default-image" select="'/themes/Dryad/images/invisible.gif'"/>
 
-    <!-- 
+    <!--
         Journal info and image
     -->
+    <!-- suppress this element in document order -->
+    <xsl:template match="dri:p[@id='aspect.journal.landing.JournalStats.p.hidden-fields']"/>
     <xsl:template match="//dri:document/dri:body/dri:div[@n='journal-landing-banner-outer']">
         <xsl:variable name="journal-name" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalName'])"/>
         <xsl:variable name="journal-abbr" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalAbbr'])"/>
         <xsl:variable name="alt" select="concat($journal-name, ' cover')"/>
         <xsl:variable name="cover" select="concat('/themes/Dryad/images/coverimages/', $journal-abbr, '.png')"/>
-        <xsl:variable name="default" select="'/themes/Dryad/images/invisible.gif'"/>
+
         <div id="{translate(string(@id), '.', '_')}" class="ds-static-div primary clearfix">
-            <p style="position: relative; float: right; max-width:100%; max-height:100%">
-                <img alt="{$alt}" 
-                    src="{$cover}" 
-                    id="journal-logo"
-                    class="pub-cover"
-                    onerror="this.src='{$default}'"></img>
-            </p>
-            <xsl:apply-templates/>
+            <table width="100%">
+                <tr>
+                    <td>
+                        <h1 class="ds-div-head">
+                            <xsl:value-of select=".//dri:p[@id='aspect.journal.landing.JournalStats.p.hidden-fields']/dri:field/@n"/>
+                        </h1>
+                        <xsl:apply-templates/>
+                    </td>
+                    <td>
+                        <img alt="{$alt}"
+                            src="{$cover}"
+                            id="journal-logo"
+                            class="pub-cover"
+                            onerror="this.src='{$default-image}'"></img>
+                    </td>
+                </tr>
+            </table>
         </div>
     </xsl:template>
 
-    <!-- 
-        Search data in Dryad associated with ... 
+    <!--
+        Search data in Dryad associated with ...
     -->
     <xsl:template match="//dri:document/dri:body/dri:div[@n='journal-landing-search']">
         <xsl:variable name="label" select="'Enter keyword, author, title, DOI.'"/>
         <xsl:variable name="placeholder" select="concat($label, ' ', 'Example: herbivory')"/>
-        <xsl:variable name="journal-name" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalName']"/>
-        <xsl:variable name="fq" select="concat('prism.publicationName_filter:',
-                                                translate($journal-name, $upper, $lower), 
-                                                '|||', $journal-name)"/>
+
+        <!-- journal name filter parameters for solr query -->
+        <xsl:variable name="journal-name" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalName'])"/>
+        <xsl:variable name="journal-name-esc">
+            <xsl:call-template name="escape-name">
+                <xsl:with-param name="str" select="$journal-name"/>
+                <xsl:with-param name="find" select="$space"/>
+                <xsl:with-param name="replace" select="$space-esc"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="journal-name-lower" select="translate($journal-name-esc, $upper, $lower)"/>
+        <xsl:variable name="fq"                 select="concat($field, $field-sep, $journal-name-lower, $field-join, $journal-name-esc)"/>
+
         <xsl:apply-templates select="dri:head"/>
         <form id="{translate(string(@id), '.', '_')}" class="ds-interactive-div primary"
               action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
@@ -64,10 +90,10 @@
         </form>
     </xsl:template>
 
-    <!-- 
+    <!--
         Browse for data
     -->
-    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.journal.landing.JournalStats.div.journal-landing-stats']">        
+    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.journal.landing.JournalStats.div.journal-landing-stats']">
         <xsl:variable name="id" select="translate(string(@id), '.', '_')"/>
         <xsl:apply-templates select="dri:head"/>
 
@@ -96,7 +122,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <table>
-                        <xsl:if test="dri:div[@n='items']/dri:referenceSet/dri:head or 
+                        <xsl:if test="dri:div[@n='items']/dri:referenceSet/dri:head or
                                       dri:div[@n='vals']/dri:list/dri:head"
                         >
                             <tr style="width:100%">
@@ -150,6 +176,31 @@
 
     <xsl:template match="//dri:div[@n='journal-landing-banner-inner']/dri:p/dri:hi" priority="2">
         <strong><i18n:text><xsl:value-of select="."/></i18n:text></strong>
+    </xsl:template>
+
+    <!--
+        Utility template to replace all $find in $str with $replace.
+    -->
+    <xsl:template name="escape-name">
+        <xsl:param name="str"/>
+        <xsl:param name="find"/>
+        <xsl:param name="replace"/>
+        <xsl:choose>
+            <xsl:when test="string-length($str) &gt; 0 and contains($str, $find)">
+                <xsl:variable name="str-before" select="substring-before($str,$find)"/>
+                <xsl:variable name="str-after">
+                    <xsl:call-template name="escape-name">
+                        <xsl:with-param name="find" select="$find"/>
+                        <xsl:with-param name="replace" select="$replace"/>
+                        <xsl:with-param name="str" select="substring-after($str, $find)"/>
+                    </xsl:call-template>
+                </xsl:variable>
+                <xsl:value-of select="concat($str-before,$replace,$str-after)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$str"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
 </xsl:stylesheet>
