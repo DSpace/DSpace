@@ -306,12 +306,6 @@
         <dependency>
         	<groupId>org.hibernate</groupId>
         	<artifactId>hibernate-ehcache</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.logging</groupId>
-                    <artifactId>jboss-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
