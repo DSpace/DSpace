@@ -25,7 +25,7 @@
                         <map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
                         <map:generator name="AJAXMenuGenerator"
                              src="org.dspace.app.xmlui.cocoon.AJAXMenuGenerator"/>
-                        <map:generator name="UploadFileChunkGenerator" src="org.dspace.app.xmlui.aspect.submission.submit.UploadFileChunkGenerator"/>
+                        <map:generator name="ResumableUploadGenerator" src="org.dspace.app.xmlui.aspect.submission.submit.ResumableUploadGenerator"/>
 
                 </map:generators>
                 <map:serializers default="xml">
@@ -209,7 +209,7 @@
                         <map:action name="StartAuthentication" src="org.dspace.app.xmlui.aspect.eperson.StartAuthenticationAction"/>
                         <map:action name="DSpacePropertyFileReader" src="org.dspace.app.xmlui.cocoon.DSpacePropertyFileReader" />
                         <map:action name="PropertyFileReader" src="org.dspace.app.xmlui.cocoon.PropertyFileReader" />
-                        <map:action name="UploadFileChunk" src="org.dspace.app.xmlui.aspect.submission.submit.UploadFileChunk"/>
+                        <map:action name="ResumableUpload" src="org.dspace.app.xmlui.aspect.submission.submit.ResumableUpload"/>
                 </map:actions>
                 <map:pipes default="caching">
                         <map:pipe name="noncaching" src="org.apache.cocoon.components.pipeline.impl.NonCachingProcessingPipeline">

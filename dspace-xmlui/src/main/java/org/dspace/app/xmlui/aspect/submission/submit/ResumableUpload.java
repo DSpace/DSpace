@@ -79,27 +79,31 @@ public class ResumableUpload extends AbstractAction
      */
     private void init(Request request)
     {
-        // parent directory containing all bitstreams related to a submission
-        this.submissionDir = tempDir + File.separator + request.getParameter("submissionId");
-        
-        // directory containing chunks of an individual bitstream
-        this.chunkDir = this.submissionDir + File.separator + request.getParameter("resumableIdentifier");
-        
-        // create upload directories if required
-        File uploadDir = new File(this.submissionDir);
-        if(!uploadDir.exists())
-        {
-            uploadDir.mkdir();
-        }
-        
-        if(!this.chunkDir.isEmpty())
-        { 
-            File finalDir = new File(this.chunkDir);
-            if (!finalDir.exists())
+        String sId = request.getParameter("submissionId");
+
+        if(!sId.isEmpty()){
+            // parent directory containing all bitstreams related to a submission
+            this.submissionDir = tempDir + File.separator + request.getParameter("submissionId");
+
+            // directory containing chunks of an individual bitstream
+            this.chunkDir = this.submissionDir + File.separator + request.getParameter("resumableIdentifier");
+
+            // create upload directories if required
+            File uploadDir = new File(this.submissionDir);
+            if(!uploadDir.exists())
             {
-                finalDir.mkdir();
+                uploadDir.mkdir();
             }
-        }        
+
+            if(!this.chunkDir.isEmpty())
+            { 
+                File finalDir = new File(this.chunkDir);
+                if (!finalDir.exists())
+                {
+                    finalDir.mkdir();
+                }
+            }
+        }
     }
     
     /*
@@ -200,10 +204,12 @@ public class ResumableUpload extends AbstractAction
                 response.setStatus(HttpServletResponse.SC_OK);
                 exists = true;
             }
-            
-            // The chunk file does not have the expected size, delete it and 
-            // pretend that it wasn't uploaded already.
-            chunkFile.delete();
+            else
+            {
+                // The chunk file does not have the expected size, delete it and 
+                // pretend that it wasn't uploaded already.
+                chunkFile.delete();
+            }
         }
         else{
             // if we don't have the chunk send a http status code 204 No content
@@ -238,7 +244,7 @@ public class ResumableUpload extends AbstractAction
         if(resumableTotalChunks == 1)
         {
             // there is only one chunk give it the name of the file
-            chunkPath = this.submissionDir + File.separator + resumableFilename; 
+            chunkPath = this.chunkDir + File.separator + resumableFilename; 
         }
         else
         {
@@ -418,10 +424,14 @@ public class ResumableUpload extends AbstractAction
                         objectModel, 'S' + request.getParameter("submissionId"));
                     Item item = si.getSubmissionItem().getItem();
                     Context context = ContextUtil.obtainContext(objectModel);
+                    //File f = (File)obj;
                     b = this.createBitstream(context, (File)obj, item);
                     
-                    // delete upload 
-                    if(!deleteDirectory(new File(this.submissionDir)))
+                    // delete file and upload
+                    log.info(this);
+                    log.info("deleting " + this.chunkDir);
+                    //f.delete();
+                    if(!deleteDirectory(new File(this.chunkDir)))
                     {
                         log.warn("Couldn't delete submission upload path " + this.submissionDir + ", ignoring it.");
                     }
@@ -446,6 +456,10 @@ public class ResumableUpload extends AbstractAction
             catch(IOException ex){
                 throw new RuntimeException(ex);
             }
+        }
+        else
+        {
+          log.warn("No attribute found in session for " + resumableIdentifier);
         }
         
         return b;
@@ -574,7 +588,7 @@ public class ResumableUpload extends AbstractAction
             String chunkPath = ResumableUpload.this.chunkDir + File.separator + "part";
             File destFile = null;
 
-            String destFilePath = ResumableUpload.this.submissionDir + File.separator +
+            String destFilePath = ResumableUpload.this.chunkDir + File.separator +
                     this.resumableFilename;
             destFile = new File(destFilePath);
             OutputStream os = null;

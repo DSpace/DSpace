@@ -23,8 +23,16 @@ if(sId > 0){
         simultaneousUploads: 1,
         testChunks: true,
         throttleProgressCallbacks: 1,
+
+        // remove, for testing
+        xhrTimeout: 60000,
+        //xhrTimeout: 5000,
+
+        maxChunkRetries: 5,
+        //maxChunkRetries: 3,
+        chunkRetryInterval: 5000,
         method: "multipart",
-        query:{"submissionId": $('input[name="submit-id"]').val()}
+        query:{"submissionId": sId}
     });
 
 
@@ -39,7 +47,6 @@ if(doResumable){
         cache: false
     });
 
-    var sid = $('input[name="submit-id"]').val();
     var html = '\
       <div id="dialog-confirm" style="display: none;" title="Delete File(s)?">\
         <p><span id="delete-icon" class="ui-icon ui-icon-alert" ></span><span id="delete-text">?</span></p>\
@@ -139,12 +146,33 @@ if(doResumable){
     });
 
     r.on('complete', function(){
-        // Hide pause/resume when the upload has completed
-        $('#progress-resume-link, #progress-pause-link').hide();
+        console.log("onComplete");
+        var filesWithError = false;
+
+        // check if there are any errors
+        for(var i = 0; i < r.files.length; i++){
+            console.log(r.files[i].retryDueToError);
+            if(r.files[i].retryDueToError){
+                filesWithError = true;
+                break;
+            }
+        }
+
+        if(filesWithError){
+            $('#progress-pause-link').hide();
+            $('#progress-resume-link').show();
+        }
+        else{
+            // Hide pause/resume when the upload has completed
+            $('#progress-resume-link, #progress-pause-link').hide();
+        }
+
         $('#aspect_submission_StepTransformer_div_progress-bar').css('width', '0%');
     });
 
     r.on('cancel', function(){
+        console.log("onCancel");
+
         $('#progress-resume-link, #progress-pause-link').hide();
         $('#aspect_submission_StepTransformer_div_progress-bar').css('width', '0%');
     });
@@ -159,7 +187,7 @@ if(doResumable){
         var intId = setInterval(function(){
             $.ajax({
                 type: "GET",
-                url: url + "?submissionId=" + sid + "&complete=true&resumableIdentifier=" + file.uniqueIdentifier,
+                url: url + "?submissionId=" + sId + "&complete=true&resumableIdentifier=" + file.uniqueIdentifier,
                 cache: false,
                 success: function(data){
                     var xml = $.parseXML(data);
@@ -173,7 +201,7 @@ if(doResumable){
                         var fullChecksum = $($(xml).find("checksum")[0]).text();
                         var sequenceId = $($(xml).find("sequenceId")[0]).text();
                         var checksum = fullChecksum.split(':');
-                        var href = '/bitstream/item/' + sid + '/' + file.fileName + '?sequence=' + sequenceId;
+                        var href = '/bitstream/item/' + sId + '/' + file.fileName + '?sequence=' + sequenceId;
                         var fAnchor = '<a href="' + href + '">' + file.fileName + '</a>';
 
                         $('#primary-'          + file.uniqueIdentifier).removeAttr('disabled');
@@ -204,12 +232,14 @@ if(doResumable){
                         if(attempts > (TIMEOUT / INTERVAL)){
                             console.warn("Creation of file timed out after " + TIMEOUT / 1000 + " seconds");
                             clearInterval(intId);
+                            $('.alert').removeClass('hide');
                         }
                     }
                 },
                 error: function(jqXHR, status, error){
                     console.error(error);
                     clearInterval(intId);
+                    $('.alert').removeClass('hide');
                 }
             });
 
@@ -217,8 +247,25 @@ if(doResumable){
     });
 
     r.on('fileError', function(file, message){
+        console.log("onError");
+
+        // flag file to be retied
+        file.retryDueToError = true;
+        $('#file-delete-' + file.uniqueIdentifier).attr('class', 'file-delete');
+
+        for(var i = 0; i < r.files.length; i++){
+            if(!r.files[i].isComplete()){
+                // stop any other file uploads
+                // note: abort did not stop any remaining
+                // files uploading hence bootstrap
+                r.files[i].bootstrap();
+
+                console.log(r.files[i]);
+                $('#file-delete-' + r.files[i].uniqueIdentifier).attr('class', 'file-delete');
+            }
+        }
+
         $('.alert').removeClass('hide');
-        r.removeFile(file);
     });
 
     $(document).on('click', '.file-delete', function(e){
@@ -229,7 +276,6 @@ if(doResumable){
         var infoCell = $(cell).siblings()[5];
         var fileName, param;
         var toBeDeleted = [];
-        //var text = "Are you sure you want to delete ";
         var text = $('input[name=text-delete-msg]').val() + " ";
 
         if($(infoCell).hasClass('file-info')){
@@ -269,7 +315,7 @@ if(doResumable){
 
             $.ajax({
                 type: "DELETE",
-                url: url + "?submissionId=" + sid + "&" + param,
+                url: url + "?submissionId=" + sId + "&" + param,
                 cache: false,
                 success: $.proxy(function(data){
                     deferred.resolve();
@@ -383,7 +429,21 @@ if(doResumable){
         $('#progress-resume-link').hide();
         $('#progress-pause-link').show();
 
+        console.log("onResume");
+
         $('#file-delete-' + currentFile.uniqueIdentifier).removeAttr('class');
+
+        for(var i = 0; i < r.files.length; i++){
+            // retry any previous failed
+            if(r.files[i].retryDueToError){
+                r.files[i].retry();
+                r.files[i].retryDueToError = false;
+                $('#file-delete-' + r.files[i].uniqueIdentifier).removeAttr('class');
+            }
+        }
+
+        // remove any error message
+        $('.alert').addClass('hide');
 
         r.upload();
     });
