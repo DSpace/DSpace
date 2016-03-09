@@ -164,4 +164,19 @@
 		</property>
 	</bean>
 	
+	<bean class="org.dspace.content.ItemEnhancer">
+		<property name="alias" value="fulltext" />
+		<property name="metadata">
+			<list>
+				<value>placeholder.placeholder.placeholder</value>
+			</list>
+		</property>
+		<property name="generators">
+			<list>				
+			    <ref bean="enhancerFulltext"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean name="enhancerFulltext" class="it.cineca.surplus.ir.defaultvalues.FulltextInfoGenerator"/>
 </beans>

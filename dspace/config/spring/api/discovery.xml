@@ -639,6 +639,7 @@
 				<ref bean="searchFilterSubject" />
 				<ref bean="searchFilterIssued" />
 				<ref bean="searchFilterType" />
+				<ref bean="searchFilterFulltext" />
 			</list>
 		</property>
 		<!--The sort filters for the discovery search -->
@@ -1760,6 +1761,7 @@
 				<ref bean="searchFilterSubject" />
 				<ref bean="searchFilterIssued" />
 				<ref bean="searchFilterType" />
+			<ref bean="searchFilterFulltext" />			
 		</list>
 		</constructor-arg>
 	</bean>
