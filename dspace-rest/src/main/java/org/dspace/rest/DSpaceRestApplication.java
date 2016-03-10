@@ -15,6 +15,7 @@ public class DSpaceRestApplication extends ResourceConfig {
 
     public DSpaceRestApplication() {
         register(JacksonFeature.class);
+        packages("io.swagger.jaxrs.listing");
         packages("org.dspace.rest");
     }
 }

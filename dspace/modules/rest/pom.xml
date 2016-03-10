@@ -24,12 +24,44 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <id>swagger-ui</id>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://github.com/swagger-api/swagger-ui/archive/master.tar.gz</url>
+                            <unpack>true</unpack>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <archiveClasses>false</archiveClasses>
                     <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                    <!-- Copy swagger generated json file & swagger UI files-->
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>${build.directory}</directory>
+                            <includes>
+                                <include>swagger-ui-master/dist/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>swagger-ui-master/dist/index.html</exclude>
+                            </excludes>
+                            <targetPath>/</targetPath>
+                        </resource>
+                    </webResources>
                     <overlays>
                         <!--
                            the priority of overlays is determined here

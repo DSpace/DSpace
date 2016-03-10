@@ -26,9 +26,16 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
+    <servlet>
+        <servlet-name>SwaggerBootstrap</servlet-name>
+        <servlet-class>org.dspace.rest.swagger.DSpaceSwaggerBootstrapServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+
     <servlet-mapping>
         <servlet-name>DSpace REST API</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
     
     <servlet-mapping>
@@ -37,15 +44,15 @@
     </servlet-mapping>
     
     <!-- Security settings and mapping -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>DSpace REST API</web-resource-name>
-            <url-pattern>/*</url-pattern>
-        </web-resource-collection>
-        <user-data-constraint>
-            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-        </user-data-constraint>
-    </security-constraint>
+    <!--<security-constraint>-->
+        <!--<web-resource-collection>-->
+            <!--<web-resource-name>DSpace REST API</web-resource-name>-->
+            <!--<url-pattern>/*</url-pattern>-->
+        <!--</web-resource-collection>-->
+        <!--<user-data-constraint>-->
+            <!--<transport-guarantee>CONFIDENTIAL</transport-guarantee>-->
+        <!--</user-data-constraint>-->
+    <!--</security-constraint>-->
     
     <!-- ConfigurationService initialization for dspace.dir -->
     <context-param>

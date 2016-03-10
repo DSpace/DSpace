@@ -30,6 +30,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -52,6 +53,7 @@ import org.dspace.usage.UsageEvent;
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
  */
 @Path("/collections")
+@Api(value = "Collection endpoint", tags = "collections")
 public class CollectionsResource extends Resource
 {
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();

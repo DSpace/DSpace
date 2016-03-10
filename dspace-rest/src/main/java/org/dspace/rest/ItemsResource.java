@@ -7,6 +7,8 @@
  */
 package org.dspace.rest;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -47,6 +49,7 @@ import java.util.List;
 // Every DSpace class used without namespace is from package org.dspace.rest.common.*. Otherwise namespace is defined.
 @SuppressWarnings("deprecation")
 @Path("/items")
+@Api(value = "Item endpoint", tags = "items")
 public class ItemsResource extends Resource
 {
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -87,7 +90,9 @@ public class ItemsResource extends Resource
     @GET
     @Path("/{item_id}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Item getItem(@PathParam("item_id") String itemId, @QueryParam("expand") String expand,
+    public Item getItem(
+            @ApiParam(value = "Internal DSpace identifier of the item", required = true)
+            @PathParam("item_id") String itemId, @QueryParam("expand") String expand,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
