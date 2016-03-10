@@ -8,24 +8,22 @@
 package org.dspace.content.crosswalk;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stax.StAXSource;
+import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.SelfNamedPlugin;
 import org.jdom.Namespace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configurable XSLT-driven Crosswalk
@@ -89,7 +87,7 @@ import org.jdom.Namespace;
 public abstract class XSLTCrosswalk extends SelfNamedPlugin
 {
     /** log4j category */
-    private static final Logger log = Logger.getLogger(XSLTCrosswalk.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XSLTCrosswalk.class);
 
     /**
      * DSpace XML Namespace in JDOM form.
@@ -119,22 +117,26 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin
         List<String> aliasList = new ArrayList<>();
         Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
 
-        log.debug("XSLTCrosswalk: Looking for config prefix = "+prefix);
+        LOG.debug("XSLTCrosswalk: Looking for config prefix = {}", prefix);
         while (pe.hasMoreElements())
         {
             String key = pe.nextElement();
             if (key.startsWith(prefix) && key.endsWith(suffix))
             {
-                log.debug("Getting XSLT plugin name from config line: "+key);
+                LOG.debug("Getting XSLT plugin name from config line: {}", key);
                 aliasList.add(key.substring(prefix.length(), key.length()-suffix.length()));
             }
         }
         return aliasList.toArray(new String[aliasList.size()]);
     }
 
+    /** We need to force this, because some dependency elsewhere interferes. */
+    private static final String TRANSFORMER_FACTORY_CLASS
+            = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
+
     private Transformer transformer = null;
-    private File transformerFile = null;
-    private long transformerLastModified = 0;
+    private File transformFile = null;
+    private long transformLastModified = 0;
 
     /**
      * Initialize the Transformation stylesheet from configured stylesheet file.
@@ -144,52 +146,51 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin
      */
     protected Transformer getTransformer(String direction)
     {
-        if (transformerFile == null)
+        if (transformFile == null)
         {
             String myAlias = getPluginInstanceName();
             if (myAlias == null)
             {
-                log.error("Must use PluginService to instantiate XSLTCrosswalk so the class knows its name.");
+                LOG.error("Must use PluginService to instantiate XSLTCrosswalk so the class knows its name.");
                 return null;
             }
             String cmPropName = CONFIG_PREFIX+direction+"."+myAlias+CONFIG_STYLESHEET;
             String fname = ConfigurationManager.getProperty(cmPropName);
             if (fname == null)
             {
-                log.error("Missing configuration filename for XSLT-based crosswalk: no "+
-                          "value for property = "+cmPropName);
+                LOG.error("Missing configuration filename for XSLT-based crosswalk: no "+
+                          "value for property = {}", cmPropName);
                 return null;
             }
             else
             {
                 String parent = ConfigurationManager.getProperty("dspace.dir") +
                     File.separator + "config" + File.separator;
-                transformerFile = new File(parent, fname);
+                transformFile = new File(parent, fname);
             }
         }
 
         // load if first time, or reload if stylesheet changed:
         if (transformer == null ||
-            transformerFile.lastModified() > transformerLastModified)
+            transformFile.lastModified() > transformLastModified)
         {
             try
             {
-                log.debug((transformer == null ? "Loading " : "Reloading")+
-                          getPluginInstanceName()+" XSLT stylesheet from "+transformerFile.toString());
-                Reader transformReader = new FileReader(transformerFile);
+                LOG.debug((transformer == null ? "Loading {} XSLT stylesheet from {}" : "Reloading {} XSLT stylesheet from {}"),
+                        getPluginInstanceName(), transformFile.toString());
 
-                XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-                XMLStreamReader xsltReader
-                        = inputFactory.createXMLStreamReader(transformReader);
-
-                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                transformer = transformerFactory.newTransformer(
-                        new StAXSource(xsltReader));
-                transformerLastModified = transformerFile.lastModified();
+                Source transformSource
+                        = new StreamSource(new FileInputStream(transformFile));
+                TransformerFactory transformerFactory
+                        = TransformerFactory.newInstance(
+                                TRANSFORMER_FACTORY_CLASS, null);
+                transformer = transformerFactory.newTransformer(transformSource);
+                transformLastModified = transformFile.lastModified();
             }
-            catch (TransformerConfigurationException | XMLStreamException | FileNotFoundException e)
+            catch (TransformerConfigurationException | FileNotFoundException e)
             {
-                log.error("Failed to initialize XSLTCrosswalk("+getPluginInstanceName()+"):"+e.toString());
+                LOG.error("Failed to initialize XSLTCrosswalk({}):  {}",
+                        getPluginInstanceName(), e.toString());
             }
         }
         return transformer;
