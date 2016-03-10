@@ -3,6 +3,7 @@ package org.dspace.workflow;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.api.DryadJournalConcept;
 import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
@@ -184,8 +185,7 @@ public class WorkflowItem implements InProgressSubmission {
     }
 
     public static WorkflowItem[] findAllByJournalCode(Context c, String journalCode) throws SQLException, AuthorizeException, IOException {
-        Concept concept = JournalUtils.getJournalConceptByShortID(c, journalCode);
-        String journalName = JournalUtils.getFullName(concept);
+        String journalName = JournalUtils.getJournalConceptByJournalID(journalCode).getFullName();
         return findAllByJournalName(c, journalName);
     }
 

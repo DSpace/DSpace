@@ -189,26 +189,6 @@ public class LocalIndexer implements AuthorityIndexerInterface {
     public String getSource() {
         return SOURCE;
     }
-
-
-    public boolean haveToAddAsterisk(String value){
-        Map<String, Map<String, String>> journalProperties = JournalUtils.journalProperties;
-        Set<String> keys = journalProperties.keySet();
-        for(String key :keys){
-            Map<String, String> props = journalProperties.get(key);
-            String valueProp = props.get(JournalUtils.FULLNAME);
-
-            if(value.equals(valueProp)){
-                String integratedJournal = props.get(JournalUtils.INTEGRATED);
-                if(integratedJournal!=null && integratedJournal.equals("true"))
-                    return true;
-            }
-        }
-        return false;
-    }
-
-
-
 }
 
 

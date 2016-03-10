@@ -5,12 +5,13 @@ package org.datadryad.rest.storage;
 import java.util.Arrays;
 import java.util.List;
 import org.datadryad.rest.models.Organization;
+import org.datadryad.api.DryadJournalConcept;
 
 /**
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public abstract class AbstractOrganizationStorage extends AbstractStorage<Organization> {
+public abstract class AbstractOrganizationStorage extends AbstractStorage<DryadJournalConcept> {
     @Override
     public final void checkCollectionPath(StoragePath path) throws StorageException {
         final List<String> expectedKeyPath = Arrays.asList(); // Collection is root

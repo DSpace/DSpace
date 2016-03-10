@@ -47,6 +47,7 @@ import org.dspace.utils.DSpace;
 import org.apache.log4j.Logger;
 
 import org.datadryad.api.DryadDataFile;
+import org.datadryad.api.DryadJournalConcept;
 
 /**
  * DataFileStats retrieves detailed statistics about a data file.
@@ -77,38 +78,28 @@ public class DataFileStats extends AbstractCurationTask {
 	
         identifierService = new DSpace().getSingletonService(IdentifierService.class);            
 	
-	// init xml processing
-	try {
-	    dbf = DocumentBuilderFactory.newInstance();
-	    docb = dbf.newDocumentBuilder();
-	} catch (ParserConfigurationException e) {
-	    throw new IOException("unable to initiate xml processor", e);
+		// init xml processing
+		try {
+			dbf = DocumentBuilderFactory.newInstance();
+			docb = dbf.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			throw new IOException("unable to initiate xml processor", e);
+		}
+
+		DryadJournalConcept[] journalConcepts = JournalUtils.getAllJournalConcepts();
+		for (DryadJournalConcept journalConcept : journalConcepts) {
+			String journalDisplay = journalConcept.getFullName();
+			if (journalConcept.getIntegrated()) {
+				integratedJournals.add(journalDisplay);
+			}
+			if (journalConcept.getAllowEmbargo()) {
+				integratedJournalsThatAllowEmbargo.add(journalDisplay);
+			}
+			if (journalConcept.getAllowReviewWorkflow()) {
+				journalsThatAllowReview.add(journalDisplay);
+			}
+		}
 	}
-
-	try {
-
-        for(Concept concept:JournalUtils.getJournalConcepts(context)){
-
-            String journalDisplay = concept.getPreferredLabel();
-            String integrated = JournalUtils.getIntegrated(concept);
-            String embargo = JournalUtils.getEmbargoAllowed(concept);
-            String allowReviewWorkflow = JournalUtils.getAllowReviewWorkflow(concept);
-
-            if(integrated != null && Boolean.valueOf(integrated)) {
-                integratedJournals.add(journalDisplay);
-            }
-            if(allowReviewWorkflow != null && Boolean.valueOf(allowReviewWorkflow)) {
-                journalsThatAllowReview.add(journalDisplay);
-            }
-            if(embargo != null && Boolean.valueOf(embargo)) {
-                integratedJournalsThatAllowEmbargo.add(journalDisplay);
-            }
-
-	    }
-	} catch(Exception e) {
-	    log.error("Unable to initialize the journal settings");
-	}
-    }
     
     /**
      * Perform the curation task upon passed DSO

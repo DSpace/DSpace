@@ -30,6 +30,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.Concept;
 import org.xml.sax.SAXException;
+import org.datadryad.api.DryadJournalConcept;
 
 /**
  * Journal landing page transformer for top panel containing journal information.
@@ -58,7 +59,7 @@ public class Banner extends AbstractDSpaceTransformer {
 
     private String journalName;
     private DryadJournal dryadJournal;
-    private Concept journalConcept;
+    private DryadJournalConcept journalConcept;
 
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
@@ -78,13 +79,9 @@ public class Banner extends AbstractDSpaceTransformer {
             log.error(ex);
             throw(new ProcessingException("Failed to make handler for " + journalName));
         }
-        try {
-            journalConcept = JournalUtils.getJournalConceptByName(context,journalName);
-        } catch (SQLException ex) {
-            throw(new ProcessingException("Error retrieving Concept for '" + journalName + "': " + ex.getMessage()));
-        }
+        journalConcept = JournalUtils.getJournalConceptByJournalName(journalName);
         if (journalConcept == null) {
-            throw(new ProcessingException("Failed to retrieve Concept for " + journalName));
+            throw(new ProcessingException("Failed to retrieve DryadJournalConcept for " + journalName));
         }
     }
 
@@ -99,13 +96,13 @@ public class Banner extends AbstractDSpaceTransformer {
         inner.setHead(journalName);
 
         // [Journal description]
-        String journalDescr = JournalUtils.getDescription(journalConcept);
+        String journalDescr = journalConcept.getDescription();
         if (journalDescr != null) {
             inner.addPara().addContent(journalDescr);
         }
 
         // Member: ___
-        String memberName = JournalUtils.getMemberName(journalConcept);
+        String memberName = journalConcept.getMemberName();
         if (memberName != null && memberName.length() > 0) {
             Para pMem = inner.addPara(BANNER_MEM, BANNER_MEM);
             pMem.addHighlight(null).addContent(T_Member);
@@ -117,7 +114,7 @@ public class Banner extends AbstractDSpaceTransformer {
         Para pSpo = inner.addPara(BANNER_SPO, BANNER_SPO);
         pSpo.addHighlight(null).addContent(T_sponsorship);
         pSpo.addContent(": ");
-        String sponsorName = JournalUtils.getSponsorName(journalConcept);
+        String sponsorName = journalConcept.getSponsorName();
         if (sponsorName != null) {
             pSpo.addContent(sponsorName);
         } else {
@@ -128,7 +125,7 @@ public class Banner extends AbstractDSpaceTransformer {
         Para pInt = inner.addPara(BANNER_INT, BANNER_INT);
         pInt.addHighlight(null).addContent(T_Integration);
         pInt.addContent(": ");
-        if (JournalUtils.getBooleanIntegrated(journalConcept)) {
+        if (journalConcept.getIntegrated()) {
             pInt.addContent(T_yes);
         } else {
             pInt.addContent(T_no);
@@ -138,7 +135,7 @@ public class Banner extends AbstractDSpaceTransformer {
         Para pAut = inner.addPara(BANNER_AUT, BANNER_AUT);
         pAut.addHighlight(null).addContent(T_Authors);
         pAut.addContent(": ");
-        if (JournalUtils.getBooleanAllowReviewWorkflow(journalConcept)) {
+        if (journalConcept.getAllowReviewWorkflow()) {
             pAut.addContent(T_review);
         } else {
             pAut.addContent(T_acceptance);
@@ -148,7 +145,7 @@ public class Banner extends AbstractDSpaceTransformer {
         Para pDat = inner.addPara(BANNER_DAT, BANNER_DAT);
         pDat.addHighlight(null).addContent(T_Embargo);
         pDat.addContent(": ");
-        if (JournalUtils.getBooleanEmbargoAllowed(journalConcept)) {
+        if (journalConcept.getAllowEmbargo()) {
             pDat.addContent(T_allowed);
         } else {
             pDat.addContent(T_notAllowed);
@@ -158,7 +155,7 @@ public class Banner extends AbstractDSpaceTransformer {
         Para pMet = inner.addPara(BANNER_MET, BANNER_MET);
         pMet.addHighlight(null).addContent(T_Hidden);
         pMet.addContent(": ");
-        if (JournalUtils.getBooleanPublicationBlackout(journalConcept)) {
+        if (journalConcept.getPublicationBlackout()) {
             pMet.addContent(T_yes);
         } else {
             pMet.addContent(T_no);

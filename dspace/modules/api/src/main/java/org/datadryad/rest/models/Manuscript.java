@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.datadryad.rest.legacymodels.LegacyManuscript;
+import org.datadryad.api.DryadJournalConcept;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.content.authority.Choices;
@@ -127,6 +128,8 @@ public class Manuscript {
     @JsonIgnore
     private boolean metadataFromJournal = true;
 
+    @JsonIgnore
+    private DryadJournalConcept journalConcept;
 
     private List<String> keywords = new ArrayList<String>();
     // from PublicationBean, but not currently used
@@ -183,6 +186,9 @@ public class Manuscript {
         this.status = status;
     }
 
+    public Manuscript(DryadJournalConcept journalConcept) {
+        this.journalConcept = journalConcept;
+    }
 
     public Manuscript(LegacyManuscript legacyManuscript) {
         this.organization = new Organization();
@@ -511,6 +517,15 @@ public class Manuscript {
         this.coverageTemporal = coverageTemporal;
     }
 
+    @JsonIgnore
+    public String getJournalName() {
+        return journalConcept.getFullName();
+    }
+
+    @JsonIgnore
+    public String getJournalISSN() {
+        return journalConcept.getISSN();
+    }
 
     public boolean isMetadataFromJournal() {
         return metadataFromJournal;
@@ -530,6 +545,20 @@ public class Manuscript {
         }
     }
 
+    @JsonIgnore
+    public DryadJournalConcept getJournalConcept() {
+        return journalConcept;
+    }
+
+    @JsonIgnore
+    public String getJournalID() {
+        return journalConcept.getJournalID();
+    }
+
+    @JsonIgnore
+    public void setJournalConcept(DryadJournalConcept journalConcept) {
+        this.journalConcept = journalConcept;
+    }
 
     public String getJournalNumber() {
         return journalNumber;
@@ -612,6 +641,9 @@ public class Manuscript {
      **/
     public void propagateMetadataToItem(Context context, Item item) {
         // These values are common to both Article Types
+        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL, journalConcept.getFullName(), journalConcept.getIdentifier(), Choices.CF_ACCEPTED);
+        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_CODE, journalConcept.getJournalID());
+        addSingleMetadataValueFromJournal(context, item, Manuscript.ISSN, journalConcept.getISSN());
 
         addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_VOLUME, this.getJournalVolume());
         addSingleMetadataValueFromJournal(context, item, Manuscript.ABSTRACT, manuscript_abstract);

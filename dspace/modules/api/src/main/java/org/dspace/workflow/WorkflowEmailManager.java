@@ -27,6 +27,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.JournalUtils;
+import org.datadryad.api.DryadJournalConcept;
 
 /**
  * Refactoring email notification methods into this class.
@@ -134,20 +135,16 @@ public class WorkflowEmailManager {
         }
     }
 
-    private static void addJournalNotifyOnArchive(Item item, Email email)
-    {
+    private static void addJournalNotifyOnArchive(Item item, Email email) {
         DCValue[] values=item.getMetadata("prism.publicationName");
-        if(values!=null && values.length> 0){
+        if (values!=null && values.length> 0) {
             String journal = values[0].value;
-            if(journal!=null){
-                Map<String, String> properties = JournalUtils.getPropertiesByJournal(journal);
-                if(properties != null) {
-                    String emails = properties.get(JournalUtils.NOTIFY_ON_ARCHIVE);
-                    if(emails != null) {
-                        String[] emails_=emails.split(",");
-                        for(String emailAddr : emails_){
-                            email.addRecipient(emailAddr);
-                        }
+            if (journal!=null) {
+                DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
+                if (journalConcept != null) {
+                    ArrayList<String> emails = journalConcept.getEmailsToNotifyOnArchive();
+                    for (String emailAddr : emails) {
+                        email.addRecipient(emailAddr);
                     }
                 }
             }

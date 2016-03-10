@@ -50,6 +50,7 @@ import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.utils.DSpace;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadJournalConcept;
 
 /**
  * DataPackageStats retrieves detailed statistics about a data package.
@@ -190,21 +191,19 @@ public class DataPackageStats extends AbstractCurationTask {
 		// embargoes are also allowed for integrated journals that have set the embargoesAllowed option
         //use new journal utils to read the configuration from database instead of from the file
         Scheme journalScheme = Scheme.findByIdentifier(context,"Journal");
-        Concept[] journalConcept = Concept.findByPreferredLabel(context,journal,journalScheme.getID());
+		DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
 
-
-
-		if(journalConcept!=null&&journalConcept.length>0) {
-            if(JournalUtils.getBooleanIntegrated(journalConcept[0])|| JournalUtils.getBooleanEmbargoAllowed(journalConcept[0])) {
+		if (journalConcept != null) {
+            if (journalConcept.getIntegrated() || journalConcept.getAllowEmbargo()) {
 		        journalAllowsEmbargo = true;
             }
-		} 
 
-		// journalAllowsReview
-		if(journalConcept!=null&&journalConcept.length>0&&JournalUtils.getBooleanAllowReviewWorkflow(journalConcept[0])) {
-		    journalAllowsReview = true;
+			// journalAllowsReview
+			if (journalConcept.getAllowReviewWorkflow()) {
+				journalAllowsReview = true;
+			}
 		}
-				
+
 		// accession date
 		vals = item.getMetadata("dc.date.accessioned");
 		if (vals.length == 0) {

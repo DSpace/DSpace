@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.AuthorsList;
+import org.datadryad.api.DryadJournalConcept;
 import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 import org.dspace.core.ConfigurationManager;
@@ -261,8 +262,7 @@ public class DryadEmailSubmission extends HttpServlet {
         EmailParser parser = null;
         Manuscript manuscript = null;
         boolean dryadContentStarted = false;
-        Context context = null;
-        Concept concept = null;
+        DryadJournalConcept journalConcept = null;
         while (emailScanner.hasNextLine()) {
             String line = emailScanner.nextLine().replace("\u00A0",""); // \u00A0 is Unicode nbsp; these should be removed
             line = StringEscapeUtils.unescapeHtml(line);
@@ -304,104 +304,80 @@ public class DryadEmailSubmission extends HttpServlet {
         }
         // After reading the entire message, attempt to find the journal by
         // Journal Code.  If Journal Code is not present, fall back to Journal Name
-        try {
-            context = new Context();
-            if (journalCode == null) {
-                LOGGER.debug("Journal Code not found in message, trying by journal name: " + journalName);
-                if (journalName != null) {
-                    try {
-                        concept = JournalUtils.getJournalConceptByName(context, journalName);
-                    } catch (SQLException e) {
-                        throw new SubmissionException(e);
-                    }
-                    journalCode = JournalUtils.getJournalShortID(concept);
+        if (journalCode == null) {
+            LOGGER.debug("Journal Code not found in message, trying by journal name: " + journalName);
+            if (journalName != null) {
+                journalConcept = JournalUtils.getJournalConceptByJournalName(journalName);
+                journalCode = journalConcept.getJournalID();
 
-                } else {
-                    throw new SubmissionException("Journal Code not present and Journal Name not found in message");
-                }
-            }
-
-            // if journalCode is still null, throw an exception.
-            if (journalCode == null) {
-                throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Name");
-            }
-            // find the associated concept and initialize the parser variable.
-            try {
-                concept = JournalUtils.getJournalConceptByShortID(context, journalCode);
-            } catch (SQLException e) {
-                throw new SubmissionException(e);
-	        }
-
-            if (concept == null) {
-                throw new SubmissionException("Concept not found for journal " + journalCode);
-            }
-
-            // at this point, concept is not null.
-            journalName = JournalUtils.getFullName(concept);
-            try {
-                parser = getEmailParser(JournalUtils.getParsingScheme(concept));
-                parser.parseMessage(dryadContent);
-                manuscript = parser.getManuscript();
-                // make sure that the manuscript has the journalCode even if we found the parser by name:
-                manuscript.organization.organizationCode = journalCode;
-            } catch (SubmissionException e) {
-                throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
-            }
-            if ((manuscript != null) && (manuscript.isValid())) {
-                // edit the manuscript ID to the canonical one:
-                manuscript.manuscriptId = JournalUtils.getCanonicalManuscriptID(context, manuscript);
-                JournalUtils.writeManuscriptToDB(context, manuscript);
-                LOGGER.debug ("this ms has status " + manuscript.getStatus());
-                Boolean approved = null;
-
-                if (manuscript.isAccepted()) {
-                    approved = true;
-                } else if (manuscript.isRejected()) {
-                    approved = false;
-                } else if (manuscript.isNeedsRevision()) {
-                    approved = false;
-                } else if (manuscript.isPublished()) {
-                    approved = true;
-                }
-
-                // if the status was "submitted," approved will still be null and we won't try to process any items.
-                if (approved != null) {
-                    DSpaceKernelImpl kernelImpl = null;
-                    try {
-                        kernelImpl = DSpaceKernelInit.getKernel(null);
-                        if (!kernelImpl.isRunning())
-                        {
-                            kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
-                        }
-                    } catch (Exception ex) {
-                        // Failed to start so destroy it and log and throw an exception
-                        try {
-                            if(kernelImpl != null) {
-                                kernelImpl.destroy();
-                            }
-                        } catch (Exception e1) {
-                            // Nothing to do
-                        }
-                        LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
-                    }
-
-                    ApproveRejectReviewItem.reviewManuscript(manuscript);
-                }
             } else {
-                throw new SubmissionException("Parser could not validly parse the message");
+                throw new SubmissionException("Journal Code not present and Journal Name not found in message");
             }
-        } catch (SQLException e) {
-            throw new SubmissionException("Couldn't get context", e);
         }
-        finally {
-            try {
-                if (context != null) {
-                    context.complete();
-                }
-            } catch (SQLException e) {
-                context.abort();
-                throw new RuntimeException("Context.complete threw an exception, aborting instead");
+
+        // if journalCode is still null, throw an exception.
+        if (journalCode == null) {
+            throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Name");
+        }
+        // find the associated concept and initialize the parser variable.
+        journalConcept = JournalUtils.getJournalConceptByJournalID(journalCode);
+
+        if (journalConcept == null) {
+            throw new SubmissionException("Concept not found for journal " + journalCode);
+        }
+
+        // at this point, concept is not null.
+        journalName = journalConcept.getFullName();
+        try {
+            parser = getEmailParser(journalConcept.getParsingScheme());
+            parser.parseMessage(dryadContent);
+            manuscript = parser.getManuscript();
+            // make sure that the manuscript has the journalCode even if we found the parser by name:
+            manuscript.getOrganization().organizationCode = journalCode;
+        } catch (SubmissionException e) {
+            throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
+        }
+        if ((manuscript != null) && (manuscript.isValid())) {
+            // edit the manuscript ID to the canonical one:
+            manuscript.setManuscriptId(JournalUtils.getCanonicalManuscriptID(manuscript));
+            JournalUtils.writeManuscriptToDB(manuscript);
+            LOGGER.debug ("this ms has status " + manuscript.getStatus());
+            Boolean approved = null;
+
+            if (manuscript.isAccepted()) {
+                approved = true;
+            } else if (manuscript.isRejected()) {
+                approved = false;
+            } else if (manuscript.isNeedsRevision()) {
+                approved = false;
+            } else if (manuscript.isPublished()) {
+                approved = true;
             }
+
+            // if the status was "submitted," approved will still be null and we won't try to process any items.
+            if (approved != null) {
+                DSpaceKernelImpl kernelImpl = null;
+                try {
+                    kernelImpl = DSpaceKernelInit.getKernel(null);
+                    if (!kernelImpl.isRunning()) {
+                        kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                    }
+                } catch (Exception ex) {
+                    // Failed to start so destroy it and log and throw an exception
+                    try {
+                        if(kernelImpl != null) {
+                            kernelImpl.destroy();
+                        }
+                    } catch (Exception e1) {
+                        // Nothing to do
+                    }
+                    LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
+                }
+
+                ApproveRejectReviewItem.reviewManuscript(manuscript);
+            }
+        } else {
+            throw new SubmissionException("Parser could not validly parse the message");
         }
     }
 
