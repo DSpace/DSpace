@@ -1,9 +1,6 @@
 package org.datadryad.submission;
 
-import org.apache.log4j.Logger;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Properties;
+import org.datadryad.rest.models.Manuscript;
 
 /**
  * The Class EmailParserForAmNat. Rewritten by Daisie Huang
@@ -18,15 +15,17 @@ public class EmailParserForAmNat extends EmailParser {
 		fieldToXMLTagMap.put("first name", "Corr_Auth_First_Name");
 		fieldToXMLTagMap.put("middle name", "Corr_Auth_Middle_Name");
 		fieldToXMLTagMap.put("last name", "Corr_Auth_Last_Name");
-		fieldToXMLTagMap.put("Address Line 1", ADDRESS_LINE_1);
-		fieldToXMLTagMap.put("Address Line 2", ADDRESS_LINE_2);
-		fieldToXMLTagMap.put("Address Line 3", ADDRESS_LINE_3);
-		fieldToXMLTagMap.put("City",CITY);
-		fieldToXMLTagMap.put("State",STATE);
-		fieldToXMLTagMap.put("Country",COUNTRY);
-		fieldToXMLTagMap.put("Zip",ZIP);
-		fieldToXMLTagMap.put("E-mail Address",EMAIL);
+		fieldToXMLTagMap.put("Address Line 1", Manuscript.ADDRESS_LINE_1);
+		fieldToXMLTagMap.put("Address Line 2", Manuscript.ADDRESS_LINE_2);
+		fieldToXMLTagMap.put("Address Line 3", Manuscript.ADDRESS_LINE_3);
+		fieldToXMLTagMap.put("City", Manuscript.CITY);
+		fieldToXMLTagMap.put("State", Manuscript.STATE);
+		fieldToXMLTagMap.put("Country", Manuscript.COUNTRY);
+		fieldToXMLTagMap.put("Zip", Manuscript.ZIP);
+		fieldToXMLTagMap.put("E-mail Address", Manuscript.EMAIL);
 
+		// optional XML fields
+		fieldToXMLTagMap.put("ORCID", Manuscript.CORRESPONDING_AUTHOR_ORCID);
 
 		// AmNat gives us a lot of unnecessary fields.
 		fieldToXMLTagMap.put("Access Type",UNNECESSARY);
@@ -71,6 +70,7 @@ public class EmailParserForAmNat extends EmailParser {
 		fieldToXMLTagMap.put("Publication Issue Number",UNNECESSARY);
 		fieldToXMLTagMap.put("Publication Volume Number",UNNECESSARY);
 		fieldToXMLTagMap.put("PubMed Author ID",UNNECESSARY);
+		fieldToXMLTagMap.put("ResearcherID", UNNECESSARY);
 		fieldToXMLTagMap.put("Resubmission of MS #",UNNECESSARY);
 		fieldToXMLTagMap.put("Revision Number",UNNECESSARY);
 		fieldToXMLTagMap.put("Scopus Author ID",UNNECESSARY);
@@ -79,11 +79,6 @@ public class EmailParserForAmNat extends EmailParser {
 		fieldToXMLTagMap.put("Tables",UNNECESSARY);
 		fieldToXMLTagMap.put("Text pages",UNNECESSARY);
 		fieldToXMLTagMap.put("Title",UNNECESSARY);
-
-		// optional XML fields
-		fieldToXMLTagMap.put("ORCID",ORCID);
-		fieldToXMLTagMap.put("ResearcherID",RESEARCHER_ID);
-
 	}
 
 	@Override
@@ -95,7 +90,7 @@ public class EmailParserForAmNat extends EmailParser {
 		if (middlename == null) { middlename = ""; }
 		if (lastname == null) { lastname = ""; }
 		String corr_author = firstname + " " + middlename + " " + lastname;
-		dataForXML.put(CORRESPONDING_AUTHOR, corr_author);
+		dataForXML.put(Manuscript.CORRESPONDING_AUTHOR, corr_author);
 		return;
 	}
 }

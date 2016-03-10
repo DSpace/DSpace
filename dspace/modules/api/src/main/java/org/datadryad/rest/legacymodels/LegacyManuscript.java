@@ -5,6 +5,7 @@ package org.datadryad.rest.legacymodels;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.CorrespondingAuthor;
 
 import java.lang.String;
 import java.util.HashMap;
@@ -33,33 +34,38 @@ public class LegacyManuscript {
 
     public LegacyManuscript() {}
     public LegacyManuscript(Manuscript manuscript) {
-        this.Journal = manuscript.organization.organizationName;
-        this.Journal_Code = manuscript.organization.organizationCode;
-        this.Submission_Metadata.Manuscript = manuscript.manuscriptId;
-        this.Submission_Metadata.Article_Title = manuscript.title;
+        this.Journal = manuscript.getOrganization().organizationName;
+        this.Journal_Code = manuscript.getOrganization().organizationCode;
+        this.Submission_Metadata.Manuscript = manuscript.getManuscriptId();
+        this.Submission_Metadata.Article_Title = manuscript.getTitle();
         this.Article_Status = manuscript.getLiteralStatus();
-        for(Author author : manuscript.authors.author) {
+        for (Author author : manuscript.getAuthors().author) {
             this.Authors.Author.add(author.fullName());
         }
-        if(manuscript.correspondingAuthor != null) {
-            if(manuscript.correspondingAuthor.author != null) {
-                this.Corresponding_Author = manuscript.correspondingAuthor.author.fullName();
+        CorrespondingAuthor correspondingAuthor = manuscript.getCorrespondingAuthor();
+        if(correspondingAuthor != null) {
+            if(correspondingAuthor.author != null) {
+                this.Corresponding_Author = correspondingAuthor.author.fullName();
             }
-            this.Email = manuscript.correspondingAuthor.email;
-            if(manuscript.correspondingAuthor.address != null) {
-                this.Address_Line_1 = manuscript.correspondingAuthor.address.addressLine1;
-                this.Address_Line_2 = manuscript.correspondingAuthor.address.addressLine2;
-                this.Address_Line_3 = manuscript.correspondingAuthor.address.addressLine3;
-                this.City = manuscript.correspondingAuthor.address.city;
-                this.State = manuscript.correspondingAuthor.address.state;
-                this.Country = manuscript.correspondingAuthor.address.country;
-                this.Zip = manuscript.correspondingAuthor.address.zip;
+            this.Email = correspondingAuthor.email;
+            if(correspondingAuthor.address != null) {
+                this.Address_Line_1 = correspondingAuthor.address.addressLine1;
+                this.Address_Line_2 = correspondingAuthor.address.addressLine2;
+                this.Address_Line_3 = correspondingAuthor.address.addressLine3;
+                this.City = correspondingAuthor.address.city;
+                this.State = correspondingAuthor.address.state;
+                this.Country = correspondingAuthor.address.country;
+                this.Zip = correspondingAuthor.address.zip;
             }
         }
-        this.Abstract = manuscript.manuscript_abstract;
+        this.Abstract = manuscript.getAbstract();
         this.optionalProperties = manuscript.optionalProperties;
-        for(String keyword : manuscript.keywords) {
+        for(String keyword : manuscript.getKeywords()) {
             this.Classification.keyword.add(keyword);
         }
+    }
+
+    public String toString() {
+        return Journal_Code + " " + Submission_Metadata.Manuscript + " " + Submission_Metadata.Article_Title;
     }
 }

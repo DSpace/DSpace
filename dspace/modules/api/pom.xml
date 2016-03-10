@@ -261,6 +261,16 @@
 			<version>4.5</version>
        </dependency>
        <dependency>
+           <groupId>com.sun.xml.bind</groupId>
+           <artifactId>jaxb-core</artifactId>
+           <version>2.2.8-b01</version>
+       </dependency>
+       <dependency>
+           <groupId>com.sun.xml.bind</groupId>
+           <artifactId>jaxb-impl</artifactId>
+           <version>2.2-promoted-b65</version>
+       </dependency>
+       <dependency>
 			<groupId>org.dspace.dependencies</groupId>
 			<artifactId>dspace-perst</artifactId>
 			<version>4.21</version>

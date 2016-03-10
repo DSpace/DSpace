@@ -268,7 +268,7 @@ public class WorkflowItem implements InProgressSubmission {
     }
 
     public static List<WorkflowItem> findAllByManuscript(Context context, Manuscript manuscript) throws ApproveRejectReviewItemException {
-        String journalCode = manuscript.organization.organizationCode;
+        String journalCode = manuscript.getOrganization().organizationCode;
         WorkflowItem[] workflowItems = null;
         ArrayList<WorkflowItem> matchingItems = new ArrayList<WorkflowItem>();
 
@@ -281,14 +281,14 @@ public class WorkflowItem implements InProgressSubmission {
                 // check to see if this matches by msid:
                 DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
                 for (int j=0; j<msids.length; j++) {
-                    String canonicalMsID = JournalUtils.getCanonicalManuscriptID(context, msids[j].value,manuscript.organization.organizationCode);
-                    if (manuscript.manuscriptId.equals(msids[j].value)) {
+                    String canonicalMsID = JournalUtils.getCanonicalManuscriptID(msids[j].value,manuscript.getOrganization().organizationCode);
+                    if (manuscript.getManuscriptId().equals(msids[j].value)) {
                         log.debug("matched " + item.getID() + " by msid");
                         matched = true;
                     }
 
                     // TEMPORARY FIX: manuscript numbers from metadata files had the JournalCode prefixed onto the manuscript number as well.
-                    String alt_msid = journalCode + "-" + manuscript.manuscriptId;
+                    String alt_msid = journalCode + "-" + manuscript.getManuscriptId();
                     if (alt_msid.equals(msids[j].value)) {
                         log.debug("matched " + item.getID() + " by msid (metadata file method)");
                         matched = true;
@@ -298,10 +298,10 @@ public class WorkflowItem implements InProgressSubmission {
                 if (matched == false) {
                     // count number of authors and number of matched authors: if equal, this is a match.
                     DCValue[] itemAuthors = item.getMetadata("dc", "contributor", "author", Item.ANY);
-                    if (manuscript.authors.author.size() == itemAuthors.length) {
+                    if (manuscript.getAuthorList().size() == itemAuthors.length) {
                         int numMatched = 0;
                         for (int j = 0; j < itemAuthors.length; j++) {
-                            for (Author a : manuscript.authors.author) {
+                            for (Author a : manuscript.getAuthorList()) {
                                 double score = JournalUtils.getHamrScore(itemAuthors[j].value, a.fullName());
                                 if (score > 0.7) {
                                     log.debug("author " + itemAuthors[j].value + " matched " + a.fullName() + " with a score of " + score);

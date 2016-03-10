@@ -2,6 +2,7 @@
  */
 package org.datadryad.rest.storage;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.datadryad.rest.models.Manuscript;
@@ -24,5 +25,9 @@ public abstract class AbstractManuscriptStorage extends AbstractStorage<Manuscri
     public final void checkObjectPath(StoragePath path) throws StorageException {
         final List<String> expectedKeyPath = Arrays.asList(Organization.ORGANIZATION_CODE, Manuscript.MANUSCRIPT_ID);
         checkPath(path, expectedKeyPath);
+    }
+
+    public List<Manuscript> getManuscriptsMatchingPath(StoragePath path, int limit) throws StorageException {
+        return new ArrayList<Manuscript>();
     }
 }

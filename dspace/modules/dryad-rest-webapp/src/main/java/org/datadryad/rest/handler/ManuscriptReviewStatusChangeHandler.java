@@ -67,7 +67,7 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
             }
             ApproveRejectReviewItem.reviewManuscript(manuscript);
         } catch (ApproveRejectReviewItemException ex) {
-            throw new HandlerException("Exception handling acceptance notice for manuscript " + manuscript.manuscriptId, ex);
+            throw new HandlerException("Exception handling acceptance notice for manuscript " + manuscript.getManuscriptId(), ex);
         }
     }
 }

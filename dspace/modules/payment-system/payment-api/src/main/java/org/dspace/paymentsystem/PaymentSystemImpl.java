@@ -430,14 +430,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         {
             if(journal!=null&&journal.length()>0) {
                 //update shoppingcart journal
-                Map<String, String> properties = JournalUtils.findJournalProperties(c,journal);
-                Boolean subscription = false;
-                if(properties!=null){
-                    if(StringUtils.equals(properties.get("subscriptionPaid"), ShoppingCart.FREE))
-                    {
-                        subscription = true;
-                    }
-                }
+                Boolean subscription = JournalUtils.getJournalConceptByJournalName(journal).getSubscriptionPaid();
                 shoppingCart.setJournal(journal);
                 shoppingCart.setJournalSub(subscription);
             }

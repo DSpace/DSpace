@@ -7,11 +7,9 @@ import java.lang.Override;
 import java.lang.String;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.bind.annotation.XmlElement;
@@ -23,6 +21,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.identifier.DOIIdentifierProvider;
+import org.datadryad.rest.legacymodels.LegacyManuscript;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
+import org.dspace.content.authority.Choices;
 
 /**
  *
@@ -31,7 +33,43 @@ import org.dspace.identifier.DOIIdentifierProvider;
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Manuscript {
+    // article-specific data:
     public static final String MANUSCRIPT_ID = "manuscriptId";
+    public static final String JOURNAL_CODE = "Journal_Code";
+    public static final String JOURNAL = "Journal";
+    public static final String ABSTRACT = "Abstract";
+    public static final String AUTHORS = "Authors";
+    public static final String ARTICLE_STATUS = "Article_Status";
+    public static final String SKIP_REVIEW = "Skip_Review";
+    public static final String MANUSCRIPT = "Manuscript_ID";
+    public static final String ARTICLE_TITLE = "Article_Title";
+    public static final String CORRESPONDING_AUTHOR = "Corresponding_Author";
+    public static final String CORRESPONDING_AUTHOR_ORCID = "Corresponding_Author_ORCID";
+    public static final String EMAIL = "Email";
+    public static final String ADDRESS_LINE_1 = "Address_Line_1";
+    public static final String ADDRESS_LINE_2 = "Address_Line_2";
+    public static final String ADDRESS_LINE_3 = "Address_Line_3";
+    public static final String CITY = "City";
+    public static final String STATE = "State";
+    public static final String COUNTRY = "Country";
+    public static final String ZIP = "Zip";
+    public static final String CLASSIFICATION = "Classification";
+    public static final String DRYAD_DOI = "Dryad_DOI";
+    public static final String PUBLICATION_DOI = "Publication_DOI";
+    public static final String FULL_CITATION = "Full_Citation";
+    public static final String CITATION_TITLE = "Citation_Title";
+    public static final String JOURNAL_VOLUME = "Journal_Volume";
+    public static final String JOURNAL_NUMBER = "Journal_Number";
+    public static final String PUBLICATION_DATE = "Publication_Date";
+    public static final String TAXONOMIC_NAMES = "Taxonomic_Names";
+    public static final String COVERAGE_SPATIAL = "Coverage_Spatial";
+    public static final String COVERAGE_TEMPORAL = "Coverage_Temporal";
+    public static final String TYPE_REGULAR = "Regular";
+    public static final String TYPE_GR_NOTE = "GR Note";
+
+    // journal-specific data:
+    public static final String ISSN = "ISSN";
+    public static final String JOURNAL_PUBLISHER = "Journal_Publisher";
 
     public static final String STATUS_SUBMITTED = "submitted";
     public static final String STATUS_ACCEPTED = "accepted";
@@ -66,22 +104,78 @@ public class Manuscript {
             STATUS_NEEDS_REVISION
     );
 
+    @JsonIgnore
+    private static Properties journalMetadata;
+
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     @XmlElement(name="abstract")
     @JsonProperty("abstract")
-    public String manuscript_abstract;
-    public AuthorsList authors = new AuthorsList();
-    public CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
+    private String manuscript_abstract = "";
+    private AuthorsList authors = new AuthorsList();
+    private CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
     private String dryadDataDOI;
-    public List<String> keywords = new ArrayList<String>();
-    public String manuscriptId = "";
+    private String manuscriptId = "";
     private String status = STATUS_ACCEPTED; // STATUS_ACCEPTED is the default
-    public String title;
-    public String publicationDOI;
-    public Date publicationDate;
-    public String dataReviewURL;
-    public String dataAvailabilityStatement;
+    private String title = "";
+    private String publicationDOI = "";
+    private Date publicationDate;
+    private String dataReviewURL = "";
+    private String dataAvailabilityStatement = "";
     public Map<String, String> optionalProperties;
+
+    // indicates whether the metadata for this publication was obtained directly from the journal
+    @JsonIgnore
+    private boolean metadataFromJournal = true;
+
+
+    private List<String> keywords = new ArrayList<String>();
+    // from PublicationBean, but not currently used
+    private String journalVolume = "";
+    private String journalNumber = "";
+    private String publisher = "";
+    private String fullCitation = "";
+    @JsonIgnore
+    private String message = "";
+
+    private List<String> taxonomicNames = new ArrayList<String>();
+    private List<String> coverageSpatial = new ArrayList<String>();
+    private List<String> coverageTemporal = new ArrayList<String>();
+    @JsonIgnore
+    private String articleType = Manuscript.TYPE_REGULAR; // Default type is regular
+    @JsonIgnore
+    private String citationTitle = "";
+    @JsonIgnore
+    private String citationAuthors = "";
+
+    @JsonIgnore
+    private static final Logger log = Logger.getLogger(Manuscript.class);
+
+    @JsonIgnore
+    private Organization organization = new Organization();
+
+    static {
+        journalMetadata = new Properties();
+
+        journalMetadata.setProperty(Manuscript.JOURNAL, "prism.publicationName");
+        journalMetadata.setProperty(Manuscript.JOURNAL_VOLUME, "dc.relation.ispartofseries");
+        journalMetadata.setProperty(Manuscript.FULL_CITATION, "dc.identifier.citation");
+        journalMetadata.setProperty(Manuscript.ARTICLE_TITLE, "dc.title");
+        journalMetadata.setProperty(Manuscript.ABSTRACT, "dc.description");
+        journalMetadata.setProperty(Manuscript.CORRESPONDING_AUTHOR, "dc.contributor.correspondingAuthor");
+        journalMetadata.setProperty(Manuscript.PUBLICATION_DOI, "dc.relation.isreferencedby");
+        journalMetadata.setProperty(Manuscript.AUTHORS, "dc.contributor.author");
+        journalMetadata.setProperty(Manuscript.CLASSIFICATION, "dc.subject");
+        journalMetadata.setProperty(Manuscript.TAXONOMIC_NAMES, "dwc.ScientificName");
+        journalMetadata.setProperty(Manuscript.COVERAGE_SPATIAL, "dc.coverage.spatial");
+        journalMetadata.setProperty(Manuscript.COVERAGE_TEMPORAL, "dc.coverage.temporal");
+        journalMetadata.setProperty(Manuscript.SKIP_REVIEW, "workflow.submit.skipReviewStage");
+        journalMetadata.setProperty(Manuscript.MANUSCRIPT, "dc.identifier.manuscriptNumber");
+        journalMetadata.setProperty(Manuscript.CITATION_TITLE, "dryad.citationTitle");
+        journalMetadata.setProperty(Manuscript.PUBLICATION_DATE, "dc.date.issued");
+        journalMetadata.setProperty(Manuscript.ISSN, "dc.identifier.issn");
+        journalMetadata.setProperty(Manuscript.JOURNAL_PUBLISHER, "dc.publisher");
+    }
+
     public Manuscript() {} // JAXB needs this
 
     public Manuscript(String manuscriptId, String status) {
@@ -89,20 +183,173 @@ public class Manuscript {
         this.status = status;
     }
 
-    @JsonIgnore
-    private static final Logger log = Logger.getLogger(Manuscript.class);
+
+    public Manuscript(LegacyManuscript legacyManuscript) {
+        this.organization = new Organization();
+        this.organization.organizationName = legacyManuscript.Journal;
+        this.organization.organizationCode = legacyManuscript.Journal_Code;
+        // Required fields are: manuscriptID, status, authors (though author identifiers are optional), and title. All other fields are optional.
+        this.manuscriptId = legacyManuscript.Submission_Metadata.Manuscript;
+        this.title = legacyManuscript.Submission_Metadata.Article_Title;
+        this.setStatus(legacyManuscript.Article_Status);
+        for (String author : legacyManuscript.Authors.Author) {
+            this.authors.author.add(new Author(author));
+        }
+        if (legacyManuscript.Abstract != null) {
+            this.manuscript_abstract = legacyManuscript.Abstract;
+        }
+        if (legacyManuscript.Corresponding_Author != null) {
+            this.correspondingAuthor = new CorrespondingAuthor();
+            this.correspondingAuthor.author = new Author(legacyManuscript.Corresponding_Author);
+            if (legacyManuscript.Email != null) {
+                this.correspondingAuthor.email = legacyManuscript.Email;
+            }
+            if (legacyManuscript.Address_Line_1 != null) {
+                this.correspondingAuthor.address.addressLine1 = legacyManuscript.Address_Line_1;
+            }
+            if (legacyManuscript.Address_Line_2 != null) {
+                this.correspondingAuthor.address.addressLine2 = legacyManuscript.Address_Line_2;
+            }
+            if (legacyManuscript.Address_Line_3 != null) {
+                this.correspondingAuthor.address.addressLine3 = legacyManuscript.Address_Line_3;
+            }
+            if (legacyManuscript.City != null) {
+                this.correspondingAuthor.address.city = legacyManuscript.City;
+            }
+            if (legacyManuscript.State != null) {
+                this.correspondingAuthor.address.state = legacyManuscript.State;
+            }
+            if (legacyManuscript.Country != null) {
+                this.correspondingAuthor.address.country = legacyManuscript.Country;
+            }
+            if (legacyManuscript.Zip != null) {
+                this.correspondingAuthor.address.zip = legacyManuscript.Zip;
+            }
+        }
+        if (legacyManuscript.Classification != null) {
+            this.keywords = new ArrayList<String>();
+            for (String keyword : legacyManuscript.Classification.keyword) {
+                this.keywords.add(keyword);
+            }
+        }
+    }
+
+    public String getManuscriptId() {
+        return manuscriptId;
+    }
+
+    public void setManuscriptId(String manuscriptId) {
+        this.manuscriptId = manuscriptId;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
+
+    public String getAbstract() {
+        return manuscript_abstract;
+    }
+
+    public void setAbstract(String msAbstract) {
+        this.manuscript_abstract = msAbstract;
+    }
+
+    public CorrespondingAuthor getCorrespondingAuthor() {
+        return correspondingAuthor;
+    }
 
     @JsonIgnore
-    public Organization organization = new Organization();
+    public String getCorrespondingAuthorFullName() {
+        String fullname = null;
+        if (this.correspondingAuthor != null && this.correspondingAuthor.author != null) {
+            fullname = this.correspondingAuthor.author.fullName();
+        }
+        return fullname;
+    }
 
-    public void setDryadDataDOI(String newDOI) {
-        this.dryadDataDOI = newDOI;
+    public void setCorrespondingAuthor(CorrespondingAuthor author) {
+        this.correspondingAuthor = author;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getPublicationDOI() {
+        return publicationDOI;
+    }
+
+    public void setPublicationDOI(String doi) {
+        this.publicationDOI = doi;
+    }
+
+    public Date getPublicationDate() {
+        return publicationDate;
+    }
+
+    public void setPublicationDate(Date date) {
+        this.publicationDate = date;
+    }
+
+    public String getDataReviewURL() {
+        return dataReviewURL;
+    }
+
+    public void setDataReviewURL(String url) {
+        this.dataReviewURL = url;
+    }
+
+    public String getDataAvailabilityStatement() {
+        return dataAvailabilityStatement;
+    }
+
+    public void setDataAvailabilityStatement(String dataAvailabilityStatement) {
+        this.dataAvailabilityStatement = dataAvailabilityStatement;
+    }
+
+    public AuthorsList getAuthors() {
+        return authors;
+    }
+
+    public List<Author> getAuthorList() {
+        return this.authors.author;
+    }
+
+    public void setAuthors(AuthorsList authorsList) {
+        this.authors = authorsList;
+    }
+
+    public void setAuthorsFromList(List<Author> authorList) {
+        if (this.authors == null) {
+            this.authors = new AuthorsList();
+        }
+        this.authors.author.addAll(authorList);
+    }
+
+    public void addAuthor(Author author) {
+        if (this.authors == null) {
+            this.authors = new AuthorsList();
+        }
+        this.authors.author.add(author);
     }
 
     public String getDryadDataDOI() {
         // find the first instance of a Dryad DOI in these three fields (in this order of priority)
         return findDryadDOI(dryadDataDOI + "," + dataReviewURL + "," + dataAvailabilityStatement);
     }
+
+    public void setDryadDataDOI(String newDOI) {
+        this.dryadDataDOI = newDOI;
+    }
+
 
     public void setStatus(String newStatus) {
         if (newStatus != null) {
@@ -229,6 +476,209 @@ public class Manuscript {
             return null;
         }
     }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        if(message != null) {
+            this.message = message.trim();
+        }
+    }
+
+    public List<String> getTaxonomicNames() {
+        return taxonomicNames;
+    }
+
+    public void setTaxonomicNames(List<String> taxonomicNames) {
+        this.taxonomicNames = taxonomicNames;
+    }
+
+    public List<String> getCoverageSpatial() {
+        return coverageSpatial;
+    }
+
+    public void setCoverageSpatial(List<String> coverageSpatial) {
+        this.coverageSpatial = coverageSpatial;
+    }
+
+    public List<String> getCoverageTemporal() {
+        return coverageTemporal;
+    }
+
+    public void setCoverageTemporal(List<String> coverageTemporal) {
+        this.coverageTemporal = coverageTemporal;
+    }
+
+
+    public boolean isMetadataFromJournal() {
+        return metadataFromJournal;
+    }
+
+    public void setMetadataFromJournal(boolean metadataFromJournal) {
+        this.metadataFromJournal = metadataFromJournal;
+    }
+
+    public String getJournalVolume() {
+        return journalVolume;
+    }
+
+    public void setJournalVolume(String journalVolume) {
+        if(journalVolume != null) {
+            this.journalVolume = journalVolume;
+        }
+    }
+
+
+    public String getJournalNumber() {
+        return journalNumber;
+    }
+
+    public void setJournalNumber(String journalNumber) {
+        if(journalNumber != null) {
+            this.journalNumber = journalNumber.trim();
+        }
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        if(publisher != null) {
+            this.publisher = publisher.trim();
+        }
+    }
+
+    public String getFullCitation() {
+        return fullCitation;
+    }
+
+    public void setFullCitation(String fullCitation) {
+        if(fullCitation != null) {
+            this.fullCitation = fullCitation.trim();
+        }
+    }
+
+    public boolean isSkipReviewStep() {
+        if (getStatus() != null && getStatus().equals(Manuscript.STATUS_SUBMITTED)) {
+            return false;
+        }
+        return true;
+    }
+
+    public String getArticleType() {
+        return articleType;
+    }
+
+    public void setArticleType(String articleType) {
+        if(articleType != null) {
+            this.articleType = articleType;
+        }
+    }
+
+    public String getCitationTitle() {
+        return citationTitle;
+    }
+
+    public void setCitationTitle(String citationTitle) {
+        if(citationTitle != null) {
+            this.citationTitle = citationTitle;
+        }
+    }
+
+    public String getCitationAuthors() {
+        return citationAuthors;
+    }
+
+    public void setCitationAuthors(String citationAuthors) {
+        if(citationAuthors != null) {
+            this.citationAuthors = citationAuthors;
+        }
+    }
+
+    public List<String> getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(List<String>keywords) {
+        this.keywords = keywords;
+    }
+
+    /**
+     Import metadata from the journal settings into the data package item. If data already exists in
+     the pBean, it will take precedence over the journal metadata.
+     **/
+    public void propagateMetadataToItem(Context context, Item item) {
+        // These values are common to both Article Types
+
+        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_VOLUME, this.getJournalVolume());
+        addSingleMetadataValueFromJournal(context, item, Manuscript.ABSTRACT, manuscript_abstract);
+        addSingleMetadataValueFromJournal(context, item, Manuscript.CORRESPONDING_AUTHOR, this.getCorrespondingAuthorFullName());
+        addSingleMetadataValueFromJournal(context, item, Manuscript.PUBLICATION_DOI, publicationDOI);
+        if (publicationDate != null) {
+            addSingleMetadataValueFromJournal(context, item, Manuscript.PUBLICATION_DATE, sdf.format(publicationDate));
+        }
+        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_NUMBER, this.getJournalNumber());
+        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_PUBLISHER, this.getPublisher());
+        addSingleMetadataValueFromJournal(context, item, Manuscript.MANUSCRIPT, this.getManuscriptId());
+        addSingleMetadataValueFromJournal(context, item, Manuscript.SKIP_REVIEW, String.valueOf(this.isSkipReviewStep()));
+        ArrayList<String> authors = new ArrayList<String>();
+        for (Author a : this.authors.author) {
+            authors.add(a.fullName());
+        }
+        addMultiMetadataValueFromJournal(context, item, Manuscript.AUTHORS, authors);
+        addMultiMetadataValueFromJournal(context, item, Manuscript.CLASSIFICATION, keywords);
+        addMultiMetadataValueFromJournal(context, item, Manuscript.TAXONOMIC_NAMES, this.getTaxonomicNames());
+        addMultiMetadataValueFromJournal(context, item, Manuscript.COVERAGE_SPATIAL, this.getCoverageSpatial());
+        addMultiMetadataValueFromJournal(context, item, Manuscript.COVERAGE_TEMPORAL, this.getCoverageTemporal());
+
+        // These values differ based on the Article Type
+        if (this.getArticleType().equals(Manuscript.TYPE_GR_NOTE)) {
+            String articleTitle = String.format("\"%s\" in %s", title, this.getCitationTitle());
+            addSingleMetadataValueFromJournal(context, item, Manuscript.ARTICLE_TITLE, articleTitle);
+            addSingleMetadataValueFromJournal(context, item, Manuscript.CITATION_TITLE, this.getCitationTitle());
+            // Citation Authors are not stored in the Item
+        } else { // Assume Regular
+            addSingleMetadataValueFromJournal(context, item, Manuscript.ARTICLE_TITLE, title);
+        }
+        log.info("journal_id=" + journalConcept.getJournalID() + ",ms=" + this.getManuscriptId());
+    }
+
+    private void addSingleMetadataValueFromJournal(Context ctx, Item publication, String key, String value, String auth_id, int confidence){
+        String mdString = journalMetadata.getProperty(key);
+        if (mdString == null) {
+            log.error("error importing field from journal: Could not retrieve a metadata field for journal getter: " + key);
+            return;
+        }
+
+        if (value != null) {
+            publication.addMetadata(mdString, null, value, auth_id, confidence);
+        }
+
+    }
+
+    private void addSingleMetadataValueFromJournal(Context ctx, Item publication, String key, String value){
+        addSingleMetadataValueFromJournal(ctx, publication, key, value, null, 0);
+    }
+
+    private void addMultiMetadataValueFromJournal(Context ctx, Item publication, String key, List<String> values){
+        String mdString = journalMetadata.getProperty(key);
+        if (mdString == null) {
+            log.error("error importing field from journal: Could not retrieve a metadata field for journal getter: " + key);
+            return;
+        }
+
+        if (values != null && 0 < values.size()) {
+            String[] valArray = values.toArray(new String[values.size()]);
+            String[] authArray = new String[values.size()];
+            int[] confArray = new int[values.size()];
+            publication.addMetadata(mdString, null, valArray, authArray, confArray);
+        }
+    }
+
+
 
     @Override
     public String toString() {

@@ -15,6 +15,7 @@ import org.dspace.content.authority.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.workflow.DryadWorkflowUtils;
+import org.datadryad.api.DryadJournalConcept;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -54,13 +55,6 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
      * that configuration file.
      */
     private static DCInputsReader INPUTS_READER = null;
-
-    private static final String FULLNAME = "fullname";
-    private static final String METADATADIR = "metadataDir";
-    private static final String INTEGRATED = "integrated";
-    private static final String PUBLICATION_BLACKOUT = "publicationBlackout";
-    private static final String NOTIFY_ON_REVIEW = "notifyOnReview";
-    private static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
 
     /**
      * Return the inputs reader. Note, the reader must have been
@@ -374,10 +368,11 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
         }
 
         // show "Publish immediately" only if publicationBlackout=false or not defined in DryadJournalSubmission.properties.
-        Concept[]  journalConcepts = JournalUtils.getJournalConcept(context,journalFullName);
+        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journalFullName);
         Boolean isBlackedOut=false;
-        if(journalConcepts!=null && journalConcepts.length > 0)
-            isBlackedOut = JournalUtils.getBooleanPublicationBlackout(journalConcepts[0]);
+        if (journalConcept != null) {
+            isBlackedOut = journalConcept.getPublicationBlackout();
+        }
 
         if(!isBlackedOut)
             select.addOption("none", "Publish immediately");

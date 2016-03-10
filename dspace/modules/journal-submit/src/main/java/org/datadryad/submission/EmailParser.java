@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Address;
 import org.datadryad.rest.models.Author;
+import org.datadryad.rest.models.CorrespondingAuthor;
 import org.datadryad.rest.models.Manuscript;
 
 import java.util.ArrayList;
@@ -29,32 +30,6 @@ public class EmailParser {
     protected Manuscript manuscript;
     protected Map<String, String> dataForXML = new LinkedHashMap<String, String>();
 
-    // required XML tags that correspond to parts of Manuscript
-    public static final String JOURNAL_CODE = "Journal_Code";
-    public static final String JOURNAL = "Journal";
-    public static final String ABSTRACT = "Abstract";
-    public static final String AUTHORS = "Authors";
-    public static final String ARTICLE_STATUS = "Article_Status";
-    public static final String MANUSCRIPT = "Manuscript_ID";
-    public static final String ARTICLE_TITLE = "Article_Title";
-    public static final String CORRESPONDING_AUTHOR = "Corresponding_Author";
-    public static final String CORRESPONDING_AUTHOR_ORCID = "Corresponding_Author_ORCID";
-    public static final String EMAIL = "Email";
-    public static final String ADDRESS_LINE_1 = "Address_Line_1";
-    public static final String ADDRESS_LINE_2 = "Address_Line_2";
-    public static final String ADDRESS_LINE_3 = "Address_Line_3";
-    public static final String CITY = "City";
-    public static final String STATE = "State";
-    public static final String COUNTRY = "Country";
-    public static final String ZIP = "Zip";
-    public static final String CLASSIFICATION = "Classification";
-
-    // commonly-used XML tags:
-    public static final String ISSN = "ISSN";
-    public static final String ORCID = "ORCID";
-    public static final String RESEARCHER_ID = "Researcher_ID";
-    public static final String DRYAD_DOI = "Dryad_DOI";
-
     // Parsers that deal with specific and unneeded fields should assign fields to the UNNECESSARY tag:
     public static final String UNNECESSARY = "Unnecessary";
 
@@ -63,34 +38,34 @@ public class EmailParser {
 
     static {
         // commonly-used field names for required tags for Manuscript
-        fieldToXMLTagMap.put("abstract", ABSTRACT);
-        fieldToXMLTagMap.put("journal", JOURNAL);
-        fieldToXMLTagMap.put("journal name",JOURNAL);
-        fieldToXMLTagMap.put("journal code", JOURNAL_CODE);
-        fieldToXMLTagMap.put("article status", ARTICLE_STATUS);
-        fieldToXMLTagMap.put("manuscript number", MANUSCRIPT);
-        fieldToXMLTagMap.put("ms dryad id",MANUSCRIPT);
-        fieldToXMLTagMap.put("ms reference number",MANUSCRIPT);
-        fieldToXMLTagMap.put("ms title",ARTICLE_TITLE);
-        fieldToXMLTagMap.put("article title", ARTICLE_TITLE);
-        fieldToXMLTagMap.put("ms authors",AUTHORS);
-        fieldToXMLTagMap.put("all authors", AUTHORS);
-        fieldToXMLTagMap.put("classification description", CLASSIFICATION);
-        fieldToXMLTagMap.put("keywords",CLASSIFICATION);
-        fieldToXMLTagMap.put("contact author",CORRESPONDING_AUTHOR);
-        fieldToXMLTagMap.put("contact author email",EMAIL);
-        fieldToXMLTagMap.put("contact author address 1",ADDRESS_LINE_1);
-        fieldToXMLTagMap.put("contact author address 2",ADDRESS_LINE_2);
-        fieldToXMLTagMap.put("contact author address 3",ADDRESS_LINE_3);
-        fieldToXMLTagMap.put("contact author city",CITY);
-        fieldToXMLTagMap.put("contact author state",STATE);
-        fieldToXMLTagMap.put("contact author country",COUNTRY);
-        fieldToXMLTagMap.put("contact author zip/postal code",ZIP);
+        fieldToXMLTagMap.put("abstract", Manuscript.ABSTRACT);
+        fieldToXMLTagMap.put("journal", Manuscript.JOURNAL);
+        fieldToXMLTagMap.put("journal name",Manuscript.JOURNAL);
+        fieldToXMLTagMap.put("journal code", Manuscript.JOURNAL_CODE);
+        fieldToXMLTagMap.put("article status", Manuscript.ARTICLE_STATUS);
+        fieldToXMLTagMap.put("manuscript number", Manuscript.MANUSCRIPT);
+        fieldToXMLTagMap.put("ms dryad id", Manuscript.MANUSCRIPT);
+        fieldToXMLTagMap.put("ms reference number", Manuscript.MANUSCRIPT);
+        fieldToXMLTagMap.put("ms title", Manuscript.ARTICLE_TITLE);
+        fieldToXMLTagMap.put("article title", Manuscript.ARTICLE_TITLE);
+        fieldToXMLTagMap.put("ms authors", Manuscript.AUTHORS);
+        fieldToXMLTagMap.put("all authors", Manuscript.AUTHORS);
+        fieldToXMLTagMap.put("classification description", Manuscript.CLASSIFICATION);
+        fieldToXMLTagMap.put("keywords", Manuscript.CLASSIFICATION);
+        fieldToXMLTagMap.put("contact author", Manuscript.CORRESPONDING_AUTHOR);
+        fieldToXMLTagMap.put("contact author email", Manuscript.EMAIL);
+        fieldToXMLTagMap.put("contact author address 1", Manuscript.ADDRESS_LINE_1);
+        fieldToXMLTagMap.put("contact author address 2", Manuscript.ADDRESS_LINE_2);
+        fieldToXMLTagMap.put("contact author address 3", Manuscript.ADDRESS_LINE_3);
+        fieldToXMLTagMap.put("contact author city", Manuscript.CITY);
+        fieldToXMLTagMap.put("contact author state", Manuscript.STATE);
+        fieldToXMLTagMap.put("contact author country", Manuscript.COUNTRY);
+        fieldToXMLTagMap.put("contact author zip/postal code", Manuscript.ZIP);
 
         // commonly-used field names for optional XML tags
-        fieldToXMLTagMap.put("ISSN", ISSN);
-        fieldToXMLTagMap.put("ms dryad doi", DRYAD_DOI);
-        fieldToXMLTagMap.put("contact author orcid", CORRESPONDING_AUTHOR_ORCID);
+        fieldToXMLTagMap.put("ISSN", Manuscript.ISSN);
+        fieldToXMLTagMap.put("ms dryad doi", Manuscript.DRYAD_DOI);
+        fieldToXMLTagMap.put("contact author orcid", Manuscript.CORRESPONDING_AUTHOR_ORCID);
 
         // unnecessary fields
         fieldToXMLTagMap.put("Dryad author url", UNNECESSARY);
@@ -112,7 +87,7 @@ public class EmailParser {
         XMLValue currValue = new XMLValue();
 
         // set a default status of ACCEPTED:
-        dataForXML.put(ARTICLE_STATUS, Manuscript.STATUS_ACCEPTED);
+        dataForXML.put(Manuscript.ARTICLE_STATUS, Manuscript.STATUS_ACCEPTED);
 
         for (String line : message) {
             if (StringUtils.stripToNull(line) != null) {
@@ -120,7 +95,7 @@ public class EmailParser {
                 XMLValue thisLine = parseLineToXMLValue(line);
                 if (thisLine.key == null) {
                     if (currValue.key != null) {
-                        if (currValue.key.equals(ABSTRACT)) {
+                        if (currValue.key.equals(Manuscript.ABSTRACT)) {
                             currValue.value = currValue.value + "\n" + thisLine.value;
                         } else {
                             currValue.value = currValue.value + " " + thisLine.value;
@@ -150,11 +125,11 @@ public class EmailParser {
         }
 
         // some tags should only have one word in them:
-        if (dataForXML.get(MANUSCRIPT) != null) {
-            dataForXML.put(MANUSCRIPT, dataForXML.get(MANUSCRIPT).split("\\s", 2)[0]);
+        if (dataForXML.get(Manuscript.MANUSCRIPT) != null) {
+            dataForXML.put(Manuscript.MANUSCRIPT, dataForXML.get(Manuscript.MANUSCRIPT).split("\\s", 2)[0]);
         }
-        if (dataForXML.get(JOURNAL_CODE) != null) {
-            dataForXML.put(JOURNAL_CODE, dataForXML.get(JOURNAL_CODE).split("\\s", 2)[0]);
+        if (dataForXML.get(Manuscript.JOURNAL_CODE) != null) {
+            dataForXML.put(Manuscript.JOURNAL_CODE, dataForXML.get(Manuscript.JOURNAL_CODE).split("\\s", 2)[0]);
         }
         // for debugging
         for (String s : dataForXML.keySet()) {
@@ -174,38 +149,35 @@ public class EmailParser {
     private void createManuscript() {
         manuscript = new Manuscript();
 
-        manuscript.manuscript_abstract = (String) dataForXML.remove(ABSTRACT);
-        String authorstring = (String) dataForXML.remove(AUTHORS);
-        manuscript.authors.author = parseAuthorList(authorstring);
+        manuscript.setAbstract((String) dataForXML.remove(Manuscript.ABSTRACT));
+        String authorstring = (String) dataForXML.remove(Manuscript.AUTHORS);
+        manuscript.setAuthorsFromList(parseAuthorList(authorstring));
 
-        manuscript.keywords.addAll(parseClassificationList((String) dataForXML.remove(CLASSIFICATION)));
-        manuscript.manuscriptId = (String) dataForXML.remove(MANUSCRIPT);
-        manuscript.setStatus(dataForXML.remove(ARTICLE_STATUS).toLowerCase());
-        manuscript.title = (String) dataForXML.remove(ARTICLE_TITLE);
-        manuscript.publicationDOI = null;
-        manuscript.publicationDate = null;
-        manuscript.dataReviewURL = null;
-        manuscript.dataAvailabilityStatement = null;
+        manuscript.setKeywords(parseClassificationList((String) dataForXML.remove(Manuscript.CLASSIFICATION)));
+        manuscript.setManuscriptId((String) dataForXML.remove(Manuscript.MANUSCRIPT));
+        manuscript.setStatus(dataForXML.remove(Manuscript.ARTICLE_STATUS).toLowerCase());
+        manuscript.setTitle((String) dataForXML.remove(Manuscript.ARTICLE_TITLE));
 
-        manuscript.organization.organizationCode = dataForXML.remove(JOURNAL_CODE);
-        manuscript.organization.organizationName = dataForXML.remove(JOURNAL);
+        manuscript.getOrganization().organizationCode = dataForXML.remove(Manuscript.JOURNAL_CODE);
+        manuscript.getOrganization().organizationName = dataForXML.remove(Manuscript.JOURNAL);
 
-        manuscript.correspondingAuthor.author = parseAuthor((String) dataForXML.remove(CORRESPONDING_AUTHOR));
-        manuscript.correspondingAuthor.email = parseEmailAddress((String) dataForXML.remove(EMAIL));
-        manuscript.correspondingAuthor.author.identifier = (String) dataForXML.remove(CORRESPONDING_AUTHOR_ORCID);
-        if (manuscript.correspondingAuthor.author.identifier != null) {
-            manuscript.correspondingAuthor.author.identifierType = "ORCID";
+        CorrespondingAuthor correspondingAuthor = manuscript.getCorrespondingAuthor();
+        correspondingAuthor.author = new Author((String) dataForXML.remove(Manuscript.CORRESPONDING_AUTHOR));
+        correspondingAuthor.email = parseEmailAddress((String) dataForXML.remove(Manuscript.EMAIL));
+        correspondingAuthor.author.identifier = (String) dataForXML.remove(Manuscript.CORRESPONDING_AUTHOR_ORCID);
+        if (correspondingAuthor.author.identifier != null) {
+            correspondingAuthor.author.identifierType = "ORCID";
         }
 
-        manuscript.correspondingAuthor.address = new Address();
-        manuscript.correspondingAuthor.address.addressLine1 = (String) dataForXML.remove(ADDRESS_LINE_1);
-        manuscript.correspondingAuthor.address.addressLine2 = (String) dataForXML.remove(ADDRESS_LINE_2);
-        manuscript.correspondingAuthor.address.addressLine3 = (String) dataForXML.remove(ADDRESS_LINE_3);
-        manuscript.correspondingAuthor.address.city = (String) dataForXML.remove(CITY);
-        manuscript.correspondingAuthor.address.state = (String) dataForXML.remove(STATE);
-        manuscript.correspondingAuthor.address.country = (String) dataForXML.remove(COUNTRY);
-        manuscript.correspondingAuthor.address.zip = (String) dataForXML.remove(ZIP);
-        manuscript.setDryadDataDOI((String) dataForXML.remove(DRYAD_DOI));
+        correspondingAuthor.address = new Address();
+        correspondingAuthor.address.addressLine1 = (String) dataForXML.remove(Manuscript.ADDRESS_LINE_1);
+        correspondingAuthor.address.addressLine2 = (String) dataForXML.remove(Manuscript.ADDRESS_LINE_2);
+        correspondingAuthor.address.addressLine3 = (String) dataForXML.remove(Manuscript.ADDRESS_LINE_3);
+        correspondingAuthor.address.city = (String) dataForXML.remove(Manuscript.CITY);
+        correspondingAuthor.address.state = (String) dataForXML.remove(Manuscript.STATE);
+        correspondingAuthor.address.country = (String) dataForXML.remove(Manuscript.COUNTRY);
+        correspondingAuthor.address.zip = (String) dataForXML.remove(Manuscript.ZIP);
+        manuscript.setDryadDataDOI((String) dataForXML.remove(Manuscript.DRYAD_DOI));
         manuscript.optionalProperties = dataForXML;
     }
 
@@ -230,53 +202,6 @@ public class EmailParser {
             }
         }
         return email;
-    }
-
-    public static Author parseAuthor(String authorString) {
-        Author author = new Author();
-        // initialize to empty strings, in case there isn't actually anything in the authorString.
-        author.givenNames = "";
-        author.familyName = "";
-        String suffix = "";
-
-        if (authorString != null) {
-            authorString = StringUtils.stripToEmpty(authorString);
-            // Remove any leading title, like Dr.
-            authorString = authorString.replaceAll("^[D|M]+rs*\\.*\\s*","");
-            // is there a comma in the name?
-            // it could either be lastname, firstname, or firstname lastname, title
-            Matcher namepattern = Pattern.compile("^(.+),\\s*(.*)$").matcher(authorString);
-            if (namepattern.find()) {
-                if (namepattern.group(2).matches("(Jr\\.*|Sr\\.*|III)")) {
-                    // if it's a suffix situation, then group 2 will say something like "Jr"
-                    // if this is the case, it's actually a firstname lastname situation.
-                    // the last name will be the last word in group 1 + ", " + suffix.
-                    suffix = ", " + namepattern.group(2);
-                    authorString = namepattern.group(1);
-                } else if (namepattern.group(2).matches("(Ph|J)\\.*D\\.*|M\\.*[DAS]c*\\.*")) {
-                    // if it's a title situation, group 2 will say something like "PhD" or "MD"
-                    // there are probably more titles that might happen here, but we can't deal with that.
-                    // throw this away.
-                    authorString = namepattern.group(1);
-                } else {
-                    author.givenNames = namepattern.group(2);
-                    author.familyName = namepattern.group(1);
-                    return author;
-                }
-            }
-
-            // if it's firstname lastname
-            namepattern = Pattern.compile("^(.+) +(.*)$").matcher(authorString);
-            if (namepattern.find()) {
-                author.givenNames = namepattern.group(1);
-                author.familyName = namepattern.group(2) + suffix;
-            } else {
-                // there is only one word in the name: assign it to the familyName?
-                author.familyName = authorString;
-                author.givenNames = null;
-            }
-        }
-        return author;
     }
 
     /**
@@ -326,7 +251,7 @@ public class EmailParser {
 
             // process these authors
             for (String s : authorStrings) {
-                authorList.add(parseAuthor(s));
+                authorList.add(new Author(s));
             }
         }
 
