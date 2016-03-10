@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.dspace.core.Context;
 
 /**
  *
@@ -288,15 +289,14 @@ public class PersonAuthorityValue extends AuthorityValue {
     }
 
 
-    public void updateConceptFromAuthorityValue(Concept concept) throws SQLException,AuthorizeException {
-
-        super.updateConceptFromAuthorityValue(concept);
-        concept.addMetadata(PERSON,"familyName",null,"",lastName,null,-1);
-        concept.addMetadata(PERSON,"givenName",null,"",firstName,null,-1);
+    public void updateConceptFromAuthorityValue(Context context, Concept concept) throws SQLException,AuthorizeException {
+        super.updateConceptFromAuthorityValue(context, concept);
+        concept.addMetadata(context, PERSON,"familyName",null,"",lastName,null,-1);
+        concept.addMetadata(context, PERSON,"givenName",null,"",firstName,null,-1);
         if(institution!=null)
-        concept.addMetadata(PERSON,"institution",null,"",institution,null,-1);
+        concept.addMetadata(context, PERSON,"institution",null,"",institution,null,-1);
         for(String email:emails) {
-            concept.addMetadata(PERSON,"email",null,"",email,null,-1);
+            concept.addMetadata(context, PERSON,"email",null,"",email,null,-1);
         }
     }
 }

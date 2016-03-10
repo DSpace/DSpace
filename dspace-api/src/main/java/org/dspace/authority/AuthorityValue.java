@@ -18,6 +18,7 @@ import org.dspace.content.Item;
 import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Term;
+import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -453,10 +454,9 @@ public class AuthorityValue {
         }
     }
 
-    public void updateConceptFromAuthorityValue(Concept concept) throws SQLException,AuthorizeException{
+    public void updateConceptFromAuthorityValue(Context context, Concept concept) throws SQLException,AuthorizeException{
 
-        for(String name : otherMetadata.keySet())
-        {
+        for(String name : otherMetadata.keySet()) {
             if(name.startsWith(LABELPREFIX)){
                 String key = name.replace(LABELPREFIX,"");
                 String[] keys = key.split("_");
@@ -468,16 +468,14 @@ public class AuthorityValue {
                 for(String value : otherMetadata.get(name))
                 {
                     // Add it to the list
-                    concept.addMetadata(schema,element,qualifier,"",value,null,-1);
+                    concept.addMetadata(context, schema,element,qualifier,"",value,null,-1);
                 }
 
             }
         }
-        for(String name : nameVariants)
-        {
+        for(String name : nameVariants) {
             //add alternate terms
-            Term term = concept.createTerm(name,Term.alternate_term);
-            term.update();
+            Term term = concept.createTerm(context, name,Term.alternate_term);
         }
     }
 

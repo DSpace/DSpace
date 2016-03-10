@@ -209,11 +209,9 @@ public class Scheme2Concept
 
      * @return recalled metadata relation
      * @throws java.sql.SQLException
-     * @throws org.dspace.authorize.AuthorizeException
      */
     public static Scheme2Concept findByElement(Context context, int role_id,
-                                               int scheme_id, int concept_id) throws SQLException,
-            AuthorizeException
+                                               int scheme_id, int concept_id) throws SQLException
     {
         // Grab rows from DB
         TableRowIterator tri;
@@ -366,11 +364,9 @@ public class Scheme2Concept
 
      * @return true if the relation exists
      * @throws java.sql.SQLException
-     * @throws org.dspace.authorize.AuthorizeException
      */
     private static boolean hasElement(Context context, int role_id,
-                                      int scheme_id, int concept_id) throws SQLException,
-            AuthorizeException
+                                      int scheme_id, int concept_id) throws SQLException
     {
         return Scheme2Concept.findByElement(context, role_id, scheme_id,
                 concept_id) != null;
@@ -408,13 +404,11 @@ public class Scheme2Concept
      * @param role_id
 
      * @return true if unique
-     * @throws org.dspace.authorize.AuthorizeException
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
     private boolean unique(Context context, int role_id, int scheme_id,
-                           int concept_id) throws IOException, SQLException,
-            AuthorizeException
+                           int concept_id) throws IOException, SQLException
     {
         int count = 0;
         Connection con = null;
@@ -734,7 +728,7 @@ public class Scheme2Concept
 
 
     public static Scheme2Concept findBySchemeAndConcept(Context context,Integer scheme_id,Integer concept_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (scheme_id == null||concept_id == null||scheme_id<0||concept_id<0)
         {
@@ -782,7 +776,7 @@ public class Scheme2Concept
 
 
     public Scheme2Concept[] findBySchemeAndRole(Context context,Integer scheme_id,Integer role_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (scheme_id == null||role_id == null||scheme_id<0||role_id<0)
         {
@@ -829,7 +823,7 @@ public class Scheme2Concept
 
     }
     public Scheme2Concept[] findByConceptAndRole(Context context,Integer concept_id,Integer role_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (concept_id == null||role_id == null||concept_id<0||role_id<0)
         {
@@ -876,7 +870,7 @@ public class Scheme2Concept
     }
 
     public Scheme2Concept[] findByConcept(Context context,Integer concept_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (concept_id == null||concept_id<0)
         {
@@ -923,7 +917,7 @@ public class Scheme2Concept
     }
 
     public Scheme2Concept[] findByScheme(Context context,Integer concept_id)
-            throws SQLException, AuthorizeException
+            throws SQLException
     {
         if (concept_id == null||concept_id<0)
         {

@@ -145,11 +145,9 @@ public class AuthorityItemConsumer implements Consumer {
                                     }
 
                                     if(newConcept==null){
-                                        newConcept = scheme.createConcept();
-                                        newConcept.setStatus(Concept.Status.ACCEPTED);
-                                        newConcept.update();
-                                        Term term = newConcept.createTerm(dcValue.value,Term.prefer_term);
-                                        term.update();
+                                        newConcept = scheme.createConcept(context);
+                                        newConcept.setStatus(context, Concept.Status.ACCEPTED.name());
+                                        Term term = newConcept.createTerm(context, dcValue.value,Term.prefer_term);
                                         context.commit();
                                     }
 

@@ -115,13 +115,11 @@ public class SolrAuthorityServiceImpl implements EditableAuthorityIndexingServic
                     }
 
                     if(newConcept==null){
-                        newConcept = scheme.createConcept();
-                        newConcept.setStatus(Concept.Status.ACCEPTED);
-                        newConcept.setSource(value.getAuthorityType());
-                        value.updateConceptFromAuthorityValue(newConcept);
-                        newConcept.update();
-                        Term term = newConcept.createTerm(value.getValue(),Term.prefer_term);
-                        term.update();
+                        newConcept = scheme.createConcept(context);
+                        newConcept.setStatus(context, Concept.Status.ACCEPTED.name());
+                        newConcept.setSource(context, value.getAuthorityType());
+                        value.updateConceptFromAuthorityValue(context, newConcept);
+                        Term term = newConcept.createTerm(context, value.getValue(),Term.prefer_term);
                         context.complete();
                     }
 

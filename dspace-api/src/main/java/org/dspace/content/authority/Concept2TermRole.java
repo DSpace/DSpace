@@ -213,8 +213,7 @@ public class Concept2TermRole
      * @throws org.dspace.authorize.AuthorizeException
      */
     public static Concept2TermRole findByRole(Context context,
-                                              String role, String label) throws SQLException,
-            AuthorizeException
+                                              String role, String label) throws SQLException
     {
         // Grab rows from DB
         TableRowIterator tri;
@@ -395,8 +394,7 @@ public class Concept2TermRole
      * @throws org.dspace.authorize.AuthorizeException
      */
     private static boolean hasElement(Context context,
-                                      String role, String label) throws SQLException,
-            AuthorizeException
+                                      String role, String label) throws SQLException
     {
         return Concept2TermRole.findByRole(context, role,
                 label) != null;
@@ -438,8 +436,7 @@ public class Concept2TermRole
      * @throws java.io.IOException
      */
     private boolean unique(Context context, String role,
-                           String label) throws IOException, SQLException,
-            AuthorizeException
+                           String label) throws IOException, SQLException
     {
         int count = 0;
         Connection con = null;
