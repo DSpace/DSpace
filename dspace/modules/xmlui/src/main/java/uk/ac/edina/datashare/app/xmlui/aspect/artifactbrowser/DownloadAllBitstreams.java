@@ -36,7 +36,6 @@ import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
 import uk.ac.edina.datashare.irusuk.IRUSUKLog;
-import uk.ac.edina.datashare.utils.DSpaceUtils;
 
 public class DownloadAllBitstreams extends AbstractReader implements Recyclable
 { 

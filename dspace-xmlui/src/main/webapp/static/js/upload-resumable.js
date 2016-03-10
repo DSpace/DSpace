@@ -13,6 +13,9 @@ var url = '/handle/' + params[4] + '/' + params[5] + '/upload';
 // get submission id
 var sId = $('input[name="submit-id"]').val();
 
+// number of bytes left in item for uploads
+var itemSpace = parseInt($('input[name=item-space]').val());
+
 var doResumable = false;
 var r;
 
@@ -30,6 +33,7 @@ if(sId > 0){
 
         maxChunkRetries: 5,
         //maxChunkRetries: 3,
+
         chunkRetryInterval: 5000,
         method: "multipart",
         query:{"submissionId": sId}
@@ -99,41 +103,50 @@ if(doResumable){
     // Handle file add event
     r.on('fileAdded', function(file){
         currentFile = file;
+        hideError('no-space');
 
-        // Show pause, hide resume
-        $('#progress-resume-link').hide();
-        $('#progress-pause-link').show();
+        // check enough space left in item for upload
+        if(r.getSize() > itemSpace){
+            console.debug("Total upload size is " + r.getSize());
+            console.debug("Space left on item is " + itemSpace);
+            showError('no-space');
+            r.cancel();
+        }
+        else{
+            // Show pause, hide resume
+            $('#progress-resume-link').hide();
+            $('#progress-pause-link').show();
 
-        // build HTML for dynamic table row
-        var tableRow =
-            '<tr class="ds-table-row">\
-               <td class="ds-table-cell">\
-                 <div class="radio"><label><input id="primary-' +  file.uniqueIdentifier + '" type="radio" name="primary_bitstream_id" disabled="disabled"></label></div>\
-               </td>\
-               <td class="ds-table-cell">\
-                 <div class="checkbox"><label><input id="select-' +  file.uniqueIdentifier + '" type="checkbox" name="select" disabled="disabled"></label></div>\
-               </td>\
-               <td class="ds-table-cell">\
-                 <div id="file-name-' + file.uniqueIdentifier + '">' + file.fileName + '</div></td>\
-               <td class="ds-table-cell">\
-                 <input id="file-description-' + file.uniqueIdentifier + '" class="ds-text-field form-control" type="text" value="" name="description" disabled="disabled"></input>\
-               </td>\
-               <td id="file-status-' +  file.uniqueIdentifier + '" class="file-uploading ds-table-cell"><div></div></td>\
-               <td id="file-info-'   +  file.uniqueIdentifier + '" class="ds-table-cell"></td>\
-               <td id="file-delete-' +  file.uniqueIdentifier + '" class="ds-table-cell"></td>\
-             </tr>';
+            // build HTML for dynamic table row
+            var tableRow =
+                '<tr class="ds-table-row">\
+                   <td class="ds-table-cell">\
+                     <div class="radio"><label><input id="primary-' +  file.uniqueIdentifier + '" type="radio" name="primary_bitstream_id" disabled="disabled"></label></div>\
+                   </td>\
+                   <td class="ds-table-cell">\
+                   <div class="checkbox"><label><input id="select-' +  file.uniqueIdentifier + '" type="checkbox" name="select" disabled="disabled"></label></div>\
+                   </td>\
+                   <td class="ds-table-cell">\
+                   <div id="file-name-' + file.uniqueIdentifier + '">' + file.fileName + '</div></td>\
+                   <td class="ds-table-cell">\
+                   <input id="file-description-' + file.uniqueIdentifier + '" class="ds-text-field form-control" type="text" value="" name="description" disabled="disabled"></input>\
+</td>\
+                   <td id="file-status-' +  file.uniqueIdentifier + '" class="file-uploading ds-table-cell"><div></div></td>\
+                   <td id="file-info-'   +  file.uniqueIdentifier + '" class="ds-table-cell"></td>\
+                   <td id="file-delete-' +  file.uniqueIdentifier + '" class="ds-table-cell"></td>\
+                 </tr>';
 
-        // add the file to the list
-        $('#aspect_submission_StepTransformer_table_resumable-upload-summary tbody').append(tableRow);
+            // add the file to the list
+            $('#aspect_submission_StepTransformer_table_resumable-upload-summary tbody').append(tableRow);
 
-        // start the upload
-        r.upload();
+            // start the upload
+            r.upload();
+        }
     });
 
     r.on('fileProgress', function(file){
         // Handle progress for both the file and the overall upload
         $('#file-status-' + file.uniqueIdentifier + ' div').html(Math.floor(file.progress()*100) + '%');
-        //$('.progress-bar').css({width:Math.floor(r.progress()*100) + '%'});
         $('#aspect_submission_StepTransformer_div_progress-bar').css({width:Math.floor(r.progress()*100) + '%'});
     });
 
@@ -146,12 +159,10 @@ if(doResumable){
     });
 
     r.on('complete', function(){
-        console.log("onComplete");
         var filesWithError = false;
 
         // check if there are any errors
         for(var i = 0; i < r.files.length; i++){
-            console.log(r.files[i].retryDueToError);
             if(r.files[i].retryDueToError){
                 filesWithError = true;
                 break;
@@ -171,8 +182,6 @@ if(doResumable){
     });
 
     r.on('cancel', function(){
-        console.log("onCancel");
-
         $('#progress-resume-link, #progress-pause-link').hide();
         $('#aspect_submission_StepTransformer_div_progress-bar').css('width', '0%');
     });
@@ -218,28 +227,30 @@ if(doResumable){
                         $('#file-delete-'      + file.uniqueIdentifier).attr('class', 'file-delete');
 
                         // give the successful upload a new id
-                        $('#file-delete-' + file.uniqueIdentifier).parent().attr('id', 'aspect_submission_StepTransformer_row_bitstream-' + bId);
+                        $('#file-delete-' + file.uniqueIdentifier).parent().attr(
+                            'id', 'aspect_submission_StepTransformer_row_bitstream-' + bId);
 
-                        var extra = '<input name="file-extra-bytes" type="hidden" value="' + bytes + '"></input>\
+                        var extra = '<input name="file-extra-bytes-' + bId + '" type="hidden" value="' + bytes + '"></input>\
                                      <input name="file-extra-format" type="hidden" value="' + format + '"></input>\
                                      <input name="file-extra-algorithm" type="hidden" value="' + checksum[0] + '"></input>\
                                      <input name="file-extra-checksum" type="hidden" value="' + checksum[1] + '"></input>';
                         $('#file-info-' + file.uniqueIdentifier).append(extra);
 
+                        itemSpace -= bytes;
                     }
                     else{
                         ++attempts;
                         if(attempts > (TIMEOUT / INTERVAL)){
                             console.warn("Creation of file timed out after " + TIMEOUT / 1000 + " seconds");
                             clearInterval(intId);
-                            $('.alert').removeClass('hide');
+                            showError('upload-failed');
                         }
                     }
                 },
                 error: function(jqXHR, status, error){
                     console.error(error);
                     clearInterval(intId);
-                    $('.alert').removeClass('hide');
+                    showError('upload-failed');
                 }
             });
 
@@ -247,9 +258,7 @@ if(doResumable){
     });
 
     r.on('fileError', function(file, message){
-        console.log("onError");
-
-        // flag file to be retied
+        // flag file to be retried
         file.retryDueToError = true;
         $('#file-delete-' + file.uniqueIdentifier).attr('class', 'file-delete');
 
@@ -260,12 +269,11 @@ if(doResumable){
                 // files uploading hence bootstrap
                 r.files[i].bootstrap();
 
-                console.log(r.files[i]);
                 $('#file-delete-' + r.files[i].uniqueIdentifier).attr('class', 'file-delete');
             }
         }
 
-        $('.alert').removeClass('hide');
+        showError('upload-failed');
     });
 
     $(document).on('click', '.file-delete', function(e){
@@ -344,11 +352,13 @@ if(doResumable){
                 },
                 "Delete": function(ev) {
                     if(toBeDeleted.length > 0){
-                        $.each(toBeDeleted, function(i, bid){
-                            var promise = deleteFile("bitstreamId=" + bid);
+                        $.each(toBeDeleted, function(i, bId){
+                            var promise = deleteFile("bitstreamId=" + bId);
                             promise.done(function(){
+                                var bytes = $("input[name='file-extra-bytes-" + bId + "']").val();
+                                itemSpace += parseInt(bytes);
 
-                                var row = $('#aspect_submission_StepTransformer_row_bitstream-' + bid);
+                                var row = $('#aspect_submission_StepTransformer_row_bitstream-' + bId);
                                 var next = row.next();
                                 if(next.find('td').length === 1){
                                     // next element is an info row remove it too
@@ -409,7 +419,7 @@ if(doResumable){
                 $('#' + newRowId).show();
             }
             else{
-                var bytes = $(cell).find("[name=\'file-extra-bytes']").val();
+                var bytes = $(cell).find("[name^='file-extra-bytes']").val();
                 var format = $(cell).find("[name='file-extra-format']").val();
                 var checksum = $(cell).find("[name='file-extra-algorithm']").val() +
                     ":" + $(cell).find("[name='file-extra-checksum']").val();
@@ -429,8 +439,6 @@ if(doResumable){
         $('#progress-resume-link').hide();
         $('#progress-pause-link').show();
 
-        console.log("onResume");
-
         $('#file-delete-' + currentFile.uniqueIdentifier).removeAttr('class');
 
         for(var i = 0; i < r.files.length; i++){
@@ -443,7 +451,7 @@ if(doResumable){
         }
 
         // remove any error message
-        $('.alert').addClass('hide');
+        hideError('upload-failed');
 
         r.upload();
     });
@@ -464,6 +472,14 @@ if(doResumable){
         $('#aspect_submission_StepTransformer_div_submit-upload').toggle();
     });
 
+
+    var showError = function(name){
+        $('#aspect_submission_StepTransformer_p_' + name).removeClass('hide');
+    };
+
+    var hideError = function(name){
+        $('#aspect_submission_StepTransformer_p_' + name).addClass('hide');
+    };
 }
 else{
     // resumable not supported hide resumable form

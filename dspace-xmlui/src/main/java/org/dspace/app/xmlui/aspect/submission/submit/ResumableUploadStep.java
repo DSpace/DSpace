@@ -58,7 +58,9 @@ public class ResumableUploadStep extends UploadStep{
             message("xmlui.Submission.submit.ResumableUploadStep.dialog.deleteunmatch");
 
     private static final Message T_upload_error =
-            message("xmlui.Submission.submit.ResumableUploadStep.error");
+            message("xmlui.Submission.submit.ResumableUploadStep.uploaderror");
+    private static final Message T_no_space =
+            message("xmlui.Submission.submit.ResumableUploadStep.nospace");
 
     /*
      * (non-Javadoc)
@@ -152,22 +154,29 @@ public class ResumableUploadStep extends UploadStep{
 
                 // info
                 Cell info = row.addCell("info-" + id, Cell.ROLE_DATA, "file-info");
-                info.addHidden("file-extra-bytes").setValue(String.valueOf(bitstream.getSize()));
-                info.addHidden("file-extra-format").setValue(bitstream.getFormatDescription());
-                info.addHidden("file-extra-algorithm").setValue(bitstream.getChecksumAlgorithm());
-                info.addHidden("file-extra-checksum").setValue(bitstream.getChecksum());
+                info.addHidden("file-extra-bytes-" + id).setValue(String.valueOf(bitstream.getSize()));
+                info.addHidden("file-extra-format-" + id).setValue(bitstream.getFormatDescription());
+                info.addHidden("file-extra-algorithm-" + id).setValue(bitstream.getChecksumAlgorithm());
+                info.addHidden("file-extra-checksum-" + id).setValue(bitstream.getChecksum());
 
                 // delete
                 row.addCell("delete-" + id, Cell.ROLE_DATA, "file-delete");
             }
 
-            // some messages that the client needs
+            // some messages and that the client needs
             Division messages = div.addDivision("text-messages", "hide");
             messages.addHidden("text-delete-msg").setValue(T_delete_message);
             messages.addHidden("text-delete-sf").setValue(T_deletesf_message);
             messages.addHidden("text-delete-unmatch").setValue(T_deleteunmatch_message);
 
-            uploadDiv.addPara("error-message", "alert alert-danger hide").addContent(T_upload_error);
+            // some item related data
+            Division data = div.addDivision("item-data", "hide");
+            long max = ConfigurationManager.getLongProperty("upload.item.max", 536870912);
+            data.addHidden("item-space").setValue(Long.toString(Math.max(max - item.getSize(), 0)));
+            
+            // error messages
+            uploadDiv.addPara("upload-error", "alert alert-danger hide").addContent(T_upload_error);
+            uploadDiv.addPara("no-space", "alert alert-danger hide").addContent(T_no_space.parameterize(max));
 
             // add standard control/paging buttons
             addControlButtons(upload);
