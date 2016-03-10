@@ -808,7 +808,7 @@
 	<message key="xmlui.Submission.Submissions.status_unknown">Neznámý stav</message>
 	<!-- Same transformer, completed submissions section -->
 	<message key="xmlui.Submission.Submissions.completed.head">Archivované příspěvky</message>
-	<message key="xmlui.Submission.Submissions.completed.info">Toto jsou vaše příspěvky, které byli zpracované a přijaté do DSpace.</message>
+	<message key="xmlui.Submission.Submissions.completed.info">Toto jsou vaše příspěvky, které byly zpracované a přijaté do DSpace.</message>
 	<message key="xmlui.Submission.Submissions.completed.column1">Datum přijetí</message>
 	<message key="xmlui.Submission.Submissions.completed.column2">Název</message>
 	<message key="xmlui.Submission.Submissions.completed.column3">Kolekce</message>
