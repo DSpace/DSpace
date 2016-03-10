@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
@@ -20,10 +19,13 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.crosswalk.ParameterizedDisseminationCrosswalk;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provide XML based metadata crosswalk for EZID Identifier provider module.
@@ -34,7 +36,7 @@ import org.jdom.output.XMLOutputter;
 public class DataCiteXMLCreator
 {
     /** log4j category */
-    private static final Logger log = Logger.getLogger(DataCiteXMLCreator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataCiteXMLCreator.class);
 
     /**
      * Name of crosswalk to convert metadata into DataCite Metadata Scheme.
@@ -52,7 +54,7 @@ public class DataCiteXMLCreator
     {
         if (dso == null)
         {
-            log.info("Invalid object: " + dso);
+            LOG.info("Invalid object: {}", dso);
             return null;
         }
 
@@ -60,7 +62,7 @@ public class DataCiteXMLCreator
 
         if (!this.xwalk.canDisseminate(dso))
         {
-            log.error("Crosswalk " + this.CROSSWALK_NAME
+            LOG.error("Crosswalk " + this.CROSSWALK_NAME
                     + " cannot disseminate DSO with type " + dso.getType()
                     + " and ID " + dso.getID() + ".");
             return null;
@@ -87,8 +89,7 @@ public class DataCiteXMLCreator
         }
         catch (CrosswalkException | IOException | SQLException | AuthorizeException e)
         {
-            log.error(
-                    "Exception while crosswolking DSO " + "with type "
+            LOG.error("Exception while crosswalking DSO with type "
                             + dso.getType() + " and ID " + dso.getID() + ".", e);
             return null;
         }
@@ -126,4 +127,21 @@ public class DataCiteXMLCreator
         }
     }
 
+    /**
+     * Test the operation of this class.
+     *
+     * @param argv <br>[0]: handle of an object for which to prepare XML metadata.
+     * @throws Exception
+     */
+    public static void main(String[] argv)
+        throws Exception
+    {
+        String handle = argv[0];
+        DataCiteXMLCreator instance = new DataCiteXMLCreator();
+        Context context = new Context();
+        DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
+                .resolveToObject(context, handle);
+
+        System.out.println(instance.getXMLString(context, dso));
+    }
 }
