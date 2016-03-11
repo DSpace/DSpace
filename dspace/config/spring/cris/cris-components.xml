@@ -254,6 +254,7 @@
 		<property name="relationConfiguration" ref="relationOUVSITEMViaRPConfiguration" />		
 		<property name="commonFilter"><util:constant static-field="org.dspace.app.webui.cris.util.RelationPreferenceUtil.HIDDEN_FILTER" /></property>
 		<property name="target" value="org.dspace.app.cris.model.OrganizationUnit" />
+		<property name="facets" ref="facetsItemConfiguration" />
 		<property name="types">
 			<map>
 				<entry key="nestedrp" value-ref="nestedrpPublicationForOUComponent" />				
@@ -276,6 +277,7 @@
 		class="org.dspace.app.webui.cris.components.CRISRPConfigurerComponent">
 		<property name="relationConfiguration" ref="relationOUVSRPConfiguration" />		
 		<property name="target" value="org.dspace.app.cris.model.OrganizationUnit" />
+		<property name="facets" ref="facetsRPConfiguration" />
 		<property name="types">
 			<map>
 				<entry key="persons" value-ref="personsForOUComponent" />								
