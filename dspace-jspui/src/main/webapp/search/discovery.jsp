@@ -486,7 +486,7 @@ else if( qResults != null)
            <input class="sr-only" id="rppUpdate" type="submit" name="submit_search" value="<fmt:message key="search.update" />" />
 
 <%
-    if (admin_button)
+    if (admin_button && mapOthers.isEmpty())
     {
         %><input type="submit" class="btn btn-default" name="submit_export_metadata" value="<fmt:message key="jsp.general.metadataexport.button"/>" /><%
     }

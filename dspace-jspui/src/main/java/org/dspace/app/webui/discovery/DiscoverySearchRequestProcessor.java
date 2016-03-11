@@ -50,7 +50,6 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
-import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
@@ -374,7 +373,12 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor {
 			}
 
 			if ("submit_export_metadata".equals(UIUtil.getSubmitButton(request, "submit"))) {
-				exportMetadata(context, response, resultsItems);
+			    if(!resultsMapOthers.isEmpty()) {
+			         //TODO
+			    }
+			    else {
+			        exportMetadata(context, response, resultsItems);
+			    }
 			}
 		} catch (SearchServiceException e) {
 			log.error(
