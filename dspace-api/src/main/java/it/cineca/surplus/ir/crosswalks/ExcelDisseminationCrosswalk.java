@@ -100,7 +100,7 @@ public class ExcelDisseminationCrosswalk extends SelfNamedPlugin
         cellCol.setCellStyle(headerStyle);
         cellCol.setCellValue(new HSSFRichTextString(EXCEL_TYPE_LABEL));
 
-        int i = 0;
+        int i = 2;
         for (String heading : csv.getHeadings())
         {
             cell = xlsRow.createCell(i);
@@ -119,16 +119,19 @@ public class ExcelDisseminationCrosswalk extends SelfNamedPlugin
             cell = xlsRow.createCell(1, HSSFCell.CELL_TYPE_STRING);
             writeCell(line.get("collection"), cell);
 
+            i = 2;
             for (String heading : csv.getHeadings())
             {
-                List<String> values = line.get(heading);
-                i = 0;
-                cell = xlsRow.createCell(i, HSSFCell.CELL_TYPE_STRING);
-                String value = valueToCell(values,
-                        getValueSeparator());
-                writeCell(value, cell);
-                exportCounter++;
+                List<String> values = line.get(heading);           
+                if (values != null && !"collection".equals(heading)) {
+                    cell = xlsRow.createCell(i, HSSFCell.CELL_TYPE_STRING);
+                    String value = valueToCell(values,
+                            getValueSeparator());
+                    writeCell(value, cell);                
+                }
+                i++;
             }
+            exportCounter++;
         }
 
         log.info("INFO: items exported: " + exportCounter);
@@ -266,7 +269,6 @@ public class ExcelDisseminationCrosswalk extends SelfNamedPlugin
             s = str.toString();
         }
 
-        // Replace internal quotes with two sets of quotes
-        return "\"" + s.replaceAll("\"", "\"\"") + "\"";
+        return s;
     }
 }
