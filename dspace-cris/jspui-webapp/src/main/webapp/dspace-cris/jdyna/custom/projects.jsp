@@ -65,6 +65,7 @@
 	    }
 	}
 	
+	boolean globalShowFacets = false;
 	if (info.getItems().length > 0) {
 %>
 <c:set var="info" value="<%= info %>" scope="request" />
@@ -94,6 +95,7 @@
     	    { 
     			if(!appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
     		    {
+    			    globalShowFacets = true;
     		        showFacet = true;
     		        break;
     		    }
@@ -240,7 +242,7 @@
           			${holder.title} <fmt:message
 				key="jsp.layout.dspace.detail.fieldset-legend.component.boxtitle.${info[holder.shortName].type}"/>
         		</a></h4>
-        		<% if(subLinks!=null && subLinks.size()>0) {%>
+        		<% if(subLinks!=null && subLinks.size()>0 && globalShowFacets) {%>
 					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseFacet" aria-expanded="false" aria-controls="collapseFacet" title="<fmt:message key="jsp.components.button.seealso.button" />">
   						<i class="fa fa-angle-double-up animated"></i>
 					</button>
