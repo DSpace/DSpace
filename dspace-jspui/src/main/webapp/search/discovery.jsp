@@ -32,7 +32,23 @@
   -
   -   admin_button     - If the user is an admin
   --%>
-  
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@page import="org.dspace.app.cris.model.ACrisObject" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core"
+    prefix="c" %>
+<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+
+<%@ page import="java.net.URLEncoder"            %>
+<%@ page import="org.dspace.content.Community"   %>
+<%@ page import="org.dspace.content.Collection"  %>
+<%@ page import="org.dspace.content.Item"        %>
+<%@ page import="org.dspace.search.QueryResults" %>
+<%@ page import="org.dspace.sort.SortOption" %>
+<%@ page import="java.util.Enumeration" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@page import="org.dspace.browse.BrowseInfo"%>
 <%@page import="org.dspace.browse.BrowseDSpaceObject"%>
 <%@page import="org.dspace.core.Utils"%>
@@ -52,23 +68,6 @@
 <%@page import="org.dspace.discovery.DiscoverResult"%>
 <%@page import="org.dspace.content.DSpaceObject"%>
 <%@page import="java.util.List"%>
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@page import="org.dspace.app.cris.model.ACrisObject" %>
-
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
-    prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core"
-    prefix="c" %>
-
-<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
-<%@ page import="java.net.URLEncoder"            %>
-<%@ page import="org.dspace.content.Community"   %>
-<%@ page import="org.dspace.content.Collection"  %>
-<%@ page import="org.dspace.content.Item"        %>
-<%@ page import="org.dspace.search.QueryResults" %>
-<%@ page import="org.dspace.sort.SortOption" %>
-<%@ page import="java.util.Enumeration" %>
-<%@ page import="java.util.Set" %>
 <%
     // Get the attributes
     DSpaceObject scope = (DSpaceObject) request.getAttribute("scope" );
@@ -122,12 +121,35 @@
     // Admin user or not
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+    
+	boolean exportBiblioEnabled =  ConfigurationManager.getBooleanProperty("exportcitation.list.enabled", false);
+	String cfg = ConfigurationManager.getProperty("exportcitation.options");
 %>
 
 <c:set var="dspace.layout.head.last" scope="request">
-<script type="text/javascript">
+<script type="text/javascript"><!--
 	var jQ = jQuery.noConflict();
 	jQ(document).ready(function() {
+		
+		var checkboxes = jQ("input[type='checkbox']"), submitButt = jQ("#export-submit-button"), radio = jQ("input[type='radio']");
+
+		radio.click(function() {
+			if('refworks'==jQ(this).prop('id')) {
+				jQ('#email').attr("checked", false);
+				jQ('#email').attr("disabled", true);
+			} else {
+				jQ('#email').attr("disabled", false);
+			}
+		});
+		
+		checkboxes.click(function() {
+			if('email'==jQ(this).prop('id')) {
+				//NOTHING TO DO	
+			}
+			else {
+				submitButt.attr("disabled", !checkboxes.is(":checked"));	
+			}		
+		});
 		jQ( "#spellCheckQuery").click(function(){
 			jQ("#query").val(jQ(this).attr('data-spell'));
 			jQ("#main-query-submit").click();
@@ -187,6 +209,12 @@
 	function validateFilters() {
 		return document.getElementById("filterquery").value.length > 0;
 	}
+	function changeAll(var1,var2) {
+		var inputbutton = jQ(var2).prop('id');
+		var inputstatus = jQ('#'+inputbutton).prop( "checked");
+		jQ("input[name*='"+var1+"']").prop('checked', inputstatus);
+	}
+	-->		
 </script>		
 </c:set>
 
@@ -559,7 +587,40 @@ else if( qResults != null)
 <% if (items.length > 0) { %>
     <div class="panel panel-info">
     <div class="panel-heading"><h6><fmt:message key="jsp.search.results.itemhits"/></h6></div>
-    <dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" />
+    
+    <%  
+	if (exportBiblioEnabled && admin_button) {
+%>
+
+		<form target="blank" class="form-inline"  id="exportform" action="<%= request.getContextPath() %>/references">
+
+		<div id="export-biblio-panel">
+	<%		
+		if (cfg == null)
+		{
+			cfg = "refman, endnote, bibtex, refworks";
+		}
+		String[] cfgSplit = cfg.split("\\s*,\\s*");
+		for (String format : cfgSplit) {
+	%>
+		<c:set var="format"><%= format %></c:set>	    
+		<label class="radio-inline">
+    		  <input id="${format}" type="radio" name="format" value="${format}" <c:if test="${format=='bibtex'}"> checked="checked"</c:if>/><fmt:message key="exportcitation.option.${format}" />
+	    </label>
+
+		
+	<% } %>
+		<label class="checkbox-inline">
+			<input type="checkbox" id="email" name="email" value="true"/><fmt:message key="exportcitation.option.email" />
+		</label>
+			<input id="export-submit-button" class="btn btn-default" type="submit" name="submit_export" value="<fmt:message key="exportcitation.option.submitexport" />" disabled/>
+		</div>	
+		<dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" radioButton="false" inputName="item_id"/>
+		</form>
+<% } else { %>
+	<dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" />
+<% } %>
+   
     </div>
 <% } %>
 </div>
