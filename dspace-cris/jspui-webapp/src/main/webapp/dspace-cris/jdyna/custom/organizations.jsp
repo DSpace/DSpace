@@ -69,6 +69,7 @@
 	    }
 	}
 	
+	boolean globalShowFacets = false;
 	if (info.getItems().length > 0) {
 %>
 	
@@ -79,7 +80,7 @@
     boolean brefine = false;
     List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig"+info.getRelationName());
     Map<String, Boolean> showFacets = new HashMap<String, Boolean>();
-    	
+    
     for (DiscoverySearchFilterFacet facetConf : facetsConf)
     {
     	if(qResults!=null) {
@@ -100,6 +101,7 @@
     			if(!appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
     		    {
     		        showFacet = true;
+    		        globalShowFacets = true;
     		        break;
     		    }
     	    }
@@ -251,7 +253,7 @@
           			${holder.title} <fmt:message
 				key="jsp.layout.dspace.detail.fieldset-legend.component.boxtitle.${info[holder.shortName].type}"/>
         		</a></h4>
-        		<% if(subLinks!=null && subLinks.size()>0) {%>
+        		<% if(subLinks!=null && subLinks.size()>0 && globalShowFacets) {%>
 					<button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseFacet" aria-expanded="false" aria-controls="collapseFacet" title="<fmt:message key="jsp.components.button.seealso.button" />">
   						<i class="fa fa-angle-double-up animated"></i>
 					</button>
