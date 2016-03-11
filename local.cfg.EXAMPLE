@@ -63,16 +63,6 @@ dspace.name = DSpace at My University
 # But, you may need to modify this if you are running DSpace on a custom port, etc.
 solr.server = http://localhost:8080/solr
 
-# Sets the schemes for the API URLs (http, https).
-rest.schemes=https
-
-# Sets the host (including a port) for the API URLs. Does not include the schemes nor context root.
-rest.host=localhost:8080
-
-# Sets the context root for the API calls.
-rest.setBasePath=/rest/api
-
-
 ##########################
 # DATABASE CONFIGURATION #
 ##########################
