@@ -143,13 +143,6 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="user">
-    <xs:sequence>
-      <xs:element name="email" type="xs:string" minOccurs="0"/>
-      <xs:element name="password" type="xs:string" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-
   <xs:simpleType name="action">
     <xs:restriction base="xs:string">
       <xs:enumeration value="READ"/>
