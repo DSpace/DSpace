@@ -209,7 +209,7 @@ public class ExportFormController extends BaseFormController
         response.setContentType("application/excel");
         response.addHeader("Content-Disposition",
                 "attachment; filename=dspace-cris-exportdata.xls");
-        ImportExportUtils.exportCSV(list, applicationService,
+        ImportExportUtils.exportExcel(list, applicationService,
                 response.getOutputStream(), metadataFirstLevel,
                 metadataNestedLevel);
         response.getOutputStream().flush();
