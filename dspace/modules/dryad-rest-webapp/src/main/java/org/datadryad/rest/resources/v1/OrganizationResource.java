@@ -73,7 +73,7 @@ public class OrganizationResource {
         StoragePath path = StoragePath.createOrganizationPath(organizationCode);
         try {
             DryadJournalConcept journalConcept = organizationStorage.findByPath(path);
-            if(journalConcept == null) {
+            if (journalConcept == null) {
                 ErrorsResponse error = ResponseFactory.makeError("Organization with code " + organizationCode + " does not exist", "Organization not found", uriInfo, Status.NOT_FOUND.getStatusCode());
                 return Response.status(Status.NOT_FOUND).entity(error).build();
             } else {
@@ -85,47 +85,79 @@ public class OrganizationResource {
         }
     }
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createOrganization(DryadJournalConcept journalConcept) {
+    private DryadJournalConcept createOrganization(DryadJournalConcept journalConcept) {
+        DryadJournalConcept storedJournalConcept = null;
+
         // Check required fields
-        if(journalConcept.isValid()) {
+        if (journalConcept.isValid()) {
             try {
                 organizationStorage.create(new StoragePath(), journalConcept);
             } catch (StorageException ex) {
                 ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to create organization", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
-                return error.toResponse().build();
             }
-            DryadJournalConcept storedJournalConcept = JournalUtils.getJournalConceptByJournalName(journalConcept.getFullName());
+            storedJournalConcept = JournalUtils.getJournalConceptByJournalName(journalConcept.getFullName());
+        }
+        return storedJournalConcept;
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createOrganization(DryadJournalConcept[] journalConcepts) {
+        Response response = null;
+        ArrayList<DryadJournalConcept> concepts = new ArrayList<DryadJournalConcept>();
+        DryadJournalConcept storedJournalConcept = null;
+        for (int i=0; i<journalConcepts.length; i++) {
+            storedJournalConcept = createOrganization(journalConcepts[i]);
+            if (storedJournalConcept != null) {
+                concepts.add(storedJournalConcept);
+            }
+        }
+        if (concepts.size() > 0) {
             UriBuilder ub = uriInfo.getAbsolutePathBuilder();
             URI uri = ub.path(storedJournalConcept.getJournalID()).build();
-            return Response.created(uri).entity(storedJournalConcept).build();
+            return Response.created(uri).entity(concepts).build();
         } else {
             ErrorsResponse error = ResponseFactory.makeError("Please check the structure of your object", "Invalid organization object", uriInfo, Status.BAD_REQUEST.getStatusCode());
             return error.toResponse().build();
         }
     }
 
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateOrganization(DryadJournalConcept journalConcept) {
+    private DryadJournalConcept updateOrganization(DryadJournalConcept journalConcept) {
         StoragePath path = StoragePath.createOrganizationPath(journalConcept.getJournalID());
+        DryadJournalConcept storedJournalConcept = null;
         // Check required fields
-        if(journalConcept.isValid()) {
+        if (journalConcept.isValid()) {
             try {
                 organizationStorage.update(path, journalConcept);
             } catch (StorageException ex) {
                 ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to update organization", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
-                return error.toResponse().build();
+                return null;
             }
-            DryadJournalConcept storedJournalConcept = JournalUtils.getJournalConceptByJournalName(journalConcept.getFullName());
+            storedJournalConcept = JournalUtils.getJournalConceptByJournalName(journalConcept.getFullName());
+        }
+        return storedJournalConcept;
+    }
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateOrganization(DryadJournalConcept[] journalConcepts) {
+        Response response = null;
+        ArrayList<DryadJournalConcept> concepts = new ArrayList<DryadJournalConcept>();
+        DryadJournalConcept storedJournalConcept = null;
+        for (int i=0; i<journalConcepts.length; i++) {
+            storedJournalConcept = updateOrganization(journalConcepts[i]);
+            if (storedJournalConcept != null) {
+                concepts.add(storedJournalConcept);
+            }
+        }
+        if (concepts.size() > 0) {
             UriBuilder ub = uriInfo.getAbsolutePathBuilder();
             URI uri = ub.path(storedJournalConcept.getJournalID()).build();
-            return Response.created(uri).entity(storedJournalConcept).build();
+            return Response.created(uri).entity(concepts).build();
         } else {
-            ErrorsResponse error = ResponseFactory.makeError("Please check the structure of your object",  "Invalid organization object", uriInfo, Status.BAD_REQUEST.getStatusCode());
+            ErrorsResponse error = ResponseFactory.makeError("Please check the structure of your object", "Invalid organization object", uriInfo, Status.BAD_REQUEST.getStatusCode());
             return error.toResponse().build();
         }
     }
