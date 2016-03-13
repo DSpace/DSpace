@@ -167,7 +167,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
 
             notFound.addPara().addXref(contextPath + "/",T_go_home);
 
-            throw new ResourceNotFoundException("Page cannot be found");
+            throw new ResourceNotFoundException("Page not found: " + sitemapURI);
 
 
         }

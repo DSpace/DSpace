@@ -117,6 +117,10 @@
                     <groupId>net.sf.ehcache</groupId>
                     <artifactId>ehcache</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.cocoon</groupId>
+                    <artifactId>cocoon-sitemap-impl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -145,6 +149,10 @@
                     <groupId>org.apache.cocoon</groupId>
                     <artifactId>cocoon-servlet-service-impl</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.cocoon</groupId>
+                    <artifactId>cocoon-sitemap-impl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -152,6 +160,12 @@
             <groupId>org.dspace.dependencies.cocoon</groupId>
             <artifactId>dspace-cocoon-servlet-service-impl</artifactId>
             <version>1.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace.dependencies.cocoon</groupId>
+            <artifactId>dspace-cocoon-sitemap-impl</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
