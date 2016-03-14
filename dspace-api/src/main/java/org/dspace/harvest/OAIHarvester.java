@@ -36,6 +36,7 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -292,6 +293,7 @@ public class OAIHarvester {
 			harvestedCollection.update(ourContext, harvestRow);
 
 			// expiration timer starts
+			configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 			int expirationInterval = configurationService.getIntProperty("oai.harvester.threadTimeout");
 	    	if (expirationInterval == 0)
             {
