@@ -7,6 +7,7 @@
  */
 package org.dspace.rest;
 
+import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -35,6 +36,7 @@ import java.sql.SQLException;
  * To change this template use File | Settings | File Templates.
  */
 @Path("/handle")
+@Api(value = "Handle endpoint", tags = "handle")
 public class HandleResource extends Resource {
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();

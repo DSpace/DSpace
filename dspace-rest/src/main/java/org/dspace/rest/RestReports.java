@@ -21,6 +21,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.dspace.rest.common.Report;
 import org.dspace.services.ConfigurationService;
@@ -35,6 +36,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * 
  */
 @Path("/reports")
+@Api(value = "Reports endpoint", tags = "reports")
 public class RestReports {
     private static Logger log = Logger.getLogger(RestReports.class);
 

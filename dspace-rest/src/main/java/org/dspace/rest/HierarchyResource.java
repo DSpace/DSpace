@@ -8,6 +8,7 @@
 package org.dspace.rest;
 
 
+import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -42,6 +43,7 @@ import java.util.List;
  */
 @Path("/hierarchy")
 @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+@Api(value = "Hierarchy endpoint", tags = "hierarchy")
 public class HierarchyResource extends Resource {
     private static Logger log = Logger.getLogger(HierarchyResource.class);
     protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();

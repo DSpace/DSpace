@@ -8,6 +8,7 @@
 package org.dspace.rest;
 
 
+import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -36,6 +37,7 @@ import java.util.List;
  * @author Terry Brady, Georgetown University
  */
 @Path("/filtered-collections")
+@Api(value = "Filtered collection endpoint", tags = {"collections", "filters"})
 public class FilteredCollectionsResource extends Resource {
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();

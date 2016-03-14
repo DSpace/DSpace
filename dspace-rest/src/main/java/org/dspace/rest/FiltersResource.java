@@ -18,6 +18,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
+import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.dspace.rest.common.ItemFilter;
 
@@ -28,7 +29,8 @@ import org.dspace.rest.common.ItemFilter;
   * 
  */
 @Path("/filters")
-public class FiltersResource 
+@Api(value = "Filters endpoint", tags = "filters")
+public class FiltersResource
 {
     private static Logger log = Logger.getLogger(FiltersResource.class);
 

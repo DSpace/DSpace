@@ -29,6 +29,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -63,7 +64,8 @@ import org.dspace.rest.common.MetadataField;
  * PUT    /registries/schema/{schema_id}
  */
 @Path("/registries")
-public class MetadataRegistryResource extends Resource 
+@Api(value = "Metadata Registry endpoint", tags = "metadata registry")
+public class MetadataRegistryResource extends Resource
 {
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();

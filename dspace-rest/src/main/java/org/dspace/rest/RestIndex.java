@@ -22,6 +22,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -38,6 +39,7 @@ import org.dspace.rest.exceptions.ContextException;
  * 
  */
 @Path("/")
+@Api(value = "General", tags = "general")
 public class RestIndex {
     protected EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static Logger log = Logger.getLogger(RestIndex.class);
