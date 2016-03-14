@@ -69,7 +69,6 @@ import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -78,6 +77,8 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import org.dspace.license.factory.LicenseServiceFactory;
 import org.dspace.license.service.CreativeCommonsService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.Format;
@@ -128,6 +129,7 @@ public abstract class AbstractMETSDisseminator
     protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
     protected final CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
+    protected final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     // for gensym()
     protected int idCounter = 1;
@@ -1498,7 +1500,7 @@ public abstract class AbstractMETSDisseminator
                 }
                 if (handle != null)
                 {
-                    return ConfigurationManager
+                    return configurationService
                                     .getProperty("dspace.url")
                             + "/bitstream/"
                             + handle
@@ -1510,7 +1512,7 @@ public abstract class AbstractMETSDisseminator
                 else
                 {   //no Handle assigned, so persistent(-ish) URI for bitstream is
                     // Format: {site-base-url}/retrieve/{bitstream-internal-id}
-                    return ConfigurationManager
+                    return configurationService
                                     .getProperty("dspace.url")
                             + "/retrieve/"
                             + String.valueOf(bitstream.getID());

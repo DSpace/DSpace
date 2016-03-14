@@ -41,7 +41,6 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -49,6 +48,8 @@ import org.dspace.eperson.Group;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.search.Harvest;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 
@@ -74,21 +75,24 @@ public class FeedServlet extends DSpaceServlet
     private static final String clazz = "org.dspace.app.webui.servlet.FeedServlet";
 
     // are syndication feeds enabled?
-    private static boolean enabled = false;
+    private boolean enabled = false;
     // number of DSpace items per feed
-    private static int itemCount = 0;
+    private int itemCount = 0;
     // optional cache of feeds
     private static Map<String, CacheFeed> feedCache = null;
     // maximum size of cache - 0 means caching disabled
     private static int cacheSize = 0;
     // how many days to keep a feed in cache before checking currency
-    private static int cacheAge = 0;
+    private int cacheAge = 0;
     // supported syndication formats
-    private static List<String> formats = null;
+    private List<String> formats = null;
     // Whether to include private items or not
-    private static boolean includeAll = true;
+    private boolean includeAll = true;
     
     // services API
+    private final transient ConfigurationService configurationService
+             = DSpaceServicesFactory.getInstance().getConfigurationService();
+    
     private final transient HandleService handleService
              = HandleServiceFactory.getInstance().getHandleService();
 
@@ -98,30 +102,29 @@ public class FeedServlet extends DSpaceServlet
     private final transient CollectionService collectionService
              = ContentServiceFactory.getInstance().getCollectionService();
 
-    static
+    public FeedServlet()
     {
-    	enabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
+    	enabled = configurationService.getBooleanProperty("webui.feed.enable");
 
         // read rest of config info if enabled
         if (enabled)
         {
-            String fmtsStr = ConfigurationManager.getProperty("webui.feed.formats");
-            if ( fmtsStr != null )
+            String[] fmts = configurationService.getArrayProperty("webui.feed.formats");
+            if ( fmts != null )
             {
                 formats = new ArrayList<>();
-                String[] fmts = fmtsStr.split(",");
-                for (int i = 0; i < fmts.length; i++)
+                for (String format : fmts)
                 {
-                    formats.add(fmts[i]);
+                    formats.add(format);
                 }
             }
 
-            itemCount = ConfigurationManager.getIntProperty("webui.feed.items");
-            cacheSize = ConfigurationManager.getIntProperty("webui.feed.cache.size");
+            itemCount = configurationService.getIntProperty("webui.feed.items");
+            cacheSize = configurationService.getIntProperty("webui.feed.cache.size");
             if (cacheSize > 0)
             {
                 feedCache = new HashMap<>();
-                cacheAge = ConfigurationManager.getIntProperty("webui.feed.cache.age");
+                cacheAge = configurationService.getIntProperty("webui.feed.cache.age");
             }
         }
     }
@@ -131,7 +134,7 @@ public class FeedServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
 	{
-        includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", true);
+        includeAll = configurationService.getBooleanProperty("harvest.includerestricted.rss", true);
         String path = request.getPathInfo();
         String feedType = null;
         String handle = null;
@@ -291,7 +294,7 @@ public class FeedServlet extends DSpaceServlet
     	try
     	{
     		// new method of doing the browse:
-    		String idx = ConfigurationManager.getProperty("recent.submissions.sort-option");
+    		String idx = configurationService.getProperty("recent.submissions.sort-option");
     		if (idx == null)
     		{
     			throw new IOException("There is no configuration supplied for: recent.submissions.sort-option");

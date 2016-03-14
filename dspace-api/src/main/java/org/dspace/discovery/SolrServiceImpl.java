@@ -968,14 +968,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
 
             List<String> toProjectionFields = new ArrayList<String>();
-            String projectionFieldsString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.index.projection");
-            if(projectionFieldsString != null){
-                if(projectionFieldsString.indexOf(",") != -1){
-                    for (int i = 0; i < projectionFieldsString.split(",").length; i++) {
-                        toProjectionFields.add(projectionFieldsString.split(",")[i].trim());
-                    }
-                } else {
-                    toProjectionFields.add(projectionFieldsString);
+            String[] projectionFields = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("discovery.index.projection");
+            if(projectionFields != null){
+                for (String field : projectionFields) {
+                    toProjectionFields.add(field.trim());
                 }
             }
 

@@ -32,13 +32,15 @@
 <%@ page import="java.util.Locale"%>
 <%@ page import="javax.servlet.jsp.jstl.core.*" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
 <%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.browse.ItemCounter" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.services.ConfigurationService" %>
+<%@ page import="org.dspace.services.factory.DSpaceServicesFactory" %>
 
 <%
     List<Community> communities = (List<Community>) request.getAttribute("communities");
@@ -49,11 +51,16 @@
     String topNews = newsService.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-top.html"));
     String sideNews = newsService.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-side.html"));
 
-    boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
+    ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    
+    boolean feedEnabled = configurationService.getBooleanProperty("webui.feed.enable");
     String feedData = "NONE";
     if (feedEnabled)
     {
-        feedData = "ALL:" + ConfigurationManager.getProperty("webui.feed.formats");
+        // FeedData is expected to be a comma separated list
+        String[] formats = configurationService.getArrayProperty("webui.feed.formats");
+        String allFormats = StringUtils.join(formats, ",");
+        feedData = "ALL:" + allFormats;
     }
     
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
@@ -170,7 +177,7 @@ if (communities != null && communities.size() != 0)
                 <p><fmt:message key="jsp.home.com2"/></p>
 				<div class="list-group">
 <%
-	boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.home-page.logos", true);
+	boolean showLogos = configurationService.getBooleanProperty("jspui.home-page.logos", true);
     for (Community com : communities)
     {
 %><div class="list-group-item row">
@@ -186,7 +193,7 @@ if (communities != null && communities.size() != 0)
 <% }  %>		
 		<h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= com.getHandle() %>"><%= com.getName() %></a>
 <%
-        if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+        if (configurationService.getBooleanProperty("webui.strengths.show"))
         {
 %>
 		<span class="badge pull-right"><%= ic.getCount(com) %></span>

@@ -203,29 +203,23 @@ public class MetadataConverterPlugin implements ConverterPlugin
     
     protected Model loadConfiguration()
     {
-        String mappingPathes = configurationService.getProperty(METADATA_MAPPING_PATH_KEY);
-        if (StringUtils.isEmpty(mappingPathes))
-        {
-            return null;
-        }
-        String[] mappings = mappingPathes.split(",\\s*");        
-        if (mappings == null || mappings.length == 0)
+        InputStream is = null;
+        Model config = ModelFactory.createDefaultModel();
+        String mapping = configurationService.getProperty(METADATA_MAPPING_PATH_KEY);
+        if (StringUtils.isEmpty(mapping))
         {
             log.error("Cannot find metadata mappings (looking for "
                     + "property " + METADATA_MAPPING_PATH_KEY + ")!");
             return null;
         }
-        
-        InputStream is = null;
-        Model config = ModelFactory.createDefaultModel();
-        for (String mappingPath : mappings)
+        else
         {
-            is = FileManager.get().open(mappingPath);
+            is = FileManager.get().open(mapping);
             if (is == null)
             {
-                log.warn("Cannot find file '" + mappingPath + "', ignoring...");
+                log.warn("Cannot find file '" + mapping + "', ignoring...");
             }
-            config.read(is, "file://" + mappingPath, FileUtils.guessLang(mappingPath));
+            config.read(is, "file://" + mapping, FileUtils.guessLang(mapping));
             try {
                 // Make sure that we have an input stream to avoid NullPointer
                 if(is != null)

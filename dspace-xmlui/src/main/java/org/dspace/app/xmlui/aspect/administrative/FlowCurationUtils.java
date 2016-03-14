@@ -68,8 +68,8 @@ public class FlowCurationUtils
     {
         if (map.isEmpty())
         {
-            String statusCodes = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.statusmessages");
-            for (String pair : statusCodes.split(","))
+            String[] statusCodes = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("curate.ui.statusmessages");
+            for (String pair : statusCodes)
             {
                 String[] parts = pair.split("=");
                 map.put(parts[0].trim(), parts[1].trim());
@@ -270,8 +270,7 @@ public class FlowCurationUtils
     
     public static void setAllTasks() throws WingException, UnsupportedEncodingException
     {
-    	String csvList = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate." + CURATE_TASK_NAMES);
-    	String[] properties = csvList.split(",");
+    	String[] properties = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("curate." + CURATE_TASK_NAMES);
     	for (String property : properties)
     	{
              //System.out.println("set all tasks and property = " + property + "\n");
@@ -283,12 +282,11 @@ public class FlowCurationUtils
     
     public static void setGroups() throws WingException, UnsupportedEncodingException
     {
-    	String csvList = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate." + CURATE_GROUP_NAMES);
-        if (csvList != null)
+    	String[] properties = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("curate." + CURATE_GROUP_NAMES);
+        if (properties != null)
         {
-        	String[] properties = csvList.split(",");
         	for (String property : properties)
-            {
+                {
         		String[] keyValuePair = property.split("=");
         		groups.put(URLDecoder.decode(keyValuePair[0].trim(), "UTF-8"),
                           URLDecoder.decode(keyValuePair[1].trim(), "UTF-8"));
@@ -308,8 +306,7 @@ public class FlowCurationUtils
     		while (iterator.hasNext())
     		{
                 String key = iterator.next();
-                String csvList = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate." + CURATE_GROUP_PREFIX + "." + key);
-                String[] properties  = csvList.split(",");
+                String[] properties = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("curate." + CURATE_GROUP_PREFIX + "." + key);
                 groupedTasks.put(URLDecoder.decode(key, "UTF-8"), properties);
             }
         }

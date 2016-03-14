@@ -12,15 +12,17 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.*;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
+
 
 public class SimpleDCEntryIngester extends AbstractSimpleDC
         implements SwordEntryIngester
@@ -30,6 +32,9 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
 
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory
             .getInstance().getWorkspaceItemService();
+    
+    protected ConfigurationService configurationService = DSpaceServicesFactory
+            .getInstance().getConfigurationService();
 
     public SimpleDCEntryIngester()
     {
@@ -115,10 +120,9 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
     private void removeMetadata(Context context, Item item)
             throws DSpaceSwordException
     {
-        String raw = ConfigurationManager
-                .getProperty("swordv2-server", "metadata.replaceable");
-        String[] parts = raw.split(",");
-        for (String part : parts)
+        String[] replaceableMetadata = configurationService
+                .getArrayProperty("swordv2-server.metadata.replaceable");
+        for (String part : replaceableMetadata)
         {
             MetadataValueInfo info = this
                     .makeMetadataValueInfo(part.trim(), null);
@@ -340,12 +344,12 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
             VerboseDescription verboseDescription)
             throws DSpaceSwordException
     {
-        String field = ConfigurationManager
-                .getProperty("swordv2-server", "updated.field");
-        if (field == null || "".equals(field))
+        String field = configurationService
+                .getProperty("swordv2-server.updated.field");
+        if (StringUtils.isBlank(field))
         {
             throw new DSpaceSwordException(
-                    "No configuration, or configuration is invalid for: sword.updated.field");
+                    "No configuration, or configuration is invalid for: swordv2-server.updated.field");
         }
 
         MetadataValueInfo info = this.makeMetadataValueInfo(field, null);
@@ -389,12 +393,12 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
             return;
         }
 
-        String field = ConfigurationManager
-                .getProperty("swordv2-server", "slug.field");
-        if (field == null || "".equals(field))
+        String field = configurationService
+                .getProperty("swordv2-server.slug.field");
+        if (StringUtils.isBlank(field))
         {
             throw new DSpaceSwordException(
-                    "No configuration, or configuration is invalid for: sword.slug.field");
+                    "No configuration, or configuration is invalid for: swordv2-server.slug.field");
         }
 
         MetadataValueInfo info = this.makeMetadataValueInfo(field, null);

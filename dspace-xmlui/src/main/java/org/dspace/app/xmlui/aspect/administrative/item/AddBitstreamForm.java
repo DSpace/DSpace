@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
+import org.apache.commons.lang.ArrayUtils;
 
 import org.dspace.app.xmlui.aspect.submission.submit.AccessStepUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -64,7 +65,7 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 	private static final Message T_no_bundles = message("xmlui.administrative.item.AddBitstreamForm.no_bundles");
 
 	
-	private static final String DEFAULT_BUNDLE_LIST = "ORIGINAL, METADATA, THUMBNAIL, LICENSE, CC-LICENSE";
+	private static final String[] DEFAULT_BUNDLE_LIST = new String[]{"ORIGINAL", "METADATA", "THUMBNAIL", "LICENSE", "CC-LICENSE"};
 
     private boolean isAdvancedFormEnabled=true;
 
@@ -102,13 +103,12 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 
             // Get the list of bundles to allow the user to upload too. Either use the default
             // or one supplied from the dspace.cfg.
-            String bundleString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.bundle.upload");
-            if (bundleString == null || bundleString.length() == 0)
+            String[] bundles = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("xmlui.bundle.upload");
+            if (ArrayUtils.isEmpty(bundles))
             {
-                bundleString = DEFAULT_BUNDLE_LIST;
+                bundles = DEFAULT_BUNDLE_LIST;
             }
-            String[] parts = bundleString.split(",");
-            for (String part : parts)
+            for (String part : bundles)
             {
                 if (addBundleOption(item, select, part.trim()))
                 {

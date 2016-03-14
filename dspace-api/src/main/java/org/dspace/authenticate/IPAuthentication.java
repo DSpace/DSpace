@@ -93,7 +93,7 @@ public class IPAuthentication implements AuthenticationMethod
 
             if (nameParts.length == 2)
             {
-                addMatchers(nameParts[1], DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(propName));
+                addMatchers(nameParts[1], DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty(propName));
             }
             else
             {
@@ -111,11 +111,9 @@ public class IPAuthentication implements AuthenticationMethod
      * @param ipRanges
      *            IP ranges
      */
-    protected void addMatchers(String groupName, String ipRanges)
+    protected void addMatchers(String groupName, String[] ipRanges)
     {
-        String[] ranges = ipRanges.split("\\s*,\\s*");
-
-        for (String entry : ranges)
+        for (String entry : ipRanges)
         {
             try
             {

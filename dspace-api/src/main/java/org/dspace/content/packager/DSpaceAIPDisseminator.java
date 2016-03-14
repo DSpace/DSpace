@@ -25,7 +25,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.core.Constants;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 import edu.harvard.hul.ois.mets.Agent;
@@ -41,7 +40,10 @@ import edu.harvard.hul.ois.mets.Type;
 import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.PCData;
 import java.util.Date;
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Subclass of the METS packager framework to disseminate a DSpace
@@ -117,6 +119,10 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     protected List<String> filterBundles = new ArrayList<String>();
     // Whether 'filterBundles' specifies an exclusion list (default) or inclusion list.
     protected boolean excludeBundles = true;
+    
+    protected ConfigurationService configurationService = 
+            DSpaceServicesFactory.getInstance().getConfigurationService();
+
 
     @Override
     public void disseminate(Context context, DSpaceObject dso,
@@ -257,17 +263,14 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     public String [] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
-        String dmdTypes = ConfigurationManager.getProperty("aip.disseminate.dmd");
-        if (dmdTypes == null)
+        String[] dmdTypes = configurationService.getArrayProperty("aip.disseminate.dmd");
+        if (ArrayUtils.isEmpty(dmdTypes))
         {
-            String result[] = new String[2];
-            result[0] = "MODS";
-            result[1] = "DIM";
-            return result;
+            return new String[] { "MODS","DIM"};
         }
         else
         {
-            return dmdTypes.split("\\s*,\\s*");
+            return dmdTypes;
         }
     }
 
@@ -289,14 +292,12 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
-        String techTypes = ConfigurationManager.getProperty("aip.disseminate.techMD");
-        if (techTypes == null)
+        String[] techTypes = configurationService.getArrayProperty("aip.disseminate.techMD");
+        if (ArrayUtils.isEmpty(techTypes))
         {
             if (dso.getType() == Constants.BITSTREAM)
             {
-                String result[] = new String[1];
-                result[0] = "PREMIS";
-                return result;
+                return new String[]{"PREMIS"};
             }
             else
             {
@@ -305,7 +306,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
         }
         else
         {
-            return techTypes.split("\\s*,\\s*");
+            return techTypes;
         }
     }
 
@@ -331,16 +332,14 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     public String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
-        String sourceTypes = ConfigurationManager.getProperty("aip.disseminate.sourceMD");
-        if (sourceTypes == null)
+        String[] sourceTypes = configurationService.getArrayProperty("aip.disseminate.sourceMD");
+        if (ArrayUtils.isEmpty(sourceTypes))
         {
-            String result[] = new String[1];
-            result[0] = "AIP-TECHMD";
-            return result;
+            return new String[] {"AIP-TECHMD"};
         }
         else
         {
-            return sourceTypes.split("\\s*,\\s*");
+            return sourceTypes;
         }
     }
 
@@ -362,14 +361,14 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     public String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
-        String dpTypes = ConfigurationManager.getProperty("aip.disseminate.digiprovMD");
-        if (dpTypes == null)
+        String[] dpTypes = configurationService.getArrayProperty("aip.disseminate.digiprovMD");
+        if (ArrayUtils.isEmpty(dpTypes))
         {
             return new String[0];
         }
         else
         {
-            return dpTypes.split("\\s*,\\s*");
+            return dpTypes;
         }
     }
 
@@ -394,10 +393,10 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     {
 
         List<String> result = new ArrayList<String>();
-        String rTypes = ConfigurationManager.getProperty("aip.disseminate.rightsMD");
+        String[] rTypes = configurationService.getArrayProperty("aip.disseminate.rightsMD");
 
         //If unspecified in configuration file, add default settings
-        if (rTypes == null)
+        if (ArrayUtils.isEmpty(rTypes))
         {
             // Licenses only apply to an Item
             if (dso.getType() == Constants.ITEM)
@@ -424,7 +423,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
         }
         else
         {
-            return rTypes.split("\\s*,\\s*");
+            return rTypes;
         }
 
         return result.toArray(new String[result.size()]);

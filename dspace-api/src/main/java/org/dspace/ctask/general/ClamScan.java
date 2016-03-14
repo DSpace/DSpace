@@ -25,7 +25,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Suspendable;
@@ -74,10 +73,10 @@ public class ClamScan extends AbstractCurationTask
     public void init(Curator curator, String taskId) throws IOException
     {
         super.init(curator, taskId);
-        host = ConfigurationManager.getProperty(PLUGIN_PREFIX, "service.host");
-        port = ConfigurationManager.getIntProperty(PLUGIN_PREFIX, "service.port");
-        timeout = ConfigurationManager.getIntProperty(PLUGIN_PREFIX, "socket.timeout");
-        failfast = ConfigurationManager.getBooleanProperty(PLUGIN_PREFIX, "scan.failfast");
+        host = configurationService.getProperty(PLUGIN_PREFIX + ".service.host");
+        port = configurationService.getIntProperty(PLUGIN_PREFIX + ".service.port");
+        timeout = configurationService.getIntProperty(PLUGIN_PREFIX + ".socket.timeout");
+        failfast = configurationService.getBooleanProperty(PLUGIN_PREFIX + ".scan.failfast");
         bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     }
 

@@ -30,11 +30,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -42,6 +42,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Implicit authentication method that gets credentials from the X.509 client
@@ -118,6 +120,8 @@ public class X509Authentication implements AuthenticationMethod
     protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected ConfigurationService configurationService = 
+            DSpaceServicesFactory.getInstance().getConfigurationService();
 
 
     /**
@@ -127,21 +131,23 @@ public class X509Authentication implements AuthenticationMethod
      */
     static
     {
+        ConfigurationService configurationService = 
+            DSpaceServicesFactory.getInstance().getConfigurationService();
         /*
          * allow identification of alternative entry points for certificate
          * authentication when selected by the user rather than implicitly.
          */
-        loginPageTitle = ConfigurationManager
-                .getProperty("authentication-x509", "chooser.title.key");
-        loginPageURL = ConfigurationManager
-                .getProperty("authentication-x509", "chooser.uri");
+        loginPageTitle = configurationService
+                .getProperty("authentication-x509.chooser.title.key");
+        loginPageURL = configurationService
+                .getProperty("authentication-x509.chooser.uri");
 
-        String keystorePath = ConfigurationManager
-                .getProperty("authentication-x509", "keystore.path");
-        String keystorePassword = ConfigurationManager
-                .getProperty("authentication-x509", "keystore.password");
-        String caCertPath = ConfigurationManager
-                .getProperty("authentication-x509", "ca.cert");
+        String keystorePath = configurationService
+                .getProperty("authentication-x509.keystore.path");
+        String keystorePassword = configurationService
+                .getProperty("authentication-x509.keystore.password");
+        String caCertPath = configurationService
+                .getProperty("authentication-x509.ca.cert");
 
         // First look for keystore full of trusted certs.
         if (keystorePath != null)
@@ -386,8 +392,8 @@ public class X509Authentication implements AuthenticationMethod
     public boolean canSelfRegister(Context context, HttpServletRequest request,
             String username) throws SQLException
     {
-        return ConfigurationManager
-                .getBooleanProperty("authentication-x509", "autoregister");
+        return configurationService
+                .getBooleanProperty("authentication-x509.autoregister");
     }
 
     /**
@@ -428,17 +434,14 @@ public class X509Authentication implements AuthenticationMethod
     {
         List<String> groupNames = new ArrayList<String>();
 
-        String x509GroupConfig = null;
-        x509GroupConfig = ConfigurationManager
-                .getProperty("authentication-x509", "groups");
+        String[] groups = configurationService
+                .getArrayProperty("authentication-x509.groups");
 
-        if (null != x509GroupConfig && !"".equals(x509GroupConfig))
+        if(ArrayUtils.isNotEmpty(groups))
         {
-            String[] groups = x509GroupConfig.split("\\s*,\\s*");
-
-            for (int i = 0; i < groups.length; i++)
+            for (String group : groups)
             {
-                groupNames.add(groups[i].trim());
+                groupNames.add(group.trim());
             }
         }
 
