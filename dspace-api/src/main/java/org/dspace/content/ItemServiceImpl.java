@@ -25,6 +25,9 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
+import org.dspace.harvest.HarvestedItem;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.versioning.service.VersioningService;
@@ -578,9 +581,15 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public void delete(Context context, Item item) throws SQLException, AuthorizeException, IOException {
         authorizeService.authorizeAction(context, item, Constants.DELETE);
+
+        // Also delete the item if it appears in a harvested collection.
+        HarvestedItemService harvestedItemService = HarvestServiceFactory.getInstance().getHarvestedItemService(); // autowire this.
+        HarvestedItem hi = harvestedItemService.find(context, item);
+        harvestedItemService.delete(context,hi);
+        
         item.getCollections().clear();
         item.setOwningCollection(null);
-        rawDelete(context,  item);
+        rawDelete(context,item);
     }
 
     @Override
