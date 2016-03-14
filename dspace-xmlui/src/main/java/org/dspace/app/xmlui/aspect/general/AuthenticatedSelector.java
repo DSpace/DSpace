@@ -89,7 +89,8 @@ public class AuthenticatedSelector extends AbstractLogEnabled implements
             
             
             /** if license confirmation for a bitstream is 3 then allow everyone (signin not required) */
-            if(ObjectModelHelper.getRequest(objectModel).getRequestURI().endsWith("license/agree")) {	            
+            String requestURI = ObjectModelHelper.getRequest(objectModel).getRequestURI();
+            if(requestURI.endsWith("license/agree") || requestURI.endsWith("/allzip")) {
             	Item item = (Item)dso;            	            
 	            manager.openSession();
 	            Bundle[] originals = item.getBundles("ORIGINAL");
