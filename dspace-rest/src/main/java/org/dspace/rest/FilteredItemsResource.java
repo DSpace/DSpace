@@ -8,6 +8,7 @@
 package org.dspace.rest;
 
 
+import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
@@ -46,6 +47,7 @@ import java.util.UUID;
  * @author Terry Brady, Georgetown University
  */
 @Path("/filtered-items")
+@Api(value = "Filtered items endpoint", tags = {"items", "filters"})
 public class FilteredItemsResource extends Resource {
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();

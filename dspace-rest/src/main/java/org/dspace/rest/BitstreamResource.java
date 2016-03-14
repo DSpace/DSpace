@@ -33,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -58,6 +59,7 @@ import org.dspace.usage.UsageEvent;
 // Every DSpace class used without namespace is from package
 // org.dspace.rest.common.*. Otherwise namespace is defined.
 @Path("/bitstreams")
+@Api(value = "Bitstreams endpoint", tags = "bitstreams")
 public class BitstreamResource extends Resource
 {
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();

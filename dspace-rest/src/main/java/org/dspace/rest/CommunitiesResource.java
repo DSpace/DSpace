@@ -7,6 +7,7 @@
  */
 package org.dspace.rest;
 
+import io.swagger.annotations.Api;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -38,6 +39,7 @@ import java.util.List;
  * 
  */
 @Path("/communities")
+@Api(value = "Communities endpoint", tags = "communities")
 public class CommunitiesResource extends Resource
 {
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
