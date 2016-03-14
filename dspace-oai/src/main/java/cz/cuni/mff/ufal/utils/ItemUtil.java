@@ -82,7 +82,7 @@ public class ItemUtil {
 
 			// mind the order in input forms, org;code;projname;type
 			Element[] elements = { organization, code, projName, fundsType };
-			for (int i = 0; i < values.length; i++) {
+			for (int i = 0; i < elements.length; i++) {
 				elements[i].appendChild(doc.createTextNode(values[i]));
 				el.appendChild(elements[i]);
 			}
