@@ -137,9 +137,8 @@ public class PasswordAuthentication
 		// ensures they are password users
 		try
 		{
-            if (context.getCurrentUser() != null &&
-                    (EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()) != null &&
-                            StringUtils.isNotBlank(EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()).toString())))
+            if (context.getCurrentUser() != null
+                && StringUtils.isNotBlank(EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()).toString()))
 			{
 				String groupName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("authentication-password.login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
