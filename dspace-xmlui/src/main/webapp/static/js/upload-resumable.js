@@ -243,7 +243,7 @@ if(doResumable){
                         if(attempts > (TIMEOUT / INTERVAL)){
                             console.warn("Creation of file timed out after " + TIMEOUT / 1000 + " seconds");
                             clearInterval(intId);
-                            showError('upload-failed');
+                            showError('create-failed');
                         }
                     }
                 },

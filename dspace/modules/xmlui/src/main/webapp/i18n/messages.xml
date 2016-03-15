@@ -823,7 +823,7 @@
     <!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
 	<message key="xmlui.Submission.submit.UploadStep.head">Upload File(s)</message>
 	<message key="xmlui.Submission.submit.UploadStep.file">File</message>
-	<message key="xmlui.Submission.submit.UploadStep.file_help">Please enter the full path of the file on your computer corresponding to your item. If you click "Browse...", a new window will allow you to select the file from your computer.</message>
+	<message key="xmlui.Submission.submit.UploadStep.file_help">Warning: Files over 10Gb are not permitted at this time. Larger files (i.e. over 2GB), or files transmitted over slower networks are subject to connectivity interruptions. If your files are over 2Gb or are not uploading, the Data Library team can arrange an alternative means of transfer, and then conduct batch import to ingest them into DataShare. Please contact us to arrange assistance by email to <a href="mailto:datalib@ed.ac.uk">datalib@ed.ac.uk</a></message>
 	<message key="xmlui.Submission.submit.UploadStep.file_error">The item must contain at least one file.</message>
 	<message key="xmlui.Submission.submit.UploadStep.upload_error">There was a problem uploading your file.  Either the filename you entered was incorrect, there was a network problem which prevented the file from reaching us correctly, or you have attempted to upload a file format marked for internal system use only.  Please try again.</message>
 	<message key="xmlui.Submission.submit.UploadStep.virus_error">File has failed virus checking, if in doubt please contact the system administrator.</message>
@@ -856,8 +856,10 @@
 	<message key="xmlui.Submission.submit.ResumableUploadStep.dialog.delete">Are you sure you want to delete</message>
 	<message key="xmlui.Submission.submit.ResumableUploadStep.dialog.deletesf">selected files</message>
 	<message key="xmlui.Submission.submit.ResumableUploadStep.dialog.deleteunmatch">The file that will be deleted does not match the one you selected, Do you want to continue</message>
-	<message key="xmlui.Submission.submit.ResumableUploadStep.uploaderror">Something has gone wrong when uploading file. Please contact the system administrator.</message>
+    <message key="xmlui.Submission.submit.ResumableUploadStep.uploaderror">Something has gone wrong when uploading a file. Please check your Submissions page to resume this submission, or contact us at {0}.</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.createerror">Something has gone wrong when uploading a file. Please try again or contact us at {0}.</message>
 	<message key="xmlui.Submission.submit.ResumableUploadStep.nospace">There is not enough space left in this item. You are restricted to {0} bytes</message>
+    <message key="xmlui.Submission.submit.ResumableUploadStep.file_help">Individual submissions over 20 GB are not permitted at this time. If your files are too large or too numerous to be uploaded through the browser, the Data Library team can arrange an alternative means of transfer, and then conduct batch import to ingest them into DataShare. Please contact us to arrange assistance, by email to <a href="mailto:datalib@ed.ac.uk">datalib@ed.ac.uk</a>.</message>
 
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>

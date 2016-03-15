@@ -38,6 +38,9 @@ import org.xml.sax.SAXException;
  * http://www.dspace.org/license/
  */
 public class ResumableUploadStep extends UploadStep{
+    
+    protected static final Message T_file_help =
+            message("xmlui.Submission.submit.ResumableUploadStep.file_help");
     private static final Message T_column_select =
             message("xmlui.Submission.submit.ResumableUploadStep.select");
     private static final Message T_column_status =
@@ -59,6 +62,8 @@ public class ResumableUploadStep extends UploadStep{
 
     private static final Message T_upload_error =
             message("xmlui.Submission.submit.ResumableUploadStep.uploaderror");
+    private static final Message T_create_error =
+            message("xmlui.Submission.submit.ResumableUploadStep.createerror");
     private static final Message T_no_space =
             message("xmlui.Submission.submit.ResumableUploadStep.nospace");
 
@@ -90,7 +95,8 @@ public class ResumableUploadStep extends UploadStep{
             addSubmissionProgressList(div);
 
             Division uploadDiv = div.addDivision("submit-file-upload");
-
+            uploadDiv.addPara(T_file_help);            
+            
             // click / drag and drop area
             Division drop = uploadDiv.addDivision("resumable-drop", "col-md-12");
             drop.addPara();
@@ -175,7 +181,8 @@ public class ResumableUploadStep extends UploadStep{
             data.addHidden("item-space").setValue(Long.toString(Math.max(max - item.getSize(), 0)));
             
             // error messages
-            uploadDiv.addPara("upload-error", "alert alert-danger hide").addContent(T_upload_error);
+            uploadDiv.addPara("upload-failed", "alert alert-danger hide").addContent(T_upload_error);
+            uploadDiv.addPara("create-failed", "alert alert-danger hide").addContent(T_create_error);
             uploadDiv.addPara("no-space", "alert alert-danger hide").addContent(T_no_space.parameterize(max));
 
             // add standard control/paging buttons
