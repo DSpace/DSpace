@@ -57,14 +57,31 @@
 				<h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param>${data.title}</fmt:param></fmt:message></h1>
    			 </div>
 		</div>
-	</div>	
+	</div>
+	<div class="pull-right">
+		<span class="label label-info">from:</span>&nbsp; 
+			<c:if test="${empty data.stats_from_date}"><fmt:message key="view.statistics.range.no-start-date" /></c:if>
+			${data.stats_from_date} &nbsp;&nbsp;&nbsp; 
+		<span class="label label-info">to:</span> &nbsp; 
+			<c:if test="${empty data.stats_to_date}"><fmt:message key="view.statistics.range.no-end-date" /></c:if>
+			${data.stats_to_date} &nbsp;&nbsp;&nbsp;
+		<a class="btn btn-default" data-toggle="modal" data-target="#stats-date-change-dialog"><fmt:message key="view.statistics.change-range" /></a>
+	</div>		
 	<c:set var="type"><%=request.getParameter("type") %></c:set>
+	<%@include file="/dspace-cris/stats/common/changeRange.jsp"%>
 		<%@ include file="/dspace-cris/stats/collection/_collectionReport-right.jsp" %>
 <div class="richeditor">
 <div class="top"></div>
 
 	<%@ include file="/dspace-cris/stats/collection/_collectionReport.jsp" %>
-<div class="bottom"></div>
+<div class="bottom">
+			<c:if test="${data.seeParentObject}">
+				<c:set var="parentLink">${contextPath}/stats/community.html?handle=${data.parentObject.handle}&type=${type}</c:set>
+				<div class="list-group">
+					<a class="list-group-item" href="${parentLink}"><fmt:message key="view.${data.jspKey}.${type}.parentStats"><fmt:param>${data.parentObject.name}</fmt:param></fmt:message></a>
+				</div>
+			</c:if>
+</div>
 </div>
 </div>
 </div>

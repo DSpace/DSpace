@@ -7,7 +7,8 @@
     https://github.com/CILEA/dspace-cris/wiki/License
 
 --%>
-<c:set var="link">${contextPath}/cris/stats/collection.html?handle=${data.object.handle}</c:set>
+
+<c:set var="link">${contextPath}/stats/collection.html?handle=${data.object.handle}&stats_from_date=${data.stats_from_date}&stats_to_date=${data.stats_to_date}</c:set>
 <c:set var="subscribeLink">${contextPath}/cris/tools/stats/subscription/subscribe?uid=${data.object.handle}&amp;type=${data.object.type}</c:set>
 <c:set var="rssLink">${contextPath}/cris/stats/rss/</c:set>
 <c:set var="rssImgLink">${contextPath}/image/stats/rss-</c:set>
@@ -25,6 +26,9 @@
 			<li class="<c:if test="${type ne 'item' && type ne 'bitstream'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}"><fmt:message key="view.stats-collection.selectedObject.page.title" /></a></li>
 			<li class="<c:if test="${type eq 'item'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=item"><fmt:message key="view.stats-collection.top.item.page.title" /></a></li>
 			<li class="<c:if test="${type eq 'bitstream'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=bitstream"><fmt:message key="view.stats-collection.top.bitstream.page.title" /></a></li>
+		 <c:if test="${data.seeUpload}">			
+			<li class="<c:if test="${type eq 'upload'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=upload"><fmt:message key="view.stats-collection.upload.page.title" /></a></li>
+		</c:if>
 		</ul>
 	<div class="titlestats tab-content with-padding">		
 		<div class="btn-group pull-right">

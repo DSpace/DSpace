@@ -9,6 +9,7 @@ package org.dspace.app.webui.cris.components.statistics;
 
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class StatSelectedObjectComponent<T extends DSpaceObject> extends
     protected static String STATS_QUERY = "id:{0}";
 
     @Override
-    public TreeKeyMap query(String id, HttpSolrServer solrServer)
+    public TreeKeyMap query(String id, HttpSolrServer solrServer, Date startDate, Date endDate)
             throws Exception
     {
         statisticDatasBeans = new TreeKeyMap();
@@ -42,7 +43,7 @@ public class StatSelectedObjectComponent<T extends DSpaceObject> extends
             solrServer.setMaxRetries(0);
             SolrQuery solrQuery = new SolrQuery();
 
-            _prepareBasicQuery(solrQuery, StatComponentsService.getYearsQuery());
+            _prepareBasicQuery(solrQuery, StatComponentsService.getYearsQuery(),startDate,endDate);
 
             if (StatComponentsService.isExcludeBot())
             {

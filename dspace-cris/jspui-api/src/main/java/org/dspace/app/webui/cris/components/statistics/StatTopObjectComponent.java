@@ -9,9 +9,11 @@ package org.dspace.app.webui.cris.components.statistics;
 
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -23,6 +25,7 @@ import org.dspace.app.cris.statistics.bean.TreeKeyMap;
 import org.dspace.app.cris.statistics.bean.TwoKeyMap;
 import org.dspace.app.webui.cris.components.BeanFacetComponent;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Site;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.statistics.ObjectCount;
@@ -33,11 +36,12 @@ public class StatTopObjectComponent<T extends DSpaceObject> extends
 {
 
 	private static final String QUERY_COMMON = "'''{'''!join from={0} to=search.uniqueid fromIndex={2}'''}'''{1} AND -withdrawn:true";
+	private static final String QUERY_GLOBAL = "'''{'''!join from={0} to=search.uniqueid fromIndex={1}'''}'''-withdrawn:true";
 
     private String fromField;
 
     @Override
-    public TreeKeyMap query(String id, HttpSolrServer solrServer) throws Exception
+    public TreeKeyMap query(String id, HttpSolrServer solrServer,Date startDate, Date endDate) throws Exception
     {
         statisticDatasBeans = new TreeKeyMap();
         if (id != null && !id.equals("") && StatComponentsService.getYearsQuery() != null)
@@ -48,7 +52,7 @@ public class StatTopObjectComponent<T extends DSpaceObject> extends
             solrServer.setMaxRetries(0);
             SolrQuery solrQuery = new SolrQuery();
             // http://localhost:8983/solr/statistics/select/?q=type%3A2&rows=20&facet=true&facet.date=time&facet.date.start=2008-07-00T00:00:00.000Z&facet.date.end=2009-06-31T00:00:00.000Z&facet.date.gap=%2B1MONTHS&facet.field=id
-            _prepareBasicQuery(solrQuery, StatComponentsService.getYearsQuery());
+            _prepareBasicQuery(solrQuery, StatComponentsService.getYearsQuery(),startDate,endDate);
             // _prepareTopQuery(type, id, fieldName, solrQuery);
 
             if(StatComponentsService.isExcludeBot()) {
@@ -62,8 +66,13 @@ public class StatTopObjectComponent<T extends DSpaceObject> extends
             solrQuery.addFilterQuery("type:"+ relationType);      
             for(String filter : getBean().getFilters()) {
                 solrQuery.addFilterQuery(filter);
-            }            
-            String query = MessageFormat.format(QUERY_COMMON, getFromField(), getBean().getQuery(), getSearchCore());
+            }
+            String query="";
+            if(!StringUtils.equals(id,"0") ){
+            	query = MessageFormat.format(QUERY_COMMON, getFromField(), getBean().getQuery(), getSearchCore());
+            }else{
+            	query = MessageFormat.format(QUERY_GLOBAL, getFromField(), getSearchCore());
+            }
             String sID = getObjectId(id);
             query = MessageFormat.format(query, sID);
             solrQuery.setQuery(query);
@@ -119,11 +128,12 @@ public class StatTopObjectComponent<T extends DSpaceObject> extends
         return labels;
     }
 
-    protected void _prepareBasicQuery(SolrQuery solrQuery, Integer yearsQuery)
+    @Override
+    protected void _prepareBasicQuery(SolrQuery solrQuery, Integer yearsQuery,Date startDate, Date endDate)
     {
-        _addBasicConfiguration(solrQuery, yearsQuery);
-        solrQuery.addFacetField(_CONTINENT, _COUNTRY_CODE, _CITY, ID,
-                _LOCATION, _FISCALYEAR, _SOLARYEAR);
+        _addBasicConfiguration(solrQuery, yearsQuery, startDate, endDate);
+        solrQuery.addFacetField(_CONTINENT, _COUNTRY_CODE, _CITY, ID, _LOCATION,
+                _FISCALYEAR, _SOLARYEAR);
         solrQuery.set("facet.missing", true);
         solrQuery.set("f." + _LOCATION + ".facet.missing", false);
         solrQuery.set("f." + ID + ".facet.missing", false);

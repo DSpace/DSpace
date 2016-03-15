@@ -10,6 +10,7 @@ package org.dspace.app.webui.cris.components.statistics;
 import it.cilea.osd.jdyna.model.PropertiesDefinition;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,9 +66,10 @@ public abstract class StatCrisDownloadSelectedObjectComponent extends
     protected abstract PropertiesDefinition innerCall(Integer pkey);
     
     
-    protected void _prepareBasicQuery(SolrQuery solrQuery, Integer yearsQuery)
+    @Override
+    protected void _prepareBasicQuery(SolrQuery solrQuery, Integer yearsQuery,Date startDate, Date endDate)
     {
-        _addBasicConfiguration(solrQuery, yearsQuery);
+        _addBasicConfiguration(solrQuery, yearsQuery, startDate, endDate);
         solrQuery.addFacetField(_CONTINENT, _COUNTRY_CODE, _CITY, ID,
                 _LOCATION, _FISCALYEAR, _SOLARYEAR);
         solrQuery.set("facet.missing", true);

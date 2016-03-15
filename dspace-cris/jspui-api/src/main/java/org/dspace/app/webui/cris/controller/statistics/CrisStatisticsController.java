@@ -16,7 +16,10 @@ import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.model.Property;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +28,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.integration.ICRISComponent;
 import org.dspace.app.cris.integration.statistics.AStatComponentService;
@@ -52,6 +56,8 @@ public class CrisStatisticsController<T extends ACrisObject<P, TP, NP, NTP, ACNO
     private static Logger log = Logger
             .getLogger(CrisStatisticsController.class);
 
+    private DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    
     private Class<T> target;
 
     public ModelAndView handleRequest(HttpServletRequest request,
@@ -61,6 +67,30 @@ public class CrisStatisticsController<T extends ACrisObject<P, TP, NP, NTP, ACNO
         String id = getId(request);
         String type = request.getParameter("type");
         String mode = request.getParameter("mode");
+        
+        Date startDate = null;
+        Date endDate = null;
+        String startDateParam = request.getParameter("stats_from_date");
+        String endDateParam = request.getParameter("stats_to_date");
+        try {
+            if (StringUtils.isNotBlank(startDateParam)) {
+                
+                startDate = df.parse(startDateParam);
+
+            }
+        }
+        catch (Exception ex) {
+            log.error("Malformed input for stas start date "+startDateParam);
+        }
+        try {
+            if (StringUtils.isNotBlank(endDateParam)) {
+                endDate = df.parse(endDateParam);
+            }
+        }
+        catch (Exception ex) {
+            log.error("Malformed input for stas end date "+endDateParam);
+        }
+        
         ACrisObject crisObject = (ACrisObject) getObject(request);
         
         if (mode == null || mode.isEmpty())
@@ -205,7 +235,7 @@ public class CrisStatisticsController<T extends ACrisObject<P, TP, NP, NTP, ACNO
                 statcomponent.setRelationObjectType(relationObjectType);
             }
 
-            dataBeans.putAll(statcomponent.query(id, solrServer));
+            dataBeans.putAll(statcomponent.query(id, solrServer, startDate, endDate));
             label.putAll(statcomponent.getLabels(UIUtil.obtainContext(request),
                     CrisConstants.getEntityTypeText(relationObjectType)));
 

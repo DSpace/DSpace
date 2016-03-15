@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.integration.statistics;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
@@ -24,7 +25,7 @@ public interface IStatsComponent<T extends DSpaceObject> extends IStatsGenericCo
 
     TwoKeyMap getLabels(Context context, String type) throws Exception;
     
-    TreeKeyMap query(String id, HttpSolrServer solrServer)  throws Exception;
+    TreeKeyMap query(String id, HttpSolrServer solrServer,Date startDate, Date endDate)  throws Exception;
        
     Map<String, ObjectCount[]> queryFacetDate(SolrLogger statsLogger,
             T object, String dateType, String dateStart,

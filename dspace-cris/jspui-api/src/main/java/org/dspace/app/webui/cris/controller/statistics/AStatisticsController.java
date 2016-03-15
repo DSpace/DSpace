@@ -8,6 +8,7 @@
 package org.dspace.app.webui.cris.controller.statistics;
 
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +46,8 @@ public abstract class AStatisticsController<T extends IStatsGenericComponent> im
 
     protected static final String _ID_LABEL = "id";
 
+    protected static final String _MAX_LIST_MOST_VIEWED_ITEM = "maxListMostViewedItem";
+    
     protected IStatComponentService<T> statsComponentsService;
 
     String jspKey;
@@ -53,6 +56,8 @@ public abstract class AStatisticsController<T extends IStatsGenericComponent> im
 
     String error;
 
+    String maxListMostViewedItem;
+    
     public String getJspKey()
     {
         return jspKey;
@@ -82,13 +87,12 @@ public abstract class AStatisticsController<T extends IStatsGenericComponent> im
     {
         this.error = error;
     }
-
    
-    public abstract String getId(HttpServletRequest request);
+    public abstract String getId(HttpServletRequest request) throws IllegalStateException, SQLException;
     
-    public abstract DSpaceObject getObject(HttpServletRequest request);
+    public abstract DSpaceObject getObject(HttpServletRequest request) throws IllegalStateException, SQLException;
     
-    public abstract String getTitle(HttpServletRequest request);
+    public abstract String getTitle(HttpServletRequest request) throws IllegalStateException, SQLException;
     
        
     public void addSubscriptionStatus(ModelAndView modelAndView,
@@ -125,6 +129,14 @@ public abstract class AStatisticsController<T extends IStatsGenericComponent> im
         }
     }
 
+
+	public String getMaxListMostViewedItem() {
+		return maxListMostViewedItem;
+	}
+
+	public void setMaxListMostViewedItem(String maxListMostViewedItem) {
+		this.maxListMostViewedItem = maxListMostViewedItem;
+	}
     
     
     public StatsConfig getSolrConfig()

@@ -216,6 +216,7 @@
 				<entry key="collection" value-ref="statscollectionforcommunity" />
 				<entry key="item" value-ref="statsitemforcommunity" />				
 				<entry key="bitstream" value-ref="statsbitstreamforcommunity" />
+				<entry key="upload" value-ref="statsuploadbitstreamforcommunity" />
 			</map>
 		</property>
 		<property name="topCountryLength" value="10" />
@@ -259,7 +260,12 @@
 		<property name="crisSearchService" ref="org.dspace.discovery.SearchService" />
 	</bean>
 	
-	
+	<bean id="statsuploadbitstreamforcommunity"
+		class="org.dspace.app.webui.cris.components.statistics.StatUploadObjectComponent">					
+		<property name="relationObjectType" value="4" />			
+		<property name="bean" ref="commonCommunityBean" />		
+		<property name="searchService" ref="org.dspace.discovery.SearchService" />
+	</bean>
 	
 	<bean id="commonCommunityBean"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
