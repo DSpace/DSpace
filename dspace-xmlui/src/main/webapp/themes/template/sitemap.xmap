@@ -63,7 +63,7 @@
                             <map:parameter name="stylesheet.screen#2" value="lib/style-ie.css"/>
                             <map:parameter name="stylesheet.screen#3" value="lib/css/jquery-ui-1.8.15.custom.css"/>
 
-                            <map:parameter name="javascript#1" value="lib/js/jquery-1.6.2.min.js"/>
+                            <map:parameter name="javascript#1" value="lib/js/jquery-1.6.4.min.js"/>
                             <map:parameter name="javascript#2" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>
 
                             <map:parameter name="theme.path" value="{global:theme-path}"/>
@@ -75,7 +75,7 @@
                             <map:parameter name="stylesheet.screen" value="lib/style.css"/>
                             <map:parameter name="stylesheet.screen#2" value="lib/jquery-ui-1.8.15.custom.css"/>
 
-                            <map:parameter name="javascript#1" value="lib/jquery-1.6.2.min.js"/>
+                            <map:parameter name="javascript#1" value="lib/jquery-1.6.4.min.js"/>
                             <map:parameter name="javascript#2" value="lib/jquery-ui-1.8.15.custom.min.js"/>
 
                             <map:parameter name="theme.path" value="{global:theme-path}"/>
