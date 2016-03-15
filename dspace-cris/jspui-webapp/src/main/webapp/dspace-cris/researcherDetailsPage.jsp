@@ -69,12 +69,30 @@
 %>
 <c:set var="admin" scope="request"><%=isAdmin%></c:set>
 <c:set var="statusAdmin" scope="request"><%=changeStatusAdmin%></c:set>
+<c:set var="req" value="${pageContext.request}" />
+<c:set var="baseURL" value="${fn:replace(req.requestURL, fn:substring(req.requestURI, 0, fn:length(req.requestURI)), req.contextPath)}" />
+<c:set var="metaprofilename"><c:choose><c:when test="${!empty entity.preferredName.value}">${entity.preferredName.value}</c:when><c:otherwise>${entity.fullName}</c:otherwise></c:choose></c:set>
 
 <c:set var="dspace.cris.navbar" scope="request">
 
 </c:set>
+<c:set var="dspace.layout.head" scope="request">		
+	<meta property="title" content="${metaprofilename}" />
+	<meta property="og:title" content="${metaprofilename}" />	
+	<meta property="og:type" content="profile" />
+	<meta property="og:url" content="${baseURL}/cris/uuid/${entity.uuid}" />
+</c:set>
 <c:set var="dspace.layout.head.last" scope="request">
 	
+	<script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "Person",
+      "name": "${metaprofilename}",
+      "url": "${baseURL}/cris/uuid/${entity.uuid}"
+    }
+    </script>
+    
     <script type="text/javascript"><!--
 
 	    var activeTab = function(){
@@ -205,8 +223,7 @@
     
 </c:set>
 
-<dspace:layout titlekey="jsp.researcher-page.details">
-
+<dspace:layout title="${entity.fullName}">
 
 <div id="content">
 <div class="row">
