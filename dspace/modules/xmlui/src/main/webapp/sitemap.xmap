@@ -658,6 +658,12 @@
                     </map:match>
 
 
+                    <!-- Temporary block -->
+                    <!-- Internally redirect all vulnerable URLs to /error (which doesn't exist and throws a 404) -->
+                    <map:match pattern="themes/**:**">
+                      <map:redirect-to uri="{request:contextPath}/error" permanent="yes"/>
+                    </map:match>
+
                     <!-- handle common theme resources, such as dri2xhtml -->
                     <map:match pattern="themes/*">
                         <map:read src="themes/{1}"/>
