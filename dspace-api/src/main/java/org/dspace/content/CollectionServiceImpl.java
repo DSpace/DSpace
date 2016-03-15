@@ -16,6 +16,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.CollectionDAO;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
 import org.dspace.core.*;
 import org.dspace.core.service.LicenseService;
@@ -23,6 +24,13 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
+import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.HarvestedCollectionServiceImpl;
+import org.dspace.harvest.HarvestedItem;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.harvest.service.HarvestedItemService;
+import org.dspace.kernel.ServiceManager;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -63,6 +71,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     protected SubscribeService subscribeService;
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
+    @Autowired(required=true)
+    protected HarvestedCollectionService harvestedCollectionService;
 
 
     protected CollectionServiceImpl()
@@ -633,6 +643,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     public void delete(Context context, Collection collection) throws SQLException, AuthorizeException, IOException {
         log.info(LogManager.getHeader(context, "delete_collection",
                 "collection_id=" + collection.getID()));
+
+        // remove harvested collections.
+        HarvestedCollection hc = harvestedCollectionService.find(context,collection);
+        if(hc!=null)
+        {
+            harvestedCollectionService.delete(context, hc);
+        }
 
         context.addEvent(new Event(Event.DELETE, Constants.COLLECTION,
                 collection.getID(), collection.getHandle(), getIdentifiers(context, collection)));
