@@ -848,7 +848,16 @@
 	<message key="xmlui.Submission.submit.UploadStep.checksum">File checksum:</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_remove">Remove selected files</message>
 
-
+	<message key="xmlui.Submission.submit.ResumableUploadStep.select">Select</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.status">Status</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.info">Info</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.delete">Delete</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.clickdrop">Click or drag and drop here to upload files</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.dialog.delete">Are you sure you want to delete</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.dialog.deletesf">selected files</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.dialog.deleteunmatch">The file that will be deleted does not match the one you selected, Do you want to continue</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.uploaderror">Something has gone wrong when uploading file. Please contact the system administrator.</message>
+	<message key="xmlui.Submission.submit.ResumableUploadStep.nospace">There is not enough space left in this item. You are restricted to {0} bytes</message>
 
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>

@@ -25,6 +25,8 @@
                         <map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
                         <map:generator name="AJAXMenuGenerator"
                              src="org.dspace.app.xmlui.cocoon.AJAXMenuGenerator"/>
+                        <map:generator name="ResumableUploadGenerator" src="org.dspace.app.xmlui.aspect.submission.submit.ResumableUploadGenerator"/>
+
                 </map:generators>
                 <map:serializers default="xml">
                         <map:serializer logger="sitemap.serializer.xml" mime-type="text/xml; charset=utf-8" name="xml"
@@ -199,7 +201,7 @@
                     <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
                     <map:reader name="JQueryLoaderReader" src="org.dspace.app.xmlui.utils.JQueryLoaderReader"/>
                     <map:reader name="JSONControlledVocabularyReader" src="org.dspace.app.xmlui.cocoon.JSONControlledVocabularyReader"/>
-                                        
+
                     <map:reader name="HandleResolverReader" src="org.dspace.app.xmlui.aspect.handle.HandleResolverReader"/>
                 </map:readers>
                 <map:actions>
@@ -207,6 +209,7 @@
                         <map:action name="StartAuthentication" src="org.dspace.app.xmlui.aspect.eperson.StartAuthenticationAction"/>
                         <map:action name="DSpacePropertyFileReader" src="org.dspace.app.xmlui.cocoon.DSpacePropertyFileReader" />
                         <map:action name="PropertyFileReader" src="org.dspace.app.xmlui.cocoon.PropertyFileReader" />
+                        <map:action name="ResumableUpload" src="org.dspace.app.xmlui.aspect.submission.submit.ResumableUpload"/>
                 </map:actions>
                 <map:pipes default="caching">
                         <map:pipe name="noncaching" src="org.apache.cocoon.components.pipeline.impl.NonCachingProcessingPipeline">
@@ -334,7 +337,7 @@
 
                         <!--
                                 Bitstreams not attached to to items (community / collection logos)
-                                
+
                                 /bitstream/id/[bitstreamID]/[ignored]
                         -->
                         <map:match pattern="bitstream/id/*/**">
@@ -440,6 +443,22 @@
                         <map:match pattern="JSON/controlled-vocabulary">
                             <map:read type="JSONControlledVocabularyReader"/>
                         </map:match>
+
+                        <!-- handle the upload of files in chunks -->
+                        <map:match pattern="handle/*/*/upload">
+                            <map:select type="AuthenticatedSelector">
+                                <map:when test="eperson">
+                                    <map:act type="ResumableUpload">
+                                      <map:parameter name="handle" value="{1}/{2}"/>
+                                      <map:generate type="ResumableUploadGenerator">
+                                        <map:parameter name="bitstream_id" value="{bitstream}"/>
+                                      </map:generate>
+                                      <map:serialize type="xhtml"/>
+                                    </map:act>
+                                </map:when>
+                            </map:select>
+                        </map:match>
+
                 </map:pipeline>
 
                 <!-- new AJAX menu (choices) responses for metadata authority control -->
@@ -655,7 +674,7 @@
                     </map:match>
 
                 </map:pipeline>
-                
+
                 <!-- pipline to run external handle server -->
                 <map:pipeline type="noncaching">
                   <map:match pattern="handleresolver/resolve/**">
@@ -682,7 +701,7 @@
                       </map:read>
                   </map:match>
                 </map:pipeline>
-                
+
                 <map:pipeline>
                         <!--<map:match pattern="**">-->
                         <map:mount check-reload="no" src="themes/themes.xmap" uri-prefix=""/>

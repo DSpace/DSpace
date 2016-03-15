@@ -11,7 +11,8 @@
         "respond": "1.4.2",
         "html5shiv": "3.7.2",
         "holderjs": "2.4.1",
-        "datatables": "1.10.3"
+        "datatables": "1.10.3",
+        "resumablejs": "1.0.2"
     },
     "devDependencies": {}
 }

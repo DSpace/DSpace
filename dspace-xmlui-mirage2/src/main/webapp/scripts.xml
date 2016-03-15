@@ -27,6 +27,9 @@
     <script src="vendor/bootstrap-sass-official/assets/javascripts/bootstrap/tooltip.js">&#160;</script>
     <script src="vendor/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js">&#160;</script>
     <script src="vendor/bootstrap-sass-official/assets/javascripts/bootstrap/transition.js">&#160;</script>
+    <script src="vendor/jquery-ui/ui/jquery.ui.widget.js">&#160;</script>
+    <script src="vendor/jquery-ui/ui/jquery.ui.dialog.js">&#160;</script>
+    <script src="vendor/resumablejs/resumable.js">&#160;</script>
     <script src="scripts/utils.js">&#160;</script>
     <script src="scripts/search-controls.js">&#160;</script>
     <script src="scripts/sidebar.js">&#160;</script>
