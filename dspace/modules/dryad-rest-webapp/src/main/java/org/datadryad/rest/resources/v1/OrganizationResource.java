@@ -118,7 +118,7 @@ public class OrganizationResource {
             URI uri = ub.path(storedJournalConcept.getJournalID()).build();
             return Response.created(uri).entity(concepts).build();
         } else {
-            ErrorsResponse error = ResponseFactory.makeError("Please check the structure of your object", "Invalid organization object", uriInfo, Status.BAD_REQUEST.getStatusCode());
+            ErrorsResponse error = ResponseFactory.makeError("Please check the structure of your object", "Invalid organization object or organization already exists", uriInfo, Status.BAD_REQUEST.getStatusCode());
             return error.toResponse().build();
         }
     }
@@ -157,7 +157,7 @@ public class OrganizationResource {
             URI uri = ub.path(storedJournalConcept.getJournalID()).build();
             return Response.created(uri).entity(concepts).build();
         } else {
-            ErrorsResponse error = ResponseFactory.makeError("Please check the structure of your object", "Invalid organization object", uriInfo, Status.BAD_REQUEST.getStatusCode());
+            ErrorsResponse error = ResponseFactory.makeError("Please check the structure of your object", "Invalid organization object or organization doesn't exist", uriInfo, Status.BAD_REQUEST.getStatusCode());
             return error.toResponse().build();
         }
     }

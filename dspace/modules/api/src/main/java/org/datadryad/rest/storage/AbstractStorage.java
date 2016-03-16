@@ -31,11 +31,7 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
 
     @Override
     public void create(StoragePath path, T object) throws StorageException {
-        if(objectExists(path, object)) {
-            throw new StorageException("Unable to create, object already exists");
-        } else {
-            createObject(path, object);
-        }
+        createObject(path, object);
     }
 
     // If this returns null, not found
@@ -49,12 +45,7 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
 
     @Override
     public void update(StoragePath path, T object) throws StorageException {
-        // find the existing organization
-        if(!objectExists(path, object)){
-            throw new StorageException("Unable to update, object does not exist");
-        } else {
-            updateObject(path, object);
-        }
+        updateObject(path, object);
     }
 
     @Override

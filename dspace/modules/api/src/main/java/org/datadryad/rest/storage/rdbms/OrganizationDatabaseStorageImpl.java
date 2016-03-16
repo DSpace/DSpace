@@ -168,20 +168,17 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     protected void createObject(StoragePath path, DryadJournalConcept journalConcept) throws StorageException {
         // if this object is the same as an existing one, delete this temporary one and throw an exception.
         String name = journalConcept.getFullName();
-        if (objectExists(path, journalConcept)) {
+        if (JournalUtils.getJournalConceptByJournalName(name) != null) {
             try {
+                // remove this journal concept because it's a temporary concept.
                 Context context = getContext();
                 context.turnOffAuthorisationSystem();
-                if (JournalUtils.getJournalConceptByJournalName(name) != null) {
-                    // remove this journal concept because it's a temporary concept.
-                    JournalUtils.removeDryadJournalConcept(context, journalConcept);
-                }
+                JournalUtils.removeDryadJournalConcept(context, journalConcept);
                 context.restoreAuthSystemState();
                 completeContext(context);
             } catch (Exception ex) {
                 throw new StorageException("Can't create new organization: couldn't remove temporary organization.");
             }
-            throw new StorageException("Can't create new organization: one named '" + name + "' already exists.");
         } else {
             try {
                 Context context = getContext();

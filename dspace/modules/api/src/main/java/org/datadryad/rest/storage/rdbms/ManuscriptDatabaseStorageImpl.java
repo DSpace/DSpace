@@ -326,6 +326,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     @Override
     protected void createObject(StoragePath path, Manuscript manuscript) throws StorageException {
+        if(objectExists(path, manuscript)) {
+            throw new StorageException("Unable to create, manuscript already exists");
+        }
+
         String organizationCode = path.getOrganizationCode();
         try {
             Context context = getContext();
@@ -375,6 +379,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     @Override
     protected void updateObject(StoragePath path, Manuscript manuscript) throws StorageException {
+        if(!objectExists(path, manuscript)){
+            throw new StorageException("Unable to update, manuscript does not exist");
+        }
+
         String organizationCode = path.getOrganizationCode();
         String manuscriptId = path.getManuscriptId();
         if(!manuscriptId.equals(manuscript.getManuscriptId())) {
