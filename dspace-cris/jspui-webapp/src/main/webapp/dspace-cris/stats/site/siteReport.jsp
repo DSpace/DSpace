@@ -79,30 +79,11 @@
 
 	<c:set var="type"><%=request.getParameter("type") %></c:set>
     <%@include file="/dspace-cris/stats/common/changeRange.jsp"%> 	
-		<%@ include file="/dspace-cris/stats/community/_communityReport-right.jsp" %> 
+		<%@ include file="/dspace-cris/stats/site/_siteReport-right.jsp" %> 
 	<div class="richeditor">
 		<div class="top"></div>
-			<%@ include file="/dspace-cris/stats/community/_communityReport.jsp" %>
-		<div class="bottom">
-			<c:if test="${data.seeParentObject}">			
-				<c:set var="parentLink">${contextPath}/stats/community.html?handle=${data.parentObject.handle}&type=${type}</c:set>
-				<div class="list-group">
-					<a class="list-group-item" href="${parentLink}"><fmt:message key="view.${data.jspKey}.${type}.parentStats"><fmt:param>${data.parentObject.name}</fmt:param></fmt:message></a>
-				</div>
-			</c:if>
-			<div class="list-group">
-				<c:forEach var="child" items="${data.childrenObjects}">
-				<c:if test="${child.type eq 3}">
-					<a class="list-group-item" href="${contextPath}/stats/collection.html?handle=${child.handle}&type=${type}&stats_from_date=${data.stats_from_date}&stats_to_date=${data.stats_to_date}"><fmt:message key="view.${data.jspKey}.${type}.childrenStats"><fmt:param>${child.name}</fmt:param></fmt:message></a>
-				</c:if>
-				<c:if test="${child.type eq 4}">
-					<a class="list-group-item" href="${contextPath}/stats/community.html?handle=${child.handle}&type=${type}&stats_from_date=${data.stats_from_date}&stats_to_date=${data.stats_to_date}"><fmt:message key="view.${data.jspKey}.${type}.childrenStats"><fmt:param>${child.name}</fmt:param></fmt:message></a>
-				</c:if>	
-				</c:forEach>
-			</div>
+			<%@ include file="/dspace-cris/stats/site/_siteReport.jsp" %>	</div>
 		</div>
-	</div>
-	</div>
 	</div>	
 </div>
 <div class="clear"></div>

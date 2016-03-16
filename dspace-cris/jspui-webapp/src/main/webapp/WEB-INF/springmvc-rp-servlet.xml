@@ -6489,6 +6489,7 @@
 				<prop key="/stats/item.html">itemStatisticsController</prop>
  				<prop key="/stats/collection.html">collectionStatisticsController</prop>
 				<prop key="/stats/community.html">communityStatisticsController</prop>
+				<prop key="/stats/site.html">siteStatisticsController</prop>
 				<prop key="/stats/rp.html">rpStatisticsController</prop>
 				<prop key="/stats/pj.html">pjStatisticsController</prop>
 				<prop key="/stats/ou.html">ouStatisticsController</prop>
@@ -7354,9 +7355,25 @@
 		<property name="jspKey" value="stats-community" />
 		<property name="success" value="stats/community/communityReport" />
 		<property name="error" value="stats/error" />
+		<property name="maxListMostViewedItem" value="50" />
 		<property name="applicationService" ref="applicationService" />
 	</bean> 
- 
+
+	<bean id="siteStatisticsController"
+		class="org.dspace.app.webui.cris.controller.statistics.StatisticsController">
+		<property name="solrConfig">
+			<ref bean="solrConfig" />
+		</property>
+		<property name="statsComponentsService">
+			<ref bean="siteRequestsManager" />
+		</property>
+		<property name="jspKey" value="stats-site" />
+		<property name="success" value="stats/site/siteReport" />
+		<property name="error" value="stats/error" />
+		<property name="maxListMostViewedItem" value="100" />
+		<property name="applicationService" ref="applicationService" />
+	</bean>
+	 
 	<bean id="solrConfig" class="org.dspace.app.cris.statistics.util.StatsConfig"/>
 		
     <bean id="openSessionInViewInterceptor"  

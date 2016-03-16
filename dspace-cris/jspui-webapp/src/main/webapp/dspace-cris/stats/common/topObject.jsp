@@ -61,7 +61,7 @@
 	<c:otherwise>
 		<div id="statstab-content-id" class="statstab-content-item">		 
 		<c:set var="pieType">id</c:set>
-		<stats:piewithtable data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}" useLocalMap="true"/>
+		<stats:piewithtable mostViewedItem="true" data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}" useLocalMap="true"/>
 		</div>	
 	</c:otherwise>
 	</c:choose>
@@ -75,34 +75,57 @@
 		<%@include file="time.jsp"%> 
 	</div>
 </div>
+</div>
 <script type="text/javascript">
 <!--
-		var j = jQuery;
-        j(document).ready(function() {
-        	j(".statstabahref").click(function() {		
-    			var d = j('div#' + j(this).attr('id').replace('ahref', 'content'));		
-    			d.trigger('redraw');			
-    		});
-    		
-    		j("#statstabs").tabs({
-    			"activate": function( event, ui ) {
-    				j("li.ui-tabs-active").toggleClass("ui-tabs-active ui-state-active active");
-    			},
-    			"beforeActivate": function( event, ui ) {
-       			 j("li.active").toggleClass("active");
-    			},
-    	   		"create": function( event, ui ) {
-    	               j("div.ui-tabs").toggleClass("ui-tabs ui-widget ui-widget-content ui-corner-all tabbable");
-    	               j("ul.ui-tabs-nav").toggleClass("ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all nav nav-tabs");
-    	               j("li.ui-tabs-active").toggleClass("ui-state-default ui-corner-top ui-tabs-active ui-state-active active");
-    	               j("li.ui-state-default").toggleClass("ui-state-default ui-corner-top");
-    	               j("div.ui-tabs-panel").toggleClass("ui-tabs-panel ui-widget-content ui-corner-bottom tab-content with-padding");
-    	        }
-    		});
-        });
+	j(document).ready(function() {
+		j(".statstabahref").click(function() {		
+			var d = j('div#' + j(this).attr('id').replace('ahref', 'content'));
+			d.trigger('redraw');
+		});
+		
+		j("#statstabs").tabs({
+			"activate": function( event, ui ) {
+				j("li.ui-tabs-active").toggleClass("ui-tabs-active ui-state-active active");
+			},
+			"beforeActivate": function( event, ui ) {
+   			 j("li.active").toggleClass("active");
+			},
+	   		"create": function( event, ui ) {
+	               j("div.ui-tabs").toggleClass("ui-tabs ui-widget ui-widget-content ui-corner-all tabbable");
+	               j("ul.ui-tabs-nav").toggleClass("ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all nav nav-tabs");
+	               j("li.ui-tabs-active").toggleClass("ui-state-default ui-corner-top ui-tabs-active ui-state-active active");
+	               j("li.ui-state-default").toggleClass("ui-state-default ui-corner-top");
+	               j("div.ui-tabs-panel").toggleClass("ui-tabs-panel ui-widget-content ui-corner-bottom tab-content with-padding");
+	        }
+		});
+		
+		j(".datatable-mostviewed")
+		.dataTable({
+					dom : "<'pull-left'f><'pull-right'B>rtip",
+					searching : true,
+					info : false,
+					paging : false,
+					ordering : true,
+					order: [[ 1, "desc" ]],
+					aoColumnDefs: [
+						{ bSortable: false, aTargets: [ 0 ] }
+					],
+					buttons : [
+							{
+								extend : 'excelHtml5',								
+								text : '<i class="fa fa-file-excel-o"></i> Download Excel'
+							},
+							{
+								extend : 'csvHtml5',
+								text : '<i class="fa fa-file-text-o"></i> Download CSV'
+							}
+					]					
+		});
+});
+
 -->
 </script>
-</div>
 	</c:when>
 	<c:otherwise> 
 		<fmt:message key="view.${data.jspKey}.${statType}.${objectName}.data.empty" />		

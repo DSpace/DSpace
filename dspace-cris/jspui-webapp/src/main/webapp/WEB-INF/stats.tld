@@ -33,4 +33,9 @@
 	<name>table</name>
 	<path>/WEB-INF/tags/stats/table.tag</path>
 </tag-file>
+
+<tag-file>
+	<name>datatable</name>
+	<path>/WEB-INF/tags/stats/datatable.tag</path>
+</tag-file>
 </taglib>

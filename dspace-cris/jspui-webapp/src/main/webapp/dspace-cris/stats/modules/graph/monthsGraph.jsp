@@ -93,7 +93,7 @@ j(document).ready(function() {
         
 		var ${jsDataObjectName} = new google.visualization.DataTable();
    	    ${jsDataObjectName}.addColumn('date','Time');
-   	  	${jsDataObjectName}.addColumn('number','Visit');
+   	  	${jsDataObjectName}.addColumn('number','Hit');
    	  	
    		<c:set var="foundfirstNotZero" scope="page">false</c:set>
    		<c:set var="counter" scope="page">1</c:set>   		 

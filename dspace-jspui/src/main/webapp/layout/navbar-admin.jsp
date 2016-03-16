@@ -42,6 +42,7 @@
     }
 
     boolean crisModuleEnabled = ConfigurationManager.getBooleanProperty(CrisConstants.CFG_MODULE,"enabled");
+    String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
     
     // E-mail may have to be truncated
     String navbarEmail = null;
@@ -93,7 +94,8 @@
                <li><a href="<%= request.getContextPath() %>/tools/group-edit"><fmt:message key="jsp.layout.navbar-admin.groups"/></a></li>
                <li><a href="<%= request.getContextPath() %>/tools/authorize"><fmt:message key="jsp.layout.navbar-admin.authorization"/></a></li>
             </ul>
-          </li>          
+          </li>
+          <li><a href="<%= request.getContextPath() %>/cris/stats/site.html?handle=<%=handlePrefix%>/0"><fmt:message key="jsp.layout.navbar-admin.statistics"/></a></li>
 		  <li class="dropdown">
              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><fmt:message key="jsp.layout.navbar-admin.settings"/> <b class="caret"></b></a>
              <ul class="dropdown-menu">

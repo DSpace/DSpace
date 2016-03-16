@@ -195,4 +195,13 @@ public class Researcher implements EPersonCRISIntegration
     public List<ICrisHomeProcessor> getCrisProcessorService() {
         return dspace.getServiceManager().getServicesByType(ICrisHomeProcessor.class);
     }
+    
+    public StatComponentsService getSiteStatsComponents() {
+        StatComponentsService compService = dspace.getServiceManager().getServiceByName("siteStatsComponent", StatComponentsService.class);
+        if (compService == null)
+        {
+            return null;
+        }
+        return compService;
+    }
 }

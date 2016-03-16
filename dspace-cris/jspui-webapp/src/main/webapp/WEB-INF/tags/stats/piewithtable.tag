@@ -4,6 +4,7 @@
 <%@ attribute name="pieType" required="true"%>
 <%@ attribute name="useLocalMap" required="false" %>
 <%@ attribute name="useFmt" required="false" %>
+<%@ attribute name="mostViewedItem" required="false" %>
 
 <%@ taglib uri="statstags" prefix="stats" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -23,9 +24,14 @@
 			<div class="clearfix"> </div>
 			<div class="target_stats" id="${targetDiv}"></div>
 
-
-<stats:table data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}" useLocalMap="${useLocalMap}" useFmt="${useFmt}" />
-
+<c:choose>
+<c:when test="${mostViewedItem}">
+	<stats:datatable data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}" useLocalMap="${useLocalMap}" useFmt="${useFmt}" />	
+</c:when>
+<c:otherwise>
+	<stats:table data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}" useLocalMap="${useLocalMap}" useFmt="${useFmt}" />
+</c:otherwise>
+</c:choose>
 <c:set var="jsDataObjectName" scope="page"> data_${statType}_${objectName}_${pieType}_${pieType}</c:set>
 <script type="text/javascript"><!--
 		var j = jQuery;

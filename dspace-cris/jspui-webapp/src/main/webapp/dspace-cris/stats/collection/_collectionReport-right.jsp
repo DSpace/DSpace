@@ -8,7 +8,7 @@
 
 --%>
 
-<c:set var="link">${contextPath}/stats/collection.html?handle=${data.object.handle}&stats_from_date=${data.stats_from_date}&stats_to_date=${data.stats_to_date}</c:set>
+<c:set var="link">${contextPath}/cris/stats/collection.html?handle=${data.object.handle}&stats_from_date=${data.stats_from_date}&stats_to_date=${data.stats_to_date}</c:set>
 <c:set var="subscribeLink">${contextPath}/cris/tools/stats/subscription/subscribe?uid=${data.object.handle}&amp;type=${data.object.type}</c:set>
 <c:set var="rssLink">${contextPath}/cris/stats/rss/</c:set>
 <c:set var="rssImgLink">${contextPath}/image/stats/rss-</c:set>

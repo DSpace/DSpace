@@ -275,5 +275,45 @@
 					
 	</bean>
 	
+
+	<!-- Components for SITE -->
+	
+	<bean id="siteStatsComponent" class="org.dspace.app.cris.integration.statistics.StatComponentsService">
+		<property name="excludeBot" value="true"/> <!-- <value>-isBot:true</value>  -->
+		<property name="showSelectedObject" value="true"/>
+		<property name="topRelation" value="20"/>
+		<property name="components">
+			<map>
+				<entry key="item" value-ref="statsitemforsite" />				
+				<entry key="upload" value-ref="statsuploadbitstreamforsite" />
+			</map>
+		</property>
+		<property name="topCountryLength" value="10" />
+		<property name="topContinentLength" value="-1" />
+		<property name="topCityLength" value="10" />		
+		<property name="showMoreLength" value="20" />
+		<property name="yearsQuery" value="5" />
+	</bean>
+
+	<bean id="statsitemforsite"
+		class="org.dspace.app.webui.cris.components.statistics.StatItemTopObjectComponent">
+		<property name="relationObjectType" value="2" />			
+		<property name="bean" ref="commonCommunityBean" />		
+	</bean>
+	
+	<bean id="statsuploadbitstreamforsite"
+		class="org.dspace.app.webui.cris.components.statistics.StatUploadObjectComponent">					
+		<property name="relationObjectType" value="0" />			
+		<property name="bean" ref="commonSiteBean" />		
+		<property name="searchService" ref="org.dspace.discovery.SearchService" />
+	</bean>
+	
+	<bean id="commonSiteBean"
+		class="org.dspace.app.webui.cris.components.BeanComponent">
+
+		<property name="componentIdentifier" value="site" />
+		<property name="query"><value>location.comm:{0}</value></property>
+					
+	</bean>
 		
 </beans>

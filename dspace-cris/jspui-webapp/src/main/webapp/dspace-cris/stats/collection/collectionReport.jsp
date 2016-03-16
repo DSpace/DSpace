@@ -29,7 +29,6 @@
     
 	
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-	<link href="${contextPath}/css/stats.css" type="text/css" rel="stylesheet" />
 	<style type="text/css">
 	  #map_canvas { height: 100% }
 	</style>

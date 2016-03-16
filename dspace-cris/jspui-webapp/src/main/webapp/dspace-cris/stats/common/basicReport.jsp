@@ -87,6 +87,7 @@
 	               j("div.ui-tabs-panel").toggleClass("ui-tabs-panel ui-widget-content ui-corner-bottom tab-content with-padding");
 	        }
 		});
+
 	});
 
 -->

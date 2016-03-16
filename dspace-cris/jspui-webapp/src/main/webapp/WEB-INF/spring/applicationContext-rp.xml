@@ -60,4 +60,5 @@
     <bean id="collectionRequestsManager" factory-bean="researcher" factory-method="getCollectionStatsComponents" />
     <bean id="itemRequestsManager" factory-bean="researcher" factory-method="getItemStatsComponents" />
     <bean id="communityRequestsManager" factory-bean="researcher" factory-method="getCommunityStatsComponents" />
+    <bean id="siteRequestsManager" factory-bean="researcher" factory-method="getSiteStatsComponents" />
 </beans>

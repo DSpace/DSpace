@@ -7,5 +7,5 @@
     https://github.com/CILEA/dspace-cris/wiki/License
 
 --%>
-<c:set var="objectName" scope="page">site</c:set>
+<c:set var="objectName" scope="page">item</c:set>
 <%@include file="../common/topObject.jsp"%>

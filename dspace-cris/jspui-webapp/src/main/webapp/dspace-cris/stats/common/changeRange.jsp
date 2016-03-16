@@ -6,10 +6,20 @@
         <h4 class="modal-title" id="StatsDataChange"><fmt:message key="view.statistics.range.change.title" /></h4>
       </div>
       <div class="modal-body">
-			<fmt:message key="view.statistics.range.from" /> <input class="form-control" type="text" id="stats_from_date" name="stats_from_date" value="${data.stats_from_date}" /> <br/>
-			<fmt:message key="view.statistics.range.to" /> <input class="form-control" type="text" id="stats_to_date" name="stats_to_date" value="${data.stats_to_date}" /> <br/>
+      <div class="row">
+					<div class='col-md-6'>
+						<div class="form-group">
+								<fmt:message key="view.statistics.range.from" /> <input class="form-control" type="text" id="stats_from_date" name="stats_from_date" value="${data.stats_from_date}" /> 
+						</div>
+					</div>
+					<div class='col-md-6'>
+						<div class="form-group">
+								<fmt:message key="view.statistics.range.to" /> <input class="form-control" type="text" id="stats_to_date" name="stats_to_date" value="${data.stats_to_date}" /> 
+						</div>
+					</div>
 			<input type="hidden" name="type" value="${type}"/>
 			<input type="hidden" name="handle" value="${data.object.handle}" />
+	  </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="view.statistics.range.change.close" /></button>
@@ -20,42 +30,31 @@
 </div>
 
 <script type="text/javascript">
-<!--
 var j = jQuery;
-j(document).ready(function() {
-	j("#stats_from_date").datepicker({
-		dateFormat: "yy-mm-dd",
-		defaultDate: "-6m",
-		changeMonth: true,
-		changeYear: true,
-		showOtherMonths: true,
-	    selectOtherMonths: true,
-		onClose: function( selectedDate ) {
-	        j( "#stats_to_date" ).datepicker( "option", "minDate", selectedDate );
-	      }
-	});
-
-	j("#stats_to_date").datepicker({
-		dateFormat: "yy-mm-dd",
-		changeMonth: true,
-		changeYear: true,
-		showOtherMonths: true,
-	    selectOtherMonths: true,
-		onClose: function( selectedDate ) {
-	        j( "#stats_from_date" ).datepicker( "option", "maxDate", selectedDate );
-	      }
-	});
-
-	j("#formChangeRange").submit(function(){
-		var sdate= j("#stats_from_date").val();
-		var edate= j("#stats_to_date").val();
-		if(sdate.length ==0){
-			sdate.val("*");
-		}
-		if(edate.length ==0){
-			edate.val("*");
-		}
-	});
+j(document).ready(function() {    
+        j('#stats_from_date').datetimepicker({
+        	format: "YYYY-MM-DD"       	
+        });
+        j('#stats_to_date').datetimepicker({
+        	format: "YYYY-MM-DD",
+            useCurrent: false //Important! See issue #1075
+        });
+        j("#stats_from_date").on("dp.change", function (e) {
+            j('#stats_to_date').data("DateTimePicker").minDate(e.date);
+        });
+        j("#stats_to_date").on("dp.change", function (e) {
+            j('#stats_from_date').data("DateTimePicker").maxDate(e.date);
+        });
+        
+    	j("#formChangeRange").submit(function(){
+    		var sdate= j("#stats_from_date").val();
+    		var edate= j("#stats_to_date").val();
+    		if(sdate.length ==0){
+    			sdate.val("*");
+    		}
+    		if(edate.length ==0){
+    			edate.val("*");
+    		}
+    	});
 });
--->
 </script>
