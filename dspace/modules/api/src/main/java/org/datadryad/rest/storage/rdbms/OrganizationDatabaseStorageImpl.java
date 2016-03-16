@@ -112,8 +112,8 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     }
 
     public static Organization getOrganizationByCode(Context context, String code) throws SQLException {
-        String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE UPPER(code) = UPPER(?)";
-        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, code);
+        String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE UPPER(code) = UPPER(?) OR UPPER(issn) = UPPER(?)";
+        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, code, code);
         return organizationFromTableRow(row);
     }
 
@@ -198,6 +198,17 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     @Override
     protected DryadJournalConcept readObject(StoragePath path) throws StorageException {
         String organizationCode = path.getOrganizationCode();
+        try {
+            Context context = getContext();
+            Organization organization = getOrganizationByCode(context, organizationCode);
+            if (organizationCode.equals(organization.organizationISSN)) {
+                // this is an ISSN, replace organizationCode with the organization's code.
+                organizationCode = organization.organizationCode;
+            }
+            completeContext(context);
+        } catch (Exception e) {
+            throw new StorageException("Exception reading organization: " + e.getMessage());
+        }
         DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(organizationCode);
         return journalConcept;
     }
