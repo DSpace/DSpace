@@ -22,10 +22,11 @@
           scope="singleton"/>
 
    <!-- provider for using the versioned handle identifier instead of the default one. -->
-    <!--<bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"-->
-          <!--scope="singleton">-->
-        <!--<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>-->
-    <!--</bean>-->
+    <!--
+    <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider" scope="singleton">
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+    </bean>
+    -->
 
     <!-- provider to mint and register DOIs with DSpace.
          To mint DOIs you need a registration agency. The DOIIdentifierProvider
@@ -33,10 +34,24 @@
          a DOIConnector that handles all API calls to your DOI registration
          agency. Please configure a DOIConnector as well! -->
 
-    <!-- In order to mint DOIs with DSpace, get an agreement with a DOI registration
-         agency,  take a look into dspace.cfg, and uncomment this.
+    <!-- In order to mint DOIs with DSpace, get an agreement with a DOI 
+         registration agency,  take a look into dspace.cfg, and activate either
+         the DOIIdentifierProvider or the VersionedDOIIdentifierProvider,
+         depending on whether you have Item Level Versioning activated or not.
+    -->
+    <!--
     <bean id="org.dspace.identifier.DOIIdentifierProvider"
         class="org.dspace.identifier.DOIIdentifierProvider"
+        scope="singleton">
+        <property name="configurationService"
+            ref="org.dspace.services.ConfigurationService" />
+        <property name="DOIConnector"
+            ref="org.dspace.identifier.doi.DOIConnector" />
+    </bean>
+    -->
+    <!--
+    <bean id="org.dspace.identifier.DOIIdentifierProvider"
+        class="org.dspace.identifier.VersionedDOIIdentifierProvider"
         scope="singleton">
         <property name="configurationService"
             ref="org.dspace.services.ConfigurationService" />
