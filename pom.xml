@@ -69,6 +69,18 @@
                             </rules>    
                         </configuration>
                       </execution>
+                      <!-- Make sure that we do not have conflicting depencies-->
+                      <execution>
+                          <id>enforce-versions</id>
+                          <goals>
+                              <goal>enforce</goal>
+                          </goals>
+                          <configuration>
+                              <rules>
+                                  <DependencyConvergence/>
+                              </rules>
+                          </configuration>
+                      </execution>
                   </executions>
               </plugin>
               <plugin>
@@ -261,6 +273,11 @@
                         </goals>
                     </execution>
                 </executions>
+         </plugin>
+         <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-enforcer-plugin</artifactId>
+             <version>1.4.1</version>
          </plugin>
       </plugins>
    </build>

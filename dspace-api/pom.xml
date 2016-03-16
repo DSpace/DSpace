@@ -218,7 +218,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    
+
                     <!-- Run Unit Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
@@ -296,6 +296,12 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
         	<groupId>org.hibernate</groupId>
@@ -325,6 +331,16 @@
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -441,6 +457,12 @@
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>xml-apis</groupId>
@@ -501,6 +523,13 @@
             <groupId>gr.ekt.bte</groupId>
             <artifactId>bte-io</artifactId>
             <version>0.9.3.5</version>
+            <exclusions>
+                <!-- A more recent version is retrieved from another dependency -->
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -575,7 +604,7 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
-		
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -593,7 +622,7 @@
             <artifactId>im4java</artifactId>
             <version>1.4.0</version>
         </dependency>
-        
+
         <!-- Flyway DB API (flywaydb.org) is used to manage DB upgrades automatically. -->
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -664,22 +693,32 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.10.50</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- S3 also wanted jackson... -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.5.3</version>
+            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.5.3</version>
+            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.5.3</version>
+            <version>2.7.0</version>
         </dependency>
     </dependencies>
 
