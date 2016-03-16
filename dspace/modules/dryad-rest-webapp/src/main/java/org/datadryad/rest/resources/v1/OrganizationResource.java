@@ -94,6 +94,7 @@ public class OrganizationResource {
                 organizationStorage.create(new StoragePath(), journalConcept);
             } catch (StorageException ex) {
                 ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to create organization", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+                return null;
             }
             storedJournalConcept = JournalUtils.getJournalConceptByJournalName(journalConcept.getFullName());
         }
