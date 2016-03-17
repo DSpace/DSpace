@@ -565,6 +565,11 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     }
 
     @JsonIgnore
+    public Boolean isAccepted() {
+        return Concept.Status.ACCEPTED.name().equals(getStatus());
+    }
+
+    @JsonIgnore
     public void setConceptStatusToAccepted() throws SQLException {
         getUnderlyingConcept().setStatus(context, Concept.Status.ACCEPTED.name());
     }

@@ -641,7 +641,11 @@ public class Manuscript {
      **/
     public void propagateMetadataToItem(Context context, Item item) {
         // These values are common to both Article Types
-        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL, journalConcept.getFullName(), journalConcept.getIdentifier(), Choices.CF_ACCEPTED);
+        int journalConfidence = Choices.CF_NOVALUE;
+        if (journalConcept.isAccepted()) {
+            journalConfidence = Choices.CF_ACCEPTED;
+        }
+        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL, journalConcept.getFullName(), journalConcept.getIdentifier(), journalConfidence);
         addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_CODE, journalConcept.getJournalID());
         addSingleMetadataValueFromJournal(context, item, Manuscript.ISSN, journalConcept.getISSN());
 
