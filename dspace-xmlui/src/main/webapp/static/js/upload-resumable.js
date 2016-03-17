@@ -103,7 +103,7 @@ if(doResumable){
     // Handle file add event
     r.on('fileAdded', function(file){
         currentFile = file;
-        hideError('no-space');
+        hideError();
 
         // check enough space left in item for upload
         if(r.getSize() > itemSpace){
@@ -451,7 +451,7 @@ if(doResumable){
         }
 
         // remove any error message
-        hideError('upload-failed');
+        hideError();
 
         r.upload();
     });
@@ -477,8 +477,8 @@ if(doResumable){
         $('#aspect_submission_StepTransformer_p_' + name).removeClass('hide');
     };
 
-    var hideError = function(name){
-        $('#aspect_submission_StepTransformer_p_' + name).addClass('hide');
+    var hideError = function(){
+        $('.alert').addClass('hide');
     };
 }
 else{

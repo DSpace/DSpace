@@ -166,18 +166,17 @@ public class ResumableUpload extends AbstractAction
      * a file was uploaded already. This method handles those requests.
      * @param request
      * @param response
-     * @return True if chunk if found.
      * @throws IOException
      */
-    private boolean doGetResumable(
+    private void doGetResumable(
             HttpServletRequest request,
             HttpServletResponse response) 
         throws IOException
     {
-        boolean exists = false;
-        
         int resumableTotalChunks =
                 Integer.parseInt(request.getParameter("resumableTotalChunks").toString());
+        int resumableChunkNumber =
+                Integer.parseInt(request.getParameter("resumableChunkNumber"));
         long resumableCurrentChunkSize = 
                 Long.valueOf(request.getParameter("resumableCurrentChunkSize"));
 
@@ -202,7 +201,18 @@ public class ResumableUpload extends AbstractAction
             if(chunkFile.length() == resumableCurrentChunkSize)
             {
                 response.setStatus(HttpServletResponse.SC_OK);
-                exists = true;
+                
+                if(resumableChunkNumber == resumableTotalChunks)
+                {
+                    // its possible for the final request to be a GET request,
+                    // in this case process file
+                    this.uploadComplete(
+                            request.getSession(),
+                            request.getParameter("resumableFilename"),
+                            request.getParameter("resumableIdentifier"),
+                            resumableTotalChunks);
+                }
+
             }
             else
             {
@@ -215,8 +225,6 @@ public class ResumableUpload extends AbstractAction
             // if we don't have the chunk send a http status code 204 No content
             response.sendError(HttpServletResponse.SC_NO_CONTENT);
         }
-        
-        return exists;
     }    
 
     /**
@@ -261,45 +269,24 @@ public class ResumableUpload extends AbstractAction
         
         if(chunkOrg.renameTo(chunk))
         {
-            boolean foundAll = false;
-
             if(resumableTotalChunks > 1)
-            {
+            { 
                 if(resumableChunkNumber == resumableTotalChunks)
                 {
-                    int noOfChunks = new File(this.chunkDir).listFiles().length; 
-                    if(noOfChunks == resumableTotalChunks)
-                    {
-                        foundAll = true;
-                    }
-                    else
-                    {
-                        String msg = "something has gone wrong with " + this.handle +
-                                ", we have received last chunk but some are missing: expected " +
-                                resumableTotalChunks + " , have: " + noOfChunks;
-                        log.error(msg);
-                        throw new RuntimeException(msg);
-                    }        	
-                }
-
-                if(foundAll) 
-                {
-                    log.info("Upload of " + resumableIdentifier + " complete. Start file reassembly");
-                    
-                    // recreate file in a new thread 
-                    new FileReassembler(
+                    // we have the final chunk process upload
+                    this.uploadComplete(
+                            request.getSession(),
                             resumableFilename,
                             resumableIdentifier,
-                            resumableTotalChunks,
-                            request.getSession()).start();
+                            resumableTotalChunks);
                 }
             }
             else
             {
                 log.debug(chunkPath + " Uploaded");
-                
-                // store uploaded file in session
-                request.getSession().setAttribute(resumableIdentifier, chunk);
+
+                // chunk is the whole file
+                this.processFile(request.getSession(), chunk, resumableIdentifier);
             }
         }
         else
@@ -397,7 +384,7 @@ public class ResumableUpload extends AbstractAction
     }
 
     /**
-     * 
+     * Complete resumable upload.
      * @param request
      * @param objectModel
      * @return
@@ -424,13 +411,10 @@ public class ResumableUpload extends AbstractAction
                         objectModel, 'S' + request.getParameter("submissionId"));
                     Item item = si.getSubmissionItem().getItem();
                     Context context = ContextUtil.obtainContext(objectModel);
-                    //File f = (File)obj;
                     b = this.createBitstream(context, (File)obj, item);
                     
                     // delete file and upload
-                    log.info(this);
                     log.info("deleting " + this.chunkDir);
-                    //f.delete();
                     if(!deleteDirectory(new File(this.chunkDir)))
                     {
                         log.warn("Couldn't delete submission upload path " + this.submissionDir + ", ignoring it.");
@@ -467,9 +451,9 @@ public class ResumableUpload extends AbstractAction
             
     /**
      * Create DSpace bitstream from file.
-     * @param context
-     * @param file
-     * @param item
+     * @param context DSpace context.
+     * @param file The bitstream on file system.
+     * @param item DSpace item.
      * @return new DSpace bitstream.
      */
     private Bitstream createBitstream(Context context, File file, Item item)
@@ -551,6 +535,142 @@ public class ResumableUpload extends AbstractAction
     }
     
     /**
+     * Do some post processing on reassembled / uploaded file.
+     * @param session User session
+     * @param file The reassembled/uploaded file
+     * @param resumableIdentifier Unique identifier of resumable upload.
+     */
+    private void processFile(
+            HttpSession session,
+            File file,
+            String resumableIdentifier)
+    {
+        int status = Curator.CURATE_SUCCESS;
+        String scan = ConfigurationManager.getProperty(
+                "submission-curation", "virus-scan");
+        
+        if(!scan.equalsIgnoreCase("false"))
+        {
+            status = ResumableUpload.this.virusCheck(file);
+            log.info("Virus check " + file + ", status is " + status);
+            
+            if(status == Curator.CURATE_ERROR)
+            {
+                String msg = "Problem with virus checker"; 
+                session.setAttribute(resumableIdentifier, new VirusCheckException(msg));
+                log.error(msg);
+            }
+            else if (status == Curator.CURATE_FAIL)
+            {
+                String msg = file + " failed virus check";
+                session.setAttribute(resumableIdentifier, new VirusCheckException(msg));
+                log.warn(msg);
+            }
+            else
+            {
+                // file good, store in session
+                session.setAttribute(resumableIdentifier, file);
+            }
+        }
+    }
+    
+    /**
+     * All the chunks have been uploaded, kick off file re-assembly
+     * @param session User session
+     * @param resumableFilename Name of the file uploaded.
+     * @param resumableIdentifier Unique identifier of resumable upload.
+     * @param resumableTotalChunks Total number of chunks uploaded.
+     */
+    private void uploadComplete(
+            HttpSession session,
+            String resumableFilename,
+            String resumableIdentifier,
+            int resumableTotalChunks)
+    {
+        // check chunk count is correct
+        int noOfChunks = new File(this.chunkDir).listFiles().length;
+        if(noOfChunks >= resumableTotalChunks)
+        {
+            log.info("Upload of " + resumableIdentifier + " complete. Start file reassembly");
+            
+            // recreate file in a new thread 
+            new FileReassembler(
+                    session,
+                    resumableFilename,
+                    resumableIdentifier,
+                    resumableTotalChunks).start();
+        }
+        else
+        {
+            String msg = "something has gone wrong with " + this.handle +
+                    ", we have received last chunk but some are missing: expected " +
+                    resumableTotalChunks + " , have: " + noOfChunks;
+            log.error(msg);
+            throw new RuntimeException(msg);
+        }           
+    }
+    
+    /**
+     * Is file virus free? Check using clamdscan process.
+     * @param file The file to check for virus.
+     * @return Curator.CURATE_SUCCESS if file is virus free?
+     */
+    private int virusCheck(File file)
+    { 
+        int bstatus = Curator.CURATE_FAIL;
+        
+        final Pattern PATTERN = Pattern.compile(".*Infected files: 0.*");
+        BufferedReader stdInput = null;
+        
+        try
+        {
+            // spawn clamscan process and wait for result
+            Process p = Runtime.getRuntime().exec(
+                    new String[] {"clamdscan", file.getPath()});
+           
+            p.waitFor();
+            int retVal = p.exitValue();
+            if(retVal == 0)
+            {
+                // good status returned check if pattern is in output 
+                stdInput = new BufferedReader(
+                        new InputStreamReader(p.getInputStream()));
+                
+                String s = null;
+                while((s = stdInput.readLine()) != null)
+                {
+                    Matcher matchHandle = PATTERN.matcher(s);
+                    if(matchHandle.find())
+                    {
+                        bstatus = Curator.CURATE_SUCCESS;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                bstatus = Curator.CURATE_ERROR;
+            }
+        }
+        catch(InterruptedException ex){log.warn(ex);}
+        catch(IOException ex){log.warn(ex);}
+        finally
+        {
+            if(stdInput != null)
+            {
+                try{stdInput.close();} catch (Exception e){log.warn(e);}
+            }
+        }
+
+        if(bstatus != Curator.CURATE_SUCCESS)
+        {
+            log.warn("*** File " + file + " has failed virus check. status = " + bstatus);
+        }
+
+        return bstatus;
+    }
+    
+    /**
      * Reassemble file from individually uploaded chunks. The file will also be virus checked.
      */
     public class FileReassembler extends Thread
@@ -562,15 +682,15 @@ public class ResumableUpload extends AbstractAction
 
         /**
          * @param resumableFilename Name of the file uploaded.
-         * @param resumableIdentifier Unique identifer of resumable upload.
+         * @param resumableIdentifier Unique identifier of resumable upload.
          * @param resumableTotalChunks Total number of chunks uploaded.
-         * @param session Users session.
+         * @param session User session.
          */
         public FileReassembler(
+                HttpSession session,
                 String resumableFilename,
                 String resumableIdentifier,
-                int resumableTotalChunks,
-                HttpSession session)
+                int resumableTotalChunks)
         {
             this.resumableFilename = resumableFilename;
             this.resumableIdentifier = resumableIdentifier;
@@ -649,100 +769,16 @@ public class ResumableUpload extends AbstractAction
             }
             
             return destFile;
-        }
-        
-        /**
-         * Is file virus free? Check using clamdscan process.
-         * @param file The file to check for virus.
-         * @return Curator.CURATE_SUCCESS if file is virus free?
-         */
-        private int virusCheck(File file)
-        { 
-            int bstatus = Curator.CURATE_FAIL;
-            
-            final Pattern PATTERN = Pattern.compile(".*Infected files: 0.*");
-            BufferedReader stdInput = null;
-            
-            try
-            {
-                // spawn clamscan process and wait for result
-                Process p = Runtime.getRuntime().exec(
-                        new String[] {"clamdscan", file.getPath()});
-               
-                p.waitFor();
-                int retVal = p.exitValue();
-                if(retVal == 0)
-                {
-                    // good status returned check if pattern is in output 
-                    stdInput = new BufferedReader(
-                            new InputStreamReader(p.getInputStream()));
-                    
-                    String s = null;
-                    while((s = stdInput.readLine()) != null)
-                    {
-                        Matcher matchHandle = PATTERN.matcher(s);
-                        if(matchHandle.find())
-                        {
-                            bstatus = Curator.CURATE_SUCCESS;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    bstatus = Curator.CURATE_ERROR;
-                }
-            }
-            catch(InterruptedException ex){log.warn(ex);}
-            catch(IOException ex){log.warn(ex);}
-            finally
-            {
-                if(stdInput != null)
-                {
-                    try{stdInput.close();} catch (Exception e){log.warn(e);}
-                }
-            }
-
-            if(bstatus != Curator.CURATE_SUCCESS)
-            {
-                log.warn("*** File " + file + " has failed virus check. status = " + bstatus);
-            }
-
-            return bstatus;
-        }
+        }        
 
         public void run() {
             try
             {
-                // recreate file from chunks
-                File file = this.makeFileFromChunks();
-                
-                int status = Curator.CURATE_SUCCESS;
-                String scan = ConfigurationManager.getProperty(
-                        "submission-curation", "virus-scan");
-                if(!scan.equalsIgnoreCase("false"))
-                {
-                    status = this.virusCheck(file);
-                    log.info("Virus check " + file + ", status is " + status);
-                    
-                    if(status == Curator.CURATE_ERROR)
-                    {
-                        String msg = "Problem with virus checker"; 
-                        this.session.setAttribute(this.resumableIdentifier, new VirusCheckException(msg));
-                        log.error(msg);
-                    }
-                    else if (status == Curator.CURATE_FAIL)
-                    {
-                        String msg = file + " failed virus check";
-                        this.session.setAttribute(this.resumableIdentifier, new VirusCheckException(msg));
-                        log.warn(msg);
-                    }
-                    else
-                    {
-                        // file good, store in session
-                        this.session.setAttribute(this.resumableIdentifier, file);
-                    }
-                }
+                // recreate file from chunks and process file
+                ResumableUpload.this.processFile(
+                        this.session,
+                        this.makeFileFromChunks(),
+                        this.resumableIdentifier);
             }
             catch(IOException ex)
             {
