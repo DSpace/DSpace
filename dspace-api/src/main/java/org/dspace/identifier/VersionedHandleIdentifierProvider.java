@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -114,7 +115,10 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
             // if identifier == 1234.5/100.4 reinstate the version 4 in the 
             // version table if absent
+            
+            
             Matcher versionHandleMatcher = Pattern.compile("^.*/.*\\.(\\d+)$").matcher(identifier);
+            // do we have to register a versioned handle?
             if(versionHandleMatcher.matches())
             {
                 // parse the version number from the handle
@@ -124,6 +128,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
                 } catch (NumberFormatException ex) {
                     throw new IllegalStateException("Cannot detect the interger value of a digit.", ex);
                 }
+                
                 // get history
                 VersionHistory history = null;
                 try {
@@ -135,22 +140,27 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
                         + " in cause of a problem with the database: ", ex);
                 }
                 
+                // do we have a version history?
                 if (history != null)
                 {
-                    // get version
+                    // get the version
                     Version version = null;
                     try {
                         versionHistoryService.getVersion(context, history, item);
                     } catch (SQLException ex) {
                         throw new RuntimeException("Problem with the database connection occurd.", ex);
                     }
+                    
+                    // did we found a version?
                     if (version != null)
                     {
+                        // do the version's number and the handle versionnumber match?
                         if (version.getVersionNumber() != versionNumber)
                         {
                             throw new IdentifierException("Trying to register a handle without matching its item's version number.");
                         }
-                        // version numbers matches, just create the handle
+                        
+                        // create the handle
                         try {
                             handleService.createHandle(context, dso, identifier);
                             populateHandleMetadata(context, item, identifier);
@@ -186,7 +196,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
             }
         }
         try {
-            // either we have a DSO not of type object or the handle was not a
+            // either we have a DSO not of type item or the handle was not a
             // versioned (e.g. 123456789/100) one
             // just register it.
             createNewIdentifier(context, dso, identifier);
@@ -417,24 +427,40 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         }
         return identifier;
     }
-
+    
     protected void populateHandleMetadata(Context context, Item item, String handleref)
             throws SQLException, IOException, AuthorizeException
     {
-        // Add handle as identifier.uri DC value.
-        // First check that identifier doesn't already exist.
-        boolean identifierExists = false;
-        List<MetadataValue> identifiers = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
+        // we want to remove the old handle and insert the new. To do so, we 
+        // load all identifiers, clear the metadata field, re add all 
+        // identifiers which are not from type handle and add the new handle.
+        List<MetadataValue> identifiers = itemService.getMetadata(item, 
+                MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
+        itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, 
+                "identifier", "uri", Item.ANY);
         for (MetadataValue identifier : identifiers)
         {
-            if (handleref.equals(identifier.getValue()))
+            if (this.supports(identifier.getValue()))
             {
-                identifierExists = true;
+                // ignore handles
+                log.debug("Removing identifier " + identifier.getValue());
+                continue;
             }
+            log.debug("Preserving identifier " + identifier.getValue());
+            itemService.addMetadata(context, 
+                    item,
+                    identifier.getMetadataField(),
+                    identifier.getLanguage(),
+                    identifier.getValue(),
+                    identifier.getAuthority(),
+                    identifier.getConfidence());
         }
-        if (!identifierExists)
+        
+        // Add handle as identifier.uri DC value.
+        if (StringUtils.isNotBlank(handleref))
         {
             itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", null, handleref);
         }
+        itemService.update(context, item);
     }
 }
