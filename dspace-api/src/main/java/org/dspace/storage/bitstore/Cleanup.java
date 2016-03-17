@@ -36,53 +36,58 @@ public class Cleanup
      */
     public static void main(String[] argv)
     {
+        log.info("Cleaning up asset store");
+
+        // set up command line parser
+        CommandLineParser parser = new PosixParser();
+        CommandLine line = null;
+
+        // create an options object and populate it
+        Options options = new Options();
+
+        options.addOption("l", "leave", false, "Leave database records but delete file from assetstore");
+        options.addOption("b", "batchSize", true, "commitBatches, default 100");
+        options.addOption("v", "verbose", false, "Provide verbose output");
+        options.addOption("h", "help", false, "Help");
+
         try
         {
-            log.info("Cleaning up asset store");
-            
-            // set up command line parser
-            CommandLineParser parser = new PosixParser();
-            CommandLine line = null;
-
-            // create an options object and populate it
-            Options options = new Options();
-
-            options.addOption("l", "leave", false, "Leave database records but delete file from assetstore");
-            options.addOption("v", "verbose", false, "Provide verbose output");
-            options.addOption("h", "help", false, "Help");
-            
-            try
-            {            	
-                line = parser.parse(options, argv);
-            }
-            catch (ParseException e)
-            {
-                log.fatal(e);
-                System.exit(1);
-            }
-            
+            line = parser.parse(options, argv);
             // user asks for help
             if (line.hasOption('h'))
             {
                 printHelp(options);
-                System.exit(0);
             }
-
-            boolean deleteDbRecords = true;
-            // Prune stage
-            if (line.hasOption('l'))
+            else  // actually do the work
             {
-            	log.debug("option l used setting flag to leave db records");
-                deleteDbRecords = false;    
+                boolean deleteDbRecords = !line.hasOption('l');
+                boolean verbose = line.hasOption('v');
+                int commitBatch = 100;
+                if (line.hasOption('b')) {
+                    try {
+                        commitBatch = Integer.parseInt(line.getOptionValue('b'));
+                    } catch (NumberFormatException ne) {
+                        throw new ParseException("batchSize must be greater equal 1");
+                    }
+                    if (commitBatch < 1) {
+                        throw new ParseException("batchSize must be greater equal 1");
+                    }
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("leave db records = " + deleteDbRecords);
+                    log.debug("batchSize = " + commitBatch);
+                }
+                if (verbose) {
+                    System.out.println("leave db records = " + deleteDbRecords);
+                    System.out.println("batchSize = " + commitBatch);
+                }
+                StorageServiceFactory.getInstance().getBitstreamStorageService().cleanup(deleteDbRecords, commitBatch, verbose);
             }
-           	log.debug("leave db records = " + deleteDbRecords);
-            StorageServiceFactory.getInstance().getBitstreamStorageService().cleanup(deleteDbRecords, line.hasOption('v'));
-            
-            System.exit(0);
         }
         catch (Exception e)
         {
             log.fatal("Caught exception:", e);
+            printHelp(options);
             System.exit(1);
         }
     }

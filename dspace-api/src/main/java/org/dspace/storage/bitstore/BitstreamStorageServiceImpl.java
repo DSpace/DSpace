@@ -217,7 +217,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     }
 
     @Override
-    public void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException, AuthorizeException {
+    public void cleanup(boolean deleteDbRecords, int batchSize,  boolean verbose) throws SQLException, IOException, AuthorizeException {
         Context context = null;
         int commitCounter = 0;
 
@@ -306,7 +306,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                 // if we hit an exception, which isn't useful at all for large
                 // amounts of bitstreams.
                 commitCounter++;
-                if (commitCounter % 100 == 0)
+                if (commitCounter % batchSize == 0)
                 {
                     context.dispatchEvents();
                 }
