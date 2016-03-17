@@ -407,14 +407,14 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
+                        <!-- Journal of Systematics and Evolution -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+systematics%5C+and%5C+evolution%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Systematics%5C+and%5C+Evolution"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JSE_Cover.png" alt="Journal of Systematics and Evolution" /></a>
                         <!-- Toxicological Sciences -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Atoxicological%5C+sciences%5C%7C%5C%7C%5C%7CToxicological%5C+Sciences"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-TOXSCICover.png" alt="Toxicological Sciences" /></a>
                         <!-- Behavioral Ecology -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abehavioral%5C+ecology%5C%7C%5C%7C%5C%7CBehavioral%5C+Ecology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BEHECOCover.png" alt="Behavioral Ecology" /></a>
                         <!-- Biotropica -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abiotropica%5C%7C%5C%7C%5C%7CBiotropica"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BITRCover.png" alt="Biotropica" /></a>
-						<!-- Development -->
-						<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Adevelopment%5C%7C%5C%7C%5C%7CDevelopment"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-DEVELOPMENT_cover.png" alt="Development" /></a>
 
                     </div>
                 </div>
