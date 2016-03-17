@@ -641,7 +641,7 @@ public class Manuscript {
      **/
     public void propagateMetadataToItem(Context context, Item item) {
         // These values are common to both Article Types
-        int journalConfidence = Choices.CF_NOVALUE;
+        int journalConfidence = Choices.CF_UNSET;
         if (journalConcept.isAccepted()) {
             journalConfidence = Choices.CF_ACCEPTED;
         }
