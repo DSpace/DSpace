@@ -22,10 +22,13 @@
 	<div class="col-md-12">
 		<div>
 		<ul class="nav nav-tabs">
-			<li class="<c:if test="${type ne 'upload'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=item"><fmt:message key="view.stats-community.top.item.page.title" /></a></li>
+			<li class="<c:if test="${type ne 'upload' && type ne 'community' && type ne 'collection' && type ne 'bitstream'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=item"><fmt:message key="view.stats-site.top.item.page.title" /></a></li>
+			<li class="<c:if test="${type eq 'bitstream'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=bitstream"><fmt:message key="view.stats-site.top.bitstream.page.title" /></a></li>
 			<c:if test="${data.seeUpload}">			
-				<li class="<c:if test="${type eq 'upload'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=upload"><fmt:message key="view.stats-community.upload.page.title" /></a></li>
-			</c:if>		
+				<li class="<c:if test="${type eq 'upload'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=upload"><fmt:message key="view.stats-site.upload.page.title" /></a></li>
+			</c:if>
+<%-- 			<li class="<c:if test="${type eq 'community'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=community"><fmt:message key="view.stats-site.top.community.page.title" /></a></li>
+			<li class="<c:if test="${type eq 'collection'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=collection"><fmt:message key="view.stats-site.top.collection.page.title" /></a></li> --%>		
 		</ul>
 
 <div class="clearfix">&nbsp;</div>

@@ -25,7 +25,6 @@ import org.dspace.statistics.SolrLogger;
 public class StatUploadObjectComponent<T extends DSpaceObject> extends StatsComponent<T> {
 
 	SearchService searchService;
-	private static final String QUERY_FILTER =" search.resourcetype:2 AND -withdrawn:true";
 	
 	@Override
 	public TwoKeyMap getLabels(Context context, String type) throws Exception {
@@ -82,7 +81,6 @@ public class StatUploadObjectComponent<T extends DSpaceObject> extends StatsComp
 	        solrQuery.set("f." + ID + ".facet.missing", false);
 	        solrQuery.set("f." + ID + ".facet.mincount", 1);
 	    	
-	    	solrQuery.addFilterQuery(QUERY_FILTER);
 	        solrQuery.setRows(0);
 	        solrQuery.setFacet(true);
 	        solrQuery.set("facet.date", "dc.date.accessioned_dt");
@@ -93,16 +91,13 @@ public class StatUploadObjectComponent<T extends DSpaceObject> extends StatsComp
 	        solrQuery.set("facet.date.gap", "+1MONTHS");
 
 	        solrQuery.setFacetMissing(true);
-            Integer relationType = getRelationObjectType();
             
 			for (String filter : getBean().getFilters()) {
 				solrQuery.addFilterQuery(filter);
 			}
 			
-			String query="*:*";
-			if(!StringUtils.equals(id,"0")){
-				query = MessageFormat.format(getBean().getQuery(), id);
-			}
+			String query= MessageFormat.format(getBean().getQuery(), id);		
+			
 			solrQuery.setQuery(query);
 			if (getBean() instanceof BeanFacetComponent) {
 				BeanFacetComponent beanFacet = (BeanFacetComponent) getBean();

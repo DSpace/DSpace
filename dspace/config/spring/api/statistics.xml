@@ -120,6 +120,7 @@
 	
 	<bean id="itemStatsComponent" class="org.dspace.app.cris.integration.statistics.StatComponentsService">
 		<property name="excludeBot" value="true"/> <!-- <value>-isBot:true</value>  -->
+		<property name="showExtraTab" value="false"/>
 		<property name="showSelectedObject" value="true"/>
 		<property name="topRelation" value="20"/>
 		<property name="components">
@@ -150,7 +151,7 @@
 
 	<bean id="commonItemBean"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
-		<property name="componentIdentifier" value="collection" />
+		<property name="componentIdentifier" value="item" />
 		<property name="query"><value>search.resourceid:{0}</value></property>					
 	</bean>
 
@@ -159,6 +160,7 @@
 	
 	<bean id="collectionStatsComponent" class="org.dspace.app.cris.integration.statistics.StatComponentsService">
 		<property name="excludeBot" value="true"/> <!-- <value>-isBot:true</value>  -->
+		<property name="showExtraTab" value="false"/>
 		<property name="showSelectedObject" value="true"/>
 		<property name="topRelation" value="20"/>
 		<property name="components">
@@ -207,6 +209,7 @@
 	
 	<bean id="communityStatsComponent" class="org.dspace.app.cris.integration.statistics.StatComponentsService">
 		<property name="excludeBot" value="true"/> <!-- <value>-isBot:true</value>  -->
+		<property name="showExtraTab" value="false"/>
 		<property name="showSelectedObject" value="true"/>
 		<property name="topRelation" value="20"/>
 		<property name="components">
@@ -281,11 +284,15 @@
 	<bean id="siteStatsComponent" class="org.dspace.app.cris.integration.statistics.StatComponentsService">
 		<property name="excludeBot" value="true"/> <!-- <value>-isBot:true</value>  -->
 		<property name="showSelectedObject" value="true"/>
+		<property name="showExtraTab" value="true"/>
 		<property name="topRelation" value="20"/>
 		<property name="components">
-			<map>
-				<entry key="item" value-ref="statsitemforsite" />				
-				<entry key="upload" value-ref="statsuploadbitstreamforsite" />
+			<map>			
+				<entry key="item" value-ref="statsitemforsite" />
+<!-- 				<entry key="community" value-ref="statscommunityforsite" />
+				<entry key="collection" value-ref="statscollectionforsite" /> -->
+				<entry key="bitstream" value-ref="statsbitstreamforsite" />				
+				<entry key="upload" value-ref="statssubmitteditemforsite" />
 			</map>
 		</property>
 		<property name="topCountryLength" value="10" />
@@ -298,22 +305,63 @@
 	<bean id="statsitemforsite"
 		class="org.dspace.app.webui.cris.components.statistics.StatItemTopObjectComponent">
 		<property name="relationObjectType" value="2" />			
-		<property name="bean" ref="commonCommunityBean" />		
+		<property name="bean" ref="commonSiteBean" />		
 	</bean>
 	
-	<bean id="statsuploadbitstreamforsite"
-		class="org.dspace.app.webui.cris.components.statistics.StatUploadObjectComponent">					
+	<bean id="statsbitstreamforsite"
+		class="org.dspace.app.webui.cris.components.statistics.StatBitstreamTopObjectComponent">					
 		<property name="relationObjectType" value="0" />			
 		<property name="bean" ref="commonSiteBean" />		
-		<property name="searchService" ref="org.dspace.discovery.SearchService" />
+		<property name="crisSearchService" ref="org.dspace.discovery.SearchService" />
 	</bean>
 	
+<!-- 	<bean id="statscommunityforsite"
+		class="org.dspace.app.webui.cris.components.statistics.StatTopObjectComponent">	
+		<property name="relationObjectType" value="4" />			
+		<property name="bean" ref="commonSiteBean" />
+	</bean>
+	
+	<bean id="statscollectionforsite"
+		class="org.dspace.app.webui.cris.components.statistics.StatTopObjectComponent">
+		<property name="relationObjectType" value="3" />			
+		<property name="bean" ref="commonSiteBean" />
+	</bean> -->
+	
+	<bean id="statssubmitteditemforsite"
+		class="org.dspace.app.webui.cris.components.statistics.StatUploadObjectComponent">					
+		<property name="relationObjectType" value="2" />			
+		<property name="bean" ref="commonSiteSubmittedItemBean" />		
+		<property name="searchService" ref="org.dspace.discovery.SearchService" />
+	</bean>
+	<bean id="commonSiteSubmittedItemBean"
+		class="org.dspace.app.webui.cris.components.BeanComponent">
+		<property name="filters">
+			<list>
+				<value>search.resourcetype:2</value>
+				<value>-withdrawn:true</value>
+			</list>
+		</property>
+		<property name="componentIdentifier" value="sitesubmitted" />
+		<property name="query"><value>*:*</value></property>
+	</bean>
+		
 	<bean id="commonSiteBean"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
-
 		<property name="componentIdentifier" value="site" />
-		<property name="query"><value>location.comm:{0}</value></property>
-					
+		<property name="subQueries">
+		<map>
+			<entry key="Journal"><value>itemtype_keyword:"Journal/Magazine Article"</value></entry>
+			<entry key="Book"><value>itemtype_keyword:"Book/Book Chapter"</value></entry>
+			<entry key="Conference"><value>itemtype_keyword:"Conference Paper"</value></entry>
+			<entry key="Presentation"><value>itemtype_keyword:"Presentation"</value></entry>
+			<entry key="Report"><value>itemtype_keyword:"Technical/Research Report"</value></entry>
+			<entry key="Issue"><value>itemtype_keyword:"Issue"</value></entry>
+			<entry key="Speech"><value>itemtype_keyword:"Speech"</value></entry>
+			<entry key="Patent"><value>-resourcetype_keyword:"Patent"</value></entry>
+			<entry key="Theses"><value>-resourcetype_keyword:"Theses"</value></entry>
+			<entry key="Others"><value>-resourcetype_keyword:"Patent" -resourcetype_keyword:"Theses" -itemtype_keyword:"Issue" -itemtype_keyword:"Journal/Magazine Article" -itemtype_keyword:"Conference Paper" -itemtype_keyword:"Book/Book Chapter" -dc.type:Patent -itemtype_keyword:"Presentation" -itemtype_keyword:"Technical/Research Report" -itemtype_keyword:"Speech"</value></entry>
+		</map>
+		</property>		
 	</bean>
 		
 </beans>

@@ -44,7 +44,7 @@
 	</div>
 	<div id="statstab-content-id" class="statstab-content-item">
                 <c:set var="pieType" >id</c:set>
-                <stats:piewithtable data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}" useLocalMap="true"/>
+                <stats:piewithtable mostViewedItem="true" data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}" useLocalMap="true"/>
 	</div>
 	<div id="statstab-content-time" class="statstab-content-item">
                 <%@include file="time.jsp"%> 

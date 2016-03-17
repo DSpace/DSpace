@@ -581,9 +581,10 @@ public class ResearcherTagLibraryFunctions
             String tempKey = temp[i][0];
             String year = tempKey.substring(0, 4);
             String month = tempKey.substring(5, 7);
-            String key = Integer.parseInt(month) < 7 ? String.valueOf(Integer
-                    .parseInt(year) - 1) + "/" + year : year + "/"
-                    + String.valueOf(Integer.parseInt(year) + 1);
+            String key = year;
+//            String key = Integer.parseInt(month) < 7 ? String.valueOf(Integer
+//                    .parseInt(year) - 1) + "/" + year : year + "/"
+//                    + String.valueOf(Integer.parseInt(year) + 1);
             if (!tempMap.containsKey(key))
             {
                 final ArrayList<String> list = new ArrayList<String>();
