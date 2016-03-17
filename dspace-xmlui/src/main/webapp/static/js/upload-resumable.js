@@ -250,6 +250,7 @@ if(doResumable){
                 error: function(jqXHR, status, error){
                     console.error(error);
                     clearInterval(intId);
+                    $('#file-delete-' + file.uniqueIdentifier).attr('class', 'file-delete');
                     showError('upload-failed');
                 }
             });
