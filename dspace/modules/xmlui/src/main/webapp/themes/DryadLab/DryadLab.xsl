@@ -291,12 +291,8 @@
             <div id="submit-data-sidebar-box" class="home-col-2 simple-box" style="padding: 8px 34px; width: 230px; margin: 8px 0 12px;">
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 75px;">
                     <p class="ds-paragraph">
-                        <a class="submitnowbutton">
-                            <xsl:attribute name="href">
-                                <xsl:value-of select="/dri:document/dri:options/dri:list[@n='submitNow']/dri:item[@n='submitnowitem']/dri:xref[@rend='submitnowbutton']/@target"/>
-                            </xsl:attribute>
-			    <xsl:text>Submit data now</xsl:text>
-                        </a>
+		      <!-- The next line should remain as one piece (without linebreaks) to allow it to be matched and replaced with mod_substitute on read-only servers -->
+                        <a class="submitnowbutton"><xsl:attribute name="href"><xsl:value-of select="/dri:document/dri:options/dri:list[@n='submitNow']/dri:item[@n='submitnowitem']/dri:xref[@rend='submitnowbutton']/@target"/></xsl:attribute><xsl:text>Submit data now</xsl:text></a>
                     </p>
                     <p style="margin: 14px 0 4px;">
                         <a href="/pages/faq#deposit">How and why?</a>
@@ -624,12 +620,8 @@
         <!-- START DEPOSIT -->
         <div class="ds-static-div primary" id="file_news_div_news">
             <p class="ds-paragraph">
-                <a class="submitnowbutton">
-                    <xsl:attribute name="href">
-                        <xsl:value-of select="/dri:document/dri:options/dri:list[@n='submitNow']/dri:item[@n='submitnowitem']/dri:xref[@rend='submitnowbutton']/@target"/>
-                    </xsl:attribute>
-                    Submit data now
-                </a>
+	      <!-- The next line should remain as one piece (without linebreaks) to allow it to be matched and replaced with mod_substitute on read-only servers -->
+                <a class="submitnowbutton"><xsl:attribute name="href"><xsl:value-of select="/dri:document/dri:options/dri:list[@n='submitNow']/dri:item[@n='submitnowitem']/dri:xref[@rend='submitnowbutton']/@target"/></xsl:attribute>Submit data now</a>
             </p>
             <p style="margin: 1em 0 4px;">
                 <a href="/pages/faq#deposit">How and why?</a>
