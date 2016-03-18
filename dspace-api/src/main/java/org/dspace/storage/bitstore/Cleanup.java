@@ -74,11 +74,11 @@ public class Cleanup
                     }
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug("leave db records = " + deleteDbRecords);
+                    log.debug("leave db records = " + !deleteDbRecords);
                     log.debug("batchSize = " + commitBatch);
                 }
                 if (verbose) {
-                    System.out.println("leave db records = " + deleteDbRecords);
+                    System.out.println("leave db records = " + !deleteDbRecords);
                     System.out.println("batchSize = " + commitBatch);
                 }
                 StorageServiceFactory.getInstance().getBitstreamStorageService().cleanup(deleteDbRecords, commitBatch, verbose);
