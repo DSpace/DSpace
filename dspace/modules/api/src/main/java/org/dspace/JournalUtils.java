@@ -46,6 +46,7 @@ public class JournalUtils {
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByJournalID = new HashMap<String, DryadJournalConcept>();
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByJournalName = new HashMap<String, DryadJournalConcept>();
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByCustomerID = new HashMap<String, DryadJournalConcept>();
+    private static HashMap<String, DryadJournalConcept> journalConceptHashMapByISSN = new HashMap<String, DryadJournalConcept>();
 
     static {
         Context context = null;
@@ -106,6 +107,9 @@ public class JournalUtils {
             if (journalConceptHashMapByJournalName.containsValue(existingConcept)) {
                 journalConceptHashMapByJournalName.remove(existingConcept.getFullName());
             }
+            if (journalConceptHashMapByISSN.containsValue(existingConcept)) {
+                journalConceptHashMapByISSN.remove(existingConcept.getISSN());
+            }
             journalConceptHashMapByConceptIdentifier.remove(existingConcept.getIdentifier());
             try {
                 existingConcept.delete(context);
@@ -132,6 +136,11 @@ public class JournalUtils {
                     journalConceptHashMapByCustomerID.remove(k);
                 }
             }
+            for (String k : journalConceptHashMapByISSN.keySet()) {
+                if (journalConceptHashMapByISSN.get(k) == journalConcept) {
+                    journalConceptHashMapByISSN.remove(k);
+                }
+            }
             if (!"".equals(journalConcept.getFullName())) {
                 journalConceptHashMapByJournalName.put(journalConcept.getFullName().toUpperCase(), journalConcept);
             }
@@ -140,6 +149,9 @@ public class JournalUtils {
             }
             if (!"".equals(journalConcept.getCustomerID())) {
                 journalConceptHashMapByCustomerID.put(journalConcept.getCustomerID(), journalConcept);
+            }
+            if (!"".equals(journalConcept.getISSN())) {
+                journalConceptHashMapByISSN.put(journalConcept.getISSN(), journalConcept);
             }
         }
 
@@ -179,6 +191,10 @@ public class JournalUtils {
 
     public static DryadJournalConcept getJournalConceptByCustomerID(String customerID) {
         return journalConceptHashMapByCustomerID.get(customerID);
+    }
+
+    public static DryadJournalConcept getJournalConceptByISSN(String ISSN) {
+        return journalConceptHashMapByISSN.get(ISSN);
     }
 
     public static String getCanonicalManuscriptID(Manuscript manuscript) {
