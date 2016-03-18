@@ -17,7 +17,9 @@
 				<a id="statsjpg_${targetDiv}" href="#" download="stats_${statType}_${objectName}_${pieType}.jpg">Save as JPEG Image</a>
 				<a id="iestatsjpg_${targetDiv}" style="display: none">Save as JPEG Image</a>
 		</div>
+<div class="row">		
 <div class="target_stats" id="${targetDiv}"></div>
+</div>
 <script type="text/javascript"><!--
 
               

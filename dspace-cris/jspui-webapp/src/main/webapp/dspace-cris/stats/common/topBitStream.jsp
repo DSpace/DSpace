@@ -76,6 +76,29 @@ j(document).ready(function() {
                j("div.ui-tabs-panel").toggleClass("ui-tabs-panel ui-widget-content ui-corner-bottom tab-content with-padding");
         }
 	});
+	
+	j(".datatable-mostviewed")
+	.dataTable({
+				dom : "<'pull-left'f><'pull-right'B>rtip",
+				searching : true,
+				info : false,
+				paging : false,
+				ordering : true,
+				order: [[ 1, "desc" ]],
+				aoColumnDefs: [
+					{ bSortable: false, aTargets: [ 0 ] }
+				],
+				buttons : [
+						{
+							extend : 'excelHtml5',								
+							text : '<i class="fa fa-file-excel-o"></i> Download Excel'
+						},
+						{
+							extend : 'csvHtml5',
+							text : '<i class="fa fa-file-text-o"></i> Download CSV'
+						}
+				]					
+	});
 });
 -->
 </script>

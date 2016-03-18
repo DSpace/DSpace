@@ -11,7 +11,7 @@
 <c:set var="pieType" scope="page">allMonths</c:set>						
 <%@include file="../modules/graph/monthsGraph.jsp"%>
 
-
+<div class="table-responsive">
 <table class="table table-bordered dataTable datatable-time">
 <thead>
 	<tr>
@@ -60,6 +60,7 @@
 	</tr-->
 </tfoot>		
 </table>
+</div>
 <div class="clearfix">&nbsp;</div>
 <script type="text/javascript">
 <!--
