@@ -67,10 +67,10 @@ public class Cleanup
                     try {
                         commitBatch = Integer.parseInt(line.getOptionValue('b'));
                     } catch (NumberFormatException ne) {
-                        throw new ParseException("batchSize must be greater equal 1");
+                        throw new ParseException("batchSize must be greater or equal 1");
                     }
                     if (commitBatch < 1) {
-                        throw new ParseException("batchSize must be greater equal 1");
+                        throw new ParseException("batchSize must be greater or equal 1");
                     }
                 }
                 if (log.isDebugEnabled()) {
