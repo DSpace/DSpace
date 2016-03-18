@@ -14,6 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -478,7 +480,12 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public void setPublicationDOI(String publicationDOI) throws SQLException {
-        // Need to filter just on metadata values that are publication DOIs
+        // check that this DOI starts with the doi: prefix. if not, add it.
+        Pattern doiPattern = Pattern.compile("^doi:.*");
+        Matcher matcher = doiPattern.matcher(publicationDOI);
+        if (!matcher.find()) {
+            publicationDOI = "doi:" + publicationDOI;
+        }
         addSingleMetadataValue(Boolean.FALSE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, publicationDOI);
     }
 
