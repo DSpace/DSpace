@@ -294,7 +294,8 @@ public class FlowContainerUtils
 		HarvestedCollection hc = harvestedCollectionService.find(context, collection);
 
 		//TODO: is there a cleaner way to do this?
-		try {
+		try
+		{
 			if (!HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_STOPPED)) {
 				synchronized(HarvestScheduler.lock) {
 					HarvestScheduler.setInterrupt(HarvestScheduler.HARVESTER_INTERRUPT_INSERT_THREAD, collectionID);
@@ -302,8 +303,9 @@ public class FlowContainerUtils
 				}
 			}
 			else {
+				// Harvester should return some errors in my opinion..
 				harvester = new OAIHarvester(context, collection, hc);
-				harvester.runHarvest();
+				harvester.runHarvest(); // this throws an exception when fetching bitstreams.
 			}
 		}
 		catch (Exception e) {
@@ -346,12 +348,15 @@ public class FlowContainerUtils
 			//System.out.println("Deleting: " + item.getHandle());
 			//ib.itemRemoved(item);
 			collectionService.removeItem(context, collection, item);
+
 		}
+
 		hc.setLastHarvested(null);
 		hc.setHarvestMessage("");
 		harvestedCollectionService.update(context, hc);
 		collectionService.update(context, collection);
-
+        // update the context?
+		//context.dispatchEvent() // not sure if this is required yet.ts();
 		return processRunCollectionHarvest(context, collectionID, request);
 	}
 
