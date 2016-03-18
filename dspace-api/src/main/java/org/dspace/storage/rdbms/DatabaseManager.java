@@ -566,6 +566,28 @@ public class DatabaseManager
         }
     }
 
+    public static TableRow findByUniqueNonCaseSensitive(Context context, String table,
+                                        String column, String value) throws SQLException {
+        String ctable = canonicalize(table);
+
+        try {
+            if ( ! DB_SAFE_NAME.matcher(ctable).matches())
+            {
+                throw new SQLException("Unable to execute select query because table name (" + ctable + ") contains non alphanumeric characters.");
+            }
+
+            if ( ! DB_SAFE_NAME.matcher(column).matches())
+            {
+                throw new SQLException("Unable to execute select query because column name (" + column + ") contains non alphanumeric characters.");
+            }
+            StringBuilder sql = new StringBuilder("select * from ").append(ctable).append(" where UPPER(").append(column).append(") = ? ");
+            return querySingleTable(context, ctable, sql.toString(), value.toUpperCase());
+        } catch (SQLException e) {
+            log.error("SQL findByUnique Error - ", e);
+            throw e;
+        }
+    }
+
     /**
      * Delete a table row via its primary key. Returns the number of rows
      * deleted.
