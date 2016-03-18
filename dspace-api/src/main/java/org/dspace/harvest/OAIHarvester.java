@@ -112,7 +112,7 @@ public class OAIHarvester {
 
     // DOMbuilder class for the DOM -> JDOM conversions
     private static DOMBuilder db = new DOMBuilder();
-
+	private static Context originalContext;
     // The point at which this thread should terminate itself
 
     /* Initialize the harvester with a collection object */
@@ -137,6 +137,7 @@ public class OAIHarvester {
         }
 
 		ourContext = c;
+		originalContext = c;
 		targetCollection = (Collection)dso;
 
 		harvestRow = hc;
@@ -226,8 +227,15 @@ public class OAIHarvester {
      * Performs a harvest cycle on this collection. This will query the remote OAI-PMH provider, check for updates since last
      * harvest, and ingest the returned items.
      */
+
+	// try to empty the cache on regular intervals ?
+
+	public static int HARVEST_BEFORE_CACHE = 5; // let's test this with a low number.
 	public void runHarvest() throws SQLException, IOException, AuthorizeException
 	{
+		// initially we have not harvested anything yet
+		int harvested = 0;
+
 		// figure out the relevant parameters
 		String oaiSource = harvestRow.getOaiSource();
 		String oaiSetId = harvestRow.getOaiSetId();
@@ -363,6 +371,13 @@ public class OAIHarvester {
 
 						processRecord(record,OREPrefix);
 						ourContext.dispatchEvents();
+						// here we might need to clear the cache and update the total we have done so far
+
+						harvested++;
+						if(harvested % HARVEST_BEFORE_CACHE==0) // enters here multiple times upon reimporting.
+						{
+							clearOAICache();
+						}
 					}
 				}
 
@@ -400,7 +415,7 @@ public class OAIHarvester {
 			harvestRow.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
 			alertAdmin(HarvestedCollection.STATUS_UNKNOWN_ERROR, ex);
 			log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause());
-			ex.printStackTrace();
+			//ex.printStackTrace();
 			return;
 		}
 		finally {
@@ -418,6 +433,23 @@ public class OAIHarvester {
 		harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
 		log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds.");
 		harvestedCollection.update(ourContext, harvestRow);
+	}
+
+	private void clearOAICache()
+	{
+		try
+		{
+			ourContext.clearCache();
+			// restore our context
+			ourContext = originalContext;
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			System.out.println("exceptions!");
+		}
+
+		System.out.println("got here without problems?");
 	}
 
     /**

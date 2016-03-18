@@ -390,7 +390,8 @@ public class Harvest
 	    		hc.setHarvestStartTime(null);
                 harvestedCollectionService.update(context, hc);
     		}
-    		context.restoreAuthSystemState();    		
+    		context.restoreAuthSystemState();
+            context.dispatchEvents();
     	}
     	catch (Exception e) {
     		System.out.println("Changes could not be committed");
