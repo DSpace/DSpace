@@ -47,8 +47,9 @@
     <head>
         <title><%= siteName %>: <%= title %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="Generator" content="<%= generator %>" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">		
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/redmond/jquery-ui-1.10.3.custom.css" type="text/css" />
 	    <link href="<%= request.getContextPath() %>/css/researcher.css" type="text/css" rel="stylesheet" />
