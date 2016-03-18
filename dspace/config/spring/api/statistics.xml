@@ -168,6 +168,7 @@
 				<entry key="selectedObject" value-ref="statscollection" />
 				<entry key="item" value-ref="statsitemforcollection" />				
 				<entry key="bitstream" value-ref="statsbitstreamforcollection" />
+				<entry key="upload" value-ref="statsubmitteditemforcollection" />
 			</map>
 		</property>
 		<property name="topCountryLength" value="10" />
@@ -196,6 +197,23 @@
 		<property name="crisSearchService" ref="org.dspace.discovery.SearchService" />
 	</bean>
 		
+	<bean id="statsubmitteditemforcollection"
+		class="org.dspace.app.webui.cris.components.statistics.StatUploadObjectComponent">					
+		<property name="relationObjectType" value="3" />			
+		<property name="bean" ref="commonCollectionSubmittedItemBean" />		
+		<property name="searchService" ref="org.dspace.discovery.SearchService" />
+	</bean>
+	<bean id="commonCollectionSubmittedItemBean"
+		class="org.dspace.app.webui.cris.components.BeanComponent">
+		<property name="filters">
+			<list>
+				<value>search.resourcetype:2</value>
+				<value>-withdrawn:true</value>
+			</list>
+		</property>
+		<property name="componentIdentifier" value="collectionsubmitted" />
+		<property name="query"><value>location.coll:{0}</value></property>
+	</bean>
 	
 	<bean id="commonCollectionBean"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
@@ -219,7 +237,7 @@
 				<entry key="collection" value-ref="statscollectionforcommunity" />
 				<entry key="item" value-ref="statsitemforcommunity" />				
 				<entry key="bitstream" value-ref="statsbitstreamforcommunity" />
-				<entry key="upload" value-ref="statsuploadbitstreamforcommunity" />
+				<entry key="upload" value-ref="statsubmitteditemforcommunity" />
 			</map>
 		</property>
 		<property name="topCountryLength" value="10" />
@@ -263,13 +281,23 @@
 		<property name="crisSearchService" ref="org.dspace.discovery.SearchService" />
 	</bean>
 	
-	<bean id="statsuploadbitstreamforcommunity"
+	<bean id="statsubmitteditemforcommunity"
 		class="org.dspace.app.webui.cris.components.statistics.StatUploadObjectComponent">					
 		<property name="relationObjectType" value="4" />			
-		<property name="bean" ref="commonCommunityBean" />		
+		<property name="bean" ref="commonCommunitySubmittedItemBean" />		
 		<property name="searchService" ref="org.dspace.discovery.SearchService" />
 	</bean>
-	
+	<bean id="commonCommunitySubmittedItemBean"
+		class="org.dspace.app.webui.cris.components.BeanComponent">
+		<property name="filters">
+			<list>
+				<value>search.resourcetype:2</value>
+				<value>-withdrawn:true</value>
+			</list>
+		</property>
+		<property name="componentIdentifier" value="communitysubmitted" />
+		<property name="query"><value>location.comm:{0}</value></property>
+	</bean>
 	<bean id="commonCommunityBean"
 		class="org.dspace.app.webui.cris.components.BeanComponent">
 
@@ -357,9 +385,9 @@
 			<entry key="Report"><value>itemtype_keyword:"Technical/Research Report"</value></entry>
 			<entry key="Issue"><value>itemtype_keyword:"Issue"</value></entry>
 			<entry key="Speech"><value>itemtype_keyword:"Speech"</value></entry>
-			<entry key="Patent"><value>-resourcetype_keyword:"Patent"</value></entry>
-			<entry key="Theses"><value>-resourcetype_keyword:"Theses"</value></entry>
-			<entry key="Others"><value>-resourcetype_keyword:"Patent" -resourcetype_keyword:"Theses" -itemtype_keyword:"Issue" -itemtype_keyword:"Journal/Magazine Article" -itemtype_keyword:"Conference Paper" -itemtype_keyword:"Book/Book Chapter" -dc.type:Patent -itemtype_keyword:"Presentation" -itemtype_keyword:"Technical/Research Report" -itemtype_keyword:"Speech"</value></entry>
+			<entry key="Patent"><value>resourcetype_keyword:"Patents"</value></entry>
+			<entry key="Theses"><value>resourcetype_keyword:"Theses"</value></entry>
+			<entry key="Others"><value>-resourcetype_keyword:"Patents" -resourcetype_keyword:"Theses" -itemtype_keyword:"Issue" -itemtype_keyword:"Journal/Magazine Article" -itemtype_keyword:"Conference Paper" -itemtype_keyword:"Book/Book Chapter" -itemtype_keyword:"Presentation" -itemtype_keyword:"Technical/Research Report" -itemtype_keyword:"Speech"</value></entry>
 		</map>
 		</property>		
 	</bean>

@@ -584,7 +584,7 @@ public abstract class ASolrStatsConfigurerComponent<T extends DSpaceObject>
 
     public PieStatisticBean generateCategoryView(SolrServer server,
             String key1, String key2, String key3, Integer hitsNumber,
-            String query, Map<String, String> subQueries, String id)
+            String query, Map<String, String> subQueries, String id, String... filters)
     {
         PieStatisticBean pieStatisticBean = new PieStatisticBean(key1, key2,
                 key3);
@@ -607,6 +607,10 @@ public abstract class ASolrStatsConfigurerComponent<T extends DSpaceObject>
                     solrQuery.setQuery(q);
                     if (StringUtils.isEmpty(name))
                         name = "Unknown";
+
+                    if(filters != null) {
+                        solrQuery.addFilterQuery(filters);
+                    }
 
                     int count = new Long(server.query(solrQuery).getResults().getNumFound()).intValue();
                     limitedData.add(new StatisticDatasBeanRow(name, count));

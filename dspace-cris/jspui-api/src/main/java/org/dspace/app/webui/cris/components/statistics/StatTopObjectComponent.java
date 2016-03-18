@@ -86,7 +86,7 @@ public class StatTopObjectComponent<T extends DSpaceObject> extends
             solrResponse = solrServer.query(solrQuery);            
             if(!getBean().getSubQueries().isEmpty()) {                
                 statisticDatasBeans.addValue(TOP, CrisConstants.getEntityTypeText(relationType), CATEGORY,
-                    generateCategoryView(solrServer, TOP, relationType.toString(), CATEGORY, StatComponentsService.getTopCityLength(), query, getBean().getSubQueries(), sID));
+                    generateCategoryView(solrServer, TOP, relationType.toString(), CATEGORY, StatComponentsService.getTopCityLength(), query, getBean().getSubQueries(), sID, solrQuery.getFilterQueries()));
             }
             buildTopResultModules(relationType);
 
