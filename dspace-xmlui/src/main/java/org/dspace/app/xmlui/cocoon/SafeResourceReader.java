@@ -37,6 +37,9 @@ public class SafeResourceReader extends ResourceReader
         // If the requested path includes any of the following strings/characters
         // then block access and return "Resource Not Found"
         if(src != null && (
+            src.toLowerCase().contains(":") ||
+            // %3a = encoded colon (:)
+            src.toLowerCase().contains("%3a") ||
             // %252e = double encoded dot (.)
             src.toLowerCase().contains("%252e") ||
             // %2e = encoded dot (.)
