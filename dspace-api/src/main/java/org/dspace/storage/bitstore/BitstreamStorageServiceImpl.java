@@ -217,57 +217,61 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     }
 
     @Override
-    public void cleanup(boolean deleteDbRecords, int batchSize,  boolean verbose) throws SQLException, IOException, AuthorizeException {
+    public void cleanup(boolean deleteDbRecords, int batchSize, boolean verbose) throws SQLException, IOException, AuthorizeException {
         Context context = null;
         int commitCounter = 0;
+        context = new Context();
+        context.turnOffAuthorisationSystem();
 
-        try
-        {
-            context = new Context();
-            context.turnOffAuthorisationSystem();
+        List<Bitstream> storage = bitstreamService.findDeletedBitstreams(context);
+        for (Bitstream bitstream : storage) {
+            int committed = cleanupOne(bitstream, context, deleteDbRecords, batchSize, verbose);
 
-            List<Bitstream> storage = bitstreamService.findDeletedBitstreams(context);
-            for (Bitstream bitstream : storage)
+            // Make sure to commit our outstanding work every batchSize
+            // iterations. Otherwise you risk losing the entire transaction
+            // if we hit an exception, which isn't useful at all for large
+            // amounts of bitstreams.
+            commitCounter += committed;
+            if (commitCounter % batchSize == 0) {
+                System.out.print("Committing changes to the database...");
+                context.dispatchEvents();
+            }
+        }
+
+        System.out.print("Committing changes to the database...");
+        context.complete();
+        System.out.println(" Done!");
+
+        context.restoreAuthSystemState();
+    }
+
+    /**
+     * This method deletes the given bitstream if it is
+     * more than 1 hour old and marked deleted. The deletions cannot
+     * be undone.
+     *
+     * @param bitstream the bitstream whose file and related data should be cleaned up
+     * @param context  database context
+     * @param deleteDbRecords if true deletes the database record otherwise it
+     * 	           only deletes the file and directories in the assetstore
+     * @param  batchSize number of deletes after which to commit changes to database
+     *
+     */
+    private int cleanupOne(Bitstream bitstream, Context context, boolean deleteDbRecords, int batchSize, boolean verbose)  throws AuthorizeException {
+        try {
+            UUID bid = bitstream.getID();
+            Map wantedMetadata = new HashMap();
+            wantedMetadata.put("size_bytes", null);
+            wantedMetadata.put("modified", null);
+            Map receivedMetadata = stores.get(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
+
+            // Make sure entries which do not exist are removed
+            if (MapUtils.isEmpty(receivedMetadata))
             {
-                UUID bid = bitstream.getID();
-                Map wantedMetadata = new HashMap();
-                wantedMetadata.put("size_bytes", null);
-                wantedMetadata.put("modified", null);
-                Map receivedMetadata = stores.get(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
-
-
-                // Make sure entries which do not exist are removed
-                if (MapUtils.isEmpty(receivedMetadata))
-                {
-                    log.debug("bitstore.about is empty, so file is not present");
-                    if (deleteDbRecords)
-                    {
-                        log.debug("deleting record");
-                        if (verbose)
-                        {
-                            System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
-                        }
-                        checksumHistoryService.deleteByBitstream(context, bitstream);
-                        if (verbose)
-                        {
-                            System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
-                        }
-                        bitstreamService.expunge(context, bitstream);
-                    }
-                    continue;
-                }
-
-                // This is a small chance that this is a file which is
-                // being stored -- get it next time.
-                if (isRecent(Long.valueOf(receivedMetadata.get("modified").toString())))
-                {
-                	log.debug("file is recent");
-                    continue;
-                }
-
+                log.debug("bitstore.about is empty, so file is not present");
                 if (deleteDbRecords)
                 {
-                    log.debug("deleting db record");
+                    log.debug("deleting record");
                     if (verbose)
                     {
                         System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
@@ -279,42 +283,53 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                     }
                     bitstreamService.expunge(context, bitstream);
                 }
+                return 0;
+            }
 
-				if (isRegisteredBitstream(bitstream.getInternalId())) {
-				    continue;			// do not delete registered bitstreams
-				}
+            // This is a small chance that this is a file which is
+            // being stored -- get it next time.
+            if (isRecent(Long.valueOf(receivedMetadata.get("modified").toString())))
+            {
+                log.debug("file is recent");
+                return 0;
+            }
 
-
-                // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on another place
-                if(0 < bitstreamService.findDuplicateInternalIdentifier(context, bitstream).size())
+            if (deleteDbRecords)
+            {
+                log.debug("deleting db record");
+                if (verbose)
                 {
-                    stores.get(bitstream.getStoreNumber()).remove(bitstream);
-
-                    String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
-                    if (log.isDebugEnabled())
-                    {
-                        log.debug(message);
-                    }
-                    if (verbose)
-                    {
-                        System.out.println(message);
-                    }
+                    System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
                 }
-
-                // Make sure to commit our outstanding work every 100
-                // iterations. Otherwise you risk losing the entire transaction
-                // if we hit an exception, which isn't useful at all for large
-                // amounts of bitstreams.
-                commitCounter++;
-                if (commitCounter % batchSize == 0)
+                checksumHistoryService.deleteByBitstream(context, bitstream);
+                if (verbose)
                 {
-                    context.dispatchEvents();
+                    System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
+                }
+                bitstreamService.expunge(context, bitstream);
+            }
+
+            if (isRegisteredBitstream(bitstream.getInternalId())) {
+                return 0;            // do not delete registered bitstreams
+            }
+
+
+            // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on another place
+            if(0 < bitstreamService.findDuplicateInternalIdentifier(context, bitstream).size())
+            {
+                stores.get(bitstream.getStoreNumber()).remove(bitstream);
+
+                String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
+                if (log.isDebugEnabled())
+                {
+                    log.debug(message);
+                }
+                if (verbose)
+                {
+                    System.out.println(message);
                 }
             }
 
-            System.out.print("Committing changes to the database...");
-            context.complete();
-            System.out.println(" Done!");
         }
         // Aborting will leave the DB objects around, even if the
         // bitstreams are deleted. This is OK; deleting them next
@@ -325,13 +340,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             {
                 System.err.println("Error: " + sqle.getMessage());
             }
-            context.abort();
-            throw sqle;
-        } finally {
-            if(context != null){
-                context.restoreAuthSystemState();
-            }
+            return 0;
         }
+        return 1;
     }
 
     /**
