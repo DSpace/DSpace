@@ -12,7 +12,7 @@
         <script type="text/javascript" src="/themes/Mirage/lib/jquery-1.3.1.min.js"> </script> 
         <script type="text/javascript" src="/themes/Mirage/lib/utils.js"> </script> 
         <script type="text/javascript" src="/themes/Mirage/lib/jquery.tooltip.js"> </script>
-        <script type="text/javascript">var referrer=document.referrer;var doi=referrer.replace(/^.*http:\/\/ezid.cdlib.org\/id\//,"")</script>
+        <script type="text/javascript">var referrer=document.referrer;var ezidpattern=/^.*http:\/\/ezid.cdlib.org\/id\//; var doi=referrer.replace(ezidpattern,"")</script>
         <script type="text/javascript">var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</script>
         <script type="text/javascript">try {var pageTracker = _gat._getTracker("UA-16949847-1");pageTracker._trackPageview();} catch(err) {}</script> 
         
@@ -26,7 +26,7 @@
             <h1 class="ds-div-head">Content restricted ahead of article publication<a id="contentRestricted">&#160;</a></h1>
             <div class="ds-static-div primary">
                 <form xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_artifactbrowser_FeedbackForm_div_feedback-form" class="ds-interactive-div primary" action="/feedback" method="post" onsubmit="javascript:tSubmit(this);">
-                    <p class="ds-paragraph">The DOI <span id="dryad-doi" class="ds-paragraph"></span> has been registered for this data package.
+                    <p class="ds-paragraph">The Dryad DOI <span id="dryad-doi" class="ds-paragraph">for this data package</span> has been registered.
                         As far as we know, the article associated with this data package has not yet been published,
                         and the journal requires us to suppress the data until then. Once the article is available,
                         we will update this DOI to automatically resolve you to the data package.</p>
@@ -79,5 +79,7 @@
 
             <div>Last revised: 2013-03-04</div>
           </div>
+        <script type="text/javascript">document.getElementById("aspect_artifactbrowser_FeedbackForm_field_page").setAttribute("value", document.referrer);</script>
+        <script type="text/javascript">if(referrer.search(ezidpattern)!=-1){document.getElementById("dryad-doi").innerHTML = doi;}</script>
     </body>
 </html>
