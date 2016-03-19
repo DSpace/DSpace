@@ -7,10 +7,11 @@
 #             {4} User-Agent HTTP Header
 #             {5} Session Id
 #             {6} The user's comments
+#             {7} email subject
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: Feedback Form Information
+Subject: {7}
 
 Comments:
 
