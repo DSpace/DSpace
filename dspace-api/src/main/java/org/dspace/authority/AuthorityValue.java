@@ -16,6 +16,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.authority.AuthorityMetadataValue;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Term;
 import org.dspace.core.Context;
@@ -468,7 +469,7 @@ public class AuthorityValue {
                 for(String value : otherMetadata.get(name))
                 {
                     // Add it to the list
-                    concept.addMetadata(context, schema,element,qualifier,"",value,null,-1);
+                    concept.addMetadata(context, schema,element,qualifier,"",value,null,Choices.CF_UNSET);
                 }
 
             }
