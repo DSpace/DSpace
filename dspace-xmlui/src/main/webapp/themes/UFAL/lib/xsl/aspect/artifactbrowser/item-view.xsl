@@ -867,7 +867,7 @@
 							select="mets:FLocat[@LOCTYPE='URL']/@xlink:title" />
 					</dd>
 					
-					<xsl:for-each select="mets:Local/*[local-name()!='file']">
+					<xsl:for-each select="mets:Local/*[local-name()!='file' and local-name()!='redirectToURL' ]">
 						<dt>
 							<xsl:value-of
 									select="local-name()" />

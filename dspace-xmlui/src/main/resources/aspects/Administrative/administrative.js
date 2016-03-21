@@ -2051,6 +2051,11 @@ function doEditBitstream(itemID, bitstreamID)
 				getDSContext(), itemID, bitstreamID, cocoon.request
 			);
 		}
+		else if (cocoon.request.get("submit_add")){
+			result = FlowItemUtils.addBitstreamMetadata(
+				getDSContext(), bitstreamID, cocoon.request
+			);
+		}
     } while (result == null || ! result.getContinue())
 
     return result;
