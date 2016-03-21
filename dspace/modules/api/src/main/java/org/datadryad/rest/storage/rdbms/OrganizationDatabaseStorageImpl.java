@@ -83,7 +83,9 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     }
 
     private static void abortContext(Context context) {
-        context.abort();
+        if (context != null) {
+            context.abort();
+        }
     }
 
     static Organization organizationFromTableRow(TableRow row) {
@@ -145,9 +147,10 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
 
     @Override
     protected void addResults(StoragePath path, List<DryadJournalConcept> journalConcepts, String searchParam, Integer limit) throws StorageException {
+        Context context = null;
         try {
             ArrayList<DryadJournalConcept> allJournalConcepts = new ArrayList<DryadJournalConcept>();
-            Context context = getContext();
+            context = getContext();
             allJournalConcepts.addAll(getJournalConcepts(context));
             completeContext(context);
             if (searchParam != null) {
@@ -160,6 +163,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
                 journalConcepts.addAll(allJournalConcepts);
             }
         } catch (SQLException ex) {
+            abortContext(context);
             throw new StorageException("Exception reading organizations", ex);
         }
     }
@@ -168,25 +172,28 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     protected void createObject(StoragePath path, DryadJournalConcept journalConcept) throws StorageException {
         // if this object is the same as an existing one, delete this temporary one and throw an exception.
         String name = journalConcept.getFullName();
+        Context context = null;
         if (JournalUtils.getJournalConceptByJournalName(name) != null) {
             try {
                 // remove this journal concept because it's a temporary concept.
-                Context context = getContext();
+                context = getContext();
                 context.turnOffAuthorisationSystem();
                 JournalUtils.removeDryadJournalConcept(context, journalConcept);
                 context.restoreAuthSystemState();
                 completeContext(context);
             } catch (Exception ex) {
+                abortContext(context);
                 throw new StorageException("Can't create new organization: couldn't remove temporary organization.");
             }
         } else {
             try {
-                Context context = getContext();
+                context = getContext();
                 context.turnOffAuthorisationSystem();
                 JournalUtils.addDryadJournalConcept(context, journalConcept);
                 context.restoreAuthSystemState();
                 completeContext(context);
             } catch (Exception ex) {
+                abortContext(context);
                 throw new StorageException("Exception creating organization: " + ex.getMessage(), ex);
             }
         }
@@ -195,8 +202,9 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     @Override
     protected DryadJournalConcept readObject(StoragePath path) throws StorageException {
         String organizationCode = path.getOrganizationCode();
+        Context context = null;
         try {
-            Context context = getContext();
+            context = getContext();
             Organization organization = getOrganizationByCode(context, organizationCode);
             if (organizationCode.equals(organization.organizationISSN)) {
                 // this is an ISSN, replace organizationCode with the organization's code.
@@ -204,6 +212,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
             }
             completeContext(context);
         } catch (Exception e) {
+            abortContext(context);
             throw new StorageException("Exception reading organization: " + e.getMessage());
         }
         DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(organizationCode);
@@ -220,8 +229,9 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         // we need to compare the new journal concept that was created to any matching existing concepts.
         // then we need to update the original concept with the new one
         // then we delete the new one.
+        Context context = null;
         try {
-            Context context = getContext();
+            context = getContext();
             context.turnOffAuthorisationSystem();
             String name = journalConcept.getFullName();
             String status = journalConcept.getStatus();
@@ -232,6 +242,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
             context.restoreAuthSystemState();
             completeContext(context);
         } catch (Exception ex) {
+            abortContext(context);
             throw new StorageException("Exception updating organization: " + ex.getMessage(), ex);
         }
     }
