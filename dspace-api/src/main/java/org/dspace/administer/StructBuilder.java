@@ -75,22 +75,24 @@ import org.xml.sax.SAXException;
  */
 
 public class StructBuilder {
-    /**
-     * The output XML document which will contain updated information about the
-     * imported structure.
-     */
-    private static final org.jdom.Document xmlOutput
-            = new org.jdom.Document(new Element("imported_structure"));
+    /** Name of the root element for the document to be imported. */
+    private static final String INPUT_ROOT = "import_structure";
 
     /**
-     * a hashtable to hold metadata for the collection being worked on
+     * Name of the root element for the document produced by importing.
+     * Community and collection elements are annotated with their identifiers.
      */
-    private static final Map<String, String> collectionMap = new HashMap<String, String>();
+    private static final String RESULT_ROOT = "imported_structure";
 
     /**
-     * a hashtable to hold metadata for the community being worked on
+     * A table to hold metadata for the collection being worked on.
      */
-    private static final Map<String, String> communityMap = new HashMap<String, String>();
+    private static final Map<String, String> collectionMap = new HashMap<>();
+
+    /**
+     * A table to hold metadata for the community being worked on.
+     */
+    private static final Map<String, String> communityMap = new HashMap<>();
 
     protected static CommunityService communityService
             = ContentServiceFactory.getInstance().getCommunityService();
@@ -109,7 +111,9 @@ public class StructBuilder {
      * DSpace.  This is of the form:
      *
      * <p>{@code StructBuilder -f [XML source] -e [administrator email] -o [output file]}</p>
+     *
      * <p>to import, or
+     *
      * <p>{@code StructBuilder -x -e [administrator email] -o [output file]}</p>
      *
      * <p>to export.  The output file will contain exactly the same as the source XML document, but
@@ -156,7 +160,7 @@ public class StructBuilder {
             output = line.getOptionValue('o');
         }
 
-        if (output == null || eperson == null) {
+        if (output == null) {
             usage(options);
             System.exit(1);
         }
@@ -171,6 +175,10 @@ public class StructBuilder {
         if (line.hasOption('x')) {
             exportStructure(context, output);
         } else if (line.hasOption('f')) {
+            if (eperson == null) {
+                usage(options);
+                System.exit(1);
+            }
             importStructure(context, file, output);
         } else {
             usage(options);
@@ -203,6 +211,12 @@ public class StructBuilder {
         // is properly structured
         validate(document);
 
+        // Check for 'identifier' attributes -- possibly output by this class.
+        NodeList identifierNodes = XPathAPI.selectNodeList(document, "//*[@identifier]");
+        if (identifierNodes.getLength() > 0) {
+            System.err.println("The input document has 'identifier' attributes, which will be ignored.");
+        }
+
         // load the mappings into the member variable hashmaps
         communityMap.put("name", "name");
         communityMap.put("description", "short_description");
@@ -225,12 +239,14 @@ public class StructBuilder {
         Element[] elements = handleCommunities(context, first, null);
 
         // generate the output
-        Element root = xmlOutput.getRootElement();
+        final Element root = new Element(RESULT_ROOT);
+
         for (Element element : elements) {
             root.addContent(element);
         }
 
         // finally write the string into the output file
+        final org.jdom.Document xmlOutput = new org.jdom.Document(root);
         try (BufferedWriter out = new BufferedWriter(new FileWriter(output))) {
             out.write(new XMLOutputter().outputString(xmlOutput));
         } catch (IOException e) {
@@ -246,7 +262,7 @@ public class StructBuilder {
      */
     private static void exportStructure(Context context, String output) {
         // Build a document from the Community/Collection hierarchy.
-        Element rootElement = xmlOutput.getRootElement();
+        Element rootElement = new Element(INPUT_ROOT);  // To be read by importStructure, perhaps
 
         List<Community> communities = null;
         try {
@@ -262,6 +278,7 @@ public class StructBuilder {
         }
 
         // Now write the structure out.
+        org.jdom.Document xmlOutput = new org.jdom.Document(rootElement);
         try (BufferedWriter out = new BufferedWriter(new FileWriter(output))) {
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             outputter.output(xmlOutput, out);
