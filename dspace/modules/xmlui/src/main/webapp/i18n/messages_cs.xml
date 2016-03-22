@@ -1139,7 +1139,7 @@
 
 	<message key="xmlui.Submission.submit.LicenseStep.morelicense_head">Žádná z daných licencí mi nevyhovuje</message>
 	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line1">Pokud potřebujete licenci, kterou momentálně nepodporujeme, postupujte následovně:</message>
-	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line2">Získejte odkaz na text licence na text samotný.</message>
+	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line2">Získejte odkaz na vlastní text licence.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line3">Pošlete <a class="helpdesk-tolink">nám</a> email s detaily licence.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line4">Uložte váš nedokončený příspěvek a vyčkejte, než vaši licenci přidáme do seznamu. Ozveme se, až se tak stane.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line5">Poté budete moci pokračovat s vaším příspěvkem.</message>
