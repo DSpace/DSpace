@@ -877,6 +877,38 @@ public class FlowItemUtils
 
 		return result;
 	}
+
+	public static FlowResult addBitstreamMetadata(Context context, int bitstreamID, Request request) throws SQLException, AuthorizeException {
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+
+		Bitstream bitstream = Bitstream.find(context, bitstreamID);
+
+		String fieldID = request.getParameter("field");
+		String value = request.getParameter("value");
+		String language = request.getParameter("language");
+
+		MetadataField field = MetadataField.find(context,Integer.valueOf(fieldID));
+		MetadataSchema schema = MetadataSchema.find(context,field.getSchemaID());
+
+
+		if ( null != bitstream ) {
+			bitstream.addMetadata(schema.getName(), field.getElement(), field.getQualifier(), language, value);
+			bitstream.update();
+			// Save our changes
+			context.commit();
+			result.setOutcome(true);
+			result.setMessage(T_bitstream_updated);
+		}else {
+			result.setOutcome(false);
+			result.setMessage(T_bitstream_not_found);
+		}
+
+		result.setContinue(true);
+
+		return result;
+
+	}
 	/**
 	 * Delete the given bitstreams from the bundle and item. If there are no more bitstreams 
 	 * left in a bundle then also remove it.

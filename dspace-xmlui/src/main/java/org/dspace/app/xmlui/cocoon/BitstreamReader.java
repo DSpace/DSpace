@@ -39,11 +39,7 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.DCDate;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -176,6 +172,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
     /** TEMP file for citation PDF. We will save here, so we can delete the temp file when done.  */
     private File tempFile;
+
+    private String redirectToURL;
 
     /**
      * Set up the bitstream reader.
@@ -427,6 +425,13 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             // If we created the database connection close it, otherwise leave it open.
             if (BitstreamReaderOpenedContext)
             	context.complete();
+
+            Metadatum[] mds = bitstream.getMetadataByMetadataString("local.bitstream.redirectToURL");
+            if(mds != null && mds.length == 1){
+                if(org.apache.commons.lang3.StringUtils.isNotBlank(mds[0].value)){
+                    this.redirectToURL = mds[0].value;
+                }
+            }
         }
         catch (SQLException sqle)
         {
@@ -782,51 +787,45 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
         try
         {
-            if (byteRange != null)
-            {
-                String entityLength;
-                String entityRange;
-                if (this.bitstreamSize != -1)
-                {
-                    entityLength = "" + this.bitstreamSize;
-                    entityRange = byteRange.intersection(
-                            new ByteRange(0, this.bitstreamSize)).toString();
-                }
-                else
-                {
-                    entityLength = "*";
-                    entityRange = byteRange.toString();
-                }
-
-                response.setHeader("Content-Range", entityRange + "/" + entityLength);
-                if (response instanceof HttpResponse)
-                {
-                    // Response with status 206 (Partial content)
-                    response.setStatus(206);
-                }
-
-                int pos = 0;
-                int posEnd;
-                while ((length = this.bitstreamInputStream.read(buffer)) > -1)
-                {
-                    posEnd = pos + length - 1;
-                    ByteRange intersection = byteRange.intersection(new ByteRange(pos, posEnd));
-                    if (intersection != null)
-                    {
-                        out.write(buffer, (int) intersection.getStart() - pos, (int) intersection.length());
+            if(org.apache.commons.lang3.StringUtils.isNotBlank(this.redirectToURL)){
+                response.sendRedirect(this.redirectToURL);
+            }else {
+                if (byteRange != null) {
+                    String entityLength;
+                    String entityRange;
+                    if (this.bitstreamSize != -1) {
+                        entityLength = "" + this.bitstreamSize;
+                        entityRange = byteRange.intersection(
+                                new ByteRange(0, this.bitstreamSize)).toString();
+                    } else {
+                        entityLength = "*";
+                        entityRange = byteRange.toString();
                     }
-                    pos += length;
-                }
-            }
-            else
-            {
-                response.setHeader("Content-Length", String.valueOf(this.bitstreamSize));
 
-                while ((length = this.bitstreamInputStream.read(buffer)) > -1)
-                {
-                    out.write(buffer, 0, length);
+                    response.setHeader("Content-Range", entityRange + "/" + entityLength);
+                    if (response instanceof HttpResponse) {
+                        // Response with status 206 (Partial content)
+                        response.setStatus(206);
+                    }
+
+                    int pos = 0;
+                    int posEnd;
+                    while ((length = this.bitstreamInputStream.read(buffer)) > -1) {
+                        posEnd = pos + length - 1;
+                        ByteRange intersection = byteRange.intersection(new ByteRange(pos, posEnd));
+                        if (intersection != null) {
+                            out.write(buffer, (int) intersection.getStart() - pos, (int) intersection.length());
+                        }
+                        pos += length;
+                    }
+                } else {
+                    response.setHeader("Content-Length", String.valueOf(this.bitstreamSize));
+
+                    while ((length = this.bitstreamInputStream.read(buffer)) > -1) {
+                        out.write(buffer, 0, length);
+                    }
+                    out.flush();
                 }
-                out.flush();
             }
         }
         finally

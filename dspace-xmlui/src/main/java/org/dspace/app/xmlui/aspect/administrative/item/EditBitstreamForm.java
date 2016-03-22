@@ -10,20 +10,17 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.cocoon.environment.ObjectModelHelper;
 import org.dspace.app.xmlui.aspect.submission.submit.AccessStepUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
@@ -59,6 +56,11 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 	private static final Message T_user_help = message("xmlui.administrative.item.EditBitstreamForm.user_help");
     private static final Message T_filename_label = message("xmlui.administrative.item.EditBitstreamForm.name_label");
     private static final Message T_filename_help = message("xmlui.administrative.item.EditBitstreamForm.name_help");
+
+	private static final Message T_name_label = message("xmlui.administrative.item.EditItemMetadataForm.name_label");
+	private static final Message T_value_label = message("xmlui.administrative.item.EditItemMetadataForm.value_label");
+	private static final Message T_lang_label = message("xmlui.administrative.item.EditItemMetadataForm.lang_label");
+	private static final Message T_submit_add = message("xmlui.administrative.item.EditItemMetadataForm.submit_add");
 
     private boolean isAdvancedFormEnabled=true;
 
@@ -189,6 +191,43 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		userFormat.setLabel(T_user_label);
 		userFormat.setHelp(T_user_help);
 		userFormat.setValue(bitstream.getUserFormatDescription());
+
+		// LIST: add new metadata
+		String previousFieldID = ObjectModelHelper.getRequest(objectModel).getParameter("field");
+		List addForm = div.addList("addBitstreamMetadata",List.TYPE_FORM);
+		addForm.setHead(T_head1);
+
+		Select addName = addForm.addItem().addSelect("field", "autocomplete");
+		addName.setLabel(T_name_label);
+		div.addHidden("field-type").setValue("select2");
+		MetadataField[] fields = MetadataField.findAll(context);
+		for (MetadataField field : fields)
+		{
+			int fieldID = field.getFieldID();
+			MetadataSchema schema = MetadataSchema.find(context, field.getSchemaID());
+			String name = schema.getName() +"."+field.getElement();
+			if (field.getQualifier() != null)
+			{
+				name += "." + field.getQualifier();
+			}
+            addName.addOption(fieldID, name);
+		}
+		if (previousFieldID != null)
+		{
+			addName.setOptionSelected(previousFieldID);
+		}
+
+
+		Composite addComposite = addForm.addItem().addComposite("value");
+		addComposite.setLabel(T_value_label);
+		TextArea addValue = addComposite.addTextArea("value");
+		Text addLang = addComposite.addText("language");
+
+		addValue.setSize(4, 35);
+		addLang.setLabel(T_lang_label);
+		addLang.setSize(6);
+
+		addForm.addItem().addButton("submit_add").setValue(T_submit_add);
 
 		// Local fields
 		List localMetadata = edit.addList("localMetadata");

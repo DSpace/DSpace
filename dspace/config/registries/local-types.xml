@@ -105,6 +105,12 @@
         <qualifier>info</qualifier>
         <scope_note>Arbitrary info seprated key and value with |</scope_note>
     </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>bitstream</element>
+        <qualifier>redirectToURL</qualifier>
+        <scope_note>Get the bitstream from this URL.</scope_note>
+    </dc-type>
 </dspace-dc-types>
 
 
