@@ -1099,8 +1099,85 @@
             <xsl:value-of select="concat($context-path, '/', substring-before($request-uri, '/piwik-statistics'))"/>
             <xsl:text disable-output-escaping="yes">/piwik?period=day</xsl:text>
         </xsl:variable>
+        
+        
+<div id="piwik-charts" style="font-family: verdana;" interval='2 day'>
 
-                <div class="panel panel-default">
+	                                <xsl:attribute name="data-url">
+                                        <xsl:value-of select="$reportURL" />
+                                </xsl:attribute>
+
+
+
+	<div class="row" style="margin-bottom: 20px;">
+	  <div class="col-md-offset-2 col-md-8">
+		<div class="input-group input-group-lg">
+		<span style="cursor: pointer;" class="input-group-addon" id="sizing-addon1" onclick="jQuery('input[name=\'daterange\']').click();"><span class="label label-primary">Period</span></span>
+		  <input type="text" name="daterange" class="form-control" value="" aria-describedby="sizing-addon1" />
+		  <span style="cursor: pointer;" class="input-group-addon" id="sizing-addon1" onclick="jQuery('input[name=\'daterange\']').click();"><i class="glyphicon glyphicon-calendar fa fa-calendar">&#160;</i></span>    
+		</div>
+	  </div>
+	</div>
+
+
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active" style="min-width: 200px;">        
+      <a href="#views" aria-controls="views" role="tab" data-toggle="tab" style="color: #60a22a;"  class="text-center">
+        <div class="bold text-center"><i class="fa fa-eye fa-2x">&#160;</i></div>
+        <div>
+          Views
+          <span class="bold text-center" id="views_tab_count">&#160;</span>
+        </div>        
+      </a>
+    </li>
+    <li role="presentation" class="text-center" style="min-width: 200px;">
+      <a href="#downloads" aria-controls="downloads" role="tab" data-toggle="tab" style="color: #1f78b4;" class="text-center">
+        <div class="bold text-center"><i class="fa fa-download fa-2x">&#160;</i></div>
+        <div>
+     	     Downloads
+			<span class="bold text-center" id="downloads_tab_count">&#160;</span>
+        </div>
+      </a>
+    </li>
+    <li role="presentation" style="min-width: 200px;">
+      <a href="#summary" aria-controls="summary" role="tab" data-toggle="tab" style="color: #888888" class="text-center">
+        <div class="bold text-center"><i class="fa fa-info-circle fa-2x">&#160;</i></div>
+        <div>
+     	     Summary
+		<span class="bold">&#160;</span>
+        </div>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="views" style="padding: 40px;">
+      <div id="visits_over_time_chart" class="jqplot-target">
+        <div id="piwik-loading" style="width: 100%; height: 100%; display: none;">
+          <i class="fa fa-pulse fa-3x" >&#xf110;</i>
+        </div>            
+      </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="downloads" style="padding: 40px;">
+      <div id="downloads_over_time_chart" class="jqplot-target">
+        <div id="piwik-loading" style="width: 100%; height: 100%; display: none;">
+          <i class="fa fa-pulse fa-3x" >&#xf110;</i>
+        </div>            
+      </div>      
+    </div>
+    <div role="tabpanel" class="tab-pane" id="summary" style="padding: 40px;">
+			<div id="visits_summary_report">
+				<div class="views">&#160;</div>
+				<div class="visits">&#160;</div>
+				<div class="downloads">&#160;</div>
+			</div>      
+    </div>
+  </div>
+
+</div>        
+
+                <!-- div class="panel panel-default">
                         <div class="panel-heading bold"><i18n:text>xmlui.UFAL.artifactbrowser.piwik.views</i18n:text>
 				<a class="jqplot-to-picture pull-right" href="#" target-div="#visits_over_time_chart">
 					<i class="fa fa-file-image-o">&#160;</i>
@@ -1145,7 +1222,7 @@
                                 <div class="downloads">&#160;</div>
                         </div>
                         </div>
-                </div>
+                </div-->
 
 		<div id="jqplot-save-as-picture" class="modal fade">
 			<div class="modal-dialog">
@@ -1165,3 +1242,4 @@
 		</div><!-- /.modal -->
         </xsl:template>
 </xsl:stylesheet>
+

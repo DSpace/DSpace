@@ -156,6 +156,7 @@
 			<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='jqplot']">
 				<link rel="stylesheet" href="{$theme-path}/lib/js/jqplot/jquery.jqplot.css"> </link>
 				<link rel="stylesheet" href="{$theme-path}/lib/css/jqplot.css"> </link>
+				<link rel="stylesheet" href="{$theme-path}/lib/css/daterangepicker.css"> </link>
 	        	</xsl:if>            
             
             <!-- select2 -->
@@ -567,6 +568,8 @@
             <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.dateAxisRenderer.min.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.enhancedLegendRenderer.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/piwik_charts.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/moment.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/daterangepicker.js">&#160;</script>
         </xsl:if>        
         
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='datepicker']">
@@ -637,6 +640,7 @@
     </xsl:template>
 
 </xsl:stylesheet>
+
 
 
 

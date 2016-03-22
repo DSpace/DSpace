@@ -102,7 +102,7 @@ public class PiwikStatisticsReader extends AbstractReader {
             this.response = ObjectModelHelper.getResponse(objectModel);
             
             rest = par.getParameter("rest", null);
-            
+
             String handle = par.getParameter("handle", null);
             
             this.isSpider = par.getParameter("userAgent", "").equals("spider");
@@ -150,20 +150,26 @@ public class PiwikStatisticsReader extends AbstractReader {
 			}
 
 			Calendar cal = Calendar.getInstance();
-			Date today = cal.getTime();
+			Date startDate = cal.getTime();
 			cal.add(Calendar.DATE, -last_n);
-			Date weekBefore = cal.getTime();
-
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			Date endDate = cal.getTime();
+			
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");			
+			
+			if(request.getParameter("date")!=null) {
+				String dt[] = request.getParameter("date").split(",");
+				startDate = df.parse(dt[1]);
+				endDate = df.parse(dt[0]);
+			}
 
 			String urlParams =
-				  "&date=" + df.format(weekBefore) + "," + df.format(today)
+				  "&date=" + df.format(endDate) + "," + df.format(startDate)
 				+ "&idSite=" + PIWIK_SITE_ID
 				+ "&token_auth=" + PIWIK_AUTH_TOKEN
 				+ "&segment=pageUrl=@" + item.getHandle()
 				+ "&columns=nb_pageviews,nb_uniq_pageviews,nb_uniq_visitors,nb_visits";
 			String downloadUrlParams =
-				  "&date=" + df.format(weekBefore) + "," + df.format(today)
+				  "&date=" + df.format(endDate) + "," + df.format(startDate)
 				+ "&idSite=" + PIWIK_DOWNLOAD_SITE_ID
 				+ "&token_auth=" + PIWIK_AUTH_TOKEN
 				+ "&segment=pageUrl=@" + item.getHandle()
@@ -201,7 +207,8 @@ public class PiwikStatisticsReader extends AbstractReader {
 						+ "&urls[0]=" + url0
 						+ "&urls[1]=" + url1
 				);
-				mergedResult = PiwikHelper.mergeJSONResults(report);
+				//mergedResult = PiwikHelper.mergeJSONResults(report);
+				mergedResult = report;
 
 			}
 
@@ -214,5 +221,6 @@ public class PiwikStatisticsReader extends AbstractReader {
 	}	
 	
 }
+
 
 
