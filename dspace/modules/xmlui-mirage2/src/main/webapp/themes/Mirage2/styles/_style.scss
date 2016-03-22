@@ -319,6 +319,11 @@ input[name='lookup_dc_subject_classification']{
     clear: both;
 }
 
+/* break file names that are too long */
+#aspect_submission_StepTransformer_table_resumable-upload-summary td:nth-child(3){
+    word-break: break-all;
+}
+
 .resumable-dragover{
     color: #555;
     background-color: #ddd;
@@ -367,6 +372,7 @@ input[name='lookup_dc_subject_classification']{
     float: left;
     margin: 0 7px 20px 0;
 }
+
 
 /*************************** misc *******************************/
 .glyphicon-lock {
