@@ -26,7 +26,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.MetadataAuthorityManager;
@@ -409,7 +409,7 @@ public class IndexBrowse
                         for (int mdIdx = 0; mdIdx < bis[i].getMetadataCount(); mdIdx++)
                         {
                             String[] md = bis[i].getMdBits(mdIdx);
-                            DCValue[] values = item.getMetadata(md[0], md[1], md[2], Item.ANY);
+                            Metadatum[] values = item.getMetadata(md[0], md[1], md[2], Item.ANY);
 
                             // if we have values to index on, then do so
                             if (values != null && values.length > 0)
@@ -417,7 +417,7 @@ public class IndexBrowse
                                 int minConfidence = MetadataAuthorityManager.getManager()
                                         .getMinConfidence(values[0].schema, values[0].element, values[0].qualifier);
 
-                                for (DCValue value : values)
+                                for (Metadatum value : values)
                                 {
                                     // Ensure that there is a value to index before inserting it
                                     if (StringUtils.isEmpty(value.value))
@@ -537,18 +537,18 @@ public class IndexBrowse
 
                 // If we've already used the metadata for this Item
                 // it will be cached in the map
-                DCValue value = null;
+                Metadatum value = null;
 
                 if (itemMDMap != null)
                 {
-                    value = (DCValue) itemMDMap.get(metadata);
+                    value = (Metadatum) itemMDMap.get(metadata);
                 }
 
                 // We haven't used this metadata before, so grab it from the item
                 if (value == null)
                 {
                     String[] somd = so.getMdBits();
-                    DCValue[] dcv = item.getMetadata(somd[0], somd[1], somd[2], Item.ANY);
+                    Metadatum[] dcv = item.getMetadata(somd[0], somd[1], somd[2], Item.ANY);
 
                     if (dcv == null)
                     {
@@ -1218,7 +1218,7 @@ public class IndexBrowse
 	        this.id         = id;
 	    }
 
-	    public DCValue[] getMetadata(String schema, String element, String qualifier, String lang)
+	    public Metadatum[] getMetadata(String schema, String element, String qualifier, String lang)
 	        throws SQLException
 	    {
 	        if (item != null)

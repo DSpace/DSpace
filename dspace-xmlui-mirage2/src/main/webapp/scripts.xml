@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     The contents of this file are subject to the license and copyright
@@ -10,8 +11,8 @@
 <scripts>
     <!-- build:js scripts/theme.js-->
     <script src="vendor/jquery/jquery.min.js">&#160;</script>
-    <script src="vendor/jquery-ui/ui/jquery.ui.core.js"></script>
-    <script src="vendor/jquery-ui/ui/jquery.ui.datepicker.js"></script>
+    <script src="vendor/jquery-ui/ui/jquery.ui.core.js">&#160;</script>
+    <script src="vendor/jquery-ui/ui/jquery.ui.datepicker.js">&#160;</script>
     <script src="vendor/handlebars/handlebars.js">&#160;</script>
     <script src="vendor/holderjs/holder.js">&#160;</script>
     <!--<script src="vendor/bootstrap-sass-official/assets/javascripts/bootstrap/affix.js">&#160;</script>-->
@@ -36,9 +37,16 @@
     <script src="scripts/access-form-util.js">&#160;</script>
     <script src="scripts/forms.js">&#160;</script>
     <script src="scripts/vendor-extensions.js">&#160;</script>
+    <script src="scripts/google-stats-dates.js">&#160;</script>
     <script src="scripts/templates.js">&#160;</script>
+
+    <!-- authorLookup and its dependencies -->
+    <script src="vendor/datatables/media/js/jquery.dataTables.js">&#160;</script>
+    <script src="scripts/person-lookup.js">&#160;</script>
+
     <!-- endbuild -->
-    <!-- build:remove -->
-    <script src="scripts/set-devmode.js">&#160;</script>
-    <!-- endbuild -->
+
+    <!--the build comments below need to be inline to fix the 'undefined'
+    issue mentioned at https://github.com/yeoman/grunt-usemin/issues/128 -->
+    <!-- build:remove --><script src="scripts/set-devmode.js">&#160;</script><!-- endbuild -->
 </scripts>

@@ -1,17 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.dspace</groupId>
-    <artifactId>dspace-xmlui</artifactId>
-    <packaging>war</packaging>
-    <name>DSpace XML-UI (Manakin)</name>
-    <description>
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-xmlui</artifactId>
+   <packaging>war</packaging>
+   <name>DSpace XML-UI (Manakin)</name>
+   <description>
       DSpace web-based user interface based upon Apache Cocoon.
    </description>
 
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>4.1-5.2</version>
+      <version>5.4-0</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -51,10 +51,10 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
                 <configuration>
-                    <!--Exclude license check for XMLUI files which don't need it -->
+                    <!--Exclude license check for XMLUI files which don't need it-->
                     <excludes>
                         <exclude>**/META-INF/**</exclude>
                         <exclude>**/robots.txt</exclude>
@@ -63,6 +63,7 @@
                         <exclude>**/cocoon/**</exclude>
                         <exclude>**/scriptaculous/**</exclude>
                         <exclude>**/jquery*</exclude>
+                        <exclude>**/Datatables/**</exclude>
                         <exclude>**/modernizr*</exclude>
                         <exclude>**/DD_belated*</exclude>
                         <exclude>**/detectmobile*</exclude>
@@ -220,7 +221,7 @@
             <artifactId>opencsv</artifactId>
             <version>2.0</version>
         </dependency>
-        <!-- Gson: Java to Json conversion -->
+        <!--  Gson: Java to Json conversion -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -233,12 +234,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- CAS: Needed for CAS authentication -->
-        <dependency>
-            <groupId>cas</groupId>
-            <artifactId>casclient</artifactId>
-            <version>2.1.1</version>
-        </dependency>
     </dependencies>
 
 </project>

@@ -354,7 +354,7 @@ public class BrowserScope
      */
     public void setResultsPerPage(int resultsPerPage)
     {
-        if (resultsPerPage > -1)
+        if (resultsPerPage > -1 || (browseIndex != null && browseIndex.isTagCloudEnabled()))
         {
             this.resultsPerPage = resultsPerPage;
         }

@@ -17,7 +17,8 @@
             $this = $(this);
             browse_controls = $('#aspect_artifactbrowser_ConfigurableBrowse_div_browse-controls, ' +
                     '#aspect_administrative_WithdrawnItems_div_browse-controls, ' +
-                    '#aspect_administrative_PrivateItems_div_browse-controls');
+                    '#aspect_administrative_PrivateItems_div_browse-controls, '+
+                    '#aspect_discovery_SearchFacetFilter_div_browse-controls');
             $('*[name="' +$this.data('name') + '"]', browse_controls).val($this.data('returnvalue'));
             $('.btn', browse_controls).click();
             $this.closest('.open').removeClass('open');

@@ -34,6 +34,7 @@ import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortConfiguration.SORT_ORDER;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
@@ -454,11 +455,11 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 itemName.append(item.getHandle()).append(":").append(metadataKey.toString());
 
 
-                DCValue[] itemMetadata = item.getMetadata(schema, metadataField.getElement(), metadataField.getQualifier(), Item.ANY);
+                Metadatum[] itemMetadata = item.getMetadata(schema, metadataField.getElement(), metadataField.getQualifier(), Item.ANY);
                 if(!ArrayUtils.isEmpty(itemMetadata))
                 {
                     org.dspace.app.xmlui.wing.element.List metadataFieldList = itemList.addList(itemName.toString());
-                    for (DCValue metadataValue : itemMetadata)
+                    for (Metadatum metadataValue : itemMetadata)
                     {
                         String value = metadataValue.value;
                         addMetadataField(highlightedResults, metadataKey.toString(), metadataFieldList, value);
@@ -616,8 +617,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                         }
                         break;
                     default:
-                        //Partial match allowed, only render the highlighted part
-                        if(value.contains(highlight.replaceAll("</?em>", "")))
+                        //Partial match allowed, only render the highlighted part (will also remove \r since this char is not indexed in solr & will cause issues
+                        if(value.replace("\r", "").contains(highlight.replaceAll("</?em>", "")))
                         {
                             value = highlight;
                         }
@@ -722,11 +723,11 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         {
             return;
         }
-        
 
         String query = getQuery();
 
-        //DSpaceObject scope = getScope();
+        // Escape any special characters in this user-entered query
+        query = DiscoveryUIUtils.escapeQueryChars(query);
 
         int page = getParameterPage();
 
@@ -979,14 +980,32 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         boolean selected = ("score".equals(currentSort) || (currentSort == null && searchSortConfiguration.getDefaultSort() == null));
         sortOptions.addItem("relevance", "gear-option" + (selected ? " gear-option-selected" : "")).addXref("sort_by=score&order=" + searchSortConfiguration.getDefaultSortOrder(), T_sort_by_relevance);
 
+        if (currentSort == null
+                && searchSortConfiguration.getDefaultSort() != null)
+        {
+            currentSort = SearchUtils.getSearchService()
+                    .toSortFieldIndex(
+                            searchSortConfiguration.getDefaultSort()
+                                    .getMetadataField(),
+                            searchSortConfiguration.getDefaultSort().getType());
+        }
+        String sortOrder = getParameterOrder();
+        if (sortOrder == null
+                && searchSortConfiguration.getDefaultSortOrder() != null)
+        {
+            sortOrder = searchSortConfiguration.getDefaultSortOrder().name();
+        }
+
         if(searchSortConfiguration.getSortFields() != null)
         {
             for (DiscoverySortFieldConfiguration sortFieldConfiguration : searchSortConfiguration.getSortFields())
             {
                 String sortField = SearchUtils.getSearchService().toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
 
-                boolean selectedAsc = ((sortField.equals(currentSort) && "asc".equals(getParameterOrder())) || (sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())) && DiscoverySortConfiguration.SORT_ORDER.asc.equals(searchSortConfiguration.getDefaultSortOrder()));
-                boolean selectedDesc= ((sortField.equals(currentSort) && "desc".equals(getParameterOrder())) || (sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())) && DiscoverySortConfiguration.SORT_ORDER.desc.equals(searchSortConfiguration.getDefaultSortOrder()));
+                boolean selectedAsc = sortField.equals(currentSort)
+                        && SORT_ORDER.asc.name().equals(sortOrder);
+                boolean selectedDesc = sortField.equals(currentSort)
+                        && SORT_ORDER.desc.name().equals(sortOrder);
                 String sortFieldParam = "sort_by=" + sortField + "&order=";
                 sortOptions.addItem(sortField, "gear-option" + (selectedAsc ? " gear-option-selected" : "")).addXref(sortFieldParam + "asc", message("xmlui.Discovery.AbstractSearch.sort_by." + sortField + "_asc"));
                 sortOptions.addItem(sortField, "gear-option" + (selectedDesc ? " gear-option-selected" : "")).addXref(sortFieldParam + "desc", message("xmlui.Discovery.AbstractSearch.sort_by." + sortField + "_desc"));

@@ -8,8 +8,6 @@
 package org.dspace.content.authority;
 
 import java.io.IOException;
-import mockit.UsingMocksAndStubs;
-import org.dspace.MockConfigurationManager;
 import org.dspace.core.PluginManager;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,7 +18,6 @@ import org.junit.*;
  *
  * @author mwood
  */
-@UsingMocksAndStubs(value=MockConfigurationManager.class)
 public class DSpaceControlledVocabularyTest
 {
     public DSpaceControlledVocabularyTest()
@@ -73,14 +70,7 @@ public class DSpaceControlledVocabularyTest
     {
         System.out.println("getMatches");
 
-        // Set up the PluginManager
         final String PLUGIN_INTERFACE = "org.dspace.content.authority.ChoiceAuthority";
-        final String PLUGIN_NAME = "org.dspace.content.authority.DSpaceControlledVocabulary";
-
-        MockConfigurationManager.setProperty("dspace.dir",
-                System.getProperty("dspace.dir.static"));
-        MockConfigurationManager.setProperty(
-                "plugin.selfnamed." + PLUGIN_INTERFACE, PLUGIN_NAME);
 
         // Ensure that 'id' attribute is optional
         String field = null; // not used
@@ -89,6 +79,9 @@ public class DSpaceControlledVocabularyTest
         int start = 0;
         int limit = 0;
         String locale = null;
+        // This "farm" Controlled Vocab is included in TestEnvironment data 
+        // (under /src/test/data/dspaceFolder/) and it should be auto-loaded
+        // by test configs in /src/test/data/dspace.cfg.more
         DSpaceControlledVocabulary instance = (DSpaceControlledVocabulary)
                 PluginManager.getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
         assertNotNull(instance);

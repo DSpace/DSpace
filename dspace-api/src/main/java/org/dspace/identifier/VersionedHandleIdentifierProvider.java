@@ -633,8 +633,8 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         // Add handle as identifier.uri DC value.
         // First check that identifier doesn't already exist.
         boolean identifierExists = false;
-        DCValue[] identifiers = item.getDC("identifier", "uri", Item.ANY);
-        for (DCValue identifier : identifiers)
+        Metadatum[] identifiers = item.getDC("identifier", "uri", Item.ANY);
+        for (Metadatum identifier : identifiers)
         {
             if (handleref.equals(identifier.value))
             {

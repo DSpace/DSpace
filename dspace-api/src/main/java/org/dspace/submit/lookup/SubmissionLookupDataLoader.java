@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.httpclient.HttpException;
 import org.dspace.core.Context;
 
 import gr.ekt.bte.core.DataLoader;
 import gr.ekt.bte.core.Record;
+import org.apache.http.HttpException;
 
 /**
  * @author Andrea Bollini

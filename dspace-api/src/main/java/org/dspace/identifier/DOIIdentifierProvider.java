@@ -10,10 +10,9 @@ package org.dspace.identifier;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
@@ -68,12 +67,12 @@ public class DOIIdentifierProvider
     public static final String DOI_QUALIFIER = "uri";
     
     public static final Integer TO_BE_REGISTERED = 1;
-    public static final Integer TO_BE_RESERVERED = 2;
+    public static final Integer TO_BE_RESERVED = 2;
     public static final Integer IS_REGISTERED = 3;
     public static final Integer IS_RESERVED = 4;
-    public static final Integer UPDATE_RESERVERED = 5;
+    public static final Integer UPDATE_RESERVED = 5;
     public static final Integer UPDATE_REGISTERED = 6;
-    public static final Integer UPDATE_BEFORE_REGISTERATION = 7;
+    public static final Integer UPDATE_BEFORE_REGISTRATION = 7;
     public static final Integer TO_BE_DELETED = 8;
     public static final Integer DELETED = 9;
     
@@ -251,7 +250,7 @@ public class DOIIdentifierProvider
             return;
         } 
                 
-        doiRow.setColumn("status", TO_BE_RESERVERED);
+        doiRow.setColumn("status", TO_BE_RESERVED);
         try
         {
             DatabaseManager.update(context, doiRow);
@@ -328,7 +327,8 @@ public class DOIIdentifierProvider
         }
         
         doiRow.setColumn("status", IS_REGISTERED);
-        DatabaseManager.update(context, doiRow);        
+        DatabaseManager.update(context, doiRow);
+        dso.resetIdentifiersCache();
     }
     
     public void updateMetadata(Context context, DSpaceObject dso, String identifier)
@@ -352,11 +352,11 @@ public class DOIIdentifierProvider
         }
         else if (TO_BE_REGISTERED == doiRow.getIntColumn("status")) 
         {
-            doiRow.setColumn("status", UPDATE_BEFORE_REGISTERATION);
+            doiRow.setColumn("status", UPDATE_BEFORE_REGISTRATION);
         }
         else if (IS_RESERVED == doiRow.getIntColumn("status")) 
         {
-            doiRow.setColumn("status", UPDATE_RESERVERED);
+            doiRow.setColumn("status", UPDATE_RESERVED);
         }
         else
         {
@@ -415,11 +415,11 @@ public class DOIIdentifierProvider
         {
             doiRow.setColumn("status", IS_REGISTERED);
         }
-        else if (UPDATE_BEFORE_REGISTERATION == doiRow.getIntColumn("status")) 
+        else if (UPDATE_BEFORE_REGISTRATION == doiRow.getIntColumn("status"))
         {
             doiRow.setColumn("status", TO_BE_REGISTERED);
         }
-        else if (UPDATE_RESERVERED == doiRow.getIntColumn("status")) 
+        else if (UPDATE_RESERVED == doiRow.getIntColumn("status"))
         {
             doiRow.setColumn("status", IS_RESERVED);
         }
@@ -612,7 +612,7 @@ public class DOIIdentifierProvider
         }
         catch (SQLException ex)
         {
-            log.error("SQLException occured while deleting a DOI out of an item: "
+            log.error("SQLException occurred while deleting a DOI out of an item: "
                     + ex.getMessage());
             throw new RuntimeException("Error while deleting a DOI out of the " +
                     "metadata of an Item " + dso.getID(), ex);
@@ -847,8 +847,8 @@ public class DOIIdentifierProvider
         }
         Item item = (Item)dso;
 
-        DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        for (DCValue id : metadata)
+        Metadatum[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        for (Metadatum id : metadata)
         {
             if (id.value.startsWith(DOI.RESOLVER + "/10."))
             {
@@ -910,10 +910,10 @@ public class DOIIdentifierProvider
         }
         Item item = (Item)dso;
 
-        DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        Metadatum[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         List<String> remainder = new ArrayList<String>();
 
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (!id.value.equals(DOI.DOIToExternalForm(doi)))
             {

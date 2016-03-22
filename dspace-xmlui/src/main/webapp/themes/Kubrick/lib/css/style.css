@@ -1987,3 +1987,12 @@ margin: 2px 2px 0px 2px;
 #ds-language-selection {
 text-align: right;
 }
+
+.hidden {
+display:none;
+visibility:hidden;
+}
+
+.pre {
+    white-space:pre;
+}

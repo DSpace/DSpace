@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.util.MetadataExposure;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.wing.AttributeMap;
@@ -26,7 +27,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.authority.Choices;
@@ -35,6 +36,7 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.statistics.content.StatisticsBSAdapter;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
@@ -269,9 +271,9 @@ public class ItemAdapter extends AbstractAdapter
             }
             startElement(DIM, "dim", attributes);
 
-            DCValue[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY,
+            Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY,
                     Item.ANY);
-            for (DCValue dcv : dcvs)
+            for (Metadatum dcv : dcvs)
             {
                 if (!MetadataExposure.isHidden(context, dcv.schema,
                         dcv.element, dcv.qualifier))
@@ -1036,7 +1038,20 @@ public class ItemAdapter extends AbstractAdapter
         String checksumType = bitstream.getChecksumAlgorithm();
         String checksum = bitstream.getChecksum();
         long size = bitstream.getSize();
-        int views = bitstream.getIntMetadata("views");
+        Long views = null;
+
+        StatisticsBSAdapter statBSAdapter = new StatisticsBSAdapter();
+        try
+        {
+            views = statBSAdapter.getNumberOfVisits(
+                    StatisticsBSAdapter.BITSTREAM_VISITS, item);
+        }
+        catch (SolrServerException e1)
+        {
+            // Print stacktrace and continue
+            // (Download count will not display)
+            e1.printStackTrace();
+        }
 
         // Check if bitstream has an embargo. If yes, display a 'Restricted
         // Access' description with bitstream.
@@ -1071,7 +1086,10 @@ public class ItemAdapter extends AbstractAdapter
             attributes.put("CHECKSUMTYPE", checksumType);
         }
         attributes.put("SIZE", String.valueOf(size));
-        attributes.put("VIEWS", String.valueOf(views));
+        if (views != null)
+        {
+            attributes.put("VIEWS", String.valueOf(views));
+        }
         attributes.put("EMBARGO", String.valueOf(flagEmbargo));
         startElement(METS, "file", attributes);
 

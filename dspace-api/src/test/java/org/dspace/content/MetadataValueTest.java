@@ -14,6 +14,7 @@ import java.util.List;
 import org.dspace.AbstractUnitTest;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Constants;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
@@ -66,7 +67,8 @@ public class MetadataValueTest extends AbstractUnitTest
             this.mf = MetadataField.findByElement(context,
                     MetadataSchema.DC_SCHEMA_ID, element, qualifier);
             this.mv = new MetadataValue(mf);
-            this.mv.setItemId(Item.create(context).getID());
+            this.mv.setResourceId(Item.create(context).getID());
+            this.mv.setResourceTypeId(Constants.ITEM);
             context.commit();
             context.restoreAuthSystemState();
         }
@@ -127,7 +129,7 @@ public class MetadataValueTest extends AbstractUnitTest
     @Test
     public void testGetItemId() 
     {
-        assertTrue("testGetItemId 0", mv.getItemId() >= 0);
+        assertTrue("testGetItemId 0", mv.getResourceId() >= 0);
     }
 
     /**
@@ -137,8 +139,9 @@ public class MetadataValueTest extends AbstractUnitTest
     public void testSetItemId()
     {
         int itemId = 55;
-        mv.setItemId(itemId);
-        assertThat("testSetItemId 0", mv.getItemId(), equalTo(itemId));
+        mv.setResourceId(itemId);
+        mv.setResourceTypeId(Constants.ITEM);
+        assertThat("testSetItemId 0", mv.getResourceId(), equalTo(itemId));
     }
 
     /**

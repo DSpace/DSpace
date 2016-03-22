@@ -82,7 +82,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         } 
         else
         {
-            collections = Collection.findAuthorized(context, null, Constants.ADD);
+            collections = Collection.findAuthorizedOptimized(context, Constants.ADD);
         }
         
         // Basic form with a drop down list of all the collections
@@ -98,9 +98,10 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         select.setHelp(T_collection_help);
         
         select.addOption("",T_collection_default);
-        for (Collection collection : collections) 
+	    CollectionDropDown.CollectionPathEntry[] collectionPaths = CollectionDropDown.annotateWithPaths(collections);
+        for (CollectionDropDown.CollectionPathEntry entry : collectionPaths)
         {
-            select.addOption(collection.getHandle(), CollectionDropDown.collectionPath(collection));
+            select.addOption(entry.collection.getHandle(), entry.path);
         }
         
         Button submit = list.addItem().addButton("submit");

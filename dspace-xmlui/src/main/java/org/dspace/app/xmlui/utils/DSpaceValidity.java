@@ -17,7 +17,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
@@ -276,8 +276,8 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(item.getOwningCollection());
             validityKey.append(item.getLastModified());
             // Include all metadata values in the validity key.
-            DCValue[] dcvs = item.getDC(Item.ANY,Item.ANY,Item.ANY);
-            for (DCValue dcv : dcvs)
+            Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY,Item.ANY,Item.ANY);
+            for (Metadatum dcv : dcvs)
             {
                 validityKey.append(dcv.schema).append(".");
                 validityKey.append(dcv.element).append(".");
@@ -298,8 +298,8 @@ public class DSpaceValidity implements SourceValidity
         	
         	validityKey.append("BrowseItem:");
         	validityKey.append(browseItem.getHandle());
-        	DCValue[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            for (DCValue dcv : dcvs)
+        	Metadatum[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            for (Metadatum dcv : dcvs)
             {
                 validityKey.append(dcv.schema).append(".");
                 validityKey.append(dcv.element).append(".");

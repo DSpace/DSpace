@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>4.1-5.2</version>
+        <version>5.4-0</version>
         <relativePath>..</relativePath>
     </parent>
 

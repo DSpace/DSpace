@@ -9,13 +9,14 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>dspace-parent</artifactId>
-		<version>4.1-5.2</version>
+		<version>5.4-0</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../..</root.basedir>
+        <license.skip>true</license.skip>
     </properties>
 
 
@@ -38,11 +39,11 @@
             </activation>
             <modules>
             	<module>additions</module>
-            	<module>jspui</module>
                 <module>rest</module>
                 <module>oai</module>
                 <module>xmlui-mirage2</module>
                 <module>xmlui</module>
+                <module>swordv2</module>
             </modules>
         </profile>
         <profile>
@@ -53,6 +54,7 @@
             </modules>
         </profile>
         <profile>
+        	<!-- This profiles builds all modules including the modules that are not used in umd (jspui, sword,solr) -->
             <id>all-modules</id>
             <modules>
             	<module>additions</module>
@@ -73,6 +75,8 @@
                 <module>xmlui</module>
             </modules>
         </profile>
+        <!-- Note:- The LNI module is not built by default and is considered deprecated.
+            To build it activate the profile with '-Pdspace-lni'. -->
         <profile>
             <id>dspace-lni</id>
             <modules>
@@ -83,6 +87,12 @@
             <id>dspace-jspui</id>
             <modules>
                 <module>jspui</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-rdf</id>
+            <modules>
+                <module>rdf</module>
             </modules>
         </profile>
         <profile>
@@ -121,6 +131,5 @@
                 <module>xmlui-mirage2</module>
             </modules>
         </profile>
-        
     </profiles>
 </project>

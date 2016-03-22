@@ -7,14 +7,16 @@
  */
 package org.dspace.rest.common;
 
-import org.apache.log4j.Logger;
-import org.dspace.core.Constants;
-
-import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.apache.log4j.Logger;
+import org.dspace.content.Bundle;
+import org.dspace.core.Constants;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,7 +38,9 @@ public class Bitstream extends DSpaceObject {
     private String retrieveLink;
     private CheckSum checkSum;
     private Integer sequenceId;
-
+    
+    private ResourcePolicy[] policies = null;
+    
     public Bitstream() {
 
     }
@@ -74,6 +78,24 @@ public class Bitstream extends DSpaceObject {
             parentObject = new DSpaceObject(bitstream.getParentObject());
         } else {
             this.addExpand("parent");
+        }
+
+        if(expandFields.contains("policies") || expandFields.contains("all")) {
+            // Find policies without context.
+        	List<ResourcePolicy> tempPolicies = new ArrayList<ResourcePolicy>();
+        	Bundle[] bundles = bitstream.getBundles();
+			for (Bundle bundle : bundles) {
+				List<org.dspace.authorize.ResourcePolicy> bitstreamsPolicies = bundle.getBitstreamPolicies();
+				for (org.dspace.authorize.ResourcePolicy policy : bitstreamsPolicies) {
+					if (policy.getResourceID() == this.getId()) {
+						tempPolicies.add(new ResourcePolicy(policy));
+					}
+				}
+			}
+			
+			policies = tempPolicies.toArray(new ResourcePolicy[0]);
+        } else {
+            this.addExpand("policies");
         }
 
         if(!expandFields.contains("all")) {
@@ -153,4 +175,13 @@ public class Bitstream extends DSpaceObject {
 		this.checkSum = checkSum;
 	}
 
+	public ResourcePolicy[] getPolicies() {
+		return policies;
+	}
+
+	public void setPolicies(ResourcePolicy[] policies) {
+		this.policies = policies;
+	}
+    
+    
 }

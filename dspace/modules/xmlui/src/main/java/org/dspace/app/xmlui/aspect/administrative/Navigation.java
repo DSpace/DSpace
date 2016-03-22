@@ -71,6 +71,8 @@ CacheableProcessingComponent
 
     private static final Message T_context_export_metadata = message("xmlui.administrative.Navigation.context_export_metadata");
 
+    private static final Message T_administrative_batch_import = message("xmlui.administrative.Navigation.administrative_batch_import");
+
     private static final Message T_administrative_import_metadata = message("xmlui.administrative.Navigation.administrative_import_metadata");
 
     private static final Message T_administrative_head = message("xmlui.administrative.Navigation.administrative_head");
@@ -88,6 +90,8 @@ CacheableProcessingComponent
     private static final Message T_administrative_metadata = message("xmlui.administrative.Navigation.administrative_metadata");
 
     private static final Message T_administrative_format = message("xmlui.administrative.Navigation.administrative_format");
+
+    private static final Message T_administrative_content = message("xmlui.administrative.Navigation.administrative_content");
 
     private static final Message T_administrative_items = message("xmlui.administrative.Navigation.administrative_items");
 
@@ -356,11 +360,36 @@ CacheableProcessingComponent
         {
             admin.setHead(T_administrative_head);
 
-            List drum = admin.addList("drum");
+            // Control panel
+            admin.addItemXref(contextPath+"/admin/panel", T_administrative_control_panel);
+
+            // Access Controls
             List epeople = admin.addList("epeople");
+            epeople.setHead(T_administrative_access_control);
+            epeople.addItemXref(contextPath+"/admin/epeople", T_administrative_people);
+            epeople.addItemXref(contextPath+"/admin/groups", T_administrative_groups);
+            epeople.addItemXref(contextPath+"/admin/authorize", T_administrative_authorizations);
+
+            // Content Admin
+            List content = admin.addList("content");
+            content.setHead(T_administrative_content);
+            content.addItemXref(contextPath+"/admin/item", T_administrative_items);
+            content.addItemXref(contextPath+"/admin/withdrawn", T_administrative_withdrawn);
+            content.addItemXref(contextPath+"/admin/private", T_administrative_private);
+            content.addItemXref(contextPath+"/admin/metadataimport", T_administrative_import_metadata);
+            content.addItemXref(contextPath+"/admin/batchimport", T_administrative_batch_import);
+
+            // Registries
             List registries = admin.addList("registries");
+            registries.setHead(T_administrative_registries);
+            registries.addItemXref(contextPath+"/admin/metadata-registry",T_administrative_metadata);
+            registries.addItemXref(contextPath+"/admin/format-registry",T_administrative_format);
+
+            admin.addItemXref(contextPath + "/statistics", T_statistics);
+            admin.addItemXref(contextPath + "/admin/curate", T_administrative_curation);
 
             // DRUM Customizations
+            List drum = admin.addList("drum");
             drum.setHead(T_DRUM_customizations);
             drum.addItemXref(contextPath + "/monthly-statistics",
                     T_DRUM_monthly_statistics);
@@ -369,34 +398,6 @@ CacheableProcessingComponent
                     T_DRUM_ETD_departments);
             drum.addItemXref(contextPath + "/admin/units", T_DRUM_units);
             // End DRUM Customizations
-
-            epeople.setHead(T_administrative_access_control);
-            epeople.addItemXref(contextPath + "/admin/epeople",
-                    T_administrative_people);
-            epeople.addItemXref(contextPath + "/admin/groups",
-                    T_administrative_groups);
-            epeople.addItemXref(contextPath + "/admin/authorize",
-                    T_administrative_authorizations);
-
-            registries.setHead(T_administrative_registries);
-            registries.addItemXref(contextPath + "/admin/metadata-registry",
-                    T_administrative_metadata);
-            registries.addItemXref(contextPath + "/admin/format-registry",
-                    T_administrative_format);
-
-            admin.addItemXref(contextPath + "/admin/item",
-                    T_administrative_items);
-            admin.addItemXref(contextPath + "/admin/withdrawn",
-                    T_administrative_withdrawn);
-            admin.addItemXref(contextPath + "/admin/private",
-                    T_administrative_private);
-            admin.addItemXref(contextPath + "/admin/panel",
-                    T_administrative_control_panel);
-            admin.addItemXref(contextPath + "/statistics", T_statistics);
-            admin.addItemXref(contextPath + "/admin/metadataimport",
-                    T_administrative_import_metadata);
-            admin.addItemXref(contextPath + "/admin/curate",
-                    T_administrative_curation);
         }
     }
 

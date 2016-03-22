@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0"?>
 <commands>
-
     <command>
         <name>checker</name>
         <description>Run the checksum checker</description>
@@ -8,7 +7,6 @@
             <class>org.dspace.app.checker.ChecksumChecker</class>
         </step>
     </command>
-
     <command>
         <name>checker-emailer</name>
         <description>Send emails related to the checksum checker</description>
@@ -16,13 +14,11 @@
             <class>org.dspace.checker.DailyReportEmailer</class>
         </step>
     </command>
-
     <command>
         <name>classpath</name>
         <description>Calculate and display the DSpace classpath</description>
-        <step></step>
+        <step/>
     </command>
-
     <command>
         <name>cleanup</name>
         <description>Remove deleted bitstreams from the assetstore</description>
@@ -30,7 +26,6 @@
             <class>org.dspace.storage.bitstore.Cleanup</class>
         </step>
     </command>
-
     <command>
         <name>community-filiator</name>
         <description>Tool to manage community and sub-community relationships</description>
@@ -38,7 +33,6 @@
             <class>org.dspace.administer.CommunityFiliator</class>
         </step>
     </command>
-
     <command>
         <name>create-administrator</name>
         <description>Create a DSpace administrator account</description>
@@ -46,7 +40,6 @@
             <class>org.dspace.administer.CreateAdministrator</class>
         </step>
     </command>
-    
     <command>
         <name>curate</name>
         <description>Perform curation tasks on DSpace objects</description>
@@ -54,7 +47,20 @@
             <class>org.dspace.curate.CurationCli</class>
         </step>
     </command>
-
+    <command>
+        <name>database</name>
+        <description>Perform database tasks like test database connection, migrate/repair database, remove database</description>
+        <step>
+            <class>org.dspace.storage.rdbms.DatabaseUtils</class>
+        </step>
+    </command>
+    <command>
+        <name>doi-organiser</name>
+        <description>Run the DOI organiser</description>
+        <step>
+            <class>org.dspace.identifier.doi.DOIOrganiser</class>
+        </step>
+    </command>
     <command>
         <name>dsprop</name>
         <description>View a DSpace property from dspace.cfg</description>
@@ -62,7 +68,6 @@
             <class>org.dspace.core.ConfigurationManager</class>
         </step>
     </command>
-
     <command>
         <name>dsrun</name>
         <description>Run a class directly</description>
@@ -70,7 +75,6 @@
             <class>dsrun</class>
         </step>
     </command>
-
     <command>
         <name>embargo-lifter</name>
         <description>Embargo manager tool used to check, list and lift embargoes</description>
@@ -78,7 +82,6 @@
             <class>org.dspace.embargo.EmbargoManager</class>
         </step>
     </command>
-
     <command>
         <name>export</name>
         <description>Export items or collections</description>
@@ -86,7 +89,6 @@
             <class>org.dspace.app.itemexport.ItemExport</class>
         </step>
     </command>
-
     <command>
         <name>filter-media</name>
         <description>Perform the media filtering to extract full text from documents and to create thumbnails</description>
@@ -94,7 +96,6 @@
             <class>org.dspace.app.mediafilter.MediaFilterManager</class>
         </step>
     </command>
-
     <command>
         <name>generate-sitemaps</name>
         <description>Generate search engine and html sitemaps</description>
@@ -102,7 +103,6 @@
             <class>org.dspace.app.sitemap.GenerateSitemaps</class>
         </step>
     </command>
-
     <command>
         <name>harvest</name>
         <description>Manage the OAI-PMH harvesting of external collections</description>
@@ -110,7 +110,6 @@
             <class>org.dspace.app.harvest.Harvest</class>
         </step>
     </command>
-
     <command>
         <name>import</name>
         <description>Import items into DSpace</description>
@@ -118,7 +117,13 @@
             <class>org.dspace.app.itemimport.ItemImport</class>
         </step>
     </command>
-
+    <command>
+        <name>index-authority</name>
+        <description>Indexes all metadata fields that use solr authority</description>
+        <step>
+            <class>org.dspace.authority.indexer.AuthorityIndexClient</class>
+        </step>
+    </command>
     <command>
         <name>index-db-browse</name>
         <description>General browse index command (requires extra parameters)</description>
@@ -126,7 +131,6 @@
             <class>org.dspace.browse.IndexBrowse</class>
         </step>
     </command>
-
     <command>
         <name>index-discovery</name>
         <description>Update Discovery Solr Search Index</description>
@@ -134,7 +138,6 @@
             <class>org.dspace.discovery.IndexClient</class>
         </step>
     </command>
-    
     <command>
         <name>index-lucene-init</name>
         <description>Initialise the Lucene search and browse indexes</description>
@@ -151,7 +154,6 @@
             <argument>-b</argument>
         </step>
     </command>
-
     <command>
         <name>index-lucene-update</name>
         <description>Update the Lucene search and browse indexes</description>
@@ -165,8 +167,7 @@
         <step passuserargs="false">
             <class>org.dspace.search.DSIndexer</class>
         </step>
-     </command>
-
+    </command>
     <command>
         <name>itemcounter</name>
         <description>Update the item strength counts in the user interface</description>
@@ -174,7 +175,6 @@
             <class>org.dspace.browse.ItemCounter</class>
         </step>
     </command>
-
     <command>
         <name>itemupdate</name>
         <description>Item update tool for altering metadata and bitstream content in items</description>
@@ -182,7 +182,6 @@
             <class>org.dspace.app.itemupdate.ItemUpdate</class>
         </step>
     </command>
-
     <command>
         <name>make-handle-config</name>
         <description>Run the handle server simple setup command</description>
@@ -190,7 +189,6 @@
             <class>net.handle.server.SimpleSetup</class>
         </step>
     </command>
-
     <command>
         <name>metadata-export</name>
         <description>Export metadata for batch editing</description>
@@ -198,7 +196,6 @@
             <class>org.dspace.app.bulkedit.MetadataExport</class>
         </step>
     </command>
-
     <command>
         <name>metadata-import</name>
         <description>Import metadata after batch editing</description>
@@ -206,15 +203,20 @@
             <class>org.dspace.app.bulkedit.MetadataImport</class>
         </step>
     </command>
-
-      <command>
-        <name>doi-organiser</name>
-        <description>Run the DOI organiser</description>
+    <command>
+        <name>migrate-embargo</name>
+        <description>Embargo manager tool used to migrate old version of Embargo to the new one included in dspace3</description>
         <step>
-            <class>org.dspace.identifier.doi.DOIOrganiser</class>
+            <class>org.dspace.embargo.EmbargoManager</class>
         </step>
     </command>
-
+    <command>
+        <name>oai</name>
+        <description>OAI script manager</description>
+        <step>
+            <class>org.dspace.xoai.app.XOAI</class>
+        </step>
+    </command>
     <command>
         <name>packager</name>
         <description>Execute a packager</description>
@@ -222,15 +224,13 @@
             <class>org.dspace.app.packager.Packager</class>
         </step>
     </command>
-
     <command>
-        <name>registry-loader</name>
-        <description>Load entries into a registry</description>
+        <name>rdfizer</name>
+        <description>The RDFizer manages the attached triple store if dspace-rdf is enabled</description>
         <step>
-            <class>org.dspace.administer.RegistryLoader</class>
+            <class>org.dspace.rdf.RDFizer</class>
         </step>
     </command>
-
     <command>
         <name>read</name>
         <description>Execute a stream of 'dspace' commands from a file or pipe</description>
@@ -238,7 +238,46 @@
             <class>org.dspace.app.launcher.CommandRunner</class>
         </step>
     </command>
-
+    <command>
+        <name>registry-loader</name>
+        <description>Load entries into a registry</description>
+        <step>
+            <class>org.dspace.administer.RegistryLoader</class>
+        </step>
+    </command>
+    <command>
+        <name>solr-export-statistics</name>
+        <description>Export usage statistics data from Solr for back-up purposes</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrImportExport</class>
+	    <argument>-a</argument>
+	    <argument>export</argument>
+	    <argument>-i</argument>
+	    <argument>statistics</argument>
+        </step>
+    </command>
+    <command>
+        <name>solr-import-statistics</name>
+        <description>Import usage statistics data (as previously exported using solr-export-statistics) into Solr</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrImportExport</class>
+	    <argument>-a</argument>
+	    <argument>import</argument>
+	    <argument>-i</argument>
+	    <argument>statistics</argument>
+        </step>
+    </command>
+    <command>
+        <name>solr-reindex-statistics</name>
+        <description>Reindex the Solr-based usage statistics, for example after an upgrade that changes the schema</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrImportExport</class>
+	    <argument>-a</argument>
+	    <argument>reindex</argument>
+	    <argument>-i</argument>
+	    <argument>statistics</argument>
+        </step>
+    </command>
     <command>
         <name>stat-general</name>
         <description>Compile the general statistics</description>
@@ -248,7 +287,6 @@
             <argument>stat-general</argument>
         </step>
     </command>
-
     <command>
         <name>stat-initial</name>
         <description>Compile the initial statistics</description>
@@ -258,27 +296,24 @@
             <argument>stat-initial</argument>
         </step>
     </command>
-
     <command>
         <name>stat-monthly</name>
         <description>Compile the monthly statistics</description>
         <step passuserargs="false">
             <class>org.dspace.app.statistics.CreateStatReport</class>
-            <argument>-r</argument> 
+            <argument>-r</argument>
             <argument>stat-monthly</argument>
         </step>
     </command>
-
     <command>
         <name>stat-report-general</name>
         <description>Create the general statistics report</description>
         <step passuserargs="false">
             <class>org.dspace.app.statistics.CreateStatReport</class>
-            <argument>-r</argument>>
+            <argument>-r</argument>
             <argument>stat-report-general</argument>
         </step>
     </command>
-
     <command>
         <name>stat-report-initial</name>
         <description>Create the initial statistics report</description>
@@ -288,7 +323,6 @@
             <argument>stat-report-initial</argument>
         </step>
     </command>
-
     <command>
         <name>stat-report-monthly</name>
         <description>Create the monthly statistics report</description>
@@ -298,7 +332,6 @@
             <argument>stat-report-monthly</argument>
         </step>
     </command>
-
     <command>
         <name>stats-log-converter</name>
         <description>Convert dspace.log files ready for import into solr statistics</description>
@@ -306,7 +339,6 @@
             <class>org.dspace.statistics.util.ClassicDSpaceLogConverter</class>
         </step>
     </command>
-
     <command>
         <name>stats-log-importer</name>
         <description>Import previously converted log files into solr statistics</description>
@@ -314,7 +346,6 @@
             <class>org.dspace.statistics.util.StatisticsImporter</class>
         </step>
     </command>
-
     <command>
         <name>stats-log-importer-elasticsearch</name>
         <description>Import solr-format converted log files into Elastic Search statistics</description>
@@ -322,7 +353,6 @@
             <class>org.dspace.statistics.util.StatisticsImporterElasticSearch</class>
         </step>
     </command>
-
     <command>
         <name>stats-util</name>
         <description>Statistics Client for Maintenance of Solr Statistics Indexes</description>
@@ -330,7 +360,6 @@
             <class>org.dspace.statistics.util.StatisticsClient</class>
         </step>
     </command>
-
     <command>
         <name>structure-builder</name>
         <description>Build DSpace community and collection structure</description>
@@ -338,7 +367,6 @@
             <class>org.dspace.administer.StructBuilder</class>
         </step>
     </command>
-    
     <command>
         <name>sub-daily</name>
         <description>Send daily subscription notices</description>
@@ -346,31 +374,6 @@
             <class>org.dspace.eperson.Subscribe</class>
         </step>
     </command>
-    
-    <command>
-        <name>test-database</name>
-        <description>Test the DSpace database connection is OK</description>
-        <step>
-            <class>org.dspace.storage.rdbms.DatabaseManager</class>
-        </step>
-    </command>
-
-    <command>
-        <name>setup-database</name>
-        <description>Create the database tables</description>
-        <step>
-            <class>org.dspace.storage.rdbms.InitializeDatabase</class>
-        </step>
-    </command>
-
-    <command>
-        <name>clean-database</name>
-        <description>Remove the database tables</description>
-        <step>
-            <class>org.dspace.storage.rdbms.InitializeDatabase</class>
-        </step>
-    </command>
-
     <command>
         <name>test-email</name>
         <description>Test the DSpace email server settings are OK</description>
@@ -378,7 +381,6 @@
             <class>org.dspace.core.Email</class>
         </step>
     </command>
-
     <command>
         <name>update-handle-prefix</name>
         <description>Update handle records and metadata when moving from one handle to another</description>
@@ -386,7 +388,6 @@
             <class>org.dspace.handle.UpdateHandlePrefix</class>
         </step>
     </command>
-
     <command>
         <name>user</name>
         <description>Manipulate a normal user account</description>
@@ -394,23 +395,13 @@
             <class>org.dspace.eperson.EPerson</class>
         </step>
     </command>
-
     <command>
-        <name>migrate-embargo</name>
-        <description>Embargo manager tool used to migrate old version of Embargo to the new one included in dspace3</description>
+        <name>validate-date</name>
+        <description>interactively validate date values against the multi-format date parser (good for testing custom regular expression configurations)</description>
         <step>
-            <class>org.dspace.embargo.EmbargoManager</class>
+            <class>org.dspace.util.MultiFormatDateParser</class>
         </step>
     </command>
-
-    <command>
-        <name>oai</name>
-        <description>OAI script manager</description>
-        <step>
-            <class>org.dspace.xoai.app.XOAI</class>
-        </step>
-    </command>
-
     <command>
         <name>version</name>
         <description>Display the version of DSpace and other troubleshooting information</description>
@@ -418,5 +409,4 @@
             <class>org.dspace.app.util.Version</class>
         </step>
     </command>
-
 </commands>

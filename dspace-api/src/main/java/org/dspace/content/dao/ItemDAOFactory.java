@@ -8,7 +8,7 @@
 package org.dspace.content.dao;
 
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,7 +21,7 @@ public class ItemDAOFactory
 {
     public static ItemDAO getInstance(Context context)
     {
-        if (ConfigurationManager.getProperty("db.name").equalsIgnoreCase("oracle"))
+        if (DatabaseManager.isOracle())
         {
             return new ItemDAOOracle(context);
         }

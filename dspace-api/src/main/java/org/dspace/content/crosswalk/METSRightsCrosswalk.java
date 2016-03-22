@@ -205,11 +205,11 @@ public class METSRightsCrosswalk
               //Default all DSpace groups to have "MANAGED GRP" as the type
               String contextClass=GROUP_CONTEXTCLASS;
 
-              if(group.getID()==0) //DSpace Anonymous Group = 'GENERAL PUBLIC' type
+              if(group.getID()==Group.ANONYMOUS_ID) //DSpace Anonymous Group = 'GENERAL PUBLIC' type
               {
                   contextClass = ANONYMOUS_CONTEXTCLASS;
               }
-              else if(group.getID()==1) //DSpace Administrator Group = 'REPOSITORY MGR' type
+              else if(group.getID()==Group.ADMIN_ID) //DSpace Administrator Group = 'REPOSITORY MGR' type
               {
                   contextClass = ADMIN_CONTEXTCLASS;
               }

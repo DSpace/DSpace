@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 import org.dspace.content.DCPersonName;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 
@@ -76,7 +76,7 @@ public class SFXFileReader {
 
    /** Parses XML file and returns XML document.
     * @param fileName XML file to parse
-    * @return XML document or <B>null</B> if error occured. The error is caught and logged.
+    * @return XML document or <B>null</B> if error occurred. The error is caught and logged.
     */
 
    public static Document parseFile(String fileName) {
@@ -207,7 +207,7 @@ public class SFXFileReader {
                         }
                         if (finish == 4)
                         {
-                        DCValue[] dcvalue = item.getMetadata(schema, element, qualifier, Item.ANY);
+                        Metadatum[] dcvalue = item.getMetadata(schema, element, qualifier, Item.ANY);
                         if (dcvalue.length > 0)
                             {
                             // Issued Date
