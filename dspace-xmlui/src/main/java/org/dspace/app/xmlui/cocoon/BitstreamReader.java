@@ -431,6 +431,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 if(org.apache.commons.lang3.StringUtils.isNotBlank(mds[0].value)){
                     this.redirectToURL = mds[0].value;
                 }
+            } else {
+            	this.redirectToURL = "";
             }
         }
         catch (SQLException sqle)
@@ -871,4 +873,5 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
 
 }
+
 
