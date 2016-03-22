@@ -272,7 +272,7 @@ public class DryadEmailSubmission extends HttpServlet {
             }
 
             // Stop reading lines if we've run into the sig line
-            if (StringUtils.stripToEmpty(line).equals("--")) {
+            if (StringUtils.stripToEmpty(line).equals("--") && (dryadContentStarted == true)) {
                 break;
             }
 
