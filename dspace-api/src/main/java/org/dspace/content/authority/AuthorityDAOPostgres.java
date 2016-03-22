@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.MetadataField;
@@ -35,6 +36,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  */
 public class AuthorityDAOPostgres implements AuthorityDAO {
 
+    private static Logger log = Logger.getLogger(AuthorityDAOPostgres.class);
+    
     private Context context;
 
 //    private static final String SQL_NUM_METADATA_GROUP_BY_AUTHKEY_CONFIDENCE = "select authority, confidence, count(*) as num from item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) group by authority, confidence";
@@ -320,7 +323,7 @@ public class AuthorityDAOPostgres implements AuthorityDAO {
             fieldId = MetadataField.findByElement(context, schemaID, metadata[1], metadata.length > 2 ? metadata[2] : null).getFieldID();
         }catch (NullPointerException npe) {
             // the metadata field is not defined
-            throw new IllegalArgumentException("Error retriving metadata field for input the supplied string: " + md, npe);
+            log.warn("Error retriving metadata field for input the supplied string: " + md, npe);
         }
 
         return fieldId;
