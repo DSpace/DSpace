@@ -15,7 +15,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -47,6 +46,7 @@ public class ResumableUploadStep extends UploadStep{
             SubmissionInfo subInfo) throws ServletException, IOException, SQLException, AuthorizeException
     {
         int status = UploadStep.STATUS_COMPLETE;
+        boolean next = false;
                 
         String resumable = request.getParameter(RESUMABLE_PARAM);
         if(resumable != null && Boolean.parseBoolean(resumable))
@@ -76,13 +76,14 @@ public class ResumableUploadStep extends UploadStep{
                         bundles[0].update();
                     }
                 }
+                else if(key.equals(NEXT_BUTTON)){
+                    next = true;
+                }
             }
 
-            String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
             Item item = subInfo.getSubmissionItem().getItem();
-            if (fileRequired && !item.hasUploadedFiles()
-                    && !buttonPressed.equals(UploadStep.SUBMIT_MORE_BUTTON))
-            {
+            if (fileRequired && next && !item.hasUploadedFiles()){
+                // if next has been chosen check files have been uploaded
                 status = UploadStep.STATUS_NO_FILES_ERROR;
             }
         }

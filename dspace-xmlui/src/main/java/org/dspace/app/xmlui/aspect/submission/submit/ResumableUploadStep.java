@@ -184,6 +184,11 @@ public class ResumableUploadStep extends UploadStep{
             uploadDiv.addPara("upload-failed", "alert alert-danger hide").addContent(T_upload_error);
             uploadDiv.addPara("create-failed", "alert alert-danger hide").addContent(T_create_error);
             uploadDiv.addPara("no-space", "alert alert-danger hide").addContent(T_no_space.parameterize(max));
+            
+            if(this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_NO_FILES_ERROR)
+            {
+                uploadDiv.addPara("files-missing", "alert alert-danger").addContent(T_file_error);
+            }
 
             // add standard control/paging buttons
             addControlButtons(upload);
