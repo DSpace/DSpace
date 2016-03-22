@@ -486,7 +486,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     		}else{
     			all= communityService.getMetadata((Community)dso, "*", "*", "*", "*");
     			Community theCommunity= (Community)dso;
-    			if(theCommunity.getParentCommunities()!=null){
+    			if(!(theCommunity.getParentCommunities().isEmpty())){
     				parent=theCommunity.getParentCommunities().get(0).getName();
     			}
     		}
