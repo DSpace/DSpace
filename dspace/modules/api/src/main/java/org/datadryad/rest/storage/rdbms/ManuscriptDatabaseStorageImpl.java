@@ -228,6 +228,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                     manuscripts.add(manuscript);
                 }
             }
+            completeContext(context);
         } catch (Exception ex) {
             throw new StorageException("Exception finding manuscript", ex);
         }

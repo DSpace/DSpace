@@ -38,14 +38,10 @@ public class ManuscriptToLegacyXMLConverter {
         marshaller.marshal(legacyManuscript, outputStream);
     }
 
-    public static Manuscript convertInternalXMLToManuscript(File file) {
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(LegacyManuscript.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            LegacyManuscript legacyManuscript = (LegacyManuscript) jaxbUnmarshaller.unmarshal(file);
-            return new Manuscript(legacyManuscript);
-        } catch (JAXBException e) {
-            return null;
-        }
+    public static Manuscript convertInternalXMLToManuscript(File file) throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(LegacyManuscript.class);
+        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        LegacyManuscript legacyManuscript = (LegacyManuscript) jaxbUnmarshaller.unmarshal(file);
+        return new Manuscript(legacyManuscript);
     }
 }
