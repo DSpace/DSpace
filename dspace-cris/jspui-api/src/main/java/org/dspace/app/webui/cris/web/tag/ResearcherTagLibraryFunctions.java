@@ -865,4 +865,9 @@ public class ResearcherTagLibraryFunctions
         return applicationService.getNestedObjectsByParentIDAndShortname(id,
                 typoNested, nestedClass);
     }
+    
+    public static <TP extends PropertiesDefinition, P extends Property<TP>> TP getPropertiesDefinition(Class<TP> clazz, String shortName)
+    {
+        return applicationService.findPropertiesDefinitionByShortName(clazz, shortName);
+    }
 }
