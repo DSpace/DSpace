@@ -55,6 +55,8 @@ ranges: {
 					url : reportURL,
 					dataType : 'json',
 					beforeSend: function() {
+					
+					jQuery('#visits_over_time_chart').html('<div id="piwik-loading" style="width: 100%; height: 100%; z-index=1; display: none;"><i class="fa fa-pulse fa-3x" >&#xf110;</i></div>');
         				jQuery("#piwik-loading").css("display", "block");
     				}
 				}
@@ -93,7 +95,6 @@ ranges: {
 		jQuery('#downloads_tab_count').html("<strong>" + total_downloads + "</strong>");
 		jQuery('#period').html(dates[0] + " to " + dates[dates.length-1]);
 
- 			 jQuery('#visits_over_time_chart').html("");
                          visitsPlot = $.jqplot ('visits_over_time_chart', [nb_views, nb_views], {
                         		axes:{
                         			xaxis:{
@@ -237,8 +238,8 @@ ranges: {
                         })
 
                         jQuery(window).resize(function(){
-                        	visitsPlot.replot();
-                        	downloadPlot.replot();
+				if(visitsPlot!=null) visitsPlot.replot();
+                        	if(downloadPlot!=null) downloadPlot.replot();
                         });
 
 					}
