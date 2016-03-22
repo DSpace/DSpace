@@ -173,6 +173,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         return ERROR_SELECT_JOURNAL;
                     }
 
+                    item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
                     item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY,"false");
                     item.update();
                 } else {
@@ -326,7 +327,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         ArrayList<String> archiveEmailList = journalConcept.getEmailsToNotifyOnArchive();
         String[] archiveEmails = archiveEmailList.toArray(new String[archiveEmailList.size()]);
 
-        if(archiveEmails != null) {
+        if (archiveEmails != null) {
             item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", null, archiveEmails);
         }
 
@@ -381,11 +382,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         // the Article Status chosen must match the specified manuscript's status. Otherwise, it's invalid.
                         if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_ACCEPTED) {
                             if (manuscript.isAccepted() || manuscript.isPublished()) {
+                                item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
                                 item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "false");
                                 manuscriptNumberInvalid = false;
                             }
                         } else if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_IN_REVIEW) {
                             if (manuscript.isSubmitted() || manuscript.isNeedsRevision()) {
+                                item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
                                 item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "false");
                                 manuscriptNumberInvalid = false;
                             }
