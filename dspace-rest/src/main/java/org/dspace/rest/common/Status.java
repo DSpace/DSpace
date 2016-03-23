@@ -29,17 +29,7 @@ public class Status
     private String sourceVersion;
     private String apiVersion;
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    private String token;
-
-    public void setCommonProps() {
+    public Status() {
         setOkay(true);
 
         setSourceVersion(Util.getSourceVersion());
@@ -49,27 +39,21 @@ public class Status
         setAuthenticated(false);
     }
 
-    public Status() {
-        setCommonProps();
-    }
-
-    public Status(String email, String fullname, String token) {
-        setCommonProps();
-
+    public Status(String email, String fullname) {
+        setOkay(true);
         setAuthenticated(true);
         setEmail(email);
         setFullname(fullname);
-        setToken(token);
     }
 
-    public Status(EPerson eperson, String token) {
-        setCommonProps();
-
-        if (eperson != null) {
+    public Status(EPerson eperson) {
+        setOkay(true);
+        if(eperson != null) {
             setAuthenticated(true);
             setEmail(eperson.getEmail());
             setFullname(eperson.getFullName());
-            setToken(token);
+        } else {
+            setAuthenticated(false);
         }
     }
 
