@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
@@ -25,7 +26,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
@@ -37,6 +37,7 @@ import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -57,7 +58,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Utility methods to processes actions on Communities and Collections.
@@ -604,7 +604,7 @@ public class FlowContainerUtils
         }
 		
 		Group role = groupService.create(context);
-        groupService.setName(context, role, "COLLECTION_"+collection.getID().toString() +"_DEFAULT_READ");
+        groupService.setName(role, "COLLECTION_"+collection.getID().toString() +"_DEFAULT_READ");
 		
 		// Remove existing privileges from the anonymous group.
 		authorizeService.removePoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);

@@ -40,11 +40,13 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         criteria.add(
                 Restrictions.and(
                         Restrictions.not(Restrictions.eq("id", metadataFieldId)),
-                        Restrictions.eq("metadataSchema", metadataSchema),
+                        Restrictions.eq("metadataSchema.id", metadataSchema.getSchemaID()),
                         Restrictions.eq("element", element),
                         Restrictions.eqOrIsNull("qualifier", qualifier)
                 )
         );
+        criteria.setCacheable(true);
+
         return singleResult(criteria);
     }
 
@@ -54,11 +56,13 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         Criteria criteria = createCriteria(context, MetadataField.class);
         criteria.add(
                 Restrictions.and(
-                        Restrictions.eq("metadataSchema", metadataSchema),
+                        Restrictions.eq("metadataSchema.id", metadataSchema.getSchemaID()),
                         Restrictions.eq("element", element),
                         Restrictions.eqOrIsNull("qualifier", qualifier)
                 )
         );
+        criteria.setCacheable(true);
+
         return singleResult(criteria);
     }
 
@@ -66,6 +70,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     public List<MetadataField> findAll(Context context, Class<MetadataField> clazz) throws SQLException {
         Criteria criteria = createCriteria(context, MetadataField.class);
         criteria.createAlias("metadataSchema", "s").addOrder(Order.asc("s.name")).addOrder(Order.asc("element")).addOrder(Order.asc("qualifier"));
+        criteria.setCacheable(true);
         return list(criteria);
     }
 
@@ -80,6 +85,8 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
                         Restrictions.eqOrIsNull("qualifier", qualifier)
                 )
         );
+        criteria.setCacheable(true);
+
         return singleResult(criteria);
     }
 
@@ -93,6 +100,8 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
                         Restrictions.eq("element", element)
                 )
         );
+        criteria.setCacheable(true);
+
         return list(criteria);
     }
 
@@ -102,8 +111,10 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         // Get all the metadatafieldregistry rows
         Criteria criteria = createCriteria(context, MetadataField.class);
         criteria.createAlias("metadataSchema", "s");
-        criteria.add(Restrictions.eq("metadataSchema", metadataSchema));
+        criteria.add(Restrictions.eq("s.id", metadataSchema.getSchemaID()));
         criteria.addOrder(Order.asc("s.name")).addOrder(Order.asc("element")).addOrder(Order.asc("qualifier"));
+
+        criteria.setCacheable(true);
         return list(criteria);
     }
 }

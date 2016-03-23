@@ -268,7 +268,7 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         // currently set group
         actionsList.addLabel(T_policy_currentGroup);
         Select groupSelect = actionsList.addItem().addSelect("group_id");
-        for (Group group : groupService.findAll(context, GroupService.NAME))
+        for (Group group : groupService.findAll(context, null))
         {
             if (group == currentGroup)
             {

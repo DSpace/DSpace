@@ -141,10 +141,23 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void setGroupName() throws SQLException, AuthorizeException {
-        topGroup.setName(context, "new name");
+        topGroup.setName("new name");
         groupService.update(context, topGroup);
         assertThat("setGroupName 1", topGroup.getName(), notNullValue());
         assertEquals("setGroupName 2", topGroup.getName(), "new name");
+    }
+
+    @Test
+    public void setGroupNameOnPermanentGroup() throws SQLException, AuthorizeException {
+        topGroup.setPermanent(true);
+
+        topGroup.setName("new name");
+        groupService.update(context, topGroup);
+        assertThat("setGroupName 1", topGroup.getName(), notNullValue());
+        assertEquals("setGroupName 2", topGroup.getName(), "topGroup");
+
+        topGroup.setPermanent(false);
+        groupService.update(context, topGroup);
     }
 
     @Test
@@ -157,7 +170,7 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void findAll() throws SQLException {
-        List<Group> groups = groupService.findAll(context, GroupService.NAME);
+        List<Group> groups = groupService.findAll(context, null);
         assertThat("findAll 1", groups, notNullValue());
         System.out.println("TEST GROUP OUTPUT " + groups);
         assertTrue("findAll 2", 0 < groups.size());
@@ -184,7 +197,7 @@ public class GroupTest extends AbstractUnitTest {
     @Test
     public void findAllNameSort() throws SQLException {
         // Retrieve groups sorted by name
-        List<Group> groups = groupService.findAll(context, GroupService.NAME);
+        List<Group> groups = groupService.findAll(context, null);
 
         assertThat("findAllNameSort 1", groups, notNullValue());
 
@@ -491,7 +504,7 @@ public class GroupTest extends AbstractUnitTest {
     protected Group createGroup(String name) throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         Group group = groupService.create(context);
-        group.setName(context, name);
+        group.setName(name);
         groupService.update(context, group);
         context.restoreAuthSystemState();
         return group;
