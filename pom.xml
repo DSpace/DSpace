@@ -40,7 +40,7 @@
             Upgrading the spring version will make the XMLUI crash
         -->
         <hibernate.version>4.2.21.Final</hibernate.version>
-        <spring.version>3.2.16.RELEASE</spring.version>
+        <spring.version>4.2.5.RELEASE</spring.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
