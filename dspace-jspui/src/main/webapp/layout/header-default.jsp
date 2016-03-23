@@ -142,11 +142,13 @@
     %>
     
 
-<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-<!--[if lt IE 9]>
-  <script src="<%= request.getContextPath() %>/static/js/html5shiv.js"></script>
-  <script src="<%= request.getContextPath() %>/static/js/respond.min.js"></script>
-<![endif]-->
+	<!-- HTML5 shiv and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>  
+	  <script src="<%= request.getContextPath() %>/static/js/html5shiv.js"></script>
+	  <script src="<%= request.getContextPath() %>/static/js/selectivizr-min.js"></script>
+	  <script src="<%= request.getContextPath() %>/static/js/respond.min.js"></script>
+	  <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme-IElte9.css" type="text/css" />
+	<![endif]-->
     </head>
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
