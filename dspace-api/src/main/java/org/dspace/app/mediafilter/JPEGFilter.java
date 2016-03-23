@@ -133,7 +133,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
             // to STDOUT
             if (verbose)
             {
-                System.out.println("new size: " + xsize + "," + ysize);
+                System.out.println("size after fitting to maximum width: " + xsize + "," + ysize);
             }
         }
 
@@ -151,7 +151,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
         // if verbose flag is set, print details to STDOUT
         if (verbose)
         {
-            System.out.println("created thumbnail size: " + xsize + ", "
+            System.out.println("size after fitting to maximum height: " + xsize + ", "
                     + ysize);
         }
 
