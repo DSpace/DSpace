@@ -23,6 +23,7 @@ before_install:
 install:
 - ./test/bin/travis-install-missing-poms.sh
 - ./test/bin/travis-install-dryad-dir.sh
+- ./test/bin/travis-broken-tests.sh
 script: mvn package -DskipTests=false -Ddefault.dspace.dir=$DSPACE_DIR
 after_failure: find . -type f -path "*/surefire-reports/*" -name "*.txt" -print -exec cat {} \;
 notifications:
