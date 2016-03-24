@@ -1719,6 +1719,18 @@
 		<property name="sortOrder" value="VALUE" />
 	</bean>
 
+	<bean id="searchFilterFulltext"
+		class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+		<property name="indexFieldName" value="infofulltext" />
+		<property name="metadataFields">
+			<list>
+				<value>item.fulltext</value>				
+			</list>
+		</property>
+		<property name="facetLimit" value="10" />
+		<property name="sortOrder" value="COUNT" />
+	</bean>
+	
 	<!--Sort properties -->
 	<bean id="sortTitle"
 		class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
@@ -1761,7 +1773,7 @@
 				<ref bean="searchFilterSubject" />
 				<ref bean="searchFilterIssued" />
 				<ref bean="searchFilterType" />
-			<ref bean="searchFilterFulltext" />			
+				<ref bean="searchFilterFulltext" />			
 		</list>
 		</constructor-arg>
 	</bean>
