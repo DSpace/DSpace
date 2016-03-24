@@ -378,16 +378,13 @@
 		<property name="componentIdentifier" value="site" />
 		<property name="subQueries">
 		<map>
-			<entry key="Journal"><value>itemtype_keyword:"Journal/Magazine Article"</value></entry>
-			<entry key="Book"><value>itemtype_keyword:"Book/Book Chapter"</value></entry>
-			<entry key="Conference"><value>itemtype_keyword:"Conference Paper"</value></entry>
-			<entry key="Presentation"><value>itemtype_keyword:"Presentation"</value></entry>
-			<entry key="Report"><value>itemtype_keyword:"Technical/Research Report"</value></entry>
-			<entry key="Issue"><value>itemtype_keyword:"Issue"</value></entry>
-			<entry key="Speech"><value>itemtype_keyword:"Speech"</value></entry>
-			<entry key="Patent"><value>resourcetype_keyword:"Patents"</value></entry>
-			<entry key="Theses"><value>resourcetype_keyword:"Theses"</value></entry>
-			<entry key="Others"><value>-resourcetype_keyword:"Patents" -resourcetype_keyword:"Theses" -itemtype_keyword:"Issue" -itemtype_keyword:"Journal/Magazine Article" -itemtype_keyword:"Conference Paper" -itemtype_keyword:"Book/Book Chapter" -itemtype_keyword:"Presentation" -itemtype_keyword:"Technical/Research Report" -itemtype_keyword:"Speech"</value></entry>
+			<entry key="Article"><value>dc.type:"Article"</value></entry>
+			<entry key="Dataset"><value>dc.type:"Dataset"</value></entry>
+			<entry key="Book"><value>dc.type:"Book"</value></entry>
+			<entry key="BookChapter"><value>dc.type:"Book chapter"</value></entry>
+			<entry key="Presentation"><value>dc.type:"Presentation"</value></entry>
+			<entry key="Thesis"><value>dc.type:"Thesis"</value></entry>
+			<entry key="Others"><value>-dc.type:"Article" -dc.type:"Dataset" -dc.type:"Book" -dc.type:"Thesis" -dc.type:"Presentation" -dc.type:"Book chapter"</value></entry>
 		</map>
 		</property>		
 	</bean>
