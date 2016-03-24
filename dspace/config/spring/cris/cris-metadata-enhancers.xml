@@ -38,7 +38,7 @@
 		<property name="alias" value="project" />
 		<property name="metadata">
 			<list>
-				<value>dc.authority.project</value>
+				<value>dc.relation</value>
 			</list>
 		</property>
 		<property name="clazz">

@@ -19,8 +19,8 @@
 	<bean id="rpStatComponentsService" class="org.dspace.app.cris.integration.CrisComponentsService">
 		<property name="components">
 			<map>
-
-				<entry key="dspaceitems" value-ref="publicationlist" />			</map>
+				<entry key="dspaceitems" value-ref="publicationlist" />			
+			</map>
 		</property>
 	</bean>
 	
@@ -32,8 +32,6 @@
 			</map>
 		</property>
 	</bean>
-
-	
 		
 	<!-- Publication component for RP -->
 	<bean id="publicationlist"
