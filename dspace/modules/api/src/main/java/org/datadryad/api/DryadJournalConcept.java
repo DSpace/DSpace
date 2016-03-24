@@ -45,7 +45,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     public static final String NOTIFY_ON_REVIEW = "notifyOnReview";
     public static final String NOTIFY_WEEKLY = "notifyWeekly";
     public static final String PUBLICATION_BLACKOUT = "publicationBlackout";
-    public static final String SUBSCRIPTION_PAID = "subscriptionPaid";
     public static final String PAYMENT_PLAN = "paymentPlanType";
 
     // Journal Concepts can also have the following fields:
@@ -81,7 +80,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
         journalMetadata.setProperty(NOTIFY_ON_REVIEW, "journal.notifyOnReview");
         journalMetadata.setProperty(NOTIFY_WEEKLY, "journal.notifyWeekly");
         journalMetadata.setProperty(PUBLICATION_BLACKOUT, "journal.publicationBlackout");
-        journalMetadata.setProperty(SUBSCRIPTION_PAID, "journal.subscriptionPaid");
         journalMetadata.setProperty(PAYMENT_PLAN, "journal.paymentPlanType");
         journalMetadata.setProperty(ISSN, "journal.issn");
         journalMetadata.setProperty(CUSTOMER_ID, "journal.customerID");
@@ -523,11 +521,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
         return newSubscriptionPaid;
     }
 
-    @JsonIgnore
-    private void setSubscriptionPaid(String value) {
-        setConceptMetadataValue(journalMetadata.getProperty(SUBSCRIPTION_PAID), value);
-    }
-
     public String getPaymentPlan() {
         return getConceptMetadataValue(journalMetadata.getProperty(PAYMENT_PLAN));
     }
@@ -545,7 +538,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
             newSubscriptionPaid = true;
             paymentPlanType = PREPAID_PLAN;
         }
-        setSubscriptionPaid(newSubscriptionPaid.toString());
         setConceptMetadataValue(journalMetadata.getProperty(PAYMENT_PLAN), paymentPlanType);
     }
 
