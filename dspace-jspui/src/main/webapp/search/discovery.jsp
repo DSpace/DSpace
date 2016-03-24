@@ -52,7 +52,6 @@
 <%@page import="org.dspace.browse.BrowseInfo"%>
 <%@page import="org.dspace.browse.BrowseDSpaceObject"%>
 <%@page import="org.dspace.core.Utils"%>
-<%@page import="org.dspace.core.Utils"%>
 <%@page import="com.coverity.security.Escape"%>
 <%@page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet"%>
 <%@page import="org.dspace.app.webui.util.UIUtil"%>
@@ -275,7 +274,7 @@ jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope)?"."+searchSco
 				<%
 					for (DiscoverySearchFilter searchFilter : availableFilters)
 					{
-					    String fkey = "jsp.search.filter."+searchFilter.getIndexFieldName();
+					    String fkey = "jsp.search.filter." + Escape.uriParam(searchFilter.getIndexFieldName());
 					    %><option value="<%= Utils.addEntities(searchFilter.getIndexFieldName()) %>"<% 
 					            if (filter[0].equals(searchFilter.getIndexFieldName()))
 					            {
@@ -286,7 +285,7 @@ jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope)?"."+searchSco
 					}
 					if (!found)
 					{
-					    String fkey = "jsp.search.filter."+filter[0];
+					    String fkey = "jsp.search.filter." + Escape.uriParam(filter[0]);
 					    %><option value="<%= Utils.addEntities(filter[0]) %>" selected="selected"><fmt:message key="<%= fkey %>"/></option><%
 					}
 				%>
@@ -295,7 +294,7 @@ jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope)?"."+searchSco
 				<%
 					for (String opt : options)
 					{
-					    String fkey = "jsp.search.filter.op."+opt;
+					    String fkey = "jsp.search.filter.op." + Escape.uriParam(opt);
 					    %><option value="<%= Utils.addEntities(opt) %>"<%= opt.equals(filter[1])?" selected=\"selected\"":"" %>><fmt:message key="<%= fkey %>"/></option><%
 					}
 				%>
@@ -340,7 +339,7 @@ jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope)?"."+searchSco
 		<%
 			for (DiscoverySearchFilter searchFilter : availableFilters)
 			{
-			    String fkey = "jsp.search.filter."+searchFilter.getIndexFieldName();
+			    String fkey = "jsp.search.filter." + Escape.uriParam(searchFilter.getIndexFieldName());
 			    %><option value="<%= Utils.addEntities(searchFilter.getIndexFieldName()) %>"><fmt:message key="<%= fkey %>"/></option><%
 			}
 		%>
@@ -349,7 +348,7 @@ jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope)?"."+searchSco
 		<%
 			for (String opt : options)
 			{
-			    String fkey = "jsp.search.filter.op."+opt;
+			    String fkey = "jsp.search.filter.op." + Escape.uriParam(opt);
 			    %><option value="<%= Utils.addEntities(opt) %>"><fmt:message key="<%= fkey %>"/></option><%
 			}
 		%>
@@ -396,6 +395,7 @@ else if( qResults != null)
     
     // create the URLs accessing the previous and next search result pages
     String baseURL =  request.getContextPath()
+                    + (!searchScope.equals("") ? "/handle/" + searchScope : "")
                     + "/simple-search?query="
                     + URLEncoder.encode(query,"UTF-8")
                     + "&amp;location="+ searchScope
@@ -803,6 +803,7 @@ else
 	        if (idx != limit && !appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
 	        {
 	        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="<%= request.getContextPath()
+                + (!searchScope.equals("")?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
 				+ "&amp;location=" + searchScope
@@ -828,6 +829,7 @@ else
 	        %><li class="list-group-item"><span style="visibility: hidden;">.</span>
 	        <% if (currFp > 0) { %>
 	        <a class="pull-left" href="<%= request.getContextPath()
+	            + (!searchScope.equals("")?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
 				+ "&amp;location=" + searchScope
@@ -840,6 +842,7 @@ else
             <% } %>
             <% if (idx == limit) { %>
             <a href="<%= request.getContextPath()
+	            + (!searchScope.equals("")?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
 				+ "&amp;location=" + searchScope

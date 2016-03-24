@@ -554,13 +554,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
             if (force)
             {
-                getSolr().deleteByQuery("search.resourcetype:" + type);
+                getSolr().deleteByQuery(RESOURCE_TYPE_FIELD + ":" + type);
             }
             else
             {
                 SolrQuery query = new SolrQuery();
+				// Query for all indexed Items, Collections and Communities,
+                // returning just their handle
 				query.setFields(HANDLE_FIELD);
-                query.setQuery("search.resourcetype:" + type);
+                query.setQuery(RESOURCE_TYPE_FIELD + ":" + type);
                 QueryResponse rsp = getSolr().query(query);
                 SolrDocumentList docs = rsp.getResults();
 

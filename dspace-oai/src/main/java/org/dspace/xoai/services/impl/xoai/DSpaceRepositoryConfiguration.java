@@ -77,8 +77,9 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration
             baseUrl = configurationService.getProperty("oai", "dspace.oai.url");
             if (baseUrl == null) {
                 log.warn("{ OAI 2.0 :: DSpace } Not able to retrieve the dspace.oai.url property from oai.cfg. Falling back to request address");
-            baseUrl = request.getRequestURL().toString()
-                    .replace(request.getPathInfo(), "");
+                baseUrl = request.getRequestURL().toString()
+                    .replace(request.getPathInfo(), "");    
+            }
             }
         }
         return baseUrl + request.getPathInfo();
