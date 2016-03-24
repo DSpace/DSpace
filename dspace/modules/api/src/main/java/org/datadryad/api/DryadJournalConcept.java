@@ -206,9 +206,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     @JsonIgnore
     private void setConceptMetadataValue(String mdString, String value) {
-        if ("".equals(value)) {
-            return;
-        }
         try {
             Context context = new Context();
             context.turnOffAuthorisationSystem();
@@ -404,7 +401,7 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     @JsonIgnore
     public void setEmailsToNotifyOnArchiveString(String emailString) {
-        if (emailString != null && !(emailString.equals(""))) {
+        if (emailString != null) {
             setConceptMetadataValue(journalMetadata.getProperty(NOTIFY_ON_ARCHIVE), emailString);
         }
     }
@@ -432,7 +429,7 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     @JsonIgnore
     public void setEmailsToNotifyOnReviewString(String emailString) {
-        if (emailString != null && !(emailString.equals(""))) {
+        if (emailString != null) {
             setConceptMetadataValue(journalMetadata.getProperty(NOTIFY_ON_REVIEW), emailString);
         }
     }
@@ -460,7 +457,7 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     @JsonIgnore
     public void setEmailsToNotifyWeeklyString(String emailString) {
-        if (emailString != null && !(emailString.equals(""))) {
+        if (emailString != null) {
             setConceptMetadataValue(journalMetadata.getProperty(NOTIFY_WEEKLY), emailString);
         }
     }
