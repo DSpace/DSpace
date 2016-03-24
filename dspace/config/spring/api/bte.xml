@@ -556,7 +556,7 @@
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry value="jissn" key="dc.identifier.issn" />
 				<entry value="pisbn" key="dc.identifier.isbn" />
-				<entry value="journal" key="dc.source" />
+				<entry value="journal" key="dc.relation.ispartof" />
 				<entry value="title" key="dc.title" />
 				<entry value="issued" key="dc.date.issued" />
 				<entry value="language" key="dc.language.iso" />
