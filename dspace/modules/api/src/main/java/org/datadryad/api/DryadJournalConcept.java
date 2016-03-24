@@ -59,6 +59,7 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     public static final String NO_PLAN = "NONE";
 
     public static Properties journalMetadata;
+    private static Properties defaultMetadataValues;
 
     private Context context = null;
 
@@ -85,6 +86,26 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
         journalMetadata.setProperty(CUSTOMER_ID, "journal.customerID");
         journalMetadata.setProperty(DESCRIPTION, "journal.description");
         journalMetadata.setProperty(MEMBERNAME, "journal.memberName");
+
+        defaultMetadataValues = new Properties();
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(JOURNAL_ID), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(FULLNAME), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(CANONICAL_MANUSCRIPT_NUMBER_PATTERN), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(SPONSOR_NAME), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(PARSING_SCHEME), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(METADATADIR), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(ALLOW_REVIEW_WORKFLOW), "false");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(EMBARGO_ALLOWED), "true");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(INTEGRATED), "false");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(NOTIFY_ON_ARCHIVE), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(NOTIFY_ON_REVIEW), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(NOTIFY_WEEKLY), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(PUBLICATION_BLACKOUT), "false");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(PAYMENT_PLAN), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(ISSN), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(CUSTOMER_ID), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(DESCRIPTION), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(MEMBERNAME), "");
     }
 
     // these are mandatory elements
@@ -99,6 +120,10 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
             context = new Context();
             create(context);
             context.commit();
+            for (String prop : journalMetadata.stringPropertyNames()) {
+                String mdString = journalMetadata.getProperty(prop);
+                this.setConceptMetadataValue(mdString, defaultMetadataValues.getProperty(mdString));
+            }
         } catch (Exception e) {
             log.error("Couldn't make new concept: " + e.getMessage());
             if (context != null) {
@@ -166,10 +191,15 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     @JsonIgnore
     private String getConceptMetadataValue(String mdString) {
         AuthorityMetadataValue authorityValue = getUnderlyingConcept().getSingleMetadata(mdString);
-        String result = "";
+        String result = null;
         if (authorityValue != null) {
             result = authorityValue.getValue();
             return result;
+        } else {
+            result = defaultMetadataValues.getProperty(mdString);
+        }
+        if (result == null) {
+            result = "";
         }
         return result;
     }
