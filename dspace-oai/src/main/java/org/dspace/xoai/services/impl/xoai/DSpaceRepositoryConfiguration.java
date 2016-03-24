@@ -80,7 +80,6 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration
                 baseUrl = request.getRequestURL().toString()
                     .replace(request.getPathInfo(), "");    
             }
-            }
         }
         return baseUrl + request.getPathInfo();
     }
