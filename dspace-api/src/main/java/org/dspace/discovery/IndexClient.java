@@ -7,8 +7,14 @@
  */
 package org.dspace.discovery;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -18,6 +24,7 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ExternalService;
 import org.dspace.handle.HandleManager;
@@ -106,6 +113,8 @@ public class IndexClient {
 
         options.addOption(OptionBuilder.isRequired(false).withDescription(
                 "optimize search core").create("o"));
+        
+        options.addOption("e", "readfile", true, "Read the identifier from a file");
 
         try {
             line = new PosixParser().parse(options, args);
@@ -162,6 +171,37 @@ public class IndexClient {
 				}
 				indexer.indexContent(context, dso, line.hasOption("f"));
 			}
+        } else if (line.hasOption('e')) {
+            try {
+                String filename = line.getOptionValue('e');
+                FileInputStream fstream = new FileInputStream(filename);
+                // Get the object of DataInputStream
+                DataInputStream in = new DataInputStream(fstream);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                String strLine;
+                // Read File Line By Line
+
+                int item_id = 0;
+                List<Integer> ids = new ArrayList<Integer>();
+
+                while ((strLine = br.readLine()) != null) {
+                    item_id = Integer.parseInt(strLine.trim());
+                    ids.add(item_id);
+                }
+
+                in.close();
+
+                int type = -1;
+                if (line.hasOption('t')) {
+                    type = Integer.parseInt(line.getOptionValue("t"));
+                } else {
+                    // force to item
+                    type = Constants.ITEM;
+                }
+                indexer.updateIndex(context, ids, line.hasOption("f"), type);
+            } catch (Exception e) {
+                log.error("Error: " + e.getMessage());
+            }
         } else {
             log.info("Updating and Cleaning Index");
             indexer.cleanIndex(line.hasOption("f"));
