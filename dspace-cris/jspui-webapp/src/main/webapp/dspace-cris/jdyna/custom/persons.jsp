@@ -64,7 +64,7 @@
 	    }
 	}
 
-	boolean globalShowFacet = false;	
+	boolean globalShowFacets = false;	
 	if (info.getItems().length > 0) {
 %>
 	
