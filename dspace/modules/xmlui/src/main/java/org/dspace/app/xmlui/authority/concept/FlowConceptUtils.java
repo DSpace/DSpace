@@ -24,7 +24,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-
+import org.dspace.JournalUtils;
+import org.datadryad.api.DryadJournalConcept;
 
 /**
  * Utility methods to processes actions on EPeople. These methods are used
@@ -331,6 +332,23 @@ public class FlowConceptUtils {
         return result;
     }
 
+    public static FlowResult processConceptMetadata(Context context, String conceptID, Request request) throws SQLException, AuthorizeException, UIException, IOException {
+        FlowResult flowResult = null;
+        if (request.get("submit_update") != null) {
+            flowResult = processEditConceptMetadata(context, conceptID, request);
+        } else if (request.get("submit_delete") != null) {
+            flowResult = doDeleteMetadataFromConcept(context, conceptID, request);
+        } else if (request.get("submit_add") != null) {
+            flowResult = doAddMetadataToConcept(context, Integer.valueOf(conceptID).intValue(), request);
+        }
+
+        Concept concept = Concept.find(context, Integer.parseInt(conceptID));
+        if (DryadJournalConcept.conceptIsValidJournal(concept)) {
+            JournalUtils.updateDryadJournalConcept(new DryadJournalConcept(context, concept));
+        }
+        return flowResult;
+    }
+
     public static FlowResult processEditConceptMetadata(Context context, String id,Request request){
         return FlowAuthorityMetadataValueUtils.processEditMetadata(context, Constants.CONCEPT, id, request);
     }
@@ -353,7 +371,7 @@ public class FlowConceptUtils {
         {
             role_id = 1;
         }
-        concept.addTerm(context, term,role_id);
+        concept.addTerm(context, term, role_id);
         context.commit();
     }
     public static FlowResult processDeleteTerm(Context context, String conceptId,String[] termIds)throws SQLException,AuthorizeException{

@@ -773,30 +773,13 @@ function doEditConceptMetadata(conceptId)
         sendPageAndWait("admin/concept/editMetadata",{"conceptId":conceptId},result);
         result == null;
 
-        if (cocoon.request.get("submit_update"))
-        {
-            // Attempt to save the changes.
-            assertAdministrator();
-            result = FlowConceptUtils.processEditConceptMetadata(getDSContext(),conceptId,cocoon.request);
-        }
-        else if (cocoon.request.get("submit_return"))
-        {
+        if (cocoon.request.get("submit_return")) {
             // Cancel out and return to wherever the user came from.
             return null;
-        }
-        else if (cocoon.request.get("submit_delete"))
-        {
-            // Delete this user
+        } else {
+            // Attempt to save the changes.
             assertAdministrator();
-            result = FlowConceptUtils.doDeleteMetadataFromConcept(getDSContext(),conceptId,cocoon.request);
-
-        }
-        else if (cocoon.request.get("submit_add"))
-        {
-            // Delete this user
-            assertAdministrator();
-            result = FlowConceptUtils.doAddMetadataToConcept(getDSContext(),conceptId,cocoon.request);
-
+            result = FlowConceptUtils.processConceptMetadata(getDSContext(),conceptId,cocoon.request);
         }
 
     } while (result == null || !result.getContinue())
