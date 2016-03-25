@@ -431,7 +431,6 @@
             %>
                 query:{workspace_item_id:'<%= subInfo.getSubmissionItem().getID()%>'}
             <%}%>
-            <%}%>
           });
         // Resumable.js isn't supported, fall back on a different method
 
