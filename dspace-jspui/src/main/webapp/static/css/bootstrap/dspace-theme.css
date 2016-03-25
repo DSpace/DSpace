@@ -267,3 +267,7 @@ i.animated {
         transform: scale(1);
     }
 }
+
+footer.navbar-bottom {
+	z-index: -1;
+}
