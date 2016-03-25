@@ -716,8 +716,12 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
     }
 
     protected List<String> getFilters(String type)
-    {
-        return getTypes().get(type).getFilters();
+    {        
+        if(getTypes()!=null && getTypes().containsKey(type)) {
+            return getTypes().get(type).getFilters();
+        }
+        
+        return new ArrayList<String>();
     }
 
     public Map<String, IBC> getTypes()
