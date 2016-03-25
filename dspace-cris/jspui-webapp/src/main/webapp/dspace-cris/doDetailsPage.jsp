@@ -124,12 +124,15 @@
 			
 			j("#tabs").tabs({
 				cache: true,
-				selected: ${currTabIdx-1},
+				active: ${currTabIdx-1},
 				load: function(event, ui){
 					activeTab();
 				},
 				"activate": function( event, ui ) {
 					j("li.ui-tabs-active").toggleClass("ui-tabs-active ui-state-active active");
+					if(history!=undefined) {
+						history.replaceState(null, null, "${root}/cris/${entity.typo.shortName}/${entity.crisID}/" + j(ui.newTab[0]).data("tabname")+".html");	
+					}
 				},
 				"beforeActivate": function( event, ui ) {
 	   			 j("li.active").toggleClass("active");
@@ -150,7 +153,7 @@
     
 </c:set>
 
-<dspace:layout title="${entity.typo.label}">
+<dspace:layout title="${entity.typo.label} ${entity.name}">
 
 <div id="content">
 <div class="row">
