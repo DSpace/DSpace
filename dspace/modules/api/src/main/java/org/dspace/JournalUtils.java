@@ -507,8 +507,8 @@ public class JournalUtils {
 
             }
 
-        }catch (Exception e) {
-            log.error("Error while loading journal properties", e);
+        } catch (Exception e) {
+            log.error("Error while loading journal properties for " + journal, e);
         }
         return myJournalProperties;
 
