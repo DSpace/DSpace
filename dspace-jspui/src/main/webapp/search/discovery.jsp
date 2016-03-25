@@ -101,6 +101,8 @@
     List<DiscoverySearchFilter> availableFilters = (List<DiscoverySearchFilter>) request.getAttribute("availableFilters");
 	List<String[]> appliedFilters = (List<String[]>) request.getAttribute("appliedFilters");
 	List<String> appliedFilterQueries = (List<String>) request.getAttribute("appliedFilterQueries");
+	Map<String, String> displayAppliedFilters = new HashMap<String, String>();
+	
 	if (appliedFilters != null && appliedFilters.size() >0 ) 
 	{
 	    int idx = 1;
@@ -123,6 +125,48 @@
     
 	boolean exportBiblioEnabled =  ConfigurationManager.getBooleanProperty("exportcitation.list.enabled", false);
 	String cfg = ConfigurationManager.getProperty("exportcitation.options");
+
+	DiscoverResult qResults = (DiscoverResult)request.getAttribute("queryresults");
+	Item      [] items       = (Item[]      )request.getAttribute("items");
+	Community [] communities = (Community[] )request.getAttribute("communities");
+	Collection[] collections = (Collection[])request.getAttribute("collections");
+	Map<Integer, BrowseDSpaceObject[]> mapOthers = (Map<Integer, BrowseDSpaceObject[]>) request.getAttribute("resultsMapOthers");
+	
+	boolean brefine = false;
+	
+	List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig");
+	Map<String, Boolean> showFacets = new HashMap<String, Boolean>();
+		
+	for (DiscoverySearchFilterFacet facetConf : facetsConf)
+	{
+		if(qResults!=null) {
+		    String f = facetConf.getIndexFieldName();
+		    List<FacetResult> facet = qResults.getFacetResult(f);
+		    if (facet.size() == 0)
+		    {
+		        facet = qResults.getFacetResult(f+".year");
+			    if (facet.size() == 0)
+			    {
+			        showFacets.put(f, false);
+			        continue;
+			    }
+		    }
+		    boolean showFacet = false;
+		    for (FacetResult fvalue : facet)
+		    { 
+				if(!appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
+			    {
+			        showFacet = true;
+			    }
+				else {
+					displayAppliedFilters.put(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery(),
+							fvalue.getDisplayedValue());
+				}
+		    }
+		    showFacets.put(f, showFacet);
+		    brefine = brefine || showFacet;
+		}
+	}
 %>
 
 <c:set var="dspace.layout.head.last" scope="request">
@@ -259,7 +303,7 @@ jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope)?"."+searchSco
                                 <input type="hidden" value="<%= Utils.addEntities(sortedBy) %>" name="sort_by" />
                                 <input type="hidden" value="<%= Utils.addEntities(order) %>" name="order" />
 <% if (appliedFilters.size() > 0 ) { %>                                
-		<div id="appliedFilters" class="switch-filters hidden panel panel-primary">
+		<div id="appliedFilters" class="switch-filters hidden panel panel-primary form-inline">
 		<div class="panel-heading">
 		<h5><fmt:message key="jsp.search.filter.applied" /></h5>
 		</div>
@@ -269,8 +313,11 @@ jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope)?"."+searchSco
 			for (String[] filter : appliedFilters)
 			{
 			    boolean found = false;
+			    boolean showDisplay = displayAppliedFilters.containsKey(filter[0]+"::"+filter[1]+"::"+filter[2]) && !StringUtils.equalsIgnoreCase(displayAppliedFilters.get(filter[0]+"::"+filter[1]+"::"+filter[2]), filter[2]);
+			    
 			    %>
-			    <select id="filter_field_<%=idx %>" name="filter_field_<%=idx %>">
+			    <div class="form-group">
+			    <select id="filter_field_<%=idx %>" name="filter_field_<%=idx %>" class="form-control">
 				<%
 					for (DiscoverySearchFilter searchFilter : availableFilters)
 					{
@@ -290,7 +337,9 @@ jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope)?"."+searchSco
 					}
 				%>
 				</select>
-				<select id="filter_type_<%=idx %>" name="filter_type_<%=idx %>">
+				</div>
+				<div class="form-group">
+				<select id="filter_type_<%=idx %>" name="filter_type_<%=idx %>" class="form-control">
 				<%
 					for (String opt : options)
 					{
@@ -299,8 +348,19 @@ jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope)?"."+searchSco
 					}
 				%>
 				</select>
-				<input type="text" id="filter_value_<%=idx %>" name="filter_value_<%=idx %>" value="<%= Utils.addEntities(filter[2]) %>" size="45"/>
-				<input class="btn btn-default" type="submit" id="submit_filter_remove_<%=idx %>" name="submit_filter_remove_<%=idx %>" value="X" />
+				</div>
+				<div class="form-group">
+				<input class="form-control" type="text" id="filter_value_<%=idx %>" name="filter_value_<%=idx %>" value="<%= Utils.addEntities(filter[2]) %>" size="<%= showDisplay?"15":"52" %>"/>
+				<% if (showDisplay) {
+					%>
+					</div>
+					<div class="form-group">
+					<input type="text" id="filter_applied_display_<%=idx %>" 
+						value="<%= Utils.addEntities(displayAppliedFilters.get(filter[0]+"::"+filter[1]+"::"+filter[2])) %>" 
+						size="32" disabled="disabled" class="form-control" />
+				<% } %>
+				</div>
+				<input class="btn btn-default pull-right" type="submit" id="submit_filter_remove_<%=idx %>" name="submit_filter_remove_<%=idx %>" value="X" />
 				<br/>
 				<%
 				idx++;
@@ -364,12 +424,6 @@ jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope)?"."+searchSco
 <% } %>
 </div>   
 <% 
-
-DiscoverResult qResults = (DiscoverResult)request.getAttribute("queryresults");
-Item      [] items       = (Item[]      )request.getAttribute("items");
-Community [] communities = (Community[] )request.getAttribute("communities");
-Collection[] collections = (Collection[])request.getAttribute("collections");
-Map<Integer, BrowseDSpaceObject[]> mapOthers = (Map<Integer, BrowseDSpaceObject[]>) request.getAttribute("resultsMapOthers");
 
 if( error )
 {
@@ -738,38 +792,6 @@ else
 %>
 
 <%
-	boolean brefine = false;
-	
-	List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig");
-	Map<String, Boolean> showFacets = new HashMap<String, Boolean>();
-		
-	for (DiscoverySearchFilterFacet facetConf : facetsConf)
-	{
-		if(qResults!=null) {
-		    String f = facetConf.getIndexFieldName();
-		    List<FacetResult> facet = qResults.getFacetResult(f);
-		    if (facet.size() == 0)
-		    {
-		        facet = qResults.getFacetResult(f+".year");
-			    if (facet.size() == 0)
-			    {
-			        showFacets.put(f, false);
-			        continue;
-			    }
-		    }
-		    boolean showFacet = false;
-		    for (FacetResult fvalue : facet)
-		    { 
-				if(!appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
-			    {
-			        showFacet = true;
-			        break;
-			    }
-		    }
-		    showFacets.put(f, showFacet);
-		    brefine = brefine || showFacet;
-		}
-	}
 	if (brefine) {
 %>
 
@@ -803,7 +825,6 @@ else
 	        if (idx != limit && !appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
 	        {
 	        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="<%= request.getContextPath()
-                + (!searchScope.equals("")?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
 				+ "&amp;location=" + searchScope
@@ -829,7 +850,6 @@ else
 	        %><li class="list-group-item"><span style="visibility: hidden;">.</span>
 	        <% if (currFp > 0) { %>
 	        <a class="pull-left" href="<%= request.getContextPath()
-	            + (!searchScope.equals("")?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
 				+ "&amp;location=" + searchScope
@@ -842,7 +862,6 @@ else
             <% } %>
             <% if (idx == limit) { %>
             <a href="<%= request.getContextPath()
-	            + (!searchScope.equals("")?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
 				+ "&amp;location=" + searchScope
@@ -860,7 +879,6 @@ else
 	}
 
 %>
-
 </div>
 <% } %>
 </dspace:sidebar>
