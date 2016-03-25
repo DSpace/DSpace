@@ -275,7 +275,7 @@
 		class="org.dspace.app.webui.cris.components.CRISRPConfigurerComponent">
 		<property name="relationConfiguration" ref="relationOUVSRPConfiguration" />		
 		<property name="target" value="org.dspace.app.cris.model.OrganizationUnit" />
-		<property name="facets" ref="facetsRPConfiguration" />
+		<property name="facets" ref="facetsRPforComponentConfiguration" />
 		<property name="types">
 			<map>
 				<entry key="persons" value-ref="personsForOUComponent" />								

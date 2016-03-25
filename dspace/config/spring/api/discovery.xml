@@ -1172,7 +1172,7 @@
 				<ref bean="searchFilterObjectName" />
 				<ref bean="searchFilterRPDept" />
 				<ref bean="searchFilterRPWorkgroup" />
-				<ref bean="searchFilterRPInterests" />
+				<ref bean="searchFilterRPInterests" />				
 			</list>
 		</property>
 		<!--The sort filters for the discovery search -->
@@ -1807,6 +1807,16 @@
 		</constructor-arg>
 	</bean>
 
+	<bean id="facetsRPforComponentConfiguration" class="java.util.ArrayList">
+		<constructor-arg>
+		<list>
+				<ref bean="searchFilterObjectPeople" />
+				<ref bean="searchFilterRPInterests" />
+				<ref bean="searchFilterRPWorkgroup" />
+		</list>
+		</constructor-arg>
+	</bean>
+	
 	<bean id="facetsPJConfiguration" class="java.util.ArrayList">
 		<constructor-arg>
 		<list>
