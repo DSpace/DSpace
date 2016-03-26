@@ -312,29 +312,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     }
 
-    private void addJournalSelectStatusNotYetSubmitted(String selectedJournalName, Item newItem) throws WingException,SQLException {
-        Composite optionsList = newItem.addComposite("journalID_status_not_yet_submitted");
-        Select journalID = optionsList.addSelect("journalIDStatusNotYetSubmitted");
-        if (selectedJournalName == null || "".equals(selectedJournalName)) {
-            java.util.List<DryadJournalConcept> journalConcepts = Arrays.asList((DryadJournalConcept[]) JournalUtils.getAllJournalConcepts());
-            for (DryadJournalConcept journalConcept : journalConcepts) {
-                String val = journalConcept.getFullName();
-                String name = val;
-                if (journalConcept.getIntegrated()) {
-                    name += "*";
-                }
-                journalID.addOption(val.equals(selectedJournalName), val, name);
-            }
-        } else {
-            journalID.addOption(selectedJournalName, selectedJournalName);
-        }
-        journalID.setLabel(T_SELECT_LABEL);
-        journalID.setHelp(T_SELECT_HELP_NOT_YET_SUBMITTED);
-        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
-            journalID.addError(T_SELECT_ERROR);
-    }
-
-
     private void addJournalSelectStatusInReview(String selectedJournalName, Item newItem, Manuscript manuscript, Request request) throws WingException,SQLException {
         Composite optionsList = newItem.addComposite("journalID_status_in_review");
         Select journalID = optionsList.addSelect("journalIDStatusInReview");

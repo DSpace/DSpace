@@ -54,7 +54,6 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public final static int  ARTICLE_STATUS_PUBLISHED=0;
     public final static int  ARTICLE_STATUS_ACCEPTED=1;
     public final static int  ARTICLE_STATUS_IN_REVIEW=2;
-    public final static int  ARTICLE_STATUS_NOT_YET_SUBMITTED=3;
 
     public final static int  UNKNOWN_DOI=5;
     public final static int  MANU_ACC=6;
@@ -151,17 +150,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                                     ",articleStatus=" + articleStatus + ",manuscriptNumber=" + manuscriptNumber);
                         }
                     }
-                } else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_NOT_YET_SUBMITTED) {
-                    String journal = request.getParameter("journalIDStatusNotYetSubmitted");
 
-                    if(journal==null||journal.equals("")){
-                        EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
-                        return ERROR_INVALID_JOURNAL;
-                    } else if(!processJournal(journal, null, null, manuscriptNumber, item, context, request, articleStatus)){
 
-                        EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
-                        return ERROR_SELECT_JOURNAL;
-                    }
                 } else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW) {
                     String journalID = request.getParameter("journalIDStatusInReview");
 
