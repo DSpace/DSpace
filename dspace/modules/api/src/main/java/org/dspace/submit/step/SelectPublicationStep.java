@@ -62,126 +62,106 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public final static String crossRefApiFormat = "/transform/application/vnd.crossref.unixref+xml";
 
     public int doProcessing(Context context, HttpServletRequest request, HttpServletResponse response, SubmissionInfo submissionInfo) throws ServletException, IOException, SQLException, AuthorizeException {
-        try {
-            // First of all check if we have accepted our license
-            if (request.getParameter("license_accept") == null || !Boolean.valueOf(request.getParameter("license_accept"))) {
-                EventLogger.log(context, "submission-select-publication", "error=failed_license_accept");
-                return STATUS_LICENSE_NOT_ACCEPTED;
-            }
+        Item item = submissionInfo.getSubmissionItem().getItem();
+        // if article status is ACCEPTED, user enters journal name and manuscript number
+        // if article status is PUBLISHED, user can either enter journal name or pub DOI
+        // if article status is ARTICLE_STATUS_IN_REVIEW, user chooses journal from pulldown and optionally enters manuscript number
 
-            String articleStatus = request.getParameter("article_status");
-
-            // get the journalID selected by the user in the UI
-            if (articleStatus==null) {
-                EventLogger.log(context, "submission-select-publication", "error=exception_reselect_journal");
-                return ERROR_SELECT_JOURNAL;
-            } else {
-                Item item = submissionInfo.getSubmissionItem().getItem();
-                String manuscriptNumber = request.getParameter("manu");
-                if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) {
-                    String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
-                    manuscriptNumber = manuscriptNumberAcc;
-                    manuscriptNumber = manuscriptNumber.trim();
-
-                    // try to get authority id first, its better than name
-                    String journalUuid = request.getParameter("prism_publicationName_authority");
-                    if(journalUuid != null) {
-                        journalUuid = journalUuid.trim();
-                    }
-                    
-                    String journal = request.getParameter("prism_publicationName");
-                    if(journal!= null) {
-                        journal=journal.replace("*", "");
-                        journal=journal.trim();
-                    }
-
-                    if(journal==null||journal.equals("")){
-                        EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
-                        return ERROR_INVALID_JOURNAL;
-                    } else if(!processJournal(journal, null, journalUuid, manuscriptNumber, item, context, request, articleStatus)){
-                        EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
-                        return ENTER_MANUSCRIPT_NUMBER;
-                    }
-
-                    EventLogger.log(context, "submission-select-publication", "journalID=" + journal +
-                            ",articleStatus=" + articleStatus + ",manuscriptNumber=" + manuscriptNumber);
-
-                } else if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED) {
-                    //attempt to process a DOI or PMID entered in the UI
-                    String identifier = request.getParameter("article_doi");
-
-                    // This is the Journal name if they don't know the publication
-                    String journal = request.getParameter("unknown_doi");
-
-                    if (identifier!=null && !identifier.equals("")) {
-                        if (identifier.indexOf('/')!=-1) {
-                            if (!processDOI(context, item, identifier)) {
-                                EventLogger.log(context, "submission-select-publication", "doi=" + identifier + ",error=failed_doi_lookup");
-                                return ERROR_PUBMED_DOI;
-                            } else {
-                                EventLogger.log(context, "submission-select-publication", "doi=" + identifier);
-                            }
-                        } else {
-                            if (!processPubMed(context, item, identifier)) {
-                                EventLogger.log(context, "submission-select-publication", "pmid=" + identifier + ",error=failed_pubmed_lookup");
-                                return ERROR_PUBMED_DOI;
-                            } else {
-                                EventLogger.log(context, "submission-select-publication", "pmid=" + identifier);
-                            }
-                        }
-                    } else {
-                        if (journal==null||journal.length()==0) {
-                            EventLogger.log(context, "submission-select-publication", "error=no_journal_name");
-                            return ERROR_PUBMED_NAME;
-                        } else {
-                            journal=journal.replace("*", "");
-                            journal=journal.trim();
-
-                            if (journal==null||journal.equals("")){
-                                EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
-                                return ERROR_INVALID_JOURNAL;
-                            } else if(!processJournal(journal, null, null, manuscriptNumber, item, context, request, articleStatus)){
-                                if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
-
-                                EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
-                                return ERROR_SELECT_JOURNAL;
-                            }
-                            EventLogger.log(context, "submission-select-publication", "journalID=" + journal +
-                                    ",articleStatus=" + articleStatus + ",manuscriptNumber=" + manuscriptNumber);
-                        }
-                    }
-
-
-                } else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW) {
-                    String journalID = request.getParameter("journalIDStatusInReview");
-
-                    if(journalID==null||journalID.equals("")){
-                        EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
-                        return ERROR_INVALID_JOURNAL;
-                    } else if(!processJournal(null, journalID, null, manuscriptNumber, item, context, request, articleStatus)){
-                        EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
-                        return ERROR_SELECT_JOURNAL;
-                    }
-
-                    item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
-                    item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY,"false");
-                    item.update();
-                } else {
-                    // ########### TRYING TO SUBMIT FORM WITHOUT ARTICLE STATUS ###########
-                    EventLogger.log(context, "submission-select-publication", "error=exception_reselect_journal");
-                    return ERROR_SELECT_JOURNAL;
-                }
-            }
-
-            EventLogger.log(context, "submission-select-publication", "status=complete");
-            return STATUS_COMPLETE;
-
-        }catch(Exception e){
-            log.error(e);
+        // First of all check if we have accepted our license
+        if (request.getParameter("license_accept") == null || !Boolean.valueOf(request.getParameter("license_accept"))) {
+            EventLogger.log(context, "submission-select-publication", "error=failed_license_accept");
+            return STATUS_LICENSE_NOT_ACCEPTED;
         }
 
-        EventLogger.log(context, "submission-select-publication", "error=exception_reselect_journal");
-        return ERROR_SELECT_JOURNAL;
+        String articleStatus = request.getParameter("article_status");
+        // get the journalID selected by the user in the UI
+        if (articleStatus==null) {
+            EventLogger.log(context, "submission-select-publication", "error=exception_reselect_journal");
+            return ERROR_SELECT_JOURNAL;
+        }
+
+        // Find the journal concept:
+
+        // Look for a journal name, and if found, trim it.
+        String journal = request.getParameter("prism_publicationName");
+        if (journal == null) {
+            String journal = request.getParameter("unknown_doi");
+        }
+
+        if (journal != null) {
+            journal=journal.replace("*", "");
+            journal=journal.trim();
+        }
+
+        // Look for a journal ID
+        String journalID = request.getParameter("journalIDStatusInReview");
+
+        // Look for a DOI or PMID entered in the UI
+        String identifier = request.getParameter("article_doi");
+        if (identifier!=null && !identifier.equals("")) {
+            if (identifier.indexOf('/')!=-1) {
+                if (!processDOI(context, item, identifier)) {
+                    EventLogger.log(context, "submission-select-publication", "doi=" + identifier + ",error=failed_doi_lookup");
+                    return ERROR_PUBMED_DOI;
+                } else {
+                    EventLogger.log(context, "submission-select-publication", "doi=" + identifier);
+                }
+            } else {
+                if (!processPubMed(context, item, identifier)) {
+                    EventLogger.log(context, "submission-select-publication", "pmid=" + identifier + ",error=failed_pubmed_lookup");
+                    return ERROR_PUBMED_DOI;
+                } else {
+                    EventLogger.log(context, "submission-select-publication", "pmid=" + identifier);
+                }
+            }
+        }
+
+        // Look for a manuscript number
+        String manuscriptNumber = request.getParameter("manu");
+        if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) {
+            String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
+            manuscriptNumber = manuscriptNumberAcc;
+            manuscriptNumber = manuscriptNumber.trim();
+        }
+
+        DryadJournalConcept journalConcept = null;
+
+        if (journalConcept==null && journal != null && journal.length() > 0) {
+            journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
+        }
+
+        if (journalConcept==null && journalID != null && journalID.length() > 0) {
+            journalConcept = JournalUtils.getJournalConceptByJournalID(journalID);
+        }
+
+        if (journalConcept == null) {
+            // if article is PUBLISHED or ACCEPTED, can be any journal, so we should make a temp journal.
+            if ((Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) || (Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED)) {
+                try {
+                // if we still haven't found a matching journal concept, make a new, temporary one.
+                journalConcept = JournalUtils.createJournalConcept(journal);
+                } catch (Exception e) {
+                // this should not happen because we've already checked to see if a matching concept existed.
+                    log.error("couldn't create a concept");
+                }
+            }
+        }
+
+        if (!processJournal(journalConcept, manuscriptNumber, item, context, request, articleStatus)) {
+            EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
+            return ERROR_SELECT_JOURNAL;
+        }
+
+        // at this point, the item has been populated with metadata for the journal concept and any manuscript metadata.
+        // submitted manuscripts go through the review workflow, so don't skipReviewStage
+        if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW) {
+            item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
+            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY,"false");
+            item.update();
+        }
+
+        EventLogger.log(context, "submission-select-publication", "status=complete");
+        return STATUS_COMPLETE;
     }
 
     /**
@@ -328,27 +308,11 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         }
     }
 
-
-    private boolean processJournal(String journalName, String journalShortID, String journalUuid, String manuscriptNumber, Item item, Context context,
+    private boolean processJournal(DryadJournalConcept journalConcept, String manuscriptNumber, Item item, Context context,
                                    HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
-        DryadJournalConcept journalConcept = null;
 
-        if (journalConcept==null && journalShortID != null && journalShortID.length() > 0) {
-            journalConcept = JournalUtils.getJournalConceptByJournalID(journalShortID);
-        }
-
-        if (journalConcept==null && journalName != null && journalName.length() > 0) {
-            journalConcept = JournalUtils.getJournalConceptByJournalName(journalName);
-        }
-
-        // if we still haven't found a matching journal concept, make a new, temporary one.
         if (journalConcept == null) {
-            try {
-                journalConcept = JournalUtils.createJournalConcept(journalName);
-            } catch (Exception e) {
-                // this should not happen because we've already checked to see if a matching concept existed.
-                log.error("couldn't create a concept");
-            }
+            return false;
         }
 
         Manuscript manuscript = new Manuscript(journalConcept);
