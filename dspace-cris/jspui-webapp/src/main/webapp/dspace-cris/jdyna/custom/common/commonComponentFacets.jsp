@@ -88,7 +88,6 @@
     		    {
     			    globalShowFacets = true;
     		        showFacet = true;
-    		        break;
     		    }
 				else {
 					displayAppliedFilters.put(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery(),
@@ -139,7 +138,7 @@
 						    { 
 						        if (idx != limit && !appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
 						        {
-						        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="${area.shortName}.html?open=<%=info.getType()							
+						        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="?open=<%=info.getType()							
 					                + httpFilters
 					                + "&amp;filtername="+URLEncoder.encode(f,"UTF-8")
 					                + "&amp;filterquery="+URLEncoder.encode(fvalue.getAsFilterQuery(),"UTF-8")
@@ -157,11 +156,11 @@
 						    {
 						        %><li class="list-group-item"><span style="visibility: hidden;">.</span>
 						        <% if (currFp > 0) { %>
-						        <a class="pull-left" href="${area.shortName}.html?open=<%=info.getType() + httpFilters
+						        <a class="pull-left" href="?open=<%=info.getType() + httpFilters
 					                + "&amp;"+f+"_page="+(currFp-1) %>#${holder.shortName}"><fmt:message key="jsp.search.facet.refine.previous" /></a>
 					            <% } %>
 					            <% if (idx == limit) { %>
-					            <a href="${area.shortName}.html?open=<%=info.getType() + httpFilters
+					            <a href="?open=<%=info.getType() + httpFilters
 					                + "&amp;"+f+"_page="+(currFp+1) %>#${holder.shortName}"><span class="pull-right"><fmt:message key="jsp.search.facet.refine.next" /></span></a>
 					            <%
 					            }

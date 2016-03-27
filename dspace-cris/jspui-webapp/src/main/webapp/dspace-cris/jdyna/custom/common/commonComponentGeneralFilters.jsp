@@ -59,7 +59,7 @@
 	</button>
 	<ul class="dropdown-menu dropdown-menu-right" role="menu">
 		<% for (String[] sub : subLinks ) { %>
-		<li><a href="${area.shortName}?open=<%= sub[0] %>"><%= sub[1] %></a></li>
+		<li><a href="?open=<%= sub[0] %>"><%= sub[1] %></a></li>
 		<% } %>
 	</ul>
 	<% } else { %>

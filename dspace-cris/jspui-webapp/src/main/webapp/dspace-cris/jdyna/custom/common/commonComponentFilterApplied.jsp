@@ -88,7 +88,6 @@
     		    {
     			    globalShowFacets = true;
     		        showFacet = true;
-    		        break;
     		    }
 				else {
 					displayAppliedFilters.put(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery(),
@@ -116,7 +115,7 @@
 				    <span class="span-filter-applied-bordered">				    
 	  				<fmt:message key="<%= fkey %>" />:&nbsp;			    
 				    <b><%= displayAppliedFilters.get(filter[0]+"::"+filter[1]+"::"+filter[2]) %></b>
-	  					<a class="a-filter-applied-remove" href="${area.shortName}.html?open=<%=info.getType()							
+	  					<a class="a-filter-applied-remove" href="?open=<%=info.getType()							
 				                + httpFilters
 				                + "&amp;submit_filter_remove_"+ idx +"="+Utils.addEntities(filter[2]) %>#${holder.shortName}"><i class="remove fa fa-times"></i></a> 
 				    
