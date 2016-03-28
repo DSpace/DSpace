@@ -11,7 +11,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -30,11 +32,11 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.content.crosswalk.ParameterizedDisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
-import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.DOI;
 import org.dspace.services.ConfigurationService;
@@ -63,7 +65,15 @@ implements DOIConnector
     // Configuration property names
     static final String CFG_USER = "identifier.doi.user";
     static final String CFG_PASSWORD = "identifier.doi.password";
-    
+    private static final String CFG_PREFIX
+            = "identifier.doi.prefix";
+    private static final String CFG_PUBLISHER
+            = "crosswalk.dissemination.DataCite.publisher";
+    private static final String CFG_DATAMANAGER
+            = "crosswalk.dissemination.DataCite.dataManager";
+    private static final String CFG_HOSTINGINSTITUTION
+            = "crosswalk.dissemination.DataCite.hostingInstitution";
+
     /**
      * Stores the scheme used to connect to the DataCite server. It will be set
      * by spring dependency injection.
@@ -96,7 +106,7 @@ implements DOIConnector
      * {@link setDisseminationCrosswalk(String) setDisseminationCrosswalk} which
      * instantiates the crosswalk.
      */
-    protected DisseminationCrosswalk xwalk;
+    protected ParameterizedDisseminationCrosswalk xwalk;
     
     protected ConfigurationService configurationService;
     
@@ -198,7 +208,7 @@ implements DOIConnector
         if (null != this.xwalk)
             return;
         
-        this.xwalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
+        this.xwalk = (ParameterizedDisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
                 DisseminationCrosswalk.class, this.CROSSWALK_NAME);
         
         if (this.xwalk == null)
@@ -383,11 +393,27 @@ implements DOIConnector
                     + " using crosswalk " + this.CROSSWALK_NAME + ".",
                     DOIIdentifierException.CONVERSION_ERROR);
         }
-        
+
+        // Set the transform's parameters.
+        // XXX Should the actual list be configurable?
+        Map<String, String> parameters = new HashMap<>();
+        if (configurationService.hasProperty(CFG_PREFIX))
+            parameters.put("prefix",
+                    configurationService.getProperty(CFG_PREFIX));
+        if (configurationService.hasProperty(CFG_PUBLISHER))
+            parameters.put("publisher",
+                    configurationService.getProperty(CFG_PUBLISHER));
+        if (configurationService.hasProperty(CFG_DATAMANAGER))
+            parameters.put("datamanager",
+                    configurationService.getProperty(CFG_DATAMANAGER));
+        if (configurationService.hasProperty(CFG_HOSTINGINSTITUTION))
+            parameters.put("hostinginstitution",
+                    configurationService.getProperty(CFG_HOSTINGINSTITUTION));
+
         Element root = null;
         try
         {
-            root = xwalk.disseminateElement(context, dso);
+            root = xwalk.disseminateElement(context, dso, parameters);
         }
         catch (AuthorizeException ae)
         {

@@ -43,6 +43,15 @@ public class DataCiteXMLCreator
      */
     protected String CROSSWALK_NAME = "DataCite";
 
+    private static final String CFG_PREFIX
+            = "identifier.doi.prefix";
+    private static final String CFG_PUBLISHER
+            = "crosswalk.dissemination.DataCite.publisher";
+    private static final String CFG_DATAMANAGER
+            = "crosswalk.dissemination.DataCite.dataManager";
+    private static final String CFG_HOSTINGINSTITUTION
+            = "crosswalk.dissemination.DataCite.hostingInstitution";
+
     /**
      * DisseminationCrosswalk to map local metadata into DataCite metadata. The
      * name of the crosswalk is set by {@link setDisseminationCrosswalk(String)
@@ -72,14 +81,14 @@ public class DataCiteXMLCreator
         // XXX Should the actual list be configurable?
         ConfigurationService cfg = new DSpace().getConfigurationService();
         Map<String, String> parameters = new HashMap<>();
-        if (null != cfg.getProperty("identifier.doi.prefix"))
-            parameters.put("prefix", cfg.getProperty("identifier.doi.prefix"));
-        if (null != cfg.getProperty("crosswalk.dissemination.DataCite.publisher"))
-            parameters.put("publisher", cfg.getProperty("crosswalk.dissemination.DataCite.publisher"));
-        if (null != cfg.getProperty("crosswalk.dissemination.DataCite.dataManager"))
-            parameters.put("datamanager", cfg.getProperty("crosswalk.dissemination.DataCite.dataManager"));
-        if (null != cfg.getProperty("crosswalk.dissemination.DataCite.hostingInstitution"))
-            parameters.put("hostinginstitution", cfg.getProperty("crosswalk.dissemination.DataCite.hostingInstitution"));
+        if (cfg.hasProperty(CFG_PREFIX))
+            parameters.put("prefix", cfg.getProperty(CFG_PREFIX));
+        if (cfg.hasProperty(CFG_PUBLISHER))
+            parameters.put("publisher", cfg.getProperty(CFG_PUBLISHER));
+        if (cfg.hasProperty(CFG_DATAMANAGER))
+            parameters.put("datamanager", cfg.getProperty(CFG_DATAMANAGER));
+        if (cfg.hasProperty(CFG_HOSTINGINSTITUTION))
+            parameters.put("hostinginstitution", cfg.getProperty(CFG_HOSTINGINSTITUTION));
 
         // Transform the metadata
         Element root;
