@@ -110,16 +110,16 @@
 				{
 				    boolean showDisplay = displayAppliedFilters.containsKey(filter[0]+"::"+filter[1]+"::"+filter[2]) && !StringUtils.equalsIgnoreCase(displayAppliedFilters.get(filter[0]+"::"+filter[1]+"::"+filter[2]), filter[2]);
 				    String fkey = "jsp.search.filter."+filter[0];
-				    %>			    
+				    %>				    	    
 				    <div class="btn btn-default">
-				    <span class="span-filter-applied-bordered">				    
-	  				<fmt:message key="<%= fkey %>" />:&nbsp;			    
-				    <b><%= displayAppliedFilters.get(filter[0]+"::"+filter[1]+"::"+filter[2]) %></b>
-	  					<a class="a-filter-applied-remove" href="?open=<%=info.getType()							
-				                + httpFilters
-				                + "&amp;submit_filter_remove_"+ idx +"="+Utils.addEntities(filter[2]) %>#${holder.shortName}"><i class="remove fa fa-times"></i></a> 
-				    
-				    </span>
+					    <span class="span-filter-applied-bordered">				    
+		  				<fmt:message key="<%= fkey %>" />:&nbsp;		  							    
+					    <b><%= showDisplay?displayAppliedFilters.get(filter[0]+"::"+filter[1]+"::"+filter[2]):filter[2] %></b>
+		  					<a class="a-filter-applied-remove" href="?open=<%=info.getType()							
+					                + httpFilters
+					                + "&amp;submit_filter_remove_"+ idx +"="+Utils.addEntities(filter[2]) %>#${holder.shortName}"><i class="remove fa fa-times"></i></a> 
+					    
+					    </span>
 				    </div>
 					<%
 					idx++;
