@@ -711,15 +711,15 @@
                        This is specifically for global HTML files or robots.txt files,
                        either of which can be placed in the 'static/' directory.-->
                     <map:match pattern="*.txt">
-                        <map:read src="static/{1}.txt"/>
+                        <map:read type="ThemeResourceReader" src="static/{1}.txt"/>
                     </map:match>
                     <map:match pattern="*.html">
-                        <map:read src="static/{1}.html"/>
+                        <map:read type="ThemeResourceReader" src="static/{1}.html"/>
                     </map:match>
                     <!-- Also, allow reference to globally static content via the /static path.
                         This will allow your globally static HTML docs to load static CSS or images. -->
                     <map:match pattern="static/*/**">
-                        <map:read src="static/{1}/{2}"/>
+                        <map:read type="ThemeResourceReader" src="static/{1}/{2}"/>
                     </map:match>
 
                     <!-- DSpace does not have any paths beginning with numbers (0-9). If one is accessed,
