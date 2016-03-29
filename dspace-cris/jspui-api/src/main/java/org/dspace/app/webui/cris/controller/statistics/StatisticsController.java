@@ -124,6 +124,7 @@ public class StatisticsController extends AStatisticsController
             data.put("seeUpload", canSeeUpload(c,dso));
             data.put("stats_from_date", startDateParam);
             data.put("stats_to_date", endDateParam);
+            data.put("type", type);
             data.put("showExtraTab", statsComponentsService.isShowExtraTab());
             modelAndView.addObject("data", data);
 

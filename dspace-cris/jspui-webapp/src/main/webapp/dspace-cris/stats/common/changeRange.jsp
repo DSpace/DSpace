@@ -26,8 +26,15 @@
 								<fmt:message key="view.statistics.range.to" /> <input class="form-control" type="text" id="stats_to_date" name="stats_to_date" value="${data.stats_to_date}" /> 
 						</div>
 					</div>
-			<input type="hidden" name="type" value="${type}"/>
-			<input type="hidden" name="handle" value="${data.object.handle}" />
+			<input type="hidden" name="type" value="${data.type}"/>
+			<c:choose>
+			<c:when test="${data.object.type < 9}">
+				<input type="hidden" name="handle" value="${data.object.handle}" />
+			</c:when>
+			<c:otherwise>
+				<input type="hidden" name="id" value="${data.object.handle}" />
+			</c:otherwise>
+			</c:choose>						
 	  </div>
       </div>
       <div class="modal-footer">

@@ -78,8 +78,8 @@
 	</div>	
 
 	<c:set var="type"><%=request.getParameter("type") %></c:set>
-    <%@include file="/dspace-cris/stats/common/changeRange.jsp"%> 	
-		<%@ include file="/dspace-cris/stats/site/_siteReport-right.jsp" %> 
+    <%@ include file="/dspace-cris/stats/common/changeRange.jsp"%> 	
+	<%@ include file="/dspace-cris/stats/site/_siteReport-right.jsp" %> 
 	<div class="richeditor">
 		<div class="top"></div>
 			<%@ include file="/dspace-cris/stats/site/_siteReport.jsp" %>	</div>
