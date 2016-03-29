@@ -170,7 +170,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <!-- An input-type of twobox MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
-         <input-type>twobox</input-type>
+         <input-type>onebox</input-type>
          <hint>Enter appropriate subject keywords or phrases. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
@@ -368,7 +368,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <!-- An input-type of twobox MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
-         <input-type>twobox</input-type>
+         <input-type>onebox</input-type>
          <hint>Enter appropriate subject keywords or phrases. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
@@ -577,7 +577,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <!-- An input-type of twobox MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
-         <input-type>twobox</input-type>
+         <input-type>onebox</input-type>
          <hint>Enter appropriate subject keywords or phrases. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
@@ -786,7 +786,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <!-- An input-type of twobox MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
-         <input-type>twobox</input-type>
+         <input-type>onebox</input-type>
          <hint>Enter appropriate subject keywords or phrases. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
@@ -962,7 +962,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <!-- An input-type of twobox MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
-         <input-type>twobox</input-type>
+         <input-type>onebox</input-type>
          <hint>Enter appropriate subject keywords or phrases. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
@@ -1149,7 +1149,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <!-- An input-type of twobox MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
-         <input-type>twobox</input-type>
+         <input-type>onebox</input-type>
          <hint>Enter appropriate subject keywords or phrases. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
