@@ -27,6 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.itemexport.ItemExport;
 import org.dspace.app.itemexport.ItemExportException;
@@ -88,7 +89,16 @@ public class ReferencesServlet extends DSpaceServlet
             SQLException, AuthorizeException
     {
 
-		int[] item_ids = UIUtil.getIntParameters(request, "item_id");
+        int[] item_ids = null;
+        
+        String prefix = request.getParameter("prefix");
+        if(StringUtils.isNotEmpty(prefix)) {
+            item_ids = UIUtil.getIntParameters(request, prefix+"item_id");
+        }
+        else {
+            item_ids = UIUtil.getIntParameters(request, "item_id");            
+        }
+		
         String format = request.getParameter("format");
         boolean fulltext = UIUtil.getBoolParameter(request, "fulltext");
         boolean email = UIUtil.getBoolParameter(request, "email");
@@ -120,7 +130,13 @@ public class ReferencesServlet extends DSpaceServlet
 
 			for (int id : item_ids)
             {
-				redirectURLCallBack.append(URLEncoder.encode("&item_id=" + id));
+		        if(StringUtils.isNotEmpty(prefix)) {
+		            redirectURLCallBack.append(URLEncoder.encode("&"+prefix+"item_id=" + id));
+		        }
+		        else {
+		            redirectURLCallBack.append(URLEncoder.encode("&item_id=" + id));            
+		        }
+				
             }
             response.sendRedirect(redirectURLCallBack.toString());
             return;

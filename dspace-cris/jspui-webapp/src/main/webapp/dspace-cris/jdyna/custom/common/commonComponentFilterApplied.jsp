@@ -43,6 +43,9 @@
 <%
 	Box holder = (Box)request.getAttribute("holder");
 	ComponentInfoDTO info = ((Map<String, ComponentInfoDTO>)(request.getAttribute("componentinfomap"))).get(holder.getShortName());
+	
+	String relationName = info.getRelationName();
+		
 	DiscoverResult qResults = (DiscoverResult) request.getAttribute("qResults"+info.getRelationName());
 	
 	List<String[]> appliedFilters = (List<String[]>) request.getAttribute("appliedFilters"+info.getRelationName());
@@ -55,9 +58,9 @@
 	    int idx = 1;
 	    for (String[] filter : appliedFilters)
 	    {
-	        httpFilters += "&amp;filter_field_"+idx+"="+URLEncoder.encode(filter[0],"UTF-8");
-	        httpFilters += "&amp;filter_type_"+idx+"="+URLEncoder.encode(filter[1],"UTF-8");
-	        httpFilters += "&amp;filter_value_"+idx+"="+URLEncoder.encode(filter[2],"UTF-8");
+	        httpFilters += "&amp;filter_field_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[0],"UTF-8");
+	        httpFilters += "&amp;filter_type_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[1],"UTF-8");
+	        httpFilters += "&amp;filter_value_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[2],"UTF-8");
 	        idx++;
 	    }
 	}
@@ -117,7 +120,7 @@
 					    <b><%= showDisplay?displayAppliedFilters.get(filter[0]+"::"+filter[1]+"::"+filter[2]):filter[2] %></b>
 		  					<a class="a-filter-applied-remove" href="?open=<%=info.getType()							
 					                + httpFilters
-					                + "&amp;submit_filter_remove_"+ idx +"="+Utils.addEntities(filter[2]) %>#${holder.shortName}"><i class="remove fa fa-times"></i></a> 
+					                + "&amp;submit_filter_remove_"+ relationName + "_" + idx +"="+Utils.addEntities(filter[2]) %>#${holder.shortName}"><i class="remove fa fa-times"></i></a> 
 					    
 					    </span>
 				    </div>

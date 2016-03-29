@@ -43,10 +43,13 @@
 <%
 	Box holder = (Box)request.getAttribute("holder");
 	ComponentInfoDTO info = ((Map<String, ComponentInfoDTO>)(request.getAttribute("componentinfomap"))).get(holder.getShortName());
-	DiscoverResult qResults = (DiscoverResult) request.getAttribute("qResults"+info.getRelationName());
 	
-	List<String[]> appliedFilters = (List<String[]>) request.getAttribute("appliedFilters"+info.getRelationName());
-	List<String> appliedFilterQueries = (List<String>) request.getAttribute("appliedFilterQueries"+info.getRelationName());
+	String relationName = info.getRelationName();
+	
+	DiscoverResult qResults = (DiscoverResult) request.getAttribute("qResults"+relationName);
+	
+	List<String[]> appliedFilters = (List<String[]>) request.getAttribute("appliedFilters"+relationName);
+	List<String> appliedFilterQueries = (List<String>) request.getAttribute("appliedFilterQueries"+relationName);
 	Map<String, String> displayAppliedFilters = new HashMap<String, String>();
 	
     String httpFilters ="";
@@ -55,16 +58,16 @@
 	    int idx = 1;
 	    for (String[] filter : appliedFilters)
 	    {
-	        httpFilters += "&amp;filter_field_"+idx+"="+URLEncoder.encode(filter[0],"UTF-8");
-	        httpFilters += "&amp;filter_type_"+idx+"="+URLEncoder.encode(filter[1],"UTF-8");
-	        httpFilters += "&amp;filter_value_"+idx+"="+URLEncoder.encode(filter[2],"UTF-8");
+	        httpFilters += "&amp;filter_field_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[0],"UTF-8");
+	        httpFilters += "&amp;filter_type_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[1],"UTF-8");
+	        httpFilters += "&amp;filter_value_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[2],"UTF-8");
 	        idx++;
 	    }
 	}
 	
 	boolean globalShowFacets = false;
     boolean brefine = false;
-    List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig"+info.getRelationName());
+    List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig"+relationName);
     Map<String, Boolean> showFacets = new HashMap<String, Boolean>();
     
     for (DiscoverySearchFilterFacet facetConf : facetsConf)
@@ -140,9 +143,9 @@
 						        {
 						        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="?open=<%=info.getType()							
 					                + httpFilters
-					                + "&amp;filtername="+URLEncoder.encode(f,"UTF-8")
-					                + "&amp;filterquery="+URLEncoder.encode(fvalue.getAsFilterQuery(),"UTF-8")
-					                + "&amp;filtertype="+URLEncoder.encode(fvalue.getFilterType(),"UTF-8") %>#${holder.shortName}"
+					                + "&amp;filtername" + relationName + "="+URLEncoder.encode(f,"UTF-8")
+					                + "&amp;filterquery" + relationName + "="+URLEncoder.encode(fvalue.getAsFilterQuery(),"UTF-8")
+					                + "&amp;filtertype" + relationName + "="+URLEncoder.encode(fvalue.getFilterType(),"UTF-8") %>#${holder.shortName}"
 					                title="<fmt:message key="jsp.search.facet.narrow"><fmt:param><%=fvalue.getDisplayedValue() %></fmt:param></fmt:message>">
 					                <%= fvalue.getDisplayedValue() %></a></li><%
 					                idx++;

@@ -50,11 +50,14 @@
 	
 	Box holder = (Box)request.getAttribute("holder");
 	ComponentInfoDTO info = ((Map<String, ComponentInfoDTO>)(request.getAttribute("componentinfomap"))).get(holder.getShortName());
-	List<String[]> subLinks = (List<String[]>) request.getAttribute("activeTypes"+info.getRelationName());
 	
-	DiscoverResult qResults = (DiscoverResult) request.getAttribute("qResults"+info.getRelationName());
-	List<String> appliedFilterQueries = (List<String>) request.getAttribute("appliedFilterQueries"+info.getRelationName());
-	List<String[]> appliedFilters = (List<String[]>) request.getAttribute("appliedFilters"+info.getRelationName());
+	String relationName = info.getRelationName();
+	
+	List<String[]> subLinks = (List<String[]>) request.getAttribute("activeTypes"+relationName);
+	
+	DiscoverResult qResults = (DiscoverResult) request.getAttribute("qResults"+relationName);
+	List<String> appliedFilterQueries = (List<String>) request.getAttribute("appliedFilterQueries"+relationName);
+	List<String[]> appliedFilters = (List<String[]>) request.getAttribute("appliedFilters"+relationName);
 	Map<String, String> displayAppliedFilters = new HashMap<String, String>();
 	
     String httpFilters ="";
@@ -63,15 +66,15 @@
 	    int idx = 1;
 	    for (String[] filter : appliedFilters)
 	    {
-	        httpFilters += "&amp;filter_field_"+idx+"="+URLEncoder.encode(filter[0],"UTF-8");
-	        httpFilters += "&amp;filter_type_"+idx+"="+URLEncoder.encode(filter[1],"UTF-8");
-	        httpFilters += "&amp;filter_value_"+idx+"="+URLEncoder.encode(filter[2],"UTF-8");
+	        httpFilters += "&amp;filter_field_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[0],"UTF-8");
+	        httpFilters += "&amp;filter_type_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[1],"UTF-8");
+	        httpFilters += "&amp;filter_value_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[2],"UTF-8");
 	        idx++;
 	    }
 	}
 	
 	boolean globalShowFacets = false;
-	if (info.getItems().length > 0) {
+	if (info!=null && info.getItems()!=null && info.getItems().length > 0) {
 	    
 %>
 
@@ -79,7 +82,7 @@
 
 	<% 
     boolean brefine = false;
-    List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig"+info.getRelationName());
+    List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig"+relationName);
     Map<String, Boolean> showFacets = new HashMap<String, Boolean>();
     
     for (DiscoverySearchFilterFacet facetConf : facetsConf)
@@ -206,9 +209,9 @@ if (info.getPagetotal() > 1)
 	   	    int idx = 1;
 	   	    for (String[] filter : appliedFilters)
 	   	    { %>
-	   	    	<input id="filter_field_<%= idx %>" type="hidden" name="filter_field_<%= idx %>" value="<%= filter[0]%>"/>
-	   	    	<input id="filter_type_<%= idx %>" type="hidden" name="filter_type_<%= idx %>" value="<%= filter[1]%>"/>
-	   	    	<input id="filter_value_<%= idx %>" type="hidden" name="filter_value_<%= idx %>" value="<%= filter[2] %>"/>
+	   	    	<input id="filter_field_<%= relationName + "_" + idx %>" type="hidden" name="filter_field_<%= relationName + "_" + idx %>" value="<%= filter[0]%>"/>
+	   	    	<input id="filter_type_<%= relationName + "_" + idx %>" type="hidden" name="filter_type_<%= relationName + "_" + idx %>" value="<%= filter[1]%>"/>
+	   	    	<input id="filter_value_<%= relationName + "_" + idx %>" type="hidden" name="filter_value_<%= relationName + "_" + idx %>" value="<%= filter[2] %>"/>
 	   	      <%  
 	   	        idx++;
 	   	    }
@@ -222,9 +225,11 @@ if (info.getPagetotal() > 1)
 	if (exportBiblioEnabled && isLoggedIn) {
 %>
 
-		<form target="blank" class="form-inline"  id="exportform" action="<%= request.getContextPath() %>/references">
-
-		<div id="export-biblio-panel">
+		<form target="blank" class="form-inline"  id="<%= info.getType() %>exportform" action="<%= request.getContextPath() %>/references">
+		
+		<input type="hidden" name="prefix" value="<%= info.getType() %>"/>
+		
+		<div id="<%= info.getType() %>export-biblio-panel">
 	<%		
 		if (cfg == null)
 		{
@@ -235,17 +240,17 @@ if (info.getPagetotal() > 1)
 	%>
 		<c:set var="format"><%= format %></c:set>	    
 		<label class="radio-inline">
-    		  <input id="${format}" type="radio" name="format" value="${format}" <c:if test="${format=='bibtex'}"> checked="checked"</c:if>/><fmt:message key="exportcitation.option.${format}" />
+    		  <input class="<%= info.getType() %>format" id="<%= info.getType() + format %>" type="radio" name="format" value="${format}" <c:if test="${format=='bibtex'}"> checked="checked"</c:if>/><fmt:message key="exportcitation.option.${format}" />
 	    </label>
 
 		
 	<% } %>
 		<label class="checkbox-inline">
-			<input type="checkbox" id="email" name="email" value="true"/><fmt:message key="exportcitation.option.email" />
+			<input type="checkbox" id="<%= info.getType() %>email" name="email" value="true"/><fmt:message key="exportcitation.option.email" />
 		</label>
-			<input class="btn btn-default" type="submit" name="submit_export" value="<fmt:message key="exportcitation.option.submitexport" />" disabled/>
+			<input id="<%= info.getType() %>submit_export" class="btn btn-default" type="submit" name="submit_export" value="<fmt:message key="exportcitation.option.submitexport" />" disabled/>
 		</div>	
-		<dspace:itemlist itemStart="<%=info.getStart()+1%>" items="<%= (Item[])info.getItems() %>" sortOption="<%= info.getSo() %>" authorLimit="<%= info.getEtAl() %>" order="<%= info.getOrder() %>" config="${info[holder.shortName].type}" radioButton="false" inputName="item_id"/>
+		<dspace:itemlist itemStart="<%=info.getStart()+1%>" items="<%= (Item[])info.getItems() %>" sortOption="<%= info.getSo() %>" authorLimit="<%= info.getEtAl() %>" order="<%= info.getOrder() %>" config="${info[holder.shortName].type}" radioButton="false" inputName="<%= info.getType() + \"item_id\"%>"/>
 		</form>
 <% } else { %>
 		<dspace:itemlist itemStart="<%=info.getStart()+1%>" items="<%= (Item[])info.getItems() %>" sortOption="<%= info.getSo() %>" authorLimit="<%= info.getEtAl() %>" order="<%= info.getOrder() %>" config="${info[holder.shortName].type}"/>
@@ -260,30 +265,26 @@ if (info.getPagetotal() > 1)
         j('#sortform<%= info.getType() %>').submit();        
     }
     
-	function changeAll(var1,var2) {
-		var inputbutton = j(var2).prop('id');
+	j("#<%= info.getType() %>item_idchecker").click(function() {
+		var inputbutton = j(this).prop('id');
+		var var1 = j(this).data('checkboxname');
 		var inputstatus = j('#'+inputbutton).prop( "checked");
 	    j("input[name*='"+var1+"']").prop('checked', inputstatus);
-	}
-	
-	var checkboxes = j("input[type='checkbox']"), submitButt = j("input[type='submit']"), radio = j("input[type='radio']");
+	    j('#<%= info.getType() %>submit_export').attr('disabled', !inputstatus);
+	});
 
-	radio.click(function() {
-		if('refworks'==j(this).prop('id')) {
-			j('#email').attr("checked", false);
-			j('#email').attr("disabled", true);
+
+	j(".<%= info.getType() %>format").click(function() {	
+		if('<%= info.getType() %>refworks'==j(this).prop('id')) {
+			j('#<%= info.getType() %>email').attr("checked", false);
+			j('#<%= info.getType() %>email').attr("disabled", true);
 		} else {
-			j('#email').attr("disabled", false);
+			j('#<%= info.getType() %>email').attr("disabled", false);
 		}
 	});
 	
-	checkboxes.click(function() {
-		if('email'==j(this).prop('id')) {
-			//NOTHING TO DO	
-		}
-		else {
-			submitButt.attr("disabled", !checkboxes.is(":checked"));	
-		}		
+	j("input[name='<%= info.getType() %>item_id']").click(function() {
+		 j('#<%= info.getType() %>submit_export').attr("disabled", !j("input[name='<%= info.getType() %>item_id']").is(":checked"));	
 	});		
 	-->
 </script>

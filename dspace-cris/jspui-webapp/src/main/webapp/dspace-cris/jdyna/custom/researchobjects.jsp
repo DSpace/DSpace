@@ -44,12 +44,13 @@
 	
 	Box holder = (Box)request.getAttribute("holder");
 	ComponentInfoDTO info = ((Map<String, ComponentInfoDTO>)(request.getAttribute("componentinfomap"))).get(holder.getShortName());
-	List<String[]> subLinks = (List<String[]>) request
-            .getAttribute("activeTypes"+info.getRelationName());
+	String relationName = info.getRelationName();
 	
-	DiscoverResult qResults = (DiscoverResult) request.getAttribute("qResults"+info.getRelationName());
-	List<String> appliedFilterQueries = (List<String>) request.getAttribute("appliedFilterQueries"+info.getRelationName());
-	List<String[]> appliedFilters = (List<String[]>) request.getAttribute("appliedFilters"+info.getRelationName());
+	List<String[]> subLinks = (List<String[]>) request.getAttribute("activeTypes"+relationName);
+	
+	DiscoverResult qResults = (DiscoverResult) request.getAttribute("qResults"+relationName);
+	List<String> appliedFilterQueries = (List<String>) request.getAttribute("appliedFilterQueries"+relationName);
+	List<String[]> appliedFilters = (List<String[]>) request.getAttribute("appliedFilters"+relationName);
 	Map<String, String> displayAppliedFilters = new HashMap<String, String>();
 	
     String httpFilters ="";
@@ -58,15 +59,15 @@
 	    int idx = 1;
 	    for (String[] filter : appliedFilters)
 	    {
-	        httpFilters += "&amp;filter_field_"+idx+"="+URLEncoder.encode(filter[0],"UTF-8");
-	        httpFilters += "&amp;filter_type_"+idx+"="+URLEncoder.encode(filter[1],"UTF-8");
-	        httpFilters += "&amp;filter_value_"+idx+"="+URLEncoder.encode(filter[2],"UTF-8");
+	        httpFilters += "&amp;filter_field_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[0],"UTF-8");
+	        httpFilters += "&amp;filter_type_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[1],"UTF-8");
+	        httpFilters += "&amp;filter_value_" + relationName + "_"+idx+"="+URLEncoder.encode(filter[2],"UTF-8");
 	        idx++;
 	    }
 	}
 		
 	boolean globalShowFacet = false;
-	if (info.getItems().length > 0) {
+	if (info!=null && info.getItems()!=null && info.getItems().length > 0) {
 %>
 	
 <c:set var="info" value="<%= info %>" scope="request" />
@@ -199,9 +200,9 @@ if (info.getPagetotal() > 1)
 	   	    int idx = 1;
 	   	    for (String[] filter : appliedFilters)
 	   	    { %>
-	   	    	<input id="filter_field_<%= idx %>" type="hidden" name="filter_field_<%= idx %>" value="<%= filter[0]%>"/>
-	   	    	<input id="filter_type_<%= idx %>" type="hidden" name="filter_type_<%= idx %>" value="<%= filter[1]%>"/>
-	   	    	<input id="filter_value_<%= idx %>" type="hidden" name="filter_value_<%= idx %>" value="<%= filter[2] %>"/>
+	   	    	<input id="filter_field_<%= relationName + "_" + idx %>" type="hidden" name="filter_field_<%= relationName + "_" + idx %>" value="<%= filter[0]%>"/>
+	   	    	<input id="filter_type_<%= relationName + "_" + idx %>" type="hidden" name="filter_type_<%= relationName + "_" + idx %>" value="<%= filter[1]%>"/>
+	   	    	<input id="filter_value_<%= relationName + "_" + idx %>" type="hidden" name="filter_value_<%= relationName + "_" + idx %>" value="<%= filter[2] %>"/>
 	   	      <%  
 	   	        idx++;
 	   	    }

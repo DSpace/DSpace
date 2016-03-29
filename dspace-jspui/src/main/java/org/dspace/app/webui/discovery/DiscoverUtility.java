@@ -333,7 +333,7 @@ public class DiscoverUtility
 			}
 		}
 		
-        List<String[]> filters = getFilters(request);
+        List<String[]> filters = getFilters(request, null);
         List<String> userFilters = new ArrayList<String>();
         for (String[] f : filters)
         {
@@ -777,11 +777,19 @@ public class DiscoverUtility
 
     public static List<String[]> getFilters(HttpServletRequest request)
     {
+        return getFilters(request, null);
+    }
+
+    public static List<String[]> getFilters(HttpServletRequest request, String relationType)
+    {
+        if(StringUtils.isEmpty(relationType)) {
+            relationType = "";
+        }
         String submit = UIUtil.getSubmitButton(request, "submit");
         int ignore = -1;
-        if (submit.startsWith("submit_filter_remove_"))
+        if (submit.startsWith("submit_filter_remove_" + relationType + "_"))
         {
-            ignore = Integer.parseInt(submit.substring("submit_filter_remove_".length()));
+            ignore = Integer.parseInt(submit.substring(("submit_filter_remove_" + relationType + "_").length()));
         }
         List<String[]> appliedFilters = new ArrayList<String[]>();
         
@@ -790,7 +798,7 @@ public class DiscoverUtility
         List<String> filterField = new ArrayList<String>();
         for (int idx = 1; ; idx++)
         {
-            String op = request.getParameter("filter_type_"+idx);
+            String op = request.getParameter("filter_type_" + relationType + "_" + idx);
             if (StringUtils.isBlank(op))
             {
                 break;
@@ -798,17 +806,17 @@ public class DiscoverUtility
             else if (idx != ignore)
             {
                 filterOp.add(op);
-                filterField.add(request.getParameter("filter_field_"+idx));
-                filterValue.add(request.getParameter("filter_value_"+idx));
+                filterField.add(request.getParameter("filter_field_" + relationType + "_" + idx));
+                filterValue.add(request.getParameter("filter_value_" + relationType + "_" + idx));
             }
         }
         
-        String op = request.getParameter("filtertype");
+        String op = request.getParameter("filtertype"+ relationType);
         if (StringUtils.isNotBlank(op))
         {
             filterOp.add(op);
-            filterField.add(request.getParameter("filtername"));
-            filterValue.add(request.getParameter("filterquery"));
+            filterField.add(request.getParameter("filtername"+ relationType));
+            filterValue.add(request.getParameter("filterquery"+ relationType));
         }
         
         for (int idx = 0; idx < filterOp.size(); idx++)
