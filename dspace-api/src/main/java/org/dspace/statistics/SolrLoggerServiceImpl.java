@@ -318,7 +318,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             }
             catch (Exception e)
             {
-                log.error("Failed DNS Lookup for IP:" + ip);
+                log.info("Failed DNS Lookup for IP:" + ip);
                 log.debug(e.getMessage(),e);
             }
 		    if(request.getHeader("User-Agent") != null)
@@ -404,7 +404,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             }
             catch (Exception e)
             {
-                log.error("Failed DNS Lookup for IP:" + ip);
+                log.info("Failed DNS Lookup for IP:" + ip);
                 log.debug(e.getMessage(),e);
             }
 		    if(userAgent != null)
