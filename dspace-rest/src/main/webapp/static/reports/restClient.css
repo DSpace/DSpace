@@ -22,6 +22,7 @@ td.mod, th.mod {width: 200px;}
 #itemtable {width: 100%;}
 #itemdiv {display: none;}
 td.ititle, th.ititle {width: 600px;}
+td.partial {color:red; font-style: italic;}
 
 button:disabled {
 	background-color:gray;
@@ -79,4 +80,12 @@ fieldset.catdiv div {
 
 #filterdiv label {
 	font-weight: normal;
+}
+
+.button {
+	background-color: #EEEEEE;
+}
+
+.toobig::before {
+	content: "*";
 }
