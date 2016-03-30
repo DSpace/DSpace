@@ -746,8 +746,6 @@ Common usage:
 
         <mkdir dir="${org.dspace.app.itemexport.download.dir}" />
 
-        <mkdir dir="${assetstore.dir}" />
-
         <mkdir dir="${handle.dir}" />
 
         <mkdir dir="${log.dir}" />
