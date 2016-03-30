@@ -282,13 +282,16 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     @Override
     protected void addResults(StoragePath path, List<Manuscript> manuscripts, String searchParam, Integer limit) throws StorageException {
         String organizationCode = path.getOrganizationCode();
+        String manuscriptId = path.getManuscriptId();
         int limitInt = DEFAULT_LIMIT;
         if (limit != null) {
             limitInt = limit.intValue();
         }
         try {
             Context context = getContext();
-            if (searchParam == null) {
+            if (manuscriptId != null) {
+                manuscripts.add(getManuscriptById(context, manuscriptId, organizationCode));
+            } else if (searchParam == null) {
                 manuscripts.addAll(getManuscripts(context, organizationCode, limitInt));
             } else {
                 manuscripts.addAll(getManuscriptsMatchingQuery(context, organizationCode, searchParam, limitInt));
