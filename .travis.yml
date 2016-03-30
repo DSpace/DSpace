@@ -1,56 +1,56 @@
 language: java
 jdk:
-  - oraclejdk7
-  - oraclejdk8
+- oraclejdk7
+- oraclejdk8
 sudo: true
-
 addons:
-  postgresql: "9.4"
-
+  postgresql: '9.4'
 before_install:
   # https://github.com/travis-ci/travis-ci/issues/4629
   - sed -i.bak -e 's|https://nexus.codehaus.org/snapshots/|https://oss.sonatype.org/content/repositories/codehaus-snapshots/|g' ~/.m2/settings.xml
   # https://github.com/travis-ci/travis-ci/issues/4613
-  - echo "MAVEN_OPTS='-Xmx4g -XX:MaxPermSize=1g'" > ~/.mavenrc
-  - whoami
-  - java -version
-  - pwd
-  - mvn help:system
-  - export FS=`pwd`
-  - rm -rf /tmp/dspace
+- echo "MAVEN_OPTS='-Xmx4g -XX:MaxPermSize=1g'" > ~/.mavenrc
+- whoami
+- java -version
+- pwd
+- mvn help:system
+- export FS=`pwd`
+- rm -rf /tmp/dspace
 
 # see https://github.com/travis-ci/travis-ci/issues/1066 for the && signs
 # yaml format: "When a string contains line breaks, you can use the literal style, indicated by the pipe (|), to indicate that the string will span several lines. In literals, newlines are preserved" (might not be necessary)
 install: |
-   echo "Update settings" &&
-   cd $FS/utilities/project_helpers &&
-   sed -i'' 's/tomcat.(TOMCAT_VERSION)/travis/' ./config/variable.makefile.example &&
-   sed -i'' 's#DIR_LINDAT_COMMON_THEME.*#DIR_LINDAT_COMMON_THEME :=/tmp/dspace/lindat-common#' ./config/variable.makefile.example &&
-   sed -i'' 's/dspace.install.dir = /dspace.install.dir = \/tmp\/dspace/' ./config/local.conf.dist &&
-   cd $FS/utilities/project_helpers/config &&
-   cp local.conf.dist ../sources/local.properties &&
-   cd $FS/utilities/project_helpers/scripts &&
-   echo "Creating dspace DB user and initialising databases" &&
-   createuser --username=postgres --superuser dspace &&
-   make create_databases &&
-   echo "Installing prerequisites" &&
-   free -m -t &&
-   make install_libs &&
-   free -m -t &&
-   make mvn_help &&
-   make new_deploy | grep -v "Download" &&
-   free -m -t &&
-   make print_message
-
+  echo "Update settings" &&
+  cd $FS/utilities/project_helpers &&
+  sed -i'' 's/tomcat.(TOMCAT_VERSION)/travis/' ./config/variable.makefile.example &&
+  sed -i'' 's#DIR_LINDAT_COMMON_THEME.*#DIR_LINDAT_COMMON_THEME :=/tmp/dspace/lindat-common#' ./config/variable.makefile.example &&
+  sed -i'' 's/dspace.install.dir = /dspace.install.dir = \/tmp\/dspace/' ./config/local.conf.dist &&
+  cd $FS/utilities/project_helpers/config &&
+  cp local.conf.dist ../sources/local.properties &&
+  cd $FS/utilities/project_helpers/scripts &&
+  echo "Creating dspace DB user and initialising databases" &&
+  createuser --username=postgres --superuser dspace &&
+  make create_databases &&
+  echo "Installing prerequisites" &&
+  free -m -t &&
+  make install_libs &&
+  free -m -t &&
+  make mvn_help &&
+  make new_deploy | grep -v "Download" &&
+  free -m -t &&
+  make print_message
 script:
-   free -m -t &&
-   make test_dspace_database &&
-   free -m -t &&
-   make test_utilities_database &&
-   free -m -t &&
-   cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test | grep -v "Download" &&
-   free -m -t &&
-   cd $FS/utilities/project_helpers/scripts &&
-   free -m -t &&
-   make tests
-   #make selenium_tests || echo "Tests failed"
+  free -m -t &&
+  make test_dspace_database &&
+  free -m -t &&
+  make test_utilities_database &&
+  free -m -t &&
+  cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test | grep -v "Download" &&
+  free -m -t &&
+  cd $FS/utilities/project_helpers/scripts &&
+  free -m -t &&
+  make tests
+  #make selenium_tests || echo "Tests failed"
+notifications:
+  slack:
+    secure: RVKF3ge2FZ92r2HCD3LKgEFdIya/JQmm6fjfH3WTsvaNYOaiyG2qf2dzBZd76uUNoB6u3aV8gL/kWmm6lmJGlgg8wSgmi16bQOmKz9OmYDPcnMCwOVP+5NyiK8qoZhzgXUvUNlpqUAOdj1VUHyo7ROgzi2WyvIDPwl77Yo4hONc=
