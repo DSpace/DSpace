@@ -177,7 +177,7 @@
 			</div>
 		 	<div class="form-group pull-right" style="margin-top:1.5em;">
 				<div class="btn-group">
-					<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/stats/ou.html?id=${entity.uuid}"><i class="fa fa-bar-chart-o"></i> <fmt:message key="jsp.cris.detail.link.statistics" /></a>
+					<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/stats/do.html?id=${entity.uuid}"><i class="fa fa-bar-chart-o"></i> <fmt:message key="jsp.cris.detail.link.statistics" /></a>
 					<c:choose>
 	       					<c:when test="${!subscribed}">
 	               				<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/tools/subscription/subscribe?uuid=${entity.uuid}"><i class="fa fa-bell"></i> <fmt:message key="jsp.cris.detail.link.email.alert" /></a>
