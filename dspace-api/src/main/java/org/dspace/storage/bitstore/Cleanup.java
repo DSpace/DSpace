@@ -65,7 +65,7 @@ public class Cleanup
                     try {
                         commitBatch = Integer.parseInt(line.getOptionValue('b'));
                     } catch (NumberFormatException ne) {
-                        throw new RuntimeException( "'" + line.getOptionValue('b') + "' is not a positve integer");
+                        throw new RuntimeException( "'" + line.getOptionValue('b') + "' is not a positive integer");
                     }
                     if (commitBatch < 1) {
                         throw new RuntimeException( "batchSize must be greater or equal 1");
