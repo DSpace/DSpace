@@ -156,7 +156,7 @@ public class StatSyndicationFeed
                         .format(localize(msgs, MSG_ENTRY_DESCRIPTION, freq,
                                 type, AStatComponentService._SELECTED_OBJECT,
                                 "view"), dataBean.getPeriodSelectedView(),
-                                dataBean.getTotalSelectedView());
+                                dataBean.getTotalSelectedView(), AStatComponentService._SELECTED_OBJECT);
 
                 if (dataBean.isShowSelectedObjectDownload())
                 {
@@ -165,7 +165,7 @@ public class StatSyndicationFeed
                                     AStatComponentService._SELECTED_OBJECT,
                                     "download"), dataBean
                                     .getPeriodSelectedDownload(), dataBean
-                                    .getTotalSelectedDownload());
+                                    .getTotalSelectedDownload(), AStatComponentService._SELECTED_OBJECT);
                 }
 
                 for (String key : dataBean.getPeriodAndTotalTopView().keySet())
@@ -180,7 +180,7 @@ public class StatSyndicationFeed
                                             .getPeriodAndTotalTopView()
                                             .get(key).get(0), dataBean
                                             .getPeriodAndTotalTopView()
-                                            .get(key).get(1));
+                                            .get(key).get(1), key);
                         }
                         if (dataBean.getPeriodAndTotalTopDownload().get(key) != null)
                         {
@@ -193,7 +193,7 @@ public class StatSyndicationFeed
                                         dataBean.getPeriodAndTotalTopDownload()
                                                 .get(key).get(0), dataBean
                                                 .getPeriodAndTotalTopDownload()
-                                                .get(key).get(1));
+                                                .get(key).get(1), key);
                             }
                         }
 
@@ -272,6 +272,7 @@ public class StatSyndicationFeed
     {
         String fulli18n = s + ".freq" + freq + ".type" + type;
         String notypei18n = s + ".freq" + freq;
+        String defaulttypei18n = s;
         if (component != null)
         {
             fulli18n += "." + component;
@@ -280,6 +281,7 @@ public class StatSyndicationFeed
             {
                 fulli18n += "." + mode;
                 notypei18n += "." + mode;
+                defaulttypei18n += "." + mode;
             }
         }
 
@@ -287,6 +289,8 @@ public class StatSyndicationFeed
             return labels.getString(fulli18n);
         else if (labels.containsKey(notypei18n))
             return labels.getString(notypei18n);
+        else if (labels.containsKey(defaulttypei18n))
+            return labels.getString(defaulttypei18n);
         else
             return labels.getString(s);
     }
