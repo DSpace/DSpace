@@ -9,11 +9,11 @@ package org.dspace.content.dao.impl;
 
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.dao.MetadataSchemaDAO;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -44,11 +44,14 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
     public MetadataSchema findByNamespace(Context context, String namespace) throws SQLException
     {
         // Grab rows from DB
-        Criteria criteria = createCriteria(context, MetadataSchema.class);
-        criteria.add(Restrictions.eq("namespace", namespace));
-        criteria.setCacheable(true);
+        Query query = createQuery(context,
+                "SELECT ms FROM MetadataSchema ms " +
+                "WHERE ms.namespace = :namespace ");
 
-        return singleResult(criteria);
+        query.setParameter("namespace", namespace);
+
+        query.setCacheable(true);
+        return singleResult(query);
     }
 
     @Override
@@ -74,14 +77,15 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
     @Override
     public boolean uniqueNamespace(Context context, int metadataSchemaId, String namespace) throws SQLException
     {
-        Criteria criteria = createCriteria(context, MetadataSchema.class);
-        criteria.add(Restrictions.and(
-                Restrictions.not(Restrictions.eq("id", metadataSchemaId)),
-                Restrictions.eq("namespace", namespace)
-        ));
-        criteria.setCacheable(true);
+        Query query = createQuery(context,
+                "SELECT ms FROM MetadataSchema ms " +
+                "WHERE ms.namespace = :namespace and ms.id != :id");
 
-        return singleResult(criteria) == null;
+        query.setParameter("namespace", namespace);
+        query.setParameter("id", metadataSchemaId);
+
+        query.setCacheable(true);
+        return singleResult(query) == null;
     }
 
     /**
@@ -96,14 +100,15 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
     @Override
     public boolean uniqueShortName(Context context, int metadataSchemaId, String name) throws SQLException
     {
-        Criteria criteria = createCriteria(context, MetadataSchema.class);
-        criteria.add(Restrictions.and(
-                Restrictions.not(Restrictions.eq("id", metadataSchemaId)),
-                Restrictions.eq("name", name)
-        ));
-        criteria.setCacheable(true);
+        Query query = createQuery(context,
+                "SELECT ms FROM MetadataSchema ms " +
+                "WHERE ms.name = :name and ms.id != :id");
 
-        return singleResult(criteria) == null;
+        query.setParameter("name", name);
+        query.setParameter("id", metadataSchemaId);
+
+        query.setCacheable(true);
+        return singleResult(query) == null;
     }
 
     /**
@@ -119,12 +124,13 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
     @Override
     public MetadataSchema find(Context context, String shortName) throws SQLException
     {
-        Criteria criteria = createCriteria(context, MetadataSchema.class);
-        criteria.add(
-                Restrictions.eq("name", shortName)
-        );
-        criteria.setCacheable(true);
+        Query query = createQuery(context,
+                "SELECT ms FROM MetadataSchema ms " +
+                "WHERE ms.name = :name");
 
-        return singleResult(criteria);
+        query.setParameter("name", shortName);
+
+        query.setCacheable(true);
+        return singleResult(query);
     }
 }

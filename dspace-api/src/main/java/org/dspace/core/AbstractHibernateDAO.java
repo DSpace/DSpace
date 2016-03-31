@@ -8,7 +8,9 @@
 package org.dspace.core;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 
 import java.sql.SQLException;
@@ -159,6 +161,17 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
             return null;
         }
 
+    }
+
+    public T singleResult(final Query query) {
+        query.setMaxResults(1);
+        List<T> list = list(query);
+        if(CollectionUtils.isNotEmpty(list))
+        {
+            return list.get(0);
+        }else{
+            return null;
+        }
     }
 
     public T uniqueResult(Query query)

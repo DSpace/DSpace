@@ -316,7 +316,31 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     @Override
     public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value) throws SQLException {
-        addMetadata(context, dso, metadataField, language, Arrays.asList(value), null, null);
+        addMetadata(context, dso, metadataField, language, Arrays.asList(value));
+    }
+
+    @Override
+    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, List<String> values) throws SQLException {
+        String fieldKey = metadataAuthorityService.makeFieldKey(metadataField.getMetadataSchema().getName(), metadataField.getElement(), metadataField.getQualifier());
+        if (metadataAuthorityService.isAuthorityControlled(fieldKey))
+        {
+            List<String> authorities = new ArrayList<String>();
+            List<Integer> confidences = new ArrayList<Integer>();
+            for (int i = 0; i < values.size(); ++i)
+            {
+                if(dso instanceof Item)
+                {
+                    getAuthoritiesAndConfidences(fieldKey, ((Item) dso).getOwningCollection(), values, authorities, confidences, i);
+                }else{
+                    getAuthoritiesAndConfidences(fieldKey, null, values, authorities, confidences, i);
+                }
+            }
+            addMetadata(context, dso, metadataField, language, values, authorities, confidences);
+        }
+        else
+        {
+            addMetadata(context, dso, metadataField, language, values, null, null);
+        }
 
     }
 
