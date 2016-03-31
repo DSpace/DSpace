@@ -163,8 +163,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             Integer organizationId = organization.organizationId;
             String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
             TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
-            Manuscript manuscript = manuscriptFromTableRow(row);
-            if (manuscript != null) {
+            Manuscript manuscript = null;
+            if (row != null) {
+                manuscript = manuscriptFromTableRow(row);
                 manuscript.organization.organizationCode = organizationCode;
             }
             return manuscript;
@@ -290,7 +291,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         try {
             Context context = getContext();
             if (manuscriptId != null) {
-                manuscripts.add(getManuscriptById(context, manuscriptId, organizationCode));
+                Manuscript manuscript = getManuscriptById(context, manuscriptId, organizationCode);
+                if (manuscript != null) {
+                    manuscripts.add(manuscript);
+                }
             } else if (searchParam == null) {
                 manuscripts.addAll(getManuscripts(context, organizationCode, limitInt));
             } else {
