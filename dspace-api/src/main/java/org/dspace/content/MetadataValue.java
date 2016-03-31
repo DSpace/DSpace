@@ -36,7 +36,7 @@ public class MetadataValue
     private int valueId;
 
     /** The primary key for the metadata value */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "metadata_field_id")
     private MetadataField metadataField = null;
 
@@ -62,7 +62,7 @@ public class MetadataValue
     @Column(name = "confidence")
     private int confidence = -1;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade={CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY, cascade={CascadeType.PERSIST})
     @JoinColumn(name="dspace_object_id")
     protected DSpaceObject dSpaceObject;
 

@@ -8,9 +8,12 @@
 package org.dspace.content;
 
 import org.dspace.core.Context;
+import org.hibernate.annotations.*;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * Class representing a schema in DSpace.
@@ -26,6 +29,8 @@ import javax.persistence.*;
  * @see org.dspace.content.MetadataField
  */
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Table(name="metadataschemaregistry")
 public class MetadataSchema
 {

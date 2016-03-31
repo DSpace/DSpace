@@ -8,9 +8,12 @@
 package org.dspace.content;
 
 import org.dspace.core.Context;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
+
 
 /**
  * DSpace object that represents a metadata field, which is
@@ -23,6 +26,8 @@ import javax.persistence.*;
  * @see org.dspace.content.MetadataSchema
  */
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Table(name="metadatafieldregistry")
 public class MetadataField {
 
@@ -32,7 +37,7 @@ public class MetadataField {
     @SequenceGenerator(name="metadatafieldregistry_seq", sequenceName="metadatafieldregistry_seq", allocationSize = 1, initialValue = 1)
     private int id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "metadata_schema_id",nullable = false)
     private MetadataSchema metadataSchema;
 

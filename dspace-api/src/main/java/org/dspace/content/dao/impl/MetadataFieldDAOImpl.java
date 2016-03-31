@@ -13,6 +13,7 @@ import org.dspace.content.dao.MetadataFieldDAO;
 import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -45,6 +46,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
                         Restrictions.eqOrIsNull("qualifier", qualifier)
                 )
         );
+        criteria.setFetchMode("metadataSchema", FetchMode.JOIN);
         criteria.setCacheable(true);
 
         return singleResult(criteria);
@@ -61,6 +63,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
                         Restrictions.eqOrIsNull("qualifier", qualifier)
                 )
         );
+        criteria.setFetchMode("metadataSchema", FetchMode.JOIN);
         criteria.setCacheable(true);
 
         return singleResult(criteria);
@@ -70,6 +73,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     public List<MetadataField> findAll(Context context, Class<MetadataField> clazz) throws SQLException {
         Criteria criteria = createCriteria(context, MetadataField.class);
         criteria.createAlias("metadataSchema", "s").addOrder(Order.asc("s.name")).addOrder(Order.asc("element")).addOrder(Order.asc("qualifier"));
+        criteria.setFetchMode("metadataSchema", FetchMode.JOIN);
         criteria.setCacheable(true);
         return list(criteria);
     }
@@ -85,6 +89,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
                         Restrictions.eqOrIsNull("qualifier", qualifier)
                 )
         );
+        criteria.setFetchMode("metadataSchema", FetchMode.JOIN);
         criteria.setCacheable(true);
 
         return singleResult(criteria);
@@ -100,6 +105,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
                         Restrictions.eq("element", element)
                 )
         );
+        criteria.setFetchMode("metadataSchema", FetchMode.JOIN);
         criteria.setCacheable(true);
 
         return list(criteria);
@@ -113,6 +119,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         criteria.createAlias("metadataSchema", "s");
         criteria.add(Restrictions.eq("s.id", metadataSchema.getSchemaID()));
         criteria.addOrder(Order.asc("s.name")).addOrder(Order.asc("element")).addOrder(Order.asc("qualifier"));
+        criteria.setFetchMode("metadataSchema", FetchMode.JOIN);
 
         criteria.setCacheable(true);
         return list(criteria);

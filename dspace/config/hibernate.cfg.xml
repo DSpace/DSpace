@@ -22,6 +22,7 @@
         <property name="hibernate.cache.use_second_level_cache">true</property>
         <property name="hibernate.cache.use_query_cache">true</property>
         <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+        <property name="javax.persistence.sharedCache.mode">ENABLE_SELECTIVE</property>
 
 
         <!-- Entities to be loaded by hibernate -->
@@ -74,10 +75,5 @@
         <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>-->
         <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>-->
 
-        <!--*********************-->
-        <!-- Cache configuration -->
-        <!--*********************-->
-        <class-cache class="org.dspace.content.MetadataSchema" usage="read-write" />
-        <class-cache class="org.dspace.content.MetadataField" usage="read-write" />
     </session-factory>
 </hibernate-configuration>
