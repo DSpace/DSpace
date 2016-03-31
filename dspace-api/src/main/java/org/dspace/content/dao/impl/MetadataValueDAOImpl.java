@@ -7,6 +7,7 @@
  */
 package org.dspace.content.dao.impl;
 
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.MetadataValueDAO;
@@ -75,5 +76,13 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
     @Override
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) FROM MetadataValue"));
+    }
+
+    @Override
+    public void delete(Context context, DSpaceObject dso) throws SQLException {
+        String queryString = "delete from MetadataValue where dSpaceObject= :dso";
+        Query query = createQuery(context, queryString);
+        query.setParameter("dso", dso);
+        query.executeUpdate();
     }
 }

@@ -396,12 +396,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
      */
     protected void deleteMetadata(Context context, T dso) throws SQLException {
 
-        Iterator<MetadataValue> metadataValueIterator = dso.getMetadata().iterator();
-        while (metadataValueIterator.hasNext()) {
-            MetadataValue metadataValue = metadataValueIterator.next();
-            metadataValueIterator.remove();
-            metadataValueService.delete(context, metadataValue);
-        }
+        metadataValueService.delete(context, dso);
     }
 
     /**

@@ -94,6 +94,13 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     }
 
     @Override
+    public void delete(Context context, DSpaceObject dso) throws SQLException {
+        log.info(LogManager.getHeader(context, "delete_metadata_values",
+                " dso=" + dso.getID()));
+        metadataValueDAO.delete(context, dso);
+    }
+
+    @Override
     public List<MetadataValue> findByValueLike(Context context, String value) throws SQLException {
         return metadataValueDAO.findByValueLike(context, value);
     }

@@ -7,6 +7,7 @@
  */
 package org.dspace.content.dao;
 
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
@@ -34,4 +35,6 @@ public interface MetadataValueDAO extends GenericDAO<MetadataValue> {
             throws SQLException;
 
     int countRows(Context context) throws SQLException;
+
+    public void delete(Context context, DSpaceObject dso) throws SQLException;
 }

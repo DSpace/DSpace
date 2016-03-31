@@ -15,14 +15,7 @@ import java.io.StringWriter;
 import java.net.ConnectException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -32,18 +25,15 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
+import org.dspace.content.Collection;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.Utils;
+import org.dspace.core.*;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.harvest.factory.HarvestServiceFactory;
@@ -93,6 +83,10 @@ public class OAIHarvester {
     protected PluginService pluginService;
     protected ConfigurationService configurationService;
 
+	// try to empty the cache on regular intervals
+	public static final int HARVEST_BEFORE_CACHE = 100;
+
+
     //  The collection this harvester instance is dealing with
 	Collection targetCollection;
 	HarvestedCollection harvestRow;
@@ -112,7 +106,6 @@ public class OAIHarvester {
 
     // DOMbuilder class for the DOM -> JDOM conversions
     private static DOMBuilder db = new DOMBuilder();
-	private static Context originalContext;
     // The point at which this thread should terminate itself
 
     /* Initialize the harvester with a collection object */
@@ -137,7 +130,6 @@ public class OAIHarvester {
         }
 
 		ourContext = c;
-		originalContext = c;
 		targetCollection = (Collection)dso;
 
 		harvestRow = hc;
@@ -227,10 +219,6 @@ public class OAIHarvester {
      * Performs a harvest cycle on this collection. This will query the remote OAI-PMH provider, check for updates since last
      * harvest, and ingest the returned items.
      */
-
-	// try to empty the cache on regular intervals ?
-
-	public static int HARVEST_BEFORE_CACHE = 5; // let's test this with a low number.
 	public void runHarvest() throws SQLException, IOException, AuthorizeException
 	{
 		// initially we have not harvested anything yet
@@ -376,7 +364,7 @@ public class OAIHarvester {
 						harvested++;
 						if(harvested % HARVEST_BEFORE_CACHE==0) // enters here multiple times upon reimporting.
 						{
-							clearOAICache();
+							resetCache();
 						}
 					}
 				}
@@ -400,7 +388,7 @@ public class OAIHarvester {
 			}
 		}
 		catch (HarvestingException hex) {
-			log.error("Harvesting error occurred while processing an OAI record: " + hex.getMessage());
+			log.error("Harvesting error occurred while processing an OAI record: " + hex.getMessage(), hex);
 			harvestRow.setHarvestMessage("Error occurred while processing an OAI record");
 
 			// if the last status is also an error, alert the admin
@@ -408,14 +396,17 @@ public class OAIHarvester {
 				alertAdmin(HarvestedCollection.STATUS_OAI_ERROR, hex);
 			}
 			harvestRow.setHarvestStatus(HarvestedCollection.STATUS_OAI_ERROR);
+			harvestedCollection.update(ourContext, harvestRow);
+			ourContext.complete();
 			return;
 		}
 		catch (Exception ex) {
 			harvestRow.setHarvestMessage("Unknown error occurred while generating an OAI response");
 			harvestRow.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
+			harvestedCollection.update(ourContext, harvestRow);
 			alertAdmin(HarvestedCollection.STATUS_UNKNOWN_ERROR, ex);
-			log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause());
-			//ex.printStackTrace();
+			log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause(), ex);
+			ourContext.complete();
 			return;
 		}
 		finally {
@@ -435,21 +426,29 @@ public class OAIHarvester {
 		harvestedCollection.update(ourContext, harvestRow);
 	}
 
-	private void clearOAICache()
+
+	/**
+	 * Reset the OAI cache, will commit our currently ingested items and create a new context.
+	 */
+	protected void resetCache()
 	{
 		try
 		{
-			ourContext.clearCache();
-			// restore our context
-			ourContext = originalContext;
+			final UUID epersonId = ourContext.getCurrentUser().getID();
+			final UUID collectionID = targetCollection.getID();
+			ourContext.complete();
+			//Create a new context so we have a new database connection
+			ourContext = new Context();
+			// Restore our logged in user
+			ourContext.setCurrentUser(EPersonServiceFactory.getInstance().getEPersonService().find(ourContext, epersonId));
+			//Load our objects in our cache
+			targetCollection = collectionService.find(ourContext, collectionID);
+			harvestRow = harvestedCollection.find(ourContext, targetCollection);
 		}
 		catch(Exception ex)
 		{
-			ex.printStackTrace();
-			System.out.println("exceptions!");
+			log.error(LogManager.getHeader(ourContext, "oai_harvest_cache_reset_error", "Error while attempting to reset the cache for the OAI harvest"), ex);
 		}
-
-		System.out.println("got here without problems?");
 	}
 
     /**
@@ -510,7 +509,7 @@ public class OAIHarvester {
 			Date OAIDatestamp = Utils.parseISO8601Date(header.getChildText("datestamp", OAI_NS));
 			Date itemLastHarvest = hi.getHarvestDate();
 			if (itemLastHarvest != null && OAIDatestamp.before(itemLastHarvest)) {
-				log.info("Item " + item.getHandle() + " was harvested more recently than the last update time reporetd by the OAI server; skipping.");
+				log.info("Item " + item.getHandle() + " was harvested more recently than the last update time reported by the OAI server; skipping.");
 				return;
 			}
 

@@ -82,6 +82,14 @@ public interface MetadataValueService {
      */
     public void delete(Context context, MetadataValue metadataValue) throws SQLException;
 
+    /**
+     * Delete all metadata fields for a specified dspace object
+     * @param context dspace context
+     * @param dso the dspace object
+     * @throws SQLException
+     */
+    public void delete(Context context, DSpaceObject dso) throws SQLException;
+
     public List<MetadataValue> findByValueLike(Context context, String value) throws SQLException;
 
     public void deleteByMetadataField(Context context, MetadataField metadataField) throws SQLException;
