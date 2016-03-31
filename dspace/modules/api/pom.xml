@@ -265,6 +265,12 @@
 			<artifactId>dspace-perst</artifactId>
 			<version>4.21</version>
        </dependency>
+       <dependency>
+           <groupId>org.mockito</groupId>
+           <artifactId>mockito-all</artifactId>
+           <version>1.10.19</version>
+           <scope>test</scope>
+       </dependency>
    </dependencies>
     <properties>
         <jersey.version>1.18.1</jersey.version>
