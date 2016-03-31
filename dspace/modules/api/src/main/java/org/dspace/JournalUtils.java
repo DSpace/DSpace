@@ -487,8 +487,13 @@ public class JournalUtils {
             String publicationNameProp = ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName");
             Scheme scheme = Scheme.findByIdentifier(c, publicationNameProp);
             int schemeID = scheme.getID();
-            Concept[] concepts = Concept.findByPreferredLabel(c,journal, schemeID);
             log.debug("journal lookup: name = " + journal + ", publicationNameProp = " + publicationNameProp + ", ID  = " + schemeID);
+            Concept[] concepts = Concept.findByPreferredLabel(c,journal, schemeID);
+	    if(concepts.length == 0) {
+		log.error("No concept found for journal " + journal);
+		return myJournalProperties;
+	    }
+
             //todo:add the journal order
             Concept concept = concepts[0];
 
@@ -507,8 +512,8 @@ public class JournalUtils {
 
             }
 
-        }catch (Exception e) {
-            log.error("Error while loading journal properties", e);
+        } catch (Exception e) {
+            log.error("Error while loading journal properties for " + journal, e);
         }
         return myJournalProperties;
 

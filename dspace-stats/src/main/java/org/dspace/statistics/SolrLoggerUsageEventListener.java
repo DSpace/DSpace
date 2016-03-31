@@ -26,23 +26,17 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 	
 	public void receiveEvent(Event event) {
 
-		if(event instanceof UsageEvent)
-		{
-			try{
-			
-			    UsageEvent ue = (UsageEvent)event;
-			
-			    EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
-
-                SolrLogger.post(ue.getObject(), ue.getRequest(), currentUser);
-
-			}
-			catch(Exception e)
-			{
-				log.error(e.getMessage());
-			}
+		if(event instanceof UsageEvent) {
+		    String userName = null;
+		    UsageEvent ue = (UsageEvent)event;
+		    try {
+			EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
+			userName = currentUser.getFullName();
+			SolrLogger.post(ue.getObject(), ue.getRequest(), currentUser);
+		    }
+		    catch(Exception e) {
+			log.error("unable to post solr usage event for user " + userName + ", request " + ue.getRequest().getRequestURI(),e);
+		    }
 		}
-				
 	}
-
 }
