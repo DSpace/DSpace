@@ -222,7 +222,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             {
                                 //When we have an hierarchical facet always show the "view more" they may want to filter the children of the top nodes
                                 if(field.getType().equals(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)){
-                                    addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
+                                    addViewMoreUrl(filterValsList, dso, request, field);
                                 }
                                 break;
                             }
@@ -252,7 +252,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             }
                             //Show a "view more" url should there be more values, unless we have a date
                             if (i == shownFacets - 1 && !field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)/*&& facetField.getGap() == null*/) {
-                                addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
+                                addViewMoreUrl(filterValsList, dso, request, field);
                             }
                         }
                     }
@@ -301,12 +301,12 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         return parametersString;
     }
 
-    private void addViewMoreUrl(List facet, DSpaceObject dso, Request request, String fieldName) throws WingException, UnsupportedEncodingException {
+    private void addViewMoreUrl(List facet, DSpaceObject dso, Request request, DiscoverySearchFilterFacet field) throws WingException, UnsupportedEncodingException {
         String parameters = retrieveParameters(request);
         facet.addItem().addXref(
                 contextPath +
                         (dso == null ? "" : "/handle/" + dso.getHandle()) +
-                        "/search-filter?" + parameters + BrowseFacet.FACET_FIELD + "=" + fieldName,
+                        "/search-filter?" + parameters + BrowseFacet.FACET_FIELD + "=" + field.getIndexFieldName()+"&order="+field.getSortOrderFilterPage(),
                 T_VIEW_MORE
 
         );
@@ -426,7 +426,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             //We need a list of our years
                             //We have a date range add faceting for our field
                             //The faceting will automatically be limited to the 10 years in our span due to our filterquery
-                            queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), 10, facet.getSortOrder()));
+                            queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), 10, facet.getSortOrderSidebar()));
                         }else{
                             java.util.List<String> facetQueries = new ArrayList<String>();
                             //Create facet queries but limit them to 11 (11 == when we need to show a "show more" url)
@@ -463,7 +463,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                     int facetLimit = facet.getFacetLimit();
                     //Add one to our facet limit to make sure that if we have more then the shown facets that we show our "show more" url
                     facetLimit++;
-                    queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit, facet.getSortOrder()));
+                    queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit, facet.getSortOrderSidebar()));
                 }
             }
         }
