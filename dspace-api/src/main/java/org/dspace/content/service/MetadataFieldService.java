@@ -113,7 +113,7 @@ public interface MetadataFieldService {
     public void delete(Context context, MetadataField metadataField) throws SQLException, AuthorizeException;
 
     /**
-     * Split the given string into its schema, element, and wualifier components
+     * Split the given string into its schema, element, and Qualifier components
      *
      * @param str metadata field
      * @return array 3 element array

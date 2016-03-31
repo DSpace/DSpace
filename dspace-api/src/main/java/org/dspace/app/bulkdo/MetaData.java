@@ -45,7 +45,6 @@ public class MetaData {
     }
 
     public void apply(Printer p, boolean dryRun) throws SQLException, AuthorizeException {
-        int i;
         log.debug("apply: " + args.getActionString() + " dryRun=" + String.valueOf(dryRun));
         String beforeKey = "before:" + args.metaData_name;
         String changedKey = "changed";
@@ -139,7 +138,7 @@ class MetaDataArguments extends  Arguments {
 
     MetaDataArguments() {
         super(MetaData.class.getCanonicalName(), new char[]{Arguments.DO_ADD, Arguments.DO_DEL});
-        options.addOption(Arguments.METADATA, Arguments.METADATA_LONG, true, "metadata setting of the form 'schema.ualifier.name=value'");
+        options.addOption(Arguments.METADATA, Arguments.METADATA_LONG, true, "metadata setting of the form 'schema.qualifier.name=value'");
     }
 
     @Override
