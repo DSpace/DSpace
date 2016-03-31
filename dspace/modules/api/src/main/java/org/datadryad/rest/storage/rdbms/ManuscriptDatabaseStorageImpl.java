@@ -163,8 +163,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             Integer organizationId = organization.organizationId;
             String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
             TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
-            Manuscript manuscript = manuscriptFromTableRow(row);
-            if (manuscript != null) {
+            Manuscript manuscript = null;
+            if (row != null) {
+                manuscript = manuscriptFromTableRow(row);
                 manuscript.organization.organizationCode = organizationCode;
             }
             return manuscript;
@@ -282,13 +283,19 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     @Override
     protected void addResults(StoragePath path, List<Manuscript> manuscripts, String searchParam, Integer limit) throws StorageException {
         String organizationCode = path.getOrganizationCode();
+        String manuscriptId = path.getManuscriptId();
         int limitInt = DEFAULT_LIMIT;
         if (limit != null) {
             limitInt = limit.intValue();
         }
         try {
             Context context = getContext();
-            if (searchParam == null) {
+            if (manuscriptId != null) {
+                Manuscript manuscript = getManuscriptById(context, manuscriptId, organizationCode);
+                if (manuscript != null) {
+                    manuscripts.add(manuscript);
+                }
+            } else if (searchParam == null) {
                 manuscripts.addAll(getManuscripts(context, organizationCode, limitInt));
             } else {
                 manuscripts.addAll(getManuscriptsMatchingQuery(context, organizationCode, searchParam, limitInt));

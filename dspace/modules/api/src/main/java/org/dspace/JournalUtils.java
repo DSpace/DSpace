@@ -557,7 +557,7 @@ public class JournalUtils {
             List<Organization> orgs = organizationStorage.getResults(storagePath, journalCode, 0);
             if (orgs.size() > 0) {
                 ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
-                manuscripts.addAll(manuscriptStorage.getResults(storagePath, manuscriptId, 10));
+                manuscripts.addAll(manuscriptStorage.getResults(storagePath, null, 10));
             }
         } catch (StorageException e) {
             log.error("Exception getting manuscripts", e);
@@ -638,6 +638,10 @@ public class JournalUtils {
                 context.abort();
             }
             //invalid journalID
+            pBean = new PublicationBean();
+            pBean.setManuscriptNumber(manuscriptNumber);
+            pBean.setJournalID(selectedJournalId);
+            pBean.setMessage("Invalid manuscript number");
             log.error("Error getting parameters for invalid JournalID: " + selectedJournalId, e);
         }
         return pBean;
