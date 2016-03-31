@@ -53,4 +53,5 @@ script:
   #make selenium_tests || echo "Tests failed"
 notifications:
   slack:
+    on_success: always
     secure: RVKF3ge2FZ92r2HCD3LKgEFdIya/JQmm6fjfH3WTsvaNYOaiyG2qf2dzBZd76uUNoB6u3aV8gL/kWmm6lmJGlgg8wSgmi16bQOmKz9OmYDPcnMCwOVP+5NyiK8qoZhzgXUvUNlpqUAOdj1VUHyo7ROgzi2WyvIDPwl77Yo4hONc=
