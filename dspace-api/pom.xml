@@ -690,11 +690,6 @@
             <version>2.22.1</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.neethi</groupId>
-            <artifactId>neethi</artifactId>
-            <version>3.0.2</version>
-        </dependency>
         <!-- S3 -->
         <dependency>
             <groupId>com.amazonaws</groupId>
