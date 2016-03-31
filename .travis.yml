@@ -39,7 +39,7 @@ install: |
   make new_deploy | grep -v "Download" &&
   free -m -t &&
   make print_message
-script:
+script: |
   free -m -t &&
   make test_dspace_database &&
   free -m -t &&
