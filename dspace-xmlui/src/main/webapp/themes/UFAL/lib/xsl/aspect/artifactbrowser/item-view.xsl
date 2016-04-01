@@ -943,7 +943,7 @@
 									<xsl:copy-of select="mets:Local/mets:file"/>
 								</xsl:variable>  						  							
   								<xsl:choose>
-  									<xsl:when test="@MIMETYPE='application/zip'">
+  									<xsl:when test="@MIMETYPE='application/zip' or @MIMETYPE='application/x-tar'">
 			  							<xsl:value-of select="ft:parse($files)" disable-output-escaping="yes" />
 		  							</xsl:when>
   									<xsl:when test="@MIMETYPE='text/plain'">
