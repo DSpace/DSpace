@@ -920,7 +920,7 @@
 						<xsl:attribute name="href">
 							<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
 						</xsl:attribute>					
-                    	<i class="fa fa-file-eye">&#160;</i>
+                    	<i class="fa fa-eye">&#160;</i>
                     	Preview
 					</a>
 					<div class="collapse">
