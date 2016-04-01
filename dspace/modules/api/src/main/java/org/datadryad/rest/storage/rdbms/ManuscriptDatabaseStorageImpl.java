@@ -167,7 +167,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             Manuscript manuscript = null;
             if (row != null) {
                 manuscript = manuscriptFromTableRow(row);
-                manuscript.organization.organizationCode = organizationCode;
+                manuscript.getOrganization().organizationCode = organizationCode;
             }
             return manuscript;
         }

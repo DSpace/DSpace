@@ -688,7 +688,7 @@ public class Manuscript {
             return;
         }
 
-        if (value != null) {
+        if (!"".equals(value)) {
             publication.addMetadata(mdString, null, value, auth_id, confidence);
         }
 
