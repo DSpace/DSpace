@@ -636,8 +636,7 @@ public class Manuscript {
     }
 
     /**
-     Import metadata from the journal settings into the data package item. If data already exists in
-     the pBean, it will take precedence over the journal metadata.
+     Import metadata from the journal settings into the data package item.
      **/
     public void propagateMetadataToItem(Context context, Item item) {
         // These values are common to both Article Types
