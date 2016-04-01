@@ -3205,9 +3205,9 @@
 	<message key="input_forms.complex_definitions.sizeInfo.2_unit.label">Unit</message>
 
 	<!-- cz.cuni.mff.ufal.ContractPage -->
-	<message key="xmlui.ContractPage.title">Deposition contract</message>
-	<message key="xmlui.ContractPage.trail">Deposition contract</message>
-	<message key="xmlui.ContractPage.head">Deposition contract</message>
+	<message key="xmlui.ContractPage.title">Distribution License Agreement</message>
+	<message key="xmlui.ContractPage.trail">Distribution License Agreement</message>
+	<message key="xmlui.ContractPage.head">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.collection_name">{0}</message>
 
 </catalogue>

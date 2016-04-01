@@ -73,6 +73,7 @@ public class ContractPage extends AbstractDSpaceTransformer {
         Division license = division.addDivision("license_" + id, "well well-sm well-white");
         license.setHead(head);
         TextArea textArea = license.addPara().addTextArea("license_text_" + id);
+        textArea.setSize(34,0); //cols are overridden by .form-control
         textArea.setValue(text);
         textArea.setDisabled();
     }
