@@ -379,10 +379,10 @@ public class JournalUtils {
         }
         if (result == null) {
             result = new Manuscript();
-            result.setJournalConcept(journalConcept);
             result.setManuscriptId(manuscriptNumber);
             result.setMessage("Invalid manuscript number");
         }
+        result.setJournalConcept(journalConcept);
         return result;
     }
 
