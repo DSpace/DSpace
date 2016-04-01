@@ -437,23 +437,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             switch (type)
             {
             case Constants.ITEM:
-            ItemIterator items = null;
-            try
-            {
-                for (items = Item.findAllUnfiltered(context); items.hasNext();)
-                {
-                    Item item = items.next();
-                    indexContent(context, item, force);
-                    item.decache();
-                }
-            }
-            finally
-            {
-                if (items != null)
-                {
-                    items.close();
-                }
-            }
+                List<Integer> ids = Item.findAllItemIDsUnfiltered(context);
+                startMultiThreadIndex(force, ids);
                 break;
             case Constants.COLLECTION:
             Collection[] collections = Collection.findAll(context);
@@ -2616,10 +2601,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 				final String head = this.getName() + "#" + this.getId();
 				final int size = itemids.size();
 				for (Integer id : itemids) {
-					Item item = Item.find(context, id);
-					indexContent(context, item, force);
-					System.out.println(head + ":" + (idx++) + " / " + size);
-					item.decache();
+				    try {				        
+				        Item item = Item.find(context, id);
+				        indexContent(context, item, force);				        
+				        item.decache();
+				    }
+				    catch(Exception ex) {
+				        System.out.println("ERROR: identifier item:" + id + " identifier thread:"+ head);
+				    }
+				    System.out.println(head + ":" + (idx++) + " / " + size);				    
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
