@@ -921,7 +921,7 @@
 							<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
 						</xsl:attribute>					
                     	<i class="fa fa-eye">&#160;</i>
-                    	Preview
+						<i18n:text>xmlui.UFAL.artifactbrowser.item_view.preview</i18n:text>
 					</a>
 					<div class="collapse">
 						<xsl:attribute name="id">
@@ -930,7 +930,7 @@
   						<div class="panel panel-info" style="margin: 5px 1px 1px 1px;">
 							<div class="bold panel-heading text-center" style="height: auto; padding: 0px;">
 								<i class="fa fa-eye">&#160;</i>
-								File Preview
+								<i18n:text>xmlui.UFAL.artifactbrowser.item_view.file_preview</i18n:text>
 								<a role="button" data-toggle="collapse" class="pull-right">
 									<xsl:attribute name="href">
 										<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
@@ -960,7 +960,7 @@
 							<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
 						</xsl:attribute>					
                     	<i class="fa fa-eye">&#160;</i>
-                    	Preview
+						<i18n:text>xmlui.UFAL.artifactbrowser.item_view.preview</i18n:text>
 					</a>
 					<div class="collapse">
 						<xsl:attribute name="id">
@@ -969,7 +969,7 @@
   						<div class="panel panel-info" style="margin: 5px 1px 1px 1px;">
 							<div class="bold panel-heading text-center" style="height: auto; padding: 0px;">
 								<i class="fa fa-eye">&#160;</i>
-								File Preview
+								<i18n:text>xmlui.UFAL.artifactbrowser.item_view.file_preview</i18n:text>
 								<a role="button" data-toggle="collapse" class="pull-right">
 									<xsl:attribute name="href">
 										<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
