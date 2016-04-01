@@ -14,4 +14,4 @@
 -- http://flywaydb.org/
 -- ===============================================================
 
-ALTER TABLE resourcepolicy ALTER COLUMN rpdescription VARCHAR2(2000);
+ALTER TABLE resourcepolicy ALTER COLUMN rpdescription CLOB;
