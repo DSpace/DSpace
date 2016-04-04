@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 
 public class CorrespondingAuthor {
-    public Address address;
+    public Address address = new Address();
     public Author author;
     public String email;
 

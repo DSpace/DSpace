@@ -86,7 +86,7 @@ public class ManuscriptResource {
         if(manuscript.isValid()) {
             try {
                 // Find the organization in database first.
-                manuscript.organization = organizationStorage.findByPath(organizationPath);
+                manuscript.setOrganization(organizationStorage.findByPath(organizationPath).getOrganizationFromJournalConcept());
                 manuscriptStorage.create(organizationPath, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception creating manuscript", ex);
@@ -96,7 +96,7 @@ public class ManuscriptResource {
             // call handlers - must set organization first
             handlers.handleObjectCreated(organizationPath, manuscript);
             UriBuilder ub = uriInfo.getAbsolutePathBuilder();
-            URI uri = ub.path(manuscript.manuscriptId).build();
+            URI uri = ub.path(manuscript.getManuscriptId()).build();
             return Response.created(uri).entity(manuscript).build();
         } else {
             ErrorsResponse error = ResponseFactory.makeError("Please check the structure of your object", "Invalid manuscript object", uriInfo, Status.BAD_REQUEST.getStatusCode());
@@ -113,7 +113,7 @@ public class ManuscriptResource {
         if(manuscript.isValid()) {
             try {
                 StoragePath organizationPath = StoragePath.createOrganizationPath(organizationCode);
-                manuscript.organization = organizationStorage.findByPath(organizationPath);
+                manuscript.setOrganization(organizationStorage.findByPath(organizationPath).getOrganizationFromJournalConcept());
                 manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception updating manuscript", ex);
@@ -133,12 +133,12 @@ public class ManuscriptResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, Manuscript manuscript) {
-        String manuscriptId = manuscript.manuscriptId;
+        String manuscriptId = manuscript.getManuscriptId();
         StoragePath path = StoragePath.createManuscriptPath(organizationCode, manuscriptId);
         if(manuscript.isValid()) {
             try {
                 StoragePath organizationPath = StoragePath.createOrganizationPath(organizationCode);
-                manuscript.organization = organizationStorage.findByPath(organizationPath);
+                manuscript.setOrganization(organizationStorage.findByPath(organizationPath).getOrganizationFromJournalConcept());
                 manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception updating manuscript", ex);

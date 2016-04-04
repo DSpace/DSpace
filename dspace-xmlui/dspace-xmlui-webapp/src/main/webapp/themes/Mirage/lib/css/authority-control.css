@@ -46,7 +46,7 @@ img.ds-authority-confidence
 { width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: middle; display: inline-block;}
 
 img.ds-authority-confidence.cf-unset
-  { background: transparent url(../../images/authority_control/confidence/bug.png); }
+  { background: transparent url(../../images/authority_control/invisible.gif); }
 img.ds-authority-confidence.cf-novalue
   /* { background: transparent } */
   { background: transparent url(../../images/authority_control/confidence/3-circleslash.gif); }

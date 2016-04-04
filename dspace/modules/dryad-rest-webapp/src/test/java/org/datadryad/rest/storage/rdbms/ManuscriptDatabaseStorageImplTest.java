@@ -15,6 +15,9 @@ import org.dspace.storage.rdbms.TableRow;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.datadryad.api.DryadJournalConcept;
+import org.dspace.core.Context;
+import org.dspace.JournalUtils;
 
 /**
  *
@@ -41,26 +44,26 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
     public void setUp() {
         super.setUp();
         // Create an organization
-        Organization organization = new Organization();
-        organization.organizationCode = TEST_ORGANIZATION_CODE;
-        organization.organizationName = TEST_ORGANIZATION_NAME;
-        TableRow row = OrganizationDatabaseStorageImpl.tableRowFromOrganization(organization);
-        Integer organizationId = null;
+        Organization organization = null;
         try {
-            DatabaseManager.deleteByValue(context, OrganizationDatabaseStorageImpl.ORGANIZATION_TABLE, OrganizationDatabaseStorageImpl.COLUMN_CODE, TEST_ORGANIZATION_CODE);
-            DatabaseManager.insert(context, row);
-            organizationId = row.getIntColumn(OrganizationDatabaseStorageImpl.COLUMN_ID);
-        } catch (SQLException ex) {
+            DryadJournalConcept journalConcept = new DryadJournalConcept();
+            journalConcept.setFullName(TEST_ORGANIZATION_NAME);
+            journalConcept.setJournalID(TEST_ORGANIZATION_CODE);
+            Context context = new Context();
+            JournalUtils.addDryadJournalConcept(context, journalConcept);
+            organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, TEST_ORGANIZATION_CODE);
+            context.complete();
+        } catch (Exception ex) {
             fail("Exception setting up test organization: " + ex);
         }
 
         // Create a manuscript
         Manuscript manuscript = new Manuscript();
         manuscript.configureTestValues();
-        manuscript.manuscriptId = TEST_MANUSCRIPT_ID_1;
+        manuscript.setManuscriptId(TEST_MANUSCRIPT_ID_1);
         try {
             DatabaseManager.deleteByValue(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, ManuscriptDatabaseStorageImpl.COLUMN_MSID, TEST_MANUSCRIPT_ID_1);
-            TableRow manuscriptRow = ManuscriptDatabaseStorageImpl.tableRowFromManuscript(manuscript, organizationId);
+            TableRow manuscriptRow = ManuscriptDatabaseStorageImpl.tableRowFromManuscript(manuscript, organization.organizationId);
             manuscriptRow.setColumn(ManuscriptDatabaseStorageImpl.COLUMN_VERSION, 1);
             manuscriptRow.setColumn(ManuscriptDatabaseStorageImpl.COLUMN_ACTIVE, ManuscriptDatabaseStorageImpl.ACTIVE_TRUE);
             DatabaseManager.insert(context, manuscriptRow);
@@ -90,7 +93,7 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
         log.info("objectExists");
         StoragePath path = collectionPath;
         Manuscript manuscript = new Manuscript();
-        manuscript.manuscriptId = TEST_MANUSCRIPT_ID_1;
+        manuscript.setManuscriptId(TEST_MANUSCRIPT_ID_1);
         ManuscriptDatabaseStorageImpl instance = new ManuscriptDatabaseStorageImpl();
         Boolean expResult = Boolean.TRUE;
         Boolean result = instance.objectExists(path, manuscript);
@@ -124,7 +127,7 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
         assertNull("Object must not exist before creating", manuscript);
         manuscript = new Manuscript();
         manuscript.configureTestValues();
-        manuscript.manuscriptId = TEST_MANUSCRIPT_ID_2;
+        manuscript.setManuscriptId(TEST_MANUSCRIPT_ID_2);
         path = collectionPath;
         instance.createObject(path, manuscript);
         Boolean exists = instance.objectExists(path, manuscript);
@@ -141,7 +144,7 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
         ManuscriptDatabaseStorageImpl instance = new ManuscriptDatabaseStorageImpl();
         String expManuscriptId = TEST_MANUSCRIPT_ID_1;
         Manuscript result = instance.readObject(path);
-        assertEquals("Read object should have same id as original", expManuscriptId, result.manuscriptId);
+        assertEquals("Read object should have same id as original", expManuscriptId, result.getManuscriptId());
     }
 
     /**
@@ -167,16 +170,16 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
         StoragePath path = manuscriptPath1;
         Manuscript manuscript = new Manuscript();
         manuscript.configureTestValues();
-        manuscript.manuscriptId = TEST_MANUSCRIPT_ID_1;
+        manuscript.setManuscriptId(TEST_MANUSCRIPT_ID_1);
         String updatedTitle = "Updated Title";
-        manuscript.title = updatedTitle;
+        manuscript.setTitle(updatedTitle);
         ManuscriptDatabaseStorageImpl instance = new ManuscriptDatabaseStorageImpl();
         instance.updateObject(path, manuscript);
         manuscript = instance.readObject(path);
-        assertEquals(updatedTitle, manuscript.title);
+        assertEquals(updatedTitle, manuscript.getTitle());
 
         // version should change internally!
         String query = "SELECT * FROM MANUSCRIPT where msid = ? and active = ?";
-        TableRow row = DatabaseManager.querySingleTable(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, query, manuscript.manuscriptId, ManuscriptDatabaseStorageImpl.ACTIVE_TRUE);
+        TableRow row = DatabaseManager.querySingleTable(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, query, manuscript.getManuscriptId(), ManuscriptDatabaseStorageImpl.ACTIVE_TRUE);
     }
 }

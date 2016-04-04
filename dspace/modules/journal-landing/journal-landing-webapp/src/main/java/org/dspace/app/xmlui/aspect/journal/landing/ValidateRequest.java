@@ -22,6 +22,7 @@ import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.authority.Concept;
 import org.dspace.core.Context;
+import org.datadryad.api.DryadJournalConcept;
 
 /**
  * Cocoon Action to confirm that the requested journal landing page is for 
@@ -41,12 +42,11 @@ public class ValidateRequest extends AbstractAction {
         if (journalAbbr == null || journalAbbr.length() == 0) return null;
 
         // verify we have an accurate journal
-        Context context = ContextUtil.obtainContext(objectModel);
-        Concept journalConcept = JournalUtils.getJournalConceptByShortID(context,journalAbbr);
+        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(journalAbbr);
         if (journalConcept == null) {
             return null;
         }
-        String journalName = JournalUtils.getFullName(journalConcept);        
+        String journalName = journalConcept.getFullName();
         if (journalName != null && journalName.length() != 0) {
             Map map = new HashMap();
             map.put(PARAM_JOURNAL_NAME, journalName);

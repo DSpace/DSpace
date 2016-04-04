@@ -15,8 +15,6 @@ import org.apache.log4j.Logger;
 import org.dspace.JournalUtils;
 import org.dspace.content.Item;
 import org.dspace.content.authority.AuthorityMetadataValue;
-import org.dspace.content.authority.Concept;
-import org.dspace.content.authority.Scheme;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.w3c.dom.Document;
@@ -26,18 +24,18 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.*;
 import javax.xml.xpath.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URLEncoder;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.datadryad.api.DryadJournalConcept;
 
 /**
  * Load CustomerCredit facilitates communication with the Association Anywhere service and
@@ -53,9 +51,7 @@ public class AssociationAnywhere {
 
     protected static Logger log = Logger.getLogger(AssociationAnywhere.class);
 
-    public static void main(String[] argv)
-            throws Exception
-    {
+    public static void main(String[] argv) throws Exception {
         CommandLineParser parser = new PosixParser();
         Options options = new Options();
 
@@ -66,32 +62,38 @@ public class AssociationAnywhere {
         options.addOption("l", "list customer", false, "list customer");
         CommandLine line = parser.parse(options, argv);
 
-	Context context = new Context(); 
-	try {
-	    if(line.hasOption("u")) {
-		log.debug("aa updating credits");
-		if(line.hasOption("i"))
-		    updateConcept(context, line.getOptionValue("i"));
-		else
-		    updateConcept(context);
-	    }
-	    else if(line.hasOption("t")){
-		log.debug("aa tallying credits");
-		tallyCredit(context, line.getOptionValue("i"), line.getOptionValue("p"));
-	    }
-	    else if(line.hasOption("l")){
-		log.debug("aa list customer");
-		System.out.print(printDocument(loadCustomerInfo(context, line.getOptionValue("i"))));
-	    }
-	    else if(line.hasOption("i")) {
-		log.debug("aa listing credits");
-		//load credit
-		String credit = getCredit(context, line.getOptionValue("i"));
-		System.out.println("credit : "+ credit);
-	    }
-	} finally {
-	    context.commit();
-	}
+        Context context = new Context();
+        try {
+            if (line.hasOption("u")) {
+                log.debug("aa updating credits");
+                if (line.hasOption("i")) {
+                    DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByCustomerID(line.getOptionValue("i"));
+                    if (journalConcept != null) {
+                        updateConcept(context, journalConcept);
+                    } else {
+                        log.debug("no journal concept with the customerID" + line.getOptionValue("i"));
+                    }
+                } else {
+                    DryadJournalConcept[] journalConcepts = JournalUtils.getAllJournalConcepts();
+                    for (DryadJournalConcept journalConcept : journalConcepts) {
+                        updateConcept(context, journalConcept);
+                    }
+                }
+            } else if (line.hasOption("t")) {
+                log.debug("aa tallying credits");
+                tallyCredit(context, line.getOptionValue("i"), line.getOptionValue("p"));
+            } else if (line.hasOption("l")) {
+                log.debug("aa list customer");
+                System.out.print(printDocument(loadCustomerInfo(context, line.getOptionValue("i"))));
+            } else if (line.hasOption("i")) {
+                log.debug("aa listing credits");
+                //load credit
+                String credit = getCredit(context, line.getOptionValue("i"));
+                System.out.println("credit : "+ credit);
+            }
+        } finally {
+            context.commit();
+        }
     }
 
     /**
@@ -224,55 +226,24 @@ public class AssociationAnywhere {
     }
 
     /**
-     * Iterate over all Concepts and update credits available.
-     *
-     * @param context
-     * @throws Exception
-     */
-    private static void updateConcept(Context context) throws Exception {
-
-        Scheme scheme = Scheme.findByIdentifier(context,ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
-        for(Concept concept : scheme.getConcepts())
-        {
-            for(AuthorityMetadataValue value : concept.getMetadata("internal", "journal", "customerID",AuthorityMetadataValue.ANY))
-            {
-                updateConcept(context, concept, value.getValue());
-            }
-        }
-    }
-
-    /**
-     * Update Credit for a specific customer id.
-     * @param context
-     * @param customerId
-     * @throws Exception
-     */
-    private static void updateConcept(Context context, String customerID)
-            throws Exception {
-	Concept concept = JournalUtils.getJournalConceptByCustomerID(context, customerID);
-	updateConcept(context, concept, customerID);
-    }
-
-    /**
-       Retrieve the type of payment plan being used by the customer.
-     **/ 
+     Retrieve the type of payment plan being used by the customer.
+     **/
     private String getCustomerPlanType(String customerId) {
-	return "Error getCustomerPlanType";
+        return "Error getCustomerPlanType";
     }
 
     /**
      * Update Credit for a specific customer id.
+     * @param context
      * @param customerId
      * @throws Exception
      */
-    private static void updateConcept(Context context, Concept concept, String customerID)
-            throws Exception {
-
-        if(customerID==null)
-        {
-            throw new AssociationAnywhereException("customerID cannot be null");
+    private static void updateConcept(Context context, DryadJournalConcept journalConcept) throws Exception {
+        String customerID = journalConcept.getCustomerID();
+        if ("".equals(customerID)) {
+            log.debug("concept has no customerID");
+            return;
         }
-
         String credit = getCredit(context, customerID);
         Document customerInfo = loadCustomerInfo(context, customerID);
         String result = printDocument(customerInfo);
@@ -280,56 +251,22 @@ public class AssociationAnywhere {
         String classSubclassDescr = getStringValue(customerInfo, "//classSubclassDescr");
         String statusCode = getStringValue(customerInfo, "//statusCode");
 
-        changeConceptMetadataValue(concept,"customerID",customerID);
-
-        if(classSubclassDescr!=null&&classSubclassDescr.contains("Subscription"))
-        {
-            if(statusCode!=null&&statusCode.contains("ACTIVE"))
-            {
-                //set journal.submissionPaid=true and journal paymentPlanType=subscription
-                changeConceptMetadataValue(concept,"subscriptionPaid","true");
-                changeConceptMetadataValue(concept,"paymentPlanType", JournalUtils.SUBSCRIPTION_PLAN);
+        if (classSubclassDescr != null && statusCode!=null && statusCode.contains("ACTIVE")) {
+            if (classSubclassDescr.contains("Subscription")) {
+                journalConcept.setPaymentPlan(DryadJournalConcept.SUBSCRIPTION_PLAN);
+            } else if (classSubclassDescr.contains("Deferred")) {
+                journalConcept.setPaymentPlan(DryadJournalConcept.DEFERRED_PLAN);
+            } else {
+                journalConcept.setPaymentPlan(DryadJournalConcept.NO_PLAN);
             }
-            else
-            {
-                //journal.submissionPaid=false and journal paymentPlanType=null
-                changeConceptMetadataValue(concept,"subscriptionPaid","false");
-                changeConceptMetadataValue(concept,"paymentPlanType","");
-            }
-
-        }
-        else if(classSubclassDescr!=null&&classSubclassDescr.contains("Deferred"))
-        {
-            if(statusCode!=null&&statusCode.contains("ACTIVE"))
-            {
-                //set submissionPaid=true and paymentPlanType=deferred
-                changeConceptMetadataValue(concept,"subscriptionPaid","true");
-                changeConceptMetadataValue(concept,"paymentPlanType", JournalUtils.DEFERRED_PLAN);
-            }
-            else
-            {
-                //journal.submissionPaid=false and journal paymentPlanType=null
-                changeConceptMetadataValue(concept,"subscriptionPaid","false");
-                changeConceptMetadataValue(concept,"paymentPlanType","");
-            }
-        }
-        else
-        {
-            if(credit!=null&&Integer.parseInt(credit)>0)
-            {
+        } else {
+            if (credit!=null && Integer.parseInt(credit)>0) {
                 //set as a prepaid journal
-                changeConceptMetadataValue(concept,"subscriptionPaid","true");
-                changeConceptMetadataValue(concept,"paymentPlanType", JournalUtils.PREPAID_PLAN);
-            }
-            else
-            {
-                changeConceptMetadataValue(concept,"subscriptionPaid","false");
-                changeConceptMetadataValue(concept,"paymentPlanType","");
+                journalConcept.setPaymentPlan(DryadJournalConcept.PREPAID_PLAN);
+            } else {
+                journalConcept.setPaymentPlan(DryadJournalConcept.NO_PLAN);
             }
         }
-
-        concept.update();
-
     }
 
     // ####################### PRIVATE UTILITY METHODS FOR FORMATTING REQUESTS AND PARSING RESPONSES
@@ -370,35 +307,36 @@ public class AssociationAnywhere {
         try {
             if(template == null) {
                 template = TransformerFactory.newInstance().newTemplates(new StreamSource(AssociationAnywhere.class.getResourceAsStream("/anywhere/request-templates.xsl")));
-	    }
+	        }
             Transformer transformer = template.newTransformer();
             transformer.setParameter("username",ConfigurationManager.getProperty("association.anywhere.username"));
             transformer.setParameter("password", ConfigurationManager.getProperty("association.anywhere.password"));
             transformer.setParameter("customerID", customerID);
             transformer.setParameter("date", dateFormat.format(new Date()));
 
-	    if(transactionDescription == null) {
-		transactionDescription = "";
-	    }
-	    transformer.setParameter("transactionDescription", transactionDescription);
+            if (transactionDescription == null) {
+                transactionDescription = "";
+            }
 
-	    Concept concept = JournalUtils.getJournalConceptByCustomerID(context, customerID);
-	    if(concept != null) {
-		String transactionType = JournalUtils.getPaymentPlanType(concept);
-	
-		if (transactionType != null) {
-		    transformer.setParameter("transactionType", transactionType);
-	       
-		    String creditsAccepted = "1";
-		    if(transactionType.equals(JournalUtils.PREPAID_PLAN)) {
-			creditsAccepted = "-1";
-		    }
-		
-		    transformer.setParameter("creditsAccepted", creditsAccepted);
-		} else {
-		    log.error("Journal w/ customerID " + customerID + " does not have a transactionType.");
-		}
-	    }
+            transformer.setParameter("transactionDescription", transactionDescription);
+
+            DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByCustomerID(customerID);
+            if (journalConcept != null) {
+                String transactionType = journalConcept.getPaymentPlan();
+
+                if (transactionType != null) {
+                    transformer.setParameter("transactionType", transactionType);
+
+                    String creditsAccepted = "1";
+                    if(transactionType.equals(DryadJournalConcept.PREPAID_PLAN)) {
+                        creditsAccepted = "-1";
+                    }
+
+                    transformer.setParameter("creditsAccepted", creditsAccepted);
+                } else {
+                    log.error("Journal w/ customerID " + customerID + " does not have a transactionType.");
+                }
+            }
             StringWriter writer = new StringWriter();
             transformer.transform(new StreamSource(new StringReader("<" + form + "/>")),new StreamResult(writer));
             return writer.toString();
@@ -406,31 +344,8 @@ public class AssociationAnywhere {
             log.error("Unable to generate request URL", e);
         } catch (TransformerException e) {
             log.error("Unable to generate request URL", e);
-        } catch (SQLException e) {
-            log.error("Unable to generate request URL", e);
-	}
-        return null;
-    }
-
-    private static void changeConceptMetadataValue(Concept concept,String field,String value)
-    {
-        AuthorityMetadataValue[] metadataValues = concept.getMetadata("internal","journal",field, Item.ANY);
-        if(metadataValues==null||metadataValues.length==0)
-        {
-	    concept.addMetadata("internal","journal",field,"en",value,null,-1);
-	}
-        else{
-
-            for(AuthorityMetadataValue authorityMetadataValue:metadataValues)
-            {
-                if(!authorityMetadataValue.value.equals(value))
-                {
-                    concept.clearMetadata("internal","journal",field, Item.ANY);
-		    concept.addMetadata("internal","journal",field,"en",value,null,-1);
-                    break;
-                }
-            }
         }
+        return null;
     }
 }
 

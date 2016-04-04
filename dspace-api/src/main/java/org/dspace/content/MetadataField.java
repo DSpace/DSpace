@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import java.io.IOException;
+import java.lang.String;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -256,6 +257,17 @@ public class MetadataField
 
         log.info(LogManager.getHeader(context, "create_metadata_field",
                 "metadata_field_id=" + row.getIntColumn("metadata_field_id")));
+    }
+
+    public static MetadataField findByElement(Context context, String schemaName, String element, String qualifier) throws SQLException {
+        MetadataSchema schema = MetadataSchema.find(context, schemaName);
+        int schemaID = -1;
+        if (schema != null) {
+            schemaID = schema.getSchemaID();
+        } else {
+            throw new SQLException("no schema called " + schemaName);
+        }
+        return findByElement(context, schemaID, element, qualifier);
     }
 
     /**

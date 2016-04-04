@@ -30,6 +30,7 @@ import java.util.List;
  */
 public class Scheme extends AuthorityObject
 {
+    public static String TABLE = "scheme";
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(Scheme.class);
@@ -50,62 +51,6 @@ public class Scheme extends AuthorityObject
         return "SchemeMetadataValue";
     }
 
-    public Date getCreated()
-    {
-        Date myDate = myRow.getDateColumn("created");
-
-        if (myDate == null)
-        {
-            myDate = new Date();
-        }
-
-        return myDate;
-    }
-    public void setCreated(Date date)
-    {
-        Date myDate = myRow.getDateColumn("created");
-
-        if (date != null)
-        {
-            myRow.setColumn("created", date);
-            modified = true;
-        }
-    }
-
-    public String getStatus()
-    {
-        return myRow.getStringColumn("status");
-
-    }
-    public void setStatus(String status)
-    {
-        myRow.setColumn("status", status);
-        modified = true;
-    }
-
-    public String getSource()
-    {
-        return myRow.getStringColumn("source");
-
-    }
-    public void setSource(String source)
-    {
-        myRow.setColumn("source", source);
-        modified = true;
-    }
-
-    public String getLang()
-    {
-        return myRow.getStringColumn("lang");
-
-    }
-    public void setLang(String lang)
-    {
-        myRow.setColumn("lang", lang);
-        modified = true;
-    }
-
-
     /**
      * Create a new metadata scheme
      *
@@ -115,26 +60,7 @@ public class Scheme extends AuthorityObject
     public static Scheme create(Context context) throws SQLException,
             AuthorizeException
     {
-        // authorized?
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to create an Metadata Scheme");
-        }
-
-        // Create a table row
-        TableRow row = DatabaseManager.create(context, "scheme");
-
-        Scheme e = new Scheme(context, row);
-
-        e.setIdentifier(AuthorityObject.createIdentifier());
-
-        log.info(LogManager.getHeader(context, "create_scheme", "metadata_scheme_id="
-                + e.getID()));
-
-        context.addEvent(new Event(Event.CREATE, Constants.SCHEME, e.getID(), null));
-
-        return e;
+        return create(context, AuthorityObject.createIdentifier());
     }
     /**
      * Create a new metadata scheme
@@ -153,16 +79,13 @@ public class Scheme extends AuthorityObject
         }
 
         // Create a table row
-        TableRow row = DatabaseManager.create(context, "scheme");
+        TableRow row = DatabaseManager.create(context, TABLE);
 
         Scheme e = new Scheme(context, row);
 
-        e.setIdentifier(identifier);
+        e.setIdentifier(context, identifier);
         log.info(LogManager.getHeader(context, "create_scheme", "metadata_scheme_id="
                 + e.getID()));
-
-        context.addEvent(new Event(Event.CREATE, Constants.SCHEME, e.getID(), null));
-
         return e;
     }
     /**
@@ -192,7 +115,7 @@ public class Scheme extends AuthorityObject
             return fromCache;
         }
 
-        TableRow row = DatabaseManager.find(context, "scheme", id);
+        TableRow row = DatabaseManager.find(context, TABLE, id);
 
         if (row == null)
         {
@@ -215,7 +138,7 @@ public class Scheme extends AuthorityObject
     public static Scheme findByIdentifier(Context context, String identifier)
             throws SQLException
     {
-        TableRowIterator iterator = DatabaseManager.query(context,"select * from scheme where identifier = '"+identifier+"'");
+        TableRowIterator iterator = DatabaseManager.queryTable(context, TABLE, "select * from scheme where identifier = '" + identifier + "'");
 
         if (!iterator.hasNext())
         {
@@ -272,8 +195,8 @@ public class Scheme extends AuthorityObject
         // NOTE: The use of 's' in the order by clause can not cause an SQL
         // injection because the string is derived from constant values above.
         TableRowIterator rows = DatabaseManager.queryTable(
-                context, "scheme",
-                "SELECT * FROM scheme ORDER BY "+s);
+                context, TABLE,
+                "SELECT * FROM scheme ORDER BY " + s);
 
         try
         {
@@ -416,8 +339,7 @@ public class Scheme extends AuthorityObject
             paramArr = new Object[]{int_param,params,  offset};
         }
 
-        TableRowIterator rows =
-                DatabaseManager.query(context, dbquery, paramArr);
+        TableRowIterator rows = DatabaseManager.queryTable(context, TABLE, dbquery, paramArr);
 
         try
         {
@@ -427,19 +349,7 @@ public class Scheme extends AuthorityObject
             for (int i = 0; i < schemeRows.size(); i++)
             {
                 TableRow row = schemeRows.get(i);
-
-                // First check the cache
-                Scheme fromCache = (Scheme) context.fromCache(Scheme.class, row
-                        .getIntColumn("id"));
-
-                if (fromCache != null)
-                {
-                    schemes[i] = fromCache;
-                }
-                else
-                {
-                    schemes[i] = new Scheme(context, row);
-                }
+                schemes[i] = new Scheme(context, row);
             }
             return schemes;
         }
@@ -497,32 +407,16 @@ public class Scheme extends AuthorityObject
         return count.intValue();
     }
 
-
-    /**
-     * Delete a scheme
-     *
+    /* Delete data specific to schemes
      */
-    public void delete() throws SQLException
-    {
-        // FIXME: authorizations
-
-        // Remove from cache
-        myContext.removeCached(this, getID());
-        // Remove metadata
-        DatabaseManager.updateQuery(myContext,
-                "DELETE FROM SchemeMetadataValue WHERE parent_id= ? ",
-                getID());
+    @Override
+    protected void deleteAssociatedData(Context context) throws SQLException, AuthorizeException {
         Concept[] concepts = getConcepts();
-        for(Concept concept : concepts)
-        {
-            concept.delete();
+        for(Concept concept : concepts) {
+            concept.delete(context);
         }
-        // Remove ourself
-        DatabaseManager.delete(myContext, myRow);
-
-        log.info(LogManager.getHeader(myContext, "delete_scheme", "scheme_id="
-                + getID()));
     }
+
 
 
     /**
@@ -579,68 +473,39 @@ public class Scheme extends AuthorityObject
         return this.getMetadata("dc","title",null,"*") + "(" + this.getIdentifier() + ")";
     }
 
-
-    public Date getLastModified()
-    {
-        Date myDate = myRow.getDateColumn("modified");
-
-        if (myDate == null)
-        {
-            myDate = new Date();
+    public Concept[] getConcepts() throws SQLException {
+        Context context = getContext();
+        Concept[] concepts = getConcepts(context);
+        try {
+            completeContext(context);
+        } catch (SQLException e) {
+            abortContext(context);
         }
-
-        return myDate;
-    }
-    public void setLastModified(Date date)
-    {
-        Date myDate = myRow.getDateColumn("modified");
-
-        if (date != null)
-        {
-            myRow.setColumn("modified", date);
-            modified = true;
-        }
+        return concepts;
     }
 
-
-    public Concept[] getConcepts() throws SQLException
+    public Concept[] getConcepts(Context context) throws SQLException
     {
         List<Concept> concepts = new ArrayList<Concept>();
 
         // Get the table rows
         TableRowIterator tri = DatabaseManager.queryTable(
-                myContext,"concept",
+                context, "concept",
                 "SELECT concept.* FROM concept, scheme2concept,concept2term,term WHERE " +
                         "scheme2concept.concept_id=concept.id " +
                         "AND scheme2concept.scheme_id= ? AND concept2term.concept_id=concept.id AND concept2term.role_id=1 AND concept2term.term_id=term.id ORDER BY term.literalform",
                 getID());
 
         // Make Concept objects
-        try
-        {
-            while (tri.hasNext())
-            {
+        try {
+            while (tri.hasNext()) {
                 TableRow row = tri.next();
-
-                // First check the cache
-                Concept fromCache = (Concept) myContext.fromCache(
-                        Concept.class, row.getIntColumn("id"));
-
-                if (fromCache != null)
-                {
-                    concepts.add(fromCache);
-                }
-                else
-                {
-                    concepts.add(new Concept(myContext, row));
-                }
+                concepts.add(new Concept(context, row));
             }
         }
-        finally
-        {
+        finally {
             // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
+            if (tri != null) {
                 tri.close();
             }
         }
@@ -666,16 +531,13 @@ public class Scheme extends AuthorityObject
      * @param c
      *            collection to add
      */
-    public void addConcept(Concept c) throws SQLException
-    {
-        // Check authorisation
-        AuthorizeManager.isAdmin(myContext);
-
-        log.info(LogManager.getHeader(myContext, "add_concept",
-                "scheme_id=" + getID() + ",concept_id=" + c.getID()));
-
+    public void addConcept(Context context, Concept c) throws SQLException, AuthorizeException {
+        // authorized?
+        if (!AuthorizeManager.isAdmin(context)) {
+            throw new AuthorizeException("You must be an admin to add a Concept");
+        }
         // Find out if mapping exists
-        TableRowIterator tri = DatabaseManager.queryTable(myContext,
+        TableRowIterator tri = DatabaseManager.queryTable(context,
                 "scheme2concept",
                 "SELECT * FROM scheme2concept WHERE " +
                         "scheme_id= ? AND concept_id= ? ",getID(),c.getID());
@@ -690,7 +552,7 @@ public class Scheme extends AuthorityObject
                 mappingRow.setColumn("scheme_id", getID());
                 mappingRow.setColumn("concept_id", c.getID());
 
-                DatabaseManager.insert(myContext, mappingRow);
+                DatabaseManager.insert(context, mappingRow);
             }
         }
         finally
@@ -702,15 +564,17 @@ public class Scheme extends AuthorityObject
             }
         }
     }
-    public void removeConcept(Concept c) throws SQLException{
-        // Check authorisation
-        AuthorizeManager.isAdmin(myContext);
+    public void removeConcept(Context context, Concept c) throws SQLException, AuthorizeException {
+        // authorized?
+        if (!AuthorizeManager.isAdmin(context)) {
+            throw new AuthorizeException("You must be an admin to modify a Concept's Parent Concept");
+        }
 
-        log.info(LogManager.getHeader(myContext, "add_concept",
+        log.info(LogManager.getHeader(context, "add_concept",
                 "scheme_id=" + getID() + ",concept_id=" + c.getID()));
 
         // Find out if mapping exists
-        TableRowIterator tri = DatabaseManager.queryTable(myContext,
+        TableRowIterator tri = DatabaseManager.queryTable(context,
                 "scheme2concept",
                 "SELECT * FROM scheme2concept WHERE " +
                         "scheme_id= ? AND concept_id= ? ",getID(),c.getID());
@@ -725,9 +589,9 @@ public class Scheme extends AuthorityObject
                 mappingRow.setColumn("scheme_id", getID());
                 mappingRow.setColumn("concept_id", c.getID());
 
-                DatabaseManager.insert(myContext, mappingRow);
+                DatabaseManager.insert(context, mappingRow);
 
-                c.delete();
+                c.delete(context);
             }
         }
         finally
@@ -739,45 +603,42 @@ public class Scheme extends AuthorityObject
             }
         }
     }
-    public void removeConcepts() throws SQLException{
-        // Check authorisation
-        AuthorizeManager.isAdmin(myContext);
+    public void removeConcepts(Context context) throws SQLException, AuthorizeException {
+        // authorized?
+        if (!AuthorizeManager.isAdmin(context)) {
+            throw new AuthorizeException("You must be an admin to remove concepts");
+        }
 
-        log.info(LogManager.getHeader(myContext, "remove_concept",
+        log.info(LogManager.getHeader(context, "remove_concept",
                 "scheme_id=" + getID()));
 
         Concept[] concepts = getConcepts();
-        for(Concept concept : concepts)
-        {
-            removeConcept(concept);
+        for(Concept concept : concepts) {
+            removeConcept(context, concept);
         }
     }
 
 
-    public Concept createConcept() throws SQLException, AuthorizeException {
-        Concept concept = Concept.create(this.myContext);
-        Date date = new Date();
-        concept.setLastModified(date);
-        concept.setCreated(date);
-        concept.setLang(I18nUtil.getDefaultLocale().getLanguage());
-        concept.setTopConcept(true);
-        concept.setStatus(Concept.Status.CANDIDATE);
-        this.addConcept(concept);
-        return concept;
+    public Concept createConcept(Context context) throws SQLException, AuthorizeException {
+        return createConcept(context, null);
     }
 
-    public Concept createConcept(String identifier) throws SQLException, AuthorizeException {
+    public Concept createConcept(Context context, String identifier) throws SQLException, AuthorizeException {
+        Concept concept = null;
 
-        Concept concept = Concept.create(this.myContext, identifier);
-
+        if (identifier == null) {
+            concept = Concept.create(context);
+        } else {
+            concept = Concept.create(context, identifier);
+        }
         Date date = new Date();
-        concept.setLastModified(date);
-        concept.setCreated(date);
-        concept.setLang(I18nUtil.getDefaultLocale().getLanguage());
-        concept.setTopConcept(true);
-        concept.setStatus(Concept.Status.CANDIDATE);
-
-        this.addConcept(concept);
+        concept.setLastModified(context, date);
+        concept.setCreated(context, date);
+        concept.setLang(context, I18nUtil.getDefaultLocale().getLanguage());
+        concept.setTopConcept(context, true);
+        concept.setStatus(context, Concept.Status.CANDIDATE.name());
+        this.addConcept(context, concept);
+        context.commit();
 
         return concept;
     }

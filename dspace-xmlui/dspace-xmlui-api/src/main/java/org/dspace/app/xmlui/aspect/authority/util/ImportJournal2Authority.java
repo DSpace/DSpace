@@ -124,11 +124,10 @@ public final class ImportJournal2Authority {
             Scheme instituteScheme = Scheme.findByIdentifier(context,"Journal");
             if(instituteScheme==null){
                 instituteScheme = Scheme.create(context, "Journal");
-                instituteScheme.setLastModified(date);
-                instituteScheme.setCreated(date);
-                instituteScheme.setLang("en");
-                instituteScheme.setStatus("Published");
-                instituteScheme.update();
+                instituteScheme.setLastModified(context, date);
+                instituteScheme.setCreated(context, date);
+                instituteScheme.setLang(context, "en");
+                instituteScheme.setStatus(context, "Published");
             }
 
 
@@ -148,17 +147,17 @@ public final class ImportJournal2Authority {
                         if(authorityValue.getId() != null){
                             ArrayList<Concept> aConcepts = Concept.findByIdentifier(context,authorityValue.getId());
                             if(aConcepts==null||aConcepts.size()==0)  {
-                                Concept aConcept = instituteScheme.createConcept(authorityValue.getId());
-                                aConcept.setLastModified(authorityValue.getLastModified());
-                                aConcept.setCreated(authorityValue.getCreationDate());
-                                aConcept.setLang("en");
-                                aConcept.setStatus(Concept.Status.ACCEPTED);
-                                aConcept.setTopConcept(true);
+                                Concept aConcept = instituteScheme.createConcept(context, authorityValue.getId());
+                                aConcept.setLastModified(context, authorityValue.getLastModified());
+                                aConcept.setCreated(context, authorityValue.getCreationDate());
+                                aConcept.setLang(context, "en");
+                                aConcept.setStatus(context, Concept.Status.ACCEPTED.name());
+                                aConcept.setTopConcept(context, true);
                                 String fullName = authorityValue.getValue();
 
                                 if(solrDocument.getFieldValue("source")!=null) {
                                     String source = String.valueOf(solrDocument.getFieldValue("source"));
-                                    aConcept.setSource(source);
+                                    aConcept.setSource(context, source);
                                     if(source.equals("LOCAL-DryadJournal"))
                                     {
                                         Map<String,String> val = journalProperties.get(authorityValue.getValue());
@@ -166,69 +165,67 @@ public final class ImportJournal2Authority {
                                             journalProperties.remove(authorityValue.getValue());
                                             if(val.get("journalID")!=null&&val.get("journalID").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","journalID",null,"",val.get("journalID"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","journalID",null,"",val.get("journalID"),authorityValue.getId(),0);
                                             }
                                             if(val.get("fullname")!=null&&val.get("fullname").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","fullname",null,"",val.get("fullname"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","fullname",null,"",val.get("fullname"),authorityValue.getId(),0);
                                                 fullName =  val.get("fullname");
                                             }
 
                                             if(val.get("metadataDir")!=null&&val.get("metadataDir").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","metadataDir",null,"",val.get("metadataDir"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","metadataDir",null,"",val.get("metadataDir"),authorityValue.getId(),0);
                                             }
                                             if(val.get("parsingScheme")!=null&&val.get("parsingScheme").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","parsingScheme",null,"",val.get("parsingScheme"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","parsingScheme",null,"",val.get("parsingScheme"),authorityValue.getId(),0);
                                             }
                                             if(val.get("integrated")!=null&&val.get("integrated").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","integrated",null,"",val.get("integrated"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","integrated",null,"",val.get("integrated"),authorityValue.getId(),0);
                                             }
                                             if(val.get("embargoAllowed")!=null&&val.get("embargoAllowed").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","embargoAllowed",null,"",val.get("embargoAllowed"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","embargoAllowed",null,"",val.get("embargoAllowed"),authorityValue.getId(),0);
                                             }
                                             if(val.get("allowReviewWorkflow")!=null&&val.get("allowReviewWorkflow").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),authorityValue.getId(),0);
                                             }
                                             if(val.get("publicationBlackout")!=null&&val.get("publicationBlackout").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","publicationBlackout",null,"",val.get("publicationBlackout"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","publicationBlackout",null,"",val.get("publicationBlackout"),authorityValue.getId(),0);
                                             }
                                             if(val.get("subscriptionPaid")!=null&&val.get("subscriptionPaid").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","subscriptionPaid",null,"",val.get("subscriptionPaid"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","subscriptionPaid",null,"",val.get("subscriptionPaid"),authorityValue.getId(),0);
                                             }
                                             if(val.get("sponsorName")!=null&&val.get("sponsorName").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","sponsorName",null,"",val.get("sponsorName"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","sponsorName",null,"",val.get("sponsorName"),authorityValue.getId(),0);
                                             }
                                             if(val.get("notifyOnReview")!=null&&val.get("notifyOnReview").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","notifyOnReview",null,"",val.get("notifyOnReview"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","notifyOnReview",null,"",val.get("notifyOnReview"),authorityValue.getId(),0);
                                             }
                                             if(val.get("notifyOnArchive")!=null&&val.get("notifyOnArchive").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","notifyOnArchive",null,"",val.get("notifyOnArchive"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","notifyOnArchive",null,"",val.get("notifyOnArchive"),authorityValue.getId(),0);
                                             }
                                             if(val.get("notifyWeekly")!=null&&val.get("notifyWeekly").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","notifyWeekly",null,"",val.get("notifyWeekly"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","notifyWeekly",null,"",val.get("notifyWeekly"),authorityValue.getId(),0);
                                             }
                                             if(val.get("manuscriptNumberIgnorePattern")!=null&&val.get("manuscriptNumberIgnorePattern").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","manuscriptNumberIgnorePattern",null,"",val.get("manuscriptNumberIgnorePattern"),authorityValue.getId(),0);
+                                                aConcept.addMetadata(context, "journal","manuscriptNumberIgnorePattern",null,"",val.get("manuscriptNumberIgnorePattern"),authorityValue.getId(),0);
                                             }
                                         }
                                     }
                                 }
-                                aConcept.update();
-                                Term aTerm = aConcept.createTerm(fullName,Term.prefer_term);
-                                aTerm.setStatus(Concept.Status.ACCEPTED.name());
-                                aTerm.update();
+                                Term aTerm = aConcept.createTerm(context, fullName,Term.prefer_term);
+                                aTerm.setStatus(context, Concept.Status.ACCEPTED.name());
                                 context.commit();
                             }
                         }
@@ -244,75 +241,72 @@ public final class ImportJournal2Authority {
                 Map<String,String> val = journalProperties.get(key);
                 Concept[] aConcepts = Concept.findByPreferredLabel(context,val.get("fullname"),instituteScheme.getID());
                 if(aConcepts==null||aConcepts.length==0)  {
-                    Concept aConcept = instituteScheme.createConcept();
-                    aConcept.setLastModified(date);
-                    aConcept.setCreated(date);
-                    aConcept.setLang("en");
-                    aConcept.setTopConcept(true);
-                    aConcept.setSource("LOCAL-DryadJournal");
+                    Concept aConcept = instituteScheme.createConcept(context);
+                    aConcept.setLastModified(context, date);
+                    aConcept.setCreated(context, date);
+                    aConcept.setLang(context, "en");
+                    aConcept.setTopConcept(context, true);
+                    aConcept.setSource(context, "LOCAL-DryadJournal");
 
                     if(val.get("journalID")!=null&&val.get("journalID").length()>0)
                     {
-                        aConcept.addMetadata("journal","journalID",null,"",val.get("journalID"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","journalID",null,"",val.get("journalID"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("fullname")!=null&&val.get("fullname").length()>0)
                     {
-                        aConcept.addMetadata("journal","fullname",null,"",val.get("fullname"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","fullname",null,"",val.get("fullname"),aConcept.getIdentifier(),0);
                     }
 
                     if(val.get("metadataDir")!=null&&val.get("metadataDir").length()>0)
                     {
-                        aConcept.addMetadata("journal","metadataDir",null,"",val.get("metadataDir"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","metadataDir",null,"",val.get("metadataDir"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("parsingScheme")!=null&&val.get("parsingScheme").length()>0)
                     {
-                        aConcept.addMetadata("journal","parsingScheme",null,"",val.get("parsingScheme"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","parsingScheme",null,"",val.get("parsingScheme"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("integrated")!=null&&val.get("integrated").length()>0)
                     {
-                        aConcept.addMetadata("journal","integrated",null,"",val.get("integrated"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","integrated",null,"",val.get("integrated"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("embargoAllowed")!=null&&val.get("embargoAllowed").length()>0)
                     {
-                        aConcept.addMetadata("journal","embargoAllowed",null,"",val.get("embargoAllowed"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","embargoAllowed",null,"",val.get("embargoAllowed"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("allowReviewWorkflow")!=null&&val.get("allowReviewWorkflow").length()>0)
                     {
-                        aConcept.addMetadata("journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("publicationBlackout")!=null&&val.get("publicationBlackout").length()>0)
                     {
-                        aConcept.addMetadata("journal","publicationBlackout",null,"",val.get("publicationBlackout"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","publicationBlackout",null,"",val.get("publicationBlackout"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("subscriptionPaid")!=null&&val.get("subscriptionPaid").length()>0)
                     {
-                        aConcept.addMetadata("journal","subscriptionPaid",null,"",val.get("subscriptionPaid"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","subscriptionPaid",null,"",val.get("subscriptionPaid"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("sponsorName")!=null&&val.get("sponsorName").length()>0)
                     {
-                        aConcept.addMetadata("journal","sponsorName",null,"",val.get("sponsorName"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","sponsorName",null,"",val.get("sponsorName"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("notifyOnReview")!=null&&val.get("notifyOnReview").length()>0)
                     {
-                        aConcept.addMetadata("journal","notifyOnReview",null,"",val.get("notifyOnReview"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","notifyOnReview",null,"",val.get("notifyOnReview"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("notifyOnArchive")!=null&&val.get("notifyOnArchive").length()>0)
                     {
-                        aConcept.addMetadata("journal","notifyOnArchive",null,"",val.get("notifyOnArchive"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","notifyOnArchive",null,"",val.get("notifyOnArchive"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("notifyWeekly")!=null&&val.get("notifyWeekly").length()>0)
                     {
-                        aConcept.addMetadata("journal","notifyWeekly",null,"",val.get("notifyWeekly"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","notifyWeekly",null,"",val.get("notifyWeekly"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("manuscriptNumberIgnorePattern")!=null&&val.get("manuscriptNumberIgnorePattern").length()>0)
                     {
-                        aConcept.addMetadata("journal","manuscriptNumberIgnorePattern",null,"",val.get("manuscriptNumberIgnorePattern"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata(context, "journal","manuscriptNumberIgnorePattern",null,"",val.get("manuscriptNumberIgnorePattern"),aConcept.getIdentifier(),0);
                     }
-                    aConcept.update();
 
-
-                    Term aTerm = aConcept.createTerm(val.get("fullname"),Term.prefer_term);
-                    aTerm.update();
+                    Term aTerm = aConcept.createTerm(context, val.get("fullname"),Term.prefer_term);
                     context.commit();
                 }
             }

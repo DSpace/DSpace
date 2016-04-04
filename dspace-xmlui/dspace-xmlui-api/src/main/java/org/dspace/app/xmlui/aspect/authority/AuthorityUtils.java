@@ -33,8 +33,7 @@ public class AuthorityUtils {
         // Need to create new concept
         if(schemeId!=null) {
             Scheme scheme = (Scheme) AuthorityObject.find(context, Constants.SCHEME, Integer.parseInt(schemeId));
-            Concept concept = scheme.createConcept(value);
-            concept.update();
+            Concept concept = scheme.createConcept(context, value);
             context.commit();
             return concept;
         }
@@ -53,10 +52,10 @@ public class AuthorityUtils {
         String conceptId = request.getParameter("concept");
         if(conceptId!=null){
             Concept concept = (Concept) AuthorityObject.find(context,Constants.CONCEPT,Integer.parseInt(conceptId));
-            Term term = concept.createTerm(literalForm,Term.prefer_term);
-            term.setStatus(status);
-            term.setLang(language);
-            term.setSource(source);
+            Term term = concept.createTerm(context, literalForm,Term.prefer_term);
+            term.setStatus(context, status);
+            term.setLang(context, language);
+            term.setSource(context, source);
             context.commit();
 
             return term;
@@ -96,12 +95,11 @@ public class AuthorityUtils {
 
         Scheme scheme = Scheme.create(context);
         Date date = new Date();
-        scheme.setLastModified(date);
-        scheme.setCreated(date);
-        scheme.setLang(language);
+        scheme.setLastModified(context, date);
+        scheme.setCreated(context, date);
+        scheme.setLang(context, language);
         //concept.setTopConcept(topConcept);
-        scheme.setStatus(status);
-        scheme.update();
+        scheme.setStatus(context, status);
         context.commit();
         // Give site auth a chance to set/override appropriate fields
         //AuthenticationManager.initEPerson(context, request, eperson);

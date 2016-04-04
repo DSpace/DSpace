@@ -19,6 +19,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
+import java.lang.Override;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +38,8 @@ public class Term extends AuthorityObject {
 
     public static int alternate_term = 2;
     public static int prefer_term = 1;
+    public static String TABLE = "term";
+
     /** log4j category */
     private static final Logger log = Logger.getLogger(Term.class);
 
@@ -70,93 +73,15 @@ public class Term extends AuthorityObject {
         return getLiteralForm() + " (" + getIdentifier() + ")";
     }
 
-    public Date getLastModified()
-    {
-        Date myDate = myRow.getDateColumn("modified");
-
-        if (myDate == null)
-        {
-            myDate = new Date();
-        }
-
-        return myDate;
-    }
-    public void setLastModified(Date date)
-    {
-        Date myDate = myRow.getDateColumn("modified");
-
-        if (date != null)
-        {
-            myRow.setColumn("modified", date);
-            modified = true;
-        }
-    }
-
-    public Date getCreated()
-    {
-        Date myDate = myRow.getDateColumn("created");
-
-        if (myDate == null)
-        {
-            myDate = new Date();
-        }
-
-        return myDate;
-    }
-    public void setCreated(Date date)
-    {
-        Date myDate = myRow.getDateColumn("created");
-
-        if (date != null)
-        {
-            myRow.setColumn("created", date);
-            modified = true;
-        }
-    }
-
-
-
-    public String getStatus()
-    {
-        return myRow.getStringColumn("status");
-
-    }
-    public void setStatus(String status)
-    {
-        myRow.setColumn("status", status);
-        modified = true;
-    }
-
-    public String getSource()
-    {
-        return myRow.getStringColumn("source");
-
-    }
-    public void setSource(String source)
-    {
-        myRow.setColumn("source", source);
-        modified = true;
-    }
-
     public String getLiteralForm()
     {
         return myRow.getStringColumn("literalForm");
 
     }
-    public void setLiteralForm(String literalForm)
+    public void setLiteralForm(Context context, String literalForm) throws SQLException
     {
         myRow.setColumn("literalForm", literalForm);
-        modified = true;
-    }
-    public String getLang()
-    {
-        return myRow.getStringColumn("lang");
-
-    }
-    public void setLang(String lang)
-    {
-        myRow.setColumn("lang", lang);
-        modified = true;
+        DatabaseManager.update(context, myRow);
     }
 
     /**
@@ -300,8 +225,7 @@ public class Term extends AuthorityObject {
         }
 
         // Get all the terms that match the query
-        TableRowIterator rows = DatabaseManager.query(context,
-                dbquery, paramArr);
+        TableRowIterator rows = DatabaseManager.queryTable(context, TABLE, dbquery, paramArr);
         try
         {
             List<TableRow> termsRows = rows.toList();
@@ -358,11 +282,9 @@ public class Term extends AuthorityObject {
 
         Term e = new Term(context, row);
 
-        e.setIdentifier(AuthorityObject.createIdentifier());
+        e.setIdentifier(context, AuthorityObject.createIdentifier());
         log.info(LogManager.getHeader(context, "create_term", "metadata_term_id="
                 + e.getID()));
-
-        context.addEvent(new Event(Event.CREATE, Constants.TERM, e.getID(), null));
 
         return e;
     }
@@ -371,44 +293,33 @@ public class Term extends AuthorityObject {
      * Delete an Term
      *
      */
-    public void delete() throws SQLException, AuthorizeException
-    {
+    public void delete(Context context) throws SQLException, AuthorizeException {
         // authorized?
-        if (!AuthorizeManager.isAdmin(myContext))
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to delete an Term");
+        if (!AuthorizeManager.isAdmin(context)) {
+            throw new AuthorizeException("You must be an admin to delete an Term");
         }
-
-        TableRow trow = DatabaseManager.querySingle(myContext,
-                "SELECT COUNT(DISTINCT concept_id) AS num FROM concept2term WHERE term_id= ? AND role_id=1",
-                getID());
-        if (trow.getLongColumn("num") > 0)
-        {
-            log.error("can't remove term :"+getID()+", concept refered");
-        }
-
-        // Remove from cache
-        myContext.removeCached(this, getID());
-
 
         // Remove metadata
-        DatabaseManager.updateQuery(myContext,
+        DatabaseManager.updateQuery(context,
                 "DELETE FROM TermMetadataValue WHERE parent_id= ? ",
                 getID());
-
-        // Remove any concept memberships first
-        DatabaseManager.updateQuery(myContext,
-                "DELETE FROM Concept2Term WHERE term_id= ? ",
-                getID());
-
+        deleteAssociatedData(context);
         // Remove ourself
-        DatabaseManager.delete(myContext, myRow);
+        DatabaseManager.delete(context, myRow);
 
-        log.info(LogManager.getHeader(myContext, "delete_metadata_term",
+        log.info(LogManager.getHeader(context, "delete_metadata_term",
                 "term_id=" + getID()));
     }
 
+    /* Delete data specific to terms
+     */
+    @Override
+    protected void deleteAssociatedData(Context context) throws SQLException, AuthorizeException {
+        // Remove any concept memberships first
+        DatabaseManager.updateQuery(context,
+                "DELETE FROM Concept2Term WHERE term_id= ? ",
+                getID());
+    }
 
     public static Term find(Context context, int id) throws SQLException
     {
@@ -450,7 +361,7 @@ public class Term extends AuthorityObject {
         TableRow row = null;
         if(conceptId==null){
             // Get all the terms that match the query
-            row = DatabaseManager.querySingle(context,
+            row = DatabaseManager.querySingleTable(context, TABLE,
                     "SELECT count(*) as termcount FROM term WHERE id = ? OR " +
                             "LOWER(identifier) like ?",
                     new Object[] {int_param,dbquery});
@@ -477,44 +388,30 @@ public class Term extends AuthorityObject {
         return count.intValue();
     }
 
-    public Concept[] getConcepts() throws SQLException
-    {
+    public Concept[] getConcepts() throws SQLException {
         List<Concept> concepts = new ArrayList<Concept>();
-
+        Context context = getContext();
         // Get the table rows
         TableRowIterator tri = DatabaseManager.queryTable(
-                myContext,"concept",
+                context,"concept",
                 "SELECT concept.* FROM concept, concept2term WHERE " +
                         "concept2term.concept_id=concept.id " +
                         "AND concept2term.term_id= ? ORDER BY LOWER(concept.identifier)",
                 getID());
 
         // Make Concept objects
-        try
-        {
-            while (tri.hasNext())
-            {
+        try {
+            while (tri.hasNext()) {
                 TableRow row = tri.next();
-
-                // First check the cache
-                Concept fromCache = (Concept) myContext.fromCache(
-                        Concept.class, row.getIntColumn("id"));
-
-                if (fromCache != null)
-                {
-                    concepts.add(fromCache);
-                }
-                else
-                {
-                    concepts.add(new Concept(myContext, row));
-                }
+                concepts.add(new Concept(context, row));
             }
+            completeContext(context);
+        } catch (SQLException e) {
+            abortContext(context);
         }
-        finally
-        {
+        finally {
             // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
+            if (tri != null) {
                 tri.close();
             }
         }

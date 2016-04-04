@@ -91,8 +91,7 @@ public class FlowTermUtils {
             if(conceptId!=null&&conceptId.length()>0)
             {
                 Concept concept = Concept.find(context, Integer.parseInt(conceptId));
-                Term newTerm = concept.createTerm(literalForm,Term.prefer_term);
-                newTerm.update();
+                Term newTerm = concept.createTerm(context, literalForm,Term.prefer_term);
 
                 context.commit();
                 // success
@@ -105,12 +104,11 @@ public class FlowTermUtils {
             {
                 //create term without concept
                 Term newTerm = Term.create(context);
-                newTerm.setStatus(status);
-                newTerm.setLang(language);
-                newTerm.setSource(source);
-                newTerm.setCreated(newTerm.getCreated());
-                newTerm.setLastModified(newTerm.getCreated());
-                newTerm.update();
+                newTerm.setStatus(context, status);
+                newTerm.setLang(context, language);
+                newTerm.setSource(context, source);
+                newTerm.setCreated(context, newTerm.getCreated());
+                newTerm.setLastModified(context, newTerm.getCreated());
                 context.commit();
                 // success
                 result.setContinue(true);
@@ -172,7 +170,7 @@ public class FlowTermUtils {
 
                 if (potentialDupicate == null)
                 {
-                    termModified.setLiteralForm(literalForm);
+                    termModified.setLiteralForm(context, literalForm);
                 }
                 else if (potentialDupicate.equals(termModified))
                 {
@@ -183,18 +181,17 @@ public class FlowTermUtils {
             }
             String originalSource = termModified.getSource();
             if (originalSource == null || !originalSource.equals(source)) {
-                termModified.setSource(source);
+                termModified.setSource(context, source);
             }
             String originalStatus = termModified.getStatus();
             if (originalStatus == null || !originalStatus.equals(status)) {
-                termModified.setStatus(status);
+                termModified.setStatus(context, status);
             }
             String originalLang = termModified.getLang();
             if (originalLang == null || !originalLang.equals(language)) {
-                termModified.setLang(language);
+                termModified.setLang(context, language);
             }
 
-            termModified.update();
             context.commit();
 
             result.setContinue(true);
@@ -227,7 +224,7 @@ public class FlowTermUtils {
         {
             Term termDeleted = Term.find(context, Integer.valueOf(id));
             try {
-                termDeleted.delete();
+                termDeleted.delete(context);
             }
             catch (Exception epde)
             {

@@ -13,7 +13,10 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
 
+import java.lang.Exception;
 import java.sql.SQLException;
 
 /**
@@ -90,6 +93,25 @@ public class AuthorityMetadataValue {
             confidence = row.getIntColumn("confidence");
             this.row = row;
         }
+    }
+
+    public AuthorityMetadataValue(Context context, TableRow row) {
+        this(row);
+        try {
+            MetadataField field = MetadataField.find(context, fieldId);
+            MetadataSchema thisSchema = MetadataSchema.find(context, field.getSchemaID());
+            if (thisSchema != null) {
+                schema = thisSchema.getName();
+            }
+            element = field.getElement();
+            qualifier = field.getQualifier();
+        } catch (Exception e) {
+            log.error("couldn't initialize AuthorityMetadataValue field parameters");
+        }
+    }
+
+    public String toString() {
+        return "table " + tableName + ": " + schema + "." + element + "." + qualifier + "(" + fieldId + ")=" + value + ", authority="+ authority + ", confidence="+confidence;
     }
 
     /**

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.datadryad.api.DryadJournalConcept;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -78,20 +79,16 @@ public class DryadReviewAction extends ProcessingAction {
 
     private void sendEmailToJournalNotifyOnReview(Context c, WorkflowItem wf, List<String> mailsSent, UUID uuid) throws SQLException, IOException, WorkflowException {
         DCValue[] values=wf.getItem().getMetadata("prism.publicationName");
-        if(values!=null && values.length> 0){
+        if (values!=null && values.length> 0) {
             String journal = values[0].value;
-            if(journal!=null){
-                Map<String, String> properties = JournalUtils.getPropertiesByJournal(journal);
-                if(properties!=null){
-                    String emails = properties.get(JournalUtils.NOTIFY_ON_REVIEW);
-                    log.debug("reviewers for journal " + journal + " are " + emails);
-                    if(emails != null) {
-                        String[] emails_=emails.split(",");
-                        for(String email : emails_){
-                            if(!mailsSent.contains(email)){
-                                sendReviewerEmail(c, email, wf, uuid.toString());
-                                mailsSent.add(email);
-                            }
+            if (journal!=null) {
+                DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
+                if (journalConcept != null) {
+                    ArrayList<String> emails = journalConcept.getEmailsToNotifyOnReview();
+                    for (String email : emails) {
+                        if(!mailsSent.contains(email)) {
+                            sendReviewerEmail(c, email, wf, uuid.toString());
+                            mailsSent.add(email);
                         }
                     }
                 }

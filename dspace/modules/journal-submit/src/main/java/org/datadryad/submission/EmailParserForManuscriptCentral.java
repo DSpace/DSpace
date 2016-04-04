@@ -1,18 +1,22 @@
 package org.datadryad.submission;
 
+import org.datadryad.rest.models.Manuscript;
+
 /**
  * The Class EmailParserForManuscriptCentral. Rewritten by Daisie Huang.
  */
 public class EmailParserForManuscriptCentral extends EmailParser {
     static {
         // optional XML tags
-        fieldToXMLTagMap.put("print issn",ISSN);
-        fieldToXMLTagMap.put("online issn","Online_ISSN");
-        fieldToXMLTagMap.put("journal admin email","Journal_Admin_Email");
-        fieldToXMLTagMap.put("journal editor","Journal_Editor");
-        fieldToXMLTagMap.put("journal editor email", "Journal_Editor_Email");
-        fieldToXMLTagMap.put("journal embargo period", "Journal_Embargo_Period");
-        fieldToXMLTagMap.put("publication doi","Publication_DOI");
+        fieldToXMLTagMap.put("print issn", Manuscript.ISSN);
+        fieldToXMLTagMap.put("publication doi", Manuscript.PUBLICATION_DOI);
+        fieldToXMLTagMap.put("online issn",UNNECESSARY);
+        fieldToXMLTagMap.put("journal admin email",UNNECESSARY);
+        fieldToXMLTagMap.put("journal editor",UNNECESSARY);
+        fieldToXMLTagMap.put("journal editor email",UNNECESSARY);
+        fieldToXMLTagMap.put("journal embargo period",UNNECESSARY);
+        fieldToXMLTagMap.put("editor in chief",UNNECESSARY);
+        fieldToXMLTagMap.put("editor in chief email",UNNECESSARY);
 
         // New fields for MolEcol resources GR Note
         fieldToXMLTagMap.put("article type", "Article_Type");
@@ -22,7 +26,5 @@ public class EmailParserForManuscriptCentral extends EmailParser {
         // Accept 'Article type' for PLoS Biology
         fieldToXMLTagMap.put("article type", "Article_Type");
 
-        fieldToXMLTagMap.put("editor in chief","Editor_In_Chief");
-        fieldToXMLTagMap.put("editor in chief email","Editor_In_Chief_Email");
     }
 }

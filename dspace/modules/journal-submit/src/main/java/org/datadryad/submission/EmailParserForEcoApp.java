@@ -1,5 +1,7 @@
 package org.datadryad.submission;
 
+import org.datadryad.rest.models.Manuscript;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,10 +11,10 @@ public class EmailParserForEcoApp extends EmailParser {
 		fieldToXMLTagMap.put("Contact Author and Address", "Corresponding_Author_Address");
 
 		// optional XML fields
-		fieldToXMLTagMap.put("journal editor", "Journal_Editor");
-		fieldToXMLTagMap.put("journal senior editor", "Journal_Editor");
-		fieldToXMLTagMap.put("journal admin email", "Journal_Editor_Email");
-		fieldToXMLTagMap.put("journal embargo period", "Journal_Embargo_Period");
+		fieldToXMLTagMap.put("journal editor", UNNECESSARY);
+		fieldToXMLTagMap.put("journal senior editor", UNNECESSARY);
+		fieldToXMLTagMap.put("journal admin email", UNNECESSARY);
+		fieldToXMLTagMap.put("journal embargo period", UNNECESSARY);
 	}
 
 	@Override
@@ -22,8 +24,8 @@ public class EmailParserForEcoApp extends EmailParser {
 		if (corr_auth_address != null) {
 			Matcher fieldpattern = Pattern.compile("^(.*?)[,;:]\\s*(.*)\\s*$").matcher(corr_auth_address);
 			if (fieldpattern.find()) {
-				dataForXML.put(CORRESPONDING_AUTHOR, fieldpattern.group(1));
-				dataForXML.put(EMAIL, fieldpattern.group(2));
+				dataForXML.put(Manuscript.CORRESPONDING_AUTHOR, fieldpattern.group(1));
+				dataForXML.put(Manuscript.EMAIL, fieldpattern.group(2));
 			}
 		}
 		return;

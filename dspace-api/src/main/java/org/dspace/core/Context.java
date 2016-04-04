@@ -331,9 +331,11 @@ public class Context
                     dispName = EventManager.DEFAULT_DISPATCHER;
                 }
 
-                dispatcher = EventManager.getDispatcher(dispName);
                 connection.commit();
-                dispatcher.dispatch(this);
+                dispatcher = EventManager.getDispatcher(dispName);
+                if (dispatcher != null) {
+                    dispatcher.dispatch(this);
+                }
             }
             else
             {

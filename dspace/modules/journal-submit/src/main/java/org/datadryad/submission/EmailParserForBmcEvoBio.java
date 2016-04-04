@@ -1,11 +1,5 @@
 package org.datadryad.submission;
 
-import java.util.List;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
 import org.datadryad.rest.models.Manuscript;
 
 /**
@@ -16,7 +10,7 @@ public class EmailParserForBmcEvoBio extends EmailParserForManuscriptCentral {
     
     // static block
     static {
-        fieldToXMLTagMap.put("Author Name", CORRESPONDING_AUTHOR);
-        fieldToXMLTagMap.put("Author Email", EMAIL);
+        fieldToXMLTagMap.put("Author Name",  Manuscript.CORRESPONDING_AUTHOR);
+        fieldToXMLTagMap.put("Author Email",  Manuscript.EMAIL);
     }
 }

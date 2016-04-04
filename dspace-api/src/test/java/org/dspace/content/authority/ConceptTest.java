@@ -148,8 +148,7 @@ public class ConceptTest extends AbstractDSpaceObjectTest
 
             context.turnOffAuthorisationSystem();
             Scheme parent = Scheme.create(context);
-            parent.addConcept(c);
-            parent.update();
+            parent.addConcept(context, c);
 
             context.restoreAuthSystemState();
             assertThat("testGetParentObject 1", c.getParentObject(), notNullValue());

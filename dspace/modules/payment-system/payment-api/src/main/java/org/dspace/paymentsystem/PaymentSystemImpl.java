@@ -27,6 +27,7 @@ import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.VersionHistoryImpl;
 import org.dspace.versioning.VersioningService;
 import org.dspace.workflow.DryadWorkflowUtils;
+import org.datadryad.api.DryadJournalConcept;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -375,7 +376,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         //this method check all the discount: journal,country,voucher
         Boolean journalSubscription =  getJournalSubscription(context, shoppingcart, journal);
         Boolean countryDiscount = getCountryWaiver(context,shoppingcart);
-        Boolean voucherDiscount = voucherValidate(context,shoppingcart);
+        Boolean voucherDiscount = voucherValidate(context, shoppingcart);
 
         if(countryDiscount){
             return ShoppingCart.COUNTRY_WAIVER;
@@ -426,20 +427,15 @@ public class PaymentSystemImpl implements PaymentSystemService {
     }
 
     private void updateJournal(Context c,ShoppingCart shoppingCart,String journal){
-        if(!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
-        {
-            if(journal!=null&&journal.length()>0) {
+        if (!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
+            if (journal!=null&&journal.length()>0) {
                 //update shoppingcart journal
-                Map<String, String> properties = JournalUtils.findJournalProperties(c,journal);
-                Boolean subscription = false;
-                if(properties!=null){
-                    if(StringUtils.equals(properties.get("subscriptionPaid"), ShoppingCart.FREE))
-                    {
-                        subscription = true;
-                    }
+                DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
+                if (journalConcept != null) {
+                    Boolean subscription = journalConcept.getSubscriptionPaid();
+                    shoppingCart.setJournal(journal);
+                    shoppingCart.setJournalSub(subscription);
                 }
-                shoppingCart.setJournal(journal);
-                shoppingCart.setJournalSub(subscription);
             }
 
         }

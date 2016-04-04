@@ -118,14 +118,13 @@ public class FlowSchemeUtils {
             Scheme schemeModified = Scheme.find(context, schemeID);
             String originalStatus = schemeModified.getStatus();
             if (originalStatus == null || !originalStatus.equals(status)) {
-                schemeModified.setStatus(status);
+                schemeModified.setStatus(context, status);
             }
             String originalLang = schemeModified.getLang();
             if (originalLang == null || !originalLang.equals(language)) {
-                schemeModified.setLang(language);
+                schemeModified.setLang(context, language);
             }
 
-            schemeModified.update();
             context.commit();
 
             result.setContinue(true);
@@ -155,7 +154,7 @@ public class FlowSchemeUtils {
         {
             Scheme schemeDeleted = Scheme.find(context, Integer.valueOf(id));
             try {
-                schemeDeleted.delete();
+                schemeDeleted.delete(context);
             }
             catch (Exception epde)
             {
@@ -205,7 +204,7 @@ public class FlowSchemeUtils {
         {
             Concept concept = Concept.find(context, Integer.valueOf(id));
             try {
-                schemeDeleted.removeConcept(concept);
+                schemeDeleted.removeConcept(context, concept);
             }
             catch (Exception epde)
             {
@@ -236,7 +235,6 @@ public class FlowSchemeUtils {
         }
         else
         {
-            schemeDeleted.update();
             context.commit();
             result.setOutcome(true);
             result.setMessage(t_delete_Scheme_success_notice);
@@ -253,8 +251,7 @@ public class FlowSchemeUtils {
     {
         Scheme scheme = Scheme.find(context, Integer.parseInt(schemeId));
         Concept concept = Concept.find(context, Integer.parseInt(conceptId));
-        scheme.addConcept(concept);
-        scheme.update();
+        scheme.addConcept(context, concept);
         context.commit();
     }
 

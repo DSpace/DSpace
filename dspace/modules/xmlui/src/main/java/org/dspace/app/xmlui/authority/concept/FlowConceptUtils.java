@@ -24,7 +24,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-
+import org.dspace.JournalUtils;
+import org.datadryad.api.DryadJournalConcept;
 
 /**
  * Utility methods to processes actions on EPeople. These methods are used
@@ -88,13 +89,11 @@ public class FlowConceptUtils {
             if(schemeId!=null&&schemeId.length()>0)
             {
                 Scheme scheme = Scheme.find(context, Integer.parseInt(schemeId));
-                newConcept = scheme.createConcept();
-                newConcept.setStatus(status);
-                newConcept.setLang(language);
-                newConcept.setTopConcept(topConcept);
-                newConcept.update();
-                Term newTerm = newConcept.createTerm(value,Term.prefer_term);
-                newTerm.update();
+                newConcept = scheme.createConcept(context);
+                newConcept.setStatus(context, status);
+                newConcept.setLang(context, language);
+                newConcept.setTopConcept(context, topConcept);
+                Term newTerm = newConcept.createTerm(context, value,Term.prefer_term);
                 context.commit();
                 // success
                 result.setContinue(true);
@@ -145,18 +144,17 @@ public class FlowConceptUtils {
             Concept conceptModified = Concept.find(context, conceptID);
             Boolean originalTopConcept = conceptModified.getTopConcept();
             if (originalTopConcept == null || !originalTopConcept.equals(topConcept)) {
-                conceptModified.setTopConcept(topConcept);
+                conceptModified.setTopConcept(context, topConcept);
             }
             String originalStatus = conceptModified.getStatus();
             if (originalStatus == null || !originalStatus.equals(status)) {
-                conceptModified.setStatus(status);
+                conceptModified.setStatus(context, status);
             }
             String originalLang = conceptModified.getLang();
             if (originalLang == null || !originalLang.equals(language)) {
-                conceptModified.setLang(language);
+                conceptModified.setLang(context, language);
             }
 
-            conceptModified.update();
             context.commit();
 
             result.setContinue(true);
@@ -190,7 +188,7 @@ public class FlowConceptUtils {
         {
             Concept conceptDeleted = Concept.find(context, Integer.valueOf(id));
             try {
-                conceptDeleted.delete();
+                conceptDeleted.delete(context);
             }
             catch (Exception epde)
             {
@@ -301,31 +299,27 @@ public class FlowConceptUtils {
                 //add it as alt term
                 preferred=Integer.toString(Term.alternate_term);
             }
-            Term term = concept.createTerm(literalForm, Integer.parseInt(preferred));
+            Term term = concept.createTerm(context, literalForm, Integer.parseInt(preferred));
             java.util.Date date = new java.util.Date();
-            term.setCreated(date);
+            term.setCreated(context, date);
 
             if (literalForm == null) {
-                term.setLiteralForm(literalForm);
+                term.setLiteralForm(context, literalForm);
             }
 
             if (source == null ) {
-                term.setSource(source);
+                term.setSource(context, source);
             }
 
             if (status == null ) {
-                term.setStatus(status);
+                term.setStatus(context, status);
             }
 
             if (lang == null ) {
-                term.setLang(lang);
-            }
-            if (lang == null ) {
-                term.setLang(lang);
+                term.setLang(context, lang);
             }
 
-            term.setLastModified(date);
-            term.update();
+            term.setLastModified(context, date);
             context.commit();
 
             result.setContinue(true);
@@ -336,6 +330,23 @@ public class FlowConceptUtils {
 
         // Everything was fine
         return result;
+    }
+
+    public static FlowResult processConceptMetadata(Context context, String conceptID, Request request) throws SQLException, AuthorizeException, UIException, IOException {
+        FlowResult flowResult = null;
+        if (request.get("submit_update") != null) {
+            flowResult = processEditConceptMetadata(context, conceptID, request);
+        } else if (request.get("submit_delete") != null) {
+            flowResult = doDeleteMetadataFromConcept(context, conceptID, request);
+        } else if (request.get("submit_add") != null) {
+            flowResult = doAddMetadataToConcept(context, Integer.valueOf(conceptID).intValue(), request);
+        }
+
+        Concept concept = Concept.find(context, Integer.parseInt(conceptID));
+        if (DryadJournalConcept.conceptIsValidJournal(concept)) {
+            JournalUtils.updateDryadJournalConcept(new DryadJournalConcept(context, concept));
+        }
+        return flowResult;
     }
 
     public static FlowResult processEditConceptMetadata(Context context, String id,Request request){
@@ -360,8 +371,7 @@ public class FlowConceptUtils {
         {
             role_id = 1;
         }
-        concept.addTerm(term,role_id);
-        concept.update();
+        concept.addTerm(context, term, role_id);
         context.commit();
     }
     public static FlowResult processDeleteTerm(Context context, String conceptId,String[] termIds)throws SQLException,AuthorizeException{
@@ -424,7 +434,7 @@ public class FlowConceptUtils {
                 if(!conceptId.equals(secondConceptId)) {
                     Concept secondConcept = (Concept)AuthorityObject.find(context,Constants.CONCEPT,Integer.parseInt(secondConceptId));
                     if(secondConcept!=null){
-                        concept.addChildConcept(secondConcept, Integer.parseInt(request.getParameter("roleId")));
+                        concept.addChildConcept(context, secondConcept, Integer.parseInt(request.getParameter("roleId")));
                         context.commit();
                         result.setOutcome(true);
                         result.setMessage(t_add_Concept_success_notice);

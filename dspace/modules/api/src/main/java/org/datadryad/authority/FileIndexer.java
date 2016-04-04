@@ -8,6 +8,7 @@ import org.dspace.core.Utils;
 import org.dspace.JournalUtils;
 import java.sql.SQLException;
 import java.util.*;
+import org.datadryad.api.DryadJournalConcept;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,9 +18,6 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class FileIndexer implements AuthorityIndexerInterface {
-
-    private String SOURCE="LOCAL-DryadJournal";
-
     private AuthorityValue nextValue;
 
     LinkedList<AuthorityValue> authorities = new LinkedList<AuthorityValue>();
@@ -27,19 +25,11 @@ public class FileIndexer implements AuthorityIndexerInterface {
     Context context;
 
     public void init() {
-        Map<String, Map<String, String>> journalProperties = JournalUtils.journalProperties;
-        Set<String> keys = journalProperties.keySet();
-        for(String key :keys){
-            try {
-                if(key != null) {
-                    Map<String, String> props = journalProperties.get(key);
-                    authorities.push(createHashMap(props));
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("unable to process index for journal " + key, e);
-            }
+        DryadJournalConcept[] journalConcepts = JournalUtils.getAllJournalConcepts();
+        for (DryadJournalConcept journalConcept : journalConcepts) {
+            AuthorityValue authorityValue = createAuthorityValue(journalConcept);
+            authorities.push(authorityValue);
         }
-
     }
 
     @Override
@@ -80,15 +70,12 @@ public class FileIndexer implements AuthorityIndexerInterface {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-
-    private AuthorityValue createHashMap(Map<String, String> props) throws Exception {
-
-        String value = props.get(JournalUtils.FULLNAME);
+    private AuthorityValue createAuthorityValue(DryadJournalConcept journalConcept) {
+        String value = journalConcept.getFullName();
 
         AuthorityValue authorityValue = new AuthorityValue();
 
         authorityValue.setId(Utils.getMD5(value));
-        authorityValue.setSource(SOURCE);
         authorityValue.setField("prism.publicationName");
         authorityValue.setValue(value);
         authorityValue.setFullText(value);
@@ -98,7 +85,6 @@ public class FileIndexer implements AuthorityIndexerInterface {
         return authorityValue;
     }
 
-
     private Context getContext() throws SQLException {
         if(context==null) context=new Context();
         return context;
@@ -107,11 +93,6 @@ public class FileIndexer implements AuthorityIndexerInterface {
 
     public String indexerName() {
         return this.getClass().getName();
-    }
-
-
-    public String getSource() {
-        return SOURCE;
     }
 
     public Map<String, String> createHashMap(String fieldName, String value){

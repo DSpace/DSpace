@@ -3,12 +3,15 @@
 package org.datadryad.rest.storage.rdbms;
 
 import java.io.File;
+import java.lang.Exception;
 import java.lang.Integer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.AbstractOrganizationStorage;
 import org.datadryad.rest.storage.StorageException;
@@ -18,6 +21,7 @@ import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.JournalUtils;
 
 /**
  *
@@ -79,7 +83,9 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     }
 
     private static void abortContext(Context context) {
-        context.abort();
+        if (context != null) {
+            context.abort();
+        }
     }
 
     static Organization organizationFromTableRow(TableRow row) {
@@ -98,93 +104,119 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         }
     }
 
-    static TableRow tableRowFromOrganization(Organization organization) {
+    static DryadJournalConcept journalConceptFromTableRow(TableRow row) {
+        DryadJournalConcept journalConcept = null;
+        Organization organization = organizationFromTableRow(row);
         if (organization != null) {
-            TableRow row = new TableRow(ORGANIZATION_TABLE, ORGANIZATION_COLUMNS);
-            if (organization.organizationId != null) {
-                row.setColumn(COLUMN_ID, organization.organizationId);
-            }
-            row.setColumn(COLUMN_CODE, organization.organizationCode);
-            row.setColumn(COLUMN_NAME, organization.organizationName);
-            row.setColumn(COLUMN_ISSN, organization.organizationISSN);
-            return row;
-        } else {
-            return null;
+            journalConcept = JournalUtils.getJournalConceptByJournalName(organization.organizationName);
         }
+        return journalConcept;
     }
 
     public static Organization getOrganizationByCode(Context context, String code) throws SQLException {
-        String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE UPPER(code) = UPPER(?)";
-        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, code);
+        String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE UPPER(code) = UPPER(?) OR UPPER(issn) = UPPER(?)";
+        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, code, code);
         return organizationFromTableRow(row);
     }
 
-    private static List<Organization> getOrganizations(Context context) throws SQLException {
-        List<Organization> organizations = new ArrayList<Organization>();
+    private static List<DryadJournalConcept> getJournalConcepts(Context context) throws SQLException {
+        List<DryadJournalConcept> journalConcepts = new ArrayList<DryadJournalConcept>();
         String query = "SELECT * FROM " + ORGANIZATION_TABLE;
         TableRowIterator rows = DatabaseManager.queryTable(context, ORGANIZATION_TABLE, query);
         while(rows.hasNext()) {
             TableRow row = rows.next();
-            organizations.add(organizationFromTableRow(row));
+            journalConcepts.add(journalConceptFromTableRow(row));
         }
-        return organizations;
+        return journalConcepts;
     }
 
     @Override
-    public Boolean objectExists(StoragePath path, Organization organization) throws StorageException {
-        try {
-            Context context = getContext();
-            String code = organization.organizationCode;
-            Organization databaseOrganization = getOrganizationByCode(context, code);
-            completeContext(context);
-            return databaseOrganization != null;
-        } catch (SQLException ex) {
-            throw new StorageException("Exception finding organization", ex);
+    public Boolean objectExists(StoragePath path, DryadJournalConcept journalConcept) {
+        String name = journalConcept.getFullName();
+        Boolean result = false;
+        if (JournalUtils.getJournalConceptByJournalName(name) != null) {
+            result = true;
         }
+        return result;
     }
 
-    protected void addAll(StoragePath path, List<Organization> organizations) throws StorageException {
+    protected void addAll(StoragePath path, List<DryadJournalConcept> journalConcepts) throws StorageException {
         // passing in a limit of null to addResults should return all records
-        addResults(path, organizations, null, null);
+        addResults(path, journalConcepts, null, null);
     }
 
     @Override
-    protected void addResults(StoragePath path, List<Organization> organizations, String searchParam, Integer limit) throws StorageException {
+    protected void addResults(StoragePath path, List<DryadJournalConcept> journalConcepts, String searchParam, Integer limit) throws StorageException {
+        Context context = null;
         try {
-            ArrayList<Organization> allOrgs = new ArrayList<Organization>();
-            Context context = getContext();
-            allOrgs.addAll(getOrganizations(context));
+            ArrayList<DryadJournalConcept> allJournalConcepts = new ArrayList<DryadJournalConcept>();
+            context = getContext();
+            allJournalConcepts.addAll(getJournalConcepts(context));
             completeContext(context);
             if (searchParam != null) {
-                for (Organization org : allOrgs) {
-                    if (org.organizationCode.equalsIgnoreCase(searchParam)) {
-                        organizations.add(org);
+                for (DryadJournalConcept journalConcept : allJournalConcepts) {
+                    if (journalConcept.getJournalID().equalsIgnoreCase(searchParam)) {
+                        journalConcepts.add(journalConcept);
                     }
                 }
             } else {
-                organizations.addAll(allOrgs);
+                journalConcepts.addAll(allJournalConcepts);
             }
         } catch (SQLException ex) {
+            abortContext(context);
             throw new StorageException("Exception reading organizations", ex);
         }
     }
 
     @Override
-    protected void createObject(StoragePath path, Organization organization) throws StorageException {
-        throw new StorageException("can't create an organization");
+    protected void createObject(StoragePath path, DryadJournalConcept journalConcept) throws StorageException {
+        // if this object is the same as an existing one, delete this temporary one and throw an exception.
+        String name = journalConcept.getFullName();
+        Context context = null;
+        if (JournalUtils.getJournalConceptByJournalName(name) != null) {
+            try {
+                // remove this journal concept because it's a temporary concept.
+                context = getContext();
+                context.turnOffAuthorisationSystem();
+                JournalUtils.removeDryadJournalConcept(context, journalConcept);
+                context.restoreAuthSystemState();
+                completeContext(context);
+            } catch (Exception ex) {
+                abortContext(context);
+                throw new StorageException("Can't create new organization: couldn't remove temporary organization.");
+            }
+        } else {
+            try {
+                context = getContext();
+                context.turnOffAuthorisationSystem();
+                JournalUtils.addDryadJournalConcept(context, journalConcept);
+                context.restoreAuthSystemState();
+                completeContext(context);
+            } catch (Exception ex) {
+                abortContext(context);
+                throw new StorageException("Exception creating organization: " + ex.getMessage(), ex);
+            }
+        }
     }
 
     @Override
-    protected Organization readObject(StoragePath path) throws StorageException {
+    protected DryadJournalConcept readObject(StoragePath path) throws StorageException {
         String organizationCode = path.getOrganizationCode();
+        Context context = null;
         try {
-            Context context = getContext();
+            context = getContext();
             Organization organization = getOrganizationByCode(context, organizationCode);
+            if (organizationCode.equals(organization.organizationISSN)) {
+                // this is an ISSN, replace organizationCode with the organization's code.
+                organizationCode = organization.organizationCode;
+            }
             completeContext(context);
-            return organization;
-        } catch (SQLException ex) {
-            throw new StorageException("Exception reading organization", ex);
+        } catch (Exception e) {
+            abortContext(context);
+            throw new StorageException("Exception reading organization: " + e.getMessage());
         }
+        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(organizationCode);
+        return journalConcept;
     }
 
     @Override
@@ -193,8 +225,26 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     }
 
     @Override
-    protected void updateObject(StoragePath path, Organization organization) throws StorageException {
-        throw new StorageException("can't update an organization");
+    protected void updateObject(StoragePath path, DryadJournalConcept journalConcept) throws StorageException {
+        // we need to compare the new journal concept that was created to any matching existing concepts.
+        // then we need to update the original concept with the new one
+        // then we delete the new one.
+        Context context = null;
+        try {
+            context = getContext();
+            context.turnOffAuthorisationSystem();
+            String name = journalConcept.getFullName();
+            String status = journalConcept.getStatus();
+            context.commit();
+            DryadJournalConcept conceptToUpdate = JournalUtils.getJournalConceptByJournalName(name);
+            conceptToUpdate.transferFromJournalConcept(context, journalConcept);
+            JournalUtils.removeDryadJournalConcept(context, journalConcept);
+            context.restoreAuthSystemState();
+            completeContext(context);
+        } catch (Exception ex) {
+            abortContext(context);
+            throw new StorageException("Exception updating organization: " + ex.getMessage(), ex);
+        }
     }
 
 

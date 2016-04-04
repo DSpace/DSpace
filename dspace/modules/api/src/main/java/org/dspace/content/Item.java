@@ -560,18 +560,14 @@ public class Item extends DSpaceObject
      */
     public DCValue[] getMetadata(String mdString)
     {
-        StringTokenizer dcf = new StringTokenizer(mdString, ".");
+        String[] tokens = getElements(mdString);
 
-        String[] tokens = { "", "", "" };
-        int i = 0;
-        while(dcf.hasMoreTokens())
-        {
-            tokens[i] = dcf.nextToken().trim();
-            i++;
-        }
         String schema = tokens[0];
         String element = tokens[1];
-        String qualifier = tokens[2];
+        String qualifier = "";
+        if (tokens[2] != null) {
+            qualifier = tokens[2];
+        }
 
         DCValue[] values;
         if ("*".equals(qualifier))
@@ -917,7 +913,73 @@ public class Item extends DSpaceObject
      * Add a single metadata field. This is appended to existing
      * values. Use <code>clearDC</code> to remove values.
      *
-     * @param schema
+     * @param mdString
+     *        the schema.element[.qualifier] in a string
+     * @param lang
+     *            the ISO639 language code, optionally followed by an underscore
+     *            and the ISO3166 country code. <code>null</code> means the
+     *            value has no language (for example, a date).
+     * @param value
+     *            the value to add.
+     * @param authority
+     *            the external authority key for this value (or null)
+     * @param confidence
+     *            the authority confidence (default 0)
+     */
+    public void addMetadata(String mdString, String lang, String[] valArray, String[] authArray, int[] confArray) {
+        String[] tokens = getElements(mdString);
+        String schema = tokens[0];
+        String element = tokens[1];
+        String qualifier = null;
+        if (tokens[2] != null) {
+            qualifier = tokens[2];
+        }
+
+        addMetadata(schema, element, qualifier, lang, valArray, authArray, confArray);
+    }
+
+
+    /**
+     * Add a single metadata field. This is appended to existing
+     * values. Use <code>clearDC</code> to remove values.
+     *
+     * @param mdString
+     *        the schema.element[.qualifier] in a string
+     * @param lang
+     *            the ISO639 language code, optionally followed by an underscore
+     *            and the ISO3166 country code. <code>null</code> means the
+     *            value has no language (for example, a date).
+     * @param value
+     *            the value to add.
+     * @param authority
+     *            the external authority key for this value (or null)
+     * @param confidence
+     *            the authority confidence (default 0)
+     */
+    public void addMetadata(String mdString, String lang, String value, String authority, int confidence) {
+        String[] tokens = getElements(mdString);
+        String schema = tokens[0];
+        String element = tokens[1];
+        String qualifier = null;
+        if (tokens[2] != null) {
+            qualifier = tokens[2];
+        }
+
+        String[] valArray = new String[1];
+        String[] authArray = new String[1];
+        int[] confArray = new int[1];
+        valArray[0] = value;
+        authArray[0] = authority;
+        confArray[0] = confidence;
+
+        addMetadata(schema, element, qualifier, lang, valArray, authArray, confArray);
+    }
+
+    /**
+     * Add a single metadata field. This is appended to existing
+     * values. Use <code>clearMetadata</code> to remove values.
+     *
+     * @param mdString
      *            the schema for the metadata field. <em>Must</em> match
      *            the <code>name</code> of an existing metadata schema.
      * @param element
@@ -1018,6 +1080,24 @@ public class Item extends DSpaceObject
         dublinCore.metadataChanged = true;
         updateMetadata();
     }
+
+    /**
+     * Clear a metadata field.
+     *
+     * @param mdString
+     *        the schema.element[.qualifier] in a string
+     */
+    public void clearMetadata(String mdString) {
+        String[] tokens = getElements(mdString);
+        String schema = tokens[0];
+        String element = tokens[1];
+        String qualifier = Item.ANY;
+        if (tokens[2] != null) {
+            qualifier = tokens[2];
+        }
+        clearMetadata(schema, element, qualifier, null);
+    }
+
 
     /**
      * Utility method for pattern-matching metadata elements.  This

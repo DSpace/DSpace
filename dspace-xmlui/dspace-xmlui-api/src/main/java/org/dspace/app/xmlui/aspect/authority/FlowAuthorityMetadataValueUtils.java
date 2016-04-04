@@ -30,7 +30,7 @@ public class FlowAuthorityMetadataValueUtils {
     private static final Logger log = Logger.getLogger(FlowAuthorityMetadataValueUtils.class);
 
 
-    public static FlowResult processEditMetadata(Context context,int type, String authorityId,Request request){
+    public static FlowResult processEditMetadata(Context context, int type, String authorityId,Request request){
         FlowResult result = new FlowResult();
         result.setContinue(false); // default to failure
         try{
@@ -43,12 +43,12 @@ public class FlowAuthorityMetadataValueUtils {
             String scope = request.getParameter("scope");
             if ("*".equals(scope))
             {
-                authorityObject.clearMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+                authorityObject.clearMetadata(context, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             }
             else
             {
                 String[] parts = parseName(scope);
-                authorityObject.clearMetadata(parts[0],parts[1],parts[2],Item.ANY);
+                authorityObject.clearMetadata(context, parts[0],parts[1],parts[2],Item.ANY);
             }
 
             // STEP 2:
@@ -106,11 +106,10 @@ public class FlowAuthorityMetadataValueUtils {
                 {
                     iconf = Choices.CF_NOVALUE;
                 }
-                authorityObject.addMetadata(parts[0], parts[1], parts[2], lang,
+                authorityObject.addMetadata(context, parts[0], parts[1], parts[2], lang,
                         value, authority, iconf);
             }
 
-            authorityObject.update();
             context.commit();
         }catch (Exception e)
         {
