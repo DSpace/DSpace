@@ -31,7 +31,9 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 		    UsageEvent ue = (UsageEvent)event;
 		    try {
 			EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
-			userName = currentUser.getFullName();
+			if(currentUser != null) {
+			    userName = currentUser.getFullName();
+			}
 			SolrLogger.post(ue.getObject(), ue.getRequest(), currentUser);
 		    }
 		    catch(Exception e) {
