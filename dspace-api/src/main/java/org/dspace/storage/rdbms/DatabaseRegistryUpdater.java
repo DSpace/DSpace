@@ -22,16 +22,21 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is a FlywayCallback class which automatically updates the
- * Metadata Schema Registry and Bitstream Formats Registries BEFORE
- * any Database migration occurs.
+ * Metadata Schema Registry and Bitstream Formats Registries AFTER
+ * all Database migrations occur.
  * <P>
- * The reason this runs BEFORE a migration is to ensure that any new
- * metadata fields are FIRST added to our registries, so that the
- * migrations can make use of those new metadata fields, etc.
+ * The reason this runs AFTER all migrations is that the RegistryLoader
+ * and MetadataImporter now depend on Hibernate and Hibernate cannot be
+ * initialized until the Database is fully migrated.
  * <P>
- * However, there is one exception. If this is a "fresh install" of DSpace,
- * we'll need to wait until the necessary database tables are created. In
- * that scenario we will load registries AFTER the initial migration.
+ * If a migration needs to use on one or more registry values, there are
+ * two options:
+ * <UL>
+ * <LI>Create/insert those registry values in the migration itself (via SQL or similar).</LI>
+ * <LI>Alternatively, first check for the existence of the MetadataSchemaRegistry (or similar)
+ * before running the migration logic. If the table or fields do not yet exist, you might be
+ * able to skip the migration logic entirely. See "DatabaseUtils.tableExists()" and similar methods.</LI>
+ * </UL>
  *
  * @author Tim Donohue
  */
@@ -111,6 +116,7 @@ public class DatabaseRegistryUpdater implements FlywayCallback
 
     @Override
     public void afterMigrate(Connection connection) {
+        // Must run AFTER all migrations complete, since it is dependent on Hibernate
         updateRegistries();
     }
 
