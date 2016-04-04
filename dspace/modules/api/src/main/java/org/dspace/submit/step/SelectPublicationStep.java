@@ -198,12 +198,12 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         }
 
         // then look in the request parameter for publication name.
-        if (journal == null) {
+        if (journal == null || "".equals(journal)) {
             journal = request.getParameter("prism_publicationName");
         }
 
         // then look in the unknown_doi parameter.
-        if (journal == null) {
+        if (journal == null || "".equals(journal)) {
             journal = request.getParameter("unknown_doi");
         }
 
