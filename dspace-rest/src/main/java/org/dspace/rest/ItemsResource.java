@@ -693,8 +693,7 @@ public class ItemsResource extends Resource
             writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting item.");
-            org.dspace.content.Collection collection = collectionService.find(context, dspaceItem.getCollections().get(0).getID());
-            collectionService.removeItem(context, collection, dspaceItem);
+            itemService.delete(context, dspaceItem);
             context.complete();
 
         }
