@@ -21,6 +21,7 @@ import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.storage.rdbms.DatabaseUtils;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 import org.slf4j.Logger;
@@ -37,6 +38,8 @@ import org.slf4j.LoggerFactory;
 public class V6_0_2016_04_01__DS_2199_Move_Identifiers
     implements JdbcMigration, MigrationChecksumProvider
 {
+    private static final String SCHEMA_TABLE = "MetadataSchemaRegistry";
+
     private static final String OLD_SCHEMA = MetadataSchema.DC_SCHEMA;
     private static final String OLD_ELEMENT = "identifier";
     private static final String OLD_QUALIFIER = null;
@@ -56,6 +59,31 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
     public void migrate(Connection cnctn)
             throws Exception
     {
+        /*
+         * Bail out if there is no metadata schema registry or it is empty.
+         * If there are no registered schemae,
+         * then we are doing a fresh install or in a test,
+         * and there can be no data to migrate.
+         */
+        if (!DatabaseUtils.tableExists(cnctn, SCHEMA_TABLE))
+        {
+            LOG.info("MetadataSchemaRegistry table does not exist, so there is nothing to migrate.");
+            return;
+        }
+
+        // Find the field IDs for old and new fields
+        final int old_field_id = getMetadataFieldId(cnctn,
+                OLD_SCHEMA, OLD_ELEMENT, OLD_QUALIFIER);
+        final int new_field_id = getMetadataFieldId(cnctn,
+                NEW_SCHEMA, NEW_ELEMENT, NEW_QUALIFIER);
+        if (old_field_id < 0 || new_field_id < 0)
+        {
+            LOG.info("Skipping because old ({}) or new ({}) field ID is undefined",
+                    old_field_id, new_field_id);
+            return;
+        }
+
+        // OK, the required fields exist, so we have work to do.
         final ConfigurationService cfg
                 = DSpaceServicesFactory.getInstance().getConfigurationService();
         final DOIService doiService
@@ -65,11 +93,6 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
                 + cfg.getProperty(EZIDIdentifierProvider.CFG_SHOULDER)
                 + '%';
         LOG.debug("Prefix = {}", prefix);
-
-        final int old_field_id = getMetadataFieldId(cnctn,
-                OLD_SCHEMA, OLD_ELEMENT, OLD_QUALIFIER);
-        final int new_field_id = getMetadataFieldId(cnctn,
-                NEW_SCHEMA, NEW_ELEMENT, NEW_QUALIFIER);
 
         final PreparedStatement select = cnctn.prepareStatement(
                 "SELECT * FROM metadatavalue"
@@ -102,7 +125,6 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
                     rs.updateRow();
 
                     checksum.update(newIdentifier.getBytes(), 0, newIdentifier.length());
-                    oldIdentifier = "unknown";
                 } catch (SQLException e) {
                     LOG.error("Skipped {}:  {}", oldIdentifier, e.getMessage());
                 }
@@ -125,13 +147,12 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
      * @param schema
      * @param element
      * @param qualifier
-     * @return
+     * @return the field ID, or -1 if not found.
      * @throws SQLException on a database error.
-     * @throws IllegalArgumentException if the field is not registered.
      */
     private int getMetadataFieldId(Connection cnctn, String schema,
             String element, String qualifier)
-            throws SQLException, IllegalArgumentException
+            throws SQLException
     {
         PreparedStatement select;
         final String SELECT_FIELD_ID_NULL_QUALIFIER
@@ -147,13 +168,11 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
         if (null == qualifier)
         {
             select = cnctn.prepareStatement(SELECT_FIELD_ID_NULL_QUALIFIER);
-            System.out.println(SELECT_FIELD_ID_NULL_QUALIFIER);
         }
         else
         {
             select = cnctn.prepareStatement(SELECT_FIELD_ID_NONNULL_QUALIFIER);
             select.setString(3, qualifier);
-            System.out.println(SELECT_FIELD_ID_NONNULL_QUALIFIER);
         }
         select.setString(1, schema);
         select.setString(2, element);
@@ -166,9 +185,7 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
         }
         else
         {
-            throw new IllegalArgumentException(
-                    String.format("Field %s.%s.%s is not registered",
-                            schema, element, qualifier));
+            return -1;
         }
     }
 }
