@@ -420,6 +420,7 @@
 
     <message key="xmlui.administrative.Navigation.administrative_metadata_registry">Registry</message>
     <message key="xmlui.administrative.Navigation.administrative_metadata_scheme">Manage Scheme</message>
+    <message key="xmlui.administrative.Navigation.administrative_journal_settings">Manage Journal Settings</message>
 
     <message key="xmlui.aspect.authority.concept.ManageMetadataRegistryMain.actions_head">Metadata Registries</message>
     <message key="xmlui.aspect.authority.concept.ManageMetadataRegistryMain.main_head">Metadata Registries</message>
