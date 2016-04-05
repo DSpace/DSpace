@@ -50,11 +50,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_administrative_authority 	= message("xmlui.administrative.Navigation.administrative_authority_control");
     private static final Message T_administrative_scheme_metadata = message("xmlui.administrative.Navigation.administrative_metadata_scheme");
     private static final Message T_administrative_registry = message("xmlui.administrative.Navigation.administrative_metadata_registry");
-
-
     private static final Message T_account_export			 		= message("xmlui.administrative.Navigation.account_export");
-
     private static final Message T_my_account                       = message("xmlui.EPerson.Navigation.my_account");
+    private static final Message T_administrative_journal_settings = message("xmlui.administrative.Navigation.administrative_journal_settings");
 
     /** Cached validity object */
     private SourceValidity validity;
@@ -184,6 +182,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
             authority.setHead(T_administrative_authority);
             authority.addItemXref(contextPath+"/admin/scheme",T_administrative_scheme_metadata);
+	    authority.addItemXref(contextPath+"/admin/scheme?schemeID=3&search",T_administrative_journal_settings);
         }
     }
     /**
