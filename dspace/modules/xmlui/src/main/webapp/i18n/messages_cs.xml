@@ -3467,4 +3467,12 @@
 	<message key="input_forms.complex_definitions.funding.3_projname.label">Zdroj financí (jméno projektku)</message>
 	<message key="input_forms.complex_definitions.funding.5_openaire_id.label">EU Project Identifier (OpenAIRE)</message>
 	<message key="input_forms.complex_definitions.sizeInfo.2_unit.label">Jednotka</message>
+
+	<!-- cz.cuni.mff.ufal.ContractPage -->
+	<message key="xmlui.ContractPage.title">Smlouva o distribuci dat</message>
+	<message key="xmlui.ContractPage.trail">Smlouva o distribuci dat</message>
+	<message key="xmlui.ContractPage.head">Smlouva o distribuci dat</message>
+	<message key="xmlui.ContractPage.collection_name">{0}</message>
+	<message key="xmlui.ContractPage.explain_non_localized_license">Smlouva se uzavírá v angličtině a její plné znění naleznete níže. Následující český překlad je pouze orientační. V případě rozporů platí anglická verze. </message>
+
 </catalogue>
