@@ -18,6 +18,10 @@ import java.util.Map;
  */
 public class PubmedFieldMapping extends AbstractMetadataFieldMapping {
 
+    /* Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+     * only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+     * what metadatafield is generated.
+     */
     @Override
     @Resource (name = "pubmedMetadataFieldMap")
     public void setMetadataFieldMap(Map metadataFieldMap) {

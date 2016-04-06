@@ -33,6 +33,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     private MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping;
 
+    /* A list of all the dateFormats to attempt, these should be configured to have the most specific first and the more lenient at the back */
     private List<String> dateFormatsToAttempt;
 
 
@@ -69,7 +70,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     @Override
     public Collection<MetadatumDTO> contributeMetadata(T t) {
-        List<MetadatumDTO> values = new LinkedList<MetadatumDTO>();
+        List<MetadatumDTO> values = new LinkedList<>();
 
 
         try {
@@ -89,17 +90,20 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
                     dateString = yearList.get(i).getValue();
                 }
 
-
-                for (String dateFormat : dateFormatsToAttempt) {
+                int j = 0 ;
+                // Use the first dcDate that has been formatted (Config should go from most specific to most lenient)
+                while (j<dateFormatsToAttempt.size() && dcDate==null){
+                    String dateFormat = dateFormatsToAttempt.get(j);
                     try {
                         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
                         Date date = formatter.parse(dateString);
                         dcDate = new DCDate(date);
                     } catch (ParseException e) {
-                        log.error(e.getMessage(), e);
+                        // Multiple dateformats can be configured, we don't want to print the entire stacktrace every time one of those formats fails.
+                        log.info("Failed parsing "+dateString+" using the following format: "+dateFormat+ ", check the configured dataformats in config/spring/api/pubmed-integration.xml");
                     }
+                    j++;
                 }
-
 
                 if (dcDate != null) {
                     values.add(metadataFieldMapping.toDCValue(field, dcDate.toString()));

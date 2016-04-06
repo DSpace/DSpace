@@ -23,6 +23,10 @@ import java.util.*;
  * Created by Roeland Dillen (roeland at atmire dot com)
  * Date: 17/09/12
  * Time: 14:19
+ *
+ * Instead of calling the different importer implementations, the ImportService should be called instead.
+ * This class contains the same methods as the other implementations, but has an extra parameter URL.
+ * This URL should be the same identifier that is returned by the "getImportSource" method that is defined in the importer implementation you want to use.
  */
 public class ImportService implements Destroyable {
     private HashMap<String, Imports> importSources = new HashMap<String, Imports>();

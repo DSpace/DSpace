@@ -39,46 +39,55 @@ public class ImportMetadataSourceServiceImpl extends org.dspace.importer.externa
     private WebTarget pubmedWebTarget;
 
 
+    // Return the number of records from the pubmedWebTarget based on a query String
     @Override
     public int getNbRecords(String query) throws MetadataSourceException {
         return retry(new GetNbRecords(query));
     }
 
+    // Return the number of records from the pubmedWebTarget based on a query object
     @Override
     public int getNbRecords(Query query) throws MetadataSourceException {
         return retry(new GetNbRecords(query));
     }
 
+    // Return the records from the pubmedWebTarget based on a query string, the start and count
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
         return retry(new GetRecords(query, start, count));
     }
 
+    // Return the records from the pubmedWebTarget based on a query object
     @Override
     public Collection<ImportRecord> getRecords(Query q) throws MetadataSourceException {
         return retry(new GetRecords(q));
     }
 
+    // Retrieve a single records based on an id
     @Override
     public ImportRecord getRecord(String id) throws MetadataSourceException {
         return retry(new GetRecord(id));
     }
 
+    // Retrieve a single records based on q query object
     @Override
     public ImportRecord getRecord(Query q) throws MetadataSourceException {
         return retry(new GetRecord(q));
     }
 
+    // Return the configured baseAddress
     @Override
     public String getImportSource() {
         return baseAddress;
     }
 
+    // Return a collection of matching records based on a given item.
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
         return retry(new FindMatchingRecords(item));
     }
 
+    // Return a collection of matching records based on a given query object.
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query q) throws MetadataSourceException {
         return retry(new FindMatchingRecords(q));

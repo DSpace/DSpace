@@ -23,6 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by: Antoine Snyers (antoine at atmire dot com)
  * Date: 27 Oct 2014
+ * This class contains functionality to handle request timeouts and to retry requests.
  */
 public abstract class MetadataSource {
 
