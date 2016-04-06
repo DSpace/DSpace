@@ -466,7 +466,7 @@
         </dependency>
         <dependency>
             <groupId>xml-apis</groupId>
-            <artifactId>xmlParserAPIs</artifactId>
+            <artifactId>xml-apis</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
