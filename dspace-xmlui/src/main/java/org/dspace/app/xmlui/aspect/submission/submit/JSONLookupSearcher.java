@@ -65,7 +65,7 @@ public class JSONLookupSearcher extends AbstractGenerator {
         } catch (SQLException e) {
             log.error(e.getMessage(),e);
         }
-        importService = new DSpace().getServiceManager().getServiceByName(null, ImportService.class);
+        importService = new DSpace().getServiceManager().getServiceByName("importService", ImportService.class);
     }
 
     @Override

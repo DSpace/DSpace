@@ -23,6 +23,8 @@ import java.util.LinkedList;
 /**
  * Created by: Roeland Dillen (roeland at atmire dot com)
  * Date: 29 May 2015
+ * AbstractImportSourceService has a generic type set 'RecordType'.
+ * In the importer implementation this type set should be the class of the records received from the remote source's response
  */
 public abstract class AbstractImportMetadataSourceService<RecordType> extends MetadataSource implements Imports {
 	private GenerateQueryService generateQueryForItem = null;

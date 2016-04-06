@@ -11,6 +11,11 @@ package org.dspace.importer.external.metadatamapping;
  * Created by Philip Vissenaekens (philip at atmire dot com)
  * Date: 21/10/15
  * Time: 09:52
+ *
+ * This class is used to cary data between processes.
+ * Using this class, we have a uniform, generalised single Object type containing the information used by different classes.
+ * This Data Transfer Object contains all data for a call pertaining metadata, resulting in the possibility to return a larger quantity of information.
+ * As this is a generalised class, we can use this across the external imports implementations
  */
 public class MetadatumDTO {
 

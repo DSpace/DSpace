@@ -33,8 +33,10 @@
     </bean>
     <bean id="dateContrib" class="org.dspace.importer.external.pubmed.metadatamapping.PubmedDateMetadatumContributor">
         <property name="dateFormatsToAttempt">
+            <!-- The first format that is successful will be used and the rest will be skipped. Make sure to add the most specific at the top and add the more lenient at the bottom-->
             <list>
                 <value>yyyy-MMM-dd</value>
+                <value>yyyy-MMM</value>
                 <value>yyyy-MM-dd</value>
             </list>
         </property>

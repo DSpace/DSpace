@@ -58,7 +58,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
      */
     @Override
     public Collection<MetadatumDTO> contributeMetadata(T t) {
-        List<MetadatumDTO> values=new LinkedList<MetadatumDTO>();
+        List<MetadatumDTO> values=new LinkedList<>();
 
         LinkedList<LinkedList<MetadatumDTO>> metadatumLists = new LinkedList<>();
 

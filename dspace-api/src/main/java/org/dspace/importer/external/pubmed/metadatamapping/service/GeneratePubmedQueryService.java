@@ -22,10 +22,19 @@ import java.util.List;
  * Created by jonas - jonas@atmire.com on 06/11/15.
  */
 public class GeneratePubmedQueryService implements GenerateQueryService {
+
+
+    /*
+    * Create a Query object based on a given item.
+    * If the item has at least 1 value for dc.identifier.doi, the first one will be used.
+    * If no DOI is found, the title will be used.
+    * When no DOI or title is found, an null object is returned instead.
+    */
     @Override
     public Query generateQueryForItem(Item item) throws MetadataSourceException {
         Query query = new Query();
 
+        // Retrieve an instance of the ItemService to access business calls on an item.
         ItemService itemService = ContentServiceFactory.getInstance().getItemService();
         List<MetadataValue> doi = itemService.getMetadata(item, "dc", "identifier", "doi", Item.ANY);
 

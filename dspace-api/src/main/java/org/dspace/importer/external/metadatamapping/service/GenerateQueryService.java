@@ -18,5 +18,8 @@ import org.dspace.importer.external.MetadataSourceException;
  */
 public interface GenerateQueryService {
 
+    /* Create a Query object based on a given item.
+     * Implementations need to make their own decisions as what to add in or leave out of the query
+     */
     public Query generateQueryForItem(Item item) throws MetadataSourceException;
 }

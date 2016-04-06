@@ -14,5 +14,8 @@ package org.dspace.importer.external.metadatamapping.service;
  */
 public interface MetadataProcessorService {
 
+    /* Process a given metadataValue to make them compliant to specific rules.
+     * Implementations should regulate their own processing as to what is required for a specific cause
+     */
     public String processMetadataValue(String value);
 }

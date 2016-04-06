@@ -31,6 +31,9 @@ public abstract class AbstractMetadataFieldMapping<RecordType> implements Metada
      */
     private static Logger log = Logger.getLogger(AbstractMetadataFieldMapping.class);
 
+    /* A map containing what processing has to be done on a given metadataFieldConfig.
+     * The processing of a value is used to determine the actual value that will be returned used.
+     */
     private Map<MetadataFieldConfig, MetadataProcessorService> metadataProcessorMap;
 
     public void setMetadataProcessorMap(Map<MetadataFieldConfig, MetadataProcessorService> metadataProcessorMap)

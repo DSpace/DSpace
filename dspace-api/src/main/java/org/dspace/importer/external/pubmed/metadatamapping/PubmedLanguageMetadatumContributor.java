@@ -31,6 +31,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
 
     public PubmedLanguageMetadatumContributor() {
         iso3toIso2=new HashMap<>();
+        // Populate the languageMap with the mapping between iso3 and iso2 language codes
         for (Locale locale : Locale.getAvailableLocales()) {
             iso3toIso2.put(locale.getISO3Language(),locale.getLanguage());
         }
@@ -56,7 +57,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
             LinkedList<MetadatumDTO> languageList = (LinkedList<MetadatumDTO>) language.contributeMetadata(t);
 
             for (MetadatumDTO metadatum : languageList) {
-
+                // Add the iso2 language code corresponding to the retrieved iso3 code to the metadata
                 values.add(metadataFieldMapping.toDCValue(field, iso3toIso2.get(metadatum.getValue().toLowerCase())));
             }
         } catch (Exception e) {
