@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -815,21 +816,11 @@ public class HandleServlet extends DSpaceServlet
     {
         // Find all the "parent" communities for the community
         List<Community> parents = communityService.getAllParents(context, c);
-
-        // put into an array in reverse order
-        List<Community> reversedParents = new ArrayList<>();
-        int index = parents.size() - 1;
-
-        for (int i = 0; i < parents.size(); i++)
-        {
-            reversedParents.add(parents.get(index - i));
-        }
-
+        parents = Lists.reverse(parents);
         if (include)
         {
-            reversedParents.add(0, c);
+            parents.add(c);
         }
-
-        return reversedParents;
+        return parents;
     }
 }
