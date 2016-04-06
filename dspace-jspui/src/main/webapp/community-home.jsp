@@ -115,7 +115,7 @@
 <p class="copyrightText"><%= copyright %></p>
 	<div class="row">
 <%
-	if (rs != null)
+	if (rs != null  && rs.count() > 0)
 	{ %>
 	<div class="col-md-8">
         <div class="panel panel-primary">        
