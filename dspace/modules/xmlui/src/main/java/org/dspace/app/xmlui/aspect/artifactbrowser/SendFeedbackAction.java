@@ -78,6 +78,10 @@ public class SendFeedbackAction extends AbstractAction
         String agent = request.getHeader("User-Agent");
         String session = request.getSession().getId();
         String comments = request.getParameter("comments");
+        String subject = request.getParameter("subject");
+        if (subject == null) {
+            subject = "Feedback Form Information";
+        }
 
         // Obtain information from request
         // The page where the user came from
@@ -168,6 +172,7 @@ public class SendFeedbackAction extends AbstractAction
         email.addArgument(agent);      // User agent
         email.addArgument(session);    // Session ID
         email.addArgument(comments);   // The feedback itself
+        email.addArgument(subject);    // Subject
 
         // Replying to feedback will reply to email on form
         email.setReplyTo(address);
