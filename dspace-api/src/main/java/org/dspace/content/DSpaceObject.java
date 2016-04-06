@@ -8,6 +8,8 @@
 package org.dspace.content;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.handle.Handle;
 import org.hibernate.annotations.GenericGenerator;
@@ -44,7 +46,7 @@ public abstract class DSpaceObject implements Serializable
     // Order by is here to ensure that the oldest handle is retrieved first,
     // multiple handles are assigned to the latest version of an item the original handle will have the lowest identifier
     // This handle is the prefered handle.
-    @OrderBy("handle_id ASC")
+    @OrderBy("id ASC")
     private List<Handle> handles = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", cascade={CascadeType.PERSIST}, orphanRemoval = false)
@@ -192,4 +194,5 @@ public abstract class DSpaceObject implements Serializable
     protected void setModified() {
         this.modified = true;
     }
+
 }

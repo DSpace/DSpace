@@ -8,6 +8,7 @@
 package org.dspace.core;
 
 import org.dspace.storage.rdbms.DatabaseConfigVO;
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -32,10 +33,13 @@ public class HibernateDBConnection implements DBConnection<Session> {
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
 
+    private boolean batchModeEnabled = false;
+
     @Override
     public Session getSession() throws SQLException {
         if(!isTransActionAlive()){
             sessionFactory.getCurrentSession().beginTransaction();
+            configureBatchMode();
         }
         return sessionFactory.getCurrentSession();
     }
@@ -74,6 +78,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
     public void commit() throws SQLException {
         if(isTransActionAlive() && !getTransaction().wasRolledBack())
         {
+            getSession().flush();
             getTransaction().commit();
         }
     }
@@ -110,6 +115,26 @@ public class HibernateDBConnection implements DBConnection<Session> {
 
 	@Override
 	public void clearCache() throws SQLException {
-		this.getSession().clear();
+        getSession().flush();
+		getSession().clear();
 	}
+
+    @Override
+    public long getCacheSize() throws SQLException {
+        return getSession().getStatistics().getEntityCount();
+    }
+
+    @Override
+    public void setOptimizedForBatchProcessing(final boolean batchOptimized) throws SQLException {
+        this.batchModeEnabled = batchOptimized;
+        configureBatchMode();
+    }
+
+    private void configureBatchMode() throws SQLException {
+        if(batchModeEnabled) {
+            getSession().setFlushMode(FlushMode.ALWAYS);
+        } else {
+            getSession().setFlushMode(FlushMode.AUTO);
+        }
+    }
 }

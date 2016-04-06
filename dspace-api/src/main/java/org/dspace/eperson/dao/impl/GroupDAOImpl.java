@@ -97,7 +97,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         query.setParameter("name", name);
         query.setCacheable(true);
 
-        return uniqueResult(query);
+        return singleResult(query);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
             query.setParameter("eperson_id", ePerson.getID());
             query.setCacheable(true);
 
-            return uniqueResult(query);
+            return singleResult(query);
         }
     }
 

@@ -41,4 +41,8 @@ public interface DBConnection<T> {
     public DatabaseConfigVO getDatabaseConfig() throws SQLException;
     
     public void clearCache() throws SQLException;
+
+    public void setOptimizedForBatchProcessing(boolean batchOptimized) throws SQLException;
+
+    public long getCacheSize() throws SQLException;
 }

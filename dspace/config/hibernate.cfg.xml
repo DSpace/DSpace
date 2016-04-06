@@ -12,6 +12,7 @@
         <property name="hibernate.hbm2ddl.auto">validate</property>
         <property name="hibernate.hbm2ddl.import_files_sql_extractor">org.hibernate.tool.hbm2ddl.SingleLineSqlCommandExtractor</property>
         <property name="hibernate.connection.autocommit">false</property>
+        <property name="hibernate.jdbc.batch_size">20</property>
         <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
 
         <!--Debug property that can be used to display the sql-->

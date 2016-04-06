@@ -26,7 +26,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedItem;
-import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
@@ -622,7 +621,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Remove any Handle
         handleService.unbindHandle(context, item);
 
-                // remove version attached to the item
+        // remove version attached to the item
         removeVersion(context, item);
 
         // Finally remove item row

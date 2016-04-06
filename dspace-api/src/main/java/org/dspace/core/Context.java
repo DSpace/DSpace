@@ -7,9 +7,6 @@
  */
 package org.dspace.core;
 
-import java.sql.SQLException;
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -21,6 +18,9 @@ import org.dspace.event.service.EventService;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.utils.DSpace;
 import org.springframework.util.CollectionUtils;
+
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Class representing the context of a particular DSpace operation. This stores
@@ -89,9 +89,13 @@ public class Context
         init();
     }
 
+
     /**
      * Construct a new context object with default options. A database connection is opened.
      * No user is authenticated.
+     *
+     * @exception SQLException
+     *                if there was an error obtaining a database connection
      */
     public Context()
     {
@@ -152,6 +156,10 @@ public class Context
     DBConnection getDBConnection()
     {
         return dbConnection;
+    }
+
+    public void enableBatchMode(boolean batchModeEnabled) throws SQLException {
+        dbConnection.setOptimizedForBatchProcessing(batchModeEnabled);
     }
 
 
@@ -346,8 +354,31 @@ public class Context
         if(!isValid())
             log.info("complete() was called on a closed Context object. No changes to commit.");
 
-        // FIXME: Might be good not to do a commit() if nothing has actually
-        // been written using this connection
+        try
+        {
+            // As long as we have a valid, writeable database connection,
+            // commit any changes made as part of the transaction
+            commit();
+        }
+        finally
+        {
+            if(dbConnection != null)
+            {
+                // Free the DB connection
+                dbConnection.closeDBConnection();
+                dbConnection = null;
+            }
+        }
+    }
+
+    public void commit() throws SQLException
+    {
+        // If Context is no longer open/valid, just note that it has already been closed
+        if(!isValid()) {
+            log.info("commit() was called on a closed Context object. No changes to commit.");
+        }
+
+        // Our DB Connection (Hibernate) will decide if an actual commit is required or not
         try
         {
             // As long as we have a valid, writeable database connection,
@@ -356,16 +387,16 @@ public class Context
             {
                 dispatchEvents();
             }
-        }
-        finally
-        {
+
+        } finally {
+            if(log.isDebugEnabled()) {
+                log.debug("Cache size on commit is " + getCacheSize());
+            }
+
             if(dbConnection != null)
             {
                 //Commit our changes
                 dbConnection.commit();
-                // Free the DB connection
-                dbConnection.closeDBConnection();
-                dbConnection = null;
             }
         }
     }
@@ -594,6 +625,20 @@ public class Context
     }
 
 	public void clearCache() throws SQLException {
+        if(log.isDebugEnabled()) {
+            log.debug("Cache size before clear cache is " + getCacheSize());
+        }
+
+        UUID epersonId = getCurrentUser().getID();
+
 		this.getDBConnection().clearCache();
+
+        if(epersonId != null) {
+            setCurrentUser(EPersonServiceFactory.getInstance().getEPersonService().find(this, epersonId));
+        }
 	}
+
+    public long getCacheSize() throws SQLException {
+        return this.getDBConnection().getCacheSize();
+    }
 }
