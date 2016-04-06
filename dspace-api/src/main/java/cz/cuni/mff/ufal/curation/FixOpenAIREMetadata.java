@@ -1,6 +1,7 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal.curation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.DCInput;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -15,7 +16,7 @@ import org.dspace.curate.Curator;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Arrays;
 
 public class FixOpenAIREMetadata extends AbstractCurationTask
 {
@@ -34,7 +35,12 @@ public class FixOpenAIREMetadata extends AbstractCurationTask
         if (dso.getType() == Constants.ITEM)
         {
             Item item = (Item)dso;
-            
+
+			//Curation before approval - might not have handle
+			String itemId = item.getHandle() == null ? Integer.toString(item.getID()) : item.getHandle();
+
+			results.append("Processing ").append(itemId).append(":\n");
+
             
             ArrayList<String> valid_dc_relations = new ArrayList<String>();
 
@@ -54,6 +60,7 @@ public class FixOpenAIREMetadata extends AbstractCurationTask
             	
             	Choices choices = authority.getMatches("dc_relation", id, -1, 0, 0, null);
             	if(choices.total>0) {
+					results.append("Found authority value for '" + value[1] + "'\n");
             		String dc_relation_value = choices.values[0].value;
             		
             		valid_dc_relations.add(dc_relation_value);            		
@@ -62,13 +69,18 @@ public class FixOpenAIREMetadata extends AbstractCurationTask
             		//test if sponsor contains OpenAIRE id at the end
             		if(!value[value.length-1].equals(dc_relation_value)){
             			Metadatum newValue = m.copy();
+						if(value[value.length-1].contains("info:eu-repo")){
+							results.append(String.format("WARN: Sponsor contains info:eu-repo but authority value differs (was %s is %s)\n", value[value.length-1], dc_relation_value));
+							String[] valueButLast = Arrays.copyOfRange(value, 0, value.length - 1);
+							newValue.value = StringUtils.join(valueButLast, DCInput.ComplexDefinition.SEPARATOR);
+						}
             			newValue.value += DCInput.ComplexDefinition.SEPARATOR + dc_relation_value;
             			item.replaceMetadataValue(m, newValue);
             		}
             		            		
             	} else {
             		status = Curator.CURATE_ERROR;
-            		results.append("OpenAIRE return zero results for '" + value[1] + "'");
+            		results.append("OpenAIRE return zero results for '" + value[1] + "'\n");
                     report(results.toString());
                     setResult(results.toString());
                     return status;
@@ -84,9 +96,7 @@ public class FixOpenAIREMetadata extends AbstractCurationTask
             try {
 				item.update();
 	            status = Curator.CURATE_SUCCESS;
-				//Curation before approval - might not have handle
-				String prefix = item.getHandle() == null ? "Item" : item.getHandle();
-	            results.append(prefix + " synced for OpenAIRE").append("\n");
+	            results.append("synced for OpenAIRE").append("\n");
 			} catch (SQLException | AuthorizeException e) {
 				status = Curator.CURATE_FAIL;
 				results.append(e.getLocalizedMessage()).append("\n");

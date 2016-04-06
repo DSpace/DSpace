@@ -1,14 +1,19 @@
 #!/bin/bash
+set -o nounset
+set -o errexit
+set -o pipefail
 
 # Get the DSPACE/bin directory
 BINDIR=$(dirname $0)
 
 echo "> Starting \"$0\" execution..."
 
+FILE=`mktemp`
+
 echo "Updating OpenAIRE Project list"
 
 # Read parameters from DSpace config
-FILE=`$BINDIR/dspace dsrun org.dspace.core.ConfigurationManager -module openaire -property projects.filename`
+FINAL_FILE=`$BINDIR/dspace dsrun org.dspace.core.ConfigurationManager -module openaire -property projects.filename`
 ONLINE=`$BINDIR/dspace dsrun org.dspace.core.ConfigurationManager -module openaire -property projects.url`
 
 ONLINE=$(echo $ONLINE | sed 's/\"//g')
@@ -29,7 +34,7 @@ do
          cp "$url" "${INTFILE}"
       fi
 
-      xmllint --format "${INTFILE}" | head -n -2 > "$FILE"
+      xmllint --format "${INTFILE}" | xsltproc $BINDIR/openaire.xslt - | head -n -2 > "$FILE"
       rm "${INTFILE}"
 
       i=$(($i+1))
@@ -40,7 +45,7 @@ do
          cp "$url" "${INTFILE}"
       fi
 
-      xmllint --format "${INTFILE}" | head -n -2 | tail -n +4 >> "$FILE"
+      xmllint --format "${INTFILE}" | xsltproc $BINDIR/openaire.xslt - | head -n -2 | tail -n +4 >> "$FILE"
       rm "${INTFILE}"
 
       i=$(($i+1))
@@ -48,5 +53,7 @@ do
 done
 
 echo -e "\n$XML_CLOSE_ELEMENTS" >> $FILE
+
+mv $FILE $FINAL_FILE
 
 echo "> Ended \"$0\" execution."
