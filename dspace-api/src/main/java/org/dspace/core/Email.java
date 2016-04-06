@@ -265,18 +265,6 @@ public class Email
         String username = ConfigurationManager.getProperty("mail.server.username");
         String password = ConfigurationManager.getProperty("mail.server.password");
         
-        if (username != null)
-        {
-            props.put("mail.smtp.auth", "true");
-            SMTPAuthenticator smtpAuthenticator = new SMTPAuthenticator(
-                    username, password);
-            session = Session.getInstance(props, smtpAuthenticator);
-        }
-        else
-        {
-            session = Session.getDefaultInstance(props);
-        }
-
         // Set extra configuration properties
         String extras = ConfigurationManager.getProperty("mail.extraproperties");
         if ((extras != null) && (!"".equals(extras.trim())))
@@ -289,6 +277,18 @@ public class Email
                 value = argument.substring(argument.indexOf('=') + 1).trim();
                 props.put(key, value);
             }
+        }
+        
+        if (username != null)
+        {
+            props.put("mail.smtp.auth", "true");
+            SMTPAuthenticator smtpAuthenticator = new SMTPAuthenticator(
+                    username, password);
+            session = Session.getInstance(props, smtpAuthenticator);
+        }
+        else
+        {
+            session = Session.getDefaultInstance(props);
         }
 
         // Create message
