@@ -174,6 +174,14 @@
 	var jQ = jQuery.noConflict();
 	jQ(document).ready(function() {
 		
+		j("#item_idchecker").click(function() {
+			var inputbutton = j(this).prop('id');
+			var var1 = j(this).data('checkboxname');
+			var inputstatus = j('#'+inputbutton).prop( "checked");
+		    j("input[name*='"+var1+"']").prop('checked', inputstatus);
+		    j('#submit_export').attr('disabled', !inputstatus);
+		});
+		
 		var checkboxes = jQ("input[type='checkbox']"), submitButt = jQ("#export-submit-button"), radio = jQ("input[type='radio']");
 
 		radio.click(function() {
@@ -251,11 +259,6 @@
 	});
 	function validateFilters() {
 		return document.getElementById("filterquery").value.length > 0;
-	}
-	function changeAll(var1,var2) {
-		var inputbutton = jQ(var2).prop('id');
-		var inputstatus = jQ('#'+inputbutton).prop( "checked");
-		jQ("input[name*='"+var1+"']").prop('checked', inputstatus);
 	}
 	-->		
 </script>		
