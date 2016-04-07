@@ -243,7 +243,7 @@ public class GoogleMetadata extends MappingMetadata
     /**
      * Fetch retaining the order of the values for any given key in which they
      * where added (like authors).
-     * 
+     *
      * Usage: GoogleMetadata gmd = new GoogleMetadata(item); for(Entry<String,
      * String> mapping : googlemd.getMappings()) { ... }
      * 

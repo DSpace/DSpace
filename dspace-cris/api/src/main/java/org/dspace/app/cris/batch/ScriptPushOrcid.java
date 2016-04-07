@@ -123,16 +123,20 @@ public class ScriptPushOrcid {
 			if (line.getOptions() == null || line.getOptions().length == 0) {
 				List<OrcidQueue> queue = applicationService.getList(OrcidQueue.class);
 				List<ResearcherPage> rpWithManualModeEnabled = new ArrayList<ResearcherPage>();
+		        boolean byPassManualMode = ConfigurationManager.getBooleanProperty("cris",
+		                "system.script.pushtoorcid.force", false);
 				for (OrcidQueue orcidQueue : queue) {
 					// see preferences and mode (batch vs manual)
 					ResearcherPage rp = applicationService.getEntityByCrisId(orcidQueue.getOwner(),
 							ResearcherPage.class);
-					if (PushToORCID.isManualModeEnable(rp)) {
+					if (!byPassManualMode && PushToORCID.isManualModeEnable(rp)) {
 						if (!rpWithManualModeEnabled.contains(rp)) {
 							rpWithManualModeEnabled.add(rp);
 						}
 					}
-					PushToORCID.sendOrcidQueue(applicationService, orcidQueue);
+					else {
+					    PushToORCID.sendOrcidQueue(applicationService, orcidQueue);
+					}
 				}
 				for (ResearcherPage rp : rpWithManualModeEnabled) {
 					PushToORCID.sendEmail(context, rp, rp.getCrisID());

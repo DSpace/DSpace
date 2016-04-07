@@ -34,6 +34,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
     request.setAttribute("LanguageSwitch", "hide");
@@ -113,7 +114,8 @@ List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(conte
 				<% for(ResourcePolicy rpolicy : rpolicies) { 
 						if(rpolicy.getStartDate()!=null) {
 						%>
-							<i class="label label-info"><fmt:message key="jsp.submit.review.policies.embargoed"><fmt:param><%= rpolicy.getStartDate() %></fmt:param></fmt:message></i>				    
+							<c:set var="policyStartDate" value="<%= rpolicy.getStartDate() %>" target="java.util.Date"/>
+							<i class="label label-info"><fmt:message key="jsp.submit.review.policies.embargoed"><fmt:param value="${policyStartDate}"/></fmt:message></i>				    
 						<%
 						}
 						else { 

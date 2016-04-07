@@ -7,12 +7,12 @@
  */
 package org.dspace.discovery;
 
-import org.apache.solr.client.solrj.SolrServerException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
-
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 
 /**
  * Interface used for indexing dspaceobject into discovery
@@ -54,6 +54,8 @@ public interface IndexingService {
     void updateIndex(Context context, boolean force);
 
     void updateIndex(Context context, boolean force, int type);
+    
+    void updateIndex(Context context, List<Integer> ids, boolean force, int type);
 
     void cleanIndex(boolean force) throws IOException,
             SQLException, SearchServiceException;

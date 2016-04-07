@@ -19,8 +19,8 @@
 	<bean id="rpStatComponentsService" class="org.dspace.app.cris.integration.CrisComponentsService">
 		<property name="components">
 			<map>
-
-				<entry key="dspaceitems" value-ref="publicationlist" />			</map>
+				<entry key="dspaceitems" value-ref="publicationlist" />			
+			</map>
 		</property>
 	</bean>
 	
@@ -32,8 +32,6 @@
 			</map>
 		</property>
 	</bean>
-
-	
 		
 	<!-- Publication component for RP -->
 	<bean id="publicationlist"
@@ -277,7 +275,7 @@
 		class="org.dspace.app.webui.cris.components.CRISRPConfigurerComponent">
 		<property name="relationConfiguration" ref="relationOUVSRPConfiguration" />		
 		<property name="target" value="org.dspace.app.cris.model.OrganizationUnit" />
-		<property name="facets" ref="facetsRPConfiguration" />
+		<property name="facets" ref="facetsRPforComponentConfiguration" />
 		<property name="types">
 			<map>
 				<entry key="persons" value-ref="personsForOUComponent" />								

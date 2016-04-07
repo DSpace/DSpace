@@ -63,7 +63,7 @@
 	    <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/static/css/dataTables.bootstrap.min.css"/>
 		<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/static/css/buttons.bootstrap.min.css"/>
 		<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/static/css/responsive.bootstrap.min.css"/>
-		<link rel="stylesheet" href="<%= request.getContextPath() %>/static/polyu-layout/css/dspace-theme.css" type="text/css" />
+		<link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
 		<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/css/bootstrap-datetimepicker.min.css" />
 <%
     if (!"NONE".equals(feedRef))

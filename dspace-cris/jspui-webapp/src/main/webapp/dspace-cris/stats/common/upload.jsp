@@ -43,10 +43,6 @@
 	</c:when>
 	<c:otherwise> 
 		<fmt:message key="view.${data.jspKey}.${statType}.${objectName}.data.empty" />
-		<div>
-	<span class="label label-info">from:</span>&nbsp; ${data.stats_from_date} &nbsp;&nbsp;&nbsp; <span class="label label-info">to:</span> &nbsp; ${data.stats_to_date}
-						<a class="btn btn-default" data-toggle="modal" data-target="#stats-date-change-dialog"><fmt:message key="view.statistics.change-range" /></a>
-	</div>	
 				
 	</c:otherwise>
 </c:choose>

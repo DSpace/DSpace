@@ -237,7 +237,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         request.setAttribute(
                 "qResults" + getRelationConfiguration().getRelationName(),
                 docs);
-        List<String[]> appliedFilters = DiscoverUtility.getFilters(request);
+        List<String[]> appliedFilters = DiscoverUtility.getFilters(request, getRelationConfiguration().getRelationName());
         request.setAttribute(
                 "appliedFilters" + getRelationConfiguration().getRelationName(),
                 appliedFilters);
@@ -355,7 +355,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         List<String> userFilters = new ArrayList<String>();
         if (request != null)
         {
-            List<String[]> httpfilters = DiscoverUtility.getFilters(request);
+            List<String[]> httpfilters = DiscoverUtility.getFilters(request, getRelationConfiguration().getRelationName());
             for (String[] f : httpfilters)
             {
                 try
@@ -675,7 +675,9 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         int etAl = UIUtil.getIntParameter(request, "etAl" + type);
         if (etAl == -1)
         {
-            etAl = types.get(type).getEtal();
+            if(getTypes()!=null && getTypes().containsKey(type)) {
+                etAl = getTypes().get(type).getEtal();
+            }
         }
         return etAl;
     }
@@ -695,14 +697,19 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         String order = request.getParameter("order" + type);
         if (order == null)
         {
-            order = getTypes().get(type).getOrder();
+            if(getTypes()!=null && getTypes().containsKey(type)) {
+                order = getTypes().get(type).getOrder();
+            }
         }
         return order;
     }
     
     private List<String> getExtraFields(String type)
     {
-        return getTypes().get(type).getExtraFields();
+        if(getTypes()!=null && getTypes().containsKey(type)) {
+            return getTypes().get(type).getExtraFields();
+        }
+        return new ArrayList<String>();
     }
 
     private int getSortBy(HttpServletRequest request, String type)
@@ -710,14 +717,20 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         int sortBy = UIUtil.getIntParameter(request, "sort_by" + type);
         if (sortBy == -1)
         {
-            sortBy = getTypes().get(type).getSortby();
+            if(getTypes()!=null && getTypes().containsKey(type)) {
+                sortBy = getTypes().get(type).getSortby();
+            }
         }
         return sortBy;
     }
 
     protected List<String> getFilters(String type)
-    {
-        return getTypes().get(type).getFilters();
+    {        
+        if(getTypes()!=null && getTypes().containsKey(type)) {
+            return getTypes().get(type).getFilters();
+        }
+        
+        return new ArrayList<String>();
     }
 
     public Map<String, IBC> getTypes()

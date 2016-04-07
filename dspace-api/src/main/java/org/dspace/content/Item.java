@@ -249,7 +249,32 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
 
         return new ItemIterator(context, rows);
 	}
-	
+
+    public static List<Integer> findAllItemIDsUnfiltered(Context context)
+            throws SQLException
+    {
+        String myQuery = "SELECT * FROM item WHERE in_archive='1' or withdrawn='1'";
+        TableRowIterator rows = null;
+        List<Integer> result = new ArrayList<Integer>();
+        try
+        {
+            rows = DatabaseManager.query(context, myQuery);
+            while (rows.hasNext())
+            {
+                TableRow row = rows.next();
+                result.add(row.getIntColumn("item_id"));
+            }
+        }
+        finally
+        {
+            if (rows != null)
+            {
+                rows.close();
+            }
+        }
+        return result;
+    }
+    
     /**
      * Find all the items in the archive by a given submitter. The order is
      * indeterminate. Only items with the "in archive" flag set are included.
@@ -286,7 +311,7 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
         }
 
         String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' " +
-                "AND (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) AND metadata_field_id = ?";
+                "AND item.item_id = metadatavalue.resource_id AND metadatavalue.resource_type_id=2 AND metadata_field_id = ?";
         TableRowIterator rows = null;
         if (Item.ANY.equals(authority)) {
             rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID());

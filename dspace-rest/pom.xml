@@ -3,7 +3,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-rest</artifactId>
     <packaging>war</packaging>
-    <version>CRIS-5.4.1-SNAPSHOT</version>
+    <version>CRIS-5.5.1-SNAPSHOT</version>
     <name>DSpace REST :: API and Implementation</name>
     <description>DSpace RESTful Web Services API</description>
     <url>http://demo.dspace.org</url>
@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>CRIS-5.4.1-SNAPSHOT</version>
+        <version>CRIS-5.5.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -33,21 +33,21 @@
 
     <dependencies>
         <!-- Jersey, for RESTful web services -->
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
+        <dependency>            
+            <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>1.19</version>
+            <version>2.22.1</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-servlet</artifactId>
-            <version>1.19</version>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>2.22.1</version>
         </dependency>
         <!-- JSON serialization, should I use jackson?-->
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-            <version>1.19</version>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>2.22.1</version>
         </dependency>
                 
         <!-- Spring 3 dependencies -->
@@ -67,10 +67,10 @@
         </dependency>
 		
         <!-- Jersey + Spring -->
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-spring</artifactId>
-            <version>1.19</version>
+        <dependency>                        
+            <groupId>org.glassfish.jersey.ext</groupId>
+	    	<artifactId>jersey-spring3</artifactId>
+            <version>2.22.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -133,5 +133,12 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
         </dependency>
+        
+   	   <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>2.4.3</version>
+        </dependency>
+
     </dependencies>
 </project>

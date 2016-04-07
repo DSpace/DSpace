@@ -40,9 +40,13 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
     private static Logger log = Logger
             .getLogger(RPResourcePolicyListener.class);
 
+    private static final String QUERY_DELETE_WITH_EPERSON = "select * from resourcepolicy where eperson_id = ? resource_type_id = 9 and resource_id = ?";
+
+    private static final String QUERY_DELETE_WITHOUT_EPERSON = "select * from resourcepolicy where resource_type_id = 9 and resource_id = ?";
+
     @Override
     public void onPostDelete(PostDeleteEvent event)
-    {    	
+    {
         Object object = event.getEntity();
         if (!(object instanceof ResearcherPage))
         {
@@ -51,7 +55,7 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
         }
 
         log.debug("Call onPostDelete " + RPResourcePolicyListener.class);
-        
+
         ResearcherPage cris = (ResearcherPage) object;
 
         Context context = null;
@@ -59,15 +63,14 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
         {
             context = new Context();
             context.turnOffAuthorisationSystem();
-            if(cris.getEpersonID()!=null) {
-                delete(cris.getEpersonID(), cris.getId(), context);
-            }
+            delete(null, cris.getId(), context);
             context.complete();
         }
         catch (Exception e)
         {
-            log.error("Failed to delete resource policy attached to RP just deleted"
-                    + cris.getPublicPath() + " uuid:" + cris.getUuid());
+            log.error(
+                    "Failed to delete resource policy attached to RP just deleted"
+                            + cris.getPublicPath() + " uuid:" + cris.getUuid());
             emailException(e);
         }
         finally
@@ -83,12 +86,18 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
     private void delete(Integer epersonID, Integer rpID, Context context)
             throws SQLException
     {
-        TableRow row = DatabaseManager
-                .querySingleTable(
-                        context,
-                        "ResourcePolicy",
-                        "select * from resourcepolicy where eperson_id = ? and resource_type_id = 9 and resource_id = ?",
-                        epersonID, rpID);
+        TableRow row = null;
+
+        if (epersonID == null)
+        {
+            row = DatabaseManager.querySingleTable(context, "ResourcePolicy",
+                    QUERY_DELETE_WITHOUT_EPERSON, rpID);
+        }
+        else
+        {
+            row = DatabaseManager.querySingleTable(context, "ResourcePolicy",
+                    QUERY_DELETE_WITH_EPERSON, epersonID, rpID);
+        }
         if (row != null)
         {
             DatabaseManager.delete(context, row);
@@ -106,7 +115,7 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
         }
 
         log.debug("Call onPostInsert " + RPResourcePolicyListener.class);
-        
+
         ResearcherPage cris = (ResearcherPage) object;
 
         Context context = null;
@@ -129,8 +138,9 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
         }
         catch (Exception e)
         {
-            log.error("Failed to delete resource policy attached to RP just deleted"
-                    + cris.getPublicPath() + " uuid:" + cris.getUuid());
+            log.error(
+                    "Failed to delete resource policy attached to RP just deleted"
+                            + cris.getPublicPath() + " uuid:" + cris.getUuid());
             emailException(e);
         }
         finally
@@ -155,7 +165,7 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
         }
 
         log.debug("Call onPostUpdate " + RPResourcePolicyListener.class);
-        
+
         ResearcherPage cris = (ResearcherPage) object;
 
         Context context = null;
@@ -163,9 +173,10 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
         {
             context = new Context();
             context.turnOffAuthorisationSystem();
-            if ((cris.getOldEpersonID() != null && !cris.getOldEpersonID()
-                    .equals(cris.getEpersonID()))
-                    || (cris.getOldEpersonID() == null && cris.getEpersonID() != null))
+            if ((cris.getOldEpersonID() != null
+                    && !cris.getOldEpersonID().equals(cris.getEpersonID()))
+                    || (cris.getOldEpersonID() == null
+                            && cris.getEpersonID() != null))
             {
                 if (cris.getEpersonID() != null)
                 {
@@ -188,8 +199,9 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
         }
         catch (Exception e)
         {
-            log.error("Failed to delete resource policy attached to RP just deleted"
-                    + cris.getPublicPath() + " uuid:" + cris.getUuid());
+            log.error(
+                    "Failed to delete resource policy attached to RP just deleted"
+                            + cris.getPublicPath() + " uuid:" + cris.getUuid());
             emailException(e);
         }
         finally
@@ -208,7 +220,7 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
         Object object = event.getEntity();
         if (object instanceof ResearcherPage)
         {
-        	log.debug("Call onPostLoad " + RPResourcePolicyListener.class);
+            log.debug("Call onPostLoad " + RPResourcePolicyListener.class);
             ResearcherPage rp = (ResearcherPage) object;
             rp.setOldEpersonID(rp.getEpersonID());
             log.debug("End onPostLoad " + RPResourcePolicyListener.class);
@@ -225,12 +237,11 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
 
             if (recipient != null)
             {
-                Email email = Email
-                        .getEmail(I18nUtil.getEmailFilename(
-                                Locale.getDefault(), "internal_error"));
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(
+                        Locale.getDefault(), "internal_error"));
                 email.addRecipient(recipient);
-                email.addArgument(ConfigurationManager
-                        .getProperty("dspace.url"));
+                email.addArgument(
+                        ConfigurationManager.getProperty("dspace.url"));
                 email.addArgument(new Date());
 
                 String stackTrace;

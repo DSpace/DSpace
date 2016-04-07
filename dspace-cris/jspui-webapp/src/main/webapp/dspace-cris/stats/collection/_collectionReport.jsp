@@ -17,7 +17,7 @@
 	<c:set value="3" var="markerasnumber"/>
 	<%@include file="../common/topBitStream.jsp"%>
 </c:when>
-<c:when test="${(type eq 'upload') && (data.seeUpload)} ">
+<c:when test="${(type eq 'upload') && (data.seeUpload)}">
 	<c:set value="4" var="markerasnumber"/>
 	<%@include file="../common/upload.jsp"%>
 </c:when>

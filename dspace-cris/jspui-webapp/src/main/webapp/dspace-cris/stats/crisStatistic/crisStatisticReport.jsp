@@ -54,9 +54,20 @@
 <div id="content">
 
  	<h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param><h1><fmt:message key="statistics.type.${data.target.simpleName}" /></fmt:param><fmt:param><a href="${contextPath}/cris/${data.object.publicPath}/${data.object.crisID}">${data.title}</a></fmt:param></fmt:message></h1>
-
+	
+	<div class="pull-right">
+		<span class="label label-info"><fmt:message key="view.statistics.range.from" /></span> &nbsp; 
+			<c:if test="${empty data.stats_from_date}"><fmt:message key="view.statistics.range.no-start-date" /></c:if>
+			${data.stats_from_date} &nbsp;&nbsp;&nbsp; 
+		<span class="label label-info"><fmt:message key="view.statistics.range.to" /></span> &nbsp; 
+			<c:if test="${empty data.stats_to_date}"><fmt:message key="view.statistics.range.no-end-date" /></c:if>
+			${data.stats_to_date} &nbsp;&nbsp;&nbsp;
+		<a class="btn btn-default" data-toggle="modal" data-target="#stats-date-change-dialog"><fmt:message key="view.statistics.change-range" /></a>
+	</div>	
+	
 	<div class="row">			 
 	 <c:set var="type"><%=request.getParameter("type") %></c:set>
+	 <%@include file="/dspace-cris/stats/common/changeRange.jsp"%>
 	<%@ include file="/dspace-cris/stats/crisStatistic/_crisStatisticReport-right.jsp" %>
 
 	<div class="richeditor">

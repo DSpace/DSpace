@@ -9,8 +9,6 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
@@ -429,7 +427,7 @@
             <%
             } else {
             %>
-            query:{workspace_item_id:'<%= subInfo.getSubmissionItem().getID()%>'}
+                query:{workspace_item_id:'<%= subInfo.getSubmissionItem().getID()%>'}
             <%}%>
           });
         // Resumable.js isn't supported, fall back on a different method

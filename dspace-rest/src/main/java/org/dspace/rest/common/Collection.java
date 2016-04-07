@@ -12,6 +12,7 @@ import org.dspace.content.ItemIterator;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.SQLException;
@@ -46,13 +47,15 @@ public class Collection extends DSpaceObject {
 
     public Collection(){}
 
-    public Collection(org.dspace.content.Collection collection, String expand, Context context, Integer limit, Integer offset) throws SQLException, WebApplicationException{
-        super(collection);
-        setup(collection, expand, context, limit, offset);
-    }
+    
+    public Collection(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset) throws SQLException, WebApplicationException{
+	        super(collection, servletContext);
+	        setup(collection, servletContext, expand, context, limit, offset);
+     }
 
-    private void setup(org.dspace.content.Collection collection, String expand, Context context, Integer limit, Integer offset) throws SQLException{
-        List<String> expandFields = new ArrayList<String>();
+    
+     private void setup(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset) throws SQLException{
+    List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
@@ -61,11 +64,11 @@ public class Collection extends DSpaceObject {
         this.setIntroductoryText(collection.getMetadata(org.dspace.content.Collection.INTRODUCTORY_TEXT));
         this.setShortDescription(collection.getMetadata(org.dspace.content.Collection.SHORT_DESCRIPTION));
         this.setSidebarText(collection.getMetadata(org.dspace.content.Collection.SIDEBAR_TEXT));
-        
+
         if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
             org.dspace.content.Community[] parentCommunities = collection.getCommunities();
             for(org.dspace.content.Community parentCommunity : parentCommunities) {
-                this.addParentCommunityList(new Community(parentCommunity, null, context));
+                this.addParentCommunityList(new Community(parentCommunity, servletContext, null, context));
             }
         } else {
             this.addExpand("parentCommunityList");
@@ -73,7 +76,7 @@ public class Collection extends DSpaceObject {
 
         if(expandFields.contains("parentCommunity") | expandFields.contains("all")) {
             org.dspace.content.Community parentCommunity = (org.dspace.content.Community) collection.getParentObject();
-            this.setParentCommunity(new Community(parentCommunity, null, context));
+            this.setParentCommunity(new Community(parentCommunity, servletContext, null, context));
         } else {
             this.addExpand("parentCommunity");
         }
@@ -92,7 +95,7 @@ public class Collection extends DSpaceObject {
                 org.dspace.content.Item item = childItems.next();
 
                 if(ItemService.isItemListedForUser(context, item)) {
-                    items.add(new Item(item, null, context));
+                    items.add(new Item(item, servletContext, null, context));
                 }
             }
         } else {
@@ -107,7 +110,7 @@ public class Collection extends DSpaceObject {
 
         if(expandFields.contains("logo") || expandFields.contains("all")) {
             if(collection.getLogo() != null) {
-                this.logo = new Bitstream(collection.getLogo(), null);
+                this.logo = new Bitstream(collection.getLogo(), servletContext, null, context);
             }
         }
         else {

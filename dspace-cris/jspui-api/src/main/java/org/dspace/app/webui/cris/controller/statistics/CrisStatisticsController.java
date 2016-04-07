@@ -247,6 +247,9 @@ public class CrisStatisticsController<T extends ACrisObject<P, TP, NP, NTP, ACNO
             data.put("object", getObject(request));
             data.put("target", getTarget());
             data.put("rightMenu", rightMenu);
+            data.put("stats_from_date", startDateParam);
+            data.put("stats_to_date", endDateParam);
+            data.put("type", type);
             data.put("relationType",
                     CrisConstants.getEntityTypeText(relationObjectType));
             data.put("showExtraTab", statsComponentsService.isShowExtraTab());

@@ -286,14 +286,14 @@ public class EventManager
 
             try {
 
-            for (Iterator ci = ((Dispatcher) dispatcher).getConsumers()
-                    .iterator(); ci.hasNext();)
-            {
-                ConsumerProfile cp = (ConsumerProfile) ci.next();
-                if (cp != null)
+                for (Iterator ci = ((Dispatcher) dispatcher).getConsumers()
+                        .iterator(); ci.hasNext();)
                 {
-                    cp.getConsumer().finish(ctx);
-                }
+                    ConsumerProfile cp = (ConsumerProfile) ci.next();
+                    if (cp != null)
+                    {
+                        cp.getConsumer().finish(ctx);
+                    }
                 }
 
                 ctx.complete();

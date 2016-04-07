@@ -151,7 +151,7 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
         List<String> userFilters = new ArrayList<String>();
         if (request != null)
         {
-            List<String[]> filters = DiscoverUtility.getFilters(request);
+            List<String[]> filters = DiscoverUtility.getFilters(request, getRelationConfiguration().getRelationName());
             for (String[] f : filters)
             {
                 try

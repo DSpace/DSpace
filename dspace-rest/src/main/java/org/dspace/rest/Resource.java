@@ -31,14 +31,15 @@ import org.dspace.utils.DSpace;
  * context, write statistics, processsing exceptions, splitting a key of
  * metadata, string representation of action and method for getting the logged
  * in user from the token in request header.
- * 
+ *
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
- * 
+ *
  */
 public class Resource
 {
 
-    @javax.ws.rs.core.Context public static ServletContext servletContext;
+    @javax.ws.rs.core.Context public ServletContext servletContext;
+
 
     private static Logger log = Logger.getLogger(Resource.class);
 
@@ -48,8 +49,9 @@ public class Resource
         writeStatistics = ConfigurationManager.getBooleanProperty("rest", "stats", false);
     }
 
-    static public String getServletContextPath() {
-        return servletContext.getContextPath();
+    
+     public String getServletContextPath() {
+	        return servletContext.getContextPath();
     }
     /**
      * Create context to work with DSpace database. It can create context
@@ -58,7 +60,7 @@ public class Resource
      * with reading from database. Throws AuthorizeException if there was
      * a problem with authorization to read from the database. Throws Exception
      * if there was a problem creating context.
-     * 
+     *
      * @param person
      *            User which will be logged in context.
      * @return Newly created context with the logged in user unless the specified user was null.
@@ -133,7 +135,7 @@ public class Resource
     /**
      * Process exception, print message to logger error stream and abort DSpace
      * context.
-     * 
+     *
      * @param message
      *            Message, which will be printed to error stream.
      * @param context
@@ -172,7 +174,7 @@ public class Resource
 
     /**
      * Split string with regex ".".
-     * 
+     *
      * @param key
      *            String which will be splitted.
      * @return String array filed with separated string.
@@ -205,7 +207,7 @@ public class Resource
     /**
      * Return string representation of values
      * org.dspace.core.Constants.{READ,WRITE,DELETE}.
-     * 
+     *
      * @param action
      *            Constant from org.dspace.core.Constants.*
      * @return String representation. read or write or delete.
@@ -240,7 +242,7 @@ public class Resource
     /**
      * Return EPerson based on stored token in headers under
      * "rest-dspace-token".
-     * 
+     *
      * @param headers
      *            Only must have "rest-api-token" for successfull return of
      *            user.

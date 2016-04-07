@@ -244,7 +244,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor {
 		List<DiscoverySearchFilter> availableFilters = discoveryConfiguration.getSearchFilters();
 		request.setAttribute("availableFilters", availableFilters);
 
-		List<String[]> appliedFilters = DiscoverUtility.getFilters(request);
+		List<String[]> appliedFilters = DiscoverUtility.getFilters(request, null);
 		request.setAttribute("appliedFilters", appliedFilters);
 		List<String> appliedFilterQueries = new ArrayList<String>();
 		for (String[] filter : appliedFilters) {
@@ -559,7 +559,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor {
 		List<DiscoverySearchFilter> availableFilters = discoveryConfiguration.getSearchFilters();
 		request.setAttribute("availableFilters", availableFilters);
 
-		List<String[]> appliedFilters = DiscoverUtility.getFilters(request);
+		List<String[]> appliedFilters = DiscoverUtility.getFilters(request, null);
 		request.setAttribute("appliedFilters", appliedFilters);
 		List<String> appliedFilterQueries = new ArrayList<String>();
 		for (String[] filter : appliedFilters) {
