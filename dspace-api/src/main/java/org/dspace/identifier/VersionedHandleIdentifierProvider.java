@@ -428,9 +428,10 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         return identifier;
     }
     
-    protected void populateHandleMetadata(Context context, Item item, String handleref)
+    protected void populateHandleMetadata(Context context, Item item, String handle)
             throws SQLException, IOException, AuthorizeException
     {
+        String handleref = getCanonicalForm(handle);
         // we want to remove the old handle and insert the new. To do so, we 
         // load all identifiers, clear the metadata field, re add all 
         // identifiers which are not from type handle and add the new handle.
