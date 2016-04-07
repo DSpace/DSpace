@@ -610,13 +610,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogManager.getHeader(context, "delete_item", "item_id="
                 + item.getID()));
 
-        deleteMetadata(context, item);
-
         // Remove bundles
         removeAllBundles(context, item);
-
-        // remove all of our authorization policies
-        authorizeService.removeAllPolicies(context, item, false);
 
         // Remove any Handle
         handleService.unbindHandle(context, item);

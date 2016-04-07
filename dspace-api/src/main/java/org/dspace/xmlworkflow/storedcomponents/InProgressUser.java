@@ -8,6 +8,7 @@
 package org.dspace.xmlworkflow.storedcomponents;
 
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 
 import javax.persistence.*;
@@ -22,13 +23,13 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="cwf_in_progress_user")
-public class InProgressUser {
+public class InProgressUser implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name="in_progress_user_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="cwf_in_progress_user_seq")
     @SequenceGenerator(name="cwf_in_progress_user_seq", sequenceName="cwf_in_progress_user_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
@@ -51,7 +52,7 @@ public class InProgressUser {
 
     }
 
-    public int getId() {
+    public Integer getID() {
         return id;
     }
 

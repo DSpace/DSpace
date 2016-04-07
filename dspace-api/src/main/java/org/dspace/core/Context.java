@@ -158,11 +158,6 @@ public class Context
         return dbConnection;
     }
 
-    public void enableBatchMode(boolean batchModeEnabled) throws SQLException {
-        dbConnection.setOptimizedForBatchProcessing(batchModeEnabled);
-    }
-
-
     public DatabaseConfigVO getDBConfig() throws SQLException
     {
         return dbConnection.getDatabaseConfig();
@@ -371,6 +366,16 @@ public class Context
         }
     }
 
+    /**
+     * Commit the current transaction with the database, persisting any pending changes.
+     * The database connection is not closed and can be reused afterwards.
+     *
+     * <b>WARNING: After calling this method all previously fetched entities are "detached" (pending
+     * changes are not tracked anymore). You have to reload all entities you still want to work manually
+     * after this method call (see {@link Context#reloadEntity(ReloadableEntity)}).</b>
+     *
+     * @throws SQLException When committing the transaction in the database fails.
+     */
     public void commit() throws SQLException
     {
         // If Context is no longer open/valid, just note that it has already been closed
@@ -397,6 +402,7 @@ public class Context
             {
                 //Commit our changes
                 dbConnection.commit();
+                reloadContextBoundEntities();
             }
         }
     }
@@ -624,21 +630,82 @@ public class Context
         dbConnection.shutdown();
     }
 
+    /**
+     * Clear the cache of all object that have been read from the database so far. This will also free up
+     * (heap space) memory. You should use this method when processing a large number of records.
+     *
+     * <b>WARNING: After calling this method all previously fetched entities are "detached" (pending
+     * changes are not tracked anymore). You have to reload all entities you still want to work manually
+     * after this method call (see {@link Context#reloadEntity(ReloadableEntity)}).</b>
+     *
+     * This method will take care of reloading the current user.
+     *
+     * @throws SQLException When clearing the entity cache fails
+     */
 	public void clearCache() throws SQLException {
         if(log.isDebugEnabled()) {
             log.debug("Cache size before clear cache is " + getCacheSize());
         }
 
-        UUID epersonId = getCurrentUser().getID();
-
 		this.getDBConnection().clearCache();
 
-        if(epersonId != null) {
-            setCurrentUser(EPersonServiceFactory.getInstance().getEPersonService().find(this, epersonId));
-        }
-	}
+        reloadContextBoundEntities();
+    }
 
+    /**
+     * Returns the size of the cache of all object that have been read from the database so far. A larger number
+     * means that more memory is consumed by the cache. This also has a negative impact on the query performance. In
+     * that case you should consider clearing the cache (see {@link Context#clearCache() clearCache}).
+     *
+     * @throws SQLException When connecting to the active cache fails.
+     */
     public long getCacheSize() throws SQLException {
         return this.getDBConnection().getCacheSize();
+    }
+
+    /**
+     * Enable or disable "batch processing mode" for this context.
+     *
+     * Enabling batch processing mode means that the database connection is configured so that it is optimized to
+     * process a large number of records.
+     *
+     * Disabling batch processing mode restores the normal behaviour that is optimal for querying and updating a
+     * small number of records.
+     *
+     * @param batchModeEnabled When true, batch processing mode will be enabled. If false, it will be disabled.
+     * @throws SQLException When configuring the database connection fails.
+     */
+    public void enableBatchMode(boolean batchModeEnabled) throws SQLException {
+        dbConnection.setOptimizedForBatchProcessing(batchModeEnabled);
+    }
+
+    /**
+     * Check if "batch processing mode" is enabled for this context.
+     * @return True if batch processing mode is enabled, false otherwise.
+     */
+    public boolean isBatchModeEnabled() {
+        return dbConnection.isOptimizedForBatchProcessing();
+    }
+
+    /**
+     * Reload an entity from the database into the cache. This method will return a reference to the "attached"
+     * entity. This means changes to the entity will be tracked and persisted to the database.
+     *
+     * @param entity The entity to reload
+     * @param <E> The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @return A (possibly) <b>NEW</b> reference to the entity that should be used for further processing.
+     * @throws SQLException When reloading the entity from the database fails.
+     */
+    @SuppressWarnings("unchecked")
+    public <E extends ReloadableEntity> E reloadEntity(E entity) throws SQLException {
+        return (E) dbConnection.reloadEntity(entity);
+    }
+
+    /**
+     * Reload all entities related to this context.
+     * @throws SQLException When reloading one of the entities fails.
+     */
+    private void reloadContextBoundEntities() throws SQLException {
+        currentUser = reloadEntity(currentUser);
     }
 }

@@ -215,6 +215,7 @@ public class OAIHarvester {
      */
 	public void runHarvest() throws SQLException, IOException, AuthorizeException
 	{
+		boolean originalMode = ourContext.isBatchModeEnabled();
 		ourContext.enableBatchMode(true);
 
 		// figure out the relevant parameters
@@ -436,7 +437,7 @@ public class OAIHarvester {
 		log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested " + currentRecord + " items.");
 		harvestedCollection.update(ourContext, harvestRow);
 
-		ourContext.enableBatchMode(false);
+		ourContext.enableBatchMode(originalMode);
 	}
 
 	private void intermediateCommit() throws SQLException {
@@ -462,9 +463,9 @@ public class OAIHarvester {
 	}
 
 	private void reloadRequiredEntities() throws SQLException {
-		//Load our objects in our cache
-		targetCollection = collectionService.find(ourContext, targetCollection.getID());
-		harvestRow = harvestedCollection.find(ourContext, targetCollection);
+		//Reload our objects in our cache
+		targetCollection = ourContext.reloadEntity(targetCollection);
+		harvestRow = ourContext.reloadEntity(harvestRow);
 	}
 
 	/**

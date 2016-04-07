@@ -44,7 +44,6 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         Query query = createQuery(context,
                 "SELECT p " +
                 "FROM EPerson p " +
-                "LEFT JOIN FETCH p.metadata " +
                 "WHERE p.email = :email" );
 
         query.setParameter("email", email.toLowerCase());
@@ -59,7 +58,6 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         Query query = createQuery(context,
                 "SELECT p " +
                         "FROM EPerson p " +
-                        "LEFT JOIN FETCH p.metadata " +
                         "WHERE p.netid = :netid" );
 
         query.setParameter("netid", netid);
@@ -70,8 +68,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     @Override
     public List<EPerson> search(Context context, String query, List<MetadataField> queryFields, List<MetadataField> sortFields, int offset, int limit) throws SQLException
     {
-        String queryString = "SELECT " + EPerson.class.getSimpleName().toLowerCase() + " FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase()
-                + " LEFT JOIN FETCH " + EPerson.class.getSimpleName().toLowerCase() + ".metadata ";
+        String queryString = "SELECT " + EPerson.class.getSimpleName().toLowerCase() + " FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase() + " ";
 
         if(query != null) query= "%"+query.toLowerCase()+"%";
         Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, sortFields, null);
@@ -98,8 +95,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
 
     @Override
     public List<EPerson> findAll(Context context, MetadataField metadataSortField, String sortField) throws SQLException {
-        String queryString = "SELECT " + EPerson.class.getSimpleName().toLowerCase() + " FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase()
-                + " LEFT JOIN FETCH " + EPerson.class.getSimpleName().toLowerCase() + ".metadata ";
+        String queryString = "SELECT " + EPerson.class.getSimpleName().toLowerCase() + " FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase();
 
         List<MetadataField> sortFields = ListUtils.EMPTY_LIST;
 
@@ -131,7 +127,6 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         Query query = createQuery(context,
                 "SELECT p " +
                         "FROM EPerson p " +
-                        "LEFT JOIN FETCH p.metadata " +
                         "WHERE p.password IS NOT NULL AND p.digestAlgorithm IS NULL " );
 
         return list(query);
@@ -142,7 +137,6 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         Query query = createQuery(context,
                 "SELECT p " +
                         "FROM EPerson p " +
-                        "LEFT JOIN FETCH p.metadata " +
                         "WHERE p.lastActive <= :date " );
         query.setParameter("date", date);
 
@@ -172,7 +166,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
             query.setParameter("queryParam", "%"+queryParam.toLowerCase()+"%");
         }
         for (MetadataField metadataField : metadataFieldsToJoin) {
-            query.setParameter(metadataField.toString(), metadataField.getFieldID());
+            query.setParameter(metadataField.toString(), metadataField.getID());
         }
 
         return query;
@@ -180,7 +174,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
 
     @Override
     public List<EPerson> findAllSubscribers(Context context) throws SQLException {
-        return list(createQuery(context, "SELECT DISTINCT e from Subscription s JOIN s.ePerson e LEFT JOIN FETCH e.metadata "));
+        return list(createQuery(context, "SELECT DISTINCT e from Subscription s JOIN s.ePerson e "));
     }
 
     @Override

@@ -72,7 +72,7 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     public void update(Context context, MetadataValue metadataValue) throws SQLException {
         metadataValueDAO.save(context, metadataValue);
         log.info(LogManager.getHeader(context, "update_metadatavalue",
-                "metadata_value_id=" + metadataValue.getValueId()));
+                "metadata_value_id=" + metadataValue.getID()));
 
     }
 
@@ -89,15 +89,8 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     @Override
     public void delete(Context context, MetadataValue metadataValue) throws SQLException {
         log.info(LogManager.getHeader(context, "delete_metadata_value",
-                " metadata_value_id=" + metadataValue.getValueId()));
+                " metadata_value_id=" + metadataValue.getID()));
         metadataValueDAO.delete(context, metadataValue);
-    }
-
-    @Override
-    public void delete(Context context, DSpaceObject dso) throws SQLException {
-        log.info(LogManager.getHeader(context, "delete_metadata_values",
-                " dso=" + dso.getID()));
-        metadataValueDAO.delete(context, dso);
     }
 
     @Override

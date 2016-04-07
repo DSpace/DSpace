@@ -69,7 +69,7 @@ public class CrosswalkMetadataValidator {
                 if (forceCreate && schemaChoice.equals("add")) {
                     try {
                         mdSchema = metadataSchemaService.create(context, schema, String.valueOf(new Date().getTime()));
-                        mdSchema.setNamespace("unknown" + mdSchema.getSchemaID());
+                        mdSchema.setNamespace("unknown" + mdSchema.getID());
                         metadataSchemaService.update(context, mdSchema);
                     } catch (NonUniqueMetadataException e) {
                         // This case should not be possible

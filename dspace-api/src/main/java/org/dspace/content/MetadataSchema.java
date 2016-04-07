@@ -8,12 +8,11 @@
 package org.dspace.content;
 
 import org.dspace.core.Context;
-import org.hibernate.annotations.*;
+import org.dspace.core.ReloadableEntity;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 
 /**
  * Class representing a schema in DSpace.
@@ -32,7 +31,7 @@ import javax.persistence.Table;
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Table(name="metadataschemaregistry")
-public class MetadataSchema
+public class MetadataSchema implements ReloadableEntity<Integer>
 {
     /** Short Name of built-in Dublin Core schema. */
     public static final String DC_SCHEMA = "dc";
@@ -41,7 +40,7 @@ public class MetadataSchema
     @Column(name="metadata_schema_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="metadataschemaregistry_seq")
     @SequenceGenerator(name="metadataschemaregistry_seq", sequenceName="metadataschemaregistry_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
 
     @Column(name = "namespace", unique = true, length = 256)
     private String namespace;
@@ -137,7 +136,7 @@ public class MetadataSchema
      *
      * @return schema record key
      */
-    public int getSchemaID()
+    public Integer getID()
     {
         return id;
     }

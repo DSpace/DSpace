@@ -44,5 +44,13 @@ public interface DBConnection<T> {
 
     public void setOptimizedForBatchProcessing(boolean batchOptimized) throws SQLException;
 
+    public boolean isOptimizedForBatchProcessing();
+
     public long getCacheSize() throws SQLException;
+
+    /**
+     * Reload a DSpace object from the database. This will make sure the object is valid and stored in the cache.
+     * @param entity The DSpace object to reload
+     */
+    public <E extends ReloadableEntity> E reloadEntity(E entity) throws SQLException;
 }

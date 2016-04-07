@@ -55,7 +55,7 @@ public class MetadataField {
         }
         
         this.setName(sb.toString());
-        this.setFieldId(field.getFieldID());
+        this.setFieldId(field.getID());
         this.setElement(field.getElement());
         this.setQualifier(field.getQualifier());
         this.setDescription(field.getScopeNote());

@@ -394,17 +394,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     /**
-     * Protected method that deletes all metadata values from the database, should only be called when deleting the item.
-     * @param context the dspaceObject
-     * @param dso the dspaceObject who's metadata we are to delete
-     * @throws SQLException if database error
-     */
-    protected void deleteMetadata(Context context, T dso) throws SQLException {
-
-        metadataValueService.delete(context, dso);
-    }
-
-    /**
      * Utility method for pattern-matching metadata elements.  This
      * method will return <code>true</code> if the given schema,
      * element, qualifier and language match the schema, element,

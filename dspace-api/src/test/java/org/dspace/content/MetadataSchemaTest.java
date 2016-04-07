@@ -7,18 +7,20 @@
  */
 package org.dspace.content;
 
-import org.dspace.authorize.AuthorizeException;
 import mockit.NonStrictExpectations;
+import org.apache.log4j.Logger;
+import org.dspace.AbstractUnitTest;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataSchemaService;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.AbstractUnitTest;
-import org.apache.log4j.Logger;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.MetadataSchemaService;
-import org.junit.*;
-import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * Unit Tests for class MetadataSchema
@@ -120,7 +122,7 @@ public class MetadataSchemaTest extends AbstractUnitTest
     @Test
     public void testGetSchemaID() throws SQLException
     {
-        assertThat("testGetSchemaID 0",ms.getSchemaID(), equalTo(metadataSchemaService.find(context, MetadataSchema.DC_SCHEMA).getSchemaID()));
+        assertThat("testGetSchemaID 0",ms.getID(), equalTo(metadataSchemaService.find(context, MetadataSchema.DC_SCHEMA).getID()));
     }
 
     /**
@@ -188,7 +190,7 @@ public class MetadataSchemaTest extends AbstractUnitTest
         log.info(">>"+ms.getNamespace()+" "+ms.getName());
         MetadataSchema found = metadataSchemaService.findByNamespace(context, ms.getNamespace());
         assertThat("testFindByNamespace 0",found, notNullValue());
-        assertThat("testFindByNamespace 1",found.getSchemaID(), equalTo(ms.getSchemaID()));
+        assertThat("testFindByNamespace 1",found.getID(), equalTo(ms.getID()));
     }
 
     /**
@@ -210,7 +212,7 @@ public class MetadataSchemaTest extends AbstractUnitTest
         metadataSchemaService.update(context, metadataSchema);
 
         MetadataSchema found = metadataSchemaService.findByNamespace(context, namespace);
-        assertThat("testUpdateAuth 0",found.getSchemaID(), equalTo(metadataSchema.getSchemaID()));
+        assertThat("testUpdateAuth 0",found.getID(), equalTo(metadataSchema.getID()));
     }
 
     /**
@@ -321,9 +323,9 @@ public class MetadataSchemaTest extends AbstractUnitTest
     @Test
     public void testFind_Context_int() throws Exception
     {
-        MetadataSchema found = metadataSchemaService.find(context, ms.getSchemaID());
+        MetadataSchema found = metadataSchemaService.find(context, ms.getID());
         assertThat("testFind_Context_int 0",found, notNullValue());
-        assertThat("testFind_Context_int 1",found.getSchemaID(), equalTo(ms.getSchemaID()));
+        assertThat("testFind_Context_int 1",found.getID(), equalTo(ms.getID()));
         assertThat("testFind_Context_int 2",found.getName(), equalTo(ms.getName()));
         assertThat("testFind_Context_int 3",found.getNamespace(), equalTo(ms.getNamespace()));
     }
@@ -337,7 +339,7 @@ public class MetadataSchemaTest extends AbstractUnitTest
         String shortName = ms.getName();
         MetadataSchema found = metadataSchemaService.find(context, shortName);
         assertThat("testFind_Context_String 0",found, notNullValue());
-        assertThat("testFind_Context_String 1",found.getSchemaID(), equalTo(ms.getSchemaID()));
+        assertThat("testFind_Context_String 1",found.getID(), equalTo(ms.getID()));
         assertThat("testFind_Context_String 2",found.getName(), equalTo(ms.getName()));
         assertThat("testFind_Context_String 3",found.getNamespace(), equalTo(ms.getNamespace()));
 

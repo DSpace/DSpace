@@ -7,31 +7,20 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.registries;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.CheckBox;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Highlight;
-import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.app.xmlui.wing.element.TextArea;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Edit a metadata schema by: listing all the existing fields in
@@ -177,7 +166,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		
 		for (MetadataField field : fields)
 		{
-			String id = String.valueOf(field.getFieldID());
+			String id = String.valueOf(field.getID());
 			String fieldElement = field.getElement();
 			String fieldQualifier = field.getQualifier();
 			
@@ -188,7 +177,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
             }
 				
 			boolean highlight = false;
-			if (field.getFieldID() == highlightID)
+			if (field.getID() == highlightID)
             {
                 highlight = true;
             }
@@ -320,7 +309,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		
 		
 		Division newField = div.addDivision("edit-schema-update-field");
-		newField.setHead(T_head4.parameterize(field.getFieldID()));
+		newField.setHead(T_head4.parameterize(field.getID()));
 		
 		List form = newField.addList("edit-schema-update-field-form",List.TYPE_FORM);
 		

@@ -21,8 +21,8 @@ CREATE INDEX metadatafieldregistry_idx_element_qualifier on metadatafieldregistr
 
 CREATE INDEX resourcepolicy_idx_rptype on resourcepolicy(rptype);
 
--- Clean up
+ALTER TABLE resourcepolicy DROP CONSTRAINT ResourcePolicy_dspace_object_fk;
+ALTER TABLE ResourcePolicy ADD CONSTRAINT ResourcePolicy_dspace_object_fk FOREIGN KEY (dspace_object) REFERENCES dspaceobject ON DELETE CASCADE;
 
--- Duplicates of INDEX metadatavalue_field_object (a composite index can also serve as a 'single field' index)
-DROP INDEX metadatavalue_field;
-DROP INDEX metadatavalue_field_fk_idx;
+ALTER TABLE metadatavalue DROP CONSTRAINT metadatavalue_dspace_object_id_fk;
+ALTER TABLE metadatavalue ADD CONSTRAINT metadatavalue_dspace_object_id_fk FOREIGN KEY (dspace_object_id) REFERENCES dspaceobject ON DELETE CASCADE;

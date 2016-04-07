@@ -7,18 +7,21 @@
  */
 package org.dspace.content;
 
+import org.apache.log4j.Logger;
+import org.dspace.AbstractUnitTest;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.AbstractUnitTest;
-import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.*;
-import org.junit.*;
-import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * Unit Tests for class MetadataValue
@@ -132,9 +135,9 @@ public class MetadataValueTest extends AbstractUnitTest
     public void testGetFieldId()
     {
         MetadataValue instance = new MetadataValue();
-        assertThat("testGetFieldId 0", instance.getValueId(), equalTo(0));
+        assertThat("testGetFieldId 0", instance.getID(), equalTo(0));
 
-        assertThat("testGetFieldId 1", mv.getMetadataField().getFieldID(), equalTo(mf.getFieldID()));
+        assertThat("testGetFieldId 1", mv.getMetadataField().getID(), equalTo(mf.getID()));
     }
 
     /**
@@ -192,7 +195,7 @@ public class MetadataValueTest extends AbstractUnitTest
     @Test
     public void testGetValueId() 
     {
-        assertThat("testGetValueId 0",mv.getValueId(), notNullValue());
+        assertThat("testGetValueId 0",mv.getID(), notNullValue());
     }
 
     /**
@@ -271,10 +274,10 @@ public class MetadataValueTest extends AbstractUnitTest
     public void testFind() throws Exception 
     {
         metadataValueService.create(context, it, mf);
-        int id = mv.getValueId();
+        int id = mv.getID();
         MetadataValue found = metadataValueService.find(context, id);
         assertThat("testFind 0",found, notNullValue());
-        assertThat("testFind 1",found.getValueId(), equalTo(id));
+        assertThat("testFind 1",found.getID(), equalTo(id));
     }
 
     /**
