@@ -258,7 +258,7 @@ public class DescribeStep extends AbstractSubmissionStep
                                 for (MetadataValue dcValue : unfiltered)
                                 {
                                         String unfilteredFieldName = dcValue.getMetadataField().getElement() + "." + dcValue.getMetadataField().getQualifier();
-                                        if ( ! inputSet.isFieldPresent(unfilteredFieldName) )
+                                        if ( ! inputSet.isFieldPresent(unfilteredFieldName, documentType) )
                                         {
                                                 filtered.add( dcValue );
                                         }
