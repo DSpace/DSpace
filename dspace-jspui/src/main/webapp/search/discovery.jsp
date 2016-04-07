@@ -40,15 +40,15 @@
 <%@page import="org.dspace.content.Community" %>
 <%@page import="org.dspace.content.DSpaceObject" %>
 <%@page import="org.dspace.content.Item" %>
+<%@page import="org.dspace.core.ConfigurationManager" %>
+<%@page import="org.dspace.core.Context" %>
 <%@page import="org.dspace.discovery.DiscoverQuery" %>
 <%@page import="org.dspace.discovery.DiscoverResult" %>
 <%@page import="org.dspace.discovery.DiscoverResult.FacetResult" %>
 <%@page import="org.dspace.discovery.configuration.DiscoverySearchFilter" %>
 <%@page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet" %>
-<%@page import="org.dspace.sort.SortOption" %>
-<%@page import="ua.edu.sumdu.essuir.utils.DCInputReader" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.sort.SortOption" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
            prefix="fmt" %>
@@ -56,11 +56,17 @@
            prefix="c" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ page import="org.dspace.storage.rdbms.DatabaseManager" %>
+<%@ page import="org.dspace.storage.rdbms.TableRow" %>
+<%@ page import="org.dspace.storage.rdbms.TableRowIterator" %>
+<%@ page import="ua.edu.sumdu.essuir.utils.DCInputReader" %>
 <%@ page import="ua.edu.sumdu.essuir.utils.EssuirUtils" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.sql.SQLException" %>
 <%@ page import="java.util.*" %>
-<%@ page import="com.google.api.client.util.Lists" %>
-<%
+<%!
+    private static final String FIRST_PAPER_YEAR = "1964";
+%><%
     // Get the attributes
     DSpaceObject scope = (DSpaceObject) request.getAttribute("scope");
     String searchScope = scope != null ? scope.getHandle() : "";
@@ -426,13 +432,37 @@
         </div>
         <% } %>
     </div>
+
     <%
         DiscoverResult qResults = (DiscoverResult) request.getAttribute("queryresults");
         Item[] items = (Item[]) request.getAttribute("items");
         Community[] communities = (Community[]) request.getAttribute("communities");
         Collection[] collections = (Collection[]) request.getAttribute("collections");
-        String minimalYear = "1964";
+
+        String minimalYearBound = FIRST_PAPER_YEAR;
+        String maximalYearBound = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+
+        String minimalYear = FIRST_PAPER_YEAR;
         String maximalYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+
+        String minimalYearQuery = "SELECT MIN(text_value) AS value FROM metadatavalue LEFT JOIN item ON resource_id = item_id WHERE metadata_field_id = 15 AND in_archive";
+        Context context = UIUtil.obtainContext(request);
+
+        try {
+            TableRowIterator tri = null;
+
+            try {
+                tri = DatabaseManager.query(context, minimalYearQuery);
+                while (tri.hasNext()) {
+                    minimalYearBound = tri.next().getStringColumn("value");
+                }
+            } finally {
+                if (tri != null)
+                    tri.close();
+            }
+        } catch (SQLException e) {
+            %><%=e.toString()%><%
+        }
 
 
         if (dateIssuedItemIndex != -1) {
@@ -471,8 +501,8 @@
                 arrows: false,
                 step: 1,
                 bounds: {
-                    min: 1964,
-                    max: 2016
+                    min: <%= minimalYearBound %>,
+                    max: <%= maximalYearBound %>
                 },
                 defaultValues: {
                     min: <%= minimalYear %>,
