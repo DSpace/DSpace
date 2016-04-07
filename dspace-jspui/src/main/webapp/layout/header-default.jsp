@@ -57,7 +57,8 @@
     <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css"
           type="text/css"/>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/treeview.css" type="text/css"/>
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/pagination.css">
+    <link rel="stylesheet" href="/static/css/pagination.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/rangeslider/css/iThing.css" type="text/css" />
     <%
         if (!"NONE".equals(feedRef)) {
             for (int i = 0; i < parts.size(); i += 3) {
@@ -89,6 +90,7 @@
     <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"></script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/bootstrap-tree.js"> </script>
+    <script src="<%= request.getContextPath() %>/static/rangeslider/jQRangeSlider-min.js"></script>
     <%--Gooogle Analytics recording.--%>
     <%
         if (analyticsKey != null && analyticsKey.length() > 0) {
