@@ -104,30 +104,10 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         }
     }
 
-    static DryadJournalConcept journalConceptFromTableRow(TableRow row) {
-        DryadJournalConcept journalConcept = null;
-        Organization organization = organizationFromTableRow(row);
-        if (organization != null) {
-            journalConcept = JournalUtils.getJournalConceptByJournalName(organization.organizationName);
-        }
-        return journalConcept;
-    }
-
     public static Organization getOrganizationByCode(Context context, String code) throws SQLException {
         String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE UPPER(code) = UPPER(?) OR UPPER(issn) = UPPER(?)";
         TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, code, code);
         return organizationFromTableRow(row);
-    }
-
-    private static List<DryadJournalConcept> getJournalConcepts(Context context) throws SQLException {
-        List<DryadJournalConcept> journalConcepts = new ArrayList<DryadJournalConcept>();
-        String query = "SELECT * FROM " + ORGANIZATION_TABLE;
-        TableRowIterator rows = DatabaseManager.queryTable(context, ORGANIZATION_TABLE, query);
-        while(rows.hasNext()) {
-            TableRow row = rows.next();
-            journalConcepts.add(journalConceptFromTableRow(row));
-        }
-        return journalConcepts;
     }
 
     @Override
@@ -151,7 +131,8 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         try {
             ArrayList<DryadJournalConcept> allJournalConcepts = new ArrayList<DryadJournalConcept>();
             context = getContext();
-            allJournalConcepts.addAll(getJournalConcepts(context));
+            DryadJournalConcept[] dryadJournalConcepts = JournalUtils.getAllJournalConcepts();
+            allJournalConcepts.addAll(Arrays.asList(dryadJournalConcepts));
             completeContext(context);
             if (searchParam != null) {
                 for (DryadJournalConcept journalConcept : allJournalConcepts) {

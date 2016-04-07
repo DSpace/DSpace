@@ -151,7 +151,13 @@ public class DryadEmailSubmission extends HttpServlet {
                         processMimeMessage(message);
                     } catch (Exception details) {
                         DryadGmailService.addErrorLabelForMessageWithId(mID);
-                        LOGGER.info("Exception thrown while processing message " + mID + ": " + details.getMessage() + ", " + details.getClass().getName() + details.getStackTrace().toString());
+                        LOGGER.info("Exception thrown while processing message " + mID + ": " + details.getMessage() + ", " + details.getClass().getName());
+                        StringBuilder sb = new StringBuilder();
+                        for (StackTraceElement element : details.getStackTrace()) {
+                            sb.append(element.toString());
+                            sb.append("\n");
+                        }
+                        LOGGER.info(sb.toString());
                     }
                     DryadGmailService.removeJournalLabelForMessageWithId(mID);
                 }
