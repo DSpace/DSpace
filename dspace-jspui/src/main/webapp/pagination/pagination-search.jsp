@@ -1,8 +1,4 @@
 <%
-    int perPage = ConfigurationManager.getIntProperty("webui.collectionhome.perpage", 20);
-//    int totalPublications = bi.getTotal();
-//    int from = bi.getStart();
-//    int to = bi.getFinish();
     int totalPages = (int)pageTotal;
     int currentPage = (int)pageCurrent;
 
@@ -30,7 +26,7 @@
         <%  }  %>
 
         <% for(int i = leftPage; i <= rightPage; i++) {
-                String link = baseURL + Integer.valueOf(perPage * (i - 1)).toString();
+                String link = baseURL + Integer.valueOf(rpp * (i - 1)).toString();
 
         %>
             <li><a href="<%= link %>" <% if(i == currentPage) { %> class="current" <% } %> > <%= i %></a></li>
