@@ -78,7 +78,7 @@ public class ImportMetadataSourceServiceImpl extends org.dspace.importer.externa
     // Return the configured baseAddress
     @Override
     public String getImportSource() {
-        return baseAddress;
+        return "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
     }
 
     // Return a collection of matching records based on a given item.
