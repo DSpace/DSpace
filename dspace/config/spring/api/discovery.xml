@@ -766,7 +766,7 @@
 		<property name="defaultFilterQueries">
 			<list>
 				<!--Only find items, communities and collections -->
-				<value>resourcetype_filter:theses</value>
+				<value>resourcetype_authority:theses</value>
 			</list>
 		</property>
 		<!--The configuration for the recent submissions -->
@@ -871,7 +871,7 @@
 		<property name="defaultFilterQueries">
 			<list>
 				<!--Only find items, communities and collections -->
-				<value>resourcetype_filter:patents</value>
+				<value>resourcetype_authority:patents</value>
 			</list>
 		</property>
 		<!--The configuration for the recent submissions -->
