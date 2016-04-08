@@ -618,7 +618,7 @@ public class Context
          * If a context is garbage-collected, we roll back and free up the
          * database connection if there is one.
          */
-        if (dbConnection.isTransActionAlive())
+        if (dbConnection != null && dbConnection.isTransActionAlive())
         {
             abort();
         }

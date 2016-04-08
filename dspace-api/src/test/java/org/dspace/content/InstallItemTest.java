@@ -90,7 +90,6 @@ public class InstallItemTest extends AbstractUnitTest
             context.turnOffAuthorisationSystem();
             communityService.delete(context, owningCommunity);
             context.restoreAuthSystemState();
-            context.commit();
         } catch (SQLException | AuthorizeException | IOException ex) {
             log.error("SQL Error in destroy", ex);
             fail("SQL Error in destroy: " + ex.getMessage());

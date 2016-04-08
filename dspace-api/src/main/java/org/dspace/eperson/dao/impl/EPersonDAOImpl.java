@@ -11,14 +11,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataField;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDSODAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.EPersonDAO;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
@@ -41,35 +40,25 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     @Override
     public EPerson findByEmail(Context context, String email) throws SQLException
     {
-        Query query = createQuery(context,
-                "SELECT p " +
-                "FROM EPerson p " +
-                "WHERE p.email = :email" );
-
-        query.setParameter("email", email.toLowerCase());
-
-        return uniqueResult(query);
+        // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup
+        Criteria criteria = createCriteria(context, EPerson.class);
+        criteria.add(Restrictions.eq("email", email.toLowerCase()));
+        return uniqueResult(criteria);
     }
 
 
     @Override
     public EPerson findByNetid(Context context, String netid) throws SQLException
     {
-        Query query = createQuery(context,
-                "SELECT p " +
-                        "FROM EPerson p " +
-                        "WHERE p.netid = :netid" );
-
-        query.setParameter("netid", netid);
-
-        return uniqueResult(query);
+        Criteria criteria = createCriteria(context, EPerson.class);
+        criteria.add(Restrictions.eq("netid", netid));
+        return uniqueResult(criteria);
     }
 
     @Override
     public List<EPerson> search(Context context, String query, List<MetadataField> queryFields, List<MetadataField> sortFields, int offset, int limit) throws SQLException
     {
         String queryString = "SELECT " + EPerson.class.getSimpleName().toLowerCase() + " FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase() + " ";
-
         if(query != null) query= "%"+query.toLowerCase()+"%";
         Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, sortFields, null);
 
@@ -110,37 +99,36 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
 
     @Override
     public List<EPerson> findByGroups(Context context, Set<Group> groups) throws SQLException {
-        Criteria criteria = createCriteria(context, EPerson.class);
-        criteria.createAlias("groups", "g");
-        Disjunction orRestriction = Restrictions.or();
-        for(Group group : groups)
-        {
-            orRestriction.add(Restrictions.eq("g.id", group.getID()));
-        }
-        criteria.add(orRestriction);
-        return list(criteria);
-    }
+        Query query = createQuery(context,
+                "SELECT DISTINCT e FROM EPerson e " +
+                        "JOIN e.groups g " +
+                        "WHERE g.id IN (:idList)");
 
+        List<UUID> idList = new ArrayList<>(groups.size());
+        for (Group group : groups) {
+            idList.add(group.getID());
+        }
+
+        query.setParameterList("idList", idList);
+
+        return list(query);
+    }
 
     @Override
     public List<EPerson> findWithPasswordWithoutDigestAlgorithm(Context context) throws SQLException {
-        Query query = createQuery(context,
-                "SELECT p " +
-                        "FROM EPerson p " +
-                        "WHERE p.password IS NOT NULL AND p.digestAlgorithm IS NULL " );
-
-        return list(query);
+        Criteria criteria = createCriteria(context, EPerson.class);
+        criteria.add(Restrictions.and(
+                Restrictions.isNotNull("password"),
+                Restrictions.isNull("digestAlgorithm")
+        ));
+        return list(criteria);
     }
 
     @Override
     public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException {
-        Query query = createQuery(context,
-                "SELECT p " +
-                        "FROM EPerson p " +
-                        "WHERE p.lastActive <= :date " );
-        query.setParameter("date", date);
-
-        return list(query);
+        Criteria criteria = createCriteria(context, EPerson.class);
+        criteria.add(Restrictions.le("lastActive", date));
+        return list(criteria);
     }
 
     protected Query getSearchQuery(Context context, String queryString, String queryParam, List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField) throws SQLException {
@@ -174,7 +162,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
 
     @Override
     public List<EPerson> findAllSubscribers(Context context) throws SQLException {
-        return list(createQuery(context, "SELECT DISTINCT e from Subscription s JOIN s.ePerson e "));
+        return list(createQuery(context, "SELECT DISTINCT e from Subscription s join s.ePerson e"));
     }
 
     @Override

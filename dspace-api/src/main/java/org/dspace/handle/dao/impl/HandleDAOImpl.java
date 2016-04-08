@@ -42,7 +42,7 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
             Query query = createQuery(context,
                     "SELECT h " +
                     "FROM Handle h " +
-                    "JOIN FETCH h.dso " +
+                    "LEFT JOIN FETCH h.dso " +
                     "WHERE h.dso.id = :id ");
 
             query.setParameter("id", dso.getID());
@@ -57,7 +57,7 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
         Query query = createQuery(context,
                 "SELECT h " +
                 "FROM Handle h " +
-                "JOIN FETCH h.dso " +
+                "LEFT JOIN FETCH h.dso " +
                 "WHERE h.handle = :handle ");
 
         query.setParameter("handle", handle);

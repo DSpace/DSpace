@@ -74,7 +74,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      */
     protected MetadataValue()
     {
-
+        id = 0;
     }
 
     /**
