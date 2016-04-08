@@ -11,8 +11,8 @@
 ---------------------------------------------------------------
 -- This script will create indexes on the key fields of the
 -- metadataschemaregistry and metadatafieldregistry tables to
--- increase the performance of the queries. It will also clean
--- up some redunant indexes on the metadatavalue table.
+-- increase the performance of the queries. It will also add
+-- "ON DELETE CASCADE" to improve the performance of Item deletion.
 ---------------------------------------------------------------
 
 CREATE UNIQUE INDEX metadataschemaregistry_unique_idx_short_id on metadataschemaregistry(short_id);
@@ -31,7 +31,7 @@ ON DELETE CASCADE;
 ALTER TABLE metadatavalue
 DROP CONSTRAINT metadatavalue_dspace_object_id_fkey,
 ADD CONSTRAINT metadatavalue_dspace_object_id_fkey
-FOREIGN KEY (dspace_object)
+FOREIGN KEY (dspace_object_id)
 REFERENCES dspaceobject(uuid)
 ON DELETE CASCADE;
 

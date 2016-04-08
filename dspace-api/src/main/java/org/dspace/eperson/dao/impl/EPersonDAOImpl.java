@@ -102,7 +102,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         Query query = createQuery(context,
                 "SELECT DISTINCT e FROM EPerson e " +
                         "JOIN e.groups g " +
-                        "WHERE g.id IN (:idList)");
+                        "WHERE g.id IN (:idList) ");
 
         List<UUID> idList = new ArrayList<>(groups.size());
         for (Group group : groups) {
