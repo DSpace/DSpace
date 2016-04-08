@@ -177,7 +177,7 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
         select.setString(1, schema);
         select.setString(2, element);
         final ResultSet rs = select.executeQuery();
-        if (rs.first())
+        if (rs.next())
         {
             int id = rs.getInt(1);
             select.close();
