@@ -65,14 +65,16 @@ implements DOIConnector
     // Configuration property names
     static final String CFG_USER = "identifier.doi.user";
     static final String CFG_PASSWORD = "identifier.doi.password";
-    private static final String CFG_PREFIX
+    static final String CFG_PREFIX
             = "identifier.doi.prefix";
-    private static final String CFG_PUBLISHER
+    static final String CFG_PUBLISHER
             = "crosswalk.dissemination.DataCite.publisher";
-    private static final String CFG_DATAMANAGER
+    static final String CFG_DATAMANAGER
             = "crosswalk.dissemination.DataCite.dataManager";
-    private static final String CFG_HOSTINGINSTITUTION
+    static final String CFG_HOSTINGINSTITUTION
             = "crosswalk.dissemination.DataCite.hostingInstitution";
+    static final String CFG_NAMESPACE
+            = "crosswalk.dissemination.DataCite.namespace";
 
     /**
      * Stores the scheme used to connect to the DataCite server. It will be set
@@ -931,7 +933,9 @@ implements DOIConnector
         {
             return root;
         }
-        Element identifier = new Element("identifier", "http://datacite.org/schema/kernel-3");
+        Element identifier = new Element("identifier",
+                    configurationService.getProperty(CFG_NAMESPACE,
+                        "http://datacite.org/schema/kernel-3"));
         identifier.setAttribute("identifierType", "DOI");
         identifier.addContent(doi.substring(DOI.SCHEME.length()));
         return root.addContent(0, identifier);
