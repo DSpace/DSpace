@@ -18,7 +18,9 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.xoai.util.XOAICacheManager;
 import org.dspace.xoai.util.XOAIDatabaseManager;
 
@@ -35,6 +37,12 @@ import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 public class DSpaceDatabaseItem extends DSpaceItem
 {
     private static Logger log = LogManager.getLogger(DSpaceDatabaseItem.class);
+
+    private static final String itemIdMd = ConfigurationManager.getProperty("xoai","identifier.metadata");
+    private static final String itemIdPfx = ConfigurationManager.getProperty("xoai", "identifier.prefix");
+
+    private Item item;
+    private List<ReferenceSet> sets;
 
     private static List<ReferenceSet> getSets(Item item)
     {
@@ -64,9 +72,6 @@ public class DSpaceDatabaseItem extends DSpaceItem
         }
         return sets;
     }
-
-    private Item item;
-    private List<ReferenceSet> sets;
 
     public DSpaceDatabaseItem(Item item)
     {
@@ -198,12 +203,43 @@ public class DSpaceDatabaseItem extends DSpaceItem
     public List<String> getMetadata(String field)
     {
         String[] parts = field.split(Pattern.quote("."));
-        return getMetadata(this.getMetadata().getMetadata().getElement(), parts);
+        try {
+            return getMetadata(this.getMetadata().getMetadata().getElement(), parts);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return new ArrayList<String>();
     }
 
     public Item getItem()
     {
         return item;
+    }
+
+    public static String buildIdentifier (String handle, Item item)
+    {
+        String itemIdStr = null;
+        if (itemIdMd != null) {
+            DCValue[] mds = null;
+            String[] parts = itemIdMd.split(Pattern.quote("."));
+            if (parts.length == 2) {
+                mds = item.getMetadata(parts[0], parts[1], null, null);
+            } else if (parts.length == 3) {
+                mds = item.getMetadata(parts[0], parts[1], parts[2], null);
+            }
+            if (mds != null && mds.length > 0 && mds[0].value != null)
+                itemIdStr = mds[0].value.toString();
+        }
+        if (itemIdStr == null) {
+            itemIdStr = handle;
+        }
+        return String.format("oai:%s:%s", itemIdPfx, itemIdStr);
+    }
+
+    @Override
+    public String getIdentifier()
+    {
+        return buildIdentifier(getHandle(), item);
     }
 
     @Override

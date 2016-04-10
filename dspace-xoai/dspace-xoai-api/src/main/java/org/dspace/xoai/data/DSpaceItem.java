@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.lyncode.xoai.dataprovider.core.ReferenceSet;
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.xoai.util.MetadataNamePredicate;
 
@@ -27,9 +30,6 @@ import com.lyncode.xoai.dataprovider.xml.xoai.Element.Field;
  */
 public abstract class DSpaceItem extends AbstractItem
 {
-
-    private static final String itemIdMd = ConfigurationManager.getProperty("xoai","identifier.metadata");
-    private static final String itemIdPfx = ConfigurationManager.getProperty("xoai", "identifier.prefix");
 
 	private static List<Element> filter (List<Element> input, String name) {
     	return Lists.newArrayList(Collections2.filter(input, new MetadataNamePredicate(name)));
@@ -66,18 +66,16 @@ public abstract class DSpaceItem extends AbstractItem
     	return values(filter(flat(filter(flat(filter(metadata, schema)), element)), qualifier));
     }
 
-    public String buildIdentifier (String handle) {
-        String itemIdStr = null;
-        if (itemIdMd != null) {
-            List<String> mds = getMetadata(itemIdMd);
-            if (mds.size() > 0)
-                itemIdStr = mds.get(0);
+    private static String _prefix = null;
+    public static String buildIdentifier (String handle) {
+        if (_prefix == null)
+        {
+            _prefix = ConfigurationManager.getProperty("xoai",
+                    "identifier.prefix");
         }
-        if (itemIdStr == null) {
-            itemIdStr = handle;
-        }
-        return "oai:" + itemIdPfx + ":" + itemIdStr;
+        return "oai:" + _prefix + ":" + handle;
     }
+
     public static String parseHandle (String oaiIdentifier) {
     	String[] parts = oaiIdentifier.split(Pattern.quote(":"));
     	if (parts.length > 0) return parts[parts.length - 1];
