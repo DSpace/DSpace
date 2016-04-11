@@ -4,6 +4,7 @@ package ua.edu.sumdu.essuir.utils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ua.edu.sumdu.essuir.entity.AuthorData;
 import ua.edu.sumdu.essuir.service.DatabaseService;
 
 import javax.sql.rowset.CachedRowSet;
@@ -89,5 +90,35 @@ public class EssuirUtils {
         } else {
             return years.get(0);
         }
+    }
+
+    public static List<AuthorData> getLatestRegisteredAuthors(int limit) {
+        String query = "SELECT m1.text_value AS firstname, m2.text_value AS lastname, chair_name, faculty_name, email " +
+                "  FROM eperson " +
+                "  LEFT JOIN (SELECT chair_id, chair_name, faculty_name " +
+                "    FROM chair " +
+                "    LEFT JOIN faculty " +
+                "      ON chair.faculty_id = faculty.faculty_id) b " +
+                "  ON eperson.chair_id = b.chair_id " +
+                "LEFT JOIN metadatavalue AS m1 ON m1.resource_id = eperson.eperson_id AND m1.metadata_field_id = 129" +
+                "LEFT JOIN metadatavalue AS m2 ON m2.resource_id = eperson.eperson_id AND m2.metadata_field_id = 130" +
+                "  ORDER BY eperson_id DESC " +
+                "  LIMIT " + limit;
+
+        CachedRowSet queryResult = databaseService.executeQuery(query);
+        List<AuthorData> result = new LinkedList<>();
+
+        try {
+            while (queryResult.next()) {
+                result.add(new AuthorData().setLastname(queryResult.getString("lastname"))
+                        .setFirstname(queryResult.getString("firstname"))
+                        .setEmail(queryResult.getString("email"))
+                        .setFaculty(queryResult.getString("faculty_name"))
+                        .setChair(queryResult.getString("chair_name")));
+            }
+        } catch (SQLException e) {
+            logger.error(e);
+        }
+        return result;
     }
 }
