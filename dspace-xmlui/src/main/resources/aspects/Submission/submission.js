@@ -238,6 +238,15 @@ function doSubmission()
                {
                    shareSubmission(workspaceID);
                }
+			   else if (cocoon.request.get("submit_reserve_pid"))
+			   {
+				   //TODO add user form
+				   FlowUtils.reservePID(getObjectModel(), workspaceID);
+                   var contextPath = cocoon.request.getContextPath();
+				   cocoon.redirectTo(contextPath+"/submit?workspaceID=" + workspaceID.substring(1), true);
+				   getDSContext().complete();
+				   cocoon.exit();
+			   }
 
 
            } while (1 == 1)

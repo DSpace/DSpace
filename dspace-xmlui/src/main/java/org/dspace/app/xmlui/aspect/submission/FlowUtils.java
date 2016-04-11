@@ -34,7 +34,10 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.*;
 import org.dspace.handle.HandleManager;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierService;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -448,4 +451,20 @@ public class FlowUtils {
         email2User.send();
         return link;
     }
+
+	public static String reservePID(Map objectModel, String workspaceID) throws IdentifierException, SQLException, AuthorizeException {
+		Context context = ContextUtil.obtainContext(objectModel);
+		if(workspaceID.startsWith("S")){
+			workspaceID = workspaceID.substring(1);
+		}
+		WorkspaceItem wi = WorkspaceItem.find(context, Integer.parseInt(workspaceID));
+		Item item = wi.getItem();
+		IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+		//TODO reserve(context, dso, id)
+		context.turnOffAuthorisationSystem();
+		identifierService.reserve(context, item);
+		item.update();
+		context.restoreAuthSystemState();
+		return item.getHandle();
+	}
 }

@@ -48,6 +48,8 @@ public class ResumeStep extends AbstractStep
         message("xmlui.general.cancel");
 	protected static final Message T_submit_share =
 			message("xmlui.Submission.submit.ResumeStep.submit_share");
+	protected static final Message T_submit_reserve_pid =
+			message("xmlui.Submission.submit.ResumeStep.submit_reserve_pid");
 
 	/**
 	 * Establish our required parameters, abstractStep will enforce these.
@@ -101,5 +103,6 @@ public class ResumeStep extends AbstractStep
 		actions.addButton("submit_resume").setValue(T_submit_resume);
 		actions.addButton("submit_cancel").setValue(T_submit_cancel);
 		actions.addButton("submit_share").setValue(T_submit_share);
+		actions.addButton("submit_reserve_pid").setValue(T_submit_reserve_pid);
 	}
 }
