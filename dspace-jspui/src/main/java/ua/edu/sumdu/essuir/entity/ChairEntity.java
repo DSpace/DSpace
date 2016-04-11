@@ -37,6 +37,10 @@ public class ChairEntity {
         return facultyEntityName.getName();
     }
 
+    public Integer getFacultyEntityId() {
+        return facultyEntityName.getId();
+    }
+
     public void setFacultyEntityName(FacultyEntity facultyEntityName) {
         this.facultyEntityName = facultyEntityName;
     }

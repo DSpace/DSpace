@@ -52,10 +52,10 @@
     <mvc:annotation-driven />
 
     <context:component-scan base-package="ua.edu.sumdu.essuir"/>
-    <jpa:repositories base-package="ua.edu.sumdu.essuir.repository" />
 
-    <!-- 
-    Uncomment to enable TabFileUsageEventListener 
+
+    <!--
+    Uncomment to enable TabFileUsageEventListener
     <bean class="org.dspace.app.statistics.TabFileUsageEventListener">
     	<property name="eventService" >
     		<ref bean="dspace.eventService"/>
@@ -63,7 +63,7 @@
     </bean>
     -->
 
-    <!-- 
+    <!--
     Uncomment to enable PassiveUsageEventListener
     <bean class="org.dspace.app.statistics.PassiveUsageEventListener">
     	<property name="eventService" >

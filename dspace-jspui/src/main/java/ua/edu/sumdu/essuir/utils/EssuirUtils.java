@@ -5,26 +5,39 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.edu.sumdu.essuir.entity.AuthorData;
+import ua.edu.sumdu.essuir.entity.ChairEntity;
+import ua.edu.sumdu.essuir.entity.FacultyEntity;
+import ua.edu.sumdu.essuir.repository.ChairRepository;
+import ua.edu.sumdu.essuir.repository.FacultyRepository;
 import ua.edu.sumdu.essuir.service.DatabaseService;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class EssuirUtils {
     private static final String MINIMAL_YEAR = "1964";
 
-
     private static DatabaseService databaseService;
+    private static ChairRepository chairRepository;
+    private static FacultyRepository facultyRepository;
 
     private static Logger logger = Logger.getLogger(EssuirUtils.class);
 
     @Autowired
     public void setDatabaseService(DatabaseService databaseService) {
         EssuirUtils.databaseService = databaseService;
+    }
+
+    @Autowired
+    public void setFacultyRepository(FacultyRepository facultyRepository) {
+        EssuirUtils.facultyRepository = facultyRepository;
+    }
+
+    @Autowired
+    public void setChairRepository(ChairRepository chairRepository) {
+        EssuirUtils.chairRepository = chairRepository;
     }
 
     public static Hashtable<String, Long> getTypesCount() {
@@ -94,16 +107,16 @@ public class EssuirUtils {
 
     public static List<AuthorData> getLatestRegisteredAuthors(int limit) {
         String query = "SELECT m1.text_value AS firstname, m2.text_value AS lastname, chair_name, faculty_name, email " +
-                "  FROM eperson " +
-                "  LEFT JOIN (SELECT chair_id, chair_name, faculty_name " +
-                "    FROM chair " +
-                "    LEFT JOIN faculty " +
-                "      ON chair.faculty_id = faculty.faculty_id) b " +
-                "  ON eperson.chair_id = b.chair_id " +
+                "FROM eperson " +
+                "LEFT JOIN (SELECT chair_id, chair_name, faculty_name " +
+                "FROM chair " +
+                "LEFT JOIN faculty " +
+                "ON chair.faculty_id = faculty.faculty_id) b " +
+                "ON eperson.chair_id = b.chair_id " +
                 "LEFT JOIN metadatavalue AS m1 ON m1.resource_id = eperson.eperson_id AND m1.metadata_field_id = 129" +
                 "LEFT JOIN metadatavalue AS m2 ON m2.resource_id = eperson.eperson_id AND m2.metadata_field_id = 130" +
-                "  ORDER BY eperson_id DESC " +
-                "  LIMIT " + limit;
+                "ORDER BY eperson_id DESC " +
+                "LIMIT " + limit;
 
         CachedRowSet queryResult = databaseService.executeQuery(query);
         List<AuthorData> result = new LinkedList<>();
@@ -120,5 +133,26 @@ public class EssuirUtils {
             logger.error(e);
         }
         return result;
+    }
+
+    public static List<FacultyEntity> getFacultyList() {
+        return facultyRepository.findAll();
+    }
+
+    public static Map<Integer, Map<Integer, String>> getChairListByFaculties() {
+        List<ChairEntity> chairEntities = chairRepository.findAll();
+        Map<Integer, Map<Integer, String>> chairs = new HashMap<>();
+
+        for (ChairEntity chairEntity : chairEntities) {
+            if (!chairs.containsKey(chairEntity.getFacultyEntityId())) {
+                chairs.put(chairEntity.getFacultyEntityId(), new HashMap<Integer, String>());
+            }
+            chairs.get(chairEntity.getFacultyEntityId()).put(chairEntity.getId(), chairEntity.getChairName());
+        }
+        return chairs;
+    }
+
+    public static Integer getFacultyIdByChaidId(Integer chairId) {
+        return chairRepository.findOne(chairId).getFacultyEntityId();
     }
 }
