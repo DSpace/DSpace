@@ -21,16 +21,18 @@ public class AuthorsLocalizationPK implements Serializable{
         return surname_en;
     }
 
-    public void setSurname_en(String surname_en) {
+    public AuthorsLocalizationPK setSurname_en(String surname_en) {
         this.surname_en = surname_en;
+        return this;
     }
 
     public String getInitials_en() {
         return initials_en;
     }
 
-    public void setInitials_en(String initials_en) {
+    public AuthorsLocalizationPK setInitials_en(String initials_en) {
         this.initials_en = initials_en;
+        return this;
     }
 
 
