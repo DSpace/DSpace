@@ -24,9 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Roeland Dillen (roeland at atmire dot com)
- * Date: 11/01/13
- * Time: 09:21
+ * Metadata contributor that takes an axiom OMElement and turns it into a metadayum
+ * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class SimpleXpathMetadatumContributor implements MetadataContributor<OMElement> {
     private MetadataFieldConfig field;

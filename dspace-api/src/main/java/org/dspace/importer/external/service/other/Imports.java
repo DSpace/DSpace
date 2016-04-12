@@ -16,22 +16,56 @@ import org.dspace.importer.external.datamodel.ImportRecord;
 import java.util.Collection;
 
 /** Common interface for all import implementations.
- * Created by Roeland Dillen (roeland at atmire dot com)
- * Date: 17/09/12
- * Time: 14:08
+ * @author Roeland Dillen (roeland at atmire dot com)
  */
 public interface Imports {
-	/**
-     *
-     * @param query
-     * @return
+    /**
+     * Gets the number of records matching a query
+     * @param query the query in string format
+     * @return the number of records matching the query
      * @throws MetadataSourceException
      */
     public int getNbRecords(String query) throws MetadataSourceException;
+    /**
+     * Gets the number of records matching a query
+     * @param query the query object
+     * @return the number of records matching the query
+     * @throws MetadataSourceException
+     */
     public int getNbRecords(Query query) throws MetadataSourceException;
+
+    /**
+     * Gets a set of records matching a query. Supports pagination
+     * @param query the query. The query will generally be posted 'as is' to the source
+     * @param start offset
+     * @param count page size
+     * @return a collection of fully transformed id's
+     * @throws MetadataSourceException
+     */
     public Collection<ImportRecord> getRecords(String query, int start, int count)throws MetadataSourceException;
+
+    /**
+     *
+     * @param q
+     * @return
+     * @throws MetadataSourceException
+     */
     public Collection<ImportRecord> getRecords(Query q)throws MetadataSourceException;
+
+    /**
+     *
+     * @param id
+     * @return
+     * @throws MetadataSourceException
+     */
     public ImportRecord getRecord(String id)throws MetadataSourceException;
+
+    /**
+     *
+     * @param q
+     * @return
+     * @throws MetadataSourceException
+     */
     public ImportRecord getRecord(Query q)throws MetadataSourceException;
 
 	/**

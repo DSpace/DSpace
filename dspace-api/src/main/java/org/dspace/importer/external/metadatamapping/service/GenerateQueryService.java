@@ -12,7 +12,7 @@ import org.dspace.importer.external.Query;
 import org.dspace.importer.external.MetadataSourceException;
 
 /**
- * Created by Roeland Dillen (roeland at atmire dot com)
+ * @author Roeland Dillen (roeland at atmire dot com)
  * Date: 14/12/12
  * Time: 11:44
  */

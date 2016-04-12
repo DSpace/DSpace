@@ -20,13 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 
 /** Main entry point for the import framework.
- * Created by Roeland Dillen (roeland at atmire dot com)
- * Date: 17/09/12
- * Time: 14:19
- *
  * Instead of calling the different importer implementations, the ImportService should be called instead.
  * This class contains the same methods as the other implementations, but has an extra parameter URL.
  * This URL should be the same identifier that is returned by the "getImportSource" method that is defined in the importer implementation you want to use.
+ * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class ImportService implements Destroyable {
     private HashMap<String, Imports> importSources = new HashMap<String, Imports>();
@@ -186,11 +183,11 @@ public class ImportService implements Destroyable {
 		}
 	}
 
-	/** Get a single record from the source.
+	/** Get a single record from a source.
 	 * The first match will be returned
 	 * @param uri uri the identifier of the import implementation or * for all
-	 * @param id identifier
-	 * @return
+	 * @param id identifier for the record
+	 * @return a matching record
 	 * @throws MetadataSourceException
 	 */
     public ImportRecord getRecord(String uri, String id) throws MetadataSourceException {
@@ -204,7 +201,13 @@ public class ImportService implements Destroyable {
 			throw new MetadataSourceException(e);
 		}
 	}
-
+	/** Get a single record from the source.
+	 * The first match will be returned
+	 * @param uri uri the identifier of the import implementation or * for all
+	 * @param query a query matching a single record
+	 * @return a matching record
+	 * @throws MetadataSourceException
+	 */
     public ImportRecord getRecord(String uri, Query query) throws MetadataSourceException {
 		try {
 			for (Imports imports : matchingImports(uri)) {

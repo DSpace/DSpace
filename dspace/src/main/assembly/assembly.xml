@@ -82,7 +82,8 @@
             <include>*:jar:*</include>
          </includes>
          <outputDirectory>lib</outputDirectory>
-         <useProjectArtifact>false</useProjectArtifact>
+         <useProjectArtifact>true</useProjectArtifact>
+         <unpack>true</unpack>
       </dependencySet>
    </dependencySets>
 

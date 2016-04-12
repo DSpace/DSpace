@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by Roeland Dillen (roeland at atmire dot com)
+ * @author Roeland Dillen (roeland at atmire dot com)
  * Date: 17/09/12
  * Time: 14:03
  */

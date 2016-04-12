@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by Philip Vissenaekens (philip at atmire dot com)
+ * @author Philip Vissenaekens (philip at atmire dot com)
  * Date: 17/06/15
  * Time: 11:02
  */

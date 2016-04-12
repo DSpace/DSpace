@@ -21,9 +21,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created by: Antoine Snyers (antoine at atmire dot com)
- * Date: 27 Oct 2014
  * This class contains functionality to handle request timeouts and to retry requests.
+ * This is useful in cas the service employs throttling and to deal with general network issues.
+ * @author: Antoine Snyers (antoine at atmire dot com)
  */
 public abstract class MetadataSource {
 

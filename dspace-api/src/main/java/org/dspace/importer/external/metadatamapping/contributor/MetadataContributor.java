@@ -13,7 +13,7 @@ import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import java.util.Collection;
 
 /**
- * Created by Roeland Dillen (roeland at atmire dot com)
+ * @author Roeland Dillen (roeland at atmire dot com)
  * Date: 11/01/13
  * Time: 09:18
  */
@@ -21,7 +21,8 @@ public interface MetadataContributor<RecordType> {
 
     public void setMetadataFieldMapping(MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> rt);
 
-    /* Implementations have the responsibility to process/map their own type of metadata based on a given record
+    /**
+     *  Implementations have the responsibility to process/map their own type of metadata based on a given record
      * and return a collection of the generalised MetadatumDTO objects
      */
     public Collection<MetadatumDTO> contributeMetadata(RecordType t);

@@ -10,7 +10,7 @@ package org.dspace.importer.external.metadatamapping;
 import java.util.Collection;
 
 /**
- * Created by Roeland Dillen (roeland at atmire dot com)
+ * @author Roeland Dillen (roeland at atmire dot com)
  * Date: 18/09/12
  * Time: 14:41
  */

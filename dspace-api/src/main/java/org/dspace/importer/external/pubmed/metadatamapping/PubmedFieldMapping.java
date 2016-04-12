@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 import java.util.Map;
 
 /**
- * Created by jonas - jonas@atmire.com on 06/11/15.
+ * @author jonas - jonas@atmire.com on 06/11/15.
  */
 public class PubmedFieldMapping extends AbstractMetadataFieldMapping {
 

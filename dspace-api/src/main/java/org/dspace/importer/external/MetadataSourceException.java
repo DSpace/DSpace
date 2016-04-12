@@ -9,9 +9,7 @@
 package org.dspace.importer.external;
 
 /** Represents a problem with the input source: e.g. cannot connect to the source.
- * Created by Roeland Dillen (roeland at atmire dot com)
- * Date: 19/09/12
- * Time: 13:17
+ * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class MetadataSourceException extends Exception {
     public MetadataSourceException() {
