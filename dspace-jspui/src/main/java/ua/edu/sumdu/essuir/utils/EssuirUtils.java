@@ -5,8 +5,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.edu.sumdu.essuir.entity.AuthorData;
+import ua.edu.sumdu.essuir.entity.AuthorLocalization;
 import ua.edu.sumdu.essuir.entity.ChairEntity;
 import ua.edu.sumdu.essuir.entity.FacultyEntity;
+import ua.edu.sumdu.essuir.repository.AuthorsRepository;
 import ua.edu.sumdu.essuir.repository.ChairRepository;
 import ua.edu.sumdu.essuir.repository.FacultyRepository;
 import ua.edu.sumdu.essuir.service.DatabaseService;
@@ -22,12 +24,18 @@ public class EssuirUtils {
     private static DatabaseService databaseService;
     private static ChairRepository chairRepository;
     private static FacultyRepository facultyRepository;
+    private static AuthorsRepository authorsRepository;
 
     private static Logger logger = Logger.getLogger(EssuirUtils.class);
 
     @Autowired
     public void setDatabaseService(DatabaseService databaseService) {
         EssuirUtils.databaseService = databaseService;
+    }
+
+    @Autowired
+    public void setAuthorsRepository(AuthorsRepository authorsRepository) {
+        EssuirUtils.authorsRepository = authorsRepository;
     }
 
     @Autowired
@@ -154,5 +162,9 @@ public class EssuirUtils {
 
     public static Integer getFacultyIdByChaidId(Integer chairId) {
         return chairRepository.findOne(chairId).getFacultyEntityId();
+    }
+
+    public static List<AuthorLocalization> getAllAuthors(String startWith) {
+        return authorsRepository.findAuthorsStartedByLetter(startWith);
     }
 }

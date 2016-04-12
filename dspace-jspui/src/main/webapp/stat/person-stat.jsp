@@ -15,6 +15,7 @@
 <%@ page import="java.util.List" %>
 
 <%
+    org.dspace.core.Context context = org.dspace.app.webui.util.UIUtil.obtainContext(request);
     final String LIMIT = "20";
     EPerson user = (EPerson) request.getAttribute("dspace.current.user");
     String userEmail = "";
