@@ -55,7 +55,15 @@ public class FixOpenAIREMetadata extends AbstractCurationTask
             		Long.parseLong(id_s[id_s.length-1]);
             		id = id_s[id_s.length-1];
             	} catch(NumberFormatException e) {
-            		id = id_s[id_s.length-2];
+					try {
+						id = id_s[id_s.length - 2];
+					}catch (Exception ex){
+						status = Curator.CURATE_ERROR;
+						results.append(String.format("Failed to parse id \"%s\", probably it's not in expected format (FP-ICT-2014-1-123456).\nThe raw metadata value is \"%s\".\nCaught exception: %s", value[1], m.value, ex.getMessage()));
+						report(results.toString());
+						setResult(results.toString());
+						return status;
+					}
             	}
             	
             	Choices choices = authority.getMatches("dc_relation", id, -1, 0, 0, null);
