@@ -439,31 +439,11 @@
         Community[] communities = (Community[]) request.getAttribute("communities");
         Collection[] collections = (Collection[]) request.getAttribute("collections");
 
-        String minimalYearBound = FIRST_PAPER_YEAR;
+        String minimalYearBound = EssuirUtils.getMinimalPaperYear();
         String maximalYearBound = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
 
-        String minimalYear = FIRST_PAPER_YEAR;
+        String minimalYear = minimalYearBound;
         String maximalYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-
-        String minimalYearQuery = "SELECT MIN(text_value) AS value FROM metadatavalue LEFT JOIN item ON resource_id = item_id WHERE metadata_field_id = 15 AND in_archive";
-        Context context = UIUtil.obtainContext(request);
-
-        try {
-            TableRowIterator tri = null;
-
-            try {
-                tri = DatabaseManager.query(context, minimalYearQuery);
-                while (tri.hasNext()) {
-                    minimalYearBound = tri.next().getStringColumn("value");
-                }
-            } finally {
-                if (tri != null)
-                    tri.close();
-            }
-        } catch (SQLException e) {
-            %><%=e.toString()%><%
-        }
-
 
         if (dateIssuedItemIndex != -1) {
             String issuedFilterValue = appliedFilters.get(dateIssuedItemIndex - 1)[2];

@@ -26,21 +26,26 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
 <%@ page import="org.dspace.core.NewsManager"%>
+<%@ page import="org.springframework.context.ApplicationContext" %>
+<%@ page import="org.springframework.web.servlet.support.RequestContextUtils" %>
 <%@ page import="ua.edu.sumdu.essuir.statistics.EssuirStatistics" %>
 <%@ page import="ua.edu.sumdu.essuir.statistics.StatisticData" %>
+<%@ page import="ua.edu.sumdu.essuir.utils.EssuirUtils" %>
 <%@ page import="javax.servlet.jsp.jstl.core.Config" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="java.util.Locale" %>
 
-<%
-    Community[] communities = (Community[]) request.getAttribute("communities");
 
-    Locale sessionLocale = UIUtil.getSessionLocale(request);
+<%
+
+    Community[] communities = (Community[]) request.getAttribute("communities");
+	    Locale sessionLocale = UIUtil.getSessionLocale(request);
     Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
     String topNews = NewsManager.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-top.html"));
     String sideNews = NewsManager.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-side.html"));
 
 	org.dspace.core.Context context = org.dspace.app.webui.util.UIUtil.obtainContext(request);
+
 	StatisticData sd = EssuirStatistics.getTotalStatistic(context);
 
 	topNews = String.format(topNews, sd.getTotalCount(), sd.getLastUpdate());
@@ -75,12 +80,11 @@
 		<table border="0" cellpadding="2" width="100%">
 			<tr>
 				<%
-
-					java.util.Hashtable<String, Long> types = ua.edu.sumdu.essuir.utils.EssuirUtils.getTypesCount();
+					java.util.Hashtable<String, Long> types = EssuirUtils.getTypesCount();
 					java.util.TreeMap<String, String> typesLocale = new java.util.TreeMap<String, String>();
 
 					for (String type : types.keySet()) {
-						typesLocale.put(ua.edu.sumdu.essuir.utils.EssuirUtils.getTypeLocalized(type, sessionLocale.toString()), type);
+						typesLocale.put(EssuirUtils.getTypeLocalized(type, sessionLocale.toString()), type);
 					}
 
 
