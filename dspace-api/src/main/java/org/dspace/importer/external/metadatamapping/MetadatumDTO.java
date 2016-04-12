@@ -8,7 +8,7 @@
 package org.dspace.importer.external.metadatamapping;
 
 /**
- * Created by Philip Vissenaekens (philip at atmire dot com)
+ * @author Philip Vissenaekens (philip at atmire dot com)
  * Date: 21/10/15
  * Time: 09:52
  *

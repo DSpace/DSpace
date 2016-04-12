@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
- * Created by jonas - jonas@atmire.com on 06/11/15.
+ * Implements a data source for querying pubmed central
  */
 public class ImportMetadataSourceServiceImpl extends org.dspace.importer.external.service.AbstractImportMetadataSourceService {
     private String baseAddress;

@@ -16,7 +16,7 @@ import org.dspace.importer.external.metadatamapping.contributor.MetadataContribu
 import java.util.*;
 
 /**
- * Created by Philip Vissenaekens (philip at atmire dot com)
+ * @author Philip Vissenaekens (philip at atmire dot com)
  * Date: 07/07/15
  * Time: 15:08
  */

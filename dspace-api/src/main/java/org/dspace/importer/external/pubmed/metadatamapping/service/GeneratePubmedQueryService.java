@@ -19,7 +19,7 @@ import org.dspace.importer.external.metadatamapping.service.GenerateQueryService
 import java.util.List;
 
 /**
- * Created by jonas - jonas@atmire.com on 06/11/15.
+ * @author jonas - jonas@atmire.com on 06/11/15.
  */
 public class GeneratePubmedQueryService implements GenerateQueryService {
 

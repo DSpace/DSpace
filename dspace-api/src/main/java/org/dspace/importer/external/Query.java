@@ -12,10 +12,8 @@ import org.apache.commons.collections.map.MultiValueMap;
 
 import java.util.Collection;
 
-/**
- * Created by Roeland Dillen (roeland at atmire dot com)
- * Date: 27/09/12
- * Time: 15:26
+/** Represents a query to a source. Subclasses may enforce stricter typing or more verbose setting of parameters.
+ * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class Query {
     private MultiValueMap parameters = new MultiValueMap();
