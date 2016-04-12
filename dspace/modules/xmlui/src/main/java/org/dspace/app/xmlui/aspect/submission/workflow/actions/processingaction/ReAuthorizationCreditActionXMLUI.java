@@ -107,11 +107,11 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
                     AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("internal", "journal", "customerID", Item.ANY);
                     if(metadataValues!=null&&metadataValues.length>0){
                         try{
-                            success = AssociationAnywhere.tallyCredit(context, metadataValues[0].value, DOIIdentifierProvider.getDoiValue(item));
                             shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                             Date date= new Date();
                             shoppingCart.setPaymentDate(date);
                             shoppingCart.update();
+                            success = AssociationAnywhere.tallyCredit(context, metadataValues[0].value, DOIIdentifierProvider.getDoiValue(item));
                             sendPaymentApprovedEmail(context, workflowItem, shoppingCart);
 
                         }catch (Exception e)
