@@ -112,11 +112,11 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
                             Date date= new Date();
                             shoppingCart.setPaymentDate(date);
                             shoppingCart.update();
-                            sendPaymentApprovedEmail(context, workflowItem, shoppingCart);
+                            paymentSystemService.sendPaymentApprovedEmail(context, workflowItem, shoppingCart);
 
                         }catch (Exception e)
                         {
-                            sendPaymentErrorEmail(context, workflowItem, shoppingCart,"problem: credit not tallied successfully. \\n \\n " + e.getMessage());
+                            paymentSystemService.sendPaymentErrorEmail(context, workflowItem, shoppingCart,"problem: credit not tallied successfully. \\n \\n " + e.getMessage());
                             log.error(e.getMessage());
                             return e.getMessage();
                         }
@@ -130,69 +130,4 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
         }
         return success;
     }
-
-
-    private void sendPaymentApprovedEmail(Context c, WorkflowItem wfi, ShoppingCart shoppingCart) {
-
-        try {
-
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_approved"));
-            email.addRecipient(wfi.getSubmitter().getEmail());
-            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.alert.recipient"));
-
-            email.addArgument(
-                    wfi.getItem().getName()
-            );
-
-            email.addArgument(
-                    wfi.getSubmitter().getFullName() + " ("  +
-                            wfi.getSubmitter().getEmail() + ")");
-
-            if(shoppingCart != null)
-            {
-                /** add details of shopping cart */
-                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
-            }
-
-            email.send();
-
-        } catch (Exception e) {
-            log.error(LogManager.getHeader(c, "Error sending payment approved submission email", "WorkflowItemId: " + wfi.getID()), e);
-        }
-
-    }
-    private void sendPaymentErrorEmail(Context c, WorkflowItem wfi, ShoppingCart shoppingCart, String error) {
-
-        try {
-
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_error"));
-            // only send result of shopping cart errors to administrators
-            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.alert.recipient"));
-
-            email.addArgument(
-                    wfi.getItem().getName()
-            );
-
-            email.addArgument(
-                    wfi.getSubmitter().getFullName() + " ("  +
-                            wfi.getSubmitter().getEmail() + ")");
-
-            email.addArgument(error);
-
-            if(shoppingCart != null)
-            {
-                /** add details of shopping cart */
-                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
-            }
-
-            email.send();
-
-        } catch (Exception e) {
-            log.error(LogManager.getHeader(c, "Error sending payment rejected submission email", "WorkflowItemId: " + wfi.getID()), e);
-        }
-
-    }
-
 }

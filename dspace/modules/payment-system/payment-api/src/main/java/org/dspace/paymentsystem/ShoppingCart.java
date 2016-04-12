@@ -7,7 +7,6 @@
  */
 package org.dspace.paymentsystem;
 
-
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -19,7 +18,6 @@ import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -984,5 +982,4 @@ public class ShoppingCart {
         return myRow.getDateColumn("payment_date");
 
     }
-
 }

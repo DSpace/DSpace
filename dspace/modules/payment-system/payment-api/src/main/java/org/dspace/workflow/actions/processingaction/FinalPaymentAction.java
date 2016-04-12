@@ -17,6 +17,7 @@ import org.dspace.content.authority.Scheme;
 import org.dspace.core.*;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.paymentsystem.PaymentSystemService;
+import org.dspace.paymentsystem.PaymentSystemImpl;
 import org.dspace.paymentsystem.PaypalService;
 import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.paymentsystem.Voucher;
@@ -87,27 +88,27 @@ public class FinalPaymentAction extends ProcessingAction {
 	    Scheme scheme = Scheme.findByIdentifier(c,ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
 	    Concept[] concepts = Concept.findByPreferredLabel(c,shoppingCart.getJournal(),scheme.getID());
 	    if(concepts!=null&&concepts.length!=0){
-		AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("journal", "customerID", null, Item.ANY);
-		if(metadataValues!=null&&metadataValues.length>0){
-		    try{
-			String packageDOI = DOIIdentifierProvider.getDoiValue(wfi.getItem());
-			success = AssociationAnywhere.tallyCredit(c, metadataValues[0].value, packageDOI);
-			shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
-			Date date= new Date();
-			shoppingCart.setPaymentDate(date);
-			shoppingCart.update();
-			sendPaymentApprovedEmail(c,wfi,shoppingCart);
-			return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
-		    } catch (Exception e) {
-			log.error(e.getMessage(),e);
-			sendPaymentErrorEmail(c, wfi, shoppingCart,"problem: credit not tallied successfully. \\n \\n " + e.getMessage());
-			return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, 2);
-		    }
-		} else {
-		    log.error("unable to tally credit due to missing customerID");
-		}
+		    AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("journal", "customerID", null, Item.ANY);
+            if(metadataValues!=null&&metadataValues.length>0){
+                try {
+                    String packageDOI = DOIIdentifierProvider.getDoiValue(wfi.getItem());
+                    success = AssociationAnywhere.tallyCredit(c, metadataValues[0].value, packageDOI);
+                    shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
+                    Date date= new Date();
+                    shoppingCart.setPaymentDate(date);
+                    shoppingCart.update();
+                    paymentSystemService.sendPaymentApprovedEmail(c,wfi,shoppingCart);
+                    return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+                } catch (Exception e) {
+                    log.error(e.getMessage(),e);
+                    paymentSystemService.sendPaymentErrorEmail(c, wfi, shoppingCart, "problem: credit not tallied successfully. \\n \\n " + e.getMessage());
+                    return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, 2);
+                }
+            } else {
+                log.error("unable to tally credit due to missing customerID");
+            }
 	    } else {
-		log.error("unable to tally credit due to missing concept");
+		    log.error("unable to tally credit due to missing concept");
 	    }
 	}
 
@@ -130,71 +131,6 @@ public class FinalPaymentAction extends ProcessingAction {
 	log.info("no payment processded for Item " + itemID + ", sending to revalidation step");
         WorkflowEmailManager.notifyOfReAuthorizationPayment(c, wfi);
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, 1);
-
-    }
-
-
-    private void sendPaymentApprovedEmail(Context c, WorkflowItem wfi, ShoppingCart shoppingCart) {
-
-        try {
-
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_approved"));
-            email.addRecipient(wfi.getSubmitter().getEmail());
-            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.alert.recipient"));
-
-            email.addArgument(
-                    wfi.getItem().getName()
-            );
-
-            email.addArgument(
-                    wfi.getSubmitter().getFullName() + " ("  +
-                            wfi.getSubmitter().getEmail() + ")");
-
-            if(shoppingCart != null)
-            {
-                /** add details of shopping cart */
-                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
-            }
-
-            email.send();
-
-        } catch (Exception e) {
-            log.error(LogManager.getHeader(c, "Error sending payment approved submission email", "WorkflowItemId: " + wfi.getID()), e);
-        }
-
-    }
-
-    private void sendPaymentErrorEmail(Context c, WorkflowItem wfi, ShoppingCart shoppingCart, String error) {
-
-        try {
-
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_error"));
-            // only send result of shopping cart errors to administrators
-            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.alert.recipient"));
-
-            email.addArgument(
-                    wfi.getItem().getName()
-            );
-
-            email.addArgument(
-                    wfi.getSubmitter().getFullName() + " ("  +
-                            wfi.getSubmitter().getEmail() + ")");
-
-            email.addArgument(error);
-
-            if(shoppingCart != null)
-            {
-                /** add details of shopping cart */
-                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
-            }
-
-            email.send();
-
-        } catch (Exception e) {
-            log.error(LogManager.getHeader(c, "Error sending payment rejected submission email", "WorkflowItemId: " + wfi.getID()), e);
-        }
 
     }
 }
