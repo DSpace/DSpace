@@ -29,26 +29,47 @@ public abstract class AbstractImportMetadataSourceService<RecordType> extends Me
 	private GenerateQueryService generateQueryForItem = null;
 	private MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> metadataFieldMapping;
 
+    /**
+     * Retrieve the {@link GenerateQueryService}
+     * @return A GenerateForQueryService object set to this class
+     */
 	public GenerateQueryService getGenerateQueryForItem() {
 		return generateQueryForItem;
 	}
 
-	@Autowired
+    /**
+     * Set the {@link GenerateQueryService} used to create a {@link org.dspace.importer.external.Query}
+     * @param generateQueryForItem
+     */
+    @Autowired
 	public void setGenerateQueryForItem(GenerateQueryService generateQueryForItem) {
 		this.generateQueryForItem = generateQueryForItem;
 	}
 
+    /**
+     * Retrieve the MetadataFieldMapping containing the mapping between RecordType and Metadata
+     * @return The configured MetadataFieldMapping
+     */
 	public MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> getMetadataFieldMapping() {
 		return metadataFieldMapping;
 	}
 
+    /**
+     * Sets the MetadataFieldMapping to base the mapping of RecordType and
+     * @param metadataFieldMapping
+     */
 	@Required
 	public void setMetadataFieldMapping(
 			MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> metadataFieldMapping) {
 		this.metadataFieldMapping = metadataFieldMapping;
 	}
 
-	public ImportRecord transformSourceRecords(RecordType rt){
-		 return new ImportRecord(new LinkedList<MetadatumDTO>(getMetadataFieldMapping().resultToDCValueMapping(rt)));
+    /**
+     *  Return an ImportRecord constructed from the results in a RecordType
+     * @param recordType The recordtype to retrieve the DCValueMapping from
+     * @return An {@link ImportRecord}, This is based on the results retrieved from the recordTypeMapping
+     */
+	public ImportRecord transformSourceRecords(RecordType recordType){
+		 return new ImportRecord(new LinkedList<>(getMetadataFieldMapping().resultToDCValueMapping(recordType)));
 	}
 }

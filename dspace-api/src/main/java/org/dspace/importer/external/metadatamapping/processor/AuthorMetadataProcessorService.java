@@ -14,11 +14,14 @@ import org.dspace.importer.external.metadatamapping.service.MetadataProcessorSer
  * Removes the last point from an author name, this is required for the SAP lookup
  *
  * User: kevin (kevin at atmire.com)
- * Date: 23/10/12
- * Time: 09:50
  */
 public class AuthorMetadataProcessorService implements MetadataProcessorService {
 
+    /**
+     * Strip a given value of its last dot (.)
+     * @param value the value to run the processing over
+     * @return The initial param with its ending dot stripped
+     */
     @Override
     public String processMetadataValue(String value) {
         String ret=value;

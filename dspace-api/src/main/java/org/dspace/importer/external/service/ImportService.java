@@ -26,16 +26,24 @@ import java.util.*;
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class ImportService implements Destroyable {
-    private HashMap<String, Imports> importSources = new HashMap<String, Imports>();
+    private HashMap<String, Imports> importSources = new HashMap<>();
 
     Logger log = Logger.getLogger(ImportService.class);
 
+    /**
+     * Constructs an empty ImportService class object
+     */
     public ImportService() {
 
     }
 
     protected static final String ANY = "*";
 
+    /**
+     * Sets the importsources that will be used to delegate the retrieving and matching of records to
+     * @param importSources A list of {@link org.dspace.importer.external.service.other.Imports} to set to this service
+     * @throws MetadataSourceException
+     */
     @Autowired(required = false)
     public void setImportSources(List<Imports> importSources) throws MetadataSourceException {
         log.info("Loading " + importSources.size() + " import sources.");
@@ -45,6 +53,10 @@ public class ImportService implements Destroyable {
 
     }
 
+    /**
+     * Retrieve the importSources set to this class.
+     * @return  An unmodifiableMap of importSources
+     */
     protected Map<String, Imports> getImportSources() {
         return Collections.unmodifiableMap(importSources);
     }
@@ -154,7 +166,7 @@ public class ImportService implements Destroyable {
 	 */
     public Collection<ImportRecord> getRecords(String uri, String query, int start, int count) throws MetadataSourceException {
 		try {
-			List<ImportRecord> recordList = new LinkedList<ImportRecord>();
+			List<ImportRecord> recordList = new LinkedList<>();
 			for (Imports imports : matchingImports(uri)) {
 				recordList.addAll(imports.getRecords(query, start, count));
 			}
@@ -173,7 +185,7 @@ public class ImportService implements Destroyable {
 	 */
     public Collection<ImportRecord> getRecords(String uri, Query query) throws MetadataSourceException {
 		try {
-			List<ImportRecord> recordList = new LinkedList<ImportRecord>();
+			List<ImportRecord> recordList = new LinkedList<>();
 			for (Imports imports : matchingImports(uri)) {
 				recordList.addAll(imports.getRecords(query));
 			}
@@ -220,11 +232,15 @@ public class ImportService implements Destroyable {
 		}
 	}
 
+    /** Retrieve the importUrls that are set on the importSources .
+     *  @return a Collection of string, representing the configured importUrls
+     */
     public Collection<String> getImportUrls() {
         return importSources.keySet();
     }
 
-
+    /** Call destroy on all {@link Destroyable} {@link Imports} objects set in this ImportService
+     */
     @Override
     public void destroy() throws Exception {
         for (Imports imports : importSources.values()) {

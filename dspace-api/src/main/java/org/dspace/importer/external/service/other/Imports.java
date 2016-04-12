@@ -44,29 +44,29 @@ public interface Imports {
      */
     public Collection<ImportRecord> getRecords(String query, int start, int count)throws MetadataSourceException;
 
-    /**
+    /** Find records based on a object query.
      *
-     * @param q
-     * @return
+     * @param query a query object to base the search on.
+     * @return a set of records. Fully transformed.
      * @throws MetadataSourceException
      */
-    public Collection<ImportRecord> getRecords(Query q)throws MetadataSourceException;
+    public Collection<ImportRecord> getRecords(Query query)throws MetadataSourceException;
 
-    /**
-     *
-     * @param id
-     * @return
+    /** Get a single record from the source.
+     * The first match will be returned
+     * @param id identifier for the record
+     * @return a matching record
      * @throws MetadataSourceException
      */
     public ImportRecord getRecord(String id)throws MetadataSourceException;
 
-    /**
-     *
-     * @param q
-     * @return
+    /** Get a single record from the source.
+     * The first match will be returned
+     * @param query a query matching a single record
+     * @return a matching record
      * @throws MetadataSourceException
      */
-    public ImportRecord getRecord(Query q)throws MetadataSourceException;
+    public ImportRecord getRecord(Query query)throws MetadataSourceException;
 
 	/**
      * The string that identifies this import implementation. Preferable a URI
@@ -74,7 +74,19 @@ public interface Imports {
      */
     public String getImportSource();
 
+    /** Finds records based on an item
+     * Delegates to one or more Imports implementations based on the uri.  Results will be aggregated.
+     * @param item an item to base the search on
+     * @return a collection of import records. Only the identifier of the found records may be put in the record.
+     * @throws MetadataSourceException if the underlying imports throw any exception.
+     */
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException;
 
-    public Collection<ImportRecord> findMatchingRecords(Query q) throws MetadataSourceException;
+    /** Finds records based on query object.
+     *  Delegates to one or more Imports implementations based on the uri.  Results will be aggregated.
+     * @param query a query object to base the search on.
+     * @return a collection of import records. Only the identifier of the found records may be put in the record.
+     * @throws MetadataSourceException
+     */
+    public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException;
 }

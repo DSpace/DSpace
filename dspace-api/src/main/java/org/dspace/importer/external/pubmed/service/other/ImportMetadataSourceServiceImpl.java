@@ -38,71 +38,126 @@ public class ImportMetadataSourceServiceImpl extends org.dspace.importer.externa
 
     private WebTarget pubmedWebTarget;
 
-
-    // Return the number of records from the pubmedWebTarget based on a query String
+    /** Find the number of records matching a query;
+     *
+     * @param query a query string to base the search on.
+     * @return the sum of the matching records over this import source
+     * @throws MetadataSourceException
+     */
     @Override
     public int getNbRecords(String query) throws MetadataSourceException {
         return retry(new GetNbRecords(query));
     }
 
-    // Return the number of records from the pubmedWebTarget based on a query object
-    @Override
+    /** Find the number of records matching a query;
+     *
+     * @param query a query object to base the search on.
+     * @return the sum of the matching records over this import source
+     * @throws MetadataSourceException
+     */    @Override
     public int getNbRecords(Query query) throws MetadataSourceException {
         return retry(new GetNbRecords(query));
     }
 
-    // Return the records from the pubmedWebTarget based on a query string, the start and count
+    /**  Find the number of records matching a string query. Supports pagination
+     *
+     * @param query a query string to base the search on.
+     * @param start offset to start at
+     * @param count number of records to retrieve.
+     * @return a set of records. Fully transformed.
+     * @throws MetadataSourceException
+     */
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
         return retry(new GetRecords(query, start, count));
     }
 
-    // Return the records from the pubmedWebTarget based on a query object
+    /** Find records based on a object query.
+     *
+     * @param query a query object to base the search on.
+     * @return a set of records. Fully transformed.
+     * @throws MetadataSourceException
+     */
     @Override
-    public Collection<ImportRecord> getRecords(Query q) throws MetadataSourceException {
-        return retry(new GetRecords(q));
+    public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
+        return retry(new GetRecords(query));
     }
 
-    // Retrieve a single records based on an id
+    /** Get a single record from the source.
+     * The first match will be returned
+     * @param id identifier for the record
+     * @return a matching record
+     * @throws MetadataSourceException
+     */
     @Override
     public ImportRecord getRecord(String id) throws MetadataSourceException {
         return retry(new GetRecord(id));
     }
 
-    // Retrieve a single records based on q query object
+    /** Get a single record from the source.
+     * The first match will be returned
+     * @param query a query matching a single record
+     * @return a matching record
+     * @throws MetadataSourceException
+     */
     @Override
-    public ImportRecord getRecord(Query q) throws MetadataSourceException {
-        return retry(new GetRecord(q));
+    public ImportRecord getRecord(Query query) throws MetadataSourceException {
+        return retry(new GetRecord(query));
     }
 
-    // Return the configured baseAddress
+    /**
+     * The string that identifies this import implementation. Preferable a URI
+     * @return the identifying uri
+     */
     @Override
     public String getImportSource() {
         return "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
     }
 
-    // Return a collection of matching records based on a given item.
+    /** Finds records based on an item
+     * @param item an item to base the search on
+     * @return a collection of import records. Only the identifier of the found records may be put in the record.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
         return retry(new FindMatchingRecords(item));
     }
 
-    // Return a collection of matching records based on a given query object.
+    /** Finds records based on query object.
+     *  Delegates to one or more Imports implementations based on the uri.  Results will be aggregated.
+     * @param query a query object to base the search on.
+     * @return a collection of import records. Only the identifier of the found records may be put in the record.
+     * @throws MetadataSourceException
+     */
     @Override
-    public Collection<ImportRecord> findMatchingRecords(Query q) throws MetadataSourceException {
-        return retry(new FindMatchingRecords(q));
+    public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
+        return retry(new FindMatchingRecords(query));
     }
 
+    /**
+     * Initialize the class
+     * @throws Exception
+     */
     @Override
     public void init() throws Exception {
         Client client = ClientBuilder.newClient();
         WebTarget webTarget = client.target(baseAddress);
         pubmedWebTarget = webTarget.queryParam("db", "pubmed");
     }
+
+    /**
+     * Return the baseAddress set to this object
+     * @return The String object that represents the baseAddress of this object
+     */
     public String getBaseAddress() {
         return baseAddress;
     }
 
+    /**
+     * Set the baseAddress to this object
+     * @param baseAddress The String object that represents the baseAddress of this object
+     */
     public void setBaseAddress(String baseAddress) {
         this.baseAddress = baseAddress;
     }

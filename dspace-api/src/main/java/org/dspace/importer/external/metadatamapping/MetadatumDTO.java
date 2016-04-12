@@ -9,8 +9,6 @@ package org.dspace.importer.external.metadatamapping;
 
 /**
  * @author Philip Vissenaekens (philip at atmire dot com)
- * Date: 21/10/15
- * Time: 09:52
  *
  * This class is used to cary data between processes.
  * Using this class, we have a uniform, generalised single Object type containing the information used by different classes.
@@ -24,33 +22,68 @@ public class MetadatumDTO {
     private String qualifier;
     private String value;
 
+    /**
+     * An empty MetadatumDTO constructor
+     */
     public MetadatumDTO() {
     }
 
+    /**
+     * Retrieve the schema set to this MetadatumDTO.
+     * Returns <tt>null</tt> of no schema is set
+     * @return schema
+     */
     public String getSchema() {
         return schema;
     }
 
+    /**
+     * Set the schema to this MetadatumDTO
+     * @param schema
+     */
     public void setSchema(String schema) {
         this.schema = schema;
     }
 
+    /**
+     * Retrieve the element set to this MetadatumDTO.
+     * Returns <tt>null</tt> of no element is set
+     * @return element
+     */
     public String getElement() {
         return element;
     }
 
+    /**
+     * Set the element to this MetadatumDTO
+     * @param element
+     */
     public void setElement(String element) {
         this.element = element;
     }
 
+    /**
+     * Retrieve the qualifier set to this MetadatumDTO.
+     * Returns <tt>null</tt> of no qualifier is set
+     * @return qualifier
+     */
     public String getQualifier() {
         return qualifier;
     }
 
+    /**
+     * Set the qualifier to this MetadatumDTO
+     * @param qualifier
+     */
     public void setQualifier(String qualifier) {
         this.qualifier = qualifier;
     }
 
+    /**
+     * Retrieve the value set to this MetadatumDTO.
+     * Returns <tt>null</tt> of no value is set
+     * @return value
+     */
     public String getValue() {
         return value;
     }
