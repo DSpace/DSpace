@@ -85,8 +85,10 @@ public class DescribeStep extends AbstractSubmissionStep
         message("xmlui.Submission.submit.DescribeStep.series_name");
     protected static final Message T_report_no=
         message("xmlui.Submission.submit.DescribeStep.report_no");
-        
-        /**
+    protected static final Message T_language
+        = message("xmlui.Submission.submit.DescribeStep.language");
+
+    /**
      * A shared resource of the inputs reader. The 'inputs' are the
      * questions we ask the user to describe an item during the
      * submission process. The reader is a utility class to read
@@ -194,6 +196,9 @@ public class DescribeStep extends AbstractSubmissionStep
                     documentType = itemService.getMetadataByMetadataString(item, "dc.type").get(0).getValue();
                 }
                 
+                // Fetch the default language for the item's metadata
+                String defaultMetadataLang = getMetadataLanguage(item);
+
                 // Iterate over all inputs and add it to the form.
                 for(DCInput dcInput : inputs)
                 {
@@ -245,7 +250,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         {
                                 // We don't have a twobox field, instead it's just a
                                 // one box field that the theme can render in two columns.
-                                renderOneboxField(form, fieldName, dcInput, dcValues, readonly);
+                                renderOneboxField(form, fieldName, dcInput, dcValues, readonly, defaultMetadataLang);
                         }
                         else if (inputType.equals("qualdrop_value"))
                         {
@@ -268,7 +273,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         }
                         else if (inputType.equals("textarea"))
                         {
-                                renderTextArea(form, fieldName, dcInput, dcValues, readonly);
+                                renderTextArea(form, fieldName, dcInput, dcValues, readonly, defaultMetadataLang);
                         }
                         else if (inputType.equals("dropdown"))
                         {
@@ -280,7 +285,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         }
                         else if (inputType.equals("onebox"))
                         {
-                                renderOneboxField(form, fieldName, dcInput, dcValues, readonly);
+                                renderOneboxField(form, fieldName, dcInput, dcValues, readonly, defaultMetadataLang);
                         }
                         else
                         {
@@ -815,15 +820,44 @@ public class DescribeStep extends AbstractSubmissionStep
          *                      The field's input definition
          * @param dcValues
          *                      The field's pre-existing values.
+         * @param defaultLang
+         *                      The field's default metadata language (used only if language parameter is defined)
          */
-        private void renderTextArea(List form, String fieldName, DCInput dcInput, java.util.List<MetadataValue> dcValues, boolean readonly) throws WingException
+        private void renderTextArea(List form, String fieldName, DCInput dcInput, java.util.List<MetadataValue> dcValues, boolean readonly, String defaultLang) throws WingException
         {
                 // Plain old Textarea
-                TextArea textArea = form.addItem().addTextArea(fieldName,"submit-textarea");
+                org.dspace.app.xmlui.wing.element.Item item = form.addItem();
+                org.dspace.app.xmlui.wing.element.Composite composite = null;
+                org.dspace.app.xmlui.wing.element.Select language = null;
+                org.dspace.app.xmlui.wing.element.TextArea textArea;
 
-                // Setup the text area
-                textArea.setLabel(dcInput.getLabel());
-                textArea.setHelp(cleanHints(dcInput.getHints()));
+                if (dcInput.getLanguage())
+                {
+                    composite = item.addComposite(fieldName + "_composite", "submit-textarea");
+                    textArea = composite.addTextArea(fieldName);
+                    language = composite.addSelect(fieldName + "[lang]", "submit-lang");
+                }
+                else
+                {
+                    textArea = item.addTextArea(fieldName, "submit-textarea");
+                }
+
+                // Setup the textarea field
+                if (null == composite)
+                {
+                    textArea.setLabel(dcInput.getLabel());
+                    textArea.setHelp(cleanHints(dcInput.getHints()));
+                }
+                else
+                {
+                    composite.setLabel(dcInput.getLabel());
+                    composite.setHelp(cleanHints(dcInput.getHints()));
+                    if (null != language)
+                    {
+                        language.setHelp(T_language);
+                    }
+                }
+
                 String fieldKey = metadataAuthorityService.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
                 boolean isAuth = metadataAuthorityService.isAuthorityControlled(fieldKey);
                 if (isAuth)
@@ -839,56 +873,123 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
                 if (dcInput.isRequired())
                 {
-                    textArea.setRequired();
+                    if (null == composite)
+                    {
+                        textArea.setRequired();
+                    }
+                    else
+                    {
+                        composite.setRequired();
+                    }
                 }
                 if (isFieldInError(fieldName))
                 {
                     if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
                     {
-                        textArea.addError(dcInput.getWarning());
+                        if (null == composite)
+                        {
+                            textArea.addError(dcInput.getWarning());
+                        }
+                        else
+                        {
+                            composite.addError(dcInput.getWarning());
+                        }
                     }
                     else
                     {
-                        textArea.addError(T_required_field);
+                        if (null == composite)
+                        {
+                            textArea.addError(T_required_field);
+                        }
+                        else
+                        {
+                            composite.addError(T_required_field);
+                        }
                     }
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
-                    textArea.enableAddOperation();
+                    if (null == composite)
+                    {
+                        textArea.enableAddOperation();
+                    }
+                    else
+                    {
+                        composite.enableAddOperation();
+                    }
                 }
                 if ((dcInput.isRepeatable() || dcValues.size() > 1) && !readonly)
                 {
-                    textArea.enableDeleteOperation();
+                    if (null == composite)
+                    {
+                        textArea.enableDeleteOperation();
+                    }
+                    else
+                    {
+                        composite.enableDeleteOperation();
+                    }
                 }
 
                 if (readonly)
                 {
                     textArea.setDisabled();
+                    if (null != language)
+                    {
+                        language.setDisabled();
+                    }
                 }
                 
+                // Setup language field
+                boolean doSelectLanguage = false;
+                if (null != language)
+                {
+                    for (int j = 0; j < dcInput.getValueLanguageList().size(); j += 2)
+                    {
+                        String display = (String) dcInput.getValueLanguageList().get(j);
+                        String value = (String) dcInput.getValueLanguageList().get(j + 1);
+                        language.addOption(value, display);
+                    }
+                    doSelectLanguage = true;
+                }
+
                 // Setup the field's values
                 if (dcInput.isRepeatable() || dcValues.size() > 1)
                 {
-                        for (MetadataValue dcValue : dcValues)
+                    for (MetadataValue dcValue : dcValues)
+                    {
+                        Instance ti;
+                        if ((null == composite) || (null == language))
                         {
-                                Instance ti = textArea.addInstance();
-                                ti.setValue(dcValue.getValue());
-                                if (isAuth)
-                                {
-                                    if (dcValue.getAuthority() == null || dcValue.getAuthority().equals(""))
-                                    {
-                                        ti.setAuthorityValue("", "blank");
-                                    }
-                                    else
-                                    {
-                                        ti.setAuthorityValue(dcValue.getAuthority(), Choices.getConfidenceText(dcValue.getConfidence()));
-                                    }
+                            ti = textArea.addInstance();
+                            ti.setValue(dcValue.getValue());
                         }
-                }
+                        else
+                        {
+                            textArea.addInstance().setValue(dcValue.getValue());
+                            language.addInstance().setOptionSelected(dcValue.getLanguage());
+                            ti = composite.addInstance();
+                        }
+                        if (isAuth)
+                        {
+                            if (dcValue.getAuthority() == null || dcValue.getAuthority().equals(""))
+                            {
+                                ti.setAuthorityValue("", "blank");
+                            }
+                            else
+                            {
+                                ti.setAuthorityValue(dcValue.getAuthority(), Choices.getConfidenceText(dcValue.getConfidence()));
+                            }
+                        }
+                    }
                 }
                 else if (dcValues.size() == 1)
                 {
                         textArea.setValue(dcValues.get(0).getValue());
+                        if (null != language)
+                        {
+                            language.setOptionSelected(dcValues.get(0).getLanguage());
+                            doSelectLanguage = false;
+                        }
                         if (isAuth)
                         {
                             if (dcValues.get(0).getAuthority() == null || dcValues.get(0).getAuthority().equals(""))
@@ -899,8 +1000,12 @@ public class DescribeStep extends AbstractSubmissionStep
                             {
                                 textArea.setAuthorityValue(dcValues.get(0).getAuthority(), Choices.getConfidenceText(dcValues.get(0).getConfidence()));
                             }
+                        }
                 }
-        }
+                if ((null != language) && (doSelectLanguage))
+                {
+                    language.setOptionSelected(defaultLang);
+                }
         }
         
         /**
@@ -1146,7 +1251,7 @@ public class DescribeStep extends AbstractSubmissionStep
          * @param dcValues
          *                      The field's pre-existing values.
          */
-        private void renderOneboxField(List form, String fieldName, DCInput dcInput, java.util.List<MetadataValue> dcValues, boolean readonly) throws WingException
+        private void renderOneboxField(List form, String fieldName, DCInput dcInput, java.util.List<MetadataValue> dcValues, boolean readonly, String defaultLang) throws WingException
         {
                 // Both onebox and twobox consist a free form text field
                 // that the user may enter any value. The difference between
@@ -1154,20 +1259,47 @@ public class DescribeStep extends AbstractSubmissionStep
                 // as twobox should be listed in a two column format. Since this
                 // decision is not something the Aspect can effect we merely place
                 // as a render hint.
-            org.dspace.app.xmlui.wing.element.Item item = form.addItem();
-            Text text = item.addText(fieldName, "submit-text");
+                org.dspace.app.xmlui.wing.element.Item item = form.addItem();
+                org.dspace.app.xmlui.wing.element.Composite composite = null;
+                org.dspace.app.xmlui.wing.element.Select language = null;
+                org.dspace.app.xmlui.wing.element.Text text;
 
-            if(dcInput.getVocabulary() != null){
-                String vocabularyUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url");
-                vocabularyUrl += "/JSON/controlled-vocabulary?vocabularyIdentifier=" + dcInput.getVocabulary();
-                //Also hand down the field name so our summoning script knows the field the selected value is to end up in
-                vocabularyUrl += "&metadataFieldName=" + fieldName;
-                item.addXref("vocabulary:" + vocabularyUrl).addContent(T_vocabulary_link);
-            }
+                if (dcInput.getLanguage())
+                {
+                    composite = item.addComposite(fieldName + "_composite", "submit-text");
+                    text = composite.addText(fieldName);
+                    language = composite.addSelect(fieldName + "[lang]", "submit-lang");
+                }
+                else
+                {
+                    text = item.addText(fieldName, "submit-text");
+                }
+
+                if ((dcInput.getVocabulary() != null) && (!dcInput.getLanguage()))
+                {
+                    String vocabularyUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url");
+                    vocabularyUrl += "/JSON/controlled-vocabulary?vocabularyIdentifier=" + dcInput.getVocabulary();
+                    //Also hand down the field name so our summoning script knows the field the selected value is to end up in
+                    vocabularyUrl += "&metadataFieldName=" + fieldName;
+                    item.addXref("vocabulary:" + vocabularyUrl).addContent(T_vocabulary_link);
+                }
             
-                // Setup the select field
-                text.setLabel(dcInput.getLabel());
-                text.setHelp(cleanHints(dcInput.getHints()));
+                // Setup the text field
+                if (null == composite)
+                {
+                    text.setLabel(dcInput.getLabel());
+                    text.setHelp(cleanHints(dcInput.getHints()));
+                }
+                else
+                {
+                    composite.setLabel(dcInput.getLabel());
+                    composite.setHelp(cleanHints(dcInput.getHints()));
+                    if (null != language)
+                    {
+                        language.setHelp(T_language);
+                    }
+                }
+
                 String fieldKey = metadataAuthorityService.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
                 boolean isAuth = metadataAuthorityService.isAuthorityControlled(fieldKey);
                 if (isAuth)
@@ -1184,40 +1316,104 @@ public class DescribeStep extends AbstractSubmissionStep
 
                 if (dcInput.isRequired())
                 {
-                    text.setRequired();
+                    if (null == composite)
+                    {
+                        text.setRequired();
+                    }
+                    else
+                    {
+                        composite.setRequired();
+                    }
                 }
                 if (isFieldInError(fieldName))
                 {
                     if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
                     {
-                        text.addError(dcInput.getWarning());
+                        if (null == composite)
+                        {
+                            text.addError(dcInput.getWarning());
+                        }
+                        else
+                        {
+                            composite.addError(dcInput.getWarning());
+                        }
                     }
                     else
                     {
-                        text.addError(T_required_field);
+                        if (null == composite)
+                        {
+                            text.addError(T_required_field);
+                        }
+                        else
+                        {
+                            composite.addError(T_required_field);
+                        }
                     }
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
-                    text.enableAddOperation();
+                    if (null == composite)
+                    {
+                        text.enableAddOperation();
+                    }
+                    else
+                    {
+                        composite.enableAddOperation();
+                    }
                 }
                 if ((dcInput.isRepeatable() || dcValues.size() > 1) && !readonly)
                 {
-                    text.enableDeleteOperation();
+                    if (null == composite)
+                    {
+                        text.enableDeleteOperation();
+                    }
+                    else
+                    {
+                        composite.enableDeleteOperation();
+                    }
                 }
 
                 if (readonly)
                 {
                     text.setDisabled();
+                    if (null != language)
+                    {
+                        language.setDisabled();
+                    }
                 }
                 
+                // Setup language field
+                boolean doSelectLanguage = false;
+                if (null != language)
+                {
+                    //language.setLabel(T_language);
+                    for (int j = 0; j < dcInput.getValueLanguageList().size(); j += 2)
+                    {
+                        String display = (String) dcInput.getValueLanguageList().get(j);
+                        String value = (String) dcInput.getValueLanguageList().get(j + 1);
+                        language.addOption(value, display);
+                    }
+                    doSelectLanguage = true;
+                }
+
                 // Setup the field's values
                 if (dcInput.isRepeatable() || dcValues.size() > 1)
                 {
                         for (MetadataValue dcValue : dcValues)
                         {
-                                Instance ti = text.addInstance();
-                                ti.setValue(dcValue.getValue());
+                                Instance ti;
+                                if ((null == composite) || (null == language))
+                                {
+                                    ti = text.addInstance();
+                                    ti.setValue(dcValue.getValue());
+                                }
+                                else
+                                {
+                                    text.addInstance().setValue(dcValue.getValue());
+                                    language.addInstance().setOptionSelected(dcValue.getLanguage());
+                                    ti = composite.addInstance();
+                                }
+
                                 if (isAuth)
                                 {
                                     if (dcValue.getAuthority() == null || dcValue.getAuthority().equals(""))
@@ -1234,6 +1430,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 else if (dcValues.size() == 1)
                 {
                         text.setValue(dcValues.get(0).getValue());
+                        if (null != language)
+                        {
+                            language.setOptionSelected(dcValues.get(0).getLanguage());
+                            doSelectLanguage = false;
+                        }
                         if (isAuth)
                         {
                             if (dcValues.get(0).getAuthority() == null || dcValues.get(0).getAuthority().equals(""))
@@ -1244,6 +1445,10 @@ public class DescribeStep extends AbstractSubmissionStep
                             {
                                 text.setAuthorityValue(dcValues.get(0).getAuthority(), Choices.getConfidenceText(dcValues.get(0).getConfidence()));
                             }
+                }
+                if ((null != language) && (doSelectLanguage))
+                {
+                    language.setOptionSelected(defaultLang);
                 }
             }
         }
@@ -1293,4 +1498,38 @@ public class DescribeStep extends AbstractSubmissionStep
 
                 return clean;
         }
+        
+
+    /**
+     * Get default metadata language for specified Item.
+     *
+     * @param item
+     */
+    private String getMetadataLanguage(Item item)
+    {
+        String lang = null;
+        try
+        {
+            lang = itemService.getMetadataByMetadataString(item, "dc.language.iso").get(0).getValue();
+        }
+        catch (Exception ex)
+        {
+        }
+        if (null == lang)
+        {
+            try
+            {
+                lang = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("default.language");
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+        if (null == lang)
+        {
+            lang = "";
+        }
+        return lang;
+    }
+
 }

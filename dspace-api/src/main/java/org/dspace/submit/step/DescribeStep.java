@@ -9,6 +9,7 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -729,6 +730,34 @@ public class DescribeStep extends AbstractProcessingStep
                    confs.remove(valToRemove);
                 }
             }
+            else
+            {
+                // Maybe we got here from XMLUI?
+                removeButton = "submit_" + metadataField + "_composite_delete";
+                if (buttonPressed.startsWith(removeButton))
+                {
+                    // Which data should be removed?
+                    String removeFields = metadataField + "_composite_selected";
+                    Map<Integer, Integer> removeKeys = new HashMap<>();
+                    for (String fieldName : request.getParameterValues(removeFields))
+                    {
+                        int valToRemove = Integer.parseInt(fieldName.substring(metadataField.length() + 11)) - 1;
+                        //find the key from the given position
+                        //for more information take a look at < Edit-metadata.jsp>
+                        int key = vals.keySet().toArray(new Integer[vals.size()])[valToRemove];
+                        removeKeys.put(key, valToRemove);
+                    }
+                    for (Integer key : removeKeys.keySet())
+                    {
+                        vals.remove(key);
+                        if(isAuthorityControlled)
+                        {
+                            auths.remove(removeKeys.get(key));
+                            confs.remove(removeKeys.get(key));
+                        }
+                    }
+                }
+            }
         }
         else
         {
@@ -774,6 +803,15 @@ public class DescribeStep extends AbstractProcessingStep
                 else if (hasLanguageTag && repeated) 
                 {
                     lang = request.getParameter(metadataField + "_" + key + "[lang]");
+                    if (null == lang)
+                    {
+                        // We might have got here from XMLUI: some things are different here (than with JSPUI)
+                        lang = request.getParameter(metadataField + "[lang]_" + key);
+                        if ((null == lang) && (key == vals.lastKey()))
+                        {
+                            lang = request.getParameter(metadataField + "[lang]");
+                        }
+                    }
                 }
                 
                 if (isAuthorityControlled)
