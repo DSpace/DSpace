@@ -11,17 +11,24 @@ import java.util.Collection;
 
 /**
  * @author Roeland Dillen (roeland at atmire dot com)
- * Date: 18/09/12
- * Time: 14:41
  */
 
-public interface  MetadataFieldMapping<RecordType,QueryType> {
+public interface MetadataFieldMapping<RecordType,QueryType> {
 
-        /* Using a given MetadataFieldConfig, return a MetadatumDTO retrieved from a value. */
-        public MetadatumDTO toDCValue(MetadataFieldConfig field, String value);
+    /**
+     * @param field MetadataFieldConfig representing what to map the value to
+     * @param value The value to map to a MetadatumDTO
+     * @return A metadatumDTO created from the field and value
+     */
+    public MetadatumDTO toDCValue(MetadataFieldConfig field, String value);
 
-        /* Implementations need to handle how the result is processed,filtered and returned. */
-        public Collection<MetadatumDTO> resultToDCValueMapping(RecordType record);
+
+    /**
+     * Create a collection of MetadatumDTO retrieved from a given RecordType
+     * @param record Used to retrieve the MetadatumDTO
+     * @return Collectio of MetadatumDTO
+     */
+    public Collection<MetadatumDTO> resultToDCValueMapping(RecordType record);
 
 
 

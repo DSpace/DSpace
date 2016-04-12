@@ -24,12 +24,13 @@ import java.util.List;
 public class GeneratePubmedQueryService implements GenerateQueryService {
 
 
-    /*
-    * Create a Query object based on a given item.
-    * If the item has at least 1 value for dc.identifier.doi, the first one will be used.
-    * If no DOI is found, the title will be used.
-    * When no DOI or title is found, an null object is returned instead.
-    */
+    /**
+     * Create a Query object based on a given item.
+     * If the item has at least 1 value for dc.identifier.doi, the first one will be used.
+     * If no DOI is found, the title will be used.
+     * When no DOI or title is found, an null object is returned instead.
+     * @param item the Item to create a Query from
+     */
     @Override
     public Query generateQueryForItem(Item item) throws MetadataSourceException {
         Query query = new Query();

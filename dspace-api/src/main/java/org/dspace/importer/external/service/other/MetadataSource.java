@@ -22,7 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class contains functionality to handle request timeouts and to retry requests.
- * This is useful in cas the service employs throttling and to deal with general network issues.
+ * This is useful in case the service employs throttling and to deal with general network issues.
  * @author: Antoine Snyers (antoine at atmire dot com)
  */
 public abstract class MetadataSource {
@@ -40,45 +40,82 @@ public abstract class MetadataSource {
     protected Map<Class, List<SourceExceptionHandler>> exceptionHandlersMap;
     protected Exception error;
 
-
+    /**
+     * Constructs an empty MetadataSource class object and initializes the Exceptionhandlers
+     */
     protected MetadataSource() {
         initExceptionHandlers();
     }
 
+    /**
+     *  initialize the exceptionHandlersMap with an empty {@link java.util.LinkedHashMap}
+     */
     protected void initExceptionHandlers() {
-        exceptionHandlersMap = new LinkedHashMap<Class, List<SourceExceptionHandler>>();
+        exceptionHandlersMap = new LinkedHashMap<>();
         // if an exception is thrown that is not in there, it is not recoverable and the retry chain will stop
         // by default all exceptions are fatal, but subclasses can add their own handlers for their own exceptions
     }
 
+    /**
+     * Return the warning message used for logging during exception catching
+     * @return a "warning" String
+     */
     public String getWarning() {
         return warning;
     }
 
+    /**
+     * Set the warning message used for logging
+     * @param warning
+     */
     public void setWarning(String warning) {
         this.warning = warning;
     }
 
+    /**
+     * Return the number of retries that have currently been undertaken
+     * @return the number of retries
+     */
     public int getRetry() {
         return retry;
     }
-
+    /**
+     * Return the number of max retries that can be undertaken before separate functionality kicks in
+     * @return the number of maximum retries
+     */
     public int getMaxRetry() {
         return maxRetry;
     }
+
+    /**
+     * Set the number of maximum retries before throwing on the exception
+     * @param maxRetry
+     */
     @Resource(name="maxRetry")
     public void setMaxRetry(int maxRetry) {
         this.maxRetry = maxRetry;
     }
 
+    /**
+     * Retrieve the operationId
+     * @return A randomly generated UUID. generated during the retry method
+     */
     public String getOperationId() {
         return operationId;
     }
 
+    /**
+     * Retrieve the last encountered exception
+     * @return An Exception object, the last one encountered in the retry method
+     */
     public Exception getError() {
         return error;
     }
 
+    /**
+     * Set the last encountered error
+     * @param error
+     */
     public void setError(Exception error) {
         this.error = error;
     }
@@ -145,34 +182,54 @@ public abstract class MetadataSource {
 
     }
 
-    protected void handleException(int retry, Exception e, String operationId) throws MetadataSourceException {
+    /**
+     * Handles a given exception or throws on a {@link org.dspace.importer.external.MetadataSourceException} if no ExceptionHandler is set
+     * @param retry The number of retries before the exception was thrown on
+     * @param exception The exception to handle
+     * @param operationId The id of the operation that threw the exception
+     * @throws MetadataSourceException if no ExceptionHandler is configured for the given exception
+     */
+    protected void handleException(int retry, Exception exception, String operationId) throws MetadataSourceException {
 
-        List<SourceExceptionHandler> exceptionHandlers = getExceptionHandler(e);
+        List<SourceExceptionHandler> exceptionHandlers = getExceptionHandler(exception);
         if (exceptionHandlers != null && !exceptionHandlers.isEmpty()) {
             for (SourceExceptionHandler exceptionHandler : exceptionHandlers) {
                 exceptionHandler.handle(this);
             }
         }else{
-            throwSourceException(retry, e, operationId);
+            throwSourceException(retry, exception, operationId);
         }
     }
 
-    protected List<SourceExceptionHandler> getExceptionHandler(Exception e) {
+    /** Retrieve a list of SourceExceptionHandler objects that have an instanceof the exception configured to them.
+     * @param exception The exception to base the retrieval of {@link org.dspace.importer.external.SourceExceptionHandler} on
+     * @return a list of {@link org.dspace.importer.external.SourceExceptionHandler} objects
+     */
+    protected List<SourceExceptionHandler> getExceptionHandler(Exception exception) {
         for (Class aClass : exceptionHandlersMap.keySet()) {
-            if (aClass.isInstance(e)) {
+            if (aClass.isInstance(exception)) {
                 return exceptionHandlersMap.get(aClass);
             }
         }
         return null;
     }
 
-    protected void throwSourceException(int retry, Exception e, String operationId) throws MetadataSourceException {
+    /** Throw a {@link MetadataSourceException}
+     * @param retry The number of retries before the exception was thrown on
+     * @param exception The exception to throw
+     * @param operationId The id of the operation that threw the exception
+     * @return a list of {@link org.dspace.importer.external.SourceExceptionHandler} objects
+     * @throws MetadataSourceException
+     */
+    protected void throwSourceException(int retry, Exception exception, String operationId) throws MetadataSourceException {
         throwSourceExceptionHook();
-//        log.error("Source exception", e);
-        log.error("Source exception " + e.getMessage());
-        throw new MetadataSourceException("At retry of operation " + operationId + " " + retry, e);
+        log.error("Source exception " + exception.getMessage());
+        throw new MetadataSourceException("At retry of operation " + operationId + " " + retry, exception);
     }
 
+    /**
+     * A specified point where methods can be specified or callbacks can be executed
+     */
     protected void throwSourceExceptionHook() {
 
     }

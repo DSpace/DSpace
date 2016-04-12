@@ -11,11 +11,16 @@ package org.dspace.importer.external;
 import org.dspace.importer.external.service.other.MetadataSource;
 
 /**
+ * Represent a  handler that forces implementations to define their own behaviour for exceptions originating from
  * @author: Antoine Snyers (antoine at atmire dot com)
- * Date: 27 Oct 2014
  */
 public abstract interface SourceExceptionHandler<T extends MetadataSource> {
 
+    /**
+     * Represents a method contract to handle Exceptions originating from the source in a specific way
+     * Implementations define their own desired behaviour
+     * @param   source   The source of the exception
+     */
     public abstract void handle(T source);
 
 }

@@ -13,8 +13,6 @@ import org.dspace.importer.external.MetadataSourceException;
 
 /**
  * @author Roeland Dillen (roeland at atmire dot com)
- * Date: 14/12/12
- * Time: 11:44
  */
 public interface GenerateQueryService {
 
