@@ -56,7 +56,7 @@ public class VersioningTest extends AbstractUnitTest {
     protected VersioningService versionService = VersionServiceFactory.getInstance().getVersionService();
     protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
 
-    //A regex that can be used to see if a handle contains the format of handle created by the org.dspace.identifier.VersionedHandleIdentifierProvider
+    //A regex that can be used to see if a handle contains the format of handle created by the org.dspace.identifier.VersionedHandleIdentifierProvider*
     protected String versionedHandleRegex = ConfigurationManager.getProperty("handle.prefix") + "\\/[0-9]*\\.[0-9]";
 
     /**
@@ -147,13 +147,20 @@ public class VersioningTest extends AbstractUnitTest {
         assertThat("Test_version_handle 1", versionedItem.getHandle(), notNullValue());
         assertThat("Test_version_handle 2", originalItem.getHandle(), notNullValue());
         assertTrue("Test_version_handle 3 ", originalItem.getHandles().size() == 1);
-        assertTrue("Test_version_handle 4 ", versionedItem.getHandles().size() == 2);
-        assertTrue("Test_version_handle 5 ", originalItem.getHandle().matches(versionedHandleRegex));
-        assertTrue("Test_version_handle 6 ", originalItem.getHandle().startsWith(originalHandle + "."));
-        //The getHandle method should always return the original handle
-        assertTrue("Test_version_handle 7 ", versionedItem.getHandle().equals(originalHandle));
-        assertTrue("Test_version_handle 8 ", versionedItem.getHandles().get(1).getHandle().startsWith(originalHandle + "."));
-        assertTrue("Test_version_handle 9 ", versionedItem.getHandles().get(1).getHandle().matches(versionedHandleRegex));
+        
+        /* The following assertments are specific to the VersionHandleIdentifier 
+         * that use "canonical" handles that are moved from version to version.
+         * It would be good to create Tests for each IdentifierProvider, which
+         * would need to tell spring which one to use for which test.
+         *
+         * assertTrue("Test_version_handle 4 ", versionedItem.getHandles().size() == 2);
+         * assertTrue("Test_version_handle 5 ", originalItem.getHandle().matches(versionedHandleRegex));
+         * assertTrue("Test_version_handle 6 ", originalItem.getHandle().startsWith(originalHandle + "."));
+         * //The getHandle method should always return the original handle
+         * assertTrue("Test_version_handle 7 ", versionedItem.getHandle().equals(originalHandle));
+         * assertTrue("Test_version_handle 8 ", versionedItem.getHandles().get(1).getHandle().startsWith(originalHandle + "."));
+         * assertTrue("Test_version_handle 9 ", versionedItem.getHandles().get(1).getHandle().matches(versionedHandleRegex));
+         */
     }
 
     @Test
