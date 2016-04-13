@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="static/style.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2016-04-08T23:01:43Z</responseDate>
+  <request verb="GetRecord" identifier="oai:localhost:doi:10.5061/dryad.12" metadataPrefix="oai_dc">http://192.168.111.223:9999/xoai/request</request>
+  <GetRecord>
+    <record>
+      <header>
+        <identifier>oai::doi:10.5061/dryad.12</identifier>
+        <datestamp>2011-08-02T20:00:05Z</datestamp>
+        <setSpec>com_10255_1</setSpec>
+        <setSpec>col_10255_3</setSpec>
+      </header>
+      <metadata>
+        <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:doc="http://www.lyncode.com/xoai" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://purl.org/dc/elements/1.1/" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:title>Data from: Surprising complexity of the ancestral apoptosis network</dc:title>
+          <dc:creator>Zmasek, Christian M.</dc:creator>
+          <dc:creator>Zhang, Qing</dc:creator>
+          <dc:creator>Ye, Yuzhen</dc:creator>
+          <dc:creator>Godzik, Adam</dc:creator>
+          <dc:contributor>Zmazek, Christian M.</dc:contributor>
+          <dc:description>Apoptosis, one of the main types of programmed cell death, is regulated and performed by a complex protein network. Studies in model organisms, mostly in the nematode C. elegans, identified a relatively simple apoptotic network consisting of only a few proteins. However, analysis of several recently sequenced invertebrate genomes, ranging from the cnidarian sea anemone Nematostella vectensis, representing one of the morphologically simplest metazoans, to the deuterostomes sea urchin and amphioxus, contradicts the current paradigm of a simple ancestral network that expanded in vertebrates.&#13;
+&#13;
+Results&#13;
+&#13;
+Here we show that the apoptosome-forming CED-4/Apaf-1 protein, present in single copy in vertebrate, nematode, and insect genomes, had multiple paralogs in the cnidarian-bilaterian ancestor. Different members of this ancestral Apaf-1 family lead to the extant proteins in nematodes/insects and in deuterostomes, explaining significant functional differences between proteins that until now were believed to be orthologous. Similarly, the evolution of the Bcl-2 and caspase protein families appears surprisingly complex and apparently included significant gene loss in nematodes and insects and expansions in deuterostomes.&#13;
+&#13;
+Conclusion&#13;
+&#13;
+The emerging picture of the evolution of the apoptosis network is one of a succession of lineage-specific expansions and losses, which combined with the limited number of "apoptotic" protein families, resulted in apparent similarities between networks in different organisms that mask an underlying complex evolutionary history. Similar results are beginning to surface for other regulatory networks, contradicting the intuitive notion that regulatory networks evolved in a linear way, from simple to complex.</dc:description>
+          <dc:date>2007-12-06T20:55:28Z</dc:date>
+          <dc:date>2007-12-06T20:55:28Z</dc:date>
+          <dc:date>2007-10-24</dc:date>
+          <dc:type>Article</dc:type>
+          <dc:identifier>doi:10.5061/dryad.12</dc:identifier>
+          <dc:identifier>Zmasek CM, Zhang Q, Ye Y, Godzik A (2007) Surprising complexity of the ancestral apoptosis network.  Genome Biology 8(10): R226.</dc:identifier>
+          <dc:language>en</dc:language>
+          <dc:relation>Genome Biology</dc:relation>
+          <dc:relation>8:10, R226</dc:relation>
+          <dc:relation>doi:10.5061/dryad.12/1</dc:relation>
+          <dc:relation>doi:10.5061/dryad.12/2</dc:relation>
+          <dc:relation>doi:10.5061/dryad.12/3</dc:relation>
+          <dc:relation>doi:10.5061/dryad.12/4</dc:relation>
+          <dc:relation>doi:10.5061/dryad.12/5</dc:relation>
+          <dc:relation>doi:10.5061/dryad.12/6</dc:relation>
+          <dc:relation>doi:10.1186/gb-2007-8-10-r226</dc:relation>
+          <dc:relation>PMID:17958905</dc:relation>
+        </oai_dc:dc>
+      </metadata>
+    </record>
+  </GetRecord>
+</OAI-PMH>

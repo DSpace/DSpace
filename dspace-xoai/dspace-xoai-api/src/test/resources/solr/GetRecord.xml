@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <lst name="responseHeader">
+    <int name="status">0</int>
+    <int name="QTime">0</int>
+    <lst name="params">
+      <str name="sort">item.id asc</str>
+      <str name="q">metadata.dc.identifier:doi\:10.5061/dryad.12</str>
+    </lst>
+  </lst>
+  <result name="response" numFound="1" start="0">
+    <doc>
+      <arr name="item.collections">
+        <str>col_10255_3</str>
+      </arr>
+      <arr name="item.communities">
+        <str>com_10255_1</str>
+      </arr>
+      <str name="item.compile">
+&lt;metadata xmlns="http://www.lyncode.com/xoai"&gt;
+    &lt;element name="dc"&gt;
+        &lt;element name="contributor"&gt;
+            &lt;element name="author"&gt;
+                &lt;element name="en"&gt;
+                    &lt;field name="value"&gt;Zmasek, Christian M.&lt;/field&gt;
+                    &lt;field name="value"&gt;Zhang, Qing&lt;/field&gt;
+                    &lt;field name="value"&gt;Ye, Yuzhen&lt;/field&gt;
+                    &lt;field name="value"&gt;Godzik, Adam&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+            &lt;element name="correspondingAuthor"&gt;
+                &lt;element name="none"&gt;
+                    &lt;field name="value"&gt;Zmazek, Christian M.&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+        &lt;/element&gt;
+        &lt;element name="date"&gt;
+            &lt;element name="accessioned"&gt;
+                &lt;element name="none"&gt;
+                    &lt;field name="value"&gt;2007-12-06T20:55:28Z&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+            &lt;element name="available"&gt;
+                &lt;element name="none"&gt;
+                    &lt;field name="value"&gt;2007-12-06T20:55:28Z&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+            &lt;element name="issued"&gt;
+                &lt;element name="none"&gt;
+                    &lt;field name="value"&gt;2007-10-24&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+        &lt;/element&gt;
+        &lt;element name="identifier"&gt;
+            &lt;element name="none"&gt;
+                &lt;field name="value"&gt;doi:10.5061/dryad.12&lt;/field&gt;
+            &lt;/element&gt;
+            &lt;element name="citation"&gt;
+                &lt;element name="none"&gt;
+                    &lt;field name="value"&gt;Zmasek CM, Zhang Q, Ye Y, Godzik A (2007) Surprising complexity of the ancestral apoptosis network.  Genome Biology 8(10): R226.&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+            &lt;element name="uri"&gt;
+                &lt;element name="none"&gt;
+                    &lt;field name="value"&gt;http://hdl.handle.net/10255/dryad.12&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+        &lt;/element&gt;
+        &lt;element name="description"&gt;
+            &lt;element name="abstract"&gt;
+                &lt;element name="en_US"&gt;
+                    &lt;field name="value"&gt;Apoptosis, one of the main types of programmed cell death, is regulated and performed by a complex protein network. Studies in model organisms, mostly in the nematode C. elegans, identified a relatively simple apoptotic network consisting of only a few proteins. However, analysis of several recently sequenced invertebrate genomes, ranging from the cnidarian sea anemone Nematostella vectensis, representing one of the morphologically simplest metazoans, to the deuterostomes sea urchin and amphioxus, contradicts the current paradigm of a simple ancestral network that expanded in vertebrates.&amp;#xD;
+&amp;#xD;
+Results&amp;#xD;
+&amp;#xD;
+Here we show that the apoptosome-forming CED-4/Apaf-1 protein, present in single copy in vertebrate, nematode, and insect genomes, had multiple paralogs in the cnidarian-bilaterian ancestor. Different members of this ancestral Apaf-1 family lead to the extant proteins in nematodes/insects and in deuterostomes, explaining significant functional differences between proteins that until now were believed to be orthologous. Similarly, the evolution of the Bcl-2 and caspase protein families appears surprisingly complex and apparently included significant gene loss in nematodes and insects and expansions in deuterostomes.&amp;#xD;
+&amp;#xD;
+Conclusion&amp;#xD;
+&amp;#xD;
+The emerging picture of the evolution of the apoptosis network is one of a succession of lineage-specific expansions and losses, which combined with the limited number of &amp;quot;apoptotic&amp;quot; protein families, resulted in apparent similarities between networks in different organisms that mask an underlying complex evolutionary history. Similar results are beginning to surface for other regulatory networks, contradicting the intuitive notion that regulatory networks evolved in a linear way, from simple to complex.&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+            &lt;element name="provenance"&gt;
+                &lt;element name="en"&gt;
+                    &lt;field name="value"&gt;Approved for entry into archive by Ryan Scherle(rscherle@nescent.org) on 2007-12-06T20:55:28Z (GMT) No. of bitstreams: 1&amp;#xD;
+blank.html: 538 bytes, checksum: 817654306f6ee18587b0bf504bb186ce (MD5)&lt;/field&gt;
+                    &lt;field name="value"&gt;Submitted by Ryan Scherle (rscherle@nescent.org) on 2007-12-06T20:55:10Z&amp;#xD;
+No. of bitstreams: 1&amp;#xD;
+blank.html: 538 bytes, checksum: 817654306f6ee18587b0bf504bb186ce (MD5)&lt;/field&gt;
+                    &lt;field name="value"&gt;Item withdrawn by Ryan Scherle (rscherle@nescent.org) on 2009-05-19T17:29:37Z&amp;#xD;
+Item was in collections:&amp;#xD;
+Publications (ID: 2)&amp;#xD;
+No. of bitstreams: 0&lt;/field&gt;
+                    &lt;field name="value"&gt;Made available in DSpace on 2007-12-06T20:55:28Z (GMT). No. of bitstreams: 1&amp;#xD;
+blank.html: 538 bytes, checksum: 817654306f6ee18587b0bf504bb186ce (MD5)&lt;/field&gt;
+                    &lt;field name="value"&gt;Item reinstated by Rosie Kilgore (rrk5@duke.edu) on 2009-08-12T00:40:57Z&amp;#xD;
+Item was in collections:&amp;#xD;
+Publications (ID: 2)&amp;#xD;
+No. of bitstreams: 0&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+        &lt;/element&gt;
+        &lt;element name="language"&gt;
+            &lt;element name="iso"&gt;
+                &lt;element name="en_US"&gt;
+                    &lt;field name="value"&gt;en&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+        &lt;/element&gt;
+        &lt;element name="relation"&gt;
+            &lt;element name="ispartofseries"&gt;
+                &lt;element name="none"&gt;
+                    &lt;field name="value"&gt;Genome Biology&lt;/field&gt;
+                    &lt;field name="value"&gt;8:10, R226&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+            &lt;element name="haspart"&gt;
+                &lt;element name="none"&gt;
+                    &lt;field name="value"&gt;doi:10.5061/dryad.12/1&lt;/field&gt;
+                    &lt;field name="value"&gt;doi:10.5061/dryad.12/2&lt;/field&gt;
+                    &lt;field name="value"&gt;doi:10.5061/dryad.12/3&lt;/field&gt;
+                    &lt;field name="value"&gt;doi:10.5061/dryad.12/4&lt;/field&gt;
+                    &lt;field name="value"&gt;doi:10.5061/dryad.12/5&lt;/field&gt;
+                    &lt;field name="value"&gt;doi:10.5061/dryad.12/6&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+            &lt;element name="isreferencedby"&gt;
+                &lt;element name="none"&gt;
+                    &lt;field name="value"&gt;doi:10.1186/gb-2007-8-10-r226&lt;/field&gt;
+                    &lt;field name="value"&gt;PMID:17958905&lt;/field&gt;
+                &lt;/element&gt;
+            &lt;/element&gt;
+        &lt;/element&gt;
+        &lt;element name="title"&gt;
+            &lt;element name="en_US"&gt;
+                &lt;field name="value"&gt;Data from: Surprising complexity of the ancestral apoptosis network&lt;/field&gt;
+            &lt;/element&gt;
+        &lt;/element&gt;
+        &lt;element name="type"&gt;
+            &lt;element name="en_US"&gt;
+                &lt;field name="value"&gt;Article&lt;/field&gt;
+            &lt;/element&gt;
+        &lt;/element&gt;
+    &lt;/element&gt;
+    &lt;element name="prism"&gt;
+        &lt;element name="publicationName"&gt;
+            &lt;element name="none"&gt;
+                &lt;field name="value"&gt;Genome Biology&lt;/field&gt;
+            &lt;/element&gt;
+        &lt;/element&gt;
+    &lt;/element&gt;
+    &lt;element name="bundles"/&gt;
+    &lt;element name="others"&gt;
+        &lt;field name="handle"&gt;10255/dryad.12&lt;/field&gt;
+        &lt;field name="identifier"&gt;oai:dev.datadryad.org:10255/dryad.12&lt;/field&gt;
+        &lt;field name="lastModifyDate"&gt;2011-08-02 16:00:05.53&lt;/field&gt;
+    &lt;/element&gt;
+    &lt;element name="repository"&gt;
+        &lt;field name="name"&gt;Dryad Data Repository&lt;/field&gt;
+        &lt;field name="mail"&gt;admin@datadryad.org&lt;/field&gt;
+    &lt;/element&gt;
+&lt;/metadata&gt;
+</str>
+      <bool name="item.deleted">false</bool>
+      <str name="item.handle">10255/dryad.12</str>
+      <int name="item.id">10</int>
+      <date name="item.lastmodified">2011-08-02T20:00:05.53Z</date>
+      <bool name="item.public">true</bool>
+      <str name="item.submitter">ryan@scherle.org</str>
+      <arr name="metadata.dc.contributor.author">
+        <str>Zmasek, Christian M.</str>
+        <str>Zhang, Qing</str>
+        <str>Ye, Yuzhen</str>
+        <str>Godzik, Adam</str>
+      </arr>
+      <arr name="metadata.dc.contributor.correspondingAuthor">
+        <str>Zmazek, Christian M.</str>
+      </arr>
+      <arr name="metadata.dc.date.accessioned">
+        <str>2007-12-06T20:55:28Z</str>
+      </arr>
+      <arr name="metadata.dc.date.available">
+        <str>2007-12-06T20:55:28Z</str>
+      </arr>
+      <arr name="metadata.dc.date.issued">
+        <str>2007-10-24</str>
+      </arr>
+      <arr name="metadata.dc.description.abstract">
+        <str>Apoptosis, one of the main types of programmed cell death, is regulated and performed by a complex protein network. Studies in model organisms, mostly in the nematode C. elegans, identified a relatively simple apoptotic network consisting of only a few proteins. However, analysis of several recently sequenced invertebrate genomes, ranging from the cnidarian sea anemone Nematostella vectensis, representing one of the morphologically simplest metazoans, to the deuterostomes sea urchin and amphioxus, contradicts the current paradigm of a simple ancestral network that expanded in vertebrates.
+
+Results
+
+Here we show that the apoptosome-forming CED-4/Apaf-1 protein, present in single copy in vertebrate, nematode, and insect genomes, had multiple paralogs in the cnidarian-bilaterian ancestor. Different members of this ancestral Apaf-1 family lead to the extant proteins in nematodes/insects and in deuterostomes, explaining significant functional differences between proteins that until now were believed to be orthologous. Similarly, the evolution of the Bcl-2 and caspase protein families appears surprisingly complex and apparently included significant gene loss in nematodes and insects and expansions in deuterostomes.
+
+Conclusion
+
+The emerging picture of the evolution of the apoptosis network is one of a succession of lineage-specific expansions and losses, which combined with the limited number of "apoptotic" protein families, resulted in apparent similarities between networks in different organisms that mask an underlying complex evolutionary history. Similar results are beginning to surface for other regulatory networks, contradicting the intuitive notion that regulatory networks evolved in a linear way, from simple to complex.</str>
+      </arr>
+      <arr name="metadata.dc.description.provenance">
+        <str>Approved for entry into archive by Ryan Scherle(rscherle@nescent.org) on 2007-12-06T20:55:28Z (GMT) No. of bitstreams: 1
+blank.html: 538 bytes, checksum: 817654306f6ee18587b0bf504bb186ce (MD5)</str>
+        <str>Submitted by Ryan Scherle (rscherle@nescent.org) on 2007-12-06T20:55:10Z
+No. of bitstreams: 1
+blank.html: 538 bytes, checksum: 817654306f6ee18587b0bf504bb186ce (MD5)</str>
+        <str>Item withdrawn by Ryan Scherle (rscherle@nescent.org) on 2009-05-19T17:29:37Z
+Item was in collections:
+Publications (ID: 2)
+No. of bitstreams: 0</str>
+        <str>Made available in DSpace on 2007-12-06T20:55:28Z (GMT). No. of bitstreams: 1
+blank.html: 538 bytes, checksum: 817654306f6ee18587b0bf504bb186ce (MD5)</str>
+        <str>Item reinstated by Rosie Kilgore (rrk5@duke.edu) on 2009-08-12T00:40:57Z
+Item was in collections:
+Publications (ID: 2)
+No. of bitstreams: 0</str>
+      </arr>
+      <arr name="metadata.dc.identifier">
+        <str>doi:10.5061/dryad.12</str>
+      </arr>
+      <arr name="metadata.dc.identifier.citation">
+        <str>Zmasek CM, Zhang Q, Ye Y, Godzik A (2007) Surprising complexity of the ancestral apoptosis network.  Genome Biology 8(10): R226.</str>
+      </arr>
+      <arr name="metadata.dc.identifier.uri">
+        <str>http://hdl.handle.net/10255/dryad.12</str>
+      </arr>
+      <arr name="metadata.dc.language.iso">
+        <str>en</str>
+      </arr>
+      <arr name="metadata.dc.relation.haspart">
+        <str>doi:10.5061/dryad.12/1</str>
+        <str>doi:10.5061/dryad.12/2</str>
+        <str>doi:10.5061/dryad.12/3</str>
+        <str>doi:10.5061/dryad.12/4</str>
+        <str>doi:10.5061/dryad.12/5</str>
+        <str>doi:10.5061/dryad.12/6</str>
+      </arr>
+      <arr name="metadata.dc.relation.ispartofseries">
+        <str>Genome Biology</str>
+        <str>8:10, R226</str>
+      </arr>
+      <arr name="metadata.dc.relation.isreferencedby">
+        <str>doi:10.1186/gb-2007-8-10-r226</str>
+        <str>PMID:17958905</str>
+      </arr>
+      <arr name="metadata.dc.title">
+        <str>Data from: Surprising complexity of the ancestral apoptosis network</str>
+      </arr>
+      <arr name="metadata.dc.type">
+        <str>Article</str>
+      </arr>
+      <arr name="metadata.prism.publicationName">
+        <str>Genome Biology</str>
+      </arr>
+    </doc>
+  </result>
+</response>
