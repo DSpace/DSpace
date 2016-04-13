@@ -14,7 +14,7 @@ import org.dspace.importer.external.MetadataSourceException;
 import org.dspace.importer.external.Query;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.service.other.Destroyable;
-import org.dspace.importer.external.service.other.Imports;
+import org.dspace.importer.external.service.other.MetadataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -26,7 +26,7 @@ import java.util.*;
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class ImportService implements Destroyable {
-    private HashMap<String, Imports> importSources = new HashMap<>();
+    private HashMap<String, MetadataSource> importSources = new HashMap<>();
 
     Logger log = Logger.getLogger(ImportService.class);
 
@@ -41,14 +41,14 @@ public class ImportService implements Destroyable {
 
     /**
      * Sets the importsources that will be used to delegate the retrieving and matching of records to
-     * @param importSources A list of {@link org.dspace.importer.external.service.other.Imports} to set to this service
+     * @param importSources A list of {@link MetadataSource} to set to this service
      * @throws MetadataSourceException
      */
     @Autowired(required = false)
-    public void setImportSources(List<Imports> importSources) throws MetadataSourceException {
+    public void setImportSources(List<MetadataSource> importSources) throws MetadataSourceException {
         log.info("Loading " + importSources.size() + " import sources.");
-        for (Imports imports : importSources) {
-            this.importSources.put(imports.getImportSource(), imports);
+        for (MetadataSource metadataSource : importSources) {
+            this.importSources.put(metadataSource.getImportSource(), metadataSource);
         }
 
     }
@@ -57,16 +57,16 @@ public class ImportService implements Destroyable {
      * Retrieve the importSources set to this class.
      * @return  An unmodifiableMap of importSources
      */
-    protected Map<String, Imports> getImportSources() {
+    protected Map<String, MetadataSource> getImportSources() {
         return Collections.unmodifiableMap(importSources);
     }
 
 	/**
 	 * Utility method to find what import implementations match the imports uri.
 	 * @param uri the identifier of the import implementation or * for all
-	 * @return matching Imports implementations
+	 * @return matching MetadataSource implementations
 	 */
-    protected Collection<Imports> matchingImports(String uri) {
+    protected Collection<MetadataSource> matchingImports(String uri) {
         if (ANY.equals(uri)) {
             return importSources.values();
         } else {
@@ -78,7 +78,7 @@ public class ImportService implements Destroyable {
     }
 
 	/** Finds records based on an item
-	 * Delegates to one or more Imports implementations based on the uri.  Results will be aggregated.
+	 * Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
 	 * @param uri the identifier of the import implementation or * for all
 	 * @param item an item to base the search on
 	 * @return a collection of import records. Only the identifier of the found records may be put in the record.
@@ -88,8 +88,8 @@ public class ImportService implements Destroyable {
 		try {
 			List<ImportRecord> recordList = new LinkedList<ImportRecord>();
 
-			for (Imports imports : matchingImports(uri)) {
-				recordList.addAll(imports.findMatchingRecords(item));
+			for (MetadataSource metadataSource : matchingImports(uri)) {
+				recordList.addAll(metadataSource.findMatchingRecords(item));
 			}
 
 			return recordList;
@@ -99,7 +99,7 @@ public class ImportService implements Destroyable {
 	}
 
 	/** Finds records based on query object.
-	 *  Delegates to one or more Imports implementations based on the uri.  Results will be aggregated.
+	 *  Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
 	 * @param uri the identifier of the import implementation or * for all
 	 * @param query a query object to base the search on. The implementation decides how the query is interpreted.
 	 * @return a collection of import records. Only the identifier of the found records may be put in the record.
@@ -108,8 +108,8 @@ public class ImportService implements Destroyable {
     public Collection<ImportRecord> findMatchingRecords(String uri, Query query) throws MetadataSourceException {
 		try {
 			List<ImportRecord> recordList = new LinkedList<ImportRecord>();
-			for (Imports imports : matchingImports(uri)) {
-				recordList.addAll(imports.findMatchingRecords(query));
+			for (MetadataSource metadataSource : matchingImports(uri)) {
+				recordList.addAll(metadataSource.findMatchingRecords(query));
 			}
 
 			return recordList;
@@ -128,8 +128,8 @@ public class ImportService implements Destroyable {
     public int getNbRecords(String uri, String query) throws MetadataSourceException {
 		try {
 			int total = 0;
-			for (Imports Imports : matchingImports(uri)) {
-				total += Imports.getNbRecords(query);
+			for (MetadataSource MetadataSource : matchingImports(uri)) {
+				total += MetadataSource.getNbRecords(query);
 			}
 			return total;
 		} catch (Exception e) {
@@ -146,8 +146,8 @@ public class ImportService implements Destroyable {
 	public int getNbRecords(String uri, Query query) throws MetadataSourceException {
 		try {
 			int total = 0;
-			for (Imports Imports : matchingImports(uri)) {
-				total += Imports.getNbRecords(query);
+			for (MetadataSource MetadataSource : matchingImports(uri)) {
+				total += MetadataSource.getNbRecords(query);
 			}
 			return total;
 		} catch (Exception e) {
@@ -167,8 +167,8 @@ public class ImportService implements Destroyable {
     public Collection<ImportRecord> getRecords(String uri, String query, int start, int count) throws MetadataSourceException {
 		try {
 			List<ImportRecord> recordList = new LinkedList<>();
-			for (Imports imports : matchingImports(uri)) {
-				recordList.addAll(imports.getRecords(query, start, count));
+			for (MetadataSource metadataSource : matchingImports(uri)) {
+				recordList.addAll(metadataSource.getRecords(query, start, count));
 			}
 			return recordList;
 		} catch (Exception e) {
@@ -186,8 +186,8 @@ public class ImportService implements Destroyable {
     public Collection<ImportRecord> getRecords(String uri, Query query) throws MetadataSourceException {
 		try {
 			List<ImportRecord> recordList = new LinkedList<>();
-			for (Imports imports : matchingImports(uri)) {
-				recordList.addAll(imports.getRecords(query));
+			for (MetadataSource metadataSource : matchingImports(uri)) {
+				recordList.addAll(metadataSource.getRecords(query));
 			}
 			return recordList;
 		} catch (Exception e) {
@@ -204,8 +204,8 @@ public class ImportService implements Destroyable {
 	 */
     public ImportRecord getRecord(String uri, String id) throws MetadataSourceException {
 		try {
-			for (Imports imports : matchingImports(uri)) {
-				if (imports.getRecord(id) != null) return imports.getRecord(id);
+			for (MetadataSource metadataSource : matchingImports(uri)) {
+				if (metadataSource.getRecord(id) != null) return metadataSource.getRecord(id);
 	
 			}
 			return null;
@@ -222,8 +222,8 @@ public class ImportService implements Destroyable {
 	 */
     public ImportRecord getRecord(String uri, Query query) throws MetadataSourceException {
 		try {
-			for (Imports imports : matchingImports(uri)) {
-				if (imports.getRecord(query) != null) return imports.getRecord(query);
+			for (MetadataSource metadataSource : matchingImports(uri)) {
+				if (metadataSource.getRecord(query) != null) return metadataSource.getRecord(query);
 	
 			}
 			return null;
@@ -239,12 +239,12 @@ public class ImportService implements Destroyable {
         return importSources.keySet();
     }
 
-    /** Call destroy on all {@link Destroyable} {@link Imports} objects set in this ImportService
+    /** Call destroy on all {@link Destroyable} {@link MetadataSource} objects set in this ImportService
      */
     @Override
     public void destroy() throws Exception {
-        for (Imports imports : importSources.values()) {
-            if (imports instanceof Destroyable) ((Destroyable) imports).destroy();
+        for (MetadataSource metadataSource : importSources.values()) {
+            if (metadataSource instanceof Destroyable) ((Destroyable) metadataSource).destroy();
         }
     }
 }

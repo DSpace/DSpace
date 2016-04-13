@@ -126,7 +126,7 @@ public class ImportMetadataSourceServiceImpl extends AbstractImportMetadataSourc
     }
 
     /** Finds records based on query object.
-     *  Delegates to one or more Imports implementations based on the uri.  Results will be aggregated.
+     *  Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
      * @param query a query object to base the search on.
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
      * @throws MetadataSourceException
