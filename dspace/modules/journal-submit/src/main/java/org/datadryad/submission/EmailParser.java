@@ -61,6 +61,7 @@ public class EmailParser {
         fieldToXMLTagMap.put("contact author state", Manuscript.STATE);
         fieldToXMLTagMap.put("contact author country", Manuscript.COUNTRY);
         fieldToXMLTagMap.put("contact author zip/postal code", Manuscript.ZIP);
+        fieldToXMLTagMap.put("publication doi", Manuscript.PUBLICATION_DOI);
 
         // commonly-used field names for optional XML tags
         fieldToXMLTagMap.put("ISSN", Manuscript.ISSN);
@@ -178,6 +179,7 @@ public class EmailParser {
         correspondingAuthor.address.country = (String) dataForXML.remove(Manuscript.COUNTRY);
         correspondingAuthor.address.zip = (String) dataForXML.remove(Manuscript.ZIP);
         manuscript.setDryadDataDOI((String) dataForXML.remove(Manuscript.DRYAD_DOI));
+        manuscript.setPublicationDOI((String) dataForXML.remove(Manuscript.PUBLICATION_DOI));
         manuscript.optionalProperties = dataForXML;
     }
 
