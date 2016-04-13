@@ -20,8 +20,11 @@ import org.springframework.beans.factory.annotation.Required;
 
 import java.util.LinkedList;
 
-/** AbstractImportSourceService has a generic type set 'RecordType'.
- * In the importer implementation this type set should be the class of the records received from the remote source's response
+/**
+ * This class is a partial implementaiton of {@link Imports}. It provides assistance with mapping metadata from source format to DSpace format.
+ * AbstractImportSourceService has a generic type set 'RecordType'.
+ * In the importer implementation this type set should be the class of the records received from the remote source's response.
+ *
  * @author Roeland Dillen (roeland at atmire dot com)
  *
  */
@@ -38,7 +41,7 @@ public abstract class AbstractImportMetadataSourceService<RecordType> extends Me
 	}
 
     /**
-     * Set the {@link GenerateQueryService} used to create a {@link org.dspace.importer.external.Query}
+     * Set the {@link GenerateQueryService} used to create a {@link org.dspace.importer.external.Query} for a DSpace {@link org.dspace.content.Item}
      * @param generateQueryForItem
      */
     @Autowired

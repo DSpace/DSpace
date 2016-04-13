@@ -21,7 +21,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * This class contains functionality to handle request timeouts and to retry requests.
+ * This class contains primitives to handle request timeouts and to retry requests.
+ * This is achieved by classifying exceptions as fatal or as non fatal/retryable.
+ * Evidently only subclasses can make the proper determination of what is retryable and what isn't.
  * This is useful in case the service employs throttling and to deal with general network issues.
  * @author: Antoine Snyers (antoine at atmire dot com)
  */
