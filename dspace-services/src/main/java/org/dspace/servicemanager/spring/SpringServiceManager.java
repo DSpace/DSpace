@@ -30,7 +30,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * This is the Spring implementation of the service manager.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class SpringServiceManager implements ServiceManagerSystem {
@@ -38,7 +38,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     private static Logger log = LoggerFactory.getLogger(SpringServiceManager.class);
 
     private ClassPathXmlApplicationContext applicationContext;
-    
+
     /**
      * @return the parent core Spring {@link ApplicationContext}
      */
@@ -89,7 +89,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     public <T> T getServiceByName(String name, Class<T> type) {
         T bean = null;
         // handle special case to return the core AC
-        if (ApplicationContext.class.getName().equals(name) 
+        if (ApplicationContext.class.getName().equals(name)
                 && ApplicationContext.class.isAssignableFrom(type)) {
             bean = (T) getApplicationContext();
         } else {
@@ -99,7 +99,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
                     bean = (T) applicationContext.getBean(name, type);
                 } catch (BeansException e) {
                     // no luck, try the fall back option
-                    log.error(e.getMessage(), e);
+                    log.info("Unable to locate bean by name or id=" + name + ". Will try to look up bean by type next.");
                     bean = null;
                 }
             } else {
@@ -108,18 +108,22 @@ public final class SpringServiceManager implements ServiceManagerSystem {
                     bean = (T) applicationContext.getBean(type.getName(), type);
                 } catch (BeansException e) {
                     // no luck, try the fall back option
-                    log.error(e.getMessage(), e);
+                    log.info("Unable to locate bean by name or id=" + type.getName() + ". Will try to look up bean by type next.");
                     bean = null;
                 }
             }
             // if still no luck then try by type only
-            if (name == null 
+            if (name == null
                     && bean == null) {
                 try {
                     Map<String, T> map = applicationContext.getBeansOfType(type);
                     if (map.size() == 1) {
                         // only return the bean if there is exactly one
                         bean = (T) map.values().iterator().next();
+                    }
+                    else
+                    {
+                        log.error("Multiple beans of type " + type.getName() + " found. Only one was expected!");
                     }
                 } catch (BeansException e) {
                     // I guess there are no beans of this type
