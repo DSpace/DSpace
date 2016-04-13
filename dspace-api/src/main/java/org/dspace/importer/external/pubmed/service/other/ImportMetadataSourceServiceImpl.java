@@ -16,6 +16,7 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.MetadataSourceException;
 import org.dspace.importer.external.Query;
 import org.dspace.importer.external.datamodel.ImportRecord;
+import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.jaxen.JaxenException;
 
 import javax.ws.rs.client.Client;
@@ -33,7 +34,7 @@ import java.util.concurrent.Callable;
 /**
  * Implements a data source for querying pubmed central
  */
-public class ImportMetadataSourceServiceImpl extends org.dspace.importer.external.service.AbstractImportMetadataSourceService {
+public class ImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
     private String baseAddress;
 
     private WebTarget pubmedWebTarget;
