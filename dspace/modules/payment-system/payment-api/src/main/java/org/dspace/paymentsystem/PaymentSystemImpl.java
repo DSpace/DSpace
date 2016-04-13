@@ -729,7 +729,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
             // only send result of shopping cart errors to administrators
             email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.alert.recipient"));
             email.addArgument(wfi.getItem().getName());
-            email.addArgument(wfi.getSubmitter().getFullName() + " (" + wfi.getSubmitter().getEmail() + ")");
+            email.addArgument(wfi.getItem().getID());
             email.addArgument(error);
 
             if (shoppingCart != null) {
