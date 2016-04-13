@@ -10,25 +10,24 @@ package org.dspace.importer.external.service;
 
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
-import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
 import org.dspace.importer.external.metadatamapping.service.GenerateQueryService;
-import org.dspace.importer.external.service.other.Imports;
 import org.dspace.importer.external.service.other.MetadataSource;
+import org.dspace.importer.external.service.other.AbstractRemoteMetadataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.LinkedList;
 
 /**
- * This class is a partial implementaiton of {@link Imports}. It provides assistance with mapping metadata from source format to DSpace format.
+ * This class is a partial implementaiton of {@link MetadataSource}. It provides assistance with mapping metadata from source format to DSpace format.
  * AbstractImportSourceService has a generic type set 'RecordType'.
  * In the importer implementation this type set should be the class of the records received from the remote source's response.
  *
  * @author Roeland Dillen (roeland at atmire dot com)
  *
  */
-public abstract class AbstractImportMetadataSourceService<RecordType> extends MetadataSource implements Imports {
+public abstract class AbstractImportMetadataSourceService<RecordType> extends AbstractRemoteMetadataSource implements MetadataSource {
 	private GenerateQueryService generateQueryForItem = null;
 	private MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> metadataFieldMapping;
 
