@@ -22,6 +22,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -136,6 +137,14 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
     private void createTable(Division main, VersionHistory history, boolean isItemView, Item item) throws WingException, SQLException
     {
+        Boolean isVisible = new DSpace().getConfigurationService().getPropertyAsType("versioning.item.history.include.submitter", Boolean.FALSE);
+        boolean isAdmin = authorizeService.isAdmin(context,item.getOwningCollection());
+        if(isAdmin)
+        {
+            isVisible = true; // override it, always visible for admins.
+        }
+
+
         Table table = main.addTable("versionhistory", 1, 1);
         
         Row header = table.addRow(Row.ROLE_HEADER);
@@ -145,7 +154,10 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
         }
         header.addCell().addContent(T_column1);
         header.addCell().addContent(T_column2);
-        header.addCell().addContent(T_column3);
+        if(isVisible)
+        {
+            header.addCell().addContent(T_column3);
+        }
         header.addCell().addContent(T_column4);
         header.addCell().addContent(T_column5);
 
@@ -175,15 +187,18 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
                 row.addCell().addContent(version.getVersionNumber());
                 addItemIdentifier(row.addCell(), item, version);
 
-                EPerson editor = version.getEPerson();
-                row.addCell().addXref("mailto:" + editor.getEmail(), editor.getFullName());
+                if(isVisible)
+                {
+                    EPerson editor = version.getEPerson();
+                    row.addCell().addXref("mailto:" + editor.getEmail(), editor.getFullName()); // this one needs to be gone then.
+                }
                 row.addCell().addContent(new DCDate(version.getVersionDate()).toString());
                 row.addCell().addContent(version.getSummary());
 
 
                 if(!isItemView)
                 {
-                    row.addCell().addXref(contextPath + "/item/versionhistory?versioning-continue="+knot.getId()+"&versionID="+version.getId() +"&itemID="+ version.getItem().getID() + "&submit_update", T_submit_update);
+                    row.addCell().addXref(contextPath + "/item/versionhistory?versioning-continue=" + knot.getId() + "&versionID=" + version.getId() + "&itemID=" + version.getItem().getID() + "&submit_update", T_submit_update);
                 }
             }
         }
