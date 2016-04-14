@@ -32,6 +32,7 @@ import org.dspace.identifier.service.DOIService;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.plugin.ItemHomeProcessor;
 import org.dspace.plugin.PluginException;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -66,6 +67,10 @@ public class VersioningItemHome implements ItemHomeProcessor {
             AuthorizeException {
         boolean versioningEnabled = ConfigurationManager.getBooleanProperty(
                 "versioning", "enabled");
+        boolean submitterCanCreateNewVersion = DSpaceServicesFactory
+            .getInstance()
+            .getConfigurationService()
+            .getPropertyAsType("versioning.submitterCanCreateNewVersion", false);
         boolean newVersionAvailable = false;
         boolean showVersionWorkflowAvailable = false;
         boolean hasVersionButton = false;
@@ -81,7 +86,17 @@ public class VersioningItemHome implements ItemHomeProcessor {
                     if (versionHistoryService.isLastVersion(context, item) 
                             && item.isArchived()) {
                         hasVersionButton = true;
-                    }
+                    } 
+                }
+                else if (submitterCanCreateNewVersion) 
+                {
+                    if (versionHistoryService.isLastVersion(context, item) 
+                            && item.isArchived() 
+                            && itemService.canCreateNewVersion(context, item)) 
+                        {
+                            hasVersionButton = true;
+                        }
+                    
                 }
                 if (versionHistoryService.hasVersionHistory(context, item)) {
                     hasVersionHistory = true;

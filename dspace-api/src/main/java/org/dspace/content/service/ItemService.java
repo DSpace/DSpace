@@ -444,7 +444,15 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException if database error
      */
     public boolean canEdit(Context context, Item item) throws java.sql.SQLException;
-
+  
+    /**
+     * return TRUE if context's user can create new version of the item, false
+     * otherwise.
+     * @return boolean true = current user can create new version of the item
+     * @throws SQLException
+     */
+    public boolean canCreateNewVersion(Context context, Item item) throws SQLException;
+     
     /**
      * Returns an iterator of Items possessing the passed metadata field, or only
      * those matching the passed value, if value is not Item.ANY

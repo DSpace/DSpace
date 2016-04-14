@@ -92,7 +92,8 @@ public class VersionUtil
             Item item = itemService.find(context, itemID);
 
             if (authorizeService.authorizeActionBoolean(context, item,
-                    Constants.WRITE) || itemService.canEdit(context, item))
+                    Constants.WRITE) || itemService.canEdit(context, item) 
+                                     || itemService.canCreateNewVersion(context, item))
             {
                 VersioningService versioningService = new DSpace()
                         .getSingletonService(VersioningService.class);

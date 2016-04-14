@@ -29,6 +29,7 @@ import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -407,7 +408,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public void update(Context context, Item item) throws SQLException, AuthorizeException {
         // Check authorisation
         // only do write authorization if user is not an editor
-        if (!canEdit(context, item))
+        if (!canEdit(context, item) && !canCreateNewVersion(context, item))
         {
             authorizeService.authorizeAction(context, item, Constants.WRITE);
         }
@@ -588,7 +589,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
                 item.getHandle(), getIdentifiers(context, item)));
-
 
         log.info(LogManager.getHeader(context, "delete_item", "item_id="
                 + item.getID()));
@@ -885,13 +885,23 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         return collectionService.canEditBoolean(context, item.getOwningCollection(), false);
     }
-
     
-    /*
-    With every finished submission a bunch of resource policy entries with have null value for the dspace_object column are generated in the database.
-prevent the generation of resource policy entry values with null dspace_object as value
+    @Override
+    public boolean canCreateNewVersion(Context context, Item item) throws SQLException{
+        if (authorizeService.isAdmin(context, item)) 
+        {
+            return true;
+        }
 
-    */
+        if (context.getCurrentUser() != null
+                && context.getCurrentUser().equals(item.getSubmitter())) 
+        {
+            return DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyAsType(
+                    "versioning.submitterCanCreateNewVersion", false);
+        }
+
+        return false;
+    }
 
     /**
      * Add the default policies, which have not been already added to the given DSpace object
