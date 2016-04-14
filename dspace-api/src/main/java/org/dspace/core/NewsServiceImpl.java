@@ -24,6 +24,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Encapsulate access to the news texts.
@@ -35,13 +36,15 @@ public class NewsServiceImpl implements NewsService
     private final Logger log = LoggerFactory.getLogger(NewsServiceImpl.class);
 
 	private List<String> acceptableFilenames;
+
+    @Autowired(required = true)
+    private ConfigurationService configurationService;
 	
 	public void setAcceptableFilenames(List<String> acceptableFilenames) {
         this.acceptableFilenames = addLocalesToAcceptableFilenames(acceptableFilenames);
     }
 
     protected List<String> addLocalesToAcceptableFilenames(List<String> acceptableFilenames){
-        ConfigurationService configurationService =  DSpaceServicesFactory.getInstance().getConfigurationService();
         String [] locales = configurationService.getArrayProperty("webui.supported.locales");
         List<String> newAcceptableFilenames = new ArrayList<>();
         newAcceptableFilenames.addAll(acceptableFilenames);
