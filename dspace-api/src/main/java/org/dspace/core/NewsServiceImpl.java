@@ -40,15 +40,19 @@ public class NewsServiceImpl implements NewsService
         this.acceptableFilenames = addLocalesToAcceptableFilenames(acceptableFilenames);
     }
 
-    private List<String> addLocalesToAcceptableFilenames(List<String> acceptableFilenames){
+    protected List<String> addLocalesToAcceptableFilenames(List<String> acceptableFilenames){
         ConfigurationService configurationService =  DSpaceServicesFactory.getInstance().getConfigurationService();
         String [] locales = configurationService.getArrayProperty("webui.supported.locales");
         List<String> newAcceptableFilenames = new ArrayList<>();
         newAcceptableFilenames.addAll(acceptableFilenames);
         for(String local : locales){
             for(String acceptableFilename : acceptableFilenames){
-                String [] values = acceptableFilename.split("\\.");
-                newAcceptableFilenames.add(values[0] + "_" + local + "." + values[1]);
+                int lastPoint = acceptableFilename.lastIndexOf(".");
+                newAcceptableFilenames.add(
+                        acceptableFilename.substring(0, lastPoint)
+                                + "_"
+                                + local
+                                + acceptableFilename.substring(lastPoint));
             }
         }
         return newAcceptableFilenames;
