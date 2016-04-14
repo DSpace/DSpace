@@ -45,7 +45,7 @@ public class ChecksumHistoryDAOImpl extends AbstractHibernateDAO<ChecksumHistory
         String hql = "delete from ChecksumHistory where processEndDate < :processEndDate AND checksumResult.resultCode=:resultCode";
         Query query = createQuery(context, hql);
         query.setTimestamp("processEndDate", retentionDate);
-        query.setParameter("result", resultCode);
+        query.setParameter("resultCode", resultCode);
         return query.executeUpdate();
     }
 
