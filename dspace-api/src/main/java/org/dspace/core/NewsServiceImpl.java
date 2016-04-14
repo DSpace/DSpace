@@ -16,9 +16,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.core.service.NewsService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +37,23 @@ public class NewsServiceImpl implements NewsService
 	private List<String> acceptableFilenames;
 	
 	public void setAcceptableFilenames(List<String> acceptableFilenames) {
-		this.acceptableFilenames = acceptableFilenames;
-	}
+        this.acceptableFilenames = addLocalesToAcceptableFilenames(acceptableFilenames);
+    }
+
+    private List<String> addLocalesToAcceptableFilenames(List<String> acceptableFilenames){
+        ConfigurationService configurationService =  DSpaceServicesFactory.getInstance().getConfigurationService();
+        String [] locales = configurationService.getArrayProperty("webui.supported.locales");
+        List<String> newAcceptableFilenames = new ArrayList<>();
+        newAcceptableFilenames.addAll(acceptableFilenames);
+        for(String local : locales){
+            for(String acceptableFilename : acceptableFilenames){
+                String [] values = acceptableFilename.split("\\.");
+                newAcceptableFilenames.add(values[0] + "_" + local + "." + values[1]);
+            }
+        }
+        return newAcceptableFilenames;
+    }
+
 
     /** Not instantiable. */
     protected NewsServiceImpl() {}
