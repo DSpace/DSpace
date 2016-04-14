@@ -241,6 +241,11 @@ input[name='lookup_dc_subject_classification']{
     display: none;
 }
 
+/* hide primary bitstream radio button */
+#aspect_submission_StepTransformer_table_resumable-upload-summary  .file-primary,
+#aspect_submission_StepTransformer_table_resumable-upload-summary .ds-table-header-row th:nth-child(1){
+    display: none;
+}
 
 /*************************** item view *******************************/
 .item-summary-view-metadata h5{

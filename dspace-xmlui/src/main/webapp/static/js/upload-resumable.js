@@ -120,7 +120,7 @@ if(doResumable){
             // build HTML for dynamic table row
             var tableRow =
                 '<tr class="ds-table-row">\
-                   <td class="ds-table-cell">\
+                     <td class="ds-table-cell file-primary">\
                      <div class="radio"><label><input id="primary-' +  file.uniqueIdentifier + '" type="radio" name="primary_bitstream_id" disabled="disabled"></label></div>\
                    </td>\
                    <td class="ds-table-cell">\
