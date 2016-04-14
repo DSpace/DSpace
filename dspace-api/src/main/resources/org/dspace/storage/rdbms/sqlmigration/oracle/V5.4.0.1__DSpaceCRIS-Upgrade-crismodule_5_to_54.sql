@@ -26,7 +26,16 @@ END;
 
 BEGIN
 	EXECUTE IMMEDIATE
-    	'CREATE INDEX metrics_uuid_idx ON cris_metrics (uuid ASC)'		 
+    	'CREATE INDEX metrics_uuid_idx ON cris_metrics (uuid ASC)';
+    EXCEPTION
+	WHEN OTHERS
+    THEN
+       NULL;
+END;
+
+BEGIN
+	EXECUTE IMMEDIATE
+    	'CREATE INDEX metric_resourceuid_idx ON cris_metrics (resourceid ASC, resourcetypeid ASC)';    	
 	EXCEPTION
 	WHEN OTHERS
     THEN
@@ -35,8 +44,8 @@ END;
 
 BEGIN
 	EXECUTE IMMEDIATE
-    	'CREATE INDEX metric_resourceuid_idx ON cris_metrics (resourceid ASC, resourcetypeid ASC)'		 
-	EXCEPTION
+    	'CREATE INDEX metric_bid_idx ON cris_metrics (resourceid ASC, resourcetypeid ASC, metrictype ASC)';
+    EXCEPTION
 	WHEN OTHERS
     THEN
        NULL;
@@ -44,16 +53,7 @@ END;
 
 BEGIN
 	EXECUTE IMMEDIATE
-    	'CREATE INDEX metric_bid_idx ON cris_metrics (resourceid ASC, resourcetypeid ASC, metrictype ASC)'		 
-	EXCEPTION
-	WHEN OTHERS
-    THEN
-       NULL;
-END;
-
-BEGIN
-	EXECUTE IMMEDIATE
-    	'CREATE INDEX metrics_last_idx ON cris_metrics (last ASC)'		 
+    	'CREATE INDEX metrics_last_idx ON cris_metrics (last ASC)';		 
 	EXCEPTION
 	WHEN OTHERS
     THEN
