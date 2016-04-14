@@ -801,9 +801,6 @@ public class PushToORCID {
 		// add source internal id
 		WorkExternalIdentifiers workExternalIdentifiers = new WorkExternalIdentifiers();
 		WorkExternalIdentifier workExternalIdentifierInternal = new WorkExternalIdentifier();
-		workExternalIdentifierInternal.setWorkExternalIdentifierId("" + item.getID());
-		workExternalIdentifierInternal.setWorkExternalIdentifierType(OrcidExternalIdentifierType.SOURCE_ID.toString());
-		workExternalIdentifiers.getWorkExternalIdentifier().add(workExternalIdentifierInternal);
 
 		// add other external id
 		if (itemMetadata.getExternalIdentifier() != null && !itemMetadata.getExternalIdentifier().isEmpty()) {
@@ -814,6 +811,16 @@ public class PushToORCID {
 						.setWorkExternalIdentifierType(itemMetadata.getExternalIdentifierType(valIdentifier));
 				workExternalIdentifiers.getWorkExternalIdentifier().add(workExternalIdentifier);
 			}
+		}
+		
+		boolean forceLocalId = ConfigurationManager.getBooleanProperty("cris", "system.script.pushtoorcid.works.local.identifier.force", false); 
+		if (itemMetadata.getExternalIdentifier() == null || itemMetadata.getExternalIdentifier().isEmpty() || forceLocalId) {
+            workExternalIdentifierInternal
+                    .setWorkExternalIdentifierId("" + item.getID());
+            workExternalIdentifierInternal.setWorkExternalIdentifierType(
+                    OrcidExternalIdentifierType.SOURCE_ID.toString());
+            workExternalIdentifiers.getWorkExternalIdentifier()
+                    .add(workExternalIdentifierInternal);
 		}
 		orcidWork.setWorkExternalIdentifiers(workExternalIdentifiers);
 

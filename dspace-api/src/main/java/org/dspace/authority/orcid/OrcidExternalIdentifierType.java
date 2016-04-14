@@ -36,8 +36,10 @@ public enum OrcidExternalIdentifierType {
 	PMC("pmc"),
 	PMID("pmid"),
 	RFC("rfc"),
-	SSRN("ssrn"),
-	ZBL("zbl");
+	SSRN("ssrn"),	
+	ZBL("zbl"),
+	HANDLE("handle"),
+	WOSUID("wosuid");
 	
 	private final String stringValue;
 	private OrcidExternalIdentifierType(final String s) { stringValue = s; }
