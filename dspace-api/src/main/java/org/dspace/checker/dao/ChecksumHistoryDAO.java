@@ -24,7 +24,25 @@ import java.util.Date;
  * @author kevinvandevelde at atmire.com
  */
 public interface ChecksumHistoryDAO extends GenericDAO<ChecksumHistory> {
+
+    /**
+     * Delete all ChecksumHistory rows with retention date before the given and
+     * the specified result code.
+     *
+     * @param context
+     * @param retentionDate row must be older than this to be deleted.
+     * @param checksumResultCode row must have this result to be deleted.
+     * @return number of rows deleted.
+     * @throws SQLException
+     */
     public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode checksumResultCode) throws SQLException;
 
+    /**
+     * Delete all ChecksumHistory rows for the given Bitstream.
+     *
+     * @param context
+     * @param bitstream
+     * @throws SQLException
+     */
     public void deleteByBitstream(Context context, Bitstream bitstream) throws SQLException;
 }
