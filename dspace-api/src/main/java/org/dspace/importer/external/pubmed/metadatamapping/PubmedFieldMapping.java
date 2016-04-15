@@ -14,7 +14,10 @@ import javax.annotation.Resource;
 import java.util.Map;
 
 /**
- * @author jonas - jonas@atmire.com on 06/11/15.
+ * An implementation of {@link AbstractMetadataFieldMapping}
+ * Responsible for defining the mapping of the Pubmed metadatum fields on the DSpace metadatum fields
+ *
+ * @author jonas - (jonas at atmire dot com)
  */
 public class PubmedFieldMapping extends AbstractMetadataFieldMapping {
 
