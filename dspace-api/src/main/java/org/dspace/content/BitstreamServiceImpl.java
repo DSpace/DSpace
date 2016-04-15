@@ -238,7 +238,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public void delete(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
 
-        // changed to a check on remove
+        // changed to a check on delete
         // Check authorisation
         authorizeService.authorizeAction(context, bitstream, Constants.DELETE);
         log.info(LogManager.getHeader(context, "delete_bitstream",
@@ -249,15 +249,13 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         bitstream.getBundles().clear();
 
-
-        // Remove policies
-        authorizeService.removeAllPolicies(context, bitstream);
-
         deleteMetadata(context, bitstream);
 
         // Remove bitstream itself
         bitstream.setDeleted(true);
         update(context, bitstream);
+        // Remove policies from the file, we do this at the end since the methods above still require write rights.
+        authorizeService.removeAllPolicies(context, bitstream);
     }
 
     @Override

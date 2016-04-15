@@ -785,6 +785,8 @@ public class ItemTest  extends AbstractDSpaceObjectTest
                     Constants.ADD); result = null;
             authorizeService.authorizeAction((Context) any, (Item) any,
                     Constants.REMOVE); result = null;
+            authorizeService.authorizeAction((Context) any, (Item) any,
+                    Constants.DELETE); result = null;
         }};
 
         String name = "bundle";
@@ -926,6 +928,8 @@ public class ItemTest  extends AbstractDSpaceObjectTest
                     Constants.ADD); result = null;
             authorizeService.authorizeAction((Context) any, (Item) any,
                     Constants.REMOVE); result = null;
+            authorizeService.authorizeAction((Context) any, (Item) any,
+                    Constants.DELETE); result = null;
         }};
 
         String name = "LICENSE";
@@ -1216,6 +1220,8 @@ public class ItemTest  extends AbstractDSpaceObjectTest
             authorizeService.authorizeAction((Context) any, (Item) any,
                     Constants.REMOVE, true); result = null;
             authorizeService.authorizeAction((Context) any, (Item) any,
+                    Constants.DELETE, true); result = null;
+            authorizeService.authorizeAction((Context) any, (Item) any,
                 Constants.WRITE); result = null;
         }};
 
@@ -1257,6 +1263,8 @@ public class ItemTest  extends AbstractDSpaceObjectTest
                 Constants.WRITE); result = null;
             authorizeService.authorizeAction((Context) any, (Item) any,
                 Constants.REMOVE); result = null;
+            authorizeService.authorizeAction((Context) any, (Item) any,
+                Constants.DELETE); result = null;
 
         }};
 

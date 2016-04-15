@@ -106,6 +106,8 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         authorizeService.addPolicy(context, item, Constants.ADD, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
         // remove contents permission
         authorizeService.addPolicy(context, item, Constants.REMOVE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
+        // delete permission
+        authorizeService.addPolicy(context, item, Constants.DELETE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
 
 
         // Copy template if appropriate
