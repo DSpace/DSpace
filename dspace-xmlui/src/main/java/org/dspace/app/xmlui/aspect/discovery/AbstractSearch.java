@@ -386,14 +386,14 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                         //Render our community !
                         org.dspace.app.xmlui.wing.element.List communityMetadata = commCollWingList.addList(dso.getHandle() + ":community");
 
-                        renderCommunity((Community) dso, highlightedResults, communityMetadata);
+                        renderDSO((Community) dso, highlightedResults, communityMetadata);
                     }else
                     if(dso.getType() == Constants.COLLECTION)
                     {
                         //Render our collection !
                         org.dspace.app.xmlui.wing.element.List collectionMetadata = commCollWingList.addList(dso.getHandle() + ":collection");
 
-                        renderCollection((Collection) dso, highlightedResults, collectionMetadata);
+                        renderDSO((Collection) dso, highlightedResults, collectionMetadata);
                     }
                 }
             }
@@ -409,7 +409,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 for (Item resultDso : itemList)
                 {
                     DiscoverResult.DSpaceObjectHighlightResult highlightedResults = queryResults.getHighlightedResults(resultDso);
-                    renderItem(itemWingList, resultDso, highlightedResults);
+                    renderDSO( resultDso, highlightedResults,itemWingList);
                 }
             }
 
@@ -440,163 +440,92 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         }
         return pageURLMask;
     }
-
+    
     /**
-     * Render the given item, all metadata is added to the given list, which metadata will be rendered where depends on the xsl
-     * @param dspaceObjectsList a list of DSpace objects
-     * @param item the DSpace item to be rendered
+     * Render the given DSpaceObject, all DSpaceObject metadata is added to the list
+     * @param dso the DSpaceOBject to be rendered
      * @param highlightedResults the highlighted results
      * @throws WingException
-     * @throws SQLException Database failure in services this calls
+     * @throws SQLException 
      */
-    protected void renderItem(org.dspace.app.xmlui.wing.element.List dspaceObjectsList, Item item, DiscoverResult.DSpaceObjectHighlightResult highlightedResults) throws WingException, SQLException {
-        org.dspace.app.xmlui.wing.element.List itemList = dspaceObjectsList.addList(item.getHandle() + ":item");
-
-        List<MetadataField> metadataFields = metadataFieldService.findAll(context);
-        for (MetadataField metadataField : metadataFields)
-        {
-            //Retrieve the schema for this field
-            String schema = metadataField.getMetadataSchema().getName();
-            //Check if our field isn't hidden
-            if (!metadataExposureService.isHidden(context, schema, metadataField.getElement(), metadataField.getQualifier()))
+    protected void renderDSO(DSpaceObject dso, DiscoverResult.DSpaceObjectHighlightResult highlightedResults, org.dspace.app.xmlui.wing.element.List dsoMetadata) throws WingException, SQLException 
+    {    		
+    	
+		if(dso.getType() == Constants.ITEM)
+    	{
+			List<MetadataValue> all = itemService.getMetadata((Item)dso, "*", "*", "*", "*");
+    		org.dspace.app.xmlui.wing.element.List itemList=null;
+    		itemList = dsoMetadata.addList(dso.getHandle() + ":item");
+    		genericAddMetadata(all,dso,highlightedResults,itemList);
+    		if(highlightedResults != null)
             {
-                //Check if our metadata field is highlighted
-                StringBuilder metadataKey = new StringBuilder();
-                metadataKey.append(schema).append(".").append(metadataField.getElement());
-                if (metadataField.getQualifier() != null)
+                //Also add the full text snippet (if available !)
+                List<String> fullSnippets = highlightedResults.getHighlightResults("fulltext");
+                if(CollectionUtils.isNotEmpty(fullSnippets))
                 {
-                    metadataKey.append(".").append(metadataField.getQualifier());
-                }
+                    StringBuilder itemName = new StringBuilder();
+                    itemName.append(dso.getHandle()).append(":").append("fulltext");
 
-                StringBuilder itemName = new StringBuilder();
-                itemName.append(item.getHandle()).append(":").append(metadataKey.toString());
+                    org.dspace.app.xmlui.wing.element.List fullTextFieldList = itemList.addList(itemName.toString());
 
-
-                List<MetadataValue> itemMetadata = itemService.getMetadata(item, schema, metadataField.getElement(), metadataField.getQualifier(), Item.ANY);
-                if(!CollectionUtils.isEmpty(itemMetadata))
-                {
-                    org.dspace.app.xmlui.wing.element.List metadataFieldList = itemList.addList(itemName.toString());
-                    for (MetadataValue metadataValue : itemMetadata)
+                    for (String snippet : fullSnippets)
                     {
-                        String value = metadataValue.getValue();
-                        addMetadataField(highlightedResults, metadataKey.toString(), metadataFieldList, value);
+                        addMetadataField(fullTextFieldList, snippet);
                     }
                 }
             }
-        }
-
-        //Check our highlighted results, we may need to add non-metadata (like our full text)
-        if(highlightedResults != null)
-        {
-            //Also add the full text snippet (if available !)
-            List<String> fullSnippets = highlightedResults.getHighlightResults("fulltext");
-            if(CollectionUtils.isNotEmpty(fullSnippets))
+    	}
+    	else //  it is either a collection or a community
+    	{
+    		List<MetadataValue> all;
+    		String parent="";
+    		if(dso.getType() == Constants.COLLECTION){
+    			 all= collectionService.getMetadata((Collection)dso, "*", "*", "*", "*");
+    			 Collection theColeccion= (Collection)dso;
+    			 parent=theColeccion.getCommunities().get(0).getName();
+    		}else{
+    			all= communityService.getMetadata((Community)dso, "*", "*", "*", "*");
+    			Community theCommunity= (Community)dso;
+    			if(!(theCommunity.getParentCommunities().isEmpty())){
+    				parent=theCommunity.getParentCommunities().get(0).getName();
+    			}
+    		}
+    		genericAddMetadata(all,dso,highlightedResults,dsoMetadata);    		
+            String identifier_uri = "http://hdl.handle.net/" + dso.getHandle();
+            if(StringUtils.isNotBlank(parent))
             {
-                StringBuilder itemName = new StringBuilder();
-                itemName.append(item.getHandle()).append(":").append("fulltext");
-
-                org.dspace.app.xmlui.wing.element.List fullTextFieldList = itemList.addList(itemName.toString());
-
-                for (String snippet : fullSnippets)
-                {
-                    addMetadataField(fullTextFieldList, snippet);
-                }
+                addMetadataField(highlightedResults, "dc.other", dsoMetadata.addList(dso.getHandle() + ":dc.other"), parent);
             }
+            if(StringUtils.isNotBlank(identifier_uri))
+            {
+                addMetadataField(highlightedResults, "dc.identifier.uri", dsoMetadata.addList(dso.getHandle() + ":dc.identifier.uri"), identifier_uri);
+            }
+    	}
+    }
+    
+    private void genericAddMetadata(List<MetadataValue> allMetadata,DSpaceObject dso,DiscoverResult.DSpaceObjectHighlightResult highlightedResults,org.dspace.app.xmlui.wing.element.List dsoMetadata ) throws WingException, SQLException
+    {
+    	for(MetadataValue data:allMetadata)
+        {
+    		MetadataField theMetadatafield=data.getMetadataField();
+    		if(!metadataExposureService.isHidden(context, theMetadatafield.getMetadataSchema().getName(), theMetadatafield.getElement(), theMetadatafield.getQualifier()))
+    		{
+    			if(StringUtils.isNotBlank(data.getValue()))
+                {
+            		if(StringUtils.isNotBlank(theMetadatafield.getQualifier()))
+            		{
+            			addMetadataField(highlightedResults, theMetadatafield.getMetadataSchema().getName()+"."+theMetadatafield.getElement()+"."+theMetadatafield.getQualifier(), dsoMetadata.addList(dso.getHandle() +":"+theMetadatafield.getMetadataSchema().getName()+"."+theMetadatafield.getElement()+"."+theMetadatafield.getQualifier()), data.getValue());
+            		}else
+            		{
+            			addMetadataField(highlightedResults, theMetadatafield.getMetadataSchema().getName()+"."+theMetadatafield.getElement(), dsoMetadata.addList(dso.getHandle() +":"+theMetadatafield.getMetadataSchema().getName()+"."+theMetadatafield.getElement()), data.getValue());
+            		}
+                    
+                }
+    		}
+        	
         }
     }
-
-    /**
-     * Render the given collection, all collection metadata is added to the list
-     * @param collection the collection to be rendered
-     * @param highlightedResults the highlighted results
-     * @throws WingException
-     */
-    protected void renderCollection(Collection collection, DiscoverResult.DSpaceObjectHighlightResult highlightedResults, org.dspace.app.xmlui.wing.element.List collectionMetadata) throws WingException {
-
-        String description = collectionService.getMetadata(collection, "introductory_text");
-        String description_abstract = collectionService.getMetadata(collection, "short_description");
-        String description_table = collectionService.getMetadata(collection, "side_bar_text");
-        String identifier_uri = "http://hdl.handle.net/" + collection.getHandle();
-        String provenance = collectionService.getMetadata(collection, "provenance_description");
-        String rights = collectionService.getMetadata(collection, "copyright_text");
-        String rights_license = collectionService.getMetadata(collection, "license");
-        String title = collection.getName();
-
-        if(StringUtils.isNotBlank(description))
-        {
-            addMetadataField(highlightedResults, "dc.description", collectionMetadata.addList(collection.getHandle() + ":dc.description"), description);
-        }
-        if(StringUtils.isNotBlank(description_abstract))
-        {
-            addMetadataField(highlightedResults, "dc.description.abstract", collectionMetadata.addList(collection.getHandle() + ":dc.description.abstract"), description_abstract);
-        }
-        if(StringUtils.isNotBlank(description_table))
-        {
-            addMetadataField(highlightedResults, "dc.description.tableofcontents", collectionMetadata.addList(collection.getHandle() + ":dc.description.tableofcontents"), description_table);
-        }
-        if(StringUtils.isNotBlank(identifier_uri))
-        {
-            addMetadataField(highlightedResults, "dc.identifier.uri", collectionMetadata.addList(collection.getHandle() + ":dc.identifier.uri"), identifier_uri);
-        }
-        if(StringUtils.isNotBlank(provenance))
-        {
-            addMetadataField(highlightedResults, "dc.provenance", collectionMetadata.addList(collection.getHandle() + ":dc.provenance"), provenance);
-        }
-        if(StringUtils.isNotBlank(rights))
-        {
-            addMetadataField(highlightedResults, "dc.rights", collectionMetadata.addList(collection.getHandle() + ":dc.rights"), rights);
-        }
-        if(StringUtils.isNotBlank(rights_license))
-        {
-            addMetadataField(highlightedResults, "dc.rights.license", collectionMetadata.addList(collection.getHandle() + ":dc.rights.license"), rights_license);
-        }
-        if(StringUtils.isNotBlank(title))
-        {
-            addMetadataField(highlightedResults, "dc.title", collectionMetadata.addList(collection.getHandle() + ":dc.title"), title);
-        }
-    }
-
-    /**
-     * Render the given collection, all collection metadata is added to the list
-     * @param community the community to be rendered
-     * @param highlightedResults the highlighted results
-     * @throws WingException
-     */
-
-    protected void renderCommunity(Community community, DiscoverResult.DSpaceObjectHighlightResult highlightedResults, org.dspace.app.xmlui.wing.element.List communityMetadata) throws WingException {
-        String description = communityService.getMetadata(community, "introductory_text");
-        String description_abstract = communityService.getMetadata(community, "short_description");
-        String description_table = communityService.getMetadata(community, "side_bar_text");
-        String identifier_uri = "http://hdl.handle.net/" + community.getHandle();
-        String rights = communityService.getMetadata(community, "copyright_text");
-        String title = community.getName();
-
-        if(StringUtils.isNotBlank(description))
-        {
-            addMetadataField(highlightedResults, "dc.description", communityMetadata.addList(community.getHandle() + ":dc.description"), description);
-        }
-        if(StringUtils.isNotBlank(description_abstract))
-        {
-            addMetadataField(highlightedResults, "dc.description.abstract", communityMetadata.addList(community.getHandle() + ":dc.description.abstract"), description_abstract);
-        }
-        if(StringUtils.isNotBlank(description_table))
-        {
-            addMetadataField(highlightedResults, "dc.description.tableofcontents", communityMetadata.addList(community.getHandle() + ":dc.description.tableofcontents"), description_table);
-        }
-        if(StringUtils.isNotBlank(identifier_uri))
-        {
-            addMetadataField(highlightedResults, "dc.identifier.uri", communityMetadata.addList(community.getHandle() + ":dc.identifier.uri"), identifier_uri);
-        }
-        if(StringUtils.isNotBlank(rights))
-        {
-            addMetadataField(highlightedResults, "dc.rights", communityMetadata.addList(community.getHandle() + ":dc.rights"), rights);
-        }
-        if(StringUtils.isNotBlank(title))
-        {
-            addMetadataField(highlightedResults, "dc.title", communityMetadata.addList(community.getHandle() + ":dc.title"), title);
-        }
-    }
-
+    
     /**
      * Add the current value to the wing list
      * @param highlightedResults the highlighted results
