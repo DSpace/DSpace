@@ -12,6 +12,8 @@ import org.dspace.importer.external.Query;
 import org.dspace.importer.external.MetadataSourceException;
 
 /**
+ * Represent a service to generate a query based on an item
+ *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public interface GenerateQueryService {

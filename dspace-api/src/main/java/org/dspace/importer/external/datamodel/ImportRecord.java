@@ -15,6 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * This class contains all MetadatumDTO objects from an imported item
+ *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class ImportRecord {

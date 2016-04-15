@@ -8,6 +8,8 @@
 package org.dspace.importer.external.metadatamapping.service;
 
 /**
+ * Represents an interface to do processing of metadataValues
+ *
  * @author kevin (kevin at atmire.com)
  */
 public interface MetadataProcessorService {

@@ -10,6 +10,8 @@ package org.dspace.importer.external.metadatamapping;
 import java.util.Collection;
 
 /**
+ * Represents an interface for the mapping of the metadatum fields
+ *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 
@@ -26,7 +28,7 @@ public interface MetadataFieldMapping<RecordType,QueryType> {
     /**
      * Create a collection of MetadatumDTO retrieved from a given RecordType
      * @param record Used to retrieve the MetadatumDTO
-     * @return Collectio of MetadatumDTO
+     * @return Collection of MetadatumDTO
      */
     public Collection<MetadatumDTO> resultToDCValueMapping(RecordType record);
 

@@ -19,7 +19,11 @@ import org.dspace.importer.external.metadatamapping.service.GenerateQueryService
 import java.util.List;
 
 /**
- * @author jonas - jonas@atmire.com on 06/11/15.
+ * This class is an implementation of {@link GenerateQueryService}
+ * Represents a service that generates the pubmed query which is used to retrieve the records.
+ * This is based on a given item.
+ *
+ * @author jonas - (jonas at atmire dot com)
  */
 public class GeneratePubmedQueryService implements GenerateQueryService {
 

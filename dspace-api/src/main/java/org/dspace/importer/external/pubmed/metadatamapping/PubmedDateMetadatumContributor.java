@@ -24,6 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Pubmed specific implementation of {@link MetadataContributor}
+ * Responsible for generating a set of Date metadata from the retrieved document.
+ *
  * @author Philip Vissenaekens (philip at atmire dot com)
  */
 public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T> {

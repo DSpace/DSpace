@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Abstract class that implements {@link MetadataFieldMapping}
+ * This class adds a default implementation for the MetadataFieldMapping methods
+ *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public abstract class AbstractMetadataFieldMapping<RecordType> implements MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> {
