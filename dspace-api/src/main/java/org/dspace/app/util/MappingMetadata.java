@@ -70,6 +70,8 @@ public abstract class MappingMetadata {
 
 	// Patter to extract the converter name if any
 	private static final Pattern converterPattern = Pattern.compile(".*\\((.*)\\)");
+	
+	private static final Pattern simpleHandlePattern = Pattern.compile(".*,?(\\$simple\\-handle\\(handle\\)),?.*");
 
 	// Load configured fields from google-metadata.properties
 	public void init(String configuration) {
@@ -149,6 +151,15 @@ public abstract class MappingMetadata {
 			}
 		}
 
+        if (config.equals("$simple-handle")) {
+            if (null != item.getHandle() && !item.getHandle().equals("")) {
+                metadataMappings.put(fieldName, item.getHandle());
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
 		if (config.equals("$simple-pdf")) {
 			String pdf_url = getPDFSimpleUrl(item);
 			if (pdf_url.length() > 0) {
@@ -843,24 +854,48 @@ public abstract class MappingMetadata {
 			return false;
 		}
 
-		String identifierCode = "";
-		// check if exist another configuration for language
-		if (null == identifierCode || identifierCode.equals("")) {
-			// check if the key got language
-			Matcher converterMatcher = converterPattern.matcher(config);
-			if (converterMatcher.matches()) {
-				identifierCode = converterMatcher.group(1);
-				config = config.replaceAll("\\(" + identifierCode + "\\)", "");
-			}
-		}
-
-		ArrayList<Metadatum> fields = resolveMetadataFields(config);
+		Map<String, String> map = new HashMap<String, String>();
+        String result = "";
+        String[] ss = config.split(",");
+        int index = 0;
+        for(String s : ss) {
+            String identifierCode = "";
+            // check if exist another configuration for language
+            if (null == identifierCode || identifierCode.equals("")) {
+                // check if the key got language
+                Matcher converterMatcher = converterPattern.matcher(s);
+                if (converterMatcher.matches()) {
+                    identifierCode = converterMatcher.group(1);                    
+                    if(!s.contains("$simple-handle")) {
+                        s = s.replaceAll("\\(" + identifierCode + "\\)", "");
+                        if(index>0) {
+                            result += ",";
+                        }
+                        result += s;
+                        map.put(s.trim(), identifierCode);
+                        index++;
+                    }
+                    else {
+                        map.put("handle", identifierCode);
+                    }
+                }
+            }
+        }
+		
+        if (config.contains("$simple-handle")) {
+            if (null != item.getHandle() && !item.getHandle().equals("")) {
+                metadataMappings.put(fieldName, item.getHandle());
+                metadataMappings.put(item.getHandle(), map.get("handle"));
+            } 
+        }		
+		
+		ArrayList<Metadatum> fields = resolveMetadataFields(result);
 
 		if (null != fields && !fields.isEmpty()) {
 			for (Metadatum v : fields) {
 				if (null != v && (null != v.value) && !v.value.trim().equals("")) {
 					metadataMappings.put(fieldName, v.value);
-					metadataMappings.put(v.value, identifierCode);
+					metadataMappings.put(v.value, map.get(v.getField()));
 				}
 			}
 		} else {
@@ -909,4 +944,5 @@ public abstract class MappingMetadata {
 			return false;
 		}
 	}
+
 }

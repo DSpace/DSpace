@@ -47,6 +47,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -1114,6 +1115,10 @@ public class ItemImport
         // //getElementData(n,
         // "qualifier");
         String language = getAttributeValue(n, "language");
+        String authority = getAttributeValue(n, "authority");
+        String confidence = getAttributeValue(n, "confidence");
+        int confidenceAuth = StringUtils.isEmpty(confidence)?Choices.CF_ACCEPTED:Integer.parseInt(confidence);
+        
         if (language != null)
         {
             language = language.trim();
@@ -1121,8 +1126,14 @@ public class ItemImport
 
         if (!isQuiet)
         {
-            System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
-                    + " Value: " + value);
+            if(StringUtils.isNotEmpty(authority)) {
+                System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
+                        + " Value: " + value + " Authority: " + authority + " Confidence: " + confidenceAuth);
+            }
+            else {
+                System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
+                        + " Value: " + value);
+            }
         }
 
         if ("none".equals(qualifier) || "".equals(qualifier))
@@ -1132,7 +1143,13 @@ public class ItemImport
 
         if (!isTest)
         {
-            i.addMetadata(schema, element, qualifier, language, value);
+            if(StringUtils.isNotEmpty(authority)) {
+                
+                i.addMetadata(schema, element, qualifier, language, value, authority, confidenceAuth);
+            }
+            else {
+                i.addMetadata(schema, element, qualifier, language, value);
+            }
         }
         else
         {

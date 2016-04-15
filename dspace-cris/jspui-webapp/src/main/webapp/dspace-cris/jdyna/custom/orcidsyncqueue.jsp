@@ -99,59 +99,61 @@ jQuery(document).ready(function() {
 	};
 	
 	oTable = drawOrcidDatatable();
+	
+	j('#orcidQueueTable tbody').on('click', 'a', function() {
+		var operation = j(this).data("operation");
+		if(operation == 3) {
+			var uuid = j(this).data("uuid");
+			var owner = j(this).data("owner");
+			var ttext = j(this).data("ttext");
+			j.ajax({
+				  type: "POST", //or GET
+				  url: "<%= request.getContextPath() %>/json/orcidqueue/post/"+ttext,
+				  data: {
+		            "id" : "${entity.crisID}",
+		            "uuid" : uuid,
+		            "owner": owner
+		          },
+				  success: function(response){
+					  if(response.status==false) {
+						  alert(j("#orciderror").text());  
+					  }
+					  else {
+						  alert(j("#orcidsuccess").text());
+					  }
+					  oTable = drawOrcidDatatable();
+				  }
+			} );	
+		}
+	});
+
+
+	j('.btn-put-orcid').on('click', function() {
+			var ttext = j(this).data("ttext");
+			var id = j(this).attr('id');
+			j.ajax({
+				  type: "POST", //or GET
+				  url: "<%= request.getContextPath() %>/json/orcidqueue/put/"+ttext,
+				  data: {
+		            "id" : "${entity.crisID}",
+		            "owner" : "${entity.crisID}"
+		          },
+				  success: function(response){
+					  if(response.status==false) {
+						  alert(j("#orciderror").text());  
+					  }
+					  else {
+						  j('#'+id).hide();
+						  alert(j("#orcidsuccess").text());
+					  }				   		  	
+					  oTable = drawOrcidDatatable();
+				  }
+			} );	
+	});
 } );
 
 
-j('#orcidQueueTable tbody').on('click', 'a', function() {
-	var operation = j(this).data("operation");
-	if(operation == 3) {
-		var uuid = j(this).data("uuid");
-		var owner = j(this).data("owner");
-		var ttext = j(this).data("ttext");
-		j.ajax({
-			  type: "POST", //or GET
-			  url: "<%= request.getContextPath() %>/json/orcidqueue/post/"+ttext,
-			  data: {
-	            "id" : "${entity.crisID}",
-	            "uuid" : uuid,
-	            "owner": owner
-	          },
-			  success: function(response){
-				  if(response.status==false) {
-					  alert(j("#orciderror").text());  
-				  }
-				  else {
-					  alert(j("#orcidsuccess").text());
-				  }
-				  oTable = drawOrcidDatatable();
-			  }
-		} );	
-	}
-});
 
-
-j('.btn-put-orcid').on('click', function() {
-		var ttext = j(this).data("ttext");
-		var id = j(this).attr('id');
-		j.ajax({
-			  type: "POST", //or GET
-			  url: "<%= request.getContextPath() %>/json/orcidqueue/put/"+ttext,
-			  data: {
-	            "id" : "${entity.crisID}",
-	            "owner" : "${entity.crisID}"
-	          },
-			  success: function(response){
-				  if(response.status==false) {
-					  alert(j("#orciderror").text());  
-				  }
-				  else {
-					  j('#'+id).hide();
-					  alert(j("#orcidsuccess").text());
-				  }				   		  	
-				  oTable = drawOrcidDatatable();
-			  }
-		} );	
-});
 
 </script>
 <div class="panel-group" id="${holder.shortName}">

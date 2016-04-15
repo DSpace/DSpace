@@ -65,7 +65,7 @@ public class FormRPDynamicMetadataController
         // collection of metadata
         Map<String, List<IContainable>> mapBoxToContainables = new HashMap<String, List<IContainable>>();
 
-        AnagraficaObjectAreaDTO anagraficaObjectDTO = (AnagraficaObjectAreaDTO) command;
+        RPAnagraficaObjectDTO anagraficaObjectDTO = (RPAnagraficaObjectDTO) command;
 
         // check admin authorization
         boolean isAdmin = false;
@@ -117,8 +117,10 @@ public class FormRPDynamicMetadataController
         {
             if (isAdmin)
             {
-                if (!propertyHolder.getVisibility().equals(
-                        VisibilityTabConstant.LOW))
+                EPerson currentUser = context.getCurrentUser();
+                if ((currentUser!=null && (anagraficaObjectDTO.getEpersonID()!=null && currentUser.getID()==anagraficaObjectDTO.getEpersonID()))
+                       || !propertyHolder.getVisibility().equals(
+                               VisibilityTabConstant.LOW))              
                 {
                     propertyHoldersCurrentAccessLevel.add(propertyHolder);
                 }
