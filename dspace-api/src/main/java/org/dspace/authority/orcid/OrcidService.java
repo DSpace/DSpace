@@ -696,6 +696,7 @@ public class OrcidService extends RestSource {
 	 * @param idsa
 	 * @param token
 	 * @param work
+	 * @param handle
 	 * 
 	 * @return putcode
 	 * 
@@ -834,10 +835,13 @@ public class OrcidService extends RestSource {
 	 * 
 	 * Member API, require '/orcid-works/create' scope.
 	 * 
-	 * 
 	 * @param id
 	 * @param token
 	 * @param work
+	 * @param uuid
+	 * 
+	 * @return putcode
+	 * 
 	 * @throws IOException
 	 * @throws JAXBException
 	 */
