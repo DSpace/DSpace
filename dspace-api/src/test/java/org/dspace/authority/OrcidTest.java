@@ -76,7 +76,7 @@ public class OrcidTest {
 		work.setWorkExternalIdentifiers(externalIdentifiers);
 
 		try {
-			orcid.appendWork("0000-0001-9753-8285", "d0c29317-cb20-4a39-a475-2bcbf5cf650b", work);
+			orcid.appendWork("0000-0001-9753-8285", "d0c29317-cb20-4a39-a475-2bcbf5cf650b", work, item.getHandle());
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 		}

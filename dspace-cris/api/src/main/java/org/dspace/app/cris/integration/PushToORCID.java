@@ -8,6 +8,7 @@
 package org.dspace.app.cris.integration;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -138,8 +139,8 @@ public class PushToORCID {
 		log.debug("Working... push to ORCID");
 
 		Map<String, Map<String, List<String>>> mapResearcherMetadataToSend = new HashMap<String, Map<String, List<String>>>();
-		Map<String, List<Integer>> mapPublicationsToSend = new HashMap<String, List<Integer>>();
-		Map<String, List<Integer>> mapProjectsToSend = new HashMap<String, List<Integer>>();
+		Map<String, Map<Integer, String>> mapPublicationsToSend = new HashMap<String, Map<Integer, String>>();
+		Map<String, Map<Integer, String>> mapProjectsToSend = new HashMap<String, Map<Integer, String>>();
 
 		boolean byPassManualMode = ConfigurationManager.getBooleanProperty("cris",
 				"system.script.pushtoorcid.force", false);
@@ -210,10 +211,10 @@ public class PushToORCID {
 				prepareUpdateProfile(applicationService, mapResearcherMetadataToSend, researcher, true);
 				// default pushing selected works
 
-				prepareWorks(relationPreferenceService, searchService, mapPublicationsToSend, researcher, crisID,
+				prepareWorks(applicationService, relationPreferenceService, searchService, mapPublicationsToSend, researcher, crisID,
 						itemIDsToSend, defaultPreference == null ? "" + parseIntPublicationsPrefs : defaultPreference);
 				// default pushing selected fundings
-				prepareFundings(relationPreferenceService, searchService, mapProjectsToSend, researcher, crisID,
+				prepareFundings(applicationService, relationPreferenceService, searchService, mapProjectsToSend, researcher, crisID,
 						projectsIDsToSend, defaultPreference == null ? "" + parseIntProjectPrefs : defaultPreference);
 			} else {
 				for (RPProperty tokenRP : researcher.getAnagrafica4view().get("system-orcid-token-orcid-bio-update")) {
@@ -249,12 +250,12 @@ public class PushToORCID {
 				}
 
 				if (prepareCreateWork && prepareUpdateWork) {
-					prepareWorks(relationPreferenceService, searchService, mapPublicationsToSend, researcher, crisID,
+					prepareWorks(applicationService, relationPreferenceService, searchService, mapPublicationsToSend, researcher, crisID,
 							itemIDsToSend, publicationsPrefs);
 				}
 
 				if (prepareCreateFunding && prepareUpdateFunding) {
-					prepareFundings(relationPreferenceService, searchService, mapProjectsToSend, researcher, crisID,
+					prepareFundings(applicationService, relationPreferenceService, searchService, mapProjectsToSend, researcher, crisID,
 							projectsIDsToSend, projectPrefs);
 				}
 			}
@@ -408,8 +409,8 @@ public class PushToORCID {
 		return orcidConfigurationMapping;
 	}
 
-	private static void prepareFundings(RelationPreferenceService relationPreferenceService,
-			SearchService searchService, Map<String, List<Integer>> mapProjectsToSend, ResearcherPage researcher,
+	private static void prepareFundings(ApplicationService applicationService, RelationPreferenceService relationPreferenceService,
+			SearchService searchService, Map<String, Map<Integer, String>> mapProjectsToSend, ResearcherPage researcher,
 			String crisID, List<Integer> projectsIDsToSend, String projectsPrefs) {
 		if (StringUtils.isNotBlank(projectsPrefs)) {
 			if (Integer.parseInt(projectsPrefs) != ORCID_PROJECTS_PREFS_DISABLED) {
@@ -457,11 +458,23 @@ public class PushToORCID {
 			}
 		}
 
-		mapProjectsToSend.put(crisID, projectsIDsToSend);
+        for (Integer id : projectsIDsToSend)
+        {
+            Map<Integer, String> subResult = new HashMap<Integer, String>();
+
+            OrcidHistory orcidHistory = applicationService
+                    .uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(crisID, id,
+                            Constants.ITEM);
+            if (orcidHistory != null)
+            {
+                subResult.put(id, orcidHistory.getPutCode());
+            }
+            mapProjectsToSend.put(crisID, subResult);
+        }
 	}
 
-	private static void prepareWorks(RelationPreferenceService relationPreferenceService, SearchService searchService,
-			Map<String, List<Integer>> mapPublicationsToSend, ResearcherPage researcher, String crisID,
+	private static void prepareWorks(ApplicationService applicationService, RelationPreferenceService relationPreferenceService, SearchService searchService,
+			Map<String, Map<Integer, String>> mapPublicationsToSend, ResearcherPage researcher, String crisID,
 			List<Integer> itemIDsToSend, String publicationsPrefs) {
 		if (publicationsPrefs != null) {
 			if (Integer.parseInt(publicationsPrefs) != ORCID_PUBLICATION_PREFS_DISABLED) {
@@ -508,7 +521,16 @@ public class PushToORCID {
 				log.info(crisID + " - DISABLED publications preferences");
 			}
 		}
-		mapPublicationsToSend.put(crisID, itemIDsToSend);
+				
+		for(Integer id : itemIDsToSend) {
+		    Map<Integer, String> subResult = new HashMap<Integer, String>();
+		    
+		    OrcidHistory orcidHistory = applicationService.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(crisID, id, Constants.ITEM);
+		    if(orcidHistory!=null) {
+		        subResult.put(id, orcidHistory.getPutCode());
+		    }
+		    mapPublicationsToSend.put(crisID, subResult);
+		}
 	}
 
 	public static void prepareUpdateProfile(ApplicationService applicationService,
@@ -548,22 +570,28 @@ public class PushToORCID {
 	}
 
 	private static FundingList buildOrcidFundings(Context context, ApplicationService applicationService, String crisId,
-			Map<String, List<Integer>> mapProjectsToSend) throws SQLException {
+			Map<String, Map<Integer, String>> mapProjectsToSend) throws SQLException {
 		FundingList fundingList = new FundingList();
-		List<Integer> listOfItems = mapProjectsToSend.get(crisId);
-		for (Integer ii : listOfItems) {
-			Project project = applicationService.get(Project.class, ii);
-			Funding funding = buildOrcidFunding(context, applicationService, project);
-			fundingList.getFunding().add(funding);
-		}
+        Map<Integer, String> listOfItems = mapProjectsToSend.get(crisId);
+        for (Integer ii : listOfItems.keySet())
+        {
+            Project project = applicationService.get(Project.class, ii);
+            Funding funding = buildOrcidFunding(context, applicationService, project, listOfItems.get(ii));
+            fundingList.getFunding().add(funding);
+        }
 		return fundingList;
 	}
 
-	private static Funding buildOrcidFunding(Context context, ApplicationService applicationService, Project project)
+	private static Funding buildOrcidFunding(Context context, ApplicationService applicationService, Project project, String putCode)
 			throws SQLException {
 		OrcidFundingMetadata itemMetadata = new OrcidFundingMetadata(context, project);
-
+		
 		Funding funding = new Funding();
+        if(putCode!=null) {
+            BigInteger bi = new BigInteger(putCode);
+            funding.setPutCode(bi);
+        }
+        
 		if (StringUtils.isNotBlank(itemMetadata.getAmount())) {
 			Amount amount = new Amount();
 			CurrencyCode currencyCode = CurrencyCode.fromValue(itemMetadata.getCurrencyCode());
@@ -714,18 +742,21 @@ public class PushToORCID {
 	}
 
 	private static OrcidWorks buildOrcidWorks(Context context, String crisId,
-			Map<String, List<Integer>> mapPublicationsToSend) throws SQLException {
+			Map<String, Map<Integer, String>> mapPublicationsToSend) throws SQLException {
 		OrcidWorks orcidWorks = new OrcidWorks();
-		List<Integer> listOfItems = mapPublicationsToSend.get(crisId);
-		for (Integer ii : listOfItems) {
-			orcidWorks.getOrcidWork().add(buildOrcidWork(context, ii));
+		Map<Integer, String> listOfItems = mapPublicationsToSend.get(crisId);
+		for (Integer ii : listOfItems.keySet()) {
+			orcidWorks.getOrcidWork().add(buildOrcidWork(context, ii, listOfItems.get(ii)));
 		}
 		return orcidWorks;
 	}
 
-	private static OrcidWork buildOrcidWork(Context context, Integer ii) throws SQLException {
+	private static OrcidWork buildOrcidWork(Context context, Integer ii, String putCode) throws SQLException {
 		OrcidWork orcidWork = new OrcidWork();
-
+		if(putCode!=null) {
+		    BigInteger bi = new BigInteger(putCode);
+		    orcidWork.setPutCode(bi);
+		}
 		Item item = Item.find(context, ii);
 
 		OrcidWorkMetadata itemMetadata = new OrcidWorkMetadata(context, item);
@@ -1183,12 +1214,16 @@ public class PushToORCID {
 						orcidHistory.setTimestampLastAttempt(timestampAttempt);
 
 						log.info("(Q1)Prepare for Work:" + uuid + " for ResearcherPage crisID:" + crisId);
-						OrcidWork work = PushToORCID.buildOrcidWork(context, dso.getID());
+						OrcidWork work = PushToORCID.buildOrcidWork(context, dso.getID(), orcidHistory.getPutCode());
 						if (work != null) {
 							try {
-								orcidService.appendWork(orcid, tokenCreateWork, work);
+							    String putCode = orcidService.appendWork(orcid, tokenCreateWork, work, uuid);
 								result = true;
 								orcidHistory.setTimestampSuccessAttempt(timestampAttempt);
+								
+								if(StringUtils.isNotEmpty(putCode)) {
+								    orcidHistory.setPutCode(putCode);
+								}
 								log.info("(A1) OK for Work:" + uuid + " for ResearcherPage crisID:" + crisId);
 							} catch (Exception ex) {
 								// build message for orcid history
@@ -1358,12 +1393,13 @@ public class PushToORCID {
 						orcidHistory.setTimestampLastAttempt(timestampAttempt);
 
 						log.info("(Q1)Prepare Funding:" + uuid + " for ResearcherPage crisID:" + crisId);
-						Funding funding = PushToORCID.buildOrcidFunding(context, applicationService, project);
+						Funding funding = PushToORCID.buildOrcidFunding(context, applicationService, project, orcidHistory.getPutCode());
 						if (funding != null) {
 							try {
-								orcidService.appendFunding(orcid, tokenCreateFunding, funding);
+								String putCode = orcidService.appendFunding(orcid, tokenCreateFunding, funding, uuid);
 								result = true;
 								orcidHistory.setTimestampSuccessAttempt(timestampAttempt);
+								orcidHistory.setPutCode(putCode);
 								log.info("(A1) OK for Funding:" + uuid + " for ResearcherPage crisID:" + crisId);
 							} catch (Exception ex) {
 								// build message for orcid history
@@ -1409,7 +1445,7 @@ public class PushToORCID {
 	}
 
 	public static boolean putOrcidFundings(ApplicationService applicationService, String owner,
-			List<Integer> projects) {
+			Map<Integer, String> projects) {
 		boolean result = false;
 		log.debug("Create DSpace context");
 		Context context = null;
@@ -1438,8 +1474,8 @@ public class PushToORCID {
 							"system-orcid-token-funding-create");
 					if (tokenCreateWork != null) {
 
-						Map<String, List<Integer>> mapProjectsToSend = new HashMap<String, List<Integer>>();
-						mapProjectsToSend.put(owner, projects);
+					    Map<String, Map<Integer, String>> mapProjectsToSend = new HashMap<String, Map<Integer, String>>();
+                        mapProjectsToSend.put(owner, projects);
 						FundingList works = PushToORCID.buildOrcidFundings(context, applicationService, owner,
 								mapProjectsToSend);
 						String error = null;
@@ -1455,7 +1491,7 @@ public class PushToORCID {
 								log.error("ERROR!!! (E1) ERROR for put Works for ResearcherPage crisID:" + owner);
 							}
 
-							for (Integer i : projects) {
+							for (Integer i : projects.keySet()) {
 								Project project = applicationService.get(Project.class, i);
 								OrcidHistory orcidHistory = applicationService
 										.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(owner, i,
@@ -1467,6 +1503,7 @@ public class PushToORCID {
 								orcidHistory.setEntityUuid(project.getUuid());
 								orcidHistory.setTypeId(CrisConstants.PROJECT_TYPE_ID);
 								orcidHistory.setOwner(owner);
+								orcidHistory.setPutCode(projects.get(i));
 								SingleTimeStampInfo timestampAttempt = new SingleTimeStampInfo(new Date());
 								orcidHistory.setTimestampLastAttempt(timestampAttempt);
 								if (StringUtils.isNotBlank(error)) {
@@ -1500,7 +1537,7 @@ public class PushToORCID {
 		return result;
 	}
 
-	public static boolean putOrcidWorks(ApplicationService applicationService, String owner, List<Integer> items) {
+	public static boolean putOrcidWorks(ApplicationService applicationService, String owner, Map<Integer, String> items) {
 		boolean result = false;
 		log.debug("Create DSpace context");
 		Context context = null;
@@ -1529,7 +1566,7 @@ public class PushToORCID {
 							"system-orcid-token-orcid-works-create");
 					if (tokenCreateWork != null) {
 
-						Map<String, List<Integer>> mapPublicationsToSend = new HashMap<String, List<Integer>>();
+						Map<String, Map<Integer, String>> mapPublicationsToSend = new HashMap<String, Map<Integer, String>>();
 						mapPublicationsToSend.put(owner, items);
 						OrcidWorks works = PushToORCID.buildOrcidWorks(context, owner, mapPublicationsToSend);
 						String error = null;
@@ -1545,7 +1582,7 @@ public class PushToORCID {
 								log.error("ERROR!!! (E1) ERROR for put Works for ResearcherPage crisID:" + owner);
 							}
 
-							for (Integer i : items) {
+							for (Integer i : items.keySet()) {
 								Item item = Item.find(context, i);
 								OrcidHistory orcidHistory = applicationService
 										.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(owner, i, Constants.ITEM);
@@ -1556,6 +1593,7 @@ public class PushToORCID {
 								orcidHistory.setEntityUuid(item.getHandle());
 								orcidHistory.setTypeId(Constants.ITEM);
 								orcidHistory.setOwner(owner);
+								orcidHistory.setPutCode(items.get(i));
 								SingleTimeStampInfo timestampAttempt = new SingleTimeStampInfo(new Date());
 								orcidHistory.setTimestampLastAttempt(timestampAttempt);
 								if (StringUtils.isNotBlank(error)) {

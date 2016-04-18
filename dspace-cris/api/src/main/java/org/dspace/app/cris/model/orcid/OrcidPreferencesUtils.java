@@ -544,12 +544,12 @@ public class OrcidPreferencesUtils {
 		List<String> pjIDs = getPreferiteFundingToSendToOrcid(owner);
 		List<OrcidHistory> orcidHistories = getOrcidHistoryInSuccessByOwnerAndTypeId(owner,
 				CrisConstants.PROJECT_TYPE_ID);
-		List<Integer> putProjectIDs = new ArrayList<Integer>();
+		Map<Integer, String> putProjectIDs = new HashMap<Integer, String>();
 		for (OrcidHistory history : orcidHistories) {
 			if (pjIDs.contains(history.getEntityUuid())) {
 				// PUT
 				pjIDs.remove(history.getEntityId());
-				putProjectIDs.add(history.getEntityId());
+				putProjectIDs.put(history.getEntityId(), history.getPutCode());
 			} else {
 				// REMOVE
 				getApplicationService().delete(OrcidHistory.class, history.getId());
@@ -578,12 +578,12 @@ public class OrcidPreferencesUtils {
 		// retrieve the preferite
 		List<Integer> itemIDs = getPreferiteWorksToSendToOrcid(owner);
 		List<OrcidHistory> orcidHistories = getOrcidHistoryInSuccessByOwnerAndTypeId(owner, Constants.ITEM);
-		List<Integer> putItemIDs = new ArrayList<Integer>();
+		Map<Integer, String> putItemIDs = new HashMap<Integer, String>();
 		for (OrcidHistory history : orcidHistories) {
 			if (itemIDs.contains(history.getEntityId())) {
 				// PUT
 				itemIDs.remove(history.getEntityId());
-				putItemIDs.add(history.getEntityId());
+				putItemIDs.put(history.getEntityId(), history.getPutCode());
 			} else {
 				// REMOVE
 				getApplicationService().delete(OrcidHistory.class, history.getId());
