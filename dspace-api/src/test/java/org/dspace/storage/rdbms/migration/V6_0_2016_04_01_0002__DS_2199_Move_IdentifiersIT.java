@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
  *
  * @author mwood
  */
-public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
+public class V6_0_2016_04_01_0002__DS_2199_Move_IdentifiersIT
         extends AbstractDSpaceTest
 {
     private static final String SHOULDER = "10.5072/FK2/";
@@ -45,7 +45,7 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
 
     private Connection cnctn;
 
-    public V6_0_2016_04_01__DS_2199_Move_IdentifiersIT()
+    public V6_0_2016_04_01_0002__DS_2199_Move_IdentifiersIT()
     {
     }
 
@@ -77,7 +77,7 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
                 "SELECT metadata_schema_id FROM metadataschemaregistry"
                         + " WHERE short_id = ?"))
         {
-            stmt.setString(1, V6_0_2016_04_01__DS_2199_Move_Identifiers.OLD_SCHEMA);
+            stmt.setString(1, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.OLD_SCHEMA);
             try (ResultSet rs = stmt.executeQuery())
             {
                 if (rs.next())
@@ -90,7 +90,7 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
                 "SELECT metadata_schema_id FROM metadataschemaregistry"
                         + " WHERE short_id = ?"))
         {
-            stmt.setString(1, V6_0_2016_04_01__DS_2199_Move_Identifiers.NEW_SCHEMA);
+            stmt.setString(1, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.NEW_SCHEMA);
             try (ResultSet rs = stmt.executeQuery())
             {
                 if (rs.next())
@@ -104,8 +104,8 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
                                 + " VALUES(?, ?)",
                     new String[] {"metadata_schema_id"}))
             {
-                stmt.setString(2, V6_0_2016_04_01__DS_2199_Move_Identifiers.OLD_SCHEMA);
-                stmt.setString(3, V6_0_2016_04_01__DS_2199_Move_Identifiers.OLD_SCHEMA);
+                stmt.setString(2, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.OLD_SCHEMA);
+                stmt.setString(3, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.OLD_SCHEMA);
                 stmt.executeUpdate();
                 try (ResultSet rs = stmt.getGeneratedKeys())
                 {
@@ -121,8 +121,8 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
                                 + " VALUES(?, ?)",
                     new String[] {"metadata_schema_id"}))
             {
-                stmt.setString(1, V6_0_2016_04_01__DS_2199_Move_Identifiers.NEW_SCHEMA);
-                stmt.setString(2, V6_0_2016_04_01__DS_2199_Move_Identifiers.NEW_SCHEMA);
+                stmt.setString(1, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.NEW_SCHEMA);
+                stmt.setString(2, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.NEW_SCHEMA);
                 stmt.executeUpdate();
                 try (ResultSet rs = stmt.getGeneratedKeys())
                 {
@@ -139,8 +139,8 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
                         + " WHERE metadata_schema_id = ? and element = ? and qualifier = ?"))
         {
             stmt.setInt(1, oldSchema);
-            stmt.setString(2, V6_0_2016_04_01__DS_2199_Move_Identifiers.OLD_ELEMENT);
-            stmt.setString(3, V6_0_2016_04_01__DS_2199_Move_Identifiers.OLD_QUALIFIER);
+            stmt.setString(2, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.OLD_ELEMENT);
+            stmt.setString(3, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.OLD_QUALIFIER);
             try (ResultSet rs = stmt.executeQuery())
             {
                 if (rs.next())
@@ -154,8 +154,8 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
                         + " WHERE metadata_schema_id = ? and element = ? and qualifier = ?"))
         {
             stmt.setInt(1, oldSchema);
-            stmt.setString(2, V6_0_2016_04_01__DS_2199_Move_Identifiers.NEW_ELEMENT);
-            stmt.setString(3, V6_0_2016_04_01__DS_2199_Move_Identifiers.NEW_QUALIFIER);
+            stmt.setString(2, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.NEW_ELEMENT);
+            stmt.setString(3, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.NEW_QUALIFIER);
             try (ResultSet rs = stmt.executeQuery())
             {
                 if (rs.next())
@@ -171,8 +171,8 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
             if (oldField < 0)
             {
                 stmt.setInt(1, oldSchema);
-                stmt.setString(2, V6_0_2016_04_01__DS_2199_Move_Identifiers.OLD_ELEMENT);
-                stmt.setString(3, V6_0_2016_04_01__DS_2199_Move_Identifiers.OLD_QUALIFIER);
+                stmt.setString(2, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.OLD_ELEMENT);
+                stmt.setString(3, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.OLD_QUALIFIER);
                 stmt.executeUpdate();
                 try (ResultSet rs = stmt.getGeneratedKeys())
                 {
@@ -185,8 +185,8 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
             if (newField < 0)
             {
                 stmt.setInt(1, newSchema);
-                stmt.setString(2, V6_0_2016_04_01__DS_2199_Move_Identifiers.NEW_ELEMENT);
-                stmt.setString(3, V6_0_2016_04_01__DS_2199_Move_Identifiers.NEW_QUALIFIER);
+                stmt.setString(2, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.NEW_ELEMENT);
+                stmt.setString(3, V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.NEW_QUALIFIER);
                 stmt.executeUpdate();
                 try (ResultSet rs = stmt.getGeneratedKeys())
                 {
@@ -206,7 +206,7 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
     }
 
     /**
-     * Test of migrate method, of class V6_0_2016_04_01__DS_2199_Move_Identifiers.
+     * Test of migrate method, of class V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.
      */
     @Test
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
@@ -251,8 +251,8 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
         }
 
         // Migrate!
-        V6_0_2016_04_01__DS_2199_Move_Identifiers instance
-                = new V6_0_2016_04_01__DS_2199_Move_Identifiers();
+        V6_0_2016_04_01_0002__DS_2199_Move_Identifiers instance
+                = new V6_0_2016_04_01_0002__DS_2199_Move_Identifiers();
         instance.migrate(cnctn);
 
         // Check the table for correct results
@@ -294,7 +294,7 @@ public class V6_0_2016_04_01__DS_2199_Move_IdentifiersIT
     public void testGetChecksum()
     {
         System.out.println("getChecksum");
-        V6_0_2016_04_01__DS_2199_Move_Identifiers instance = new V6_0_2016_04_01__DS_2199_Move_Identifiers();
+        V6_0_2016_04_01_0002__DS_2199_Move_Identifiers instance = new V6_0_2016_04_01_0002__DS_2199_Move_Identifiers();
         Integer expResult = null;
         Integer result = instance.getChecksum();
         assertEquals(expResult, result);
