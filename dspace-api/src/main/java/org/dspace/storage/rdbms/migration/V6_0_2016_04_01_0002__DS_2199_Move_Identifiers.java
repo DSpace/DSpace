@@ -94,15 +94,24 @@ public class V6_0_2016_04_01_0002__DS_2199_Move_Identifiers
                 + '%';
         LOG.debug("Prefix = {}", prefix);
 
-        final PreparedStatement stmt = cnctn.prepareStatement(
-                "SELECT * FROM metadatavalue"
-                        + " WHERE metadata_field_id = ?"
-                        + " AND text_lang = ?"
-                        + " AND text_value LIKE ?");
+        String sql;
+        if (null == OLD_LANG)
+            sql = "SELECT * FROM metadatavalue"
+                    + " WHERE metadata_field_id = ?"
+                    + " AND text_value LIKE ?"
+                    + " AND text_lang IS NULL";
+        else
+            sql = "SELECT * FROM metadatavalue"
+                    + " WHERE metadata_field_id = ?"
+                    + " AND text_value LIKE ?"
+                    + " AND text_lang = ?";
+        final PreparedStatement stmt = cnctn.prepareStatement(sql,
+                ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 
         stmt.setInt(1, old_field_id);
-        stmt.setString(2, OLD_LANG);
-        stmt.setString(3, prefix);
+        stmt.setString(2, prefix);
+        if (null != OLD_LANG)
+            stmt.setString(3, OLD_LANG);
 
         final ResultSet rs = stmt.executeQuery();
 
@@ -120,8 +129,8 @@ public class V6_0_2016_04_01_0002__DS_2199_Move_Identifiers
                     LOG.debug("Moving {} (as {}).", oldIdentifier, newIdentifier);
 
                     rs.updateInt(pos_field_id, new_field_id);
-                    rs.updateString(pos_text_lang, NEW_LANG);
                     rs.updateString(pos_text_value, newIdentifier);
+                    rs.updateString(pos_text_lang, NEW_LANG);
                     rs.updateRow();
 
                     checksum.update(newIdentifier.getBytes(), 0, newIdentifier.length());
