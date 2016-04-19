@@ -125,6 +125,20 @@
             </global-variables>
         </map:component-configurations>
 
+        <map:pipeline internal-only="true">
+            <map:parameter name="expires" value="access plus 1 hours"/>
+
+            <!--
+                 Bypass the file extension check for the Mirage2 theme's scripts-dist.xml file.
+                 That way, we don't have to whitelist all .xml files just to make JS loading work.
+            -->
+            <map:match pattern="themes/{global:theme-name}/scripts-dist.xml">
+                <map:read type="ThemeResourceReader" src="scripts-dist.xml">
+                    <map:parameter name="bypass-whitelist" value="true"/>
+                </map:read>
+            </map:match>
+        </map:pipeline>
+
         <!--
              Caching Pipeline: This caching pipeline handles access to static content (css, js, etc)
              which is used by this Theme. These static files are simply passed directly to
@@ -153,7 +167,7 @@
 
             <!-- Static content -->
             <map:match pattern="themes/*/**">
-                <map:read src="{2}"/>
+                <map:read type="ThemeResourceReader" src="{2}"/>
             </map:match>
         </map:pipeline>
 
