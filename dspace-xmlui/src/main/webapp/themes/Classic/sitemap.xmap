@@ -118,7 +118,7 @@
 			
 			<!-- Static content -->
 			<map:match pattern="themes/*/**">
-				<map:read src="{2}"/>
+				<map:read type="ThemeResourceReader" src="{2}"/>
 			</map:match>
 		</map:pipeline>
 

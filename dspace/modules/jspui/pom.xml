@@ -10,12 +10,12 @@
         on top of the default JSP-UI web application provided with DSpace.
     </description>
 
-	<parent>
-		<groupId>org.dspace</groupId>
-		<artifactId>modules</artifactId>
-		<version>5.4-1-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>modules</artifactId>
+        <version>5.5-0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
 	<properties>
 		<!-- This is the path to the root [dspace-src] directory. -->

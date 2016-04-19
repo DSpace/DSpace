@@ -263,7 +263,7 @@ public class Item extends DSpaceObject
         }
 
         String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' " +
-                "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
+                "AND item.item_id = metadatavalue.resource_id AND metadatavalue.resource_type_id=2 AND metadata_field_id = ?";
         TableRowIterator rows = null;
         if (Item.ANY.equals(authority)) {
             rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID());
