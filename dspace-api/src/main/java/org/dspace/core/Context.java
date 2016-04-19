@@ -371,8 +371,8 @@ public class Context
      * The database connection is not closed and can be reused afterwards.
      *
      * <b>WARNING: After calling this method all previously fetched entities are "detached" (pending
-     * changes are not tracked anymore). You have to reload all entities you still want to work manually
-     * after this method call (see {@link Context#reloadEntity(ReloadableEntity)}).</b>
+     * changes are not tracked anymore). You have to reload all entities you still want to work with
+     * manually after this method call (see {@link Context#reloadEntity(ReloadableEntity)}).</b>
      *
      * @throws SQLException When committing the transaction in the database fails.
      */
@@ -635,8 +635,8 @@ public class Context
      * (heap space) memory. You should use this method when processing a large number of records.
      *
      * <b>WARNING: After calling this method all previously fetched entities are "detached" (pending
-     * changes are not tracked anymore). You have to reload all entities you still want to work manually
-     * after this method call (see {@link Context#reloadEntity(ReloadableEntity)}).</b>
+     * changes are not tracked anymore). You have to reload all entities you still want to work with
+     * manually after this method call (see {@link Context#reloadEntity(ReloadableEntity)}).</b>
      *
      * This method will take care of reloading the current user.
      *
