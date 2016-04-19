@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author mwood
  */
-public class V6_0_2016_04_01__DS_2199_Move_Identifiers
+public class V6_0_2016_04_01_0002__DS_2199_Move_Identifiers
     implements JdbcMigration, MigrationChecksumProvider
 {
     private static final String SCHEMA_TABLE = "MetadataSchemaRegistry";
@@ -51,7 +51,7 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
     static final String NEW_LANG = null;
 
     private static final Logger LOG
-            = LoggerFactory.getLogger(V6_0_2016_04_01__DS_2199_Move_Identifiers.class);
+            = LoggerFactory.getLogger(V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.class);
 
     private final Checksum checksum = new CRC32();
 
