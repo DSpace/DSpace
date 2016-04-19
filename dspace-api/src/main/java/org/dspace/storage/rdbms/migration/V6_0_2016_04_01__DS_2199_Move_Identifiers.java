@@ -40,15 +40,15 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
 {
     private static final String SCHEMA_TABLE = "MetadataSchemaRegistry";
 
-    private static final String OLD_SCHEMA = MetadataSchema.DC_SCHEMA;
-    private static final String OLD_ELEMENT = "identifier";
-    private static final String OLD_QUALIFIER = null;
-    private static final String OLD_LANG = null;
+    static final String OLD_SCHEMA = MetadataSchema.DC_SCHEMA;
+    static final String OLD_ELEMENT = "identifier";
+    static final String OLD_QUALIFIER = null;
+    static final String OLD_LANG = null;
 
-    private static final String NEW_SCHEMA = IdentifierProvider.URI_METADATA_SCHEMA;
-    private static final String NEW_ELEMENT = IdentifierProvider.URI_METADATA_ELEMENT;
-    private static final String NEW_QUALIFIER = IdentifierProvider.URI_METADATA_QUALIFIER;
-    private static final String NEW_LANG = null;
+    static final String NEW_SCHEMA = IdentifierProvider.URI_METADATA_SCHEMA;
+    static final String NEW_ELEMENT = IdentifierProvider.URI_METADATA_ELEMENT;
+    static final String NEW_QUALIFIER = IdentifierProvider.URI_METADATA_QUALIFIER;
+    static final String NEW_LANG = null;
 
     private static final Logger LOG
             = LoggerFactory.getLogger(V6_0_2016_04_01__DS_2199_Move_Identifiers.class);
@@ -94,17 +94,17 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
                 + '%';
         LOG.debug("Prefix = {}", prefix);
 
-        final PreparedStatement select = cnctn.prepareStatement(
+        final PreparedStatement stmt = cnctn.prepareStatement(
                 "SELECT * FROM metadatavalue"
                         + " WHERE metadata_field_id = ?"
                         + " AND text_lang = ?"
                         + " AND text_value LIKE ?");
 
-        select.setInt(0, old_field_id);
-        select.setString(1, OLD_LANG);
-        select.setString(2, prefix);
+        stmt.setInt(1, old_field_id);
+        stmt.setString(2, OLD_LANG);
+        stmt.setString(3, prefix);
 
-        final ResultSet rs = select.executeQuery();
+        final ResultSet rs = stmt.executeQuery();
 
         final int pos_field_id = rs.findColumn("metadata_field_id");
         final int pos_text_value = rs.findColumn("text_value");
@@ -130,7 +130,7 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
                 }
             }
         } finally {
-            select.close();
+            stmt.close();
         }
     }
 
@@ -154,7 +154,7 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
             String element, String qualifier)
             throws SQLException
     {
-        PreparedStatement select;
+        PreparedStatement stmt;
         final String SELECT_FIELD_ID_NULL_QUALIFIER
                 = "SELECT f.metadata_field_id"
                 + " FROM metadataschemaregistry s"
@@ -167,20 +167,20 @@ public class V6_0_2016_04_01__DS_2199_Move_Identifiers
                 + " WHERE s.short_id = ? AND f.element = ? AND f.qualifier = ?";
         if (null == qualifier)
         {
-            select = cnctn.prepareStatement(SELECT_FIELD_ID_NULL_QUALIFIER);
+            stmt = cnctn.prepareStatement(SELECT_FIELD_ID_NULL_QUALIFIER);
         }
         else
         {
-            select = cnctn.prepareStatement(SELECT_FIELD_ID_NONNULL_QUALIFIER);
-            select.setString(3, qualifier);
+            stmt = cnctn.prepareStatement(SELECT_FIELD_ID_NONNULL_QUALIFIER);
+            stmt.setString(3, qualifier);
         }
-        select.setString(1, schema);
-        select.setString(2, element);
-        final ResultSet rs = select.executeQuery();
+        stmt.setString(1, schema);
+        stmt.setString(2, element);
+        final ResultSet rs = stmt.executeQuery();
         if (rs.next())
         {
             int id = rs.getInt(1);
-            select.close();
+            stmt.close();
             return id;
         }
         else
