@@ -23,8 +23,7 @@ import org.dspace.app.xmlui.utils.*;
 public class ContextAbortAction extends ServiceableAction {
     @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel, String source, Parameters parameters) throws Exception {
-        org.dspace.core.Context context = ContextUtil.obtainContext(objectModel);
-        context.abort();
+        ContextUtil.abortContext(ObjectModelHelper.getRequest(objectModel));
         return EMPTY_MAP;
     }
 }
