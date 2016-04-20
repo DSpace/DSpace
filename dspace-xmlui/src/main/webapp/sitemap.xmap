@@ -208,6 +208,7 @@
                         <map:action name="StartAuthentication" src="org.dspace.app.xmlui.aspect.eperson.StartAuthenticationAction"/>
                         <map:action name="DSpacePropertyFileReader" src="org.dspace.app.xmlui.cocoon.DSpacePropertyFileReader" />
                         <map:action name="PropertyFileReader" src="org.dspace.app.xmlui.cocoon.PropertyFileReader" />
+                        <map:action name="ContextAbortAction" src="org.dspace.app.xmlui.cocoon.ContextAbortAction" />
                 </map:actions>
                 <map:pipes default="caching">
                         <map:pipe name="noncaching" src="org.apache.cocoon.components.pipeline.impl.NonCachingProcessingPipeline">
@@ -747,7 +748,9 @@
                                 </map:when>
 
                                 <map:otherwise>
-                                        <map:generate type="exception"/>
+                                    <map:act type="ContextAbortAction"/>
+
+                                    <map:generate type="exception"/>
                                         <map:transform src="exception2html.xslt">
                                                 <map:parameter name="contextPath" value="{request:contextPath}"/>
                                         </map:transform>

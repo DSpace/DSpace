@@ -49,6 +49,10 @@
         <map:readers>
             <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
         </map:readers>
+        <map:actions>
+            <map:action name="ContextAbortAction" src="org.dspace.app.xmlui.cocoon.ContextAbortAction" />
+        </map:actions>
+
     </map:components>
 
     <!-- Define global resources that are used in multiple areas of the pipeline. -->
@@ -197,7 +201,7 @@
             <!-- Step 3: Transform that DRI formatted exception into XHTML (using our Theme) -->
             <map:call resource="transform-to-xhtml"/>
 
-            <!-- Step 4: Serialize XHTML page to user's brower. Based on the type of error, 
+            <!-- Step 4: Serialize XHTML page to user's brower. Based on the type of error,
                          provide a different HTTP response code. -->
             <map:select type="exception">
                 <!-- HTTP 400 Bad Request -->
@@ -210,6 +214,7 @@
                 </map:when>
                 <!-- All other errors (HTTP 500 Internal Server Error) -->
                 <map:otherwise>
+                    <map:act type="ContextAbortAction"/>
                     <map:serialize type="xhtml" status-code="500"/>
                 </map:otherwise>
             </map:select>
