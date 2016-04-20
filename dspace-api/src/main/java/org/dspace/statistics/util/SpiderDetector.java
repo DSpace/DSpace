@@ -175,7 +175,7 @@ public class SpiderDetector {
                 }
                 for (String pattern : patterns)
                 {
-                    patternList.add(Pattern.compile(pattern));
+                    patternList.add(Pattern.compile(pattern,Pattern.CASE_INSENSITIVE));
                 }
                 log.info("Loaded pattern file:  {}", file.getPath());
             }
