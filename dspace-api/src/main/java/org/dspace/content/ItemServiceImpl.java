@@ -577,7 +577,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public void delete(Context context, Item item) throws SQLException, AuthorizeException, IOException {
-        authorizeService.authorizeAction(context, item, Constants.REMOVE);
+        authorizeService.authorizeAction(context, item, Constants.DELETE);
         item.getCollections().clear();
         item.setOwningCollection(null);
         rawDelete(context,  item);

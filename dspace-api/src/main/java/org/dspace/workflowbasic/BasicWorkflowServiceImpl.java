@@ -170,6 +170,20 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         {
             authorizeService.addPolicy(context, item, Constants.REMOVE, step3group, ResourcePolicy.TYPE_WORKFLOW);
         }
+        if (step1group != null)
+        {
+            authorizeService.addPolicy(context, item, Constants.DELETE, step1group, ResourcePolicy.TYPE_WORKFLOW);
+        }
+
+        if (step2group != null)
+        {
+            authorizeService.addPolicy(context, item, Constants.DELETE, step2group, ResourcePolicy.TYPE_WORKFLOW);
+        }
+
+        if (step3group != null)
+        {
+            authorizeService.addPolicy(context, item, Constants.DELETE, step3group, ResourcePolicy.TYPE_WORKFLOW);
+        }
     }
 
     @Override
