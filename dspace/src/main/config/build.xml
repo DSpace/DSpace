@@ -350,13 +350,13 @@ Common usage:
         <!-- Finally, filter some very specific configuration files, which cannot
              be managed by DSpace's configuration service. NOTE: please refrain
              from appending files to this list unless ABSOLUTELY NECESSARY.
-             Most config files are now auto-interpolated and don't need filtering! -->
+             MOST config files are now auto-interpolated at runtime and don't need filtering! -->
         <copy todir="config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
             <fileset dir="config">
-                <!-- Filter extra (third-party) log4j files, as log4j requires absolute paths
-                     to its log files. This does NOT include the default log4j.properties file
-                     as its absolute paths are interpolated by DSpace's ConfigurationService. -->
-                <include name="log4j-*.properties"/>
+                <!-- Filter all log4j files, as log4j requires absolute paths
+                     to its log files. In addition, log4j strongly prefers
+                     autoconfiguring itself (e.g. see DS-3104). -->
+                <include name="log4j*.properties"/>
                 <!-- Filter OAI-PMH description so it can include hostname and handle prefix -->
                 <include name="crosswalks/oai/description.xml"/>
                 <!-- Filter sample Tomcat context.xml -->
@@ -767,10 +767,7 @@ Common usage:
     <!-- Fresh install of config files                                 -->
     <!-- ============================================================= -->
 
-    <!-- Writes the configuration files to ${dspace.dir}/config.  It does *not*
-       run the install-configs script.  The "log4j.build.properties" file is
-       copied to ${dspace.dir}/config so there's a simple log4j.properties
-       file present for the initial run of "install-configs". -->
+    <!-- Copies the configuration files to ${dspace.dir}/config. -->
     <target name="init_configs" depends="init_installation">
 
         <copy todir="${dspace.dir}/config" preservelastmodified="true" failonerror="false">
@@ -780,7 +777,6 @@ Common usage:
         <copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
 
         <echo file='${dspace.dir}/config/ant.properties' message='ant.version = ${ant.version}'/>
-
 
     </target>
 
