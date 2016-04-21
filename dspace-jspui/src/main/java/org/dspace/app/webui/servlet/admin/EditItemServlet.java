@@ -102,6 +102,9 @@ public class EditItemServlet extends DSpaceServlet
 
     /** User confirms withdrawal of item */
     public static final int PUBLICIZE = 11;
+    
+    /** JSP to upload bitstream */
+    protected static final String UPLOAD_BITSTREAM_JSP = "/tools/upload-bitstream.jsp";
 
     /** Logger */
     private static final Logger log = Logger.getLogger(EditCommunitiesServlet.class);
@@ -832,7 +835,7 @@ public class EditItemServlet extends DSpaceServlet
             // Show upload bitstream page
             request.setAttribute("item", item);
             JSPManager
-                    .showJSP(request, response, "/tools/upload-bitstream.jsp");
+                    .showJSP(request, response, UPLOAD_BITSTREAM_JSP);
         }else
         if(button.equals("submit_update_order") || button.startsWith("submit_order_"))
         {
@@ -908,7 +911,18 @@ public class EditItemServlet extends DSpaceServlet
             Bitstream b = null;
             Item item = itemService.find(context, UIUtil.getUUIDParameter(wrapper, "item_id"));
             File temp = wrapper.getFile("file");
-
+            
+            if(temp == null)
+            {
+                boolean noFileSelected = true;
+                
+                // Show upload bitstream page
+                request.setAttribute("noFileSelected", noFileSelected);
+                request.setAttribute("item", item);
+                JSPManager
+                        .showJSP(request, response, UPLOAD_BITSTREAM_JSP);
+                return;
+            }
             // Read the temp file as logo
             InputStream is = new BufferedInputStream(new FileInputStream(temp));
 
