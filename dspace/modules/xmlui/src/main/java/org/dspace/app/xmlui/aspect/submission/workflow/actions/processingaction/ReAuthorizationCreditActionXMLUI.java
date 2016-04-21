@@ -111,8 +111,8 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
                             Date date= new Date();
                             shoppingCart.setPaymentDate(date);
                             shoppingCart.update();
-                            paymentSystemService.sendPaymentApprovedEmail(context, workflowItem, shoppingCart);
                             success = AssociationAnywhere.tallyCredit(context, metadataValues[0].value, DOIIdentifierProvider.getDoiValue(item));
+                            paymentSystemService.sendPaymentApprovedEmail(context, workflowItem, shoppingCart);
 
                         }catch (Exception e)
                         {
