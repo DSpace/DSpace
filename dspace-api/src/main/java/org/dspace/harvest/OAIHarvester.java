@@ -77,9 +77,6 @@ public class OAIHarvester {
     protected PluginService pluginService;
     protected ConfigurationService configurationService;
 
-	// try to empty the cache on regular intervals
-	public static final int CACHE_SIZE_LIMIT = 2000;
-
 
     //  The collection this harvester instance is dealing with
 	Collection targetCollection;
@@ -368,11 +365,7 @@ public class OAIHarvester {
 						processRecord(record, OREPrefix, currentRecord, totalListSize);
 						ourContext.dispatchEvents();
 
-						// here we might need to clear the cache and update the total we have done so far
-						if(ourContext.getCacheSize() >= CACHE_SIZE_LIMIT)
-						{
-							clearCache();
-						}
+						intermediateCommit();
 					}
 				}
 
@@ -443,23 +436,6 @@ public class OAIHarvester {
 	private void intermediateCommit() throws SQLException {
 		ourContext.commit();
 		reloadRequiredEntities();
-	}
-
-
-	/**
-	 * Reset the OAI cache, will commit our currently ingested items and create a new context.
-	 */
-	protected void clearCache()
-	{
-		try
-		{
-			ourContext.clearCache();
-			reloadRequiredEntities();
-		}
-		catch(Exception ex)
-		{
-			log.error(LogManager.getHeader(ourContext, "oai_harvest_cache_reset_error", "Error while attempting to reset the cache for the OAI harvest"), ex);
-		}
 	}
 
 	private void reloadRequiredEntities() throws SQLException {
