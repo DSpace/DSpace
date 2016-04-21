@@ -22,7 +22,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -137,7 +136,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
     private void createTable(Division main, VersionHistory history, boolean isItemView, Item item) throws WingException, SQLException
     {
-        Boolean isVisible = new DSpace().getConfigurationService().getPropertyAsType("versioning.item.history.include.submitter", Boolean.FALSE);
+        Boolean isVisible = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("versioning.item.history.include.submitter", Boolean.FALSE);
         boolean isAdmin = authorizeService.isAdmin(context,item.getOwningCollection());
         if(isAdmin)
         {
