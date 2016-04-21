@@ -111,7 +111,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException
     {
-        log.debug("hi");
         Request request = ObjectModelHelper.getRequest(objectModel);
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
@@ -178,19 +177,15 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         // case B: (radio selected ==> accepted)
         addfieldsStatusAccepted(newItem, request, manuscript);
 
-        // case C: (radio selected ==> Not Yet Submitted)
-        //addJournalSelectStatusNotYetSubmitted(selectedJournalId, newItem);
-
         // case D: (radio selected ==>  In Review)
         addJournalSelectStatusInReview(selectedJournalName, newItem, manuscript, request);
 
         // hidden select fields that populate integrated journals
         addJournalSelectStatusIntegrated(selectedJournalName, newItem);
 
-        // Add manuscriptNumber in any case
-        addManuscriptNumber(request, newItem, manuscriptNumber);
-
         addPublicationNumberIfSubmitExisting(form, submitExisting, pubIdError, pubColl);
+
+        addManuscriptNumber(request, newItem, manuscriptNumber);
 
         // add License checkbox.
         addLicence(form);
@@ -247,10 +242,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         } else {
             accessRadios.setOptionSelected(request.getParameter("article_status"));
         }
-
-
-
-
     }
 
 
@@ -308,34 +299,24 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         } else {
             journalField.setValue(request.getParameter("prism_publicationName"));
         }
-
-
     }
 
     private void addJournalSelectStatusInReview(String selectedJournalName, Item newItem, Manuscript manuscript, Request request) throws WingException,SQLException {
         Composite optionsList = newItem.addComposite("journalID_status_in_review");
         Select journalID = optionsList.addSelect("journalIDStatusInReview");
         journalID.addOption("", "Please select a valid journal");
-        if (selectedJournalName == null || "".equals(selectedJournalName)) {
-            java.util.List<DryadJournalConcept> journalConcepts = Arrays.asList((DryadJournalConcept[]) JournalUtils.getAllJournalConcepts());
-            for (DryadJournalConcept journalConcept : journalConcepts) {
-                String val = journalConcept.getJournalID();
-                String name = journalConcept.getFullName();
-
-                // add only journal with allowReviewWorkflow=true;
-                if (journalConcept.getAllowReviewWorkflow() && journalConcept.getIntegrated()) {
-                    // select journal only if status is "In Review"
-                    if (manuscript != null && manuscript.isSubmitted()) {
-                        journalID.addOption(name.equals(selectedJournalName), val, name);
-                    } else if (request.getParameter("journalIDStatusInReview") != null && !request.getParameter("journalIDStatusInReview").equals("")) {
-                        journalID.addOption(name.equals(selectedJournalName), val, name);
-                    } else {
-                        journalID.addOption(val, name);
-                    }
-                }
+        java.util.List<DryadJournalConcept> journalConcepts = Arrays.asList((DryadJournalConcept[]) JournalUtils.getAllJournalConcepts());
+        for (DryadJournalConcept journalConcept : journalConcepts) {
+            String val = journalConcept.getJournalID();
+            String name = journalConcept.getFullName();
+            // add only journal with allowReviewWorkflow=true;
+            if (journalConcept.getAllowReviewWorkflow() && journalConcept.getIntegrated()) {
+                journalID.addOption(val, name);
             }
-        } else {
-            journalID.addOption(selectedJournalName, selectedJournalName);
+        }
+        if (manuscript != null) {
+            String selectedJournalID = manuscript.getJournalConcept().getJournalID();
+            journalID.setOptionSelected(selectedJournalID);
         }
         journalID.setLabel(T_SELECT_LABEL);
         journalID.setHelp(T_SELECT_HELP_IN_REVIEW);
