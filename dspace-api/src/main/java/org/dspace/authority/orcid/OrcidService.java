@@ -95,7 +95,7 @@ public class OrcidService extends RestSource {
 	
 	private static final String READ_PROFILE_ENDPOINT = "/orcid-profile";
 	private static final String READ_WORKS_ENDPOINT = "/orcid-works";
-	private static final String READ_FUNDING_ENDPOINT = "/orcid-works";
+	private static final String READ_FUNDING_ENDPOINT = "/funding";
 	
 	private static final String BIO_UPDATE_ENDPOINT = "/orcid-bio";
 	private static final String SEARCH_ENDPOINT = "search/orcid-bio/";	
