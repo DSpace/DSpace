@@ -24,10 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Servlet for editing groups
@@ -106,6 +103,13 @@ public class GroupEditServlet extends DSpaceServlet
 
                 // now get members, and add new ones and remove missing ones
                 List<EPerson> members = group.getMembers();
+                List<UUID> memberIdentifiers = new ArrayList<>();
+                // Store all the identifiers of our current members
+                for (EPerson member : members)
+                {
+                    memberIdentifiers.add(member.getID());
+                }
+
                 List<Group> membergroups = group.getMemberGroups();
 
                 if (eperson_ids != null)
@@ -138,11 +142,11 @@ public class GroupEditServlet extends DSpaceServlet
                     }
 
                     // process members, removing any that aren't in eperson_ids
-                    for (EPerson e : members)
+                    for (UUID personId : memberIdentifiers)
                     {
-                        if (!epersonIDSet.contains(e.getID()))
+                        if (!epersonIDSet.contains(personId))
                         {
-                            groupService.removeMember(c, group, e);
+                            groupService.removeMember(c, group, personService.find(c, personId));
                         }
                     }
                 }
@@ -150,9 +154,9 @@ public class GroupEditServlet extends DSpaceServlet
                 {
                     // no members found (ids == null), remove them all!
 
-                    for (EPerson e : members)
+                    for (UUID personId : memberIdentifiers)
                     {
-                        groupService.removeMember(c, group, e);
+                        groupService.removeMember(c, group, personService.find(c, personId));
                     }
                 }
 
