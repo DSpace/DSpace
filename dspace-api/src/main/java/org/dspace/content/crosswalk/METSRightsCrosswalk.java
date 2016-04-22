@@ -471,107 +471,53 @@ public class METSRightsCrosswalk
             {
                 //get what class of context this is
                 String contextClass = element.getAttributeValue("CONTEXTCLASS");
-
-                if ((element.getAttributeValue("start-date") != null)
-                       || (element.getAttributeValue("end-date") != null)
-                       || (element.getAttributeValue("rpName") != null))
-                {                 
-                    SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
+                
+                try {
+                	ResourcePolicy rp = resourcePolicyService.create(context);
+            		SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
+            		
+            		//also get reference to the <Permissions> element
+                    Element permsElement = element.getChild("Permissions", METSRights_NS);
+                    
+                    if (element.getAttributeValue("rpName") != null)
+                    {
+                        rp.setRpName(element.getAttributeValue("rpName"));
+                    }
                     try {
-                        ResourcePolicy rp = resourcePolicyService.create(context);
-                        if (element.getAttributeValue("CONTEXTCLASS").equalsIgnoreCase("GENERAL PUBLIC")) {
-                            Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
-                            rp.setGroup(anonGroup);
-                        }
-                        else
+                        if (element.getAttributeValue("start-date") != null)
                         {
-                            if (element.getAttributeValue("CONTEXTCLASS").equalsIgnoreCase("REPOSITORY MGR")) {
-                                Group adminGroup = groupService.findByName(context, Group.ADMIN);
-                                rp.setGroup(adminGroup);
-                            }
+                            rp.setStartDate(sdf.parse(element.getAttributeValue("start-date")));
                         }
-                        if (element.getAttributeValue("rpName") != null)
+                        if (element.getAttributeValue("end-date") != null)
                         {
-                            rp.setRpName(element.getAttributeValue("rpName"));
+                        	rp.setEndDate(sdf.parse(element.getAttributeValue("end-date")));
                         }
-                        try {
-                            if (element.getAttributeValue("start-date") != null)
-                            {
-                                rp.setStartDate(sdf.parse(element.getAttributeValue("start-date")));
-                            }
-                            if (element.getAttributeValue("end-date") != null)
-                            {
-                                rp.setEndDate(sdf.parse(element.getAttributeValue("end-date")));
-                            }
-                        }catch (ParseException ex) {
-                            java.util.logging.Logger.getLogger(METSRightsCrosswalk.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
-                        List<Element> le = new ArrayList<Element>(element.getChildren());
-                        for (Element el : le)
-                        {
-                            if ((el.getAttributeValue("DISCOVER").equalsIgnoreCase("true")) 
-                                    && (el.getAttributeValue("DISPLAY").equalsIgnoreCase("true")))
-                            {
-                                if (el.getAttributeValue("DELETE").equalsIgnoreCase("false"))
-                                {
-                                    if (el.getAttributeValue("MODIFY").equalsIgnoreCase("false"))
-                                    {
-                                        rp.setAction(Constants.READ);
-                                    }
-                                    else
-                                    {
-                                        rp.setAction(Constants.WRITE);
-                                    }
-                                }
-                                else
-                                {
-                                    if (el.getAttributeValue("MODIFY").equalsIgnoreCase("true"))
-                                    {
-                                        rp.setAction(Constants.DELETE);
-                                        if ((el.getAttributeValue("COPY").equalsIgnoreCase("true"))
-                                                &&(el.getAttributeValue("DUPLICATE").equalsIgnoreCase("true"))
-                                                &&(el.getAttributeValue("PRINT").equalsIgnoreCase("true")))
-                                        {
-                                            rp.setAction(Constants.ADMIN);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        policies.add(rp);
-                    } catch (NullPointerException ex) {
+                    }catch (ParseException ex) {
                         java.util.logging.Logger.getLogger(METSRightsCrosswalk.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    assignPermissions(context, dso, policies);
-                }
-                else
-                {
-                    //also get reference to the <Permissions> element
-                    Element permsElement = element.getChild("Permissions", METSRights_NS);
-
+                    
                     //Check if this permission pertains to Anonymous users
                     if(ANONYMOUS_CONTEXTCLASS.equals(contextClass))
                     {
                         //get DSpace Anonymous group, ID=0
-                        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+                        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);;
                         if(anonGroup==null)
                         {
                             throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Anonymous Group is missing from the database.");
                         }
 
-                        assignPermissions(context, dso, anonGroup, permsElement);
+                        rp.setGroup(anonGroup);
                     } // else if this permission declaration pertains to Administrators
                     else if(ADMIN_CONTEXTCLASS.equals(contextClass))
                     {
                         //get DSpace Administrator group, ID=1
-                        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+                        Group adminGroup = groupService.findByName(context, Group.ADMIN);;
                         if(adminGroup==null)
                         {
                             throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Administrator Group is missing from the database.");
                         }
 
-                        assignPermissions(context, dso, adminGroup, permsElement);
+                        rp.setGroup(adminGroup);
                     } // else if this permission pertains to another DSpace group
                     else if(GROUP_CONTEXTCLASS.equals(contextClass))
                     {
@@ -600,8 +546,8 @@ public class METSRightsCrosswalk
                                         + "Please restore this group using the SITE AIP, or recreate it.");
                             }
 
-                            //assign permissions to group on this object
-                            assignPermissions(context, dso, group, permsElement);
+                            //assign group to policy
+                            rp.setGroup(group);
                         }
                         catch(PackageException pe)
                         {
@@ -609,7 +555,7 @@ public class METSRightsCrosswalk
                             //We'll just wrap it as a CrosswalkException and throw it upwards
                             throw new CrosswalkException(pe);
                         }
-                    }//end if Group
+                    }// else if this permission pertains to a DSpace person
                     else if(PERSON_CONTEXTCLASS.equals(contextClass))
                     {
                         //we need to find the person it pertains to
@@ -638,11 +584,19 @@ public class METSRightsCrosswalk
                                     + "Please restore this Person object using the SITE AIP, or recreate it.");
                         }
 
-                        //assign permissions to person on this object
-                        assignPermissions(context, dso, person, permsElement);
+                        //assign person to the policy
+                        rp.setEPerson(person);
                     }//end if Person
-                    else
+                    else {
                         log.error("Unrecognized CONTEXTCLASS:  " + contextClass);
+                    }
+                    
+                    //set permissions on policy and add to object
+                    rp.setAction(parsePermissions(permsElement));
+                	policies.add(rp);
+                	assignPermissions(context, dso, policies);
+                } catch (NullPointerException ex) {
+                    java.util.logging.Logger.getLogger(METSRightsCrosswalk.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } //end if "Context" element
         }//end while loop
