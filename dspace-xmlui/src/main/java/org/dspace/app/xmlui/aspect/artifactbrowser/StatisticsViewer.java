@@ -54,8 +54,18 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     private static final Message T_empty_title   = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.title");
     private static final Message T_empty_text    = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.text");
 
-    private static final SimpleDateFormat sdfDisplay = new SimpleDateFormat("MM'/'yyyy");
-    private static final SimpleDateFormat sdfLink    = new SimpleDateFormat("yyyy'-'M");
+    private static final ThreadLocal<DateFormat> sdfDisplay = new ThreadLocal<DateFormat>(){
+                @Override
+                protected DateFormat initialValue() {
+                    return new SimpleDateFormat("MM'/'yyyy");
+                }
+              };
+    private static final ThreadLocal<DateFormat> sdfLink    = new ThreadLocal<DateFormat>(){
+                @Override
+                protected DateFormat initialValue() {
+                    return new SimpleDateFormat("yyyy'-'M");
+                }
+              };
 
     private boolean initialised = false;
     private String reportDate = null;
@@ -164,8 +174,8 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
             HashMap<String, String> params = new HashMap<String, String>();
             for (Date date : monthlyDates)
             {
-                params.put("date", sdfLink.format(date));
-                statList.addItemXref(super.generateURL("statistics", params), sdfDisplay.format(date));
+                params.put("date", sdfLink.get().format(date));
+                statList.addItemXref(super.generateURL("statistics", params), sdfDisplay.get().format(date));
             }
         }
     }

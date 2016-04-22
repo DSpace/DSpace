@@ -10,6 +10,7 @@ package org.dspace.app.statistics;
 import org.apache.commons.lang.time.DateUtils;
 import org.dspace.core.ConfigurationManager;
 
+import java.text.DateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -37,8 +38,8 @@ public class StatisticsLoader
     private static Pattern reportMonthlyPattern;
     private static Pattern reportGeneralPattern;
 
-    private static SimpleDateFormat monthlySDF;
-    private static SimpleDateFormat generalSDF;
+    private static ThreadLocal<DateFormat>  monthlySDF;
+    private static ThreadLocal<DateFormat>  generalSDF;
 
     // one time initialisation of the regex patterns and formatters we will use
     static
@@ -48,8 +49,19 @@ public class StatisticsLoader
         reportMonthlyPattern   = Pattern.compile("report-([0-9][0-9][0-9][0-9]-[0-9]+)\\.html");
         reportGeneralPattern   = Pattern.compile("report-general-([0-9]+-[0-9]+-[0-9]+)\\.html");
 
-        monthlySDF = new SimpleDateFormat("yyyy'-'M");
-        generalSDF = new SimpleDateFormat("yyyy'-'M'-'dd");
+        monthlySDF = new ThreadLocal<DateFormat>(){
+            @Override
+            protected DateFormat initialValue() {
+                return new SimpleDateFormat("yyyy'-'M");
+            }
+          };
+
+        generalSDF = new ThreadLocal<DateFormat>() {
+            @Override
+            protected DateFormat initialValue() {
+                return new SimpleDateFormat("yyyy'-'M'-'dd");
+            }
+        };
     }
 
     /**
@@ -81,7 +93,7 @@ public class StatisticsLoader
         {
             try
             {
-                dates[i] = monthlySDF.parse(date);
+                dates[i] = monthlySDF.get().parse(date);
             }
             catch (ParseException pe)
             {
@@ -228,7 +240,7 @@ public class StatisticsLoader
                 if (statsFile == null)
                 {
                     // See if it is a monthly analysis file
-                    statsFile = makeStatsFile(thisFile, analysisMonthlyPattern, monthlySDF);
+                    statsFile = makeStatsFile(thisFile, analysisMonthlyPattern, monthlySDF.get());
                     if (statsFile != null)
                     {
                         // If it is, add it to the map
@@ -240,7 +252,7 @@ public class StatisticsLoader
                 if (statsFile == null)
                 {
                     // See if it is a monthly report file
-                    statsFile = makeStatsFile(thisFile, reportMonthlyPattern, monthlySDF);
+                    statsFile = makeStatsFile(thisFile, reportMonthlyPattern, monthlySDF.get());
                     if (statsFile != null)
                     {
                         // If it is, add it to the map
@@ -252,7 +264,7 @@ public class StatisticsLoader
                 if (statsFile == null)
                 {
                     // See if it is a general analysis file
-                    statsFile = makeStatsFile(thisFile, analysisGeneralPattern, generalSDF);
+                    statsFile = makeStatsFile(thisFile, analysisGeneralPattern, generalSDF.get());
                     if (statsFile != null)
                     {
                         // If it is, ensure that we are pointing to the most recent file
@@ -267,7 +279,7 @@ public class StatisticsLoader
                 if (statsFile == null)
                 {
                     // See if it is a general report file
-                    statsFile = makeStatsFile(thisFile, reportGeneralPattern, generalSDF);
+                    statsFile = makeStatsFile(thisFile, reportGeneralPattern, generalSDF.get());
                     if (statsFile != null)
                     {
                         // If it is, ensure that we are pointing to the most recent file
@@ -297,7 +309,7 @@ public class StatisticsLoader
      * @param thisPattern
      * @param sdf
      */
-    private static StatsFile makeStatsFile(File thisFile, Pattern thisPattern, SimpleDateFormat sdf)
+    private static StatsFile makeStatsFile(File thisFile, Pattern thisPattern, DateFormat sdf)
     {
         Matcher matcher = thisPattern.matcher(thisFile.getName());
         if (matcher.matches())
