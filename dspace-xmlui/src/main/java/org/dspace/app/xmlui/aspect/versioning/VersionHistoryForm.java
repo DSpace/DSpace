@@ -197,7 +197,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
                 if(!isItemView)
                 {
-                    row.addCell().addXref(contextPath + "/item/versionhistory?versioning-continue=" + knot.getId() + "&versionID=" + version.getId() + "&itemID=" + version.getItem().getID() + "&submit_update", T_submit_update);
+                    row.addCell().addXref(contextPath + "/item/versionhistory?versioning-continue=" + knot.getId() + "&versionID=" + version.getID() + "&itemID=" + version.getItem().getID() + "&submit_update", T_submit_update);
                 }
             }
         }
