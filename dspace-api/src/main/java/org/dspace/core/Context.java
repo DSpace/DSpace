@@ -105,7 +105,17 @@ public class Context
     /**
      * Check to get ItemWrapper on demand {@link Item}
      */
-    private boolean requiredItemWrapper = true;
+    private boolean requiredItemWrapper;
+
+    /** A stack with the history of the requiredItemWrapper check modify */
+    private Stack<Boolean> itemWrapperChangeHistory;
+    
+    /**
+     * A stack with the name of the caller class that modify requiredItemWrapper
+     * system check
+     */
+    private Stack<String> itemWrapperCallHistory;
+    
     
     /**
      * Construct a new context object with default options. A database connection is opened.
@@ -160,12 +170,16 @@ public class Context
         currentLocale = I18nUtil.DEFAULTLOCALE;
         extraLogInfo = "";
         ignoreAuth = false;
+        requiredItemWrapper = true;
 
         objectCache = new HashMap<String, Object>();
         specialGroups = new ArrayList<Integer>();
 
         authStateChangeHistory = new Stack<Boolean>();
         authStateClassCallHistory = new Stack<String>();
+        
+        itemWrapperChangeHistory = new Stack<Boolean>();
+        itemWrapperCallHistory = new Stack<String>();
     }
 
     /**
@@ -741,8 +755,71 @@ public class Context
         return requiredItemWrapper;
     }
 
-    public void setRequiredItemWrapper(boolean requiredItemWrapper)
-    {
-        this.requiredItemWrapper = requiredItemWrapper;
-    }
+    /**
+    * Turn Off the Item Wrapper for this context and store this change
+    * in a history for future use.
+    */
+   public void turnOffItemWrapper()
+   {
+       itemWrapperChangeHistory.push(requiredItemWrapper);
+       if (log.isDebugEnabled())
+       {
+           Thread currThread = Thread.currentThread();
+           StackTraceElement[] stackTrace = currThread.getStackTrace();
+           String caller = stackTrace[stackTrace.length - 1].getClassName();
+
+           itemWrapperCallHistory.push(caller);
+       }
+       requiredItemWrapper = false;
+   }
+   
+   
+   /**
+    * Restore the previous item wrapper system state. If the state was not
+    * changed by the current caller a warning will be displayed in log. Use:
+    * <code>
+    *     mycontext.turnOffItemWrapper();
+    *     some java code that require no item wrapper
+    *     mycontext.restoreItemWrapperState(); 
+        * </code> If Context debug is enabled, the correct sequence calling will be
+    * checked and a warning will be displayed if not.
+    */
+   public void restoreItemWrapperState()
+   {
+       Boolean previousState;
+       try
+       {
+           previousState = itemWrapperChangeHistory.pop();
+       }
+       catch (EmptyStackException ex)
+       {
+           log.warn(LogManager.getHeader(this, "restore_itemwrap_sys_state",
+                   "not previous state info available "
+                           + ex.getLocalizedMessage()));
+           previousState = Boolean.FALSE;
+       }
+       if (log.isDebugEnabled())
+       {
+           Thread currThread = Thread.currentThread();
+           StackTraceElement[] stackTrace = currThread.getStackTrace();
+           String caller = stackTrace[stackTrace.length - 1].getClassName();
+
+           String previousCaller = (String) itemWrapperCallHistory.pop();
+
+           // if previousCaller is not the current caller *only* log a warning
+           if (!previousCaller.equals(caller))
+           {
+               log
+                       .warn(LogManager
+                               .getHeader(
+                                       this,
+                                       "restore_itemwrap_sys_state",
+                                       "Class: "
+                                               + caller
+                                               + " call restore but previous state change made by "
+                                               + previousCaller));
+           }
+       }
+       requiredItemWrapper = previousState.booleanValue();
+   }
 }
