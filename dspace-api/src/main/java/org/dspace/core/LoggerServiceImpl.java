@@ -109,17 +109,8 @@ public class LoggerServiceImpl implements KernelStartupCallbackService
                             fatal("Can't load dspace provided log4j configuration from " + logConfigFile.getAbsolutePath(), e);
                         }
 
-                        // Merge the loaded log4j props with those in ConfigurationService
-                        // This ensures variable substitution can be used in log4j.properties (e.g. ${log.dir})
-                        // NOTE: if the same setting exists in both places, the setting in ConfigurationService
-                        // overwrites the one in log4j.properties. This lets you easily override default log4j
-                        // settings in your DSpace configs
-                        Properties mergedProps = new Properties();
-                        mergedProps.putAll(log4jProps);
-                        mergedProps.putAll(config.getProperties());
-
-                        // Configure log4j based on all the loaded properties
-                        PropertyConfigurator.configure(mergedProps);
+                        // Configure log4j based on all its properties
+                        PropertyConfigurator.configure(log4jProps);
                     }
                 }
                 else
