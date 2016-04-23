@@ -134,14 +134,12 @@ public class DB {
 				else {
 					// Solo nos interesa coger el campo apellidos
 					String[] newKey = key.split(",");
-					sql = sql.replace("?", "'%" + newKey[0].toLowerCase()
-							+ "%'");
+					sql = sql.replace("?", "'" + newKey[0] + "'");
 					// en caso de que lleve un segundo parámetro
 					if (sql.contains("@") && newKey.length>1){
-						sql = sql.replace("@", "'%"
-								+ newKey[1].toLowerCase().trim() + "%'");
+						sql = sql.replace("@", "'"	+ newKey[1].replaceAll("^\\s*","")+"'");
 					}else{
-						sql = sql.replace("@", "'%"+""+"%'");
+						sql = sql.replace("@", "''");
 					}
 				}
 				rs = stmt.executeQuery(sql);
@@ -578,9 +576,6 @@ public class DB {
 	    }
 	    return personas;
 	}
-
-	
-	
 	
 	private DatosPersona poblarPersona(ResultSet rs) throws SQLException {
 	    DatosPersona persona=new DatosPersona();
@@ -748,6 +743,24 @@ public class DB {
 			}
 		    }
 		}
+
+		@Override
+		public String toString() {
+		    StringBuffer s=new StringBuffer();
+		    s.append("orcid:").append(orcid).append("\n");
+		    s.append("googleScholar:").append(googleScholar).append("\n");
+		    s.append("researcherID:").append(researcherID).append("\n");
+		    s.append("scopusID:").append(scopusID).append("\n");
+		    s.append("dialnet:").append(dialnet).append("\n");
+		    s.append("id:").append(id).append("\n");
+		    s.append("nombre:").append(nombre).append("\n");
+		    s.append("apellidos:").append(apellidos).append("\n");
+		    s.append("centro:").append(centro).append("\n");
+		    s.append("email:").append(email).append("\n");
+		    
+		    return s.toString();
+		}
+    		
 
 	}
 

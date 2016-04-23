@@ -307,7 +307,17 @@ public class AuthorProfile extends DSpaceObject
             return new AuthorProfile(context, row);
         }
     }
+    public static AuthorProfile findByEmail(Context context, String email) throws SQLException {
+        
+	  TableRow row;
 
+	  int field=MetadataField.findByElement(context, MetadataSchema.find(context, "authorProfile").getSchemaID(),"email",null).getFieldID();
+	  row = DatabaseManager.querySingle(context, "select authorprofile_id from authorprofile as a join metadatavalue as r on (a.authorprofile_id=r.resource_id and r.metadata_field_id=? and r.text_value=?)", field, email);
+	  if(row!=null){
+	      return new AuthorProfile(context,row);
+	  }
+	  return null;
+    }
 
 
     public static AuthorProfile[] findAll(Context context) throws SQLException {

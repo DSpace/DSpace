@@ -2025,10 +2025,10 @@ public class Item extends DSpaceObject
         authorities[i] = c.values.length > 0 ? c.values[0].authority : null;
 
         // Modificación hecha para que coja el valor de autoridad en vez de el escrito por el usuario
-        if(authorities[i]!=null){
-            Choice aux= c.values[0];
-            values[0]=aux.value;
-        }
+//        if(authorities[i]!=null){
+//            Choice aux= c.values[0];
+//            values[0]=aux.value;
+//        }
 
         //Fin modificación
 

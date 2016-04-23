@@ -1640,7 +1640,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 return new DiscoverResult();
             }
             SolrQuery solrQuery = resolveToSolrQuery(context, discoveryQuery, includeUnDiscoverable);
-
+            log.info("search. SolrQuery"+solrQuery.toString());
 
             QueryResponse queryResponse = getSolr().query(solrQuery);
             return retrieveResult(context, discoveryQuery, queryResponse);

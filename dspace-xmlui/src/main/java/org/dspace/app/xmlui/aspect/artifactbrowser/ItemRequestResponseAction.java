@@ -20,17 +20,21 @@ import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.Bitstream;
+import org.dspace.core.Utils;
 import org.dspace.content.Bundle;
 import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
+import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.utils.DSpace;
 
 import javax.mail.MessagingException;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
@@ -172,32 +176,40 @@ public class ItemRequestResponseAction extends AbstractAction
 	        return true;
     	}
     	return false;
-	}
+    }
 
-	private void processSendDocuments(Context context,Request request, RequestItem requestItem,Item item,String title) throws SQLException, MessagingException, IOException {
+    private void processSendDocuments(Context context,Request request, RequestItem requestItem,Item item,String title) throws SQLException, MessagingException, IOException {
     	String message = request.getParameter("message");
-    	String subject = request.getParameter("subject");
-    	
-    	Email email = new Email();
-        email.setSubject(subject);
-        email.setContent("{0}");
-		email.addRecipient(requestItem.getReqEmail());
-        email.addArgument(message);
+	        
+        EPerson submiter = item.getSubmitter();
+    	Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.aprove"));
+         
+	email.addRecipient(requestItem.getReqEmail());
+	//email.addArgument(message);
+        email.addArgument(requestItem.getReqName());
+        email.addArgument("");    
+        email.addArgument("");      
+        email.addArgument(HandleManager.getCanonicalForm(item.getHandle()));      // User agent
+        email.addArgument(title);    // request item title
+        email.addArgument(message);   // message
+        email.addArgument(getLinkTokenDownload(context, request,requestItem));    //#   token link 
+        email.addArgument(submiter.getFullName());    //#   submmiter name
+        email.addArgument(submiter.getEmail());    //#   submmiter email
        
-        if (requestItem.isAllfiles()){
-            Bundle[] bundles = item.getBundles("ORIGINAL");
-            for (int i = 0; i < bundles.length; i++){
-                Bitstream[] bitstreams = bundles[i].getBitstreams();
-                for (int k = 0; k < bitstreams.length; k++){
-                    if (!bitstreams[k].getFormat().isInternal() /*&& RequestItemManager.isRestricted(context, bitstreams[k])*/){
-                        email.addAttachment(BitstreamStorageManager.retrieve(context, bitstreams[k].getID()), bitstreams[k].getName(), bitstreams[k].getFormat().getMIMEType());
-                    }
-                }
-            }
-        } else {
-            Bitstream bit = Bitstream.find(context,requestItem.getBitstreamId());
-            email.addAttachment(BitstreamStorageManager.retrieve(context, requestItem.getBitstreamId()), bit.getName(), bit.getFormat().getMIMEType());
-        }     
+//        if (requestItem.isAllfiles()){
+//            Bundle[] bundles = item.getBundles("ORIGINAL");
+//            for (int i = 0; i < bundles.length; i++){
+//                Bitstream[] bitstreams = bundles[i].getBitstreams();
+//                for (int k = 0; k < bitstreams.length; k++){
+//                    if (!bitstreams[k].getFormat().isInternal() /*&& RequestItemManager.isRestricted(context, bitstreams[k])*/){
+//                        email.addAttachment(BitstreamStorageManager.retrieve(context, bitstreams[k].getID()), bitstreams[k].getName(), bitstreams[k].getFormat().getMIMEType());
+//                    }
+//                }
+//            }
+//        } else {
+//            Bitstream bit = Bitstream.find(context,requestItem.getBitstreamId());
+//            email.addAttachment(BitstreamStorageManager.retrieve(context, requestItem.getBitstreamId()), bit.getName(), bit.getFormat().getMIMEType());
+//        }     
         
         email.send();
 
@@ -209,13 +221,20 @@ public class ItemRequestResponseAction extends AbstractAction
 	private void processDeny(Context context,Request request, RequestItem requestItem,Item item,String title) throws SQLException, IOException, MessagingException {
 		String message = request.getParameter("message");
     	String subject = request.getParameter("subject");
-    	        
-    	Email email = new Email();
-        email.setSubject(subject);
-        email.setContent("{0}");
-		email.addRecipient(requestItem.getReqEmail());
-        email.addArgument(message);
-        email.send();
+    	EPerson submiter = item.getSubmitter();
+    	
+	Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.reject"));
+        email.addRecipient(requestItem.getReqEmail());
+        
+        email.addArgument(requestItem.getReqName());
+        email.addArgument("");    
+        email.addArgument("");      
+        email.addArgument(HandleManager.getCanonicalForm(item.getHandle()));      // User agent
+        email.addArgument(title);    // request item title
+        email.addArgument(message);   // message
+        email.addArgument("");    //#   token link 
+        email.addArgument(submiter.getFullName());    //#   submmiter name
+        email.addArgument(submiter.getEmail());    //#   submmiter email
         
         requestItem.setDecision_date(new Date());
         requestItem.setAccept_request(false);
@@ -262,4 +281,17 @@ public class ItemRequestResponseAction extends AbstractAction
 
         email.send();
     }
+    
+    	private Object getLinkTokenDownload(Context context,Request request, RequestItem requestItem) {
+		String base = ConfigurationManager.getProperty("dspace.url");
+	        String token=Utils.generateHexKey();
+	        requestItem.setToken_descarga(token);
+	        request.getPathInfo();
+	        String specialLink = (new StringBuffer()).append(base).append(
+	                base.endsWith("/") ? "" : "/").append(
+	                "itemRequestFileDownload/").append(token)
+	                .toString()+"/";
+	        
+	        return specialLink;
+		}
 }

@@ -206,7 +206,7 @@
         <heading>submit.progressbar.describe</heading>
         <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
         <jspui-binding>org.dspace.app.webui.submit.step.JSPDescribeStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.DescribeStep</xmlui-binding>
+		<xmlui-binding>es.arvo.dspace.app.xmlui.aspect.submission.submit.DescribeStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>
       </step>
 
@@ -320,14 +320,14 @@
       <!--Step 4 will be to Upload the item-->
       <!-- ARVO: Deshabilitamos la subida de ficheros especial ( si eras de bbdd no era obligatorio y si eras de mail si)
       	Quiza en un futuro vuelvan a quererla -->
-     <!--  <step>
+       <step>
         <heading>submit.progressbar.upload</heading>
         <processing-class>es.arvo.dspace.submit.step.UploadStep</processing-class>
         <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
 		<xmlui-binding>es.arvo.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>
       </step>
- -->
+ <!-- -->
        <!-- Step 4 Upload Item with Embargo Features (not supported in JSPUI)
             to enable this step, please make sure to comment-out the previous step "UploadStep"
        <step>
@@ -431,7 +431,14 @@
            <workflow-editable>true</workflow-editable>
        </step>
         -->
-
+       <step>
+        <heading>submit.progressbar.upload</heading>
+        <processing-class>es.arvo.dspace.submit.step.UploadStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
+		<xmlui-binding>es.arvo.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>
+      
  	  <!--Step 5 will be to Verify/Review everything -->
  	  <step>
         <heading>submit.progressbar.verify</heading>

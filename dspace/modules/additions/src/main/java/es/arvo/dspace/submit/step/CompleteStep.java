@@ -34,6 +34,8 @@ import org.dspace.xmlworkflow.XmlWorkflowManager;
 
 import com.ibm.icu.text.SimpleDateFormat;
 
+import es.arvo.openaire.reputation.ReputationCalculator;
+
 /**
  * This is the class which defines what happens once a submission completes!
  * <P>
@@ -150,28 +152,43 @@ public class CompleteStep extends AbstractProcessingStep
   
         if(revisionToken!=null){
             // Añadimos a la revision datos obligatorios sobre el item:
-            // ADAN: Ñapa para que los enlaces sean clicakbles en la demo 
+ 
             Item itemRevisado=(Item) HandleManager.resolveToObject(context, revisionToken.getHandleRevisado());
             if(itemRevisado!=null && itemRevisado.getType()==Constants.ITEM){
         	if(revisionToken.getTipo().equalsIgnoreCase("R")){
-        	    subInfo.getSubmissionItem().getItem().addMetadata("dc", "title", null,Item.ANY,(itemRevisado).getMetadata("dc.title")+" (Revisión de)");
-        	    //                        subInfo.getSubmissionItem().getItem().addMetadata("dc", "relation", "isrelatedtoItem",Item.ANY, ConfigurationManager.getProperty("handle.canonical.prefix")+revisionToken.getHandleRevisado());
+        	    subInfo.getSubmissionItem().getItem().addMetadata("dc", "title", null,Item.ANY,(itemRevisado).getMetadata("dc.title")+" [Review]");
+        	    //                        subInfo.getSubmissionItem().getItem().addMetadata("dc", "relation", "isrelatedtoItem",Item.ANY, +revisionToken.getHandleRevisado());
         	    //                        itemRevisado.addMetadata("dc", "relation", "isrelatedtoRevision",Item.ANY, ConfigurationManager.getProperty("handle.canonical.prefix")+ subInfo.getSubmissionItem().getItem().getHandle());
-        	    subInfo.getSubmissionItem().getItem().addMetadata("dc", "relation", "isrelatedtoItem",Item.ANY, ConfigurationManager.getProperty("dspace.url")+"/"+revisionToken.getHandleRevisado());
+        	    if(ConfigurationManager.getBooleanProperty("openaire.modo.produccion")){
+        		subInfo.getSubmissionItem().getItem().addMetadata("dc", "relation", "isrelatedtoItem",Item.ANY, ConfigurationManager.getProperty("handle.canonical.prefix")+revisionToken.getHandleRevisado());
+        	    }else{
+        		subInfo.getSubmissionItem().getItem().addMetadata("dc", "relation", "isrelatedtoItem",Item.ANY, ConfigurationManager.getProperty("dspace.url")+"/handle/"+revisionToken.getHandleRevisado());
+        	    }
+        	    
         	    subInfo.getSubmissionItem().getItem().addMetadata("dc", "date", "issued",Item.ANY,sdf.format(new Date()));
         	    
         	    itemRevisado.addMetadata("dc", "relation", "isrelatedtoRevision",Item.ANY, ConfigurationManager.getProperty("dspace.url")+"/"+ subInfo.getSubmissionItem().getItem().getHandle());
 
         	    itemRevisado.clearMetadata("oprm", "item", "hasRevision", Item.ANY);
         	    itemRevisado.addMetadata("oprm", "item", "hasRevision",Item.ANY, REVISED);
-
+        	    ReputationCalculator.calculoRapido(context,itemRevisado,revisionToken);
         	}else if(revisionToken.getTipo().equalsIgnoreCase("J")){
         	    //            		subInfo.getSubmissionItem().getItem().addMetadata("dc", "title", null,Item.ANY,(itemRevisado).getMetadata("dc.title")+" (Juicio de)");
         	    //            		subInfo.getSubmissionItem().getItem().addMetadata("dc", "relation", "isrelatedtoRevision",Item.ANY, ConfigurationManager.getProperty("handle.canonical.prefix")+revisionToken.getHandleRevisado());
-        	    subInfo.getSubmissionItem().getItem().addMetadata("dc", "title", null,Item.ANY,(itemRevisado).getMetadata("dc.title")+" (Juicio de)");
-        	    subInfo.getSubmissionItem().getItem().addMetadata("dc", "relation", "isrelatedtoRevision",Item.ANY, ConfigurationManager.getProperty("dspace.url")+"/"+revisionToken.getHandleRevisado());
+        	    String title=(itemRevisado).getMetadata("dc.title");
+        	    if(title!=null){
+        		title=title.replaceAll("\\(Revisión de\\)", "").replaceAll("\\[Review\\]", "");
+        	    }
+        	    subInfo.getSubmissionItem().getItem().addMetadata("dc", "title", null,Item.ANY,title+"[Comment]");
         	    subInfo.getSubmissionItem().getItem().addMetadata("dc", "date", "issued",Item.ANY,sdf.format(new Date()));
-        	    itemRevisado.addMetadata("dc", "relation", "isrelatedtoJuicio",Item.ANY, ConfigurationManager.getProperty("dspace.url")+"/"+subInfo.getSubmissionItem().getItem().getHandle());
+        	    if(ConfigurationManager.getBooleanProperty("openaire.modo.produccion")){
+            	    	subInfo.getSubmissionItem().getItem().addMetadata("dc", "relation", "isrelatedtoRevision",Item.ANY, ConfigurationManager.getProperty("handle.canonical.prefix")+revisionToken.getHandleRevisado());
+            	    	itemRevisado.addMetadata("dc", "relation", "isrelatedtoJuicio",Item.ANY, ConfigurationManager.getProperty("handle.canonical.prefix")+subInfo.getSubmissionItem().getItem().getHandle());
+        	    }else{
+        		subInfo.getSubmissionItem().getItem().addMetadata("dc", "relation", "isrelatedtoRevision",Item.ANY, ConfigurationManager.getProperty("dspace.url")+"/handle/"+revisionToken.getHandleRevisado());
+            	    	itemRevisado.addMetadata("dc", "relation", "isrelatedtoJuicio",Item.ANY, ConfigurationManager.getProperty("dspace.url")+"/handle/"+subInfo.getSubmissionItem().getItem().getHandle());
+        	    }
+        	    ReputationCalculator.calculoRapido(context,itemRevisado,revisionToken);
         	} 
         	itemRevisado.update();
         	subInfo.getSubmissionItem().getItem().update();

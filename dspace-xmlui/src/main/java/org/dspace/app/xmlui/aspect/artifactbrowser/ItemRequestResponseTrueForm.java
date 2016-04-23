@@ -51,7 +51,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Adán Román Ruiz at arvo.es (added request item support)
  */
-public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer
 {
     /** Language Strings */
     private static final Message T_title =
@@ -80,25 +80,6 @@ public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer imple
 
     private static final Message T_subject = 
             message("xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.subject");
-    
-    /**
-     * Generate the unique caching key.
-     * This key must be unique inside the space of this component.
-     */
-    public Serializable getKey() {      
-		String token = parameters.getParameter("token", "");
-		String decision = parameters.getParameter("decision", "");
-
-		return HashUtil.hash(token+"-"+decision);
-    }
-
-    /**
-     * Generate the cache validity object.
-     */
-    public SourceValidity getValidity() 
-    {
-        return NOPValidity.SHARED_INSTANCE;
-    }
     
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
@@ -150,14 +131,10 @@ public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer imple
         itemRequest.addPara(T_para1);
                 
         List form = itemRequest.addList("form",List.TYPE_FORM);
-        Text subj = form.addItem().addText("subject");
-        subj.setLabel(T_subject);
-        subj.setValue(subject);
-        subj.setSize(60);
+                
         TextArea message = form.addItem().addTextArea("message");
-        message.setSize(20, 0);
         message.setLabel(T_message);
-        message.setValue(parameters.getParameter("message",messageTemplate));
+        message.setValue(parameters.getParameter("message",""));
         form.addItem().addHidden("decision").setValue(parameters.getParameter("decision",""));
         form.addItem().addButton("back").setValue(T_back);
         form.addItem().addButton("mail").setValue(T_mail);

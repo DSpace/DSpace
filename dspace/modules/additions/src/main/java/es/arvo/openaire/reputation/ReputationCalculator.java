@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.AuthorProfile;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -17,6 +16,7 @@ import org.dspace.content.Metadatum;
 import org.dspace.content.RevisionToken;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DB;
 
 import es.arvo.dspace.submit.step.CompleteStep;
@@ -27,7 +27,7 @@ public class ReputationCalculator {
     public static int  REVISIONES_K=2;
     public static int  JUICIOS_K=2;
     // Factor de decrecimiento de la disminucion de impacto de la reputacion habiendo varios autores.
-    public static double ALPHA=1;
+    public static double ALPHA=Double.parseDouble(ConfigurationManager.getProperty("openaire.reputation.calculation.alpha"));
     // Valor minimo en el que se tienen que mover la reputacion de todos los revisores del repositorio para parar el bucle. 
     public static int  DIFERENCIAL_REVISORES=1;
 
@@ -74,7 +74,7 @@ public class ReputationCalculator {
 	    }while(reputationChange>DIFERENCIAL_AUTORES);
 
 	    context.turnOffAuthorisationSystem();
-	    printReputaciones();
+	  //  printReputaciones();
 	    
 	    guardarReputacionPublicaciones(context);
 	    guardarReputacionRevisiones(context);
@@ -130,18 +130,18 @@ private void printReputaciones() {
     	while(it.hasNext()){
     		String key=(String) it.next();
     		Integer reputacion=reputacionAutoridades.get(key);
-    		if(reputacion!=DEFAULT_REPUTATION){
+    		
     			System.out.println(key+":"+reputacion);
-    		}
+    		
     	}
     	it=reputacionRevisores.keySet().iterator();
     	System.out.println("Reputacion de revisores");
     	while(it.hasNext()){
     		String key=(String) it.next();
     		Integer reputacion=reputacionRevisores.get(key.toString());
-    		if(reputacion!=DEFAULT_REPUTATION){
+    		
     			System.out.println(key+":"+reputacion);
-    		}
+    		
     	}
     	it=reputacionRevisiones.keySet().iterator();
     	System.out.println("Reputacion de revisiones");
@@ -163,19 +163,27 @@ private void printReputaciones() {
     	}
 	}
 
-	private void guardarReputacionAutoridades(Context context) throws SQLException, AuthorizeException {
-	AuthorProfile[] authorProfiles=AuthorProfile.findAll(context);
-	for(int i=0;i<authorProfiles.length;i++){
-	    guardarReputacionAutoridad(context,authorProfiles.clone()[i]); 
-	}
+    private void guardarReputacionAutoridades(Context context) throws SQLException, AuthorizeException {
+        AuthorProfile[] authorProfiles=AuthorProfile.findAll(context);
+        for(int i=0;i<authorProfiles.length;i++){
+            guardarReputacionAutoridad(context,authorProfiles[i]); 
+        }
     }
 
     private void guardarReputacionAutoridad(Context context, AuthorProfile authorProfile) throws SQLException, AuthorizeException {
-	authorProfile.clearMetadata("authorProfile", "reputacion", "autor", Item.ANY);
-	authorProfile.clearMetadata("authorProfile", "reputacion", "revisor", Item.ANY);
-	String id=authorProfile.getMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA+".authority.id");
 	String email=authorProfile.getMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA+".email");
-	if(StringUtils.isBlank(email)){
+	String id=authorProfile.getMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA+".authority.id");
+	
+	// Si el profile no tiene id, intentamos encontrar uno en la bbdd de autoridades
+	if(StringUtils.isBlank(id) && StringUtils.isNotBlank(email)){
+	    String[] authority=DB.getInstance().executeQueryUnique(ConfigurationManager.getProperty("openaire.sql.author.getByEmail"), "'"+email+"'");
+	    if(authority!=null && authority.length>0){
+		id=authority[0];
+	    }
+	}
+	
+	boolean hasChanges=false;
+	if(StringUtils.isBlank(email) && StringUtils.isNotBlank(id)){
 	    String[] results=DB.getInstance().executeQueryUnique(ConfigurationManager.getProperty("openaire.emailFromId"),id);
 	    if(results!=null && results.length>0){
 		email=results[0];
@@ -183,17 +191,38 @@ private void printReputaciones() {
 	}
 	
 	if(StringUtils.isNotBlank(email)){
-	    if(reputacionRevisores.containsKey(email)){
-		authorProfile.addMetadata("authorProfile", "reputacion", "revisor", Item.ANY,""+reputacionRevisores.get(email));
+	  //  String reputacionAnterior=authorProfile.getMetadata("authorProfile.reputacion.revisor");
+	    Integer reputacionNueva=reputacionRevisores.get(email);
+	    //if(reputacionRevisores.containsKey(email) && !reputacionNueva.toString().equals(reputacionAnterior)){
+	    //if(reputacionNueva!=null && reputacionAnterior!=null){
+	    if(authorProfile.getMetadata("authorProfile", "reputacion", "revisor", Item.ANY)!=null && authorProfile.getMetadata("authorProfile", "reputacion", "revisor", Item.ANY).length>0){
+		authorProfile.clearMetadata("authorProfile", "reputacion", "revisor", Item.ANY);
+		hasChanges=true;
 	    }
+	    if(reputacionNueva!=null && reputacionNueva!=DEFAULT_REPUTATION){
+		authorProfile.addMetadata("authorProfile", "reputacion", "revisor", Item.ANY,""+reputacionRevisores.get(email));
+		hasChanges=true;
+	    }
+	    
 	}
-	authorProfile.addMetadata("authorProfile", "reputacion",  "autor", Item.ANY,""+reputacionAutoridades.get(id));
-	authorProfile.update();
-	 context.commit();
+
+	String reputacionAnterior=authorProfile.getMetadata("authorProfile.reputacion.autor");
+	String reputacionNueva=reputacionAutoridades.get(id)==null?null:reputacionAutoridades.get(id).toString();
+	if(!(reputacionAnterior==null && reputacionNueva==null) && ((reputacionAnterior!=null && !reputacionAnterior.equalsIgnoreCase(reputacionNueva))  || (reputacionNueva!=null && !reputacionNueva.equalsIgnoreCase(reputacionAnterior)))){
+	    authorProfile.clearMetadata("authorProfile", "reputacion", "autor", Item.ANY);
+	    hasChanges=true;
+	}
+	if(reputacionNueva!=null && !reputacionNueva.equals(reputacionAnterior)){
+	    authorProfile.addMetadata("authorProfile", "reputacion",  "autor", Item.ANY,""+reputacionAutoridades.get(id));
+	    hasChanges=true;
+	}
+	if(hasChanges){
+	    authorProfile.update();
+	    context.commit();
+	}
     }
 
     private void guardarReputacionRevisiones(Context context) throws SQLException, NumberFormatException, AuthorizeException {
-	revisionesToken=RevisionToken.findAllRevisiones(context);
 	for(int i=0;i<revisionesToken.length;i++){
 	    guardarReputacionRevision(context,revisionesToken[i]);
 	}
@@ -202,18 +231,24 @@ private void printReputaciones() {
 
     private void guardarReputacionRevision(Context context, RevisionToken revisionToken) throws NumberFormatException, SQLException, AuthorizeException {
 	Item item=Item.find(context, Integer.parseInt(revisionToken.getRevisionId()));
-	item.clearMetadata("oprm", "reputacion", null, Item.ANY);
-	item.addMetadata("oprm", "reputacion", null, Item.ANY,""+reputacionRevisiones.get(revisionToken.getRevisionTokenId()));
-	item.update();
-	context.commit();
+	Integer reputacion=reputacionRevisiones.get(revisionToken.getRevisionTokenId());
+	String reputacionAnterior=item.getMetadata("oprm.reputacion");
+	if(reputacion!=null && !reputacion.toString().equals(reputacionAnterior)){
+	    item.clearMetadata("oprm", "reputacion", null, Item.ANY);
+	    item.addMetadata("oprm", "reputacion", null, Item.ANY,""+reputacionRevisiones.get(revisionToken.getRevisionTokenId()));
+	    item.update();
+	    context.commit();
+	}
     }
 
     private void guardarReputacionPublicaciones(Context context) throws SQLException, AuthorizeException, IOException {
-    	ItemIterator itemIterator=Item.findAllNoRevisionesNiJuicios(context);
-    	while(itemIterator.hasNext()){
-    		Item item=itemIterator.next();
-    		guardarReputacionPublicacion(item);
-    	}
+	Integer[] ids=reputacionPublicaciones.keySet().toArray(new Integer[0]);
+	for(int i=0;i<ids.length;i++){
+	    Item item=Item.find(context, ids[i]);
+	    if(item!=null){
+		guardarReputacionPublicacion(item);
+	    }
+	}
     }
 
     private void guardarReputacionPublicacion(Item item) throws SQLException, AuthorizeException, IOException {
@@ -251,7 +286,6 @@ private void printReputaciones() {
      * @throws SQLException
      */
     private void loadRevisores() throws SQLException {
-	
 	revisionesToken=RevisionToken.findAllRevisiones(context);
 	for(int i=0;i<revisionesToken.length;i++){
 	    reputacionRevisores.put(revisionesToken[i].getEmail(), DEFAULT_REPUTATION);
@@ -326,7 +360,7 @@ private void printReputaciones() {
 			reputacionEnjuiciador=DEFAULT_REPUTATION;
 		    }
 		    denominador+=reputacionEnjuiciador;
-		    numerador+=reputacionEnjuiciador*calculaPuntuacionRevisionToken(juicios.get(i));
+		    numerador+=reputacionEnjuiciador*calculaPuntuacionRevisionToken(context,juicios.get(i));
 		}
 		reputacionRevisiones.put(revisionToken.getRevisionTokenId(),numerador/denominador);
 	    }
@@ -341,7 +375,7 @@ private void printReputaciones() {
      * @throws SQLException 
      * @throws NumberFormatException 
      */
-    private int calculaPuntuacionRevisionToken(RevisionToken revisionToken) throws NumberFormatException, SQLException {
+    private static int calculaPuntuacionRevisionToken(Context context,RevisionToken revisionToken) throws NumberFormatException, SQLException {
 	Item itemRevision=Item.find(context, Integer.parseInt(revisionToken.getRevisionId()));
 //	int eje1=(Integer.parseInt(itemRevision.getMetadata("oprm.eje1.value")));
 //	float media=(Float.parseFloat(itemRevision.getMetadata("oprm.eje2.value"))+Float.parseFloat(itemRevision.getMetadata("oprm.eje3.value"))+Float.parseFloat(itemRevision.getMetadata("oprm.eje4.value")))/3f;
@@ -355,18 +389,23 @@ private void printReputaciones() {
 	}else{
 	    return Integer.parseInt(itemRevision.getMetadata("oprm.clasificacion"));
 	}
-	
     }
 
     private void calcularReputacionPublicaciones() throws SQLException, NumberFormatException, IOException, AuthorizeException {
-	ItemIterator itemIterator=Item.findAllNoRevisionesNiJuicios(context);
-	while(itemIterator.hasNext()){
-	    Item item=itemIterator.next();
+	//ItemIterator itemIterator=Item.findAllNoRevisionesNiJuicios(context);
+	ArrayList<String> itemsACalcular=new ArrayList<String>();
+	for(int i=0;i<revisionesToken.length;i++){
+	    itemsACalcular.add(revisionesToken[i].getHandleRevisado());
+	}
+	for(int i=0;i<itemsACalcular.size();i++){
+	    Item item= (Item) HandleManager.resolveToObject(context, itemsACalcular.get(i));
 	    // guardo la reputacion inicial
-	    if(item.getMetadata("oprm.reputacion")!=null && !item.getMetadata("oprm.reputacion").equalsIgnoreCase("null")){
-		reputacionPublicacionesInicial.put(item.getID(),Integer.parseInt(item.getMetadata("oprm.reputacion")));
+	    if(item!=null){
+		if(item.getMetadata("oprm.reputacion")!=null && !item.getMetadata("oprm.reputacion").equalsIgnoreCase("null")){
+		    reputacionPublicacionesInicial.put(item.getID(),Integer.parseInt(item.getMetadata("oprm.reputacion")));
+		}
+		calcularReputacionPublicacion(item);
 	    }
-	    calcularReputacionPublicacion(item);
 	}
     }
 
@@ -390,7 +429,7 @@ private void printReputaciones() {
 	    int numerador=0;
 	    for(int i=0;i<revisiones.size();i++){
 		denominador+=reputacionRevisores.get(revisiones.get(i).getEmail());
-		numerador+=reputacionRevisores.get(revisiones.get(i).getEmail())*calculaPuntuacionRevisionToken(revisiones.get(i));
+		numerador+=reputacionRevisores.get(revisiones.get(i).getEmail())*calculaPuntuacionRevisionToken(context,revisiones.get(i));
 	    }
 	    reputacionPublicaciones.put(item.getID(),numerador/denominador);
 	}
@@ -417,11 +456,14 @@ private void printReputaciones() {
 	    while(itemIterator.hasNext()){
 		Item itemDeAutor=itemIterator.next();
 		//System.out.println("itemId:"+itemDeAutor.getID());
-		numPublicacionesAutor++;
-		int numAutores=itemDeAutor.getMetadata("dc", "contributor", "author", Item.ANY).length;
-		int publicationReputation=reputacionPublicaciones.get(itemDeAutor.getID());
-		double gamma=Math.pow(1/(double)numAutores, ALPHA);
-		sumaReputacionesPublicaciones+=(((publicationReputation)*(gamma))+(((1-(gamma))*50)));
+		// Si no tiene reputacion calculada no se tiene en cuenta
+		if(reputacionPublicaciones.get(itemDeAutor.getID())!=null){
+        		numPublicacionesAutor++;
+        		int numAutores=itemDeAutor.getMetadata("dc", "contributor", "author", Item.ANY).length;
+        		int publicationReputation=reputacionPublicaciones.get(itemDeAutor.getID())==null?DEFAULT_REPUTATION:reputacionPublicaciones.get(itemDeAutor.getID());
+        		double gamma=Math.pow(1/(double)numAutores, ALPHA);
+        		sumaReputacionesPublicaciones+=(((publicationReputation)*(gamma))+(((1-(gamma))*50)));
+		}
 	    }
 	    reputacionAutoridades.put(autoridad,sumaReputacionesPublicaciones/numPublicacionesAutor);
 	    valorFinal=sumaReputacionesPublicaciones/numPublicacionesAutor;
@@ -433,9 +475,66 @@ private void printReputaciones() {
     }
 
     public static void main(String[] argv) throws Exception{
+    		String usage = "[-r] to reset metadata and undexing of \"has revision\".";
+    		for(int i=0;i<argv.length;i++){
+    		    if(argv[i].contains("-r")){
+    			new ReputationCalculator().reindexHasRevision();
+    		    }
+    		}
 	new ReputationCalculator().run();
     }
+    private void reindexHasRevision() {
+    	System.out.println("Reindexing hasRevision index");
+    	Context context=null;
 
+    	try {
+    		context= new Context();
+    		context.turnOffAuthorisationSystem();;
+    		ItemIterator itemIterator = Item.findAll(context);
+    		int count=0;
+    		while(itemIterator.hasNext()){
+    			actualizarHasRevision(context,itemIterator.next());
+    			count++;
+    			if(count%100==0){
+    				context.commit();
+    				context.clearCache();
+    				System.out.println("Updated:"+count);
+    			}
+    		}
+    		context.commit();
+    	} catch (SQLException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    	} catch (AuthorizeException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    	} catch (IOException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    	}finally{
+    		if (context!=null && context.isValid()){
+    			context.restoreAuthSystemState();
+    			context.abort();
+    		}
+    	}
+    }
+
+    private void actualizarHasRevision(Context context,Item item) throws SQLException, AuthorizeException, IOException {
+    	if(item.getHandle()!=null){
+    		ArrayList<RevisionToken> revisiones=RevisionToken.findRevisionsOfHandle(context,item.getHandle());
+    		String tieneRevisiones=item.getMetadata("oprm.item.hasRevision");
+    		boolean haschanges=false;
+    		if(tieneRevisiones==null || (!tieneRevisiones.equals(revisiones.size()>0?CompleteStep.REVISED:CompleteStep.NOT_REVISED))){
+    			item.clearMetadata("oprm", "item", "hasRevision", Item.ANY);
+    			item.addMetadata("oprm", "item", "hasRevision", Item.ANY, revisiones.size()>0?CompleteStep.REVISED:CompleteStep.NOT_REVISED);
+    			haschanges=true;
+    		}
+
+    		if(haschanges){
+    			item.update();
+    		}
+    	}
+    }
 //
 //    private static int calculateRevisionPublication(Context context,Item item,HashMap<String, Reputation> autoridades, ArrayList<RevisionToken> revisiones) throws SQLException {
 //    	int sumaReputacionesRevisor=0;
@@ -495,7 +594,52 @@ private void printReputaciones() {
 	return mejorReputacion;
     }  
 
-   
+    // Actualiza la reputacion de la publicacion si se añade una nueva revision (aproximado)
+    // Actualiza la reputacion de la revision y de la publicacion si se añade una nueva revision (aproximado)
+   public static void calculoRapido(Context context,Item itemRevisado, RevisionToken revisionToken) throws IOException, SQLException, AuthorizeException {
+       if(revisionToken.getTipo().equals("R")){
+	   String reputacionPublicacion=itemRevisado.getMetadata("oprm.reputacion");
+       
+	   ArrayList<RevisionToken> revisiones=RevisionToken.findRevisionsOfHandle(context, itemRevisado.getHandle());
+	
+	   // Si es la que genera puntuacion
+       	   if(revisiones.size()>=REVISIONES_K && (reputacionPublicacion== null || reputacionPublicacion.equalsIgnoreCase("null"))){
+       	       int numerador=0;
+       	       int denominador=0;
+       	       for(int i=0;i<revisiones.size();i++){
+       		   AuthorProfile profile=AuthorProfile.findByEmail(context, revisiones.get(i).getEmail());
+       		   int reputacion=DEFAULT_REPUTATION;
+       		   if(profile!=null && profile.getMetadata("authorProfile.reputacion.revisor")!=null){
+       		       reputacion=Integer.parseInt(profile.getMetadata("authorProfile.reputacion.revisor"));
+       		   }
+       		   numerador +=reputacion*calculaPuntuacionRevisionToken(context,revisiones.get(i));
+       		   denominador+=reputacion;
+       	       }
+       	       itemRevisado.addMetadata("oprm", "reputacion", null, Item.ANY,""+numerador/denominador);  	       
+       	       // Si ya hay opinion
+       	   }else if(revisiones.size()<REVISIONES_K){
+       	       // Por si acaso quitamos la reputacion
+       	       itemRevisado.clearMetadata("oprm", "reputacion", null, Item.ANY);
+       	   }else{
+       	       // Lo cogemos de la bbdd porque revisionToken esta sin actualizar
+       	       RevisionToken ultimaRevision=RevisionToken.find(context, revisionToken.getToken());
+       	       AuthorProfile profile=AuthorProfile.findByEmail(context, ultimaRevision.getEmail());
+       	       int reputacionRevisor=DEFAULT_REPUTATION;
+       	       if(profile!=null && profile.getMetadata("authorProfile.reputacion.revisor")!=null){
+       		   try {
+		    reputacionRevisor=Integer.parseInt(profile.getMetadata("authorProfile.reputacion.revisor"));
+       		   } catch (NumberFormatException e) {/*no pasa nada*/}
+       	       }
+
+       	       int numRevisiones=revisiones.size();
+       	       int valoracionRevision=calculaPuntuacionRevisionToken(context,ultimaRevision);
+       	       itemRevisado.clearMetadata("oprm", "reputacion", null, Item.ANY);
+       	       itemRevisado.addMetadata("oprm", "reputacion", null, Item.ANY,""+(((numRevisiones-1)*Integer.parseInt(reputacionPublicacion))+(valoracionRevision*(1-(reputacionRevisor/100))))/numRevisiones);  	       
+       	   }
+       }else if(revisionToken.getTipo().equals("J")){
+	   // Por ahora nada
+       }
+   }
 }
 // class ItemReputation{
 //     	RevisionToken revisionToken;

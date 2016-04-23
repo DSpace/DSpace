@@ -207,14 +207,16 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
 		requesterEmail.setHelp(T_requesterEmail_help);
 		requesterEmail.setValue(parameters.getParameter("requesterEmail", ""));
 
-		Radio radio = form.addItem().addRadio("allFiles");
-		String selected=!parameters.getParameter("allFiles","true").equalsIgnoreCase("false")?"true":"false";
-		radio.setOptionSelected(selected);
-		radio.setLabel(T_files);
-		radio.addOption("true", T_allFiles);
-		radio.addOption("false", T_notAllFiles);
+		// ARVO: Quitamos la seleccion de todos los ficheros por el envio de enlaces en lugar del propio fichero
+//		Radio radio = form.addItem().addRadio("allFiles");
+//		String selected=!parameters.getParameter("allFiles","true").equalsIgnoreCase("false")?"true":"false";
+//		radio.setOptionSelected(selected);
+//		radio.setLabel(T_files);
+//		radio.addOption("true", T_allFiles);
+//		radio.addOption("false", T_notAllFiles);
+		Hidden allFiles = form.addItem().addHidden("allFiles");
+		allFiles.setValue("false");
 		
-
 		TextArea message = form.addItem().addTextArea("message");
 		message.setLabel(T_message);
 		message.setValue(parameters.getParameter("message", ""));

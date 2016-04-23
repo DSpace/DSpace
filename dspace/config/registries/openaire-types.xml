@@ -29,6 +29,12 @@
   </dc-type>
   
   <dc-type>
+	<schema>dc</schema>
+    <element>description</element>
+    <qualifier>affiliation</qualifier>
+  </dc-type>
+  
+  <dc-type>
 	<schema>oprm</schema>
     <element>revisor</element>
     <qualifier>mail</qualifier>
@@ -66,9 +72,14 @@
 
   <dc-type>
 	<schema>oprm</schema>
-    <element>opinion</element>
+    <element>comentario</element>
   </dc-type>
-
+  
+ <dc-type>
+	<schema>oprm</schema>
+    <element>revision</element>
+  </dc-type>
+  
   <dc-type>
 	<schema>oprm</schema>
     <element>item</element>
