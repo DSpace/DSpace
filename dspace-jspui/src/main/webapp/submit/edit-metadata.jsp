@@ -1264,7 +1264,7 @@
                       sb.append("radio");
                    if (readonly)
                    {
-                       sb.append("\" readonly=\"readonly\");
+                       sb.append("\" readonly=\"readonly\"");
                    }
                    sb.append("\" name=\"")
                      .append(fieldName)
