@@ -281,30 +281,12 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Text journalField = addJournalAuthorityControlled("prism_publicationName", optionsList, "prism_publicationName");
 	    journalField.setHelp(T_asterisk_explanation);
 
-        // MANUSCRIPT NUMBER
-        Text manuText = newItem.addText("manu-number-status-accepted");
-        if (request.getParameter("manu-number-status-accepted") != null) {
-            manuText.setValue(request.getParameter("manu-number-status-accepted"));
-        }
-        manuText.setLabel(T_MANU_LABEL_NEW);
-        manuText.setHelp(T_MANU_HELP);
-        //Add an error message should our manuscript be invalid
-        if (this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ENTER_MANUSCRIPT_NUMBER) {
-            //Show the error coming from our manuscript !
-            manuText.addError(String.valueOf(request.getSession().getAttribute("submit_error")));
-            //We are done clear it
-            request.getSession().setAttribute("submit_error", null);
-        }
-
         // CHECKBOX: CONFIRM MANUSCRIPT NUMBER ACCEPTANCE
         CheckBox checkBox = newItem.addCheckBox("manu_accepted-cb");
         checkBox.addOption(String.valueOf(Boolean.TRUE), T_MANU_ACC_LABEL);
 
         if (manuscript!=null && manuscript.isAccepted()) {
             journalField.setValue(manuscript.getJournalName());
-            if (manuscript.getManuscriptId() != null) {
-                manuText.setValue(manuscript.getManuscriptId());
-            }
         } else {
             journalField.setValue(request.getParameter("prism_publicationName"));
         }

@@ -247,16 +247,14 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
         // Look for a manuscript number
         String manuscriptNumber = request.getParameter("manu");
-        if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) {
-            String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
-            manuscriptNumber = manuscriptNumberAcc;
+        if (manuscriptNumber != null) {
             manuscriptNumber = manuscriptNumber.trim();
         }
 
         request.getSession().setAttribute("submit_error", "");
         if (journalConcept.getIntegrated()) {
             addEmailsAndEmbargoSettings(journalConcept, item);
-            if (manuscriptNumber != null && manuscriptNumber.trim().equals("")) {
+            if (manuscriptNumber != null && manuscriptNumber.equals("")) {
                 // we just use this empty manuscript with the journal only.
                 log.debug("manuscript number is empty or nonexistent");
             } else {
