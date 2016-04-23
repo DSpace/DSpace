@@ -267,25 +267,17 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                     }
 
                     if (articleStatus != null) {
-                        boolean manuscriptNumberInvalid = true;
                         // the Article Status chosen must match the specified manuscript's status. Otherwise, it's invalid.
                         if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_ACCEPTED) {
                             if (manuscript.isAccepted() || manuscript.isPublished()) {
                                 item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
                                 item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "true");
-                                manuscriptNumberInvalid = false;
                             }
                         } else if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_IN_REVIEW) {
                             if (manuscript.isSubmitted() || manuscript.isNeedsRevision()) {
                                 item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
                                 item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "false");
-                                manuscriptNumberInvalid = false;
                             }
-                        }
-
-                        if (manuscriptNumberInvalid) {
-                            request.getSession().setAttribute("submit_error", "This manuscript is not in the status you selected.");
-                            return false;
                         }
                     }
                 } else if (manuscript.getMessage().equals("Invalid manuscript number")) {
