@@ -25,9 +25,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
 /**
- * Simple page to let the user know their feedback has been sent.
- * 
- * @author Scott Phillips
+ * @author Adán Roman Ruiz at arvo.es
  */
 public class SolicitarCorreccionSent extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {

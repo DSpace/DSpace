@@ -49,7 +49,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 
 /**
- * @author Scott Phillips
+ * @author Adán Roman Ruiz at arvo.es
  */
 
 public class SendRevisarAction extends AbstractAction

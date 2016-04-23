@@ -37,6 +37,7 @@ import org.dspace.core.ConfigurationManager;
  * selected from a choice list.
  *
  * @author  Brian S. Hughes
+ * @author Adán Roman Ruiz at arvo.es
  * @version $Revision$
  */
 

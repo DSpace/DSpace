@@ -15,7 +15,7 @@
     Author: lieven.droogmans at atmire.com
     Author: ben at atmire.com
     Author: Alexey Maslov
-
+    Author Adán Roman Ruiz at arvo.es
 -->
 
 <xsl:stylesheet

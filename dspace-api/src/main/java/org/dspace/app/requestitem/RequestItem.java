@@ -18,6 +18,7 @@ import java.util.Date;
 
 /**
  * Object representing an Item Request
+ * @author Adán Roman Ruiz at arvo.es
  */
 public class RequestItem {
     private static Logger log = Logger.getLogger(RequestItem.class);

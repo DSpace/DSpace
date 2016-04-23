@@ -27,7 +27,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 
 /**
- * @author Scott Phillips
+ * @author Adán Roman Ruiz at arvo.es
  */
 
 public class SendSolicitarCorreccionAction extends AbstractAction

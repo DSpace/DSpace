@@ -45,6 +45,7 @@ import org.dspace.eperson.EPerson;
  * administrators distinct from epersons that select must come first.
  * 
  * @author Scott Phillips
+ * @author Adán Roman Ruiz at arvo.es
  */
 
 public class AuthenticatedOrTokenSelector extends AbstractLogEnabled implements

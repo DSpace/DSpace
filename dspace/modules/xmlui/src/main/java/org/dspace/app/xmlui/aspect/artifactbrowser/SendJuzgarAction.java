@@ -49,7 +49,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.core.Constants;
 /**
- * @author Scott Phillips
+ * @author Adán Roman Ruiz at arvo.es
  */
 
 public class SendJuzgarAction extends AbstractAction
