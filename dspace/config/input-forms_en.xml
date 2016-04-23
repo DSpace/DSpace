@@ -49,8 +49,19 @@
          <repeatable>false</repeatable>
          <label>Author</label>
          <input-type>name</input-type>
-         <hint>Enter the name of review author.</hint>
-         <required>Youn must enter the name of review author.</required>
+         <hint>Enter your name.</hint>
+         <required>You must enter your name.</required>
+       </field>
+
+       <field>
+	 <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>affiliation</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Affiliation</label>
+         <input-type>onebox</input-type>
+         <hint>Enter your affiliation.</hint>
+         <required>You must enter your affiliation.</required>
        </field>
 
        <field>
@@ -60,8 +71,8 @@
          <repeatable>false</repeatable>
          <label>Language</label>
          <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-         <hint>Select the language.</hint>
-         <required>You must select the language.</required>
+         <hint>Select the language of your review.</hint>
+         <required>You must select the language of your review.</required>
        </field>
 
        <field>
@@ -71,8 +82,8 @@
          <repeatable>false</repeatable>
          <label>Copyright, use and reproduction.</label>
          <input-type value-pairs-name="common_rights">dropdown</input-type>
-         <hint>Copyright, use and reproduction.</hint>
-         <required>Copyright, use and reproduction.</required>
+         <hint>Copyright, use and reproduction of your review.</hint>
+         <required>Copyright, use and reproduction of your review.</required>
        </field>
 
        <field>
@@ -82,8 +93,8 @@
          <repeatable>false</repeatable>
          <label>Link to terms of use and reproduction.</label>
          <input-type value-pairs-name="common_uri_rights">dropdown</input-type>
-         <hint>Link to terms of use and reproduction.</hint>
-         <required>Link to terms of use and reproduction.</required>
+         <hint>Link to terms of use and reproduction of your review.</hint>
+         <required>Link to terms of use and reproduction of your review.</required>
        </field>
 
        <field>
@@ -92,31 +103,20 @@
          <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
          <label>Type</label>
-         <input-type value-pairs-name="common_revision_types">dropdown</input-type>
-         <hint>Type</hint>
-         <required>Type</required>
+         <input-type value-pairs-name="common_review_types">dropdown</input-type>
+         <hint>Resource type</hint>
+         <required>Resource type</required>
        </field>
 
        <field>
 	 <dc-schema>oprm</dc-schema>
-         <dc-element>eje1</dc-element>
-         <dc-qualifier>value</dc-qualifier>
-         <repeatable></repeatable>
-         <label>Scientific standard</label>
-         <input-type value-pairs-name="common_value_eje1s">dropdown</input-type>
-         <hint>Has this article reached scientific standards (option 1) or needs revisions (option 0)? Scientific standards refer to various relevant parameters, such as the methodology employed, the clarity of presentation, the use of language, the inclusion of important references, etc.</hint>
-         <required>You must select option 0 or option 1.</required>
-       	</field>
-
-       	<field>
-	 <dc-schema>oprm</dc-schema>
          <dc-element>eje2</dc-element>
          <dc-qualifier>value</dc-qualifier>
          <repeatable></repeatable>
-         <label>Importance of this article for its field.</label>
+         <label>Importance of this work for its academic field</label>
          <input-type value-pairs-name="common_value_eje2s">dropdown</input-type>
-         <hint>Rate in a scale from 0-100 the importance of this article for its specific academic field.</hint>
-         <required>You must rate the importance of this article.</required>
+         <hint>Rate in a scale from 0-100 the importance of this work for its academic field. [0-100]</hint>
+         <required>You must rate the importance of this work.</required>
        	</field>
 
        	<field>
@@ -124,10 +124,10 @@
          <dc-element>eje3</dc-element>
          <dc-qualifier>value</dc-qualifier>
          <repeatable></repeatable>
-         <label>General interest of this article for other academic fields.</label>
+         <label>General interest</label>
          <input-type value-pairs-name="common_value_eje3s">dropdown</input-type>
-         <hint>Rate in a scale from 0-100 how interesting is this article for other academic fields.</hint>
-         <required>You must rate the general interest of this article.</required>
+         <hint>Rate in a scale from 0-100 how interesting this work is for other academic fields. [0-100]</hint>
+         <required>You must rate how interesting this work is.</required>
        	</field>
        	
        <field>
@@ -135,32 +135,43 @@
          <dc-element>eje4</dc-element>
          <dc-qualifier>value</dc-qualifier>
          <repeatable></repeatable>
-         <label>Importance of this article for society in general</label>
+         <label>Social value</label>
          <input-type value-pairs-name="common_value_eje4s">dropdown</input-type>
-         <hint>Rate in a scale from 0-100 the importance of this article for society in general (social value: how relevant is this research for solving contemporary problems).</hint>
-         <required>You must rate the importance of this article.</required>
+         <hint>Rate in a scale from 0-100 the importance of this work for society in general (social value: how relevant this work is for the problems society is currently facing). [0-100]</hint>
+         <required>You must rate the importance of this work for society in general.</required>
        	</field>
 
         <field>
 	 <dc-schema>oprm</dc-schema>
-         <dc-element>opinion</dc-element>
+         <dc-element>revision</dc-element>
          <dc-qualifier></dc-qualifier>
          <repeatable></repeatable>
-         <label>Opinion about the article</label>
+         <label>Review text</label>
          <input-type>textarea</input-type>
-         <hint>Please provide below your detailed opinion about the article, including all necessary information to help its authors improve their work. Try to be constructive in your criticism. If you need to submit formatted text with figures, equations, etc., you will later have the opportunity to attach one or more additional files.</hint>
-         <required>You must write your opinion about the article.</required>
+         <hint>Please provide below your detailed review about the work, including all necessary information to help its authors improve their contribution. Try to be constructive in your criticism. If you need to submit formatted text with figure, equations, etc., you will later have the opportunity to attach one or more additional files.</hint>
+         <required>You must write a review text.</required>
        	</field>
 
         <field>
+         <dc-schema>oprm</dc-schema>
+         <dc-element>eje1</dc-element>
+         <dc-qualifier>value</dc-qualifier>
+         <repeatable></repeatable>
+         <label>Scientific standards</label>
+         <input-type value-pairs-name="common_value_eje1s">dropdown</input-type>
+         <hint>Choose option 1 if you consider that the work is scientifically acceptable. Choose option 0 if you consider that the authors should revise the work taking into account your evaluation. The scientific standard refers to various relevant parameters such as methodology, clarity of presentation, use of language, inclusion of key references, methodological soundness, etc.</hint>
+         <required>You must select option 0 or option 1.</required>
+       	</field>
+
+       	<field>
 	 <dc-schema>oprm</dc-schema>
          <dc-element>clasificacion</dc-element>
          <dc-qualifier></dc-qualifier>
          <repeatable></repeatable>
-         <label>Global classification of the article</label>
+         <label>Overall quality</label>
          <input-type value-pairs-name="common_value_clasificaciones">dropdown</input-type>
-         <hint>Rate in a scale from 0-100 the article globally.</hint>
-         <required>You must rate the article globally.</required>
+         <hint>Provide in a scale from 0-100 your overall quality assessment for this work [0-100].</hint>
+         <required>You must provide your overall quality assessment for this work.</required>
        	</field>
       </page>
     </form>
@@ -172,10 +183,21 @@
          <dc-element>contributor</dc-element>
          <dc-qualifier>author</dc-qualifier>
          <repeatable>false</repeatable>
-         <label>Author</label>
+         <label>Author.</label>
          <input-type>name</input-type>
-         <hint>Enter the name of review author.</hint>
-         <required>Youn must enter the name of review author.</required>
+         <hint>Enter your name.</hint>
+         <required>Enter your name.</required>
+       </field>
+
+       <field>
+	 <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>affiliation</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Affiliation.</label>
+         <input-type>onebox</input-type>
+         <hint>Enter your affiliation.</hint>
+         <required>You must enter your affilitation.</required>
        </field>
 
        <field>
@@ -185,8 +207,8 @@
          <repeatable>false</repeatable>
          <label>Language</label>
          <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-         <hint>Select the language.</hint>
-         <required>You must select the language.</required>
+         <hint>Select the language of your annotation.</hint>
+         <required>You must select the language of your annotation.</required>
        </field>
 
        <field>
@@ -196,8 +218,8 @@
          <repeatable>false</repeatable>
          <label>Copyright, use and reproduction.</label>
          <input-type value-pairs-name="common_rights">dropdown</input-type>
-         <hint>Copyright, use and reproduction.</hint>
-         <required>Copyright, use and reproduction.</required>
+         <hint>Copyright, use and reproduction of your annotation.</hint>
+         <required>Copyright, use and reproduction of your annotation.</required>
        </field>
 
        <field>
@@ -207,8 +229,8 @@
          <repeatable>false</repeatable>
          <label>Link to terms of use and reproduction.</label>
          <input-type value-pairs-name="common_uri_rights">dropdown</input-type>
-         <hint>Link to terms of use and reproduction.</hint>
-         <required>Link to terms of use and reproduction.</required>
+         <hint>Link to terms of use and reproduction of your annotation.</hint>
+         <required>Link to terms of use and reproduction of your annotation.</required>
        </field>
 
        <field>
@@ -217,20 +239,20 @@
          <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
          <label>Type</label>
-         <input-type value-pairs-name="common_revision_types">dropdown</input-type>
-         <hint>Type</hint>
-         <required>Type</required>
+         <input-type value-pairs-name="common_annotation_types">dropdown</input-type>
+         <hint>Resource type</hint>
+         <required>Resource type</required>
        </field>
 
         <field>
 	 <dc-schema>oprm</dc-schema>
-         <dc-element>opinion</dc-element>
+         <dc-element>comentario</dc-element>
          <dc-qualifier></dc-qualifier>
          <repeatable></repeatable>
-         <label>Opinion about the article</label>
+         <label>Your comment on the review</label>
          <input-type>textarea</input-type>
-         <hint>Please provide below your detailed opinion about the article, including all necessary information to help its authors improve their work. Try to be constructive in your criticism. If you need to submit formatted text with figures, equations, etc., you will later have the opportunity to attach one or more additional files.</hint>
-         <required>You must write your opinion about the article.</required>
+         <hint>Please provide below your detailed comment about the work’s review. Try to be constructive in your criticism. If you need to submit formatted text with figure, equations, etc., you will later have the opportunity to attach one or more additional files.</hint>
+         <required>You must provide your detailed comment about the work’s review.</required>
        	</field>
 
         <field>
@@ -238,10 +260,10 @@
          <dc-element>clasificacion</dc-element>
          <dc-qualifier></dc-qualifier>
          <repeatable></repeatable>
-         <label>Global classification of the article</label>
+         <label>Overall quality</label>
          <input-type value-pairs-name="common_value_clasificaciones">dropdown</input-type>
-         <hint>Rate in a scale from 0-100 the article globally.</hint>
-         <required>You must rate the article globally.</required>
+         <hint>Provide in a scale from 0-100 your overall quality assessment for this review [0-100].</hint>
+         <required>You must provide your overall quality assessment for this review.</required>
        	</field>
       </page>
     </form>
@@ -869,7 +891,7 @@
        <repeatable>false</repeatable>
        <label>Embargo</label>
        <input-type>onebox</input-type>
-       <hint>Rellene el metadato embargo (dc.date.embargoEndDate) solo si la editorial determina un tiempo de carencia, en el que su archivo no deba estar visible, o si no tiene permiso del editor para colocar el archivo de su trabajo en abierto y quiere almacenarlo no visible. En el primer caso, la fecha de embargo deberá rellenarla con formato 'yyyy-mm-dd'; en el segundo, la casilla la rellenará con la palabra 'indefinido', en minúscula. El fichero de su trabajo quedará custodiado, para siempre, por el IEO. Cumplimentado el embargo, aparecerá, automáticamente, un candado desde el que cualquier usuario podrá solicitarle, pulsándolo, una copia electrónica de su archivo, que usted decidirá si enviar o no. Legalmente, podría enviar hasta 30 copias de un trabajo publicado que no tenga permiso para depósito en abierto. Si lo prefiere, puede almacenar un fichero sin el trabajo, en el que se indica únicamente que el texto completo no se encuentra disponible por no existir versión digital o por restricciones de copyright. En este caso, el fichero que deberá subir será el AccesoRestringido.pdf http://hdl.handle.net/10508/508. La fecha de embargo deberá ser, lógicamente, posterior a la actual, si no, al terminar de subir el archivo, el programa mostrará un error interno.</hint>
+       <hint>Rellene el metadato embargo (dc.date.embargoEndDate) solo si la editorial determina un tiempo de carencia, en el que su archivo no deba estar visible, o si no tiene permiso del editor para colocar el archivo de su trabajo en abierto y quiere almacenarlo no visible. En el primer caso, la fecha de embargo deberá rellenarla con formato 'yyyy-mm-dd'; en el segundo, la casilla la rellenará con la palabra 'indefinido', en minúscula. El fichero de su trabajo quedará custodiado, para siempre, por el IEO. Cumplimentado el embargo, aparecerá, automáticamente, un candado desde el que cualquier usuario podrá solicitarle, pulsándolo, una copia electrónica de su archivo, que usted decidirá si enviar o no. Si lo prefiere, puede almacenar un fichero sin el trabajo, en el que se indica únicamente que el texto completo no se encuentra disponible por no existir versión digital o por restricciones de copyright. En este caso, el fichero que deberá subir será el AccesoRestringido.pdf http://hdl.handle.net/10508/508. La fecha de embargo deberá ser, lógicamente, posterior a la actual, si no, al terminar de subir el archivo, el programa mostrará un error interno.</hint>
        <required></required>
     </field>
 
@@ -2384,37 +2406,52 @@
 
    <value-pairs value-pairs-name="common_rights" dc-term="rights">
      <pair>
-       <displayed-value>Atribución-NoComercial-SinDerivadas 3.0 España</displayed-value>
-       <stored-value>Atribución-NoComercial-SinDerivadas 3.0 España</stored-value>
+       <displayed-value>Attribution 4.0 International</displayed-value>
+       <stored-value>Attribution 4.0 International</stored-value>
      </pair>
    </value-pairs>
 
    <value-pairs value-pairs-name="common_uri_rights" dc-term="rights_uri">
      <pair>
-       <displayed-value>http://creativecommons.org/licenses/by-nc-nd/3.0/es/</displayed-value>
-       <stored-value>http://creativecommons.org/licenses/by-nc-nd/3.0/es/</stored-value>
+       <displayed-value>http://creativecommons.org/licenses/by/4.0/</displayed-value>
+       <stored-value>http://creativecommons.org/licenses/by/4.0/</stored-value>
      </pair>
    </value-pairs>
 
-   <value-pairs value-pairs-name="common_revision_types" dc-term="type">
+   <value-pairs value-pairs-name="common_review_types" dc-term="type">
      <pair>
        <displayed-value>Revisión</displayed-value>
        <stored-value>review</stored-value>
      </pair>
    </value-pairs>
 
+   <value-pairs value-pairs-name="common_annotation_types" dc-term="type">
+     <pair>
+       <displayed-value>Comentario</displayed-value>
+       <stored-value>comment</stored-value>
+     </pair>
+   </value-pairs>
+
    <value-pairs value-pairs-name="common_value_eje1s" dc-term="eje1">
+     <pair>
+       <displayed-value>1</displayed-value>
+       <stored-value>1</stored-value>
+     </pair>
      <pair>
        <displayed-value>0</displayed-value>
        <stored-value>0</stored-value>
      </pair>
      <pair>
-       <displayed-value>1</displayed-value>
-       <stored-value>1</stored-value>
+       <displayed-value>No aplicable</displayed-value>
+       <stored-value>No aplicable</stored-value>
      </pair>
    </value-pairs>
 
    <value-pairs value-pairs-name="common_value_eje2s" dc-term="eje2">
+     <pair>
+       <displayed-value>No aplicable</displayed-value>
+       <stored-value>No aplicable</stored-value>
+     </pair>
      <pair>
        <displayed-value>0</displayed-value>
        <stored-value>0</stored-value>
@@ -2463,6 +2500,10 @@
 
    <value-pairs value-pairs-name="common_value_eje3s" dc-term="eje3">
      <pair>
+       <displayed-value>No aplicable</displayed-value>
+       <stored-value>No aplicable</stored-value>
+     </pair>
+     <pair>
        <displayed-value>0</displayed-value>
        <stored-value>0</stored-value>
      </pair>
@@ -2509,6 +2550,10 @@
    </value-pairs>
 
    <value-pairs value-pairs-name="common_value_eje4s" dc-term="eje4">
+     <pair>
+       <displayed-value>No aplicable</displayed-value>
+       <stored-value>No aplicable</stored-value>
+     </pair>
      <pair>
        <displayed-value>0</displayed-value>
        <stored-value>0</stored-value>

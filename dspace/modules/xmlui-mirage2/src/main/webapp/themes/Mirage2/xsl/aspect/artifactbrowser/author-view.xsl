@@ -20,7 +20,8 @@
                 xmlns:xalan="http://xml.apache.org/xalan"
                 xmlns:encoder="xalan://java.net.URLEncoder"
                 xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
-                exclude-result-prefixes="xalan encoder i18n dri mets dim  xlink xsl">
+				xmlns:confman="org.dspace.core.ConfigurationManager"
+                exclude-result-prefixes="xalan encoder i18n dri mets dim  xlink xsl confman">
 
 
     <xsl:template name="authorSummaryView-DIM">
@@ -315,7 +316,7 @@
         <div class="ds-author-bio">
             <p>
                 <xsl:variable name="bio" select="."/>
-                <xsl:value-of select="util:shortenString($bio, 530, 5)" disable-output-escaping="yes"/>
+                <xsl:value-of select="util:shortenString($bio, 800, 5)" disable-output-escaping="yes"/>
             </p>
         </div>
     </xsl:template>
@@ -344,99 +345,115 @@
     </xsl:template>
 
 	<xsl:template match="dim:field[@mdschema='authorProfile' and @element='id' and @qualifier='orcid']" mode="profile">
-        <dl>
-            <dt>
-                <i18n:text>xmlui.authorprofile.administrative.field.head.authorProfileOrcidInput</i18n:text>
-            </dt>
-            <dd>
+		<xsl:param name="urlOrcid" select="confman:getProperty('url.orcid')"/>
+     
                 <span class="author-id-orcid">
-                    <xsl:value-of select="."/>
-
-                    <xsl:for-each
-                            select="./following-sibling::dim:field[@mdschema='authorProfile' and @element='id' and @qualifier='orcid']">
-                        <xsl:text>; </xsl:text>
-                        <xsl:value-of select="."/>
-                    </xsl:for-each>
+				 <a>
+	           <xsl:attribute name="target">_blank</xsl:attribute>
+			   <xsl:attribute name="href"><xsl:value-of select="$urlOrcid"/><xsl:value-of select="."/></xsl:attribute>
+			   <xsl:attribute name="class"><xsl:text>enlace_orcid</xsl:text></xsl:attribute>			   
+			   <img>
+		           <xsl:attribute name="alt"><xsl:text>Orcid</xsl:text></xsl:attribute>				   
+				   <xsl:attribute name="title"><xsl:text>Orcid</xsl:text></xsl:attribute>
+				   <xsl:attribute name="src">
+                    	<xsl:text>/</xsl:text><xsl:value-of select="confman:getProperty('dspace.ui')" />
+                    	<xsl:text>/themes/Mirage2/images/ieo/orcid_16x16.png</xsl:text>
+                    </xsl:attribute>
+				</img>
+			</a>
                 </span>
-            </dd>
-        </dl>
+     
     </xsl:template>
     
     <xsl:template match="dim:field[@mdschema='authorProfile' and @element='id' and @qualifier='google']" mode="profile">
-        <dl>
-            <dt>
-                <i18n:text>xmlui.authorprofile.administrative.field.head.authorProfileidGoogleScholarInput</i18n:text>
-            </dt>
-            <dd>
+     
                 <span class="author-id-google">
-                    <xsl:value-of select="."/>
-
-                    <xsl:for-each
-                            select="./following-sibling::dim:field[@mdschema='authorProfile' and @element='id' and @qualifier='google']">
-                        <xsl:text>; </xsl:text>
-                        <xsl:value-of select="."/>
-                    </xsl:for-each>
+				<a>
+        		<xsl:attribute name="target">_blank</xsl:attribute>
+        		<xsl:attribute name="class"><xsl:text>enlace_orcid</xsl:text></xsl:attribute>
+        		<xsl:attribute name="href">
+        			<xsl:text>http://scholar.google.es/citations?user=</xsl:text>
+        			 <xsl:value-of select="."/>
+        		</xsl:attribute>
+		        <img>
+		           <xsl:attribute name="alt"><xsl:text>Google Scholar</xsl:text></xsl:attribute>				   
+				   <xsl:attribute name="title"><xsl:text>Google Scholar</xsl:text></xsl:attribute>
+				    <xsl:attribute name="src">
+                    	<xsl:text>/</xsl:text>
+                    	<xsl:value-of select="confman:getProperty('dspace.ui')" />
+                    	<xsl:text>/themes/Mirage2/images/ieo/scholar.png</xsl:text>
+                    </xsl:attribute>
+				</img>
+			</a>
                 </span>
-            </dd>
-        </dl>
+
     </xsl:template>
     
     <xsl:template match="dim:field[@mdschema='authorProfile' and @element='id' and @qualifier='researcher']" mode="profile">
-        <dl>
-            <dt>
-                <i18n:text>xmlui.authorprofile.administrative.field.head.authorProfileidResearcherInput</i18n:text>
-            </dt>
-            <dd>
                 <span class="author-id-researcher">
-                    <xsl:value-of select="."/>
-
-                    <xsl:for-each
-                            select="./following-sibling::dim:field[@mdschema='authorProfile' and @element='id' and @qualifier='researcher']">
-                        <xsl:text>; </xsl:text>
-                        <xsl:value-of select="."/>
-                    </xsl:for-each>
+				<a>
+        		<xsl:attribute name="target">_blank</xsl:attribute>
+        		<xsl:attribute name="class"><xsl:text>enlace_orcid</xsl:text></xsl:attribute>
+        		<xsl:attribute name="href">
+        			<xsl:text>http://www.researcherid.com/rid/</xsl:text>
+        			<xsl:value-of select="."/>
+        		</xsl:attribute>
+		        <img style="">
+		           <xsl:attribute name="alt"><xsl:text>ResearcherID</xsl:text></xsl:attribute>				   
+				   <xsl:attribute name="title"><xsl:text>ResearcherID</xsl:text></xsl:attribute>
+				    <xsl:attribute name="src">
+                    	<xsl:text>/</xsl:text>
+                    	<xsl:value-of select="confman:getProperty('dspace.ui')" />
+                    	<xsl:text>/themes/Mirage2/images/ieo/researcherID.gif</xsl:text>
+                    </xsl:attribute>
+				</img>
+			</a>
                 </span>
-            </dd>
-        </dl>
     </xsl:template>
     
     <xsl:template match="dim:field[@mdschema='authorProfile' and @element='id' and @qualifier='scopus']" mode="profile">
-        <dl>
-            <dt>
-                <i18n:text>xmlui.authorprofile.administrative.field.head.authorProfileScopusInput</i18n:text>
-            </dt>
-            <dd>
                 <span class="author-id-scopus">
-                    <xsl:value-of select="."/>
-
-                    <xsl:for-each
-                            select="./following-sibling::dim:field[@mdschema='authorProfile' and @element='id' and @qualifier='scopus']">
-                        <xsl:text>; </xsl:text>
-                        <xsl:value-of select="."/>
-                    </xsl:for-each>
+				<a>
+        			<xsl:attribute name="target">_blank</xsl:attribute>
+	        		<xsl:attribute name="class"><xsl:text>enlace_orcid</xsl:text></xsl:attribute>
+	        		<xsl:attribute name="href">
+		        		<xsl:text>http://www.scopus.com/authid/detail.url?authorId=</xsl:text>
+		        		<xsl:value-of select="."/>
+	        		</xsl:attribute>
+		        <img>
+		           <xsl:attribute name="alt"><xsl:text>Scopus</xsl:text></xsl:attribute>				   
+				   <xsl:attribute name="title"><xsl:text>Scopus</xsl:text></xsl:attribute>
+				   <xsl:attribute name="src">
+                    	<xsl:text>/</xsl:text>
+                    	<xsl:value-of select="confman:getProperty('dspace.ui')" />
+                    	<xsl:text>/themes/Mirage2/images/ieo/scopus.png</xsl:text>
+                    </xsl:attribute>
+				</img>
+			</a>
                 </span>
-            </dd>
-        </dl>
     </xsl:template>
 	
 	<xsl:template match="dim:field[@mdschema='authorProfile' and @element='id' and @qualifier='dialnet']" mode="profile">
-        <dl>
-            <dt>
-                <i18n:text>xmlui.authorprofile.administrative.field.head.authorProfileDialnetInput</i18n:text>
-            </dt>
-            <dd>
-                <span class="author-id-dialnet">
-                    <xsl:value-of select="."/>
-
-                    <xsl:for-each
-                            select="./following-sibling::dim:field[@mdschema='authorProfile' and @element='id' and @qualifier='dialnet']">
-                        <xsl:text>; </xsl:text>
-                        <xsl:value-of select="."/>
-                    </xsl:for-each>
-                </span>
-            </dd>
-        </dl>
-    </xsl:template>
+				<span class="author-id-dialnet">
+					<a>
+						<xsl:attribute name="target">_blank</xsl:attribute>
+						<xsl:attribute name="class"><xsl:text>enlace_orcid</xsl:text></xsl:attribute>
+							<xsl:attribute name="href">
+		        			<xsl:text>http://dialnet.unirioja.es/servlet/autor?codigo=</xsl:text>
+	        			<xsl:value-of select="." />
+	        		</xsl:attribute>
+						<img>
+							<xsl:attribute name="alt"><xsl:text>Dialnet</xsl:text></xsl:attribute>
+							<xsl:attribute name="title"><xsl:text>Dialnet</xsl:text></xsl:attribute>
+							<xsl:attribute name="src">
+		                    	<xsl:text>/</xsl:text>
+		                    	<xsl:value-of select="confman:getProperty('dspace.ui')" />
+		                    	<xsl:text>/themes/Mirage2/images/ieo/dialnet.png</xsl:text>
+		                    </xsl:attribute>
+						</img>
+					</a>
+				</span>
+	</xsl:template>
     
     <xsl:template match="dim:field[@mdschema='authorProfile' and @element='department' ]" mode="profile">
         <dl>
@@ -597,7 +614,21 @@
             </dt>
             <dd>
                 <p>
-                    <xsl:value-of select="." disable-output-escaping="yes"/>
+        		  <span>
+               		<xsl:attribute name="title">
+                               <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion</xsl:text>
+                          </xsl:attribute>
+                          <xsl:attribute name="alt">
+                               <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion</xsl:text>
+                          </xsl:attribute>
+                          <xsl:attribute name="i18n:attr">
+						<xsl:text>title alt</xsl:text>
+					</xsl:attribute>
+					<span class="redondel">
+						<xsl:value-of  disable-output-escaping="yes" select="util:getSvg(.)"/>
+					</span>
+                    <span class="valoracion"><xsl:value-of select="." disable-output-escaping="yes"/></span>
+                 </span>
                 </p>
             </dd>
         </dl>
@@ -611,7 +642,21 @@
             </dt>
             <dd>
                 <p>
-                    <xsl:value-of select="." disable-output-escaping="yes"/>
+             	  <span>
+               		<xsl:attribute name="title">
+                               <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion</xsl:text>
+                          </xsl:attribute>
+                          <xsl:attribute name="alt">
+                               <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion</xsl:text>
+                          </xsl:attribute>
+                          <xsl:attribute name="i18n:attr">
+						<xsl:text>title alt</xsl:text>
+					</xsl:attribute>
+					<span class="redondel">
+						<xsl:value-of  disable-output-escaping="yes" select="util:getSvg(.)"/>
+					</span>
+                    <span class="valoracion"><xsl:value-of select="." disable-output-escaping="yes"/></span>
+                 </span>
                 </p>
             </dd>
         </dl>

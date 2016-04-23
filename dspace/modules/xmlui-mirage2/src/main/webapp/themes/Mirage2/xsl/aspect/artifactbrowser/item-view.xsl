@@ -15,7 +15,7 @@
     Author: lieven.droogmans at atmire.com
     Author: ben at atmire.com
     Author: Alexey Maslov
-
+    Author Adán Roman Ruiz at arvo.es
 -->
 
 <xsl:stylesheet
@@ -104,6 +104,9 @@
 
 
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
+   	<xsl:variable name="idAutor">
+    	<xsl:value-of select="$document/dri:meta/dri:userMeta/dri:metadata[@element='identifier'][not(@qualifier)]"/>
+    </xsl:variable>
         <div class="item-summary-view-metadata">
             <xsl:call-template name="itemSummaryView-DIM-title"/>
             <div class="row">
@@ -127,13 +130,20 @@
                     </xsl:if>
                     <xsl:call-template name="itemSummaryView-solicitar-correccion"/>
                     <xsl:if test="util:isRevision(/mets:METS/@OBJEDIT)">
-                    	<xsl:call-template name="itemSummaryView-DIM-juicio-revision"/>
+                    	<xsl:if test="util:canMakeJuicio($idAutor,/mets:METS/@OBJEDIT)">
+                    		<xsl:call-template name="itemSummaryView-DIM-juicio-revision"/>
+                    	</xsl:if>
                     </xsl:if>	
                     <xsl:if test="util:isItem(/mets:METS/@OBJEDIT)">
-                    	<xsl:call-template name="itemSummaryView-DIM-revision-request"/>
+                    	<xsl:if test="util:canMakeRevision($idAutor,/mets:METS/@OBJEDIT)">
+							<xsl:call-template name="itemSummaryView-DIM-revision-request"/>
+						</xsl:if>
                     </xsl:if>	
                 </div>
                 <div class="col-sm-8">
+                	<xsl:call-template name="itemSummaryView-DIM-rating"/>
+                    <xsl:call-template name="itemSummaryView-DIM-revision"/>
+                    <xsl:call-template name="itemSummaryView-DIM-comentario"/>
                     <xsl:call-template name="itemSummaryView-DIM-abstract"/>
                     <xsl:call-template name="itemSummaryView-DIM-URI"/>
                     <xsl:call-template name="itemSummaryView-collections"/>
@@ -359,13 +369,32 @@
         <xsl:if test="dim:field[@element='reputacion' and not(@qualifier)]">
             <div class="simple-item-view-date word-break item-page-field-wrapper table">
                 <h5 class="item-headers">
-                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-reputacion</i18n:text>
+               <xsl:if test="util:isRevision(/mets:METS/@OBJEDIT)">
+               		<i18n:text>xmlui.dri2xhtml.METS-1.0.revision-reputacion</i18n:text>
+               </xsl:if>	
+               <xsl:if test="util:isItem(/mets:METS/@OBJEDIT)">
+					<i18n:text>xmlui.dri2xhtml.METS-1.0.item-reputacion</i18n:text>
+               </xsl:if>	
                 </h5>
                 <xsl:for-each select="dim:field[@element='reputacion' and not(@qualifier)]">
-                    <xsl:copy-of select="./node()"/>
-                    <xsl:if test="count(following-sibling::dim:field[@element='reputacion' and not(@qualifier)]) != 0">
-                        <br />
-                    </xsl:if>
+                <div class="relacionados">
+                	<span>
+                		<xsl:attribute name="title">
+                                <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion</xsl:text>
+                           </xsl:attribute>
+                           <xsl:attribute name="alt">
+                                <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion</xsl:text>
+                           </xsl:attribute>
+                           <xsl:attribute name="i18n:attr">
+							<xsl:text>title alt</xsl:text>
+						</xsl:attribute>
+						<span class="redondel">
+							<xsl:value-of  disable-output-escaping="yes" select="util:getSvg(./node())"/>
+						</span>
+	                    <span class="valoracion"><xsl:copy-of select="./node()"/></span>
+	                 </span>
+	             </div>
+	                
                 </xsl:for-each>
             </div>
         </xsl:if>
@@ -378,16 +407,56 @@
                     <i18n:text>xmlui.dri2xhtml.METS-1.0.item-isrelatedtoRevision</i18n:text>
                 </h5>
                 <xsl:for-each select="dim:field[@element='relation' and @qualifier='isrelatedtoRevision']">
+               		<xsl:variable name="dataRelated" select="util:getDataFromReference(./node())"/>
+						<div class="relacionados">
+						 <xsl:choose>
+						 <xsl:when test="util:isItem(/mets:METS/@OBJEDIT)">
+							<span>
+								<xsl:attribute name="title">
+	                                 <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.calificacion</xsl:text>
+	                            </xsl:attribute>
+	                            <xsl:attribute name="alt">
+	                                 <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.calificacion</xsl:text>
+	                            </xsl:attribute>
+	                            <xsl:attribute name="i18n:attr">
+									<xsl:text>title alt</xsl:text>
+								</xsl:attribute>
+								<span class="redondel">
+									<xsl:value-of  disable-output-escaping="yes" select="util:getSvg($dataRelated,1)"/>
+								</span>
+								<span class="valoracion">
+									<xsl:value-of select="util:getData($dataRelated,1)"/>
+								</span>
+							</span>
+						</xsl:when>
+						<xsl:otherwise>
+							<span>
+								<xsl:attribute name="title">
+	                                 <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion</xsl:text>
+	                            </xsl:attribute>
+	                            <xsl:attribute name="alt">
+	                                 <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion</xsl:text>
+	                            </xsl:attribute>
+	                            <xsl:attribute name="i18n:attr">
+									<xsl:text>title alt</xsl:text>
+								</xsl:attribute>
+								<span class="redondel">
+									<xsl:value-of  disable-output-escaping="yes" select="util:getSvg($dataRelated,2)"/>
+								</span>
+								<span class="valoracion">
+									<xsl:value-of select="util:getData($dataRelated,2)"/>
+								</span>
+							</span>
+						</xsl:otherwise>
+						</xsl:choose>
                   		<a>
 							<xsl:attribute name="href">
                                 <xsl:copy-of select="./node()" />
                             </xsl:attribute>
-							<xsl:copy-of select="./node()" />
+							<!-- <xsl:copy-of select="./node()" />-->
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.item-isrelatedtoRevision.revisionDe</i18n:text><xsl:value-of select="util:getData($dataRelated,0)"/>
 						</a>
-						<xsl:if
-							test="count(following-sibling::dim:field[@element='relation' and @qualifier='isrelatedtoRevision']) != 0">
-							<br />
-						</xsl:if>
+					</div>
                 </xsl:for-each>
             </div>
         </xsl:if>
@@ -400,16 +469,32 @@
                     <i18n:text>xmlui.dri2xhtml.METS-1.0.item-isrelatedtoItem</i18n:text>
                 </h5>
                  <xsl:for-each select="dim:field[@element='relation' and @qualifier='isrelatedtoItem']">
+                	 <xsl:variable name="dataRelated" select="util:getDataFromReferenceItem(./node())"/>
+                	 <div class="relacionados">
+	                	 <span>
+	                	 	<xsl:attribute name="title">
+                                 <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion</xsl:text>
+                            </xsl:attribute>
+                            <xsl:attribute name="alt">
+                                 <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion</xsl:text>
+                            </xsl:attribute>
+                            <xsl:attribute name="i18n:attr">
+								<xsl:text>title alt</xsl:text>
+							</xsl:attribute>
+							<span class="redondel">
+								<xsl:value-of  disable-output-escaping="yes" select="util:getSvg($dataRelated,1)"/>
+							</span>
+							<span class="valoracion">
+								<xsl:value-of select="util:getData($dataRelated,1)"/>
+							</span>
+						</span>
                   		<a>
 							<xsl:attribute name="href">
                                 <xsl:copy-of select="./node()" />
                             </xsl:attribute>
 							<xsl:copy-of select="./node()" />
 						</a>
-						<xsl:if
-							test="count(following-sibling::dim:field[@element='relation' and @qualifier='isrelatedtoItem']) != 0">
-							<br />
-						</xsl:if>
+					</div>
                 </xsl:for-each>
             </div>
         </xsl:if>
@@ -422,21 +507,65 @@
                     <i18n:text>xmlui.dri2xhtml.METS-1.0.item-isrelatedtoJuicio</i18n:text>
                 </h5>
                 <xsl:for-each select="dim:field[@element='relation' and @qualifier='isrelatedtoJuicio']">
+                 <xsl:variable name="dataRelated" select="util:getDataFromReference(./node())"/>
+            	    <div class="relacionados">
+            	    	                	 <span>
+	                	 	<xsl:attribute name="title">
+                                 <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.calificacion</xsl:text>
+                            </xsl:attribute>
+                            <xsl:attribute name="alt">
+                                 <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.calificacion</xsl:text>
+                            </xsl:attribute>
+                            <xsl:attribute name="i18n:attr">
+								<xsl:text>title alt</xsl:text>
+							</xsl:attribute>
+							<span class="redondel">
+								<xsl:value-of  disable-output-escaping="yes" select="util:getSvg($dataRelated,1)"/>
+							</span>
+							<span class="valoracion">
+								<xsl:value-of select="util:getData($dataRelated,1)"/>
+							</span>
+						</span>
                   		<a>
 							<xsl:attribute name="href">
                                 <xsl:copy-of select="./node()" />
                             </xsl:attribute>
-							<xsl:copy-of select="./node()" />
+						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-isrelatedtoJuicio.juicioDe</i18n:text><xsl:value-of select="util:getData($dataRelated,0)"/>
 						</a>
-						<xsl:if
-							test="count(following-sibling::dim:field[@element='relation' and @qualifier='isrelatedtoJuicio']) != 0">
-							<br />
-						</xsl:if>
+					</div>
                 </xsl:for-each>
             </div>
         </xsl:if>
     </xsl:template>
-
+<xsl:template name="itemSummaryView-DIM-rating">
+       <xsl:if test="dim:field[@element='clasificacion' and not(@qualifier)]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5 class="item-headers">
+               		<i18n:text>xmlui.dri2xhtml.METS-1.0.item-clasificacion</i18n:text>
+                </h5>
+                <xsl:for-each select="dim:field[@element='clasificacion' and not(@qualifier)]">
+                <div class="relacionados">
+                	<span>
+                		<xsl:attribute name="title">
+                                <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.calificacion</xsl:text>
+                           </xsl:attribute>
+                           <xsl:attribute name="alt">
+                                <xsl:text>xmlui.dri2xhtml.METS-1.0.item-redondel.valor.calificacion</xsl:text>
+                           </xsl:attribute>
+                           <xsl:attribute name="i18n:attr">
+							<xsl:text>title alt</xsl:text>
+						</xsl:attribute>
+						<span class="redondel">
+							<xsl:value-of  disable-output-escaping="yes" select="util:getSvg(./node())"/>
+						</span>
+	                    <span class="valoracion"><xsl:copy-of select="./node()"/></span>
+	                 </span>
+	             </div>
+	                
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+    </xsl:template>    
     <xsl:template name="itemSummaryView-DIM-date">
         <xsl:if test="dim:field[@element='date' and @qualifier='issued' and descendant::text()]">
             <div class="simple-item-view-date word-break item-page-field-wrapper table">
@@ -701,7 +830,7 @@
                                     </xsl:attribute>
                                 </img>
                             </xsl:when>
-                            <xsl:otherwise>
+                           <!-- <xsl:otherwise>
                                 <img alt="Thumbnail">
                                     <xsl:attribute name="data-src">
                                         <xsl:text>holder.js/100%x</xsl:text>
@@ -709,7 +838,7 @@
                                         <xsl:text>/text:No Thumbnail</xsl:text>
                                     </xsl:attribute>
                                 </img>
-                            </xsl:otherwise>
+                            </xsl:otherwise> -->
                         </xsl:choose>
                     </a>
                 </div>
@@ -897,6 +1026,56 @@
         <!--Lookup the MIME Type's key in messages.xml language file.  If not found, just display MIME Type-->
         <i18n:text i18n:key="{$mimetype-key}"><xsl:value-of select="$mimetype"/></i18n:text>
     </xsl:template>
-
+	<xsl:template name="itemSummaryView-DIM-revision">
+        <xsl:if test="dim:field[@element='revision' and @mdschema='oprm']">
+            <div class="simple-item-view-description item-page-field-wrapper table">
+                <h5 class="item-headers"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-abstract</i18n:text></h5>
+                <div>
+                    <xsl:for-each select="dim:field[@element='revision' and @mdschema='oprm']">
+                        <xsl:choose>
+                            <xsl:when test="node()">
+                                <xsl:copy-of select="util:shortenString(./node(),1000,5)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text>&#160;</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:if test="count(following-sibling::dim:field[@element='revision' and @mdschema='oprm']) != 0">
+                            <div class="spacer">&#160;</div>
+                        </xsl:if>
+                    </xsl:for-each>
+                    <xsl:if test="count(dim:field[@element='revision' and @mdschema='oprm']) &gt; 1">
+                        <div class="spacer">&#160;</div>
+                    </xsl:if>
+                </div>
+            </div>
+        </xsl:if>
+    </xsl:template>
+    
+        <xsl:template name="itemSummaryView-DIM-comentario">
+        <xsl:if test="dim:field[@element='comentario' and @mdschema='oprm']">
+            <div class="simple-item-view-description item-page-field-wrapper table">
+                <h5 class="item-headers"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-abstract</i18n:text></h5>
+                <div>
+                    <xsl:for-each select="dim:field[@element='comentario' and @mdschema='oprm']">
+                        <xsl:choose>
+                            <xsl:when test="node()">
+                                <xsl:copy-of select="util:shortenString(./node(),1000,5)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text>&#160;</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:if test="count(following-sibling::dim:field[@element='comentario' and @mdschema='oprm']) != 0">
+                            <div class="spacer">&#160;</div>
+                        </xsl:if>
+                    </xsl:for-each>
+                    <xsl:if test="count(dim:field[@element='comentario' and  @mdschema='oprm']) &gt; 1">
+                        <div class="spacer">&#160;</div>
+                    </xsl:if>
+                </div>
+            </div>
+        </xsl:if>
+    </xsl:template>
 
 </xsl:stylesheet>

@@ -8,10 +8,13 @@
 package org.dspace.discovery;
 
 
+import org.apache.jena.atlas.logging.Log;
+import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.content.AuthorProfile;
 import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
+import org.dspace.content.authority.OrcidUtils;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
@@ -32,7 +35,7 @@ import java.util.Locale;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public class AuthorProfileUtil {
-
+    private static Logger log = Logger.getLogger(AuthorProfileUtil.class);
 
     public static long countAuthorProfiles(Context context) throws SearchServiceException {
         DiscoverQuery dq = new DiscoverQuery();
@@ -63,13 +66,17 @@ public class AuthorProfileUtil {
 
         dq.setQuery("authority.id:("+ClientUtils.escapeQueryChars(authorityId)+")");
         dq.setDSpaceObjectFilter(Constants.AUTHOR_PROFILE);
-
+        log.info("findAuthorProfileByAuthorityId. authorityId:"+authorityId);
+        log.info("findAuthorProfileByAuthorityId. dq:"+dq.toString());
         DiscoverResult discoverResult = SearchUtils.getSearchService().search(context, dq, true);
         if (discoverResult.getDspaceObjects().size() > 0) {
             authorProfile = (AuthorProfile) discoverResult.getDspaceObjects().get(0);
+            log.info("findAuthorProfileByAuthorityId. discoverResult.getDspaceObjects().size() results");
         } else {
+            log.info("findAuthorProfileByAuthorityId. no results");
             return null;
         }
+       
         return authorProfile;
     }
     public static AuthorProfile findAuthorProfileByVariant(Context context, String authorFilterIn) throws Exception {

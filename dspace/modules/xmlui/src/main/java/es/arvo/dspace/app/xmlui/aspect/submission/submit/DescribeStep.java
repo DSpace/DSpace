@@ -85,6 +85,10 @@ public class DescribeStep extends AbstractSubmissionStep
         message("xmlui.Submission.submit.DescribeStep.series_name");
     protected static final Message T_report_no=
         message("xmlui.Submission.submit.DescribeStep.report_no");
+    protected static final Message T_title1 =
+	        message("xmlui.Submission.submit.DescribeInviteStep.title1");
+    protected static final Message T_para1 =
+	        message("xmlui.Submission.submit.DescribeInviteStep.para1");
         
         /**
      * A shared resource of the inputs reader. The 'inputs' are the
@@ -156,7 +160,25 @@ public class DescribeStep extends AbstractSubmissionStep
                 pageMeta.addMetadata("page", "jumpTo").addContent(jumpTo);
             }
         }
-
+        boolean tieneMetadato(String name,DCInput[] inputs){
+    	String[] metadataSplit=name.split("\\.");
+    	if(inputs!=null){
+    	    for(int i=0;i<inputs.length;i++){
+    		if(metadataSplit[0].equals(inputs[i].getSchema()) && metadataSplit[1].equals(inputs[i].getElement())){
+    		    if(metadataSplit.length==3){
+    			if(metadataSplit[2].equals(inputs[i].getQualifier())){
+    			    return true;
+    			}
+    		    }else{
+    			if(inputs[i].getQualifier()==null){
+    			    return true;
+    			}
+    		    }
+    		}
+    	    }
+    	}
+    	return false;
+        }
         public void addBody(Body body) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
         {
@@ -185,6 +207,12 @@ public class DescribeStep extends AbstractSubmissionStep
 
                 List form = div.addList("submit-describe",List.TYPE_FORM);
                 form.setHead(T_head);
+                // ARVO: Si es la pantalla de invitar se pone el texto
+                if (tieneMetadato("oprm.revisor.mail",inputs)){                
+                    // ARVO : Añadimos titulo
+                    form.setHead(T_title1);
+                    form.addItem().addContent(T_para1);
+                }
 
                 // Fetch the document type (dc.type)
                 String documentType = "";

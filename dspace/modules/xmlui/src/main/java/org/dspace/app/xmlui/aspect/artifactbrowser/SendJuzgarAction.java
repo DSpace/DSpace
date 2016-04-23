@@ -31,7 +31,7 @@ import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.constants.Constants;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
@@ -47,9 +47,9 @@ import org.dspace.ctask.arvo.RevisorTokenEnviarCurationTask;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
-
+import org.dspace.core.Constants;
 /**
- * @author Scott Phillips
+ * @author Adán Roman Ruiz at arvo.es
  */
 
 public class SendJuzgarAction extends AbstractAction
@@ -145,20 +145,20 @@ public class SendJuzgarAction extends AbstractAction
         email.addArgument(url);//{4}
         email.addArgument("");//{5}
         email.addArgument(ConfigurationManager.getProperty("mail.feedback.recipient"));//{6}
-//        if (requestItem.isAllfiles()){
-//            Bundle[] bundles = item.getBundles("ORIGINAL");
-//            for (int i = 0; i < bundles.length; i++){
-//                Bitstream[] bitstreams = bundles[i].getBitstreams();
-//                for (int k = 0; k < bitstreams.length; k++){
-//                    if (!bitstreams[k].getFormat().isInternal() /*&& RequestItemManager.isRestricted(context, bitstreams[k])*/){
-//                        email.addAttachment(BitstreamStorageManager.retrieve(context, bitstreams[k].getID()), bitstreams[k].getName(), bitstreams[k].getFormat().getMIMEType());
-//                    }
-//                }
-//            }
-//        } else {
-//            Bitstream bit = Bitstream.find(context,requestItem.getBitstreamId());
-//            email.addAttachment(BitstreamStorageManager.retrieve(context, requestItem.getBitstreamId()), bit.getName(), bit.getFormat().getMIMEType());
-//        }     
+        if (requestItem.isAllfiles()){
+            Bundle[] bundles = item.getBundles("ORIGINAL");
+            for (int i = 0; i < bundles.length; i++){
+                Bitstream[] bitstreams = bundles[i].getBitstreams();
+                for (int k = 0; k < bitstreams.length; k++){
+                    if (!bitstreams[k].getFormat().isInternal() /*&& RequestItemManager.isRestricted(context, bitstreams[k])*/){
+                        email.addAttachment(BitstreamStorageManager.retrieve(context, bitstreams[k].getID()), bitstreams[k].getName(), bitstreams[k].getFormat().getMIMEType());
+                    }
+                }
+            }
+        } else {
+            Bitstream bit = Bitstream.find(context,requestItem.getBitstreamId());
+            email.addAttachment(BitstreamStorageManager.retrieve(context, requestItem.getBitstreamId()), bit.getName(), bit.getFormat().getMIMEType());
+        }     
         
         email.send();
         
@@ -170,15 +170,52 @@ public class SendJuzgarAction extends AbstractAction
         requestItem.update(context);
 	}
     
-    // Solo pueden hacer juicios los que tengan revisiones de ese mismo item
+    // Solo pueden hacer juicios los que tengan revisiones de ese mismo item (y no tengan ya un juicio)
     private boolean comprobarMailPuedeEmitirJuicios(String email, String handle, Context context) throws IOException, SQLException, AuthorizeException {
 	if(StringUtils.isNotBlank(handle) && StringUtils.isNotBlank(email)){
+	    //Si ya tiene uno no puede hacer mas
+	    ArrayList<RevisionToken> juiciosToken=RevisionToken.findJuiciosOfHandle(context, handle);
+	    for(int i=0;i<juiciosToken.size();i++){
+		if(juiciosToken.get(i).getEmail().equalsIgnoreCase(email)){
+		    return false;
+		}
+	    }
+	    
+	    //Si tiene revision puede
 	    DSpaceObject dso=HandleManager.resolveToObject(context, handle);
 	    RevisionToken revisionToken=RevisionToken.findItemOfRevision(context, dso.getID());
-	    ArrayList<RevisionToken> revisiones=RevisionToken.findRevisionsOfHandle(context, revisionToken.getHandleRevisado());
-	    for(int i=0;i<revisiones.size();i++){
-		if(revisiones.get(i).getEmail().equalsIgnoreCase(email)){
-		    return true;
+	    if(revisionToken!=null){
+        	    ArrayList<RevisionToken> revisiones=RevisionToken.findRevisionsOfHandle(context, revisionToken.getHandleRevisado());
+        	    for(int i=0;i<revisiones.size();i++){
+        		if(revisiones.get(i).getEmail().equalsIgnoreCase(email)){
+        		    return true;
+        		}
+        	    }
+	    }
+	    
+	    //Si es admin puede a cualquiera
+	    if(AuthorizeManager.isAdmin(context)){
+		return true;
+	    }
+	    
+	  //Si el autor autenticado es uno de los autores del item puede
+	    EPerson eperson=context.getCurrentUser();
+	    //Si el email es el del autenticado o admin
+	    if(eperson!=null && email.equalsIgnoreCase(eperson.getEmail())){
+		//y el autenticado es autor
+		Item item=null;
+		if(dso.getType()==Constants.ITEM){
+		    item=((Item)dso);
+		}
+		if(eperson!=null && item!=null){
+		    //autor macheando nombre
+		    Metadatum[] autores = item.getMetadata("dc","contributor","author",Item.ANY);
+		    for(int i=0;i<autores.length;i++){
+			if(autores[i].value.equalsIgnoreCase(eperson.getFullName())){
+			    //esta, asi que se permiten envios a 
+			    return true;
+			}
+		    }
 		}
 	    }
 	}

@@ -2618,4 +2618,80 @@
     <message key="xmlui.AuthorProfile.trail">View author profile</message>
 
     <!--Author profile messages: END -->
+    
+    <!--Proceso de revisión-->
+ 	<message key="xmlui.Submission.submit.progressbar.revision_final">Le recordamos que su contribución va a ser publicada junto con el artículo original bajo una licencia CCBY que permite su uso público, siempre que se reconozca su autoría (mediante una cita del formato: Revisor. Fecha. Titulo del articulo original [Rev]. Autores del artículo original. handle/url).</message>
+	<message key="xmlui.openaire.juicio.juzgar">Comentar esta revisión</message>
+	<message key="xmlui.ArtifactBrowser.JuzgarSent.title">Comentar esta revisión</message>
+	<message key="xmlui.ArtifactBrowser.JuzgarSent.trail">Comentar esta revisión</message>
+	<message key="xmlui.ArtifactBrowser.JuzgarSent.head">Comentar esta revisión</message>
+ 	<message key="xmlui.ArtifactBrowser.JuzgarSent.para1">
+		<p>Comentar las revisiones de trabajos disponibles en repositorios antes (en estado preprint), o incluso después de su publicación, ayuda a los autores y revisores a mejorar sus contribuciones y abre nuevas vías de colaboración entre investigadores.</p>
+		<p>Si Vd ha efectuado una revisión del trabajo, recibirá en la dirección de correo indicada un mensaje con información sobre cómo realizar su comentario.</p>
+ 	</message>
+ 	
+ 	<message key="xmlui.ArtifactBrowser.JuzgarForm.head">Formulario de revisión</message>
+ 	<message key="xmlui.ArtifactBrowser.JuzgarForm.para1">
+		<p>Mediante esta pantalla Vd. solicita hacer un comentario sobre una revisión del trabajo disponible en el repositorio institucional digital de acceso abierto del Instituto Español de Oceanografía.</p>
+		<p>Introduciendo su email, recibirá un mensaje con un enlace para mandar su comentario. Por favor indique su email aquí:</p>
+ 	</message>
+ 	<message key="xmlui.ArtifactBrowser.JuzgarForm.email">Correo electrónico</message>
+	<message key="xmlui.ArtifactBrowser.JuzgarForm.email_help">Correo electrónico al que se enviará el enlace de un único uso con el que se podrá realizar la valoración.</message>
+ 	<message key="xmlui.ArtifactBrowser.JuzgarForm.submit">Enviar</message>
+ 	
+ 	<message key="xmlui.ArtifactBrowser.JuzgarForm.error.mailIncorrecto">Error. El correo electrónico es incorrecto.</message>
+	<message key="xmlui.ArtifactBrowser.JuzgarForm.error.mailNoPermitido">Error. No se permite que ese usuario haga comentarios sobre esta revisión.</message>
+ 
+ 	<message key="xmlui.ArtifactBrowser.RevisarSent.title">Solicitar revisión</message>
+ 	<message key="xmlui.ArtifactBrowser.RevisarSent.head">Solicitar revisión</message>
+ 	<message key="xmlui.ArtifactBrowser.RevisarSent.para1">
+ 	<p>Revisar abiertamente trabajos depositados en repositorios antes (en estado preprint), o incluso después de su publicación, ayuda a los autores a mejorar sus contribuciones y abre nuevas vías de colaboración entre investigadores.</p>
+		<p>Se ha enviado a la dirección de correo indicada un mensaje para realizar la revisión solicitada.</p> 
+ 	</message>
+ 	
+
+ 	<message key="xmlui.ArtifactBrowser.RevisarForm.head">Formulario de revisión</message>
+ 	<message key="xmlui.ArtifactBrowser.RevisarForm.para1">
+		<p>Mediante esta pantalla Vd. solicita revisar el trabajo disponible en el repositorio institucional digital de acceso abierto del Instituto Español de Oceanografía.</p>
+		<p>Revisar abiertamente trabajos depositados en repositorios antes (en estado preprint), o incluso después de su publicación, ayuda a los autores a mejorar sus contribuciones y abre nuevas vías de colaboración entre investigadores. Además, en este modelo de revisión abierta, el revisor es reconocido por su contribución, ya que su revisión se convierte en un ítem citable que puede incluir en su currículum académico. Para más información sobre este modelo innovador de revisión por pares puede leer el <a href="http://www.openscholar.org.uk/independent-peer-review-manifesto/" target="_blank">"Independent Peer Review Manifesto"</a> y <a href="http://digital.csic.es/handle/10261/130842" target="_blank">http://digital.csic.es/handle/10261/130842</a></p>
+ 		<p>Introduciendo su email, recibirá un mensaje que contendrá un enlace para efectuar la revisión solicitada.</p>
+ 	</message>
+ 	<message key="xmlui.ArtifactBrowser.RevisarForm.email">Correo electrónico</message>
+	<message key="xmlui.ArtifactBrowser.RevisarForm.email_help">Correo electrónico al que se enviará el enlace desde el que se podrá realizar la revisión.</message>
+ 	<message key="xmlui.ArtifactBrowser.RevisarForm.submit">Enviar</message>
+ 	
+ <message key="xmlui.Submission.submit.DescribeInviteStep.title1">Invitar a revisores</message>
+ <message key="xmlui.Submission.submit.DescribeInviteStep.para1">
+	<p>Mediante esta pantalla, Vd. puede solicitar a expertos revisar su trabajo.</p>
+	<p>Revisar abiertamente trabajos depositados en repositorios antes (en estado preprint), o incluso después de su publicación, ayuda a abrir nuevas vías de colaboración con otros investigadores.</p>
+	<p>Puede saltar este paso pulsando el siguiente botón.</p>
+ </message>
+ 
+ <message key="xmlui.Submission.submit.DescribeRevisionStep.title1">Revisión</message>
+ <message key="xmlui.Submission.submit.DescribeRevisionStep.para1">
+	<p class="bold">Escriba su opinión sobre el trabajo incluyendo todos los detalles necesarios para ayudar a los autores a mejorar su contribución. Procure ser constructivo.</p>
+	<p class="bold">Le recordamos que su revisión será publicada junto con el trabajo original bajo una licencia <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC-BY</a> que permite su uso público, siempre que se reconozca su autoría (mediante una cita del formato: Revisor. Fecha. Título del trabajo original [Revisión]. Autores del trabajo. handle/url).</p>
+ </message>
+ 
+<message key="xmlui.Submission.submit.progressbar.juicio">Valoración</message>
+<message key="xmlui.Submission.submit.DescribeJuicioStep.head">Valoración</message>
+<message key="xmlui.Submission.submit.DescribeJuicioStep.title1">Valoración</message>
+ <message key="xmlui.Submission.submit.DescribeJuicioStep.para1">
+	<p class="bold">Escriba su comentario sobre la revisión del trabajo incluyendo todos los detalles necesarios. Procure ser constructivo.</p>
+	<p class="bold">Le recordamos que su contribución será publicada junto con las revisiones y el trabajo original bajo una licencia <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC-BY</a> que permite su uso público, siempre y cuando que se reconozca su autoría (mediante una cita del formato: Autor del comentario. Fecha. Título del artículo original [Revisión]. Autor de la revisión. handle/url).</p>
+ </message>
+ 
+ <message key="xmlui.dri2xhtml.METS-1.0.item-isrelatedtoRevision">Revisiones relacionadas</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-isrelatedtoJuicio">Comentarios relacionados</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-isrelatedtoItem">Trabajo relacionado</message>
+ 
+<message key="xmlui.openaire.revision.solicitar">Revisar este trabajo</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-affiliation">Afiliación</message>
+ 
+<message key="xmlui.dri2xhtml.METS-1.0.item-isrelatedtoRevision.revisionDe">Ver revisión de </message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-isrelatedtoJuicio.juicioDe">Ver comentario de </message>
+
+<message key="xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion">Valor de reputación</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-redondel.valor.calificacion">Valor de calificación</message>
+<message key="xmlui.administrative.Navigation.administrative_editar_mi_perfil_autor">Mi Perfil de Autor</message>
 </catalogue>

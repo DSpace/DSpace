@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +49,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 
 /**
- * @author Scott Phillips
+ * @author Adán Roman Ruiz at arvo.es
  */
 
 public class SendRevisarAction extends AbstractAction
@@ -78,7 +79,7 @@ public class SendRevisarAction extends AbstractAction
         // Comprobar que el email es correcto
         boolean mailCorrecto=comprobarMailCorrecto(email);
         // Comprobar que ese email puede emitir juicios
-        boolean mailpermitido=comprobarMailPuedeEmitirRevisiones(email);
+        boolean mailpermitido=comprobarMailPuedeEmitirRevisiones(email,handle,context);
         // Check all data is there
         if ((handle == null) || email==null || email.equals("") || !mailpermitido || !mailCorrecto)
         {
@@ -144,20 +145,20 @@ public class SendRevisarAction extends AbstractAction
         email.addArgument(url);//{4}
         email.addArgument("");//{5}
         email.addArgument(ConfigurationManager.getProperty("mail.feedback.recipient"));//{6}
-//        if (requestItem.isAllfiles()){
-//            Bundle[] bundles = item.getBundles("ORIGINAL");
-//            for (int i = 0; i < bundles.length; i++){
-//                Bitstream[] bitstreams = bundles[i].getBitstreams();
-//                for (int k = 0; k < bitstreams.length; k++){
-//                    if (!bitstreams[k].getFormat().isInternal() /*&& RequestItemManager.isRestricted(context, bitstreams[k])*/){
-//                        email.addAttachment(BitstreamStorageManager.retrieve(context, bitstreams[k].getID()), bitstreams[k].getName(), bitstreams[k].getFormat().getMIMEType());
-//                    }
-//                }
-//            }
-//        } else {
-//            Bitstream bit = Bitstream.find(context,requestItem.getBitstreamId());
-//            email.addAttachment(BitstreamStorageManager.retrieve(context, requestItem.getBitstreamId()), bit.getName(), bit.getFormat().getMIMEType());
-//        }     
+        if (requestItem.isAllfiles()){
+            Bundle[] bundles = item.getBundles("ORIGINAL");
+            for (int i = 0; i < bundles.length; i++){
+                Bitstream[] bitstreams = bundles[i].getBitstreams();
+                for (int k = 0; k < bitstreams.length; k++){
+                    if (!bitstreams[k].getFormat().isInternal() /*&& RequestItemManager.isRestricted(context, bitstreams[k])*/){
+                        email.addAttachment(BitstreamStorageManager.retrieve(context, bitstreams[k].getID()), bitstreams[k].getName(), bitstreams[k].getFormat().getMIMEType());
+                    }
+                }
+            }
+        } else {
+            Bitstream bit = Bitstream.find(context,requestItem.getBitstreamId());
+            email.addAttachment(BitstreamStorageManager.retrieve(context, requestItem.getBitstreamId()), bit.getName(), bit.getFormat().getMIMEType());
+        }     
         
         email.send();
         
@@ -169,9 +170,15 @@ public class SendRevisarAction extends AbstractAction
         requestItem.update(context);
 	}
     
-    // Por ahora todo el mundo puede hacer Revisiones
-    private boolean comprobarMailPuedeEmitirRevisiones(String email) {
-	// TODO Auto-generated method stub
+    // Por ahora todo el mundo puede hacer Revisiones (pero solo una por item)
+    private boolean comprobarMailPuedeEmitirRevisiones(String email,String handle,Context context) throws IOException, SQLException {
+	    //Si ya tiene uno no puede hacer mas
+	    ArrayList<RevisionToken> revisionesToken=RevisionToken.findRevisionsOfHandle(context, handle);
+	    for(int i=0;i<revisionesToken.size();i++){
+		if(revisionesToken.get(i).getEmail().equalsIgnoreCase(email)){
+		    return false;
+		}
+	    }
 	return true;
     }
 

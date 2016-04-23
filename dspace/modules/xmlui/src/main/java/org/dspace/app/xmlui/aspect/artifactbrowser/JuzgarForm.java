@@ -32,9 +32,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
 /**
- * Display to the user a simple form letting the user give feedback.
- * 
- * @author Scott Phillips
+ * @author Adán Roman Ruiz at arvo.es
  */
 public class JuzgarForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {

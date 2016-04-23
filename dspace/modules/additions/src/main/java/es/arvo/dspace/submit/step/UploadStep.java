@@ -342,39 +342,50 @@ public class UploadStep extends AbstractProcessingStep
 
     /**
      * Comprueba si se requiere fichero. 
-     * // ARVO :Se requiere si es un revisor puesto a huevo dc.revisor.mail. Si es un dc.revisor.bbdd sera opcional
-     * // ARVO: Si es un juicio no necesita fichero 
+     * // ---quitado ARVO :Se requiere si es un revisor puesto a huevo dc.revisor.mail. Si es un dc.revisor.bbdd sera opcional
+     * // ---quitado ARVO: Si es un juicio no necesita fichero
+     * // ARVO: No se requiere fichero  
      * @param context
      * @param request
      * @return
      */
     private boolean getFileRequired(Context context, HttpServletRequest request) {
-	String tokenEvaluacion=request.getParameter("tokenEvaluacion");
-//	String tokenJuicio=request.getParameter("tokenJuicio");
-//	if(tokenJuicio!=null){
-//		return false;
-//	}
-	AuthorityOpenaireRevisor authority=new AuthorityOpenaireRevisor();
-	RevisionToken rt;
-	try {
-	    rt = RevisionToken.find(context, tokenEvaluacion);
-	    String handle=rt.getHandleRevisado();
-	    DSpaceObject dso=HandleManager.resolveToObject(context,handle);
-	    if(dso!=null && dso instanceof Item){
-		Item item=(Item) dso;
-		Metadatum[] revisoresSinFichero=item.getMetadataByMetadataString("oprm.revisor.bbdd");
-		for(int i=0;i<revisoresSinFichero.length;i++){
-		    if(authority.getMail(revisoresSinFichero[i].authority).equals(rt.getEmail())){
-			return false;
-		    }
-		}
-	    }
-	} catch (NumberFormatException | IOException | SQLException
-		| AuthorizeException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
-	return true;
+    	String tokenEvaluacion=request.getParameter("tokenEvaluacion");
+//    	String tokenJuicio=request.getParameter("tokenJuicio");
+//    	if(tokenJuicio!=null){
+//    		return false;
+//    	}
+    	//AuthorityOpenaireRevisor authority=new AuthorityOpenaireRevisor();
+    	RevisionToken rt;
+    	
+    	    try {
+    		rt = RevisionToken.find(context, tokenEvaluacion);
+    		String handle=rt.getHandleRevisado();
+    		DSpaceObject dso=HandleManager.resolveToObject(context,handle);
+    		if(dso!=null && dso instanceof Item){
+//    		    Item item=(Item) dso;
+//    		    DCValue[] revisoresSinFichero=item.getMetadata("oprm.revisor.bbdd");
+//    		    for(int i=0;i<revisoresSinFichero.length;i++){
+//    			if(authority.getMail(revisoresSinFichero[i].authority).equals(rt.getEmail())){
+    			    return false;
+//    			}
+//    		    }
+    		}
+    	    } catch (IllegalStateException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    	    } catch (IOException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    	    } catch (SQLException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    	    } catch (AuthorizeException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    	    }
+    	
+    	return true;
     }
 
     /**

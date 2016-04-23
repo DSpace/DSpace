@@ -7,26 +7,29 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: Solicitud de revisión de publicación
-Estimado/a Sr/a,
+Subject: Review request for the work available at the digital institutional open access Spanish Institute of Oceanography repository
+Dear Scholar,
  
-Ha solicitado emitir una revisión del artículo titulado {0}.
+You have requested to review the work titled {0}
+  
+By openly reviewing scientific works published in repositories before (preprints), or even after their publication in academic journals, you help their authors improve their contributions and promote new ways of constructive academic collaboration. Importantly, this peer review model offers reviewers recognition for their contributions, since reviews become citable items that can be included in academic records. For more information regarding this innovative peer review model that is being implemented for the first time by the digital institutional open access Spanish Institute of Oceanography repository we invite you to read the "Independent Peer Review Manifesto": http://www.openscholar.org.uk/independent-peer-review-manifesto/
  
-Revisar abiertamente manuscritos publicados en repositorios antes (en estado preprint), o incluso después de su publicación en revistas académicas, ayuda a los autores a mejorar sus contribuciones y abre nuevas vías de colaboración entre científicos. Además, en este modelo de revisión abierta, el revisor es reconocido por su contribución, ya que su revisión se convierte en un ítem citable que puede incluir en su currículum académico. Para obtener más información sobre este modelo innovador que está siendo implementado por primera vez a nivel internacional desde el repositorio del Instituto Español de Oceanografía, puede leer el artículo: Defining and Characterizing Open Peer Review: A review of the literature. Url: http://pdxscholar.library.pdx.edu/cgi/viewcontent.cgi?article=1000&context=ulib_fac
+The work you have requested to review:
  
-Los datos del artículo que ha sido invitado/a a revisar:
-
-Título: {0}
-Autores: {1}
+Title: {0}
+Authors: {1}
 Handle: {2}
-
-Se adjuntan los documentos asociados a la publicación, en caso de que disponga de ellos.
  
-Cuando quiera revisar el artículo puede acceder al siguiente enlace:
+The full text of the work is attached to this email.
+ 
+When you are ready to review the work please click on the link below:
 
 {3}
+ 
+This link does not expire, but you will only be able to use it once. However, after you initiate your review process you can save your progress and continue later. 
 
-El token anterior no caduca, pero es de un único uso. Si lo desea, puede guardar el envío y continuar el proceso más tarde, pero una vez utilice el enlace, dejará de estar operativo.
  
+If you have any questions or require further assistance please contact the repository administrator.
  
-Si necesita ayuda, por favor contacte con el administrador del repositorio.
+Kind regards,
+Digital institutional open access Spanish Institute of Oceanography repository.

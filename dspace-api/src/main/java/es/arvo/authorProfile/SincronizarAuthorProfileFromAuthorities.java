@@ -63,9 +63,6 @@ public class SincronizarAuthorProfileFromAuthorities {
 	    profile.addMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA, "author",null,null, datosPersona.getAutor());
 	    profile.addMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA, "name","variant",null, datosPersona.getAutor());
 	}
-//	if(StringUtils.isNotBlank(datosPersona.getFirma())){
-//	    profile.addMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA, "name","variant", null, datosPersona.getFirma());
-//	}
 	if(StringUtils.isNotBlank(datosPersona.getCentro())){
 	    profile.addMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA, "department","name", null, datosPersona.getCentro());
 	}
@@ -112,10 +109,6 @@ public class SincronizarAuthorProfileFromAuthorities {
 	    profile.addMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA, "author",null,null, datosPersona.getAutor());
 	    profile.addMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA, "name","variant",null, datosPersona.getAutor());
 	}
-	profile.clearMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA, "name","variant", null);
-//	if(StringUtils.isNotBlank(datosPersona.getFirma())){
-//	    profile.addMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA, "name","variant", null, datosPersona.getFirma());
-//	}
 	profile.clearMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA, "department","name", null);
 	if(StringUtils.isNotBlank(datosPersona.getCentro())){
 	    profile.addMetadata(AuthorProfile.AUTHOR_PROFILE_SCHEMA, "department","name", null, datosPersona.getCentro());

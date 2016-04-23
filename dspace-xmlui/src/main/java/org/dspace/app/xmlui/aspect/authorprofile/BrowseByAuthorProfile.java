@@ -20,6 +20,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.authority.OrcidUtils;
 import org.dspace.core.Constants;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
@@ -114,7 +115,7 @@ public class BrowseByAuthorProfile extends AbstractDiscoveryTransformer implemen
             urlParams.putAll(getFilteredParameters());
             String url = "author-page?author=" + URLEncoder.encode(filterQuery.replace("author_filter:", ""), "UTF-8");
             cell.addXref(url, modifyValue(value));
-            cell.addXref(url, " ", "author-profile");
+            cell.addXref(url, " ", "author-profile",OrcidUtils.getIdFromName(value.getAsFilterQuery()));
         }
     }
 

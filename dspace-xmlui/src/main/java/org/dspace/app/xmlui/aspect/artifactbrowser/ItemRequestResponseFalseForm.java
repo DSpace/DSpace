@@ -52,7 +52,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Adán Román Ruiz at arvo.es (added request item support)
  */
-public class ItemRequestResponseFalseForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+public class ItemRequestResponseFalseForm extends AbstractDSpaceTransformer
 {
 	 /** Language Strings */
     private static final Message T_title =
@@ -81,26 +81,7 @@ public class ItemRequestResponseFalseForm extends AbstractDSpaceTransformer impl
     
     private static final Message T_subject = 
             message("xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.subject");
-    /**
-     * Generate the unique caching key.
-     * This key must be unique inside the space of this component.
-     */
-    public Serializable getKey() {
-
-		String token = parameters.getParameter("token", "");
-		String decision = parameters.getParameter("decision", "");
-
-		return HashUtil.hash(token+"-"+decision);
-    }
-
-    /**
-     * Generate the cache validity object.
-     */
-    public SourceValidity getValidity() 
-    {
-        return NOPValidity.SHARED_INSTANCE;
-    }
-    
+       
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
             AuthorizeException

@@ -18,6 +18,7 @@ import java.util.Date;
 
 /**
  * Object representing an Item Request
+ * @author Adán Roman Ruiz at arvo.es
  */
 public class RequestItem {
     private static Logger log = Logger.getLogger(RequestItem.class);
@@ -30,6 +31,10 @@ public class RequestItem {
     private boolean allfiles;
     private Date decision_date;
     private boolean accept_request;
+    private int num_usos;
+    private String token_descarga;
+
+
 
     public RequestItem(int itemID, int bitstreamId, String reqEmail, String reqName, String reqMessage, boolean allfiles){
         this.itemID = itemID;
@@ -72,7 +77,9 @@ public class RequestItem {
 
             record.setColumn("accept_request", accept_request);
             record.setColumn("decision_date", decision_date);
-
+            record.setColumn("num_usos", num_usos);
+            record.setColumn("token_descarga", token_descarga);
+            
             DatabaseManager.update(context, record);
 
         } catch (SQLException e) {
@@ -101,7 +108,8 @@ public class RequestItem {
         record.setColumn("request_date", new Date());
         record.setColumnNull("decision_date");
         record.setColumnNull("expires");
-
+        record.setColumnNull("num_usos");
+        record.setColumnNull("token_descarga");
         DatabaseManager.update(context, record);
 
         if (log.isDebugEnabled())
@@ -159,4 +167,20 @@ public class RequestItem {
     public void setAccept_request(boolean accept_request) {
         this.accept_request = accept_request;
     }
+    public int getNum_usos() {
+        return num_usos;
+    }
+
+    public void setNum_usos(int num_usos) {
+        this.num_usos = num_usos;
+    }
+
+    public String getToken_descarga() {
+        return token_descarga;
+    }
+
+    public void setToken_descarga(String token_descarga) {
+        this.token_descarga = token_descarga;
+    }
 }
+

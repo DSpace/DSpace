@@ -191,33 +191,35 @@ public class RevisionToken
     }
     
     public static ArrayList<RevisionToken> findRevisionsOfHandle(Context context, String handle)
-            throws IOException, SQLException, AuthorizeException
-    {
-        // Grab rows from DB
-	log.debug("Buscando revisiones del handle:"+handle);
-        TableRowIterator tri = DatabaseManager.queryTable(context, "revision_token","SELECT * FROM revision_token where handle_revisado= ? and tipo='R' and revision_id is not null",handle);
+	    throws IOException, SQLException
+	    {
+	ArrayList<RevisionToken> resultado=new ArrayList<RevisionToken>();
+	if(handle!=null){
+	    // Grab rows from DB
+	    log.debug("Buscando revisiones del handle:"+handle);
+	    TableRowIterator tri = DatabaseManager.queryTable(context, "revision_token","SELECT * FROM revision_token where handle_revisado= ? and tipo='R' and revision_id is not null",handle);
 
-        TableRow row = null;
-        ArrayList<RevisionToken> resultado=new ArrayList<RevisionToken>();
-        try
-        {
-            while (tri.hasNext())
-            {
-                row = tri.next();
-                resultado.add(new RevisionToken(row));              
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-        	tri.close();
-            }
-        }
+	    TableRow row = null;
 
-           return resultado;
-    }
+	    try
+	    {
+		while (tri.hasNext())
+		{
+		    row = tri.next();
+		    resultado.add(new RevisionToken(row));              
+		}
+	    }
+	    finally
+	    {
+		// close the TableRowIterator to free up resources
+		if (tri != null)
+		{
+		    tri.close();
+		}
+	    }
+	}
+	return resultado;
+	    }
     
     public static RevisionToken findItemOfRevision(Context context, int id)
             throws IOException, SQLException, AuthorizeException
@@ -248,32 +250,34 @@ public class RevisionToken
     }
     
     public static ArrayList<RevisionToken> findJuiciosOfHandle(Context context, String handle)
-            throws IOException, SQLException, AuthorizeException
-    {
-        // Grab rows from DB
-        TableRowIterator tri = DatabaseManager.queryTable(context, "revision_token","SELECT * FROM revision_token where handle_revisado= ? and tipo='J' and revision_id is not null",handle);
+	    throws IOException, SQLException, AuthorizeException
+	    {
+	ArrayList<RevisionToken> resultado=new ArrayList<RevisionToken>();
+	if(handle!=null){
+	    // Grab rows from DB
+	    TableRowIterator tri = DatabaseManager.queryTable(context, "revision_token","SELECT * FROM revision_token where handle_revisado= ? and tipo='J' and revision_id is not null",handle);
 
-        TableRow row = null;
-        ArrayList<RevisionToken> resultado=new ArrayList<RevisionToken>();
-        try
-        {
-            while (tri.hasNext())
-            {
-                row = tri.next();
-                resultado.add(new RevisionToken(row));              
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-        	tri.close();
-            }
-        }
+	    TableRow row = null;
 
-            return resultado;
-    }
+	    try
+	    {
+		while (tri.hasNext())
+		{
+		    row = tri.next();
+		    resultado.add(new RevisionToken(row));              
+		}
+	    }
+	    finally
+	    {
+		// close the TableRowIterator to free up resources
+		if (tri != null)
+		{
+		    tri.close();
+		}
+	    }
+	}
+	return resultado;
+	    }
 
      /**
      * Update the metadata value in the database.
@@ -432,6 +436,7 @@ public class RevisionToken
      * @throws SQLException
      */
     public static RevisionToken[] findRevisionesOfRevisor(Context context,String email) throws SQLException {
+	if(email!=null){
 	String myQuery = "SELECT * FROM revision_token WHERE tipo='R' and revision_id is not null and email=?";
 
 	TableRowIterator rows = DatabaseManager.queryTable(context, "revision_token", myQuery,email);
@@ -469,6 +474,8 @@ public class RevisionToken
 		rows.close();
 	    }
 	}
+	}
+	return new RevisionToken[0];
     }
     
     public static RevisionToken verificaTokenWorkspaceID(Context context,String token,String workspaceID) throws SQLException {

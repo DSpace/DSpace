@@ -12,7 +12,7 @@
 <!--
     TODO: Describe this XSL file
     Author: Alexey Maslov
-
+    Author Adán Roman Ruiz at arvo.es
 -->
 
 <xsl:stylesheet xmlns:i18n="http://apache.org/cocoon/i18n/2.1"

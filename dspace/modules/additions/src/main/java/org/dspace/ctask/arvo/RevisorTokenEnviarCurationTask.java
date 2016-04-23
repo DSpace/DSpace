@@ -76,7 +76,7 @@ public class RevisorTokenEnviarCurationTask extends AbstractCurationTask
 	{
 	    // TEMP __ BORRAR
 //	    try {
-//		ReputationCalculator.main(null);
+//		ReputationCalculator.main(new String[0]);
 //	    } catch (Exception e1) {
 //		e1.printStackTrace();
 //	    }
