@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 
 import javax.servlet.ServletException;
@@ -47,7 +48,6 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
-
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -92,18 +92,18 @@ public class DescribeStep extends AbstractSubmissionStep
      * submission process. The reader is a utility class to read
      * that configuration file.
      */
-    private static DCInputsReader INPUTS_READER = null;
+    private static HashMap<Locale, DCInputsReader> INPUTS_READER = new HashMap<Locale,DCInputsReader>();
     private static final Message T_vocabulary_link = message("xmlui.Submission.submit.DescribeStep.controlledvocabulary.link");
 
     /**
      * Ensure that the inputs reader has been initialized, this method may be
      * called multiple times with no ill-effect.
      */
-    private static void initializeInputsReader() throws DCInputsReaderException
+    private static void initializeInputsReader(Locale locale) throws DCInputsReaderException
     {
-        if (INPUTS_READER == null)
+        if (INPUTS_READER.get(locale) == null)
         {
-            INPUTS_READER = new DCInputsReader();
+            INPUTS_READER.put(locale,new DCInputsReader(locale));
         }
     }
     
@@ -113,9 +113,9 @@ public class DescribeStep extends AbstractSubmissionStep
      *
      * @return The input reader.
      */
-    private static DCInputsReader getInputsReader()
+    private static DCInputsReader getInputsReader(Locale locale)
     {
-        return INPUTS_READER;
+        return INPUTS_READER.get(locale);
     }
     
 
@@ -127,15 +127,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 this.requireSubmission = true;
                 this.requireStep = true;
                 
-                // Ensure that the InputsReader is initialized.
-                try
-                {
-                    initializeInputsReader();
-                }
-                catch (DCInputsReaderException e)
-                {
-                    throw new ServletException(e);
-                }
+               
         }
         
         public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException,
@@ -160,6 +152,16 @@ public class DescribeStep extends AbstractSubmissionStep
         public void addBody(Body body) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
         {
+            // Ensure that the InputsReader is initialized.
+            try
+            {
+                initializeInputsReader(this.context.getCurrentLocale());
+            }
+            catch (DCInputsReaderException e)
+            {
+                throw new UIException(e);
+            }
+            
                 // Obtain the inputs (i.e. metadata fields we are going to display)
                 Item item = submission.getItem();
                 Collection collection = submission.getCollection();
@@ -169,7 +171,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 DCInput[] inputs;
                 try
                 {
-                        inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
+                        inputSet = getInputsReader(context.getCurrentLocale()).getInputs(submission.getCollection().getHandle());
                         inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
                 }
                 catch (DCInputsReaderException se)
@@ -322,7 +324,7 @@ public class DescribeStep extends AbstractSubmissionStep
         DCInputSet inputSet = null;
         try
         {
-            inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
+            inputSet = getInputsReader(context.getCurrentLocale()).getInputs(submission.getCollection().getHandle());
         }
         catch (DCInputsReaderException se)
         {

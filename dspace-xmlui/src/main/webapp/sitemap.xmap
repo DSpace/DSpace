@@ -189,6 +189,8 @@
                             <expires>3600000</expires> <!-- 1000 * 60 * 60 = 3600000 = One hour -->
                     </map:reader>
                     <map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
+                    <map:reader name="BitstreamItemRequestReader" src="org.dspace.app.xmlui.cocoon.BitstreamItemRequestReader"/>
+                    
                     <map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
                     <map:reader name="MetadataExportReader" src="org.dspace.app.xmlui.cocoon.MetadataExportReader"/>
 
@@ -353,7 +355,22 @@
                                 </map:select>
                         </map:match>
 
-
+						<!-- ARVO: Item-request -->
+						<map:match pattern="itemRequestFileDownload/*/">
+                                <map:select type="browser">
+                                  <map:when test="spider">
+                                    <map:read type="BitstreamItemRequestReader">
+                                            <map:parameter name="userAgent" value="spider"/>
+                                            <map:parameter name="tokenDescarga" value="{1}"/>
+                                    </map:read>
+                                  </map:when>
+                                  <map:otherwise>
+                                    <map:read type="BitstreamItemRequestReader">
+                                            <map:parameter name="tokenDescarga" value="{1}"/>
+                                    </map:read>
+                                  </map:otherwise>
+                                </map:select>
+                        </map:match>
                         <!--
                                 For URL compatibility with the JSPUI, redirect these old url to their new locations.
 
@@ -620,7 +637,11 @@
                             </map:read>
                     </map:match>
 
-
+				<!-- Temporary block -->
+				<!-- Internally redirect all vulnerable URLs to /error (which doesn't exist and throws a 404) -->
+				<map:match pattern="themes/**:**">
+				    <map:redirect-to uri="{request:contextPath}/error" permanent="yes"/>
+				</map:match>
                     <!-- handle common theme resources, such as dri2xhtml -->
                     <map:match pattern="themes/*">
                         <map:read src="themes/{1}"/>

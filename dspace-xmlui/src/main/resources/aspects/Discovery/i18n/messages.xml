@@ -154,5 +154,9 @@
    	<message key="xmlui.Discovery.AbstractSearch.head3">Items matching your query</message>
 
    	<message key="xmlui.Discovery.SimpleSearch.did_you_mean">Did you mean: </message>
-
+   	
+   	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.reputacion">Reputacion</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.isRevised">Revisado</message>
+   	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.reputacion">Reputation</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.isRevised">Revised</message>
 </catalogue>

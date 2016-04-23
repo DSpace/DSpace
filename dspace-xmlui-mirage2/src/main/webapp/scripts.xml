@@ -13,6 +13,10 @@
     <script src="vendor/jquery/jquery.min.js">&#160;</script>
     <script src="vendor/jquery-ui/ui/jquery.ui.core.js">&#160;</script>
     <script src="vendor/jquery-ui/ui/jquery.ui.datepicker.js">&#160;</script>
+    <script src="vendor/jquery-ui/ui/jquery.ui.widget.js">&#160;</script>
+    <script src="vendor/jquery-ui/ui/jquery.ui.position.js">&#160;</script>
+    <script src="vendor/jquery-ui/ui/jquery.ui.menu.js">&#160;</script>
+    <script src="vendor/jquery-ui/ui/jquery.ui.autocomplete.js">&#160;</script>
     <script src="vendor/handlebars/handlebars.js">&#160;</script>
     <script src="vendor/holderjs/holder.js">&#160;</script>
     <!--<script src="vendor/bootstrap-sass-official/assets/javascripts/bootstrap/affix.js">&#160;</script>-->
@@ -31,6 +35,9 @@
     <script src="scripts/search-controls.js">&#160;</script>
     <script src="scripts/sidebar.js">&#160;</script>
     <script src="scripts/community-list.js">&#160;</script>
+    <script src="scripts/author-page.js">&#160;</script>
+    <script src="scripts/author-profile.js">&#160;</script>
+    <script src="scripts/jquery.validate.min.js">&#160;</script>
     <script src="scripts/browse.js">&#160;</script>
     <script src="scripts/choice-support.js">&#160;</script>
     <script src="scripts/vocabulary-support.js">&#160;</script>

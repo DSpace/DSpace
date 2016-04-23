@@ -33,6 +33,8 @@
 	<message key="xmlui.general.return">Return</message>
 	<message key="xmlui.general.update">Update</message>
 	<message key="xmlui.general.delete">Delete</message>
+	<message key="xmlui.general.add">Add</message>
+	<message key="xmlui.general.remove">Remove</message>
 	<message key="xmlui.general.next">Next</message>
 	<message key="xmlui.general.untitled">Untitled</message>
         <message key="xmlui.general.perform">Perform</message>
@@ -281,6 +283,8 @@
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">By Submit Date</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_collection">This Collection</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_community">This Community</message>
+    <message key="xmlui.ArtifactBrowser.Navigationauthor_profile.head">Author profiles</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_by_author_profile">View</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.SimpleSearch.java -->
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.title">Search</message>
@@ -2502,4 +2506,192 @@
     <message key="xmlui.mirage2.choice-authority-control.loading">Loading...</message>
 
     <message key="xmlui.mirage2.item-list.thumbnail">Thumbnail</message>
+
+
+    <!--Author profile messages: START -->
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileLastNameInput">Last name</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileFirstNameInput">First name</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileAuthorInput">Author values used for finding records</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileNameVariantInput">Displayed name variants</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileSpecialization">Specialization</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileDegree">Degrees</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileOrchidId">ORCID</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileUnitInput">Unit</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileTitleInput">Biography Title</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileUnitInput">Please enter the author's unit</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileTitleInput">Please enter the biography's title</message>
+
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileNameSynonymInput">Human readable URL</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileNameSynonymInput">Enter a key for creating a human readable url for your author profile.</message>
+
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileDepartment">Department</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfile.department.name">Department name</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfile.department.url">Department url</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileEmail">Email address</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileHidden">Email address visibility</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileHidden.true">Hide email address</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileTelephone">Telephone number</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileSite">Link to Personal web page</message>
+    <message key="xmlui.authorprofile.administrative.field.head.site.url">Url</message>
+    <message key="xmlui.authorprofile.administrative.field.head.site.name">Label</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileBiography">Biography</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileExternalHostWork">Externally hosted work</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileSingleImage">Picture</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfilePublic">Profile public</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfilePublic.true">Enable public profile</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileInternal">Internal author</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileInternal.true">Is internal author</message>
+    <message key="xmlui.authorprofile.administrative.field.error.authorProfileLastNameInput">The last name is required.</message>
+    <message key="xmlui.authorprofile.administrative.field.error.authorProfileFirstNameInput">The first name is required.</message>
+    <message key="xmlui.authorprofile.administrative.field.error.authorProfileEmail">An email address is required</message>
+    <message key="xmlui.authorprofile.administrative.field.error.authorProfileAuthorInput">The author profile is required</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileLastNameInput">The last name is invalid.</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileFirstNameInput">The first name is invalid.</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileEmail">The email address is invalid</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileAuthorInput">The author profile is invalid</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileSite">The url is invalid</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileTelephone">The telephone number is invalid</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileAuthorInput.DuplicateAuthorNameVariant">This name is already in use.</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileEmail.regexFailed">{0} is not a valid email address.</message>
+
+
+
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileLastNameInput">Please enter the author's last name</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileFirstNameInput">Please enter the author's first name</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileAuthorInput">Enter any name variants to be used for searching items, exactly as they occur on the items in the DSpace. All the occurrences of the author's name should be entered here (including the "Last name, First name" combination above).
+        If the same person is intentionally written differently on separate items, including the variants here will ensure the items matching either one of the names will be displayed.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileNameVariantInput">Enter any name variants to be displayed on the author profile page.<br/>
+        The format to be user is "Last name, First name"</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileSpecialization">Enter the author's fields of specialization</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileDegree">Enter the author's degrees</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileOrchidId">Enter the author's ORCID</message>
+
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileDepartment">Enter the department name and corresponding URL here. The URL is not mandatory.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.department.name">Department name</message>
+    <message key="xmlui.authorprofile.administrative.field.help.department.url">Department url</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileEmail">Enter the author's email address.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileHidden">Check if the author's email address should not be displayed on the author profile page</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileTelephone">Enter the author's telephone number if it can be displayed on the author profile page</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileSite">Enter the link(s) to the Personal web page. Both the name and the URL are required.</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfile.site.url">Url</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfile.site.name">Label</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileBiography">Enter your biography here.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileExternalHostWork">Enter any Externally hosted work here.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileSingleImage">Please upload a Picture for the author profile. Please refrain from uploading large files. The picture will be resized automatically on the author profile page if necessary.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfilePublic">If the checkbox below is checked, the Author Profile will be publicly accessible. If it is not checked, only administrators will be able to see the link to the author profile or open the actual author profile page.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfilePublic.true">Enable public profile</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileInternal">Select whether the author is an internal or external author.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileInternal.true">Is internal author</message>
+
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.title">Edit author profile</message>
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.trail">Edit author profile</message>
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.submit.create">Create author profile</message>
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.submit.edit">Save author profile</message>
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.submit.remove.authorProfileSingleImage">Remove author profile image</message>
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.submit.change.authorProfileSingleImage">Alter author profile image</message>
+    <message key="xmlui.authorprofile.administrative.author.link">View author profile (unsaved changes will be lost)</message>
+    <message key="xmlui.authorprofile.administrative.author.delete">Delete author profile</message>
+    <message key="xmlui.authorprofile.administrative.Navigation.create_author_profile">Create new author profile</message>
+
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.list.head">Browse by Author Profile</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.starts_with">Jump to last name</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.edit">Edit this author profile</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.show">Show Details</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.hide">Hide details</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.statistics">Statistics</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.downloads">downloads</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.views">views</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.head">Author page for: "{0}"</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.results.head">{0}'s hosted work.</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.contactInformation">Contact Information</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.nameVariants">Author Name Variants</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.fieldsOfSpecialization">Fields of Specialization</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.degrees">Degrees</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.orchid">ORCID</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.department">Department</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.departments">Departments</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.externalLinks">External Links</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.biography">Biography</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.externalHostwork">Externally hosted work:</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.updateDate">Last updated</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.help">Select the author profile icon next to the author's name in order to view their biography and list of publications.</message>
+    <message key="xmlui.AuthorProfile.trail">View author profile</message>
+
+    <!--Author profile messages: END -->
+    
+    <!--Proceso de revisión-->
+ 	<message key="xmlui.Submission.submit.progressbar.revision_final">Le recordamos que su contribución va a ser publicada junto con el artículo original bajo una licencia CCBY que permite su uso público, siempre que se reconozca su autoría (mediante una cita del formato: Revisor. Fecha. Titulo del articulo original [Rev]. Autores del artículo original. handle/url).</message>
+	<message key="xmlui.openaire.juicio.juzgar">Comentar esta revisión</message>
+	<message key="xmlui.ArtifactBrowser.JuzgarSent.title">Comentar esta revisión</message>
+	<message key="xmlui.ArtifactBrowser.JuzgarSent.trail">Comentar esta revisión</message>
+	<message key="xmlui.ArtifactBrowser.JuzgarSent.head">Comentar esta revisión</message>
+ 	<message key="xmlui.ArtifactBrowser.JuzgarSent.para1">
+		<p>Comentar las revisiones de trabajos disponibles en repositorios antes (en estado preprint), o incluso después de su publicación, ayuda a los autores y revisores a mejorar sus contribuciones y abre nuevas vías de colaboración entre investigadores.</p>
+		<p>Si Vd ha efectuado una revisión del trabajo, recibirá en la dirección de correo indicada un mensaje con información sobre cómo realizar su comentario.</p>
+ 	</message>
+ 	
+ 	<message key="xmlui.ArtifactBrowser.JuzgarForm.head">Formulario de revisión</message>
+ 	<message key="xmlui.ArtifactBrowser.JuzgarForm.para1">
+		<p>Mediante esta pantalla Vd. solicita hacer un comentario sobre una revisión del trabajo disponible en el repositorio institucional digital de acceso abierto del Instituto Español de Oceanografía.</p>
+		<p>Introduciendo su email, recibirá un mensaje con un enlace para mandar su comentario. Por favor indique su email aquí:</p>
+ 	</message>
+ 	<message key="xmlui.ArtifactBrowser.JuzgarForm.email">Correo electrónico</message>
+	<message key="xmlui.ArtifactBrowser.JuzgarForm.email_help">Correo electrónico al que se enviará el enlace de un único uso con el que se podrá realizar la valoración.</message>
+ 	<message key="xmlui.ArtifactBrowser.JuzgarForm.submit">Enviar</message>
+ 	
+ 	<message key="xmlui.ArtifactBrowser.JuzgarForm.error.mailIncorrecto">Error. El correo electrónico es incorrecto.</message>
+	<message key="xmlui.ArtifactBrowser.JuzgarForm.error.mailNoPermitido">Error. No se permite que ese usuario haga comentarios sobre esta revisión.</message>
+ 
+ 	<message key="xmlui.ArtifactBrowser.RevisarSent.title">Solicitar revisión</message>
+ 	<message key="xmlui.ArtifactBrowser.RevisarSent.head">Solicitar revisión</message>
+ 	<message key="xmlui.ArtifactBrowser.RevisarSent.para1">
+ 	<p>Revisar abiertamente trabajos depositados en repositorios antes (en estado preprint), o incluso después de su publicación, ayuda a los autores a mejorar sus contribuciones y abre nuevas vías de colaboración entre investigadores.</p>
+		<p>Se ha enviado a la dirección de correo indicada un mensaje para realizar la revisión solicitada.</p> 
+ 	</message>
+ 	
+
+ 	<message key="xmlui.ArtifactBrowser.RevisarForm.head">Formulario de revisión</message>
+ 	<message key="xmlui.ArtifactBrowser.RevisarForm.para1">
+		<p>Mediante esta pantalla Vd. solicita revisar el trabajo disponible en el repositorio institucional digital de acceso abierto del Instituto Español de Oceanografía.</p>
+		<p>Revisar abiertamente trabajos depositados en repositorios antes (en estado preprint), o incluso después de su publicación, ayuda a los autores a mejorar sus contribuciones y abre nuevas vías de colaboración entre investigadores. Además, en este modelo de revisión abierta, el revisor es reconocido por su contribución, ya que su revisión se convierte en un ítem citable que puede incluir en su currículum académico. Para más información sobre este modelo innovador de revisión por pares puede leer el <a href="http://www.openscholar.org.uk/independent-peer-review-manifesto/" target="_blank">"Independent Peer Review Manifesto"</a> y <a href="http://digital.csic.es/handle/10261/130842" target="_blank">http://digital.csic.es/handle/10261/130842</a></p>
+ 		<p>Introduciendo su email, recibirá un mensaje que contendrá un enlace para efectuar la revisión solicitada.</p>
+ 	</message>
+ 	<message key="xmlui.ArtifactBrowser.RevisarForm.email">Correo electrónico</message>
+	<message key="xmlui.ArtifactBrowser.RevisarForm.email_help">Correo electrónico al que se enviará el enlace desde el que se podrá realizar la revisión.</message>
+ 	<message key="xmlui.ArtifactBrowser.RevisarForm.submit">Enviar</message>
+ 	
+ <message key="xmlui.Submission.submit.DescribeInviteStep.title1">Invitar a revisores</message>
+ <message key="xmlui.Submission.submit.DescribeInviteStep.para1">
+	<p>Mediante esta pantalla, Vd. puede solicitar a expertos revisar su trabajo.</p>
+	<p>Revisar abiertamente trabajos depositados en repositorios antes (en estado preprint), o incluso después de su publicación, ayuda a abrir nuevas vías de colaboración con otros investigadores.</p>
+	<p>Puede saltar este paso pulsando el siguiente botón.</p>
+ </message>
+ 
+ <message key="xmlui.Submission.submit.DescribeRevisionStep.title1">Revisión</message>
+ <message key="xmlui.Submission.submit.DescribeRevisionStep.para1">
+	<p class="bold">Escriba su opinión sobre el trabajo incluyendo todos los detalles necesarios para ayudar a los autores a mejorar su contribución. Procure ser constructivo.</p>
+	<p class="bold">Le recordamos que su revisión será publicada junto con el trabajo original bajo una licencia <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC-BY</a> que permite su uso público, siempre que se reconozca su autoría (mediante una cita del formato: Revisor. Fecha. Título del trabajo original [Revisión]. Autores del trabajo. handle/url).</p>
+ </message>
+ 
+<message key="xmlui.Submission.submit.progressbar.juicio">Valoración</message>
+<message key="xmlui.Submission.submit.DescribeJuicioStep.head">Valoración</message>
+<message key="xmlui.Submission.submit.DescribeJuicioStep.title1">Valoración</message>
+ <message key="xmlui.Submission.submit.DescribeJuicioStep.para1">
+	<p class="bold">Escriba su comentario sobre la revisión del trabajo incluyendo todos los detalles necesarios. Procure ser constructivo.</p>
+	<p class="bold">Le recordamos que su contribución será publicada junto con las revisiones y el trabajo original bajo una licencia <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC-BY</a> que permite su uso público, siempre y cuando que se reconozca su autoría (mediante una cita del formato: Autor del comentario. Fecha. Título del artículo original [Revisión]. Autor de la revisión. handle/url).</p>
+ </message>
+ 
+ <message key="xmlui.dri2xhtml.METS-1.0.item-isrelatedtoRevision">Revisiones relacionadas</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-isrelatedtoJuicio">Comentarios relacionados</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-isrelatedtoItem">Trabajo relacionado</message>
+ 
+<message key="xmlui.openaire.revision.solicitar">Revisar este trabajo</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-affiliation">Afiliación</message>
+ 
+<message key="xmlui.dri2xhtml.METS-1.0.item-isrelatedtoRevision.revisionDe">Ver revisión de </message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-isrelatedtoJuicio.juicioDe">Ver comentario de </message>
+
+<message key="xmlui.dri2xhtml.METS-1.0.item-redondel.valor.reputacion">Valor de reputación</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-redondel.valor.calificacion">Valor de calificación</message>
+<message key="xmlui.administrative.Navigation.administrative_editar_mi_perfil_autor">Mi Perfil de Autor</message>
 </catalogue>

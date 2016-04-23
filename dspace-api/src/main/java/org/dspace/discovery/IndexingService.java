@@ -38,10 +38,10 @@ public interface IndexingService {
     void unIndexContent(Context context, DSpaceObject dso, boolean commit)
             throws SQLException, IOException;
     
-    void unIndexContent(Context context, String handle)
+    void unIndexContent(Context context, String uniqueId)
             throws SQLException, IOException;
 
-    void unIndexContent(Context context, String handle, boolean commit)
+    void unIndexContent(Context context, String uniqueId, boolean commit)
             throws SQLException, IOException;
 
     void reIndexContent(Context context, DSpaceObject dso)
@@ -61,4 +61,10 @@ public interface IndexingService {
     void optimize() throws SearchServiceException;
 
     void buildSpellCheck() throws SearchServiceException;
+
+    public String getUniqueId(int type, int id);
+
+    public String getUniqueId(DSpaceObject dso);
+
+    void unIndexContentByHandle(Context context, String handle) throws SQLException, IOException;
 }

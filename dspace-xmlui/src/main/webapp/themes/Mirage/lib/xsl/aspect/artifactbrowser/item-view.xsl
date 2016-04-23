@@ -159,6 +159,12 @@
                                             <xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
                                           </xsl:if>
 	                                <xsl:copy-of select="node()"/>
+                                            <xsl:text> </xsl:text>
+                                            <xsl:call-template name="author-decorate">
+                                                <xsl:with-param name="currAuthor" select="."/>
+                                                <xsl:with-param name="context-path" select="$context-path"/>
+                                                <xsl:with-param name="pageMeta" select="$pageMeta"/>
+                                            </xsl:call-template>
                                         </span>
 	                                <xsl:if test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author']) != 0">
 	                                    <xsl:text>; </xsl:text>

@@ -12,6 +12,7 @@ import java.util.*;
 
 import org.xml.sax.SAXException;
 import org.w3c.dom.*;
+
 import javax.xml.parsers.*;
 
 import org.dspace.content.MetadataSchema;
@@ -36,6 +37,7 @@ import org.dspace.core.ConfigurationManager;
  * selected from a choice list.
  *
  * @author  Brian S. Hughes
+ * @author Adán Roman Ruiz at arvo.es
  * @version $Revision$
  */
 
@@ -48,14 +50,15 @@ public class DCInputsReader
     public static final String DEFAULT_COLLECTION = "default";
 
     /** Name of the form definition XML file  */
-    static final String FORM_DEF_FILE = "input-forms.xml";
+    static final String FORM_DEF_FILE_NAME = "input-forms";
+    static final String FORM_DEF_FILE_EXTENSION = "xml";
 
     /** Keyname for storing dropdown value-pair set name */
     static final String PAIR_TYPE_NAME = "value-pairs-name";
 
     /** The fully qualified pathname of the form definition XML file */
     private String defsFile = ConfigurationManager.getProperty("dspace.dir")
-            + File.separator + "config" + File.separator + FORM_DEF_FILE;
+            + File.separator + "config" + File.separator + FORM_DEF_FILE_NAME+"."+FORM_DEF_FILE_EXTENSION;
 
     /**
      * Reference to the collections to forms map, computed from the forms
@@ -99,6 +102,16 @@ public class DCInputsReader
          throws DCInputsReaderException
     {
         buildInputs(fileName);
+    }
+
+
+    public DCInputsReader(Locale locale) throws DCInputsReaderException{
+	if (locale==null){
+	    buildInputs(defsFile);
+	}else{
+	    String language=locale.getLanguage();
+	    buildInputs(defsFile.replace(FORM_DEF_FILE_NAME,FORM_DEF_FILE_NAME+"_"+language));
+	}
     }
 
 

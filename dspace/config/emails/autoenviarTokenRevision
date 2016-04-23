@@ -1,0 +1,35 @@
+# Email sent to DSpace reviewers users.
+#
+# Parameters: 			{0} Título
+#				{1} Autores
+#				{2} Handle
+#				{3} Token de revisión
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Review request for the work available at the digital institutional open access Spanish Institute of Oceanography repository
+Dear Scholar,
+ 
+You have requested to review the work titled {0}
+  
+By openly reviewing scientific works published in repositories before (preprints), or even after their publication in academic journals, you help their authors improve their contributions and promote new ways of constructive academic collaboration. Importantly, this peer review model offers reviewers recognition for their contributions, since reviews become citable items that can be included in academic records. For more information regarding this innovative peer review model that is being implemented for the first time by the digital institutional open access Spanish Institute of Oceanography repository we invite you to read the "Independent Peer Review Manifesto": http://www.openscholar.org.uk/independent-peer-review-manifesto/
+ 
+The work you have requested to review:
+ 
+Title: {0}
+Authors: {1}
+Handle: {2}
+ 
+The full text of the work is attached to this email.
+ 
+When you are ready to review the work please click on the link below:
+
+{3}
+ 
+This link does not expire, but you will only be able to use it once. However, after you initiate your review process you can save your progress and continue later. 
+
+ 
+If you have any questions or require further assistance please contact the repository administrator.
+ 
+Kind regards,
+Digital institutional open access Spanish Institute of Oceanography repository.

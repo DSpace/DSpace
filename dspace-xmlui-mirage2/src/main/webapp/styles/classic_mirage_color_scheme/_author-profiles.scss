@@ -1,0 +1,29 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+
+.author-biography-minimal {
+  margin-top:-10px;
+}
+
+.author-pic.icon.large{
+  font-size:120px;
+}
+
+.author-discover-item a{
+  color: $discovery-link-color;
+  text-decoration: none;
+}
+
+a.author-profile i{
+  color: $author-profile-icon-color;
+}
+
+a.author-profile i:hover{
+  color: darken($author-profile-icon-color, 25%);
+}
+

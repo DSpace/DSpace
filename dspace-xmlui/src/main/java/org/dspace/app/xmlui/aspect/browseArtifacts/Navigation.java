@@ -21,6 +21,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.content.Collection;
@@ -75,6 +76,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             {
                 key += "-" + dso.getHandle();
             }
+            key += AuthorizeManager.isAdmin(context);
 
             return HashUtil.hash(key);
         }

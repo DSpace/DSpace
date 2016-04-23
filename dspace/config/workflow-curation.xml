@@ -59,9 +59,16 @@
          <notify on="fail">$colladmin</notify>
          <notify on="error">$siteadmin</notify>
        </task>
+       
+     </flowstep>
+     <flowstep name="post_archive">
+          <!-- Envio de mails a los revisores despues de la aprobacion del item -->
+       <task name="revisorTokenEnviar">
+       </task>
      </flowstep>
    </taskset>
    
  </tasksets>
+
  
 </workflow-curation>

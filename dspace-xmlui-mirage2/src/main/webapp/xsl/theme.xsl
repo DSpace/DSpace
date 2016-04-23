@@ -42,12 +42,14 @@
     <xsl:import href="aspect/artifactbrowser/common.xsl"/>
     <xsl:import href="aspect/artifactbrowser/item-list.xsl"/>
     <xsl:import href="aspect/artifactbrowser/item-view.xsl"/>
+    <xsl:import href="aspect/artifactbrowser/item-view-buttons.xsl"/>
     <xsl:import href="aspect/artifactbrowser/community-list.xsl"/>
     <xsl:import href="aspect/artifactbrowser/collection-list.xsl"/>
     <xsl:import href="aspect/artifactbrowser/browse.xsl"/>
     <xsl:import href="aspect/discovery/discovery.xsl"/>
     <xsl:import href="aspect/artifactbrowser/one-offs.xsl"/>
     <xsl:import href="aspect/submission/submission.xsl"/>
+    <xsl:import href="aspect/artifactbrowser/author-view.xsl"/>
     <xsl:output indent="yes"/>
 
 
