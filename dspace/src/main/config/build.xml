@@ -774,6 +774,9 @@ Common usage:
             <fileset dir="config-temp" excludes="dspace.cfg" />
         </copy>
 
+        <!-- Remove the prepare_configs work directory -->
+        <delete dir="config-temp" />
+
         <copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
 
         <echo file='${dspace.dir}/config/ant.properties' message='ant.version = ${ant.version}'/>
