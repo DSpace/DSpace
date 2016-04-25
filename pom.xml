@@ -43,6 +43,7 @@
              (NOTE: individual POMs can override specific settings). -->
         <pluginManagement>
             <plugins>
+                <!-- Use to enforce a particular version of Java and ensure no conflicting dependencies -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
@@ -61,7 +62,7 @@
                                 </rules>    
                             </configuration>
                         </execution>
-                        <!-- Make sure that we do not have conflicting depencies-->
+                        <!-- Make sure that we do not have conflicting dependencies-->
                         <execution>
                             <id>enforce-versions</id>
                             <goals>
@@ -75,6 +76,7 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- Used to compile all Java classes -->
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.5.1</version>
@@ -83,6 +85,7 @@
                       <target>${java.version}</target>
                     </configuration>
                 </plugin>
+                <!-- Used to package all DSpace JARs -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
@@ -96,6 +99,7 @@
                         </archive>
                     </configuration>
                 </plugin>
+                <!-- Used to package all DSpace WARs -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
@@ -112,6 +116,7 @@
                         </archive>
                     </configuration>
                 </plugin>
+                <!-- Used to run Unit tests (when -Dskiptests=false) -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -132,6 +137,7 @@
                         -->
                     </configuration>
                 </plugin>
+                <!-- Used to run Integration tests (when -Dskipits=false) -->
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>2.19.1</version>
@@ -190,10 +196,39 @@
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>2.7</version>
                 </plugin>
+                <!-- Used to validate License Headers (see build process) -->
                 <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
                     <version>2.11</version>
+                </plugin>
+                <!-- Used to generate a new release via Sonatype (see release profile). -->
+                <plugin>
+                    <groupId>org.sonatype.plugins</groupId>
+                    <artifactId>nexus-staging-maven-plugin</artifactId>
+                    <version>1.6.7</version>
+                </plugin>
+                <!-- Used to generate JavaDocs for new releases (see release profile). -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.10.3</version>
+                    <configuration>
+                        <!-- Never fail a build based on Javadoc errors -->
+                        <failOnError>false</failOnError>
+                    </configuration>
+                </plugin>
+                <!-- Used to generate source JARs for new releases (see release profile). -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                <!-- Used to sign new releases via GPG (see release profile). -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.6</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -268,11 +303,10 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Enforce our version of Maven, etc. -->
+            <!-- Enforce our version of Java, Maven, dependencies, etc. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
             </plugin>
         </plugins>
     </build>
@@ -682,6 +716,8 @@
                         <version>1.6.7</version>
                         <extensions>true</extensions>
                         <configuration>
+                            <!-- In your settings.xml, your username/password
+                                 MUST be specified for server 'ossrh' -->
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
@@ -691,7 +727,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.4</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -705,16 +740,12 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.3</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
                                 <goals>
                                     <goal>aggregate-jar</goal>
                                 </goals>
-                                <configuration>
-                                    <failOnError>false</failOnError>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -723,7 +754,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
