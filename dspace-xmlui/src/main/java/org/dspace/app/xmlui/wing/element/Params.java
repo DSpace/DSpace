@@ -21,12 +21,19 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.NamespaceSupport;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class Params extends AbstractWingElement implements StructuralElement
 {
     /** The name of the params element */
     public static final String E_PARAMS = "params";
+    
+    /** The name of the param elements inside params */
+    public static final String E_PARAM = "param";
 
     /** The name of the operations attribute */
     public static final String A_OPERATIONS = "operations";
@@ -71,6 +78,9 @@ public class Params extends AbstractWingElement implements StructuralElement
     /** The name of the field to use for a list of choices */
     public static final String A_CHOICES_CLOSED = "choicesClosed";
 
+    /** The name of the attribute that identifies a param element */
+    public static final String A_PARAM_NAME =  "name";
+       
     /** Possible operations */
     public static final String OPERATION_ADD = "add";
 
@@ -133,6 +143,9 @@ public class Params extends AbstractWingElement implements StructuralElement
     /** Value of choicesClosed option */
     protected boolean choicesClosed = false;
 
+    /** language options if metadata is internationalizable */
+    protected Collection<Option> langOptions = new ArrayList<Option>();
+   
     /**
      * Construct a new parameter's element
      *
@@ -340,7 +353,17 @@ public class Params extends AbstractWingElement implements StructuralElement
     {
         this.choicesClosed = value;
     }
-
+    
+    /**
+     * add a new language option
+     * 
+     * @param option
+     */
+    public void setLanguageOptions(List<Option> langOptions )
+    {
+       	this.langOptions=langOptions;
+    }
+    
     /**
      * Sets whether choices are "closed" to the set returned by plugin.
      */
@@ -465,6 +488,23 @@ public class Params extends AbstractWingElement implements StructuralElement
         }
 
         startElement(contentHandler, namespaces, E_PARAMS, attributes);
+        
+        /**
+         * if the metadata is internationalizable builds a param element inside 
+         * params with the diferent language options
+         */
+        if (langOptions.size()>0)
+        {
+        	AttributeMap  langAttributes = new AttributeMap();
+        	langAttributes.put(A_PARAM_NAME, "langs");
+        	startElement(contentHandler, namespaces, E_PARAM, langAttributes);
+        	for (Option option : langOptions)
+            {
+                option.toSAX(contentHandler, lexicalHandler, namespaces);
+            }
+        	endElement(contentHandler, namespaces, E_PARAM);
+        }
+        
         endElement(contentHandler, namespaces, E_PARAMS);
     }
 }

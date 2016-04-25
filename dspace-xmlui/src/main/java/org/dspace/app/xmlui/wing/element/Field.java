@@ -59,6 +59,7 @@ package org.dspace.app.xmlui.wing.element;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.dspace.app.xmlui.wing.AttributeMap;
@@ -486,6 +487,28 @@ public abstract class Field extends AbstractWingElement implements
             remove.dispose();
         }
     }
+
+    /**
+     * build the languages select for metadata values
+     * 
+     * @param options
+     * @throws WingException
+     */
+	public void setLanguagesList(List<String> options) throws WingException 
+	{
+	 
+		List<Option> langOptions = new ArrayList<Option>();
+		 
+		for (int i = 0; i < options.size(); i += 2)
+		{
+			String display = options.get(i);
+			String value   = options.get(i+1);
+			Option option = new Option(context, value);
+	     	option.addContent(display);
+	     	langOptions.add(option);
+		}
+       	this.params.setLanguageOptions(langOptions);
+	}
 
     /**
      * Translate this element and all contained elements into SAX events. The
