@@ -204,6 +204,7 @@
             <!-- Specify our settings for new releases via 'mvn release:*' -->
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
                 <configuration>
                     <!-- During release:perform, enable the "release" profile (see below) -->
                     <releaseProfiles>release</releaseProfiles>
