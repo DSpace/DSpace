@@ -140,7 +140,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     public DryadJournalConcept(Context context, String fullName) throws StorageException {
         this();
         this.setFullName(fullName);
-        this.setJournalID(fullName);
         try {
             context.commit();
         } catch (Exception e) {
