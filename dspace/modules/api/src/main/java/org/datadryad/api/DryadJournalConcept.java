@@ -111,7 +111,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     // these are mandatory elements
     private Concept underlyingConcept;
     private String conceptIdentifier;
-    private int conceptID;
     private String fullName;
 
     public DryadJournalConcept() {
@@ -179,7 +178,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     public void setUnderlyingConcept(Context context, Concept concept) {
         this.underlyingConcept = concept;
         this.conceptIdentifier = concept.getIdentifier();
-        this.conceptID = concept.getID();
     }
 
     @Override
