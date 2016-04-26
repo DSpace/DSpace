@@ -215,8 +215,8 @@ public class MediaFilterCLITool {
                 String[] formats = 
                         DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty(
                         FILTER_PREFIX + "." + filterClassName +
-                                (pluginName!=null ? "." + pluginName : "") +
-                                "." + INPUT_FORMATS_SUFFIX);
+                        (pluginName!=null ? "." + pluginName : "") +
+                        "." + INPUT_FORMATS_SUFFIX);
 
                 //add to internal map of filters to supported formats
                 if (ArrayUtils.isNotEmpty(formats))

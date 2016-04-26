@@ -58,10 +58,10 @@ public class EventServiceImpl implements EventService
     protected EventServiceImpl()
     {
         initPool();
-        log.info("Event Dispatcher Pool Initialized");
+        log.info("EventService dispatcher pool initialized");
     }
 
-    protected void initPool()
+    private void initPool()
     {
 
         if (dispatcherPool == null)
@@ -92,7 +92,7 @@ public class EventServiceImpl implements EventService
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                log.error("Could not initialize EventService dispatcher pool", e);
             }
 
         }
@@ -131,7 +131,7 @@ public class EventServiceImpl implements EventService
         }
         catch (Exception e)
         {
-            log.error(e.getMessage(), e);
+            throw new IllegalStateException("Unable to return dispatcher named " + key, e);
         }
     }
 
@@ -179,7 +179,6 @@ public class EventServiceImpl implements EventService
         public DispatcherPoolFactory()
         {
             parseEventConfig();
-            log.info("");
         }
 
         public PooledObject<Dispatcher> wrap(Dispatcher d) {
@@ -324,13 +323,7 @@ public class EventServiceImpl implements EventService
          * 
          * <pre>
          *  # class of dispatcher &quot;default&quot;
-         *  event.dispatcher.default = org.dspace.event.BasicDispatcher
-         *  # list of consumers followed by filters for each, format is
-         *  #   &lt;consumerClass&gt;:&lt;filter&gt;[:&lt;anotherFilter&gt;..] , ...
-         *  #  and each filter is expressed as:
-         *  #    &lt;objectType&gt;[|&lt;objectType&gt; ...] + &lt;eventType&gt;[|&lt;eventType&gt; ..]
-         *  org.dspace.event.TestConsumer:all+all, \
-         *  org.dspace.eperson.SubscribeConsumer:Item+CREATE|DELETE:Collection+ADD, ...
+         *  event.dispatcher.default.class = org.dspace.event.BasicDispatcher
          * </pre>
          * 
          */
@@ -341,20 +334,13 @@ public class EventServiceImpl implements EventService
             
             for(String ckey : propertyNames)
             {
+                // If it ends with ".class", append it to our list of dispatcher classes
                 if (ckey.endsWith(".class"))
                 {
                     String name = ckey.substring(PROP_PFX.length()+1, ckey
                             .length() - 6);
                     String dispatcherClass = configurationService
                             .getProperty(ckey);
-
-                    // Can we grab all of the consumers configured for this
-                    // dispatcher
-                    // and store them also? Then there is no
-                    // ConfigurationManager call
-                    // upon other makeObject(key) requests resulting in a faster
-                    // pool
-                    // get.
 
                     dispatchers.put(name, dispatcherClass);
 

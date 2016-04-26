@@ -38,7 +38,12 @@ public class ReportGenerator
      * The minimum date for the from or to field to be. (e.g. The beginning of DSpace)
      */
     private static String MINIMUM_DATE = "2008-01-01";
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    private static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("MM/dd/yyyy");
+        }
+    };
 
     // perfect input is 2008-01-22, an alternate format is 01/22/2008
     static String[] formatStrings = {"MM/dd/yyyy", "yyyy-MM-dd"};
@@ -54,7 +59,7 @@ public class ReportGenerator
     
     public String getDateStartFormated() {
         try {
-            return dateFormat.format(dateStart);
+            return dateFormat.get().format(dateStart);
         } catch (Exception e) {
             return "";
         }
@@ -89,7 +94,7 @@ public class ReportGenerator
     
     public String getDateEndFormatted() {
         try {
-            return dateFormat.format(dateEnd);
+            return dateFormat.get().format(dateEnd);
         } catch (Exception e) {
             return "";
         }

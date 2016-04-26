@@ -305,7 +305,7 @@
            .append("\" size=\"23\" ");
          if (readonly)
          {
-             sb.append("disabled=\"disabled\" ");
+             sb.append("readonly=\"readonly\" ");
          }
          sb.append("value=\"")
            .append(dpn.getLastName().replaceAll("\"", "&quot;")) // Encode "
@@ -316,7 +316,7 @@
            .append("\" size=\"23\" ");
          if (readonly)
          {
-             sb.append("disabled=\"disabled\" ");
+             sb.append("readonly=\"readonly\" ");
          }
          sb.append("value=\"")
            .append(dpn.getFirstNames()).append("\"/></span>");         
@@ -396,7 +396,7 @@
          }
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\"><option value=\"-1\"")
             .append((dateIssued.getMonth() == -1 ? " selected=\"selected\"" : ""))
@@ -425,7 +425,7 @@
             sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
                  .append((dateIssued.getDay() > 0 ?
@@ -439,7 +439,7 @@
             sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" size=\"4\" maxlength=\"4\" value=\"")
             .append((dateIssued.getYear() > 0 ?
@@ -506,7 +506,7 @@
            sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" placeholder=\"")
            .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.seriesname").replaceAll("\"", "&quot;"));
@@ -519,7 +519,7 @@
            sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" placeholder=\"")
            .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.paperno").replaceAll("\"", "&quot;"));
@@ -611,7 +611,7 @@
          sb.append("<textarea class=\"form-control\" name=\"").append(fieldNameIdx)
            .append("\" rows=\"4\" cols=\"45\" id=\"")
            .append(fieldNameIdx).append("_id\" ")
-           .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
+           .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" readonly=\"readonly\" ":"")
            .append(">")
            .append(val)
            .append("</textarea>")
@@ -726,7 +726,7 @@
              .append("\" id=\"")
              .append(fieldNameIdx).append("\" size=\"50\" value=\"")
              .append(val +"\"")
-             .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
+             .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" readonly=\"readonly\" ":"")
              .append("/>")
 			 .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))             
              .append("</div>");
@@ -858,7 +858,7 @@
                     .append("\" size=\"15\" value=\"")
                     .append(defaults.get(i).getValue().replaceAll("\"", "&quot;"))
                     .append("\"")
-                    .append((hasVocabulary(vocabulary) && closedVocabulary) || readonly ? " disabled=\"disabled\" " : "")
+                    .append((hasVocabulary(vocabulary) && closedVocabulary) || readonly ? " readonly=\"readonly\" " : "")
                     .append("/>");
 
                 sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
@@ -899,7 +899,7 @@
                     .append("\"><input class=\"form-control\" type=\"text\" name=\"")
                     .append(fieldParam)
                     .append("\" size=\"15\"")
-                    .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
+                    .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" readonly=\"readonly\" ":"")
                     .append("/>")
                     .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
                     .append("</span>\n");
@@ -939,7 +939,7 @@
                  .append("\" size=\"15\" value=\"")
                  .append(defaults.get(i).getValue().replaceAll("\"", "&quot;"))
                  .append("\"")
-                 .append((hasVocabulary(vocabulary) && closedVocabulary) || readonly ? " disabled=\"disabled\" " : "")
+                 .append((hasVocabulary(vocabulary) && closedVocabulary) || readonly ? " readonly=\"readonly\" " : "")
                  .append("/>");
                 sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
                 sb.append("</span>");
@@ -979,7 +979,7 @@
                     .append("\"><input class=\"form-control\" type=\"text\" name=\"")
                     .append(fieldParam)
                     .append("\" size=\"15\"")
-                     .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
+                     .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" readonly=\"readonly\" ":"")
                     .append("/>")
                     .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
                     .append("</span>\n");
@@ -1071,7 +1071,7 @@
            sb.append("_").append(j+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\">");
          for (int i = 0; i < qualMap.size(); i+=2)
@@ -1095,7 +1095,7 @@
            sb.append("_").append(j+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" size=\"34\" value=\"")
            .append(currentVal.replaceAll("\"", "&quot;"))
@@ -1153,7 +1153,7 @@
         sb.append(" size=\"6\"  multiple=\"multiple\"");
       if (readonly)
       {
-          sb.append(" disabled=\"disabled\"");
+          sb.append(" readonly=\"readonly\"");
       }
       sb.append(">");
 
@@ -1264,7 +1264,7 @@
                       sb.append("radio");
                    if (readonly)
                    {
-                       sb.append("\" disabled=\"disabled");
+                       sb.append("\" readonly=\"readonly\"");
                    }
                    sb.append("\" name=\"")
                      .append(fieldName)

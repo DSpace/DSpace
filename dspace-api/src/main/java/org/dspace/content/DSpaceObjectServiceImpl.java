@@ -273,7 +273,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so use a runtime exception
                 if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority().length() == 0))
                 {
-                    throw new IllegalArgumentException("The metadata field \"" + metadataField.toString() + "\" requires an authority key but none was provided. Vaue=\"" + values.get(i) + "\"");
+                    throw new IllegalArgumentException("The metadata field \"" + metadataField.toString() + "\" requires an authority key but none was provided. Value=\"" + values.get(i) + "\"");
                 }
             }
             if (values.get(i) != null)

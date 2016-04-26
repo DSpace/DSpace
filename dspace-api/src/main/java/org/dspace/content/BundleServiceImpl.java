@@ -386,6 +386,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         log.info(LogManager.getHeader(context, "delete_bundle", "bundle_id="
                 + bundle.getID()));
 
+        authorizeService.authorizeAction(context, bundle, Constants.DELETE);
+
         context.addEvent(new Event(Event.DELETE, Constants.BUNDLE, bundle.getID(),
                 bundle.getName(), getIdentifiers(context, bundle)));
 

@@ -23,17 +23,17 @@
   -                  display any collections.
   -    admin_button - Boolean, show admin 'edit' button
   --%>
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@page contentType="text/html;charset=UTF-8" %>
 
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.handle.HandleServiceImpl" %>
-<%@ page import="org.dspace.license.CreativeCommonsServiceImpl" %>
+<%@page import="org.dspace.content.Collection" %>
+<%@page import="org.dspace.content.Item" %>
+<%@page import="org.dspace.core.ConfigurationManager" %>
+<%@page import="org.dspace.handle.HandleServiceImpl" %>
+<%@page import="org.dspace.license.CreativeCommonsServiceImpl" %>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@page import="org.dspace.versioning.Version"%>
 <%@page import="org.dspace.core.Context"%>
@@ -44,6 +44,16 @@
 <%@page import="org.dspace.core.Constants"%>
 <%@page import="org.dspace.eperson.EPerson"%>
 <%@page import="org.dspace.versioning.VersionHistory"%>
+<%@page import="org.dspace.plugin.PluginException"%>
+<%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
+<%@page import="org.dspace.content.factory.ContentServiceFactory" %>
+<%@page import="org.dspace.content.MetadataValue" %>
+<%@page import="org.dspace.license.factory.LicenseServiceFactory" %>
+<%@page import="org.dspace.license.service.CreativeCommonsService" %>
+<%@page import="org.dspace.handle.factory.HandleServiceFactory" %>
+<%@page import="org.dspace.versioning.service.VersionHistoryService" %>
+<%@page import="org.dspace.versioning.factory.VersionServiceFactory" %>
+
 <%
     // Attributes
     Boolean displayAllBoolean = (Boolean) request.getAttribute("display.all");
@@ -61,6 +71,13 @@
     // get the handle if the item has one yet
     String handle = item.getHandle();
     Context context = UIUtil.obtainContext(request);
+    
+    // get the doi if the item has one
+    String doi = (String) request.getAttribute("doi");
+    // get the preferred identifier (as URL)
+    String preferredIdentifier = (String) request.getAttribute("preferred_identifier");
+    // get the latestVersionIdentifier
+    String latestVersionIdentifier = (String)request.getAttribute("versioning.latest_version_identifier");
 
     // CC URL & RDF
     CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
@@ -98,22 +115,11 @@
     Boolean showVersionWorkflowAvailableBool = (Boolean)request.getAttribute("versioning.showversionwfavailable");
     boolean showVersionWorkflowAvailable = (showVersionWorkflowAvailableBool!=null && showVersionWorkflowAvailableBool.booleanValue());
     
-    String latestVersionHandle = (String)request.getAttribute("versioning.latestversionhandle");
-    String latestVersionURL = (String)request.getAttribute("versioning.latestversionurl");
-
     VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
     VersionHistory history = (VersionHistory)request.getAttribute("versioning.history");
     List<Version> historyVersions = (List<Version>)request.getAttribute("versioning.historyversions");
 %>
 
-<%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
-<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
-<%@ page import="org.dspace.content.MetadataValue" %>
-<%@ page import="org.dspace.license.factory.LicenseServiceFactory" %>
-<%@ page import="org.dspace.license.service.CreativeCommonsService" %>
-<%@ page import="org.dspace.handle.factory.HandleServiceFactory" %>
-<%@ page import="org.dspace.versioning.service.VersionHistoryService" %>
-<%@ page import="org.dspace.versioning.factory.VersionServiceFactory" %>
 <dspace:layout title="<%= title %>">
 <%
     if (handle != null)
@@ -124,8 +130,8 @@
 		if (newVersionAvailable)
 		   {
 		%>
-		<div class="alert alert-warning"><b><fmt:message key="jsp.version.notice.new_version_head"/></b>		
-		<fmt:message key="jsp.version.notice.new_version_help"/><a href="<%=latestVersionURL %>"><%= latestVersionHandle %></a>
+		<div class="alert alert-warning"><b><fmt:message key="jsp.version.notice.new_version_head"/></b>
+		<fmt:message key="jsp.version.notice.new_version_help"/> <a href="<%= latestVersionIdentifier %>"><%= latestVersionIdentifier %></a>
 		</div>
 		<%
 		    }
@@ -146,7 +152,7 @@
                 <%-- <strong>Please use this identifier to cite or link to this item:
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
                 <div class="well"><fmt:message key="jsp.display-item.identifier"/>
-                    <code><%= HandleServiceFactory.getInstance().getHandleService().getCanonicalForm(handle) %></code></div>
+                <code><%= preferredIdentifier %></code></div>
 <%
         if (admin_button)  // admin edit button
         { %>
@@ -319,11 +325,20 @@
 		<% for(Version versRow : historyVersions) {  
 		
 			EPerson versRowPerson = versRow.getEPerson();
-			String[] identifierPath = VersionUtil.addItemIdentifier(item, versRow);
+			String[] identifierPath = UIUtil.getItemIdentifier(UIUtil.obtainContext(request), versRow.getItem());
+                        String url = identifierPath[0];
+                        String identifier;
+                        if (ConfigurationManager.getBooleanProperty("webui.identifier.strip-prefixes", true))
+                        {
+                            identifier = identifierPath[2];
+                        } else {
+                            identifier = identifierPath[3];
+                        }
 		%>	
 		<tr>			
 			<td headers="tt1" class="oddRowEvenCol"><%= versRow.getVersionNumber() %></td>
-			<td headers="tt2" class="oddRowOddCol"><a href="<%= request.getContextPath() + identifierPath[0] %>"><%= identifierPath[1] %></a><%= item.getID().equals(versRow.getItem().getID())?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
+			<td headers="tt2" class="oddRowOddCol"><a href="<%= url %>"><%= identifier %></a><%= item.getID()==versRow.getItem().getID()?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
+
                         <% if(admin_button) { %> 
                             <td headers="tt3" class="oddRowEvenCol"><a
                                href="mailto:<%= versRowPerson.getEmail() %>"><%=versRowPerson.getFullName() %></a> </td>

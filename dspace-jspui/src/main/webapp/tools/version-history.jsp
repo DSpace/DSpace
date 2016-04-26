@@ -23,13 +23,13 @@
 <%@page import="org.dspace.versioning.VersionHistory"%>
 <%@page import="org.dspace.versioning.factory.VersionServiceFactory"%>
 <%@ page import="java.util.UUID" %>
+<%@page import="org.dspace.core.ConfigurationManager" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
-
-<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
     UUID itemID = (UUID)request.getAttribute("itemID");
@@ -101,13 +101,21 @@ var j = jQuery.noConflict();
 		
                 <% for(Version versRow : allVersions) {
 			EPerson versRowPerson = versRow.getEPerson();
-			String[] identifierPath = VersionUtil.addItemIdentifier(item, versRow);
+			String[] identifierPath = UIUtil.getItemIdentifier(context, versRow.getItem());
+                        String url = identifierPath[0];
+                        String identifier;
+                        if (ConfigurationManager.getBooleanProperty("webui.identifier.strip-prefixes", true))
+                        {
+                            identifier = identifierPath[2];
+                        } else {
+                            identifier = identifierPath[3];
+                        }
 
 		%>	
 		<tr>
 			<td headers="t0"><input type="checkbox" class="remove" name="remove" value="<%=versRow.getId()%>"/></td>
 			<td headers="t1" class="oddRowEvenCol"><%= versRow.getVersionNumber() %></td>
-			<td headers="t2" class="oddRowOddCol"><a href="<%= request.getContextPath() + identifierPath[0] %>"><%= identifierPath[1] %></a><%= item.equals(versRow.getItem())?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
+			<td headers="t2" class="oddRowOddCol"><a href="<%= url %>"><%= identifier %></a><%= item.getID()==versRow.getItem().getID()?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
                         <% if (show_submitter) { %>
 			<td headers="t3" class="oddRowEvenCol"><a href="mailto:<%= versRowPerson.getEmail() %>"><%=versRowPerson.getFullName() %></a></td>
                         <% } %>

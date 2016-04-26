@@ -8,6 +8,7 @@
 package org.dspace.checker;
 
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -38,9 +39,12 @@ public class ResultsLogger implements ChecksumResultsCollector
     /**
      * Utility date format.
      */
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
-            "MM/dd/yyyy hh:mm:ss");
-
+    private static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+        }
+    };
     /**
      * Date the current checking run started.
      */
@@ -61,7 +65,7 @@ public class ResultsLogger implements ChecksumResultsCollector
      */
     public ResultsLogger(Date startDt)
     {
-        LOG.info(msg("run-start-time") + ": " + DATE_FORMAT.format(startDt));
+        LOG.info(msg("run-start-time") + ": " + DATE_FORMAT.get().format(startDt));
     }
 
     /**
@@ -106,7 +110,7 @@ public class ResultsLogger implements ChecksumResultsCollector
         LOG.info(msg("previous-checksum") + ": " + info.getExpectedChecksum());
         LOG.info(msg("previous-checksum-date")
                 + ": "
-                + ((info.getProcessEndDate() != null) ? DATE_FORMAT.format(info
+                + ((info.getProcessEndDate() != null) ? DATE_FORMAT.get().format(info
                         .getProcessEndDate()) : "unknown"));
         LOG.info(msg("new-checksum") + ": " + info.getCurrentChecksum());
         LOG.info(msg("checksum-comparison-result") + ": "

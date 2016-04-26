@@ -7,9 +7,8 @@
  */
 package org.dspace.disseminate.service;
 
-import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -74,7 +73,7 @@ public interface CitationDocumentService {
      * @throws org.dspace.authorize.AuthorizeException
      */
     public File makeCitedDocument(Context context, Bitstream bitstream)
-            throws IOException, SQLException, AuthorizeException, COSVisitorException;
+            throws IOException, SQLException, AuthorizeException;
 
     public int drawStringWordWrap(PDPage page, PDPageContentStream contentStream, String text,
                                     int startX, int startY, PDFont pdfFont, float fontSize) throws IOException;

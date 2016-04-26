@@ -289,7 +289,9 @@ public class VersionUtil
      * @param item
      * @param version
      * @return array of string
+     * @deprecated Use {@link UIUtil#getItemIdentifier(org.dspace.core.Context, org.dspace.content.Item)} instead.
      */
+    @Deprecated
     public static String[] addItemIdentifier(Item item, Version version)
     {
     	initialize();
@@ -315,7 +317,7 @@ public class VersionUtil
         }
         return result;
     }
-
+    
     /**
      * Retrieve the summary for the version
      * 

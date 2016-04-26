@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>6.0-SNAPSHOT</version>
+        <version>6.0-rc2-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -419,10 +419,6 @@
            <artifactId>fontbox</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.apache.pdfbox</groupId>
-           <artifactId>jempbox</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15</artifactId>
         </dependency>
@@ -518,6 +514,13 @@
             <groupId>gr.ekt.bte</groupId>
             <artifactId>bte-core</artifactId>
             <version>0.9.3.5</version>
+            <exclusions>
+                <!-- A more recent version is retrieved from another dependency -->
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>gr.ekt.bte</groupId>
@@ -528,6 +531,11 @@
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
+                </exclusion>
+                <!-- A more recent version is retrieved from another dependency -->
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.StringUtils;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.VersionUtil;
@@ -24,6 +25,11 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.identifier.DOI;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
+import org.dspace.identifier.service.DOIService;
+import org.dspace.identifier.service.IdentifierService;
 import org.dspace.plugin.ItemHomeProcessor;
 import org.dspace.plugin.PluginException;
 import org.dspace.versioning.Version;
@@ -37,20 +43,22 @@ public class VersioningItemHome implements ItemHomeProcessor {
     /** log4j category */
     private static Logger log = Logger.getLogger(VersioningItemHome.class);
 
-    private ItemService itemService;
-
+    private DOIService doiService;
     private HandleService handleService;
-    
+    private IdentifierService identifierService;
     private VersionHistoryService versionHistoryService;
-    
     private VersioningService versioningService;
-
+    private ItemService itemService;
+	
     public VersioningItemHome() {
+        doiService = IdentifierServiceFactory.getInstance().getDOIService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
+        identifierService = IdentifierServiceFactory.getInstance().getIdentifierService();
         itemService = ContentServiceFactory.getInstance().getItemService();
         versioningService = VersionServiceFactory.getInstance().getVersionService();
         versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
     }
+	
 
     @Override
     public void process(Context context, HttpServletRequest request,
@@ -65,8 +73,8 @@ public class VersioningItemHome implements ItemHomeProcessor {
 
         VersionHistory history = null;
         List<Version> historyVersions = new ArrayList<Version>();
-        String latestVersionHandle = null;
-        String latestVersionURL = null;
+        String latestVersionIdentifier = null;
+
         if (versioningEnabled) {
             try {
                 if (itemService.canEdit(context, item)) {
@@ -98,26 +106,49 @@ public class VersioningItemHome implements ItemHomeProcessor {
                 throw new PluginException(e.getMessage());
             }
             
-            if (latestVersion != null) {
-                if (latestVersion.getItem() != null
-                        && !latestVersion.getItem().getID().equals(item.getID())) {
-                    // We have a newer version
-                    Item latestVersionItem = latestVersion.getItem();
-                    if (latestVersionItem.isArchived()) {
-			// Available, add a link for the user alerting him that
-                        // a new version is available
-                        newVersionAvailable = true;
-                        try {
-                            latestVersionURL = handleService.resolveToURL(
-                                    context, latestVersionItem.getHandle());
-                        } catch (SQLException e) {
-                            throw new PluginException(e.getMessage());
-                        }
-                        latestVersionHandle = latestVersionItem.getHandle();
-                    } else {
-                        // We might be dealing with a workflow/workspace item
-                        showVersionWorkflowAvailable = true;
+            if (latestVersion != null
+                    && latestVersion.getItem() != null
+                    && !latestVersion.getItem().getID().equals(item.getID()))
+            {
+                // We have a newer version
+                Item latestVersionItem = latestVersion.getItem();
+                if (latestVersionItem.isArchived()) {
+                    // Available, add a link for the user alerting him that
+                    // a new version is available
+                    newVersionAvailable = true;
+
+                    // look up the the latest version handle
+                    String latestVersionHandle = latestVersionItem.getHandle();
+                    if (latestVersionHandle != null) {
+                            latestVersionIdentifier = handleService.getCanonicalForm(latestVersionHandle);
                     }
+
+                    // lookup the latest version doi
+                    String latestVersionDOI = identifierService.lookup(
+                            context, latestVersionItem, DOI.class);
+                    if (latestVersionDOI != null)
+                    {
+                        try {
+                            latestVersionDOI = doiService.DOIToExternalForm(latestVersionDOI);
+                        } catch (IdentifierException ex)
+                        {
+                            log.error("Unable to convert DOI '" + latestVersionDOI 
+                                    + "' into external form: " + ex.toString(), ex);
+                            throw new PluginException(ex);
+                        }
+                    }
+
+                    // do we prefer to use handle or DOIs?
+                    if ("doi".equalsIgnoreCase(ConfigurationManager.getProperty("webui.preferred.identifier")))
+                    {
+                        if (latestVersionDOI != null)
+                        {
+                            latestVersionIdentifier = latestVersionDOI;
+                        }
+                    }
+                } else {
+                    // We might be dealing with a workflow/workspace item
+                    showVersionWorkflowAvailable = true;
                 }
             }
         }
@@ -131,9 +162,8 @@ public class VersioningItemHome implements ItemHomeProcessor {
                 newVersionAvailable);
         request.setAttribute("versioning.showversionwfavailable",
                 showVersionWorkflowAvailable);
-        request.setAttribute("versioning.latestversionhandle",
-                latestVersionHandle);
-        request.setAttribute("versioning.latestversionurl", latestVersionURL);
+        request.setAttribute("versioning.latest_version_identifier",
+                latestVersionIdentifier);
 
     }
 
