@@ -325,6 +325,7 @@ public class Manuscript {
         return authors;
     }
 
+    @JsonIgnore
     public List<Author> getAuthorList() {
         return this.authors.author;
     }
@@ -333,6 +334,7 @@ public class Manuscript {
         this.authors = authorsList;
     }
 
+    @JsonIgnore
     public void setAuthorsFromList(List<Author> authorList) {
         if (this.authors == null) {
             this.authors = new AuthorsList();
@@ -340,6 +342,7 @@ public class Manuscript {
         this.authors.author.addAll(authorList);
     }
 
+    @JsonIgnore
     public void addAuthor(Author author) {
         if (this.authors == null) {
             this.authors = new AuthorsList();
