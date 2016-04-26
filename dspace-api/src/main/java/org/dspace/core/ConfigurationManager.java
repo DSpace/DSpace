@@ -444,6 +444,9 @@ public class ConfigurationManager
         options.addOption("m", "module", true,
                 "optional name of the module in which 'property' exists");
 
+        options.addOption("r", "raw", false,
+                "do not do property substitution on the value");
+
         options.addOption("?", "Get help");
         options.addOption("h", "help", false, "Get help");
 
@@ -494,7 +497,11 @@ public class ConfigurationManager
         }
         else
         {
-            String val = cfg.getProperty(propName);
+            String val;
+            if (cmd.hasOption('r'))
+                val = cfg.getPropertyValue(propName).toString();
+            else
+                val = cfg.getProperty(propName);
             System.out.println(val);
         }
 
