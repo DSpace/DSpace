@@ -79,7 +79,7 @@
         <name>dsprop</name>
         <description>View a DSpace property from dspace.cfg</description>
         <step>
-            <class>org.dspace.core.ConfigurationManager</class>
+            <class>org.dspace.app.util.Configuration</class>
         </step>
     </command>
     <command>

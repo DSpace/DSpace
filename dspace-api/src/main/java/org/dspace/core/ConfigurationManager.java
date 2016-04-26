@@ -9,17 +9,10 @@ package org.dspace.core;
 
 import java.util.Enumeration;
 import java.util.Properties;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
 
 import org.apache.log4j.Logger;
-import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -418,93 +411,5 @@ public class ConfigurationManager
     {
         // Get property keys beginning with this prefix, and convert into an Enumeration
         return java.util.Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys(module));
-    }
-
-    /**
-     * Command-line interface for running configuration tasks. Possible
-     * arguments:
-     * <ul>
-     * <li>{@code -module name} the name of the configuration "module" for this property.</li>
-     * <li>{@code -property name} prints the value of the DSpace configuration
-     * property {@code name} to the standard output.</li>
-     * </ul>
-     * If the property does not exist, nothing is written.
-     *
-     * @param argv
-     *            command-line arguments
-     */
-    public static void main(String[] argv)
-    {
-        // Build a description of the command line
-        Options options = new Options();
-
-        options.addOption("p", "property", true,
-                "name of the desired property");
-
-        options.addOption("m", "module", true,
-                "optional name of the module in which 'property' exists");
-
-        options.addOption("r", "raw", false,
-                "do not do property substitution on the value");
-
-        options.addOption("?", "Get help");
-        options.addOption("h", "help", false, "Get help");
-
-        // Analyze the command line
-        CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = null;
-        try {
-            cmd = parser.parse(options, argv);
-        } catch (ParseException ex) {
-            System.err.println(ex.getMessage());
-            System.exit(1);
-        }
-
-        // Give help if asked
-        if (cmd.hasOption('?') || cmd.hasOption('h'))
-        {
-            new HelpFormatter().printHelp(
-                    "dsprop [options]",
-                    "Display the value of a DSpace configuration property",
-                    options,
-                    "If --module is omitted, then --property gives the entire"
-                            + " name of the property.  Otherwise the name is"
-                            + " composed of module.property.");
-            System.exit(0);
-        }
-
-        // Check for missing required values
-        if (!cmd.hasOption('p'))
-        {
-            System.err.println("Error:  -p is required");
-            System.exit(1);
-        }
-
-        // Figure out the property's full name
-        StringBuilder propNameBuilder = new StringBuilder(1024);
-        propNameBuilder.append(cmd.getOptionValue('p'));
-        if (cmd.hasOption('m'))
-            propNameBuilder.append('.')
-                    .append(cmd.getOptionValue('m'));
-        String propName = propNameBuilder.toString();
-
-        // Print the property's value, if it exists
-        ConfigurationService cfg
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
-        if (!cfg.hasProperty(propName))
-        {
-            System.out.println();
-        }
-        else
-        {
-            String val;
-            if (cmd.hasOption('r'))
-                val = cfg.getPropertyValue(propName).toString();
-            else
-                val = cfg.getProperty(propName);
-            System.out.println(val);
-        }
-
-        System.exit(0);
     }
 }
