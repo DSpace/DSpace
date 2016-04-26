@@ -875,7 +875,9 @@ public class EditItemServlet extends DSpaceServlet
             // Wrap multipart request to get the submission info
             FileUploadRequest wrapper = new FileUploadRequest(request);
             Bitstream b = null;
+            context.turnOffItemWrapper();
             Item item = Item.find(context, UIUtil.getIntParameter(wrapper, "item_id"));
+            context.restoreItemWrapperState();
             File temp = wrapper.getFile("file");
 
             // Read the temp file as logo
