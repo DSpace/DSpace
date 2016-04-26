@@ -2,6 +2,7 @@
  */
 package org.datadryad.rest.models;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.lang.String;
@@ -21,8 +22,8 @@ public class Author {
     public Author() {}
 
     public Author(String familyName, String givenNames) {
-        this.familyName = familyName;
-        this.givenNames = givenNames;
+        this.familyName = StringEscapeUtils.escapeHtml(familyName);
+        this.givenNames = StringEscapeUtils.escapeHtml(givenNames);
     }
 
     public Author(String authorString) {
