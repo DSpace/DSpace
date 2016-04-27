@@ -673,7 +673,13 @@ public class OrcidPreferencesUtils {
 		}
 		
 		OrcidService orcidService = OrcidService.getOrcid();
-		OrcidProfile orcidProfile = orcidService.getProfile(ORCID, token);
+		OrcidProfile orcidProfile = null;
+		try {
+		    orcidProfile = orcidService.getProfile(ORCID, token);
+		}
+		catch(Exception ex) {
+		    return false;
+		}
 		if (orcidProfile != null) {
 			ResearcherPageUtils.buildTextValue(crisObject, ORCID, "orcid");
 			
