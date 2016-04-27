@@ -10,9 +10,12 @@ var Report = function() {
 	this.COLL_LIMIT = 500;
 	this.COUNT_LIMIT = 500;
 	this.ITEM_LIMIT = 100;
-        this.ROOTPATH = "/xmlui/handle/"
-        //this.ROOTPATH = "/jspui/handle/"
+    this.ROOTPATH = "/xmlui/handle/"
+    //this.ROOTPATH = "/jspui/handle/"
 	//this.ROOTPATH = "/handle/"
+	
+	//disable this setting if Password Authentication is not supported
+	this.makeAuthLink = function(){return false;};
 
 	//Override this to return obj.id for DSpace 5 versions
 	this.getId = function(obj) {
@@ -36,14 +39,23 @@ var Report = function() {
 	}
 	
 	this.getLoginPayload = function() {
-		//Example of how to pass credentials to the service
-		//return {"email" : "Email@my.edu","password" : "my-password"};
-		return undefined;
+	    //Placeholder to allow a customized report to prompt for email/password
+	    //If not enabled, the authenticaton callback will be called immediately
+	    var email = $("#restemail").val();
+        var pass = $("#restpass").val();
+        if (email == "" || pass == "") {
+          return undefined;  
+        } else if (email == null || pass == null) {
+           return undefined;  
+		} else {
+           return {email: email, password: pass};      
+		}
 	}
 	this.getLangSuffix = function(){
 		return "";
 	}
-	this.myAuth = new Auth(this.getLoginPayload());
+	this.myAuth = new Auth(this);
+	this.myAuth.authStat();
 	this.myAuth.callback = function(data) {
 		self.spinner.stop();
 	}
@@ -112,7 +124,7 @@ var Report = function() {
 	    this.myMetadataFields.load();		
 	}
 	
-	this.baseInit = function() {
+    this.baseInit = function() {
 		this.myReportParameters = new ReportParameters(
 				this.getDefaultParameters(),
 				window.location.search.substr(1)
@@ -134,7 +146,7 @@ var Report = function() {
 		this.myFilters.createFilterTable(this.myReportParameters.params.filters);
 		this.myAuth.init();
 	}
-	
+
 	this.export = function(rows) {
 		var itemdata = "data:text/csv;charset=utf-8,";
 		rows.each(function(rownum, row){
@@ -174,17 +186,19 @@ var Report = function() {
 	this.init = function() {
 	    this.baseInit();	
 	}
+	
 }
 
-var Auth = function(loginPayload) {
+var Auth = function(report) {
+    this.report = report;
 	this.TOKEN = undefined;
 	this.callback = function(data) {
-		alert("auth complete " + this.TOKEN);		
 	};
 	this.saveToken = function(data) {
 		this.TOKEN = data;
 	}
 	this.init = function() {
+	    var loginPayload = report.getLoginPayload();
 		if (loginPayload == undefined) {
 			this.callback();
 			return;
@@ -193,22 +207,57 @@ var Auth = function(loginPayload) {
 		var self = this;
 		$.ajax({
 			url : "/rest/login",
-			contentType : "application/json",
+			contentType : "application/x-www-form-urlencoded",
 			accepts : "application/json",
 			type : "POST",
-			data : JSON.stringify(loginPayload),
+			data : loginPayload,
 			success : function(data){
 				self.saveToken(data);
-				self.callback();
-			},
+   		    },
 			error: function(xhr, status, errorThrown) {
 				alert("Error in /rest/login "+ status+ " " + errorThrown);
 			},
 			complete: function(xhr, status) {
+                self.authStat();
 				self.callback();
 			}
 		});		
 	}
+    this.authStat = function() {
+        var self = this;
+        $.ajax({
+            url : "/rest/status",
+            dataType : "json",
+            error: function(xhr, status, errorThrown) {
+                alert("Error in /rest/status "+ status+ " " + errorThrown);
+            },
+            success: function(data) {
+              var user = "";
+              if (data.email != undefined) {
+                user = data.email;                  
+              } else {
+                user = "Not logged in";
+              }
+              var anchor = $("<a/>").text(user);
+              if (self.report.makeAuthLink()) {
+                  anchor.attr("href","javascript:window.open('authenticate.html','Authenticate (Password Auth Only)','height=200,width=500')");
+              }
+              $("#currentUser").empty().append("<b>Current User: </b>").append(anchor);
+            }
+        });     
+    }
+    this.logout = function() {
+        var self = this;
+        $.ajax({
+            url : "/rest/logout",
+            error: function(xhr, status, errorThrown) {
+                alert("Error in /rest/logout "+ status+ " " + errorThrown);
+            },
+            complete: function(xhr, status) {
+                self.authStat();
+            }
+        });     
+    }
 	this.getHeaders = function() {
 		var HEADERS = {};
 		if (this.TOKEN != null) {
@@ -392,6 +441,7 @@ var MetadataFields = function(report) {
 	}
 
 	this.drawShowFields = function(pfields) {
+	    if (pfields == null) return;
 		var self = this;
 		var sel = $("<select name='show_fields'/>").attr("multiple","true").attr("size","8").appendTo("#show-fields");
 		$.each(this.metadataSchemas, function(index, schema){
@@ -490,6 +540,7 @@ var HtmlUtil = function() {
 
 var CommunitySelector = function(report, parent, paramCollSel) {
 	var self = this;
+	$("#collSel,#collSel option").remove();
 	var collSel = $("<select/>").attr("id","collSel").attr("name","collSel").attr("multiple", true).attr("size",15);
 	parent.append(collSel);
 	report.myHtmlUtil.addOpt(collSel, "Whole Repository", "");
