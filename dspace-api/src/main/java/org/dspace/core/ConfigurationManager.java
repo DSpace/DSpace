@@ -36,7 +36,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class ConfigurationManager
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(ConfigurationManager.class);
+    private static final Logger log = Logger.getLogger(ConfigurationManager.class);
 
     protected ConfigurationManager()
     {
@@ -411,59 +411,5 @@ public class ConfigurationManager
     {
         // Get property keys beginning with this prefix, and convert into an Enumeration
         return java.util.Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys(module));
-    }
-
-    /**
-     * Command-line interface for running configuration tasks. Possible
-     * arguments:
-     * <ul>
-     * <li><code>-property name</code> prints the value of the property
-     * <code>name</code> from <code>dspace.cfg</code> to the standard
-     * output. If the property does not exist, nothing is written.</li>
-     * </ul>
-     *
-     * @param argv
-     *            command-line arguments
-     */
-    public static void main(String[] argv)
-    {
-        if ((argv.length == 2) && argv[0].equals("-property"))
-        {
-            Object val = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyValue(argv[1]);
-
-            if (val != null)
-            {
-                System.out.println(val.toString());
-            }
-            else
-            {
-                System.out.println("");
-            }
-
-            System.exit(0);
-        }
-        else if ((argv.length == 4) && argv[0].equals("-module") &&
-                                        argv[2].equals("-property"))
-        {
-            Object val = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyValue(argv[1] + "." + argv[3]);
-
-            if (val != null)
-            {
-                System.out.println(val.toString());
-            }
-            else
-            {
-                System.out.println("");
-            }
-
-            System.exit(0);
-        }
-        else
-        {
-            System.err
-                    .println("Usage: ConfigurationManager OPTION\n  [-module mod.name] -property prop.name  get value of prop.name from module or dspace.cfg");
-        }
-
-        System.exit(1);
     }
 }
