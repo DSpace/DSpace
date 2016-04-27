@@ -51,7 +51,8 @@ var CollReport = function() {
 	}
 	
 	this.myAuth.callback = function(data) {
-		self.createCollectionTable();		
+		self.createCollectionTable();
+		$("#table tbody tr").remove();
 		$(".showCollections").bind("click", function(){
 			self.loadData();
 		});
@@ -62,7 +63,7 @@ var CollReport = function() {
 
 	this.createCollectionTable = function() {
 		var self = this;
-		var tbl = $("<table/>");
+ 		var tbl = $("<table/>");
 		tbl.attr("id","table");
 		$("#report").replaceWith(tbl);
 

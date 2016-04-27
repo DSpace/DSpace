@@ -45,7 +45,6 @@ var QueryReport = function() {
 
 	this.init = function() {
 	    this.baseInit();	
-		var communitySelector = new CommunitySelector(this, $("#collSelector"), this.myReportParameters.params["collSel[]"]);
 	}
 	
 	this.initMetadataFields = function() {
@@ -53,7 +52,8 @@ var QueryReport = function() {
 	    this.myMetadataFields.load();		
 	}
 	this.myAuth.callback = function(data) {
-		$(".query-button").click(function(){self.runQuery();})
+	    var communitySelector = new CommunitySelector(self, $("#collSelector"), self.myReportParameters.params["collSel[]"]);
+	    $(".query-button").click(function(){self.runQuery();})
 	}
 
 	this.runQuery = function() {
