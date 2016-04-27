@@ -50,6 +50,7 @@ public class Configuration
                 "do not do property substitution on the value");
         options.addOption("?", "Get help");
         options.addOption("h", "help", false, "Get help");
+
         // Analyze the command line
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
@@ -61,6 +62,7 @@ public class Configuration
             System.err.println(ex.getMessage());
             System.exit(1);
         }
+
         // Give help if asked
         if (cmd.hasOption('?') || cmd.hasOption('h'))
         {
@@ -72,20 +74,24 @@ public class Configuration
                     " composed of module.property.");
             System.exit(0);
         }
+
         // Check for missing required values
         if (!cmd.hasOption('p'))
         {
             System.err.println("Error:  -p is required");
             System.exit(1);
         }
+
         // Figure out the property's full name
         StringBuilder propNameBuilder = new StringBuilder(1024);
-        propNameBuilder.append(cmd.getOptionValue('p'));
         if (cmd.hasOption('m'))
         {
-            propNameBuilder.append('.').append(cmd.getOptionValue('m'));
+            propNameBuilder.append(cmd.getOptionValue('m'))
+                    .append('.');
         }
+        propNameBuilder.append(cmd.getOptionValue('p'));
         String propName = propNameBuilder.toString();
+
         // Print the property's value, if it exists
         ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
         if (!cfg.hasProperty(propName))
