@@ -108,9 +108,9 @@ var QueryReport = function() {
 			if (item.parentCollection == null) {
 				self.myHtmlUtil.addTd(tr, "--");			
 			} else {
-				self.myHtmlUtil.addTdAnchor(tr, item.parentCollection.name, "/handle/" + item.parentCollection.handle);
+				self.myHtmlUtil.addTdAnchor(tr, item.parentCollection.name, self.ROOTPATH + item.parentCollection.handle);
 			}
-			self.myHtmlUtil.addTdAnchor(tr, item.handle, "/handle/" + item.handle);
+			self.myHtmlUtil.addTdAnchor(tr, item.handle, self.ROOTPATH + item.handle);
 			self.myHtmlUtil.addTd(tr, item.name);
 			
 			for(var i=0; i<mdCols.length; i++) {
@@ -156,7 +156,7 @@ var QueryReport = function() {
 		
 		if (colnum == 2) {
 			var anchor = $(col).find("a");
-			var href = anchor.is("a") ? anchor.attr("href").replace(/\/handle\//,"") : $(col).text();
+			var href = anchor.is("a") ? anchor.attr("href").replace(self.ROOTPATH,"") : $(col).text();
 			data += "\"" + href + "\"";
 		} else {
 			data += self.exportCell(col);		}

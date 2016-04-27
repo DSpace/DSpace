@@ -127,10 +127,10 @@ var CollReport = function() {
 		var tr = self.myHtmlUtil.addTr(tbody);
 		tr.attr("cid", coll.id).attr("index",index).addClass(index % 2 == 0 ? "odd data" : "even data");
 		self.myHtmlUtil.addTd(tr, index + 1).addClass("num");
-		var parval = self.myHtmlUtil.getAnchor(top.name, "/handle/" + top.handle); 
+		var parval = self.myHtmlUtil.getAnchor(top.name, self.ROOTPATH + top.handle); 
 		
 		self.myHtmlUtil.addTd(tr, parval).addClass("title comm");
-		self.myHtmlUtil.addTdAnchor(tr, coll.name, "/handle/" + coll.handle).addClass("title");
+		self.myHtmlUtil.addTdAnchor(tr, coll.name, self.ROOTPATH + coll.handle).addClass("title");
 		var td = self.myHtmlUtil.addTd(tr, "").addClass("num").addClass("link").addClass("numCount");
 		td = self.myHtmlUtil.addTd(tr, "").addClass("num").addClass("numFiltered");
 	};
@@ -422,7 +422,7 @@ var CollReport = function() {
 					tr.addClass(index % 2 == 0 ? "odd data" : "even data");
 					self.myHtmlUtil.addTd(tr, offset+index+1).addClass("num");
 					self.myHtmlUtil.addTd(tr, self.getId(item));
-					self.myHtmlUtil.addTdAnchor(tr, item.handle, "/handle/" + item.handle);
+					self.myHtmlUtil.addTdAnchor(tr, item.handle, self.ROOTPATH + item.handle);
 					self.myHtmlUtil.addTd(tr, item.name).addClass("ititle");
 					if (fields != null) {
 						$.each(fields, function(index, field){
