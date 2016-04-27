@@ -186,7 +186,7 @@
                         .append("</span><div id=\"").append(fieldInput).append("_autocomplete\" class=\"autocomplete\" style=\"display: none;\"> </div>");
 
                 sb.append("<script type=\"text/javascript\">")
-                        .append("var gigo = DSpaceSetupAutocomplete('edit_metadata',")
+                            .append("var gigo = DSpaceSetupAutocomplete('edit_metadata',")
                         .append("{ metadataField: '").append(fieldName).append("', isClosed: '").append(required?"true":"false").append("', inputName: '")
                         .append(fieldInput).append("', authorityName: '").append(authorityName).append("', containerID: '")
                         .append(fieldInput).append("_autocomplete', indicatorID: '").append(fieldInput).append("_indicator', ")
@@ -271,7 +271,7 @@
             fieldCount = 1;
 
         headers.append("<style type=\"text/css\">" +
-                " .ac_results { padding: 0px; border: 1px solid WindowFrame; background-color: Window; overflow: hidden; } " +
+                ".ac_results { padding: 0px; border: 1px solid WindowFrame; background-color: Window; overflow: hidden; } " +
                 " .ac_results ul { width: 100%; list-style-position: outside; list-style: none; padding: 0; margin: 0; } " +
                 " .ac_results iframe { display:none;/*sorry for IE5*/ display/**/:block;/*sorry for IE5*/ position:absolute; top:0; left:0; " +
                 "z-index:-1; filter:mask(); width:3000px; height:3000px; } " +
@@ -281,7 +281,7 @@
                 " .ac_over { background-color: Highlight; color: HighlightText; } </style> \n ");
 
         sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">").append(label).append("</label>");
-        sb.append("<div class=\"col-md-10\">");
+        sb.append("<div class=\"col-md-10\" id = \"authors_block\">");
 
         out.write(headers.toString());
 
@@ -352,7 +352,8 @@
                     .append(last.toString())
                     .append("\" id=\"")
                     .append(last.toString())
-                    .append("\" size=\"23\" ");
+                    .append("\"")
+                    .append(" size=\"23\" ");
             if (readonly)
             {
                 sb.append("disabled=\"disabled\" ");
@@ -374,7 +375,8 @@
                     .append(first.toString())
                     .append("\" id=\"")
                     .append(first.toString())
-                    .append("\" size=\"23\" ");
+                    .append("\"")
+                    .append(" size=\"23\" ");
             if (readonly)
             {
                 sb.append("disabled=\"disabled\" ");
@@ -412,7 +414,9 @@
                         .append(fieldName)
                         .append("_add\" value=\"")
                         .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-                        .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
+                        .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;")
+                        .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+                        .append("</button>");
             }
             sb.append("</div>");
             if (i % 3 == 0) {
@@ -423,12 +427,13 @@
                         "    jQuery(\"#" + fieldName + "_first_" + (i + 2) + "\").val(li.extra[4]); " +
                         "    jQuery(\"#" + fieldName + "_last_" + (i + 3) + "\").val(li.extra[1]); " +
                         "    jQuery(\"#" + fieldName + "_first_" + (i + 3) + "\").val(li.extra[2]); " +
+                        "changeButtonStatus();"+
                         "  } ");
             }
 
             script.append("  jQuery(document).ready(function(){ " +
                     " jQuery(\"#" + last.toString() + "\").autocomplete(\"autocomplete.jsp\", { delay:10, minChars:2, matchSubset:1, autoFill:true, matchContains:1, cacheLength:10,  " +
-                    " selectFirst:true, formatItem:liFormat, maxItemsToShow:15,  onItemSelect:selectItem" + (i / 3) + ",  extraParams:{'locale':'" + locals[i % 3] + "'} }); }); \n ");
+                    " selectFirst:true, formatItem:liFormat, maxItemsToShow:15, onItemSelect:selectItem" + (i / 3) + ",  extraParams:{'locale':'" + locals[i % 3] + "'} }); }); \n ");
         }
 
         script.append(" </script> ");
@@ -1472,10 +1477,12 @@
 %>
 
 <c:set var="dspace.layout.head.last" scope="request">
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"></script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.min.js"></script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.min.js"></script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.min.js"></script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.min.js"></script>
+
+    <%--<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/scriptaculous.js"> </script>--%>
 </c:set>
 <dspace:layout style="submission" locbar="off" navbar="off" titlekey="jsp.submit.edit-metadata.title">
 
@@ -1691,5 +1698,35 @@
                 </div><br/>
             </div>
     </form>
+    <script>
+        function enableSubmitButton() {
+            jQuery('[name=submit_dc_contributor_author_add]').attr('disabled', false);
+        }
 
+        function disableSubmitButton() {
+            jQuery('[name=submit_dc_contributor_author_add]').attr('disabled', true);
+        }
+        function changeButtonStatus() {
+            var fields = jQuery('[id^=dc_contributor_author_]');
+            var count = 0;
+
+            jQuery.each(fields, function(element, value) {
+                        if(jQuery(value).attr('value').length > 0) {
+                            count++;
+                        }
+                    }
+            )
+            if(count == fields.length) {
+                enableSubmitButton();
+            } else {
+                disableSubmitButton();
+            }
+        }
+
+        jQuery(document).ready(function(){
+            changeButtonStatus();
+
+            jQuery('#authors_block').on('change', '[id^=dc_contributor_author_]', changeButtonStatus);
+        });
+    </script>
 </dspace:layout>
