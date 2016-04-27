@@ -10,9 +10,9 @@ var Report = function() {
 	this.COLL_LIMIT = 500;
 	this.COUNT_LIMIT = 500;
 	this.ITEM_LIMIT = 100;
-    //this.ROOTPATH = "/xmlui/handle/"
-    //this.ROOTPATH = "/jspui/handle/"
-	this.ROOTPATH = "/handle/";
+        this.ROOTPATH = "/xmlui/handle/"
+        //this.ROOTPATH = "/jspui/handle/"
+	//this.ROOTPATH = "/handle/";
 	
 	//disable this setting if Password Authentication is not supported
 	this.makeAuthLink = function(){return true;};
