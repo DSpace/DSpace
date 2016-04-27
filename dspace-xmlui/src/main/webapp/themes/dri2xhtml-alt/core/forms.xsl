@@ -776,15 +776,7 @@
                 <span class="ds-interpreted-field">No value submitted.</span>
             </xsl:otherwise>
         </xsl:choose>
-        <xsl:if test="../dri:params/dri:param[@name='langs']">
-        	<xsl:variable name="position">
-        		<xsl:number/>
-        	</xsl:variable>
-        	<xsl:call-template name="selectLangBuilder">
-        		<xsl:with-param name="name" select="concat(../@n, '_', $position)" />
-        		<xsl:with-param name="selected" select="./dri:value[@type='lang']"/>
-        	</xsl:call-template>
-        </xsl:if>
+        
     </xsl:template>
 
 	<!-- build the select field with the language options -->
