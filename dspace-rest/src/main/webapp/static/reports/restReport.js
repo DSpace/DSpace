@@ -238,7 +238,7 @@ var Auth = function(report) {
               if (data.email != undefined) {
                 user = data.email;                  
               } else {
-                user = "Not logged in";
+                user = "You are not logged in.  Some items may be excluded from reports.";
               }
               var anchor = $("<a/>").text(user);
               if (self.report.makeAuthLink()) {
