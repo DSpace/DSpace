@@ -88,8 +88,6 @@
             var s = d.getElementsByTagName(t)[0]; s.parentNode.insertBefore(j, s);
         })(document, "script", document.location.protocol);
     </script><!--/Openstat-->
-
-        <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/site"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" /></a>
         <%
             }
         %>
@@ -100,5 +98,6 @@
         </div>
     </div>
 </footer>
+
 </body>
 </html>
