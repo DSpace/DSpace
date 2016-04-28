@@ -22,6 +22,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.rdf.RDFUtil;
 import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -35,12 +36,14 @@ implements ConverterPlugin
     public static final String CONSTANT_DATA_FILENAME_KEY_PREFIX = "rdf.constant.data.";
     public static final String CONSTANT_DATA_GENERAL_KEY_SUFFIX = "GENERAL";
 
+    @Autowired(required=true)
     protected ConfigurationService configurationService;
     
     @Override
     public void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
+
     @Override
     public Model convert(Context context, DSpaceObject dso) 
             throws SQLException
