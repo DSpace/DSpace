@@ -268,6 +268,7 @@
     <dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getSortOption().getMetadata() %>"/>
     <%
         }
+        int rpp  = 0;
     %>
     <nav role = "pagination">
         <%@ include file="pagination/pagination.jsp" %>

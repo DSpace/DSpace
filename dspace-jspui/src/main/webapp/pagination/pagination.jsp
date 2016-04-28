@@ -1,12 +1,13 @@
 <%
-
-
-
+    int perPage = ConfigurationManager.getIntProperty("webui.collectionhome.perpage", 20);
+    if(rpp != 0) {
+        perPage = rpp;
+    }
     int totalPublications = bi.getTotal();
     int from = bi.getStart();
     int to = bi.getFinish();
-    int totalPages = (int) Math.ceil(Double.valueOf(totalPublications) / rpp);
-    int currentPage = bi.getOffset() / rpp + 1;
+    int totalPages = (int) Math.ceil(Double.valueOf(totalPublications) / perPage);
+    int currentPage = bi.getOffset() / perPage + 1;
 
 
     int leftPage = Math.max(1, currentPage - 2);
@@ -39,7 +40,7 @@
         <%  }  %>
 
         <% for(int i = leftPage; i <= rightPage; i++) {
-                String link = linkBase + "offset=" + Integer.valueOf(rpp * (i - 1)).toString();
+                String link = linkBase + "offset=" + Integer.valueOf(perPage * (i - 1)).toString();
 
         %>
             <li><a href="<%= link %>" <% if(i == currentPage) { %> class="current" <% } %> > <%= i %></a></li>
@@ -49,7 +50,7 @@
             <% if(rightPage < totalPages - 1) {%>
                 <li><span>...</span></li>
             <%  }  %>
-             <li><a href="<%= linkBase + "offset=" + Integer.valueOf(rpp * (totalPages - 1)).toString() %>" <% if(totalPages == currentPage) { %> class="current" <% } %> ><%= totalPages %></a></li>
+             <li><a href="<%= linkBase + "offset=" + Integer.valueOf(perPage * (totalPages - 1)).toString() %>" <% if(totalPages == currentPage) { %> class="current" <% } %> ><%= totalPages %></a></li>
         <%  }  %>
 
         <% if(!isSinglePage) { %>
