@@ -247,16 +247,14 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
         // Look for a manuscript number
         String manuscriptNumber = request.getParameter("manu");
-        if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) {
-            String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
-            manuscriptNumber = manuscriptNumberAcc;
+        if (manuscriptNumber != null) {
             manuscriptNumber = manuscriptNumber.trim();
         }
 
         request.getSession().setAttribute("submit_error", "");
         if (journalConcept.getIntegrated()) {
             addEmailsAndEmbargoSettings(journalConcept, item);
-            if (manuscriptNumber != null && manuscriptNumber.trim().equals("")) {
+            if (manuscriptNumber != null && manuscriptNumber.equals("")) {
                 // we just use this empty manuscript with the journal only.
                 log.debug("manuscript number is empty or nonexistent");
             } else {
@@ -269,25 +267,17 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                     }
 
                     if (articleStatus != null) {
-                        boolean manuscriptNumberInvalid = true;
                         // the Article Status chosen must match the specified manuscript's status. Otherwise, it's invalid.
                         if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_ACCEPTED) {
                             if (manuscript.isAccepted() || manuscript.isPublished()) {
                                 item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
                                 item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "true");
-                                manuscriptNumberInvalid = false;
                             }
                         } else if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_IN_REVIEW) {
                             if (manuscript.isSubmitted() || manuscript.isNeedsRevision()) {
                                 item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
                                 item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "false");
-                                manuscriptNumberInvalid = false;
                             }
-                        }
-
-                        if (manuscriptNumberInvalid) {
-                            request.getSession().setAttribute("submit_error", "This manuscript is not in the status you selected.");
-                            return false;
                         }
                     }
                 } else if (manuscript.getMessage().equals("Invalid manuscript number")) {
