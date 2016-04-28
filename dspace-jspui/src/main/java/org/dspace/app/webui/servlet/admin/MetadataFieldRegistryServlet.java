@@ -84,12 +84,12 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
         String element = request.getParameter("element");
 		String scope = request.getParameter("scope_note");
         String qual = request.getParameter("qualifier");
-        if (qual.equals(""))
+        if ("".equals(qual))
         {
             qual = null;
         }
 
-		if (button.equals("submit_update"))
+		if ("submit_update".equals(button))
         {
             // The sanity check will update the request error string if needed
             if (!sanityCheck(request, labels))
@@ -118,7 +118,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 log.error(e);
             }
         }
-        else if (button.equals("submit_add"))
+        else if ("submit_add".equals(button))
         {
 
             // The sanity check will update the request error string if needed
@@ -151,7 +151,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 context.abort();
             }
         }
-        else if (button.equals("submit_delete"))
+        else if ("submit_delete".equals(button))
         {
             // Start delete process - go through verification step
             MetadataField dc = fieldService.find(context, UIUtil
@@ -160,7 +160,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             JSPManager.showJSP(request, response,
                     "/dspace-admin/confirm-delete-mdfield.jsp");
         }
-        else if (button.equals("submit_confirm_delete"))
+        else if ("submit_confirm_delete".equals(button))
         {
             // User confirms deletion of type
             MetadataField dc = fieldService.find(context, UIUtil
@@ -179,7 +179,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             }
             context.complete();
         }
-        else if (button.equals("submit_move"))
+        else if ("submit_move".equals(button))
         {
             // User requests that one or more metadata elements be moved to a
             // new metadata schema. Note that we change the default schema ID to
