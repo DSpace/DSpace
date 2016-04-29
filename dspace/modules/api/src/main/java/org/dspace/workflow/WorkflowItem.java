@@ -189,6 +189,11 @@ public class WorkflowItem implements InProgressSubmission {
         return findAllByJournalName(c, journalName);
     }
 
+    public static WorkflowItem[] findAllByISSN(Context c, String ISSN) throws SQLException, AuthorizeException, IOException {
+        String journalName = JournalUtils.getJournalConceptByISSN(ISSN).getFullName();
+        return findAllByJournalName(c, journalName);
+    }
+
     public static WorkflowItem[] findAllByJournalName(Context c, String journalName) throws SQLException, AuthorizeException, IOException {
         List<WorkflowItem> wfItems = new ArrayList<WorkflowItem>();
 

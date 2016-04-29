@@ -110,6 +110,12 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         return organizationFromTableRow(row);
     }
 
+    public static Organization getOrganizationByConceptID(Context context, int conceptID) throws SQLException {
+        String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE organization_id = ?";
+        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, String.valueOf(conceptID));
+        return organizationFromTableRow(row);
+    }
+
     @Override
     public Boolean objectExists(StoragePath path, DryadJournalConcept journalConcept) {
         String name = journalConcept.getFullName();
