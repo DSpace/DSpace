@@ -135,6 +135,7 @@ public class RoleCrosswalk
      * When there are no results, an
      * empty list is returned, but never <code>null</code>.
      *
+     * @param context context
      * @param dso the  DSpace Object whose metadata to export.
      * @return results of crosswalk as list of XML elements.
      *
@@ -159,6 +160,7 @@ public class RoleCrosswalk
      * This is typically the root element of a document.
      * <p>
      *
+     * @param context context
      * @param dso the  DSpace Object whose metadata to export.
      * @return root Element of the target metadata, never <code>null</code>
      *
@@ -241,9 +243,10 @@ public class RoleCrosswalk
     /**
      * Ingest a List of XML elements
      *
-     * @param context
-     * @param dso
-     * @param metadata
+     * @param context context
+     * @param dso DSpaceObject
+     * @param metadata list of metadata
+     * @param createMissingMetadataFields whether to create missing fields
      * @throws CrosswalkException if crosswalk error
      * @throws IOException if IO error
      * @throws SQLException if database error
@@ -265,9 +268,10 @@ public class RoleCrosswalk
      * <P>
      * This essentially just wraps a call to the configured Role PackageIngester.
      *
-     * @param context
-     * @param dso
-     * @param root
+     * @param context context
+     * @param dso DSpaceObject
+     * @param root root element
+     * @param createMissingMetadataFields whether to create missing fields
      * @throws CrosswalkException if crosswalk error
      * @throws IOException if IO error
      * @throws SQLException if database error

@@ -53,6 +53,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      *
      * @param context DSpace context object
      * @param collection Collection (parent)
+     * @return Item
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      */
@@ -95,8 +96,8 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
 
     /**
      * Retrieve the list of Items submitted by eperson, ordered by recently submitted, optionally limitable
-     * @param context
-     * @param eperson
+     * @param context context
+     * @param eperson eperson
      * @param limit a positive integer to limit, -1 or null for unlimited
      * @return
      * @throws SQLException if database error
@@ -127,7 +128,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
 
     /**
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
-     * @param context
+     * @param context context
      * @param since earliest interesting last-modified date, or null for no date test.
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
@@ -361,6 +362,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @param group
      *            Group referenced by policies that needs to be removed
      * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void removeGroupPolicies(Context context, Item item, Group group) throws SQLException, AuthorizeException;
 
@@ -490,8 +492,8 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Service method for knowing if this Item should be visible in the item list.
      * Items only show up in the "item list" if the user has READ permission
      * and if the Item isn't flagged as unlisted.
-     * @param context
-     * @param item
+     * @param context context
+     * @param item item
      * @return true or false
      */
     public boolean isItemListedForUser(Context context, Item item);
@@ -502,13 +504,14 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @param context DSpace context object
      * @param collection Collection
      * @return total items
+     * @throws SQLException if database error
      */
     public int countItems(Context context, Collection collection) throws SQLException;
 
     /**
      * Find all Items modified since a Date.
      *
-     * @param context
+     * @param context context
      * @param last Earliest interesting last-modified date.
      * @return iterator over items
      * @throws SQLException if database error

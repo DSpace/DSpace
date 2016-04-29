@@ -146,6 +146,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
      * @return  the newly registered bitstream
      * @throws IOException if IO error
      * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public Bitstream register(Context context,

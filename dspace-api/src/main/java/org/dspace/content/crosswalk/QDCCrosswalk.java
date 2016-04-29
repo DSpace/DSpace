@@ -336,6 +336,11 @@ public class QDCCrosswalk extends SelfNamedPlugin
 
     /**
      * Returns object's metadata in MODS format, as XML structure node.
+     * @param context context
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso)

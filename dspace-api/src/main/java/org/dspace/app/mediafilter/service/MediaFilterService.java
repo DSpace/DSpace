@@ -48,8 +48,11 @@ public interface MediaFilterService {
      * Iterate through the item's bitstreams in the ORIGINAL bundle, applying
      * filters if possible.
      *
+     * @param context context
+     * @param myItem item
      * @return true if any bitstreams processed,
      *         false if none
+     * @throws Exception if error
      */
     public boolean filterItem(Context context, Item myItem) throws Exception;
 
@@ -60,8 +63,12 @@ public interface MediaFilterService {
      * instantiated.  Exceptions from filtering will be logged to STDOUT and
      * swallowed.
      *
+     * @param c context
+     * @param myItem item
+     * @param myBitstream bitstream
      * @return true if bitstream processed,
      *         false if no applicable filter or already processed
+     * @throws Exception if error
      */
     public boolean filterBitstream(Context c, Item myItem, Bitstream myBitstream) throws Exception;
 

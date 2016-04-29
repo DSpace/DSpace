@@ -29,6 +29,7 @@ public interface SimpleReporterService
      * Returns the bitstreams set found to be deleted for the specified date
      * range.
      * 
+     * @param context context
      * @param startDate
      *            the start date range
      * @param endDate
@@ -40,6 +41,7 @@ public interface SimpleReporterService
      * 
      * @throws IOException if IO error
      *             if io error occurs
+     * @throws SQLException if database error
      */
     public int getDeletedBitstreamReport(Context context, Date startDate, Date endDate,
             OutputStreamWriter osw) throws IOException, SQLException;
@@ -48,6 +50,7 @@ public interface SimpleReporterService
      * The a report of bitstreams found where the checksum has been changed
      * since the last check for the specified date range.
      * 
+     * @param context context
      * @param startDate
      *            the start date range.
      * @param endDate
@@ -59,6 +62,7 @@ public interface SimpleReporterService
      * 
      * @throws IOException if IO error
      *             if io error occurs
+     * @throws SQLException if database error
      */
     public int getChangedChecksumReport(Context context, Date startDate, Date endDate,
             OutputStreamWriter osw) throws IOException, SQLException;
@@ -67,6 +71,7 @@ public interface SimpleReporterService
      * The report of bitstreams for the specified date range where it was
      * determined the bitstreams can no longer be found.
      * 
+     * @param context context
      * @param startDate
      *            the start date range.
      * @param endDate
@@ -78,6 +83,7 @@ public interface SimpleReporterService
      * 
      * @throws IOException if IO error
      *             if io error occurs
+     * @throws SQLException if database error
      */
     public int getBitstreamNotFoundReport(Context context, Date startDate, Date endDate,
             OutputStreamWriter osw) throws IOException, SQLException;
@@ -86,15 +92,18 @@ public interface SimpleReporterService
      * The bitstreams that were set to not be processed report for the specified
      * date range.
      * 
+     * @param context context
      * @param startDate
      *            the start date range.
      * @param endDate
      *            the end date range.
      * @param osw
      *            the output stream writer to write to
+     * @return number of bitstreams found
      * 
      * @throws IOException if IO error
      *             if io error occurs
+     * @throws SQLException if database error
      * 
      */
     public int getNotToBeProcessedReport(Context context, Date startDate, Date endDate,
@@ -104,6 +113,7 @@ public interface SimpleReporterService
      * The bitstreams that are not known to the checksum checker. This means
      * they are in the bitstream table but not in the most recent checksum table
      * 
+     * @param context context
      * @param osw
      *            the output stream writer to write to
      * 
@@ -111,6 +121,7 @@ public interface SimpleReporterService
      * 
      * @throws IOException if IO error
      *             if io error occurs
+     * @throws SQLException if database error
      * 
      */
     public int getUncheckedBitstreamsReport(Context context, OutputStreamWriter osw)

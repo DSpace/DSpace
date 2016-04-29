@@ -70,6 +70,11 @@ public interface PackageIngester
      *
      * @throws PackageValidationException if package is unacceptable or there is
      *  a fatal error turning it into a DSpaceObject.
+     * @throws CrosswalkException if crosswalk error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws WorkflowException if workflow error
      */
     DSpaceObject ingest(Context context, DSpaceObject parent, File pkgFile,
                          PackageParameters params, String license)
@@ -112,6 +117,11 @@ public interface PackageIngester
      *          is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>ingestAll</code>
+     * @throws CrosswalkException if crosswalk error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws WorkflowException if workflow error
      */
     List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
                                 PackageParameters params, String license)
@@ -139,6 +149,11 @@ public interface PackageIngester
      *  a fatal error turning it into an Item.
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>replace</code>.
+     * @throws CrosswalkException if crosswalk error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws WorkflowException if workflow error
      */
     DSpaceObject replace(Context context, DSpaceObject dso,
                             File pkgFile, PackageParameters params)
@@ -179,6 +194,11 @@ public interface PackageIngester
      *          is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>replaceAll</code>
+     * @throws CrosswalkException if crosswalk error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws WorkflowException if workflow error
      */
     List<String> replaceAll(Context context, DSpaceObject dso,
                                 File pkgFile, PackageParameters params)

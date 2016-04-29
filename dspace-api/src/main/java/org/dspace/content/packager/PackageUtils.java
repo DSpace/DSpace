@@ -128,6 +128,7 @@ public class PackageUtils
      * Used by all SIP processors as a common sanity test.
      *
      * @param item - item to test.
+     * @throws PackageValidationException if validation error
      */
     public static void checkItemMetadata(Item item)
         throws PackageValidationException
@@ -149,6 +150,9 @@ public class PackageUtils
      * @param license - license string to add, may be null to invoke default.
      * @param item - the item.
      * @param collection - get the default license from here.
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public static void addDepositLicense(Context context, String license,
                                        Item item, Collection collection)
@@ -192,6 +196,7 @@ public class PackageUtils
      * @param item Item whose bitstreams to search.
      * @param name Bitstream's name to match.
      * @return first bitstream found or null.
+     * @throws SQLException if database error
      */
     public static Bitstream getBitstreamByName(Item item, String name)
         throws SQLException
@@ -206,6 +211,7 @@ public class PackageUtils
      * @param bsName - name of bitstream to match.
      * @param bnName - bundle name to match, or null for all.
      * @return the format found or null if none found.
+     * @throws SQLException if database error
      */
     public static Bitstream getBitstreamByName(Item item, String bsName, String bnName)
         throws SQLException
@@ -237,10 +243,12 @@ public class PackageUtils
      * Find bitstream by its format, looking in a specific bundle.
      * Used to look for particularly-typed Package Manifest bitstreams.
      *
+     * @param context context
      * @param item - dspace item whose bundles to search.
      * @param bsf - BitstreamFormat object to match.
      * @param bnName - bundle name to match, or null for all.
      * @return the format found or null if none found.
+     * @throws SQLException if database error
      */
     public static Bitstream getBitstreamByFormat(Context context, Item item,
             BitstreamFormat bsf, String bnName)
@@ -326,6 +334,8 @@ public class PackageUtils
      * @param MIMEType - MIME content-type
      * @param desc - long description
      * @return BitstreamFormat object that was found or created.  Never null.
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
      public static BitstreamFormat findOrCreateBitstreamFormat(Context context,
             String shortDesc, String MIMEType, String desc)
@@ -347,8 +357,11 @@ public class PackageUtils
      * @param shortDesc - short descriptive name, used to locate existing format.
      * @param MIMEType - mime content-type
      * @param desc - long description
+     * @param supportLevel support level
      * @param internal value for the 'internal' flag of a new format if created.
      * @return BitstreamFormat object that was found or created.  Never null.
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
      public static BitstreamFormat findOrCreateBitstreamFormat(Context context,
             String shortDesc, String MIMEType, String desc, int supportLevel, boolean internal)
@@ -378,9 +391,9 @@ public class PackageUtils
      * @param item
      *            the item
      * @return the license bitstream or null
-     *
-     * @throws IOException if IO error
-     *             if the license bitstream can't be read
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if the license bitstream can't be read
      */
     public static Bitstream findDepositLicense(Context context, Item item)
             throws SQLException, IOException, AuthorizeException
@@ -497,6 +510,7 @@ public class PackageUtils
      * @throws IOException if IO error
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
+     * @throws WorkflowException if workflow error
      */
     public static Item finishCreateItem(Context context, WorkspaceItem wsi, String handle, PackageParameters params)
             throws IOException, SQLException, AuthorizeException, WorkflowException {
@@ -536,7 +550,11 @@ public class PackageUtils
      * <p>
      * This method is necessary as there is no generic 'update()' on a DSpaceObject
      *
+     * @param context context
      * @param dso DSpaceObject to update
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     public static void updateDSpaceObject(Context context, DSpaceObject dso)
             throws AuthorizeException, SQLException, IOException
@@ -614,7 +632,7 @@ public class PackageUtils
      * Creates the specified file (along with all parent directories) if it doesn't already
      * exist.  If the file already exists, nothing happens.
      * 
-     * @param file
+     * @param file file
      * @return boolean true if succeeded, false otherwise
      * @throws IOException if IO error
      */
@@ -648,7 +666,11 @@ public class PackageUtils
      * <P>
      * This method is useful for replace functionality.
      *
+     * @param context context
      * @param dso The object to remove all bitstreams from
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public static void removeAllBitstreams(Context context, DSpaceObject dso)
             throws SQLException, IOException, AuthorizeException
@@ -687,7 +709,11 @@ public class PackageUtils
      * <P>
      * This method is useful for replace functionality.
      *
+     * @param context context
      * @param dso The object to remove all metadata from
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public static void clearAllMetadata(Context context, DSpaceObject dso)
             throws SQLException, IOException, AuthorizeException
@@ -784,6 +810,7 @@ public class PackageUtils
      * @param context current DSpace Context
      * @param groupName Group's name
      * @return the group name, with any internal IDs translated to Handles
+     * @throws PackageException if package error
      */
     public static String translateGroupNameForExport(Context context, String groupName)
             throws PackageException
@@ -869,6 +896,7 @@ public class PackageUtils
      * @param context current DSpace Context
      * @param groupName Group's name
      * @return the group name, with any Handles translated to internal IDs
+     * @throws PackageException if package error
      */
     public static String translateGroupNameForImport(Context context, String groupName)
             throws PackageException

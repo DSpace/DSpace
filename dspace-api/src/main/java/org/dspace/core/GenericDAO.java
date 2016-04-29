@@ -17,6 +17,7 @@ import java.util.UUID;
  * The default hibernate implementation offers up a class that implements all these methods.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> class type
  */
 public interface GenericDAO<T>
 {

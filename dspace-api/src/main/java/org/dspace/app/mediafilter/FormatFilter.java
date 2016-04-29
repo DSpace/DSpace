@@ -70,12 +70,10 @@ public interface FormatFilter
      * for any reason.
      * 
      * 
-     * @param c
-     *            context
-     * @param item
-     *            item containing bitstream to process
-     * @param source
-     *            source bitstream to be processed
+     * @param c context
+     * @param item item containing bitstream to process
+     * @param source source bitstream to be processed
+     * @param verbose verbose mode
      * 
      * @return true if bitstream processing should continue, 
      * 			false if this bitstream should be skipped

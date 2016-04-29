@@ -107,9 +107,10 @@ public class METSManifest
          * @param mdRef JDOM element of mdRef in the METS manifest.
          * @return stream containing the metadata mentioned in mdRef.
          * @throws MetadataValidationException if the mdRef is unacceptable or missing required information.
-         * @throws IOException if it is returned by services called by this method.
-         * @throws SQLException if it is returned by services called by this method.
-         * @throws AuthorizeException if it is returned by services called by this method.
+         * @throws PackageValidationException if package validation error
+         * @throws IOException if IO error
+         * @throws SQLException if database error
+         * @throws AuthorizeException if authorization error
          */
         public InputStream getInputStream(Element mdRef)
             throws MetadataValidationException, PackageValidationException,
@@ -230,6 +231,7 @@ public class METSManifest
      * Default constructor, only called internally.
      * @param builder XML parser (for parsing mdRef'd files and binData)
      * @param mets parsed METS document
+     * @param configName config name
      */
     protected METSManifest(SAXBuilder builder, Element mets, String configName)
     {
@@ -245,6 +247,8 @@ public class METSManifest
      * @param is input stream containing serialized XML
      * @param validate if true, enable XML validation using schemas
      *   in document.  Also validates any sub-documents.
+     * @param configName config name
+     * @throws IOException if IO error
      * @throws MetadataValidationException if there is any error parsing
      *          or validating the METS.
      * @return new METSManifest object.
@@ -318,6 +322,7 @@ public class METSManifest
      * Gets all <code>file</code> elements which make up
      *   the item's content.
      * @return a List of <code>Element</code>s.
+     * @throws MetadataValidationException if validation error
      */
     public List<Element> getBundleFiles()
         throws MetadataValidationException
@@ -375,6 +380,7 @@ public class METSManifest
      *   document.  Used by ingester to e.g. check that all
      *   required files are present.
      * @return a List of <code>Element</code>s.
+     * @throws MetadataValidationException if validation error
      */
     public List getMdFiles()
         throws MetadataValidationException
@@ -463,6 +469,7 @@ public class METSManifest
      * Get the DSpace bundle name corresponding to the <code>USE</code>
      * attribute of the file group enclosing this <code>file</code> element.
      * 
+     * @param file file element
      * @return DSpace bundle name
      * @throws MetadataValidationException when there is no USE attribute on the enclosing fileGrp.
      */
@@ -476,6 +483,8 @@ public class METSManifest
      * Get the DSpace bundle name corresponding to the <code>USE</code>
      * attribute of the file group enclosing this <code>file</code> element.
      * 
+     * @param file file element
+     * @param getParent parent flag
      * @return DSpace bundle name
      * @throws MetadataValidationException when there is no USE attribute on the enclosing fileGrp.
      */
@@ -500,6 +509,7 @@ public class METSManifest
      * By "local" we mean the reference to the actual resource containing
      * the data for this file, e.g. a relative path within a Zip or tar archive
      * if the METS is serving as a manifest for that sort of package.
+     * @param file file element
      * @return "local" file name (i.e.  relative to package or content
      *  directory) corresponding to this <code>file</code> or <code>mdRef</code> element.
      * @throws MetadataValidationException when there is not enough information to find a resource identifier.
@@ -551,6 +561,7 @@ public class METSManifest
      * first {@code structMap} has an {@code fptr}.
      *
      * @return file element of Item's primary bitstream, or null if there is none.
+     * @throws MetadataValidationException if validation error
      */
     public Element getPrimaryOrLogoBitstream()
         throws MetadataValidationException
@@ -576,7 +587,9 @@ public class METSManifest
 
     /**
      * Get the metadata type from within a *mdSec element.
+     * @param mdSec mdSec element
      * @return metadata type name.
+     * @throws MetadataValidationException if validation error
      */
     public String getMdType(Element mdSec)
         throws MetadataValidationException
@@ -604,7 +617,9 @@ public class METSManifest
 
     /**
      *  Returns MIME type of metadata content, if available.
+     * @param mdSec mdSec element
      *  @return MIMEtype word, or null if none is available.
+     * @throws MetadataValidationException if validation error
      */
     public String getMdContentMimeType(Element mdSec)
         throws MetadataValidationException
@@ -631,8 +646,14 @@ public class METSManifest
      * Return contents of *md element as List of XML Element objects.
      * Gets content, dereferencing mdRef if necessary, or decoding and parsing
      * a binData that contains XML.
+     * @param mdSec mdSec element
+     * @param callback mdref callback
      * @return contents of metadata section, or empty list if no XML content is available.
      * @throws MetadataValidationException if METS is invalid, or there is an error parsing the XML.
+     * @throws PackageValidationException if invalid package
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public List<Element> getMdContentAsXml(Element mdSec, Mdref callback)
         throws MetadataValidationException, PackageValidationException,
@@ -732,8 +753,14 @@ public class METSManifest
      * Return contents of *md element as stream.
      * Gets content, dereferencing mdRef if necessary, or decoding
      * a binData element if necessary.
+     * @param mdSec mdSec element
+     * @param callback mdref callback
      * @return Stream containing contents of metadata section.  Never returns null.
      * @throws MetadataValidationException if METS format does not contain any metadata.
+     * @throws PackageValidationException if invalid package
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public InputStream getMdContentAsStream(Element mdSec, Mdref callback)
         throws MetadataValidationException, PackageValidationException,
@@ -1076,6 +1103,17 @@ public class METSManifest
 
     /**
      * Invokes appropriate crosswalks on Item-wide descriptive metadata.
+     * @param context context
+     * @param callback mdref callback
+     * @param dso DSpaceObject
+     * @param params package params
+     * @param dmdSec dmdSec element
+     * @throws MetadataValidationException if METS error
+     * @throws CrosswalkException if crosswalk error
+     * @throws PackageValidationException if invalid package
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void crosswalkItemDmd(Context context, PackageParameters params,
                                 DSpaceObject dso,
@@ -1089,7 +1127,15 @@ public class METSManifest
     /**
      * Crosswalk all technical and source metadata sections that belong
      * to the whole object.
+     * @param context context
+     * @param callback mdref callback
+     * @param params package params
+     * @param dso DSpaceObject
      * @throws MetadataValidationException if METS is invalid, e.g. referenced amdSec is missing.
+     * @throws PackageValidationException if invalid package
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void crosswalkObjectOtherAdminMD(Context context, PackageParameters params,
                                       DSpaceObject dso, Mdref callback)
@@ -1116,7 +1162,17 @@ public class METSManifest
 
     /**
      * Just crosswalk the sourceMD sections; used to set the handle and parent of AIP.
+     * @param context context
+     * @param callback mdref callback
+     * @param params package params
+     * @param dso DSpaceObject
      * @return true if any metadata section was actually crosswalked, false otherwise
+     * @throws MetadataValidationException if METS is invalid, e.g. referenced amdSec is missing.
+     * @throws PackageValidationException if invalid package
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
      */
     public boolean crosswalkObjectSourceMD(Context context, PackageParameters params,
                                         DSpaceObject dso, Mdref callback)
@@ -1277,7 +1333,13 @@ public class METSManifest
      * @param bitstream bitstream target of the crosswalk
      * @param fileId value of ID attribute in the file element responsible
      *  for the contents of that bitstream.
-     *  @param callback ???
+     * @param callback mdref callback
+     * @throws MetadataValidationException if METS is invalid, e.g. referenced amdSec is missing.
+     * @throws PackageValidationException if invalid package
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
      */
     public void crosswalkBitstream(Context context, PackageParameters params,
                                    Bitstream bitstream,

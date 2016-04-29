@@ -88,6 +88,7 @@ public class SubmissionConfigReader
     /**
      * Load Submission Configuration from the
      * item-submission.xml configuration file 
+     * @throws ServletException if servlet error
      */
     public SubmissionConfigReader() throws ServletException
     {

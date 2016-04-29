@@ -55,6 +55,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
      *            ID of the ResourcePolicy
      *
      * @return the ResourcePolicy format, or null if the ID is invalid.
+     * @throws SQLException if database error
      */
     @Override
     public ResourcePolicy find(Context context, int id) throws SQLException
@@ -67,6 +68,8 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
      *
      * @param context
      *            DSpace context object
+     * @return ResourcePolicy
+     * @throws SQLException if database error
      */
     @Override
     public ResourcePolicy create(Context context) throws SQLException
@@ -109,6 +112,10 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
     /**
      * Delete an ResourcePolicy
      *
+     * @param context context
+     * @param resourcePolicy resource policy
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void delete(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException {
@@ -125,6 +132,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
 
 
     /**
+     * @param resourcePolicy resource policy
      * @return action text or 'null' if action row empty
      */
     @Override
@@ -144,6 +152,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
     /**
      * figures out if the date is valid for the policy
      *
+     * @param resourcePolicy resource policy
      * @return true if policy has begun and hasn't expired yet (or no dates are
      *         set)
      */
@@ -253,6 +262,10 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
 
     /**
      * Update the ResourcePolicy
+     * @param context context
+     * @param resourcePolicy resource policy
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void update(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException {

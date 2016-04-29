@@ -88,18 +88,26 @@ public interface ChoiceAuthorityService
     /**
      *  Wrapper that calls getLabel method of the plugin corresponding to
      *  the metadata field defined by schema,element,qualifier.
+     * @param metadataValue metadata value
+     * @param locale explicit localization key if available
+     * @return label
      */
     public String getLabel(MetadataValue metadataValue, String locale);
 
     /**
      *  Wrapper that calls getLabel method of the plugin corresponding to
      *  the metadata field defined by single field key.
+     * @param fieldKey single string identifying metadata field
+     * @param locale explicit localization key if available
+     * @param authKey authority key
+     * @return label
      */
     public String getLabel(String fieldKey, String authKey, String locale);
 
     /**
      * Predicate, is there a Choices configuration of any kind for the
      * given metadata field?
+     * @param fieldKey single string identifying metadata field
      * @return true if choices are configured for this field.
      */
     public boolean isChoicesConfigured(String fieldKey);
@@ -108,6 +116,7 @@ public interface ChoiceAuthorityService
      * Get the presentation keyword (should be "lookup", "select" or "suggest", but this
      * is an informal convention so it can be easily extended) for this field.
      *
+     * @param fieldKey field key
      * @return configured presentation type for this field, or null if none found
      */
     public String getPresentation(String fieldKey);
@@ -115,12 +124,15 @@ public interface ChoiceAuthorityService
     /**
      * Get the configured "closed" value for this field.
      *
+     * @param fieldKey single string identifying metadata field
      * @return true if choices are closed for this field.
      */
     public boolean isClosed(String fieldKey);
 
     /**
      * Wrapper to call plugin's getVariants().
+     * @param metadataValue metadata value
+     * @return List of variants
      */
     public List<String> getVariants(MetadataValue metadataValue);
 }

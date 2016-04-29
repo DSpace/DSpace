@@ -67,17 +67,24 @@ public interface SFXFileReaderService {
 
     /**
      * Is Empty text Node *
+     * @param nd node
+     * @return true or false
      */
     public boolean isEmptyTextNode(Node nd);
 
     /**
      * Returns the value of the node's attribute named {@code <name>}
+     * @param e node
+     * @param name name
+     * @return value
      */
     public String getAttribute(Node e, String name);
 
     /**
      * Returns the value found in the Text node (if any) in the
      * node list that's passed in.
+     * @param node node
+     * @return value
      */
     public String getValue(Node node);
 }

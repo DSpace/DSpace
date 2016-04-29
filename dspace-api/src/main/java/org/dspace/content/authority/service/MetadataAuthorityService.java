@@ -41,16 +41,32 @@ import java.util.List;
  */
 public interface MetadataAuthorityService {
 
-    /** Predicate - is field authority-controlled? */
+    /** 
+     * Predicate - is field authority-controlled?
+     * @param metadataField metadata field
+     * @return true/false
+     */
     public boolean isAuthorityControlled(MetadataField metadataField);
 
-    /** Predicate - is field authority-controlled? */
+    /** 
+     * Predicate - is field authority-controlled?
+     * @param fieldKey field key
+     * @return true/false
+     */
     public boolean isAuthorityControlled(String fieldKey);
 
-    /** Predicate - is authority value required for field? */
+    /** 
+     * Predicate - is authority value required for field?
+     * @param metadataField metadata field
+     * @return true/false 
+     */
     public boolean isAuthorityRequired(MetadataField metadataField);
 
-    /** Predicate - is authority value required for field? */
+    /** 
+     * Predicate - is authority value required for field?
+     * @param fieldKey field key
+     * @return  true/false 
+     */
     public boolean isAuthorityRequired(String fieldKey);
 
 
@@ -58,6 +74,8 @@ public interface MetadataAuthorityService {
      * Construct a single key from the tuple of schema/element/qualifier
      * that describes a metadata field.  Punt to the function we use for
      * submission UI input forms, for now.
+     * @param metadataField metadata field
+     * @return field key
      */
     public String makeFieldKey(MetadataField metadataField);
 
@@ -65,12 +83,17 @@ public interface MetadataAuthorityService {
      * Construct a single key from the tuple of schema/element/qualifier
      * that describes a metadata field.  Punt to the function we use for
      * submission UI input forms, for now.
+     * @param schema schema
+     * @param element element
+     * @param qualifier qualifier
+     * @return field key
      */
     public String makeFieldKey(String schema, String element, String qualifier);
 
     /**
      * Give the minimal level of confidence required to consider valid an authority value
      * for the given metadata.
+     * @param metadataField metadata field
      * @return the minimal valid level of confidence for the given metadata
      */
     public int getMinConfidence(MetadataField metadataField);

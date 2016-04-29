@@ -397,6 +397,7 @@ public class Context
     /**
      * Select an event dispatcher, <code>null</code> selects the default
      * 
+     * @param dispatcher dispatcher
      */
     public void setDispatcher(String dispatcher)
     {
@@ -559,6 +560,7 @@ public class Context
     /**
      * Get an array of all of the special groups that current user is a member
      * of.
+     * @return list of groups
      * @throws SQLException if database error
      */
     public List<Group> getSpecialGroups() throws SQLException

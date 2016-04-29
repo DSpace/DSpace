@@ -28,6 +28,9 @@ public interface MetadataSchemaService {
      *
      * @param context
      *            DSpace context object
+     * @param name name
+     * @param namespace namespace
+     * @return new MetadataSchema
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      * @throws NonUniqueMetadataException
@@ -48,6 +51,7 @@ public interface MetadataSchemaService {
      * Update the metadata schema in the database.
      *
      * @param context DSpace context
+     * @param metadataSchema metadata schema
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      * @throws NonUniqueMetadataException
@@ -58,6 +62,7 @@ public interface MetadataSchemaService {
      * Delete the metadata schema.
      *
      * @param context DSpace context
+     * @param metadataSchema metadata schema
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      */

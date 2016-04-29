@@ -72,6 +72,7 @@ public class ItemCountDAOSolr implements ItemCountDAO
      * Get the count of the items in the given container.
      * 
      * @param dso Dspace Context
+     * @return count
      * @throws ItemCountException if count error
      */
     @Override

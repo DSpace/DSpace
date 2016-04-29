@@ -216,6 +216,7 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService
     /**
      * Give the minimal level of confidence required to consider valid an authority value
      * for the given metadata.
+     * @param metadataField metadata field
      * @return the minimal valid level of confidence for the given metadata
      */
     @Override

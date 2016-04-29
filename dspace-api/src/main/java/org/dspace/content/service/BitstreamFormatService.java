@@ -96,8 +96,11 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
     /**
      * Set the short description of the bitstream format
      *
+     * @param context context
+     * @param bitstreamFormat format
      * @param shortDescription
      *            the new short description
+     * @throws SQLException if database error
      */
     public void setShortDescription(Context context, BitstreamFormat bitstreamFormat, String shortDescription) throws SQLException;
 
@@ -105,6 +108,7 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
      * Get the support level text for this bitstream format - one of
      * <code>UNKNOWN</code>,<code>KNOWN</code> or <code>SUPPORTED</code>.
      *
+     * @param bitstreamFormat format
      * @return the support level
      */
     public String getSupportLevelText(BitstreamFormat bitstreamFormat);
@@ -113,6 +117,7 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
      * Set the support level for this bitstream format - one of
      * <code>UNKNOWN</code>,<code>KNOWN</code> or <code>SUPPORTED</code>.
      *
+     * @param bitstreamFormat format
      * @param supportLevel
      *            the new support level
      */
@@ -134,10 +139,12 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
      * Attempt to identify the format of a particular bitstream. If the format
      * is unknown, null is returned.
      *
+     * @param context context
      * @param bitstream
      *            the bitstream to identify the format of
      *
      * @return a format from the bitstream format registry, or null
+     * @throws SQLException if database error
      */
     public BitstreamFormat guessFormat(Context context, Bitstream bitstream) throws SQLException;
 }

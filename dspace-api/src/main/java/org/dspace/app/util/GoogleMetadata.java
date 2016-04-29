@@ -210,8 +210,9 @@ public class GoogleMetadata
      * Wrap the item, parse all configured fields and generate metadata field
      * values.
      * 
-     * @param item
-     *            - The item being viewed to extract metadata from
+     * @param context context
+     * @param item The item being viewed to extract metadata from
+     * @throws SQLException if database error
      */
     public GoogleMetadata(Context context, Item item) throws SQLException
     {
@@ -779,6 +780,7 @@ public class GoogleMetadata
 
     /**
      * Produce meta elements that can easily be put into the head.
+     * @return List of elements
      */
     public List<Element> disseminateList()
     {

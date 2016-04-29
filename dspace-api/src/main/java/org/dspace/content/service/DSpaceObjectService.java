@@ -25,6 +25,7 @@ import java.util.UUID;
  * are required to have.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> class type
  */
 public interface DSpaceObjectService<T extends DSpaceObject> {
 
@@ -215,6 +216,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *            value has no language (for example, a date).
      * @param values
      *            the values to add.
+     * @throws SQLException if database error
      */
     public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, List<String> values) throws SQLException;
 
@@ -243,6 +245,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *            the external authority key for this value (or null)
      * @param confidences
      *            the authority confidence (default 0)
+     * @throws SQLException if database error
      */
     public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException;
 
@@ -265,6 +268,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *            the external authority key for this value (or null)
      * @param confidences
      *            the authority confidence (default 0)
+     * @throws SQLException if database error
      */
     public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException;
 
@@ -293,6 +297,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *            value has no language (for example, a date).
      * @param value
      *            the value to add.
+     * @throws SQLException if database error
      */
     public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value) throws SQLException;
 
@@ -320,6 +325,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *            the external authority key for this value (or null)
      * @param confidence
      *            the authority confidence (default 0)
+     * @throws SQLException if database error
      */
     public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence) throws SQLException;
 
@@ -348,6 +354,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *            values with no language are removed, and <code>Item.ANY</code>
      *            means values with any country code or no country code are
      *            removed.
+     * @throws SQLException if database error
      */
     public void clearMetadata(Context context, T dso, String schema, String element, String qualifier, String lang) throws SQLException;
 

@@ -55,6 +55,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * Sends the Deleted bitstream report to an administrator. for the
      * specified date range.
      * 
+     * @param context context
      * @param startDate
      *            the start date for the range
      * @param endDate
@@ -66,6 +67,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * 
      * @throws IOException if IO error
      *             if io error occurs
+     * @throws SQLException if database error
      */
     @Override
     public int getDeletedBitstreamReport(Context context, Date startDate, Date endDate,
@@ -100,6 +102,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
     /**
      * Send the checksum changed report for the specified date range.
      * 
+     * @param context context
      * @param startDate
      *            the start date for the range
      * @param endDate
@@ -111,6 +114,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * 
      * @throws IOException if IO error
      *             if io error occurs
+     * @throws SQLException if database error
      */
     @Override
     public int getChangedChecksumReport(Context context, Date startDate, Date endDate,
@@ -147,6 +151,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
     /**
      * Send the bitstream not found report for the specified date range.
      * 
+     * @param context context
      * @param startDate
      *            the start date for the range.
      * @param endDate
@@ -158,6 +163,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * 
      * @throws IOException if IO error
      *             if io error occurs
+     * @throws SQLException if database error
      */
     @Override
     public int getBitstreamNotFoundReport(Context context, Date startDate, Date endDate,
@@ -193,6 +199,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * Send the bitstreams that were set to not be processed report for the
      * specified date range.
      * 
+     * @param context context
      * @param startDate
      *            the start date for the range
      * @param endDate
@@ -204,6 +211,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * 
      * @throws IOException if IO error
      *             if io error occurs
+     * @throws SQLException if database error
      */
     @Override
     public int getNotToBeProcessedReport(Context context, Date startDate, Date endDate,
@@ -239,6 +247,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
     /**
      * Get any bitstreams that are not checked by the checksum checker.
      * 
+     * @param context context
      * @param osw
      *            the OutputStreamWriter to write to
      * 
@@ -246,6 +255,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * 
      * @throws IOException if IO error
      *             if io error occurs
+     * @throws SQLException if database error
      */
     @Override
     public int getUncheckedBitstreamsReport(Context context, OutputStreamWriter osw)
@@ -313,6 +323,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
     /**
      * Create a list of the found history records.
      * 
+     * @param context context
      * @param bitstreams
      *            the list of history records to be iterated over.
      * @param osw
@@ -320,6 +331,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * 
      * @throws IOException if IO error
      *             if io error occurs
+     * @throws SQLException if database error
      */
     protected void printDSpaceInfoRecords(Context context, List<Bitstream> bitstreams, OutputStreamWriter osw)
             throws IOException, SQLException {

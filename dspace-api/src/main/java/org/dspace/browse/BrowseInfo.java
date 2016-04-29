@@ -575,6 +575,7 @@ public class BrowseInfo
 
     /**
      * True if this browse was cached.
+     * @return true/false
      */
     public boolean wasCached()
     {
@@ -684,6 +685,7 @@ public class BrowseInfo
 	/**
 	 * Utility method for obtaining a string representation of the browse.  This is
 	 * useful only for debug
+         * @return String representation
 	 */
     public String toString()
     {

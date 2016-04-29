@@ -328,6 +328,9 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     /**
      * Internal method to process subcommunities recursively
+     * @param community community
+     * @param collectionList list of collections
+     * @throws SQLException if database error
      */
     protected void addCollectionList(Community community, List<Collection> collectionList) throws SQLException
     {
@@ -488,6 +491,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
      * Internal method to remove the community and all its children from the
      * database, and perform any pre/post-cleanup
      *
+     * @param context context
+     * @param community community
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error

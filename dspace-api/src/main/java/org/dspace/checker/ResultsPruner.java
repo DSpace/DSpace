@@ -49,6 +49,7 @@ public final class ResultsPruner
      * Factory method for the default results pruner configuration using
      * dspace.cfg
      * 
+     * @param context Context
      * @return a ResultsPruner that represent the default retention policy
      */
     public static ResultsPruner getDefaultPruner(Context context)
@@ -69,6 +70,7 @@ public final class ResultsPruner
     /**
      * Factory method for ResultsPruners
      * 
+     * @param context Context
      * @param propsFile
      *            to configure the results pruner.
      * @return the configured results pruner.
@@ -112,7 +114,9 @@ public final class ResultsPruner
      * Factory method for ResultsPruners (used to load ConfigurationManager
      * properties.
      * 
-     * @param props
+     * @param context Context
+     * @param props Properties
+     * @return pruner
      * @throws FileNotFoundException if file doesn't exist
      */
     public static ResultsPruner getPruner(Context context, Properties props)
@@ -177,6 +181,7 @@ public final class ResultsPruner
 
     /**
      * Default Constructor
+     * @param context Context
      */
     public ResultsPruner(Context context)
     {
@@ -234,6 +239,7 @@ public final class ResultsPruner
      * registered with this object.
      * 
      * @return number of results removed.
+     * @throws SQLException if database error
      */
     public int prune() throws SQLException {
         ChecksumResultCode[] codes = ChecksumResultCode.values();

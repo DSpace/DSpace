@@ -427,12 +427,9 @@ public class RoleIngester implements PackageIngester
     /**
      * Ingest roles from an InputStream.
      *
-     * @param context
-     *          DSpace Context
-     * @param parent
-     *          the Parent DSpaceObject
-     * @param stream
-     *          the XML Document InputStream
+     * @param context DSpace Context
+     * @param parent the Parent DSpaceObject
+     * @param params package params
      * @throws PackageException if packaging error
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error

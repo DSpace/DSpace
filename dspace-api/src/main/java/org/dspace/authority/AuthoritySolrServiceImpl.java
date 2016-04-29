@@ -131,6 +131,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     /**
      * Retrieves all the metadata fields which are indexed in the authority control
      * @return a list of metadata fields
+     * @throws Exception if error
      */
     @Override
     public List<String> getAllIndexedMetadataFields() throws Exception {

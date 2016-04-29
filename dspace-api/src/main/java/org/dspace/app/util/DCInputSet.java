@@ -25,7 +25,11 @@ public class DCInputSet
 	/** the inputs ordered by page and row position */
 	private DCInput[][] inputPages = null;
 	
-	/** constructor */
+        /** constructor
+         * @param formName form name
+         * @param pages pages
+         * @param listMap map
+         */
 	public DCInputSet(String formName, List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
 	{
 		this.formName = formName;
@@ -116,6 +120,7 @@ public class DCInputSet
      * Does the current input set define the named field?
      * Scan through every field in every page of the input set
      *
+     * @param fieldName
      * @return true if the current set has the named field
      */
     public boolean isFieldPresent(String fieldName)
@@ -141,6 +146,8 @@ public class DCInputSet
      * and is valid for the specified document type
      * Scan through every field in every page of the input set
      *
+     * @param fieldName field name
+     * @param documentType doc type
      * @return true if the current set has the named field
      */
      public boolean isFieldPresent(String fieldName, String documentType)

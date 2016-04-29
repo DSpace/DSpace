@@ -61,6 +61,7 @@ public class HandleDispatcher implements BitstreamDispatcher
     /**
      * Main constructor.
      * 
+     * @param context Context
      * @param hdl
      *            the handle to get bitstreams from.
      */
@@ -110,6 +111,7 @@ public class HandleDispatcher implements BitstreamDispatcher
     /**
      * Initializes this dispatcher on first execution.
      * 
+     * @throws SQLException if database error
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
     @Override

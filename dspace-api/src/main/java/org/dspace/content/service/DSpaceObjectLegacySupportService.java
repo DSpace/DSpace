@@ -17,6 +17,7 @@ import java.sql.SQLException;
  * to identify DSpaceObjects prior to DSpace 6.0
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> class type
  */
 public interface DSpaceObjectLegacySupportService<T extends DSpaceObject> {
 

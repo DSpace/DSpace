@@ -66,6 +66,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * number of times in the current schema.
      *
      * @param context DSpace context
+     * @param metadataSchemaId schema id
      * @param namespace namespace URI to match
      * @return true of false
      * @throws SQLException if database error
@@ -87,6 +88,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * Return true if and only if the passed name is unique.
      *
      * @param context DSpace context
+     * @param metadataSchemaId schema id
      * @param name  short name of schema
      * @return true of false
      * @throws SQLException if database error

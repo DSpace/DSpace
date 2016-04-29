@@ -98,6 +98,7 @@ public class ItemListConfig
 	 * What metadata is to go in the given column number?
 	 * 
 	 * @param col column
+         * @return array of metadata
 	 */
 	public String[] getMetadata(int col)
 	{

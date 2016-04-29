@@ -20,6 +20,7 @@ public interface LicenseService {
      * @param licenseFile
      *            name for the file into which license will be written,
      *            relative to the current directory.
+     * @param newLicense new license
      */
     public void writeLicenseFile(String licenseFile,
             String newLicense);

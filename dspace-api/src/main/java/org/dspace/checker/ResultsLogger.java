@@ -83,8 +83,10 @@ public class ResultsLogger implements ChecksumResultsCollector
     /**
      * Collect a result for logging.
      * 
+     * @param context Context
      * @param info
      *            the BitstreamInfo representing the result.
+     * @throws SQLException if database error
      * @see org.dspace.checker.ChecksumResultsCollector#collect(org.dspace.core.Context, org.dspace.checker.MostRecentChecksum)
      */
     @Override

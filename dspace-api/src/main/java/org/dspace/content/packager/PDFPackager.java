@@ -185,6 +185,12 @@ public class PDFPackager
 
     /**
      * IngestAll() cannot be implemented for a PDF ingester, because there's only one PDF to ingest
+     * @throws UnsupportedOperationException if unsupported operation
+     * @throws PackageException if package error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
      */
     @Override
     public List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
@@ -199,6 +205,12 @@ public class PDFPackager
 
     /**
      * Replace is not implemented.
+     * @throws UnsupportedOperationException if unsupported operation
+     * @throws PackageException if package error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
      */
     @Override
     public DSpaceObject replace(Context context, DSpaceObject dso,
@@ -212,6 +224,12 @@ public class PDFPackager
 
     /**
      * ReplaceAll() cannot be implemented for a PDF ingester, because there's only one PDF to ingest
+     * @throws UnsupportedOperationException if unsupported operation
+     * @throws PackageException if package error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
      */
     @Override
     public List<String> replaceAll(Context context, DSpaceObject dso,
@@ -227,6 +245,11 @@ public class PDFPackager
      * VERY crude dissemination: just look for the first
      * bitstream with the PDF package type, and toss it out.
      * Works on packages importer with this packager, and maybe some others.
+     * @param dso DSpaceObject
+     * @throws CrosswalkException if crosswalk error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     @Override
     public void disseminate(Context context, DSpaceObject dso,
@@ -277,6 +300,11 @@ public class PDFPackager
 
     /**
      * disseminateAll() cannot be implemented for a PDF disseminator, because there's only one PDF to disseminate
+     * @throws PackageException if package error
+     * @throws CrosswalkException if crosswalk error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     @Override
     public List<File> disseminateAll(Context context, DSpaceObject dso,
@@ -291,6 +319,7 @@ public class PDFPackager
     /**
      * Identifies the MIME-type of this package, i.e. "application/pdf".
      *
+     * @param params package params
      * @return the MIME type (content-type header) of the package to be returned
      */
     @Override

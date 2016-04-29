@@ -33,6 +33,7 @@ public interface ItemCountDAO
 	 * Collection.  Otherwise it will throw an exception.
 	 * 
 	 * @param dso Dspace Object
+         * @return count
 	 * @throws ItemCountException if count error
 	 */
 	public int getCount(DSpaceObject dso) throws ItemCountException;

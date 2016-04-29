@@ -43,6 +43,8 @@ public class PolicySet
 
     /**
      * Command line interface to setPolicies - run to see arguments
+     * @param argv arguments
+     * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception
     {

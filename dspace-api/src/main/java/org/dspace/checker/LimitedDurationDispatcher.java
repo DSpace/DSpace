@@ -67,6 +67,7 @@ public class LimitedDurationDispatcher implements BitstreamDispatcher
     }
 
     /**
+     * @throws SQLException if database error
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
     @Override

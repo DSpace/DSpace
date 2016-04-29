@@ -227,6 +227,10 @@ public abstract class AbstractMETSDisseminator
      * @param pkgFile File where export package should be written
      * @throws PackageValidationException if package cannot be created or there
      * is a fatal error in creating it.
+     * @throws CrosswalkException if crosswalk error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     @Override
     public void disseminate(Context context, DSpaceObject dso,
@@ -306,7 +310,9 @@ public abstract class AbstractMETSDisseminator
      * @param params Parameters to the Packager script
      * @param pkg Package output stream
      * @throws PackageValidationException if package validation error
+     * @throws CrosswalkException if crosswalk error
      * @throws AuthorizeException if authorization error
+     * @throws MetsException if METS error
      * @throws SQLException if database error
      * @throws IOException if IO error
      */
@@ -409,6 +415,10 @@ public abstract class AbstractMETSDisseminator
      * @param dso The DSpace Object
      * @param params Parameters to the Packager script
      * @param zip Zip output
+     * @throws PackageValidationException if validation error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     protected void addBitstreamsToZip(Context context, DSpaceObject dso,
             PackageParameters params, ZipOutputStream zip)
@@ -786,6 +796,17 @@ public abstract class AbstractMETSDisseminator
     /**
      * Write out a METS manifest.
      * Mostly lifted from Rob Tansley's METS exporter.
+     * @param context context
+     * @param dso DSpaceObject
+     * @param params packaging params
+     * @param extraStreams streams
+     * @return METS manifest
+     * @throws MetsException if mets error
+     * @throws PackageValidationException if validation error
+     * @throws CrosswalkException if crosswalk error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     protected Mets makeManifest(Context context, DSpaceObject dso,
                               PackageParameters params,
@@ -1195,7 +1216,7 @@ public abstract class AbstractMETSDisseminator
      * all child objects).
      * @param type - type attr value for the {@code <div>}
      * @param dso - object for which to create the div
-     * @param params
+     * @param params package params
      * @return a new {@code Div} with {@code dso} as child.
      */
     protected Div makeChildDiv(String type, DSpaceObject dso, PackageParameters params)
@@ -1260,6 +1281,7 @@ public abstract class AbstractMETSDisseminator
      *            the derived bitstream
      *
      * @return the corresponding original bitstream (or null)
+     * @throws SQLException if database error
      */
     protected Bitstream findOriginalBitstream(Item item, Bitstream derived)
         throws SQLException
@@ -1475,9 +1497,11 @@ public abstract class AbstractMETSDisseminator
      * For a manifest-only METS, this is a reference to an HTTP URL where
      * the bitstream should be able to be downloaded from.
      * 
+     * @param context context
      * @param bitstream  the Bitstream
      * @param params Packager Parameters
      * @return String in URL format naming path to bitstream.
+     * @throws SQLException if database error
      */
     public String makeBitstreamURL(Context context, Bitstream bitstream, PackageParameters params) throws SQLException {
         // if bare manifest, use external "persistent" URI for bitstreams
@@ -1541,6 +1565,11 @@ public abstract class AbstractMETSDisseminator
 
     /**
      * Create metsHdr element - separate so subclasses can override.
+     * @param context context
+     * @param dso DSpaceObject
+     * @param params packaging params
+     * @return Mets header
+     * @throws SQLException if database error
      */
     public abstract MetsHdr makeMetsHdr(Context context, DSpaceObject dso,
                                PackageParameters params) throws SQLException;
@@ -1568,8 +1597,13 @@ public abstract class AbstractMETSDisseminator
      * E.g. the type string <code>"DC:qualifiedDublinCore"</code> tells it to
      * create a METS section with <code>MDTYPE="DC"</code> and use the plugin
      * named "qualifiedDublinCore" to obtain the data.
+     * @param context context
+     * @param dso DSpaceObject
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public abstract String [] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
@@ -1579,8 +1613,13 @@ public abstract class AbstractMETSDisseminator
      * object and each Bitstream in an Item.  The type string may be a
      * simple name or colon-separated compound as specified for
      *  <code>getDmdTypes()</code> above.
+     * @param context context
+     * @param dso DSpaceObject
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public abstract String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
@@ -1590,8 +1629,13 @@ public abstract class AbstractMETSDisseminator
      * object and each Bitstream in an Item.  The type string may be a
      * simple name or colon-separated compound as specified for
      * <code>getDmdTypes()</code> above.
+     * @param context context
+     * @param dso DSpaceObject
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public abstract String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
@@ -1602,8 +1646,13 @@ public abstract class AbstractMETSDisseminator
      * The type string may be a simple name or colon-separated compound
      * as specified for <code>getDmdTypes()</code> above.
      *
+     * @param context context
+     * @param dso DSpaceObject
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public abstract String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
@@ -1614,8 +1663,13 @@ public abstract class AbstractMETSDisseminator
      * The type string may be a simple name or colon-separated compound
      * as specified for <code>getDmdTypes()</code> above.
      *
+     * @param context context
+     * @param dso DSpaceObject
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public abstract String[] getRightsMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
@@ -1625,13 +1679,21 @@ public abstract class AbstractMETSDisseminator
      * METS document, as required by this subclass.  A simple default
      * structure map which fulfills the minimal DSpace METS DIP/SIP
      * requirements is already present, so this does not need to do anything.
+     * @param context context
+     * @param dso DSpaceObject
      * @param mets the METS document to which to add structMaps
+     * @param params the PackageParameters passed to the disseminator.
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws MetsException if METS error
      */
     public abstract void addStructMap(Context context, DSpaceObject dso,
                                PackageParameters params, Mets mets)
         throws SQLException, IOException, AuthorizeException, MetsException;
 
     /**
+     * @param bundle bundle
      * @return true when this bundle should be included as "content"
      *  in the package.. e.g. DSpace SIP does not include metadata bundles.
      */

@@ -548,6 +548,7 @@ public class LegacyPluginServiceImpl implements PluginService
      * <li>Implementations of named plugin have no name collisions.
      * <li>Named plugin entries lacking names.
      * </ul>
+     * @throws IOException if IO error
      */
     public void checkConfiguration()
         throws IOException
@@ -712,6 +713,8 @@ public class LegacyPluginServiceImpl implements PluginService
      * Invoking this class from the command line just runs
      * <code>checkConfiguration</code> and shows the results.
      * There are no command-line options.
+     * @param argv arguments
+     * @throws Exception if error
      */
     public void main(String[] argv) throws Exception
     {

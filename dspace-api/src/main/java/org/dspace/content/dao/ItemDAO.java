@@ -35,9 +35,10 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
     /**
      * Find all Items modified since a Date.
      *
-     * @param context
+     * @param context Context
      * @param since Earliest interesting last-modified date.
-     * @return 
+     * @return iterator over items
+     * @throws SQLException if database error 
      */
     public Iterator<Item> findByLastModifiedSince(Context context, Date since)
             throws SQLException;
@@ -58,7 +59,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
 
     /**
      * Count number of items in a given collection
-     * @param context
+     * @param context context
      * @param collection the collection
      * @param includeArchived whether to include archived items in count
      * @param includeWithdrawn whether to include withdrawn items in count
@@ -73,7 +74,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
      * {@link org.dspace.content.service.CommunityService#getAllCollections(Context,Community)}
      * to determine the unique number of items in a Community.
      * 
-     * @param context
+     * @param context context
      * @param collections the list of collections
      * @param includeArchived whether to include archived items in count
      * @param includeWithdrawn whether to include withdrawn items in count
@@ -84,12 +85,13 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
 
     /**
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
-     * @param context
-     * @param archived
-     * @param withdrawn
-     * @param discoverable
+     * @param context context
+     * @param archived whether to find archived
+     * @param withdrawn whether to find withdrawn
+     * @param discoverable whether to find discoverable
      * @param lastModified earliest interesting last-modified date.
-     * @return
+     * @return iterator over items
+     * @throws SQLException if database error
      */
     public Iterator<Item> findAll(Context context, boolean archived,
             boolean withdrawn, boolean discoverable, Date lastModified)
@@ -97,7 +99,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
 
     /**
      * Count total number of items (rows in item table)
-     * @param context
+     * @param context context
      * @return total count
      * @throws SQLException if database error
      */
@@ -105,7 +107,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
 
     /**
      * Count number of items based on specific status flags
-     * @param context
+     * @param context context
      * @param includeArchived whether to include archived items in count
      * @param includeWithdrawn whether to include withdrawn items in count
      * @return count of items

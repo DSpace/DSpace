@@ -88,6 +88,7 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
     /**
      * Delete the history records from the database.
      *
+     * @param context Context
      * @param retentionDate
      *            any records older than this data are deleted.
      * @param checksumResultCode

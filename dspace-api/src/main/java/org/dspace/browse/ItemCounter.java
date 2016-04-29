@@ -71,6 +71,7 @@ public class ItemCounter
      * the number of items in the container in real time.
      * 
      * @param dso DSpaceObject
+     * @return count
      * @throws ItemCountException when error occurs
      */
     public int getCount(DSpaceObject dso)

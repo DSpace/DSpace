@@ -169,6 +169,8 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
      *
      * @param metadataField Is one of the fields defined in dspace.cfg to be indexed.
      * @param value         Is one of the values of the given metadataField in one of the items being indexed.
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     protected void prepareNextValue(String metadataField, MetadataValue value) throws SQLException, AuthorizeException {
 

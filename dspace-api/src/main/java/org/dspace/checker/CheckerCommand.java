@@ -73,6 +73,7 @@ public final class CheckerCommand
 
     /**
      * Default constructor uses DSpace plugin manager to construct dependencies.
+     * @param context Context
      */
     public CheckerCommand(Context context)
     {
@@ -94,6 +95,7 @@ public final class CheckerCommand
      * N.B. a valid BitstreamDispatcher must be provided using
      * setBitstreamDispatcher before calling this method
      * </p>
+     * @throws SQLException if database error
      */
     public void process() throws SQLException {
         LOG.debug("Begin Checker Processing");
@@ -136,6 +138,7 @@ public final class CheckerCommand
      *            the bitstream
      * 
      * @return the information about the bitstream and its checksum data
+     * @throws SQLException if database error
      */
     protected MostRecentChecksum checkBitstream(final Bitstream bitstream) throws SQLException {
         // get bitstream info from bitstream table
@@ -181,6 +184,7 @@ public final class CheckerCommand
      *            the second checksum
      * 
      * @return a result code (constants defined in Util)
+     * @throws SQLException if database error
      */
     protected ChecksumResult compareChecksums(String checksumA, String checksumB) throws SQLException {
         ChecksumResult result = getChecksumResultByCode(ChecksumResultCode.CHECKSUM_NO_MATCH);
@@ -205,6 +209,7 @@ public final class CheckerCommand
      * 
      * @param info
      *            a deleted bitstream.
+     * @throws SQLException if database error
      */
     protected void processDeletedBitstream(MostRecentChecksum info) throws SQLException {
         info.setProcessStartDate(new Date());
@@ -223,6 +228,7 @@ public final class CheckerCommand
      * @param info
      *            A not found BitStreamInfo
      * TODO is this method required?
+     * @throws SQLException if database error
      */
     protected void processNullInfoBitstream(MostRecentChecksum info) throws SQLException {
         info.setInfoFound(false);
@@ -246,6 +252,7 @@ public final class CheckerCommand
      * 
      * @param info
      *            BitstreamInfo to handle
+     * @throws SQLException if database error
      */
     protected void processBitstream(MostRecentChecksum info) throws SQLException {
         info.setProcessStartDate(new Date());

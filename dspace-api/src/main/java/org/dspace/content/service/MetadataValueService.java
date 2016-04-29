@@ -30,6 +30,9 @@ public interface MetadataValueService {
      *
      * @param context
      *            DSpace context object
+     * @param dso DSpaceObject
+     * @param metadataField metadata field
+     * @return new MetadataValue
      * @throws SQLException if database error
      */
     public MetadataValue create(Context context, DSpaceObject dso, MetadataField metadataField) throws SQLException;
@@ -63,6 +66,7 @@ public interface MetadataValueService {
      * Update the metadata value in the database.
      *
      * @param context dspace context
+     * @param metadataValue metadata value
      * @throws SQLException if database error
      */
     public void update(Context context, MetadataValue metadataValue) throws SQLException;
@@ -73,6 +77,7 @@ public interface MetadataValueService {
      * Delete the metadata field.
      *
      * @param context dspace context
+     * @param metadataValue metadata value
      * @throws SQLException if database error
      */
     public void delete(Context context, MetadataValue metadataValue) throws SQLException;

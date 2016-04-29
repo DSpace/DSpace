@@ -217,6 +217,7 @@ public final class Utils
      *            The InputStream to obtain data from.
      * @param output
      *            The OutputStream to copy data to.
+     * @throws IOException if IO error
      */
     public static void copy(final InputStream input, final OutputStream output)
             throws IOException
@@ -253,6 +254,7 @@ public final class Utils
      *            The InputStream to obtain data from.
      * @param destination
      *            The OutputStream to copy data to.
+     * @throws IOException if IO error
      */
     public static void bufferedCopy(final InputStream source,
             final OutputStream destination) throws IOException

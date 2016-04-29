@@ -27,6 +27,7 @@ public class CollectionDropDown {
      * @param col 
      *            Get full path for this collection
      * @return Full path to the collection
+     * @throws SQLException if database error
      */
     public static String collectionPath(Collection col) throws SQLException
     {
@@ -42,6 +43,7 @@ public class CollectionDropDown {
      * @param maxchars 
      *            Truncate the full path to maxchar characters. 0 means do not truncate.
      * @return Full path to the collection (truncated)
+     * @throws SQLException if database error
      */
     public static String collectionPath(Collection col, int maxchars) throws SQLException
     {

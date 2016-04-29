@@ -24,7 +24,13 @@ public interface RequestItemService {
 
     /**
      * Generate a request item representing the request and put it into the DB
-     * @param context
+     * @param context context
+     * @param bitstream bitstream
+     * @param item item
+     * @param reqMessage message
+     * @param allFiles all files flag
+     * @param reqEmail email
+     * @param reqName name
      * @return the token of the request item
      * @throws SQLException if database error
      */
@@ -36,6 +42,7 @@ public interface RequestItemService {
     /**
      * Save updates to the record. Only accept_request, and decision_date are set-able.
      * @param context
+     * @param requestItem
      */
     public void update(Context context, RequestItem requestItem);
 

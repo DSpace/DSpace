@@ -438,6 +438,7 @@ public class RoleDisseminator implements PackageDisseminator
      *            the description to this stream
      * @param emitPassword
      *            do not export the password hash unless true
+     * @throws XMLStreamException if XML error
      */
     protected void writeEPerson(EPerson eperson, XMLStreamWriter writer,
             boolean emitPassword) throws XMLStreamException
@@ -535,6 +536,7 @@ public class RoleDisseminator implements PackageDisseminator
      * @param context The DSpace context
      * @param object the DSpace object
      * @return array of all associated groups
+     * @throws SQLException if database error
      */
     protected List<Group> findAssociatedGroups(Context context, DSpaceObject object)
             throws SQLException
@@ -637,6 +639,7 @@ public class RoleDisseminator implements PackageDisseminator
      * @param context The DSpace context
      * @param object the DSpace object
      * @return array of all associated EPerson objects
+     * @throws SQLException if database error
      */
     protected List<EPerson> findAssociatedPeople(Context context, DSpaceObject object)
             throws SQLException

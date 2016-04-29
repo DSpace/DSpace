@@ -165,6 +165,11 @@ public class SyndicationFeed
 
     /**
      * Fills in the feed and entry-level metadata from DSpace objects.
+     * @param request request
+     * @param context context
+     * @param dso DSpaceObject
+     * @param items array of objects
+     * @param labels label map
      */
     public void populate(HttpServletRequest request, Context context, DSpaceObject dso,
                          DSpaceObject items[], Map<String, String> labels)
@@ -450,6 +455,7 @@ public class SyndicationFeed
      * Sets the feed type for XML delivery, e.g. "rss_1.0", "atom_1.0"
      * Must match one of ROME's configured generators, see rome.properties
      * (currently rss_1.0, rss_2.0, atom_1.0, atom_0.3)
+     * @param feedType feed type
      */
     public void setType(String feedType)
     {
@@ -463,6 +469,7 @@ public class SyndicationFeed
 
     /**
      * @return the feed we built as DOM Document
+     * @throws FeedException if feed error
      */
     public Document outputW3CDom()
         throws FeedException
@@ -481,6 +488,7 @@ public class SyndicationFeed
 
     /**
      * @return the feed we built as serialized XML string
+     * @throws FeedException if feed error
      */
     public String outputString()
         throws FeedException
@@ -491,6 +499,9 @@ public class SyndicationFeed
 
     /**
      * send the output to designated Writer
+     * @param writer Writer
+     * @throws FeedException if feed error
+     * @throws IOException if IO error
      */
     public void output(java.io.Writer writer)
         throws FeedException, IOException
@@ -501,6 +512,7 @@ public class SyndicationFeed
 
     /**
      * Add a ROME plugin module (e.g. for OpenSearch) at the feed level.
+     * @param m module
      */
     public void addModule(Module m)
     {
@@ -532,7 +544,7 @@ public class SyndicationFeed
      *
      * @param request current servlet request
      * @param dso The object to reference, null if to the repository.
-     * @return
+     * @return URL
      */
     protected String resolveURL(HttpServletRequest request, DSpaceObject dso)
     {

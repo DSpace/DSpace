@@ -30,6 +30,11 @@ public interface MetadataFieldService {
      *
      * @param context
      *            DSpace context object
+     * @param metadataSchema schema
+     * @param scopeNote scope note
+     * @param element element
+     * @param qualifier qualifier
+     * @return new MetadataField
      * @throws AuthorizeException if authorization error
      * @throws SQLException if database error
      * @throws NonUniqueMetadataException
@@ -94,6 +99,7 @@ public interface MetadataFieldService {
      * Update the metadata field in the database.
      *
      * @param context dspace context
+     * @param metadataField metadata field
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      * @throws NonUniqueMetadataException
@@ -106,6 +112,7 @@ public interface MetadataFieldService {
      * Delete the metadata field.
      *
      * @param context dspace context
+     * @param metadataField metadata field
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      */
