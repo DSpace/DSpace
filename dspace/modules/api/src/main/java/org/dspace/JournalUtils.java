@@ -309,7 +309,7 @@ public class JournalUtils {
                 action == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
     }
 
-    public static void writeManuscriptToDB(Manuscript manuscript) throws StorageException {
+    public static Manuscript writeManuscriptToDB(Manuscript manuscript) throws StorageException {
         String journalCode = cleanJournalCode(manuscript.getOrganization().organizationCode).toUpperCase();
         StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscript.getManuscriptId());
 
@@ -329,6 +329,7 @@ public class JournalUtils {
                 log.error("Exception updating manuscript", ex);
             }
         }
+        return manuscript;
     }
 
     // NOTE: identifier can be either journalCode or ISSN
@@ -347,6 +348,13 @@ public class JournalUtils {
         } catch (StorageException e) {
             log.error("Exception getting manuscripts", e);
         }
+        return manuscripts;
+    }
+
+    public static List<Manuscript> getManuscriptsFromJournalWithStatus(DryadJournalConcept dryadJournalConcept, String status) {
+        ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
+        StoragePath storagePath = StoragePath.createOrganizationPath(dryadJournalConcept.getISSN());
+
         return manuscripts;
     }
 
