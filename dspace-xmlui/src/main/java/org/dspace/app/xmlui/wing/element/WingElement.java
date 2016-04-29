@@ -13,7 +13,7 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 
 /**
- * This basic interface is implemented by all WingElements, once an element has
+ * This basic interface is implemented by all WingElements.  Once an element has
  * been created it can be translated into SAX events and disposed of.
  * 
  * @author Scott Phillips
@@ -35,6 +35,8 @@ public interface WingElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException
+     *            on error.
      */
     public abstract void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler,
             NamespaceSupport namespaces) throws SAXException;

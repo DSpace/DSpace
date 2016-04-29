@@ -7,17 +7,16 @@
  */
 package org.dspace.app.xmlui.wing;
 
-/**
- * A class representing the framework's context, what component is generationg
- * content, where should we log. It's basically a grab bag for framework-wide
- * communication, if all elements need to know about something then it should go
- * here.
- * 
- * @author Scott Phillips
- */
-
 import org.apache.commons.logging.Log;
 
+/**
+ * A class representing the framework's context, what component is generating
+ * content, where should we log. It's basically a grab bag for framework-wide
+ * communication.  If all elements need to know about something then it should go
+ * here.
+ *
+ * @author Scott Phillips
+ */
 public class WingContext
 {
     /** The naming divider */
@@ -51,6 +50,7 @@ public class WingContext
 
     /**
      * Return the current transformer's name.
+     * @return the name.
      */
     public String getComponentName()
     {
@@ -81,13 +81,13 @@ public class WingContext
     /**
      * Generate a unique id based upon the locally unique name and the
      * application.
-     * 
-     * The format of the unique id typically is:
-     * 
-     * <componentName> dot <application> dot <unique name>
-     * 
-     * typically the componentName is the Java class path of the Wing component.
-     * 
+     *
+     * <p>The format of the unique id typically is:
+     *
+     * <p>{@literal <componentName>} dot {@literal <application>} dot {@literal <unique name>}
+     *
+     * <p>Typically the componentName is the Java class path of the Wing component.
+     *
      * @param application
      *            The application of this element, typically this is the element
      *            type that is being identified. Such as p, div, table, field,
@@ -118,6 +118,7 @@ public class WingContext
      * @param subName
      *            An additional name to the original name to further identify it
      *            in cases when just the name alone does not accomplish this.
+     * @return the ID.
      */
     public String generateID(String application, String name, String subName)
     {
@@ -132,6 +133,7 @@ public class WingContext
      * @param name
      *            A locally unique name that distinguished this element from
      *            among it's siblings.
+     * @return the name.
      */
     public String generateName(String name)
     {
@@ -195,7 +197,8 @@ public class WingContext
     
     /**
      * Check that the context is valid, and able to be used. An error should be
-     * thrown if it is not in a valid sate.
+     * thrown if it is not in a valid state.
+     * @throws org.dspace.app.xmlui.wing.WingException never.
      */
     public void checkValidity() throws WingException
     {

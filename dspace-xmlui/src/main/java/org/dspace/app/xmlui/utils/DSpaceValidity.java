@@ -26,19 +26,18 @@ import org.dspace.eperson.Group;
  * This is a validity object specifically implemented for the caching 
  * needs of DSpace, Manakin, and Cocoon.
  * 
- * The basic idea is that each time a DSpace object rendered by a cocoon 
+ * <p>The basic idea is that each time a DSpace object rendered by a Cocoon
  * component the object and everything about it that makes it unique should 
  * be reflected in the validity object for the component. By following this 
  * principle if the object has been updated externally then the cache will be
  * invalidated.
  * 
- * This DSpaceValidity object makes this processes easier by abstracting out
+ * <p>This DSpaceValidity object makes this processes easier by abstracting out
  * the processes of determining what is unique about a DSpace object. A class
  * is expected to create a new DSpaceValidity object and add() to it all 
  * DSpaceObjects that are rendered by the component. This validity object will 
  * serialize all those objects to a string, take a hash of the string and compare
  * the hash of the string for any updates.
- * 
  * 
  * @author Scott Phillips
  */
@@ -94,6 +93,7 @@ public class DSpaceValidity implements SourceValidity
      * Complete this validity object. After the completion no more
      * objects may be added to the validity object and the object
      * will return as valid.
+     * @return this.
      */
     public DSpaceValidity complete() 
     {    
@@ -128,19 +128,19 @@ public class DSpaceValidity implements SourceValidity
     	// Also add the delay time to the validity hash so if the
     	// admin changes the delay time then all the previous caches
     	// are invalidated.
-    	this.validityKey.append("AssumedValidityDelay:"+milliseconds);
+    	this.validityKey.append("AssumedValidityDelay:").append(milliseconds);
     }
     
     /**
      * Set the time delay for how long this cache will be assumed to be valid.
      * 
-     * This method takes a string which is parsed for the delay time, the string 
-     * must be of the following form: "<integer> <scale>" where scale is days,
+     * <p>This method takes a string which is parsed for the delay time.  The string
+     * must be of the following form: "{@code <integer> <scale>}" where scale is days,
      * hours, minutes, or seconds.
      * 
-     * Examples: "1 day" or "12 hours" or "1 hour" or "30 minutes"
+     * <p>Examples: "1 day" or "12 hours" or "1 hour" or "30 minutes"
      * 
-     * See the setAssumedValidityDelay(long) for more information.
+     * @see setAssumedValidityDelay(long)
      * 
      * @param delay The delay time in a variable scale.
      */
@@ -224,8 +224,11 @@ public class DSpaceValidity implements SourceValidity
      * Bundles -> bitstreams
      * EPeople -> groups
      * 
+     * @param context
+     *          session context.
      * @param dso
      *          The object to add to the validity.
+     * @throws java.sql.SQLException passed through.
      */
     public void add(Context context, DSpaceObject dso) throws SQLException
     {
@@ -362,20 +365,14 @@ public class DSpaceValidity implements SourceValidity
      *
      * @param nonDSpaceObject
      *          The non-DSpace object to add to the validity.
+     * @throws java.sql.SQLException passed through.
      */
     public void add(String nonDSpaceObject) throws SQLException
     {
         validityKey.append("String:");
         validityKey.append(nonDSpaceObject);
     }
-    
-    
-    
-    
-    
-    
-    
-    
+
     /**
      * This method is used during serializion. When Tomcat is shutdown, Cocoon's in-memory 
      * cache is serialized and written to disk to later be read back into memory on start 
@@ -401,7 +398,6 @@ public class DSpaceValidity implements SourceValidity
     	this.assumedValidityTime = 0;
     }
     
-    
     /**
      * Reset the assume validity time. This should be called only when the validity of this cache
      * has been confirmed to be accurate. This will reset the assume valid timer based upon the
@@ -414,7 +410,10 @@ public class DSpaceValidity implements SourceValidity
     
     /**
      * Determine if the cache is still valid
+     * @return {@link SourceValidity.VALID}, {@link SourceValidity.UNKNOWN},
+     *          or {@link SourceValidity.INVALID}.
      */
+    @Override
     public int isValid()
     {
         // Return true if we have a hash.
@@ -447,7 +446,9 @@ public class DSpaceValidity implements SourceValidity
      * 
      * @param otherObject 
      *          The other validity object.
+     * @return {@link SourceValidity.VALID} or {@link SourceValidity.INVALID}.
      */
+    @Override
     public int isValid(SourceValidity otherObject)
     {
         if (this.completed && otherObject instanceof DSpaceValidity)
