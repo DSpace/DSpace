@@ -487,9 +487,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     /**
      * Splits "schema.element.qualifier.language" into an array.
-     * <p/>
-     * The returned array will always have length >= 4
-     * <p/>
+     * <p>
+     * The returned array will always have length greater than or equal to 4
+     * <p>
      * Values in the returned array can be empty or null.
      */
     protected String[] getElements(String fieldName) {
@@ -505,9 +505,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     /**
      * Splits "schema.element.qualifier.language" into an array.
-     * <p/>
-     * The returned array will always have length >= 4
-     * <p/>
+     * <p>
+     * The returned array will always have length greater than or equal to 4
+     * <p>
      * When @param fill is true, elements that would be empty or null are replaced by Item.ANY
      */
     protected String[] getElementsFilled(String fieldName) {

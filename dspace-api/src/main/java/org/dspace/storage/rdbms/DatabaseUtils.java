@@ -439,7 +439,7 @@ public class DatabaseUtils
      * If a Flyway DB migration fails it will be rolled back to the last
      * successful migration, and any errors will be logged.
      *
-     * @throws SQLException
+     * @throws SQLException if database error
      *      If database cannot be upgraded.
      */
     public static synchronized void updateDatabase()
@@ -468,7 +468,7 @@ public class DatabaseUtils
      *      DataSource object (retrieved from DatabaseManager())
      * @param connection
      *      Database connection
-     * @throws SQLException
+     * @throws SQLException if database error
      *      If database cannot be upgraded.
      */
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection)
@@ -497,7 +497,7 @@ public class DatabaseUtils
      * @param outOfOrder
      *      If true, Flyway will run any lower version migrations that were previously "ignored".
      *      If false, Flyway will only run new migrations with a higher version number.
-     * @throws SQLException
+     * @throws SQLException if database error
      *      If database cannot be upgraded.
      */
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection, String targetVersion, boolean outOfOrder)
@@ -580,7 +580,7 @@ public class DatabaseUtils
      *      Initialized Flyway object
      * @param dataSource
      *      Initialized DataSource
-     * @throws SQLException
+     * @throws SQLException if database error
      *      If database cannot be cleaned.
      */
     private static synchronized void cleanDatabase(Flyway flyway, DataSource dataSource)
@@ -977,7 +977,7 @@ public class DatabaseUtils
      *            Current Database Connection
      * @param sqlToExecute
      *            The actual SQL to execute as a String
-     * @throws SQLException
+     * @throws SQLException if database error
      *            If a database error occurs
      */
     public static void executeSql(Connection connection, String sqlToExecute) throws SQLException
@@ -1249,7 +1249,7 @@ public class DatabaseUtils
      * 
      * @param connection current DB Connection
      * @return a DB keyword/type (see DatabaseUtils.DBMS_* constants)
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public static String getDbType(Connection connection)
             throws SQLException

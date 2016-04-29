@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * Configuration keys, per metadata field (e.g. "dc.contributer.author")
  *
+ *  {@code
  *  # is field authority controlled (i.e. store authority, confidence values)?
  *  authority.controlled.<FIELD> = true
  *
@@ -44,7 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *  authority.minconfidence.SCHEMA.ELEMENT.QUALIFIER = SYMBOL
  *    e.g.
  *  authority.minconfidence.dc.contributor.author = accepted
- *
+ *  }
  * NOTE: There is *expected* to be a "choices" (see ChoiceAuthorityManager)
  * configuration for each authority-controlled field.
  *

@@ -16,7 +16,7 @@ package org.dspace.core;
  *
  * @author Larry Stone
  * @version $Revision$
- * @see PluginService
+ * @see org.dspace.core.service.PluginService
  */
 
 public class PluginConfigurationError extends Error

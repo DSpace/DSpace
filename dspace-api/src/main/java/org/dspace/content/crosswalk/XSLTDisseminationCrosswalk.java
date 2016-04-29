@@ -515,7 +515,7 @@ public class XSLTDisseminationCrosswalk
 
     /**
      * Simple command-line rig for testing the DIM output of a stylesheet.
-     * Usage:  java XSLTDisseminationCrosswalk  <crosswalk-name> <handle> [output-file]
+     * Usage:  {@code java XSLTDisseminationCrosswalk  <crosswalk-name> <handle> [output-file]}
      */
     public static void main(String[] argv) throws Exception
     {

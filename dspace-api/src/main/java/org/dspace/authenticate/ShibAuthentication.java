@@ -266,7 +266,7 @@ public class ShibAuthentication implements AuthenticationMethod
      * 
      * The values extracted (a user may have multiple roles) will be used to look
      * up which groups to place the user into. The groups are defined as
-     * "authentication.shib.role.<role-name>" which is a comma separated list of
+     * {@code authentication.shib.role.<role-name>} which is a comma separated list of
      * DSpace groups. 
      * 
      * @param context

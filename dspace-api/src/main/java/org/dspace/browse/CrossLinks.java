@@ -28,7 +28,7 @@ public class CrossLinks
 	/**
 	 * Construct a new object which will obtain the configuration for itself.
 	 * 
-	 * @throws BrowseException
+	 * @throws BrowseException if browse error
 	 */
 	public CrossLinks()
 		throws BrowseException

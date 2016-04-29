@@ -39,7 +39,7 @@ public class HarvestConsumer implements Consumer
     /**
      * Initialise the consumer
      *
-     * @throws Exception
+     * @throws Exception if error
      */
     @Override
 	public void initialize()
@@ -53,7 +53,7 @@ public class HarvestConsumer implements Consumer
      *
      * @param context
      * @param event
-     * @throws Exception
+     * @throws Exception if error
      */
     @Override
 	public void consume(Context context, Event event)
@@ -101,7 +101,7 @@ public class HarvestConsumer implements Consumer
      * Handle the end of the event
      *
      * @param ctx
-     * @throws Exception
+     * @throws Exception if error
      */
     @Override
 	public void end(Context ctx)

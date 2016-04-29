@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Grace Carpenter
  * @author Nathan Sarr
  * 
- * @todo estimate string buffer sizes.
+ * TODO estimate string buffer sizes.
  */
 public class SimpleReporterServiceImpl implements SimpleReporterService
 {
@@ -64,7 +64,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * 
      * @return number of bitstreams found
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      */
     @Override
@@ -109,7 +109,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * 
      * @return number of bitstreams found
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      */
     @Override
@@ -156,7 +156,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * 
      * @return number of bitstreams found
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      */
     @Override
@@ -202,7 +202,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * 
      * @return number of bitstreams found
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      */
     @Override
@@ -244,7 +244,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * 
      * @return the number of unchecked bitstreams
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      */
     @Override
@@ -282,7 +282,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * @param osw
      *            the output stream writer to write to.
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      */
     protected void printHistoryRecords(List<MostRecentChecksum> mostRecentChecksums, OutputStreamWriter osw)
@@ -318,7 +318,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService
      * @param osw
      *            the output stream to write to.
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      */
     protected void printDSpaceInfoRecords(Context context, List<Bitstream> bitstreams, OutputStreamWriter osw)

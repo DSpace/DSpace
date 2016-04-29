@@ -73,7 +73,7 @@ public class HandleDispatcher implements BitstreamDispatcher
     /**
      * Private initialization routine.
      * 
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if database access fails.
      */
     protected synchronized void init() throws SQLException {

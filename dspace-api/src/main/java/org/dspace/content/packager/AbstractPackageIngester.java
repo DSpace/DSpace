@@ -53,7 +53,7 @@ import org.dspace.workflow.WorkflowException;
  *
  * @author Tim Donohue
  * @see PackageIngester
- * @see PluginService
+ * @see org.dspace.core.service.PluginService
  */
 public abstract class AbstractPackageIngester
         implements PackageIngester

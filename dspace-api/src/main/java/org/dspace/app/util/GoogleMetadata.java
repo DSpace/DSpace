@@ -31,10 +31,8 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -330,7 +328,7 @@ public class GoogleMetadata
      * 
      * @param configFilter
      * @param returnType
-     * @return Array of configuration -> item-field matches
+     * @return Array of configuration to item-field matches
      */
     protected ArrayList<MetadataValue> resolveMetadata(String configFilter,
             int returnType)
@@ -658,7 +656,7 @@ public class GoogleMetadata
     /**
      * Using metadata field mappings contained in the loaded configuration,
      * parse through configured metadata fields, building valid Google metadata
-     * value strings. Field names & values contained in metadataMappings.
+     * value strings. Field names and values contained in metadataMappings.
      * 
      */
     protected void parseItem()
@@ -769,8 +767,8 @@ public class GoogleMetadata
      * Fetch retaining the order of the values for any given key in which they
      * where added (like authors).
      *
-     * Usage: GoogleMetadata gmd = new GoogleMetadata(item); for(Entry<String,
-     * String> mapping : googlemd.getMappings()) { ... }
+     * Usage: {@code GoogleMetadata gmd = new GoogleMetadata(item); for(Entry<String,
+     * String> mapping : googlemd.getMappings()) ...}
      * 
      * @return Iterable of metadata fields mapped to Google-formatted values
      */
@@ -1047,7 +1045,7 @@ public class GoogleMetadata
 	 * Additionally, this bitstream must be publicly viewable.
 	 * @param item
 	 * @return
-	 * @throws SQLException
+	 * @throws SQLException if database error
 	 */
 	protected Bitstream findLinkableFulltext(Item item) throws SQLException {
 		Bitstream bestSoFar = null;
@@ -1089,9 +1087,9 @@ public class GoogleMetadata
 	/**
      * 
      * 
-     * @param FIELD
+     * @param field
      *            to aggregate all values of in a matching option
-     * @param delim
+     * @param delimiter
      *            to delimit field values with
      */
     protected void addAggregateValues(String field, String delimiter)

@@ -256,7 +256,7 @@ public class BrowseInfo
      * exception
      *
      * @param dso		the container object; a Community or Collection
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public void setBrowseContainer(DSpaceObject dso)
     	throws BrowseException
@@ -836,7 +836,7 @@ public class BrowseInfo
      *
      * @param config
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     private String fullListingString(ItemListConfig config)
     	throws SQLException

@@ -501,8 +501,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
      * @param context
      * @param item
      * @param handle
-     * @throws SQLException
-     * @throws AuthorizeException 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     protected void modifyHandleMetadata(Context context, Item item, String handle)
             throws SQLException, AuthorizeException

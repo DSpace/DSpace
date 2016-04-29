@@ -37,11 +37,11 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * since items need to be created as workspace items. Authorisation is the
      * responsibility of the caller.
      *
-     * @param context
-     *            DSpace context object
+     * @param context DSpace context object
+     * @param workspaceItem in progress workspace item
      * @return the newly created item
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public Item create(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException;
 
@@ -51,8 +51,10 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * the collection after doing this, or the item will have been created but
      * the collection record will not refer to it.
      *
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param context DSpace context object
+     * @param collection Collection (parent)
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public Item createTemplateItem(Context context, Collection collection) throws SQLException, AuthorizeException;
 
@@ -60,10 +62,9 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Get all the items in the archive. Only items with the "in archive" flag
      * set are included. The order of the list is indeterminate.
      *
-     * @param context
-     *            DSpace context object
+     * @param context DSpace context object
      * @return an iterator over the items in the archive.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public Iterator<Item> findAll(Context context) throws SQLException;
 
@@ -74,7 +75,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @param context
      *            DSpace context object
      * @return an iterator over the items in the archive.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public Iterator<Item> findAllUnfiltered(Context context) throws SQLException;
 
@@ -87,7 +88,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @param eperson
      *            the submitter
      * @return an iterator over the items submitted by eperson
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson)
             throws SQLException;
@@ -98,23 +99,29 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @param eperson
      * @param limit a positive integer to limit, -1 or null for unlimited
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit) throws SQLException;
 
     /**
      * Get all the items in this collection. The order is indeterminate.
      *
+     * @param context DSpace context object
+     * @param collection Collection (parent)
      * @return an iterator over the items in the collection.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public Iterator<Item> findByCollection(Context context, Collection collection) throws SQLException;
 
     /**
      * Get all the items in this collection. The order is indeterminate.
      *
+     * @param context DSpace context object
+     * @param collection Collection (parent)
+     * @param limit limited number of items
+     * @param offset offset value
      * @return an iterator over the items in the collection.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public Iterator<Item> findByCollection(Context context, Collection collection, Integer limit, Integer offset) throws SQLException;
 
@@ -122,7 +129,8 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
      * @param context
      * @param since earliest interesting last-modified date, or null for no date test.
-     * @return 
+     * @return an iterator over the items in the collection.
+     * @throws SQLException if database error
      */
     public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
             throws SQLException;
@@ -130,16 +138,19 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Get all the items in this collection. The order is indeterminate.
      *
+     * @param context DSpace context object
+     * @param collection Collection (parent)
      * @return an iterator over the items in the collection.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
     /**
      * See whether this Item is contained by a given Collection.
-     * @param collection
+     * @param item Item
+     * @param collection Collection (parent
      * @return true if {@code collection} contains this Item.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public boolean isIn(Item item, Collection collection) throws SQLException;
 
@@ -148,8 +159,10 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * communities that house the collections this item is in, including parent
      * communities of the owning collections.
      *
+     * @param context DSpace context object
+     * @param item Item
      * @return the communities this item is in.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<Community> getCommunities(Context context, Item item) throws SQLException;
 
@@ -157,8 +170,10 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Get the bundles matching a bundle name (name corresponds roughly to type)
      *
+     * @param item Item
      * @param name
      *            name of bundle (ORIGINAL/TEXT/THUMBNAIL)
+     * @throws SQLException if database error
      *
      * @return the bundles in an unordered array
      */
@@ -167,10 +182,12 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Add an existing bundle to this item. This has immediate effect.
      *
+     * @param context DSpace context object
+     * @param item Item
      * @param bundle
      *            the bundle to add
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void addBundle(Context context, Item item, Bundle bundle) throws SQLException, AuthorizeException;
 
@@ -178,11 +195,13 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Remove a bundle. This may result in the bundle being deleted, if the
      * bundle is orphaned.
      *
+     * @param context DSpace context object
+     * @param item Item
      * @param bundle
      *            the bundle to remove
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws java.io.IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     public void removeBundle(Context context, Item item, Bundle bundle) throws SQLException, AuthorizeException,
             IOException;
@@ -190,12 +209,12 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Remove all bundles linked to this item. This may result in the bundle being deleted, if the
      * bundle is orphaned.
-     *
+     * @param context DSpace context object
      * @param item
      *            the item from which to remove our bundles
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws java.io.IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     public void removeAllBundles(Context context, Item item) throws AuthorizeException, SQLException, IOException;
 
@@ -203,14 +222,16 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Create a single bitstream in a new bundle. Provided as a convenience
      * method for the most common use.
      *
+     * @param context DSpace context object
+     * @param item Item
      * @param is
      *            the stream to create the new bitstream from
      * @param name
      *            is the name of the bundle (ORIGINAL, TEXT, THUMBNAIL)
      * @return Bitstream that is created
-     * @throws AuthorizeException
-     * @throws IOException
-     * @throws SQLException
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
      */
     public Bitstream createSingleBitstream(Context context, InputStream is, Item item, String name)
             throws AuthorizeException, IOException, SQLException;
@@ -218,12 +239,14 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Convenience method, calls createSingleBitstream() with name "ORIGINAL"
      *
+     * @param context DSpace context object
+     * @param item Item
      * @param is
      *            InputStream
      * @return created bitstream
-     * @throws AuthorizeException
-     * @throws IOException
-     * @throws SQLException
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
      */
     public Bitstream createSingleBitstream(Context context, InputStream is, Item item)
             throws AuthorizeException, IOException, SQLException;
@@ -232,8 +255,10 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Get all non-internal bitstreams in the item. This is mainly used for
      * auditing for provenance messages and adding format.* DC values. The order
      * is indeterminate.
-     *
+     * @param context DSpace context object
+     * @param item Item
      * @return non-internal bitstreams.
+     * @throws SQLException if database error
      */
     public List<Bitstream> getNonInternalBitstreams(Context context, Item item) throws SQLException;
 
@@ -244,9 +269,11 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * <p>
      * This method is used by the org.dspace.submit.step.LicenseStep class
      *
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @param context DSpace context object
+     * @param item Item
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     public void removeDSpaceLicense(Context context, Item item) throws SQLException, AuthorizeException,
             IOException;
@@ -254,9 +281,11 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Remove all licenses from an item - it was rejected
      *
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @param context DSpace context object
+     * @param item Item
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     public void removeLicenses(Context context, Item item) throws SQLException, AuthorizeException, IOException;
 
@@ -264,8 +293,10 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Withdraw the item from the archive. It is kept in place, and the content
      * and metadata are not deleted, but it is not publicly accessible.
      *
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param context DSpace context object
+     * @param item Item
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void withdraw(Context context, Item item) throws SQLException, AuthorizeException;
 
@@ -273,14 +304,17 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Reinstate a withdrawn item
      *
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param context DSpace context object
+     * @param item Item
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void reinstate(Context context, Item item) throws SQLException, AuthorizeException;
 
     /**
      * Return true if this Collection 'owns' this item
      *
+     * @param item Item
      * @param collection
      *            Collection
      * @return true if this Collection owns this item
@@ -291,11 +325,13 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * remove all of the policies for item and replace them with a new list of
      * policies
      *
+     * @param context DSpace context object
+     * @param item Item
      * @param newpolicies -
      *            this will be all of the new policies for the item and its
      *            contents
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void replaceAllItemPolicies(Context context, Item item, List<ResourcePolicy> newpolicies) throws SQLException,
             AuthorizeException;
@@ -304,11 +340,13 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * remove all of the policies for item's bitstreams and bundles and replace
      * them with a new list of policies
      *
+     * @param context DSpace context object
+     * @param item Item
      * @param newpolicies -
      *            this will be all of the new policies for the bundle and
      *            bitstream contents
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void replaceAllBitstreamPolicies(Context context, Item item, List<ResourcePolicy> newpolicies)
             throws SQLException, AuthorizeException;
@@ -318,9 +356,11 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * remove all of the policies for item's bitstreams and bundles that belong
      * to a given Group
      *
+     * @param context DSpace context object
+     * @param item Item
      * @param group
      *            Group referenced by policies that needs to be removed
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public void removeGroupPolicies(Context context, Item item, Group group) throws SQLException, AuthorizeException;
 
@@ -329,12 +369,14 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * the DEFAULT_ITEM_READ and DEFAULT_BITSTREAM_READ policies belonging to
      * the collection.
      *
+     * @param context DSpace context object
+     * @param item Item
      * @param collection
      *            Collection
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      *             if an SQL error or if no default policies found. It's a bit
      *             draconian, but default policies must be enforced.
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      */
     public void inheritCollectionDefaultPolicies(Context context, Item item, Collection collection)
             throws java.sql.SQLException, AuthorizeException;
@@ -347,43 +389,57 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Moves the item from one collection to another one
      *
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @param context DSpace context object
+     * @param item Item
+     * @param from Collection to move from
+     * @param to Collection to move to
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     public void move(Context context, Item item, Collection from, Collection to) throws SQLException, AuthorizeException, IOException;
 
     /**
      * Moves the item from one collection to another one
      *
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @param context DSpace context object
+     * @param item Item
+     * @param from Collection to move from
+     * @param to Collection to move to
+     * @param inheritDefaultPolicies whether to inherit policies from new collection
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     public void move (Context context, Item item, Collection from, Collection to, boolean inheritDefaultPolicies) throws SQLException, AuthorizeException, IOException;
 
     /**
      * Check the bundle ORIGINAL to see if there are any uploaded files
      *
+     * @param item Item
      * @return true if there is a bundle named ORIGINAL with one or more
      *         bitstreams inside
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public boolean hasUploadedFiles(Item item) throws SQLException;
 
     /**
      * Get the collections this item is not in.
      *
+     * @param context DSpace context object
+     * @param item Item
      * @return the collections this item is not in, if any.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<Collection> getCollectionsNotLinked(Context context, Item item) throws SQLException;
 
     /**
      * return TRUE if context's user can edit item, false otherwise
      *
+     * @param context DSpace context object
+     * @param item Item
      * @return boolean true = current user can edit item
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public boolean canEdit(Context context, Item item) throws java.sql.SQLException;
 
@@ -397,7 +453,9 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @param qualifier metadata field qualifier
      * @param value field value or Item.ANY to match any value
      * @return an iterator over the items matching that authority value
-     * @throws SQLException, AuthorizeException, IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      *
      */
     public Iterator<Item> findByMetadataField(Context context,
@@ -417,7 +475,9 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @param qualifier metadata field qualifier
      * @param value the value of authority key to look for
      * @return an iterator over the items matching that authority value
-     * @throws SQLException, AuthorizeException, IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     public Iterator<Item> findByAuthorityValue(Context context,
                                                String schema, String element, String qualifier, String value)
@@ -432,14 +492,16 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * and if the Item isn't flagged as unlisted.
      * @param context
      * @param item
-     * @return
+     * @return true or false
      */
     public boolean isItemListedForUser(Context context, Item item);
 
     /**
      * counts items in the given collection
      *
-     * @return  total items
+     * @param context DSpace context object
+     * @param collection Collection
+     * @return total items
      */
     public int countItems(Context context, Collection collection) throws SQLException;
 
@@ -448,7 +510,8 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      *
      * @param context
      * @param last Earliest interesting last-modified date.
-     * @return 
+     * @return iterator over items
+     * @throws SQLException if database error
      */
     public Iterator<Item> findByLastModifiedSince(Context context, Date last)
             throws SQLException;
@@ -456,13 +519,37 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * counts items in the given community
      *
+     * @param context DSpace context object
+     * @param community Community
      * @return total items
+     * @throws SQLException if database error
      */
     public int countItems(Context context, Community community) throws SQLException;
 
+    /**
+     * counts all items 
+     *
+     * @param context DSpace context object
+     * @return total items
+     * @throws SQLException if database error
+     */
     int countTotal(Context context) throws SQLException;
 
+     /**
+     * counts all items not in archive
+     *
+     * @param context DSpace context object
+     * @return total items
+     * @throws SQLException if database error
+     */
     int countNotArchivedItems(Context context) throws SQLException;
 
+     /**
+     * counts all withdrawn items
+     *
+     * @param context DSpace context object
+     * @return total items
+     * @throws SQLException if database error
+     */
     int countWithdrawnItems(Context context) throws SQLException;
 }

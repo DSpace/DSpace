@@ -56,6 +56,7 @@ public class RegistryLoader
      * 
      * @param argv
      *            command-line arguments
+     * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception
     {
@@ -121,6 +122,12 @@ public class RegistryLoader
      *            DSpace context object
      * @param filename
      *            the filename of the XML file to load
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws TransformerException if transformer error
+     * @throws ParserConfigurationException if config error
+     * @throws AuthorizeException if authorization error
+     * @throws SAXException if parser error
      */
     public static void loadBitstreamFormats(Context context, String filename)
             throws SQLException, IOException, ParserConfigurationException,
@@ -151,6 +158,10 @@ public class RegistryLoader
      *            DSpace context object
      * @param node
      *            the node in the DOM tree
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws TransformerException if transformer error
+     * @throws AuthorizeException if authorization error
      */
     private static void loadFormat(Context context, Node node)
             throws SQLException, IOException, TransformerException,
@@ -206,7 +217,9 @@ public class RegistryLoader
      * 
      * @param filename
      *            the filename to load from
-     * 
+     * @throws IOException if IO error
+     * @throws ParserConfigurationException if config error
+     * @throws SAXException if parser error
      * @return the DOM representation of the XML file
      */
     private static Document loadXML(String filename) throws IOException,
@@ -234,7 +247,7 @@ public class RegistryLoader
      *            the element, whose child element you want the CDATA from
      * @param childName
      *            the name of the element you want the CDATA from
-     * 
+     * @throws TransformerException if transformer error
      * @return the CDATA as a <code>String</code>
      */
     private static String getElementData(Node parentElement, String childName)
@@ -282,7 +295,7 @@ public class RegistryLoader
      *            the element, whose child element you want the CDATA from
      * @param childName
      *            the name of the element you want the CDATA from
-     * 
+     * @throws TransformerException if transformer error
      * @return the CDATA as a <code>String</code>
      */
     private static String[] getRepeatedElementData(Node parentElement,

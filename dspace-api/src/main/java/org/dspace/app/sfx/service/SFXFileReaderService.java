@@ -36,7 +36,7 @@ public interface SFXFileReaderService {
      * @param item The item to process, from which metadata values will be taken
      *
      * @return the SFX string
-     * @throws java.io.IOException
+     * @throws IOException if IO error
      */
     public String loadSFXFile(String fileName, Item item) throws IOException;
 
@@ -53,7 +53,7 @@ public interface SFXFileReaderService {
      * @param node DOM node of the mapping pair in the XML file (field element)
      * @param item The item to process, from which metadata values will be taken
      * @return processed fields.
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public String doNodes(Node node, Item item) throws IOException;
 
@@ -71,7 +71,7 @@ public interface SFXFileReaderService {
     public boolean isEmptyTextNode(Node nd);
 
     /**
-     * Returns the value of the node's attribute named <name>
+     * Returns the value of the node's attribute named {@code <name>}
      */
     public String getAttribute(Node e, String name);
 

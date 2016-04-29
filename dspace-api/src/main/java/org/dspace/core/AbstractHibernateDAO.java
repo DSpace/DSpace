@@ -93,7 +93,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @param context
      * @param query
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<T> findMany(Context context, Query query) throws SQLException {
         @SuppressWarnings("unchecked")

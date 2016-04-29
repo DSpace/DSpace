@@ -8,8 +8,6 @@
 package org.dspace.content.authority.service;
 
 import org.dspace.content.MetadataField;
-import org.dspace.content.authority.ChoiceAuthorityServiceImpl;
-import org.dspace.content.authority.Choices;
 
 import java.util.List;
 
@@ -19,26 +17,26 @@ import java.util.List;
  * Configuration keys, per metadata field (e.g. "dc.contributer.author")
  *
  *  # is field authority controlled (i.e. store authority, confidence values)?
- *  authority.controlled.<FIELD> = true
+ *  {@code authority.controlled.<FIELD> = true}
  *
  *  # is field required to have an authority value, or may it be empty?
  *  # default is false.
- *  authority.required.<FIELD> = true | false
+ *  {@code authority.required.<FIELD> = true | false}
  *
  *  # default value of minimum confidence level for ALL fields - must be
  *  # symbolic confidence level, see org.dspace.content.authority.Choices
- *  authority.minconfidence = uncertain
+ *  {@code authority.minconfidence = uncertain}
  *
  *  # minimum confidence level for this field
- *  authority.minconfidence.SCHEMA.ELEMENT.QUALIFIER = SYMBOL
+ *  {@code authority.minconfidence.SCHEMA.ELEMENT.QUALIFIER = SYMBOL}
  *    e.g.
- *  authority.minconfidence.dc.contributor.author = accepted
+ *  {@code authority.minconfidence.dc.contributor.author = accepted}
  *
  * NOTE: There is *expected* to be a "choices" (see ChoiceAuthorityManager)
  * configuration for each authority-controlled field.
  *
- * @see ChoiceAuthorityServiceImpl
- * @see Choices
+ * @see org.dspace.content.authority.ChoiceAuthorityServiceImpl
+ * @see org.dspace.content.authority.Choices
  * @author Larry Stone
  */
 public interface MetadataAuthorityService {

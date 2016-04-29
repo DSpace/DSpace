@@ -153,7 +153,7 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
      * @param context DSpace context
      * @param namespace namespace URI to match
      * @return true of false
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean uniqueNamespace(Context context, int metadataSchemaId, String namespace)
             throws SQLException
@@ -167,7 +167,7 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
      * @param context DSpace context
      * @param name  short name of schema
      * @return true of false
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean uniqueShortName(Context context, int metadataSchemaId, String name)
             throws SQLException

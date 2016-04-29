@@ -71,7 +71,7 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      * @param limit
      * @param offset
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<Community> findAll(Context context, Integer limit, Integer offset) throws SQLException;
 
@@ -122,7 +122,7 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      * Give the community a logo. Passing in <code>null</code> removes any
      * existing logo. You will need to set the format of the new logo bitstream
      * before it will work, for example to "JPEG". Note that
-     * <code>update(/code> will need to be called for the change to take
+     * <code>update</code> will need to be called for the change to take
      * effect.  Setting a logo and not calling <code>update</code> later may
      * result in a previous logo lying around as an "orphaned" bitstream.
      *
@@ -140,8 +140,8 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      * Note that other groups may also be administrators.
      *
      * @return the default group of editors associated with this community
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public Group createAdministrators(Context context, Community community) throws SQLException, AuthorizeException;
 
@@ -213,9 +213,9 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      *
      * @param c
      *            collection to remove
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     public void removeCollection(Context context, Community community, Collection c)
             throws SQLException, AuthorizeException, IOException;
@@ -227,9 +227,9 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      *
      * @param childCommunity
      *            subcommunity to remove
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     public void removeSubcommunity(Context context, Community parentCommunity, Community childCommunity)
             throws SQLException, AuthorizeException, IOException;

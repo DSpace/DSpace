@@ -35,8 +35,8 @@ import org.dspace.storage.bitstore.service.BitstreamStorageService;
  * @author Nathan Sarr
  * 
  * 
- * @todo the accessor methods are currently unused - are they useful?
- * @todo check for any existing resource problems
+ * TODO the accessor methods are currently unused - are they useful?
+ * TODO check for any existing resource problems
  */
 public final class CheckerCommand
 {
@@ -222,7 +222,7 @@ public final class CheckerCommand
      * 
      * @param info
      *            A not found BitStreamInfo
-     * @todo is this method required?
+     * TODO is this method required?
      */
     protected void processNullInfoBitstream(MostRecentChecksum info) throws SQLException {
         info.setInfoFound(false);
@@ -241,7 +241,7 @@ public final class CheckerCommand
      * actual checksumming never took place.
      * </p>
      * 
-     * @todo Why does bitstream have a timestamp indicating it's checked if
+     * TODO Why does bitstream have a timestamp indicating it's checked if
      *       checksumming doesn't occur?
      * 
      * @param info

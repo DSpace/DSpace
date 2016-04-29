@@ -37,7 +37,7 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
      *
      * @return the corresponding bitstream format, or <code>null</code> if
      *         there's no bitstream format with the given MIMEtype.
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     public BitstreamFormat findByMIMEType(Context context, String mimeType) throws SQLException;
 
@@ -51,7 +51,7 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
      *
      * @return the corresponding bitstream format, or <code>null</code> if
      *         there's no bitstream format with the given short description
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public BitstreamFormat findByShortDescription(Context context, String desc) throws SQLException;
 
@@ -62,7 +62,7 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
      *            DSpace context object
      *
      * @return the "unknown" bitstream format.
-     * @throws SQLException
+     * @throws SQLException if database error
      *
      * @throws IllegalStateException
      *             if the "unknown" bitstream format couldn't be found
@@ -76,7 +76,7 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
      *            DSpace context object
      *
      * @return the bitstream formats.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<BitstreamFormat> findAll(Context context) throws SQLException;
 
@@ -89,7 +89,7 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
      *            DSpace context object
      *
      * @return the bitstream formats.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<BitstreamFormat> findNonInternal(Context context) throws SQLException;
 

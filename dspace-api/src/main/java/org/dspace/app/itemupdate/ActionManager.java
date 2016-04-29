@@ -24,6 +24,13 @@ public class ActionManager implements Iterable<UpdateAction> {
 	protected Map<Class<? extends UpdateAction>, UpdateAction> registry
                      = new LinkedHashMap<Class<? extends UpdateAction>, UpdateAction>();
 	
+        /**
+         * Get update action
+         * @param actionClass UpdateAction class
+         * @return instantiation of UpdateAction class
+         * @throws InstantiationException if instantiation error
+         * @throws IllegalAccessException if illegal access error
+         */
 	public UpdateAction getUpdateAction(Class<? extends UpdateAction> actionClass) 
 	throws InstantiationException, IllegalAccessException
 	{

@@ -75,7 +75,7 @@ public interface SolrLoggerService {
      *            the current SolrInputDocument
      * @param dso
      *            the current dspace object we want to log
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      *             ignore it
      */
     public void storeParents(SolrInputDocument doc1, DSpaceObject dso)
@@ -200,7 +200,7 @@ public interface SolrLoggerService {
      * Export all SOLR usage statistics for viewing/downloading content to a flat text file.
      * The file goes to a series
      *
-     * @throws Exception
+     * @throws Exception if error
      */
     public void exportHits() throws Exception;
 

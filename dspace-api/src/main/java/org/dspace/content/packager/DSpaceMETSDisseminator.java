@@ -32,7 +32,7 @@ import edu.harvard.hul.ois.mets.helper.PCData;
 
 /**
  * Packager plugin to produce a
- * METS (Metadata Encoding & Transmission Standard) package
+ * METS (Metadata Encoding and Transmission Standard) package
  * that is accepted as a DSpace METS SIP (Submission Information Package).
  * See <a href="http://www.loc.gov/standards/mets/">http://www.loc.gov/standards/mets/</a>
  * for more information on METS.

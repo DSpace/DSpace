@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author Tim Donohue
  * @see PackageDisseminator
- * @see PluginService
+ * @see org.dspace.core.service.PluginService
  */
 public abstract class AbstractPackageDisseminator
         implements PackageDisseminator

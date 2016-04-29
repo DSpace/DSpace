@@ -283,7 +283,7 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
      * Converts a JDOM document to a W3C one
      * @param jdomDoc
      * @return W3C Document object
-     * @throws IOException
+     * @throws IOException if IO error
      */
     protected Document jDomToW3(org.jdom.Document jdomDoc) throws IOException
     {

@@ -92,9 +92,6 @@ public class Context
     /**
      * Construct a new context object with default options. A database connection is opened.
      * No user is authenticated.
-     * 
-     * @exception SQLException
-     *                if there was an error obtaining a database connection
      */
     public Context()
     {
@@ -106,8 +103,6 @@ public class Context
      * No user is authenticated.
      * 
      * @param options   context operation flags
-     * @exception SQLException
-     *                if there was an error obtaining a database connection
      */
     public Context(short options)
     {
@@ -453,7 +448,7 @@ public class Context
     }
 
     /**
-     * Retrieves the first element in the events list & removes it from the list of events once retrieved
+     * Retrieves the first element in the events list and removes it from the list of events once retrieved
      * @return The first event of the list or <code>null</code> if the list is empty
      */
     public Event pollEvent()
@@ -564,7 +559,7 @@ public class Context
     /**
      * Get an array of all of the special groups that current user is a member
      * of.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<Group> getSpecialGroups() throws SQLException
     {

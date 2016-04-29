@@ -38,7 +38,7 @@ public interface SimpleReporterService
      * 
      * @return number of bitstreams found
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      */
     public int getDeletedBitstreamReport(Context context, Date startDate, Date endDate,
@@ -57,7 +57,7 @@ public interface SimpleReporterService
      * 
      * @return number of bitstreams found
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      */
     public int getChangedChecksumReport(Context context, Date startDate, Date endDate,
@@ -76,7 +76,7 @@ public interface SimpleReporterService
      * 
      * @return number of bitstreams found
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      */
     public int getBitstreamNotFoundReport(Context context, Date startDate, Date endDate,
@@ -93,7 +93,7 @@ public interface SimpleReporterService
      * @param osw
      *            the output stream writer to write to
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      * 
      */
@@ -109,7 +109,7 @@ public interface SimpleReporterService
      * 
      * @return number of bitstreams found
      * 
-     * @throws IOException
+     * @throws IOException if IO error
      *             if io error occurs
      * 
      */

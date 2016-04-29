@@ -140,7 +140,7 @@ public class DataCiteXMLCreator
      * Test the operation of this class.
      *
      * @param argv <br>[0]: handle of an object for which to prepare XML metadata.
-     * @throws Exception
+     * @throws Exception if error
      */
     public static void main(String[] argv)
         throws Exception

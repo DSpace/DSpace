@@ -86,11 +86,12 @@ public class MetadataExport
     /**
      * Build an array list of item ids that are in a community (include sub-communities and collections)
      *
+     * @param context DSpace context
      * @param community The community to build from
      * @param itemIDs The itemID (used for recursion - use an empty ArrayList)
      * @param indent How many spaces to use when writing out the names of items added
      * @return The list of item ids
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected Iterator<Item> buildFromCommunity(Context context, Community community, List<Integer> itemIDs, int indent)
                                                                                throws SQLException
@@ -176,6 +177,7 @@ public class MetadataExport
 	 * main method to run the metadata exporter
 	 *
 	 * @param argv the command line arguments given
+         * @throws Exception if error occurs
 	 */
     public static void main(String[] argv) throws Exception
     {

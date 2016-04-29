@@ -523,17 +523,17 @@ public class SyndicationFeed
                  logo.getID()+"/"+(name == null?"":name);
     }
 
+    protected String baseURL = null;  // cache the result for null
     /**
      * Return a url to the DSpace object, either use the official
      * handle for the item or build a url based upon the current server.
      *
      * If the dspaceobject is null then a local url to the repository is generated.
      *
+     * @param request current servlet request
      * @param dso The object to reference, null if to the repository.
      * @return
      */
-    protected String baseURL = null;  // cache the result for null
-
     protected String resolveURL(HttpServletRequest request, DSpaceObject dso)
     {
         // If no object given then just link to the whole repository,

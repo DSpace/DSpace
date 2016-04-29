@@ -144,8 +144,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
      * @param assetstore corresponds to an assetstore in dspace.cfg
      * @param bitstreamPath the path and filename relative to the assetstore
      * @return  the newly registered bitstream
-     * @throws IOException
-     * @throws SQLException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
      */
     @Override
     public Bitstream register(Context context,

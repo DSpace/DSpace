@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -381,7 +379,7 @@ public class PackageUtils
      *            the item
      * @return the license bitstream or null
      *
-     * @throws IOException
+     * @throws IOException if IO error
      *             if the license bitstream can't be read
      */
     public static Bitstream findDepositLicense(Context context, Item item)
@@ -440,9 +438,9 @@ public class PackageUtils
      * @param handle Handle of new Object (may be null)
      * @param params Properties-style list of options (interpreted by each packager).
      * @return newly created DSpace Object (or null)
-     * @throws AuthorizeException
-     * @throws SQLException
-     * @throws IOException
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     public static DSpaceObject createDSpaceObject(Context context, DSpaceObject parent, int type, String handle, PackageParameters params)
         throws AuthorizeException, SQLException, IOException
@@ -496,9 +494,9 @@ public class PackageUtils
      * @param handle Handle to assign to item (may be null)
      * @param params Properties-style list of options (interpreted by each packager).
      * @return finished Item
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public static Item finishCreateItem(Context context, WorkspaceItem wsi, String handle, PackageParameters params)
             throws IOException, SQLException, AuthorizeException, WorkflowException {
@@ -618,7 +616,7 @@ public class PackageUtils
      * 
      * @param file
      * @return boolean true if succeeded, false otherwise
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public static boolean createFile(File file)
             throws IOException
@@ -645,7 +643,7 @@ public class PackageUtils
     /**
      * Remove all bitstreams (files) associated with a DSpace object.
      * <P>
-     * If this object is an Item, it removes all bundles & bitstreams.  If this
+     * If this object is an Item, it removes all bundles and bitstreams.  If this
      * object is a Community or Collection, it removes all logo bitstreams.
      * <P>
      * This method is useful for replace functionality.
@@ -763,7 +761,7 @@ public class PackageUtils
      * (represented by [ID] above) becomes meaningless when content is exported
      * outside of DSpace.  In order to make these Group names meaningful outside
      * of DSpace, they must be translated into a different format:
-     * <li> COMMUNITY_[HANDLE]_ADMIN (e.g. COMMUNITY_hdl:123456789/10_ADMIN), etc.
+     * {@code COMMUNITY_[HANDLE]_ADMIN} (e.g. COMMUNITY_hdl:123456789/10_ADMIN), etc.
      * <p>
      * This format replaces the internal ID with an external Handle identifier
      * (which is expected to be more meaningful even when content is exported

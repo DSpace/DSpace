@@ -30,15 +30,15 @@ public class DeleteBitstreamsAction extends UpdateBitstreamsAction
 	/**
 	 *   Delete bitstream from item
 	 * 
-	 *  @param context
-	 *  @param itarch
-	 *  @param isTest
-	 *  @param suppressUndo
-	 *  @throws IllegalArgumentException
-	 *  @throws ParseException
-	 *  @throws IOException
-	 *  @throws AuthorizeException
-	 *  @throws SQLException
+	 * @param context DSpace Context
+	 * @param itarch item archive
+	 * @param isTest test flag
+	 * @param suppressUndo undo flag
+	 * @throws IOException if IO error
+         * @throws IllegalArgumentException if arg exception
+         * @throws SQLException if database error
+         * @throws AuthorizeException if authorization error
+         * @throws ParseException if parse error
 	 */
 	@Override
     public void execute(Context context, ItemArchive itarch, boolean isTest,

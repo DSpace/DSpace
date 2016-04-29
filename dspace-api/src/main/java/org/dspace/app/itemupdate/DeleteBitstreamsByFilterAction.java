@@ -35,7 +35,7 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 	/**
 	 *   Set filter
 	 *   
-	 * @param filter
+	 * @param filter BitstreamFilter
 	 */
 	public void setBitstreamFilter(BitstreamFilter filter)
 	{
@@ -54,15 +54,15 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 	/**
 	 * 	 Delete bitstream
 	 * 
-	 *  @param context
-	 *  @param itarch
-	 *  @param isTest
-	 *  @param suppressUndo
-	 *  @throws IllegalArgumentException
-	 *  @throws ParseException
-	 *  @throws IOException
-	 *  @throws AuthorizeException
-	 *  @throws SQLException
+	 * @param context DSpace Context
+	 * @param itarch item archive
+	 * @param isTest test flag
+	 * @param suppressUndo undo flag
+	 * @throws IOException if IO error
+         * @throws SQLException if database error
+         * @throws AuthorizeException if authorization error
+         * @throws ParseException if parse error
+         * @throws BitstreamFilterException if filter error
 	 */
 	@Override
     public void execute(Context context, ItemArchive itarch, boolean isTest,

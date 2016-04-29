@@ -180,7 +180,7 @@ public class Curator
      * 
      * @param c a Dpace context
      * @param id an object identifier
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public void curate(Context c, String id) throws IOException
     {
@@ -234,7 +234,7 @@ public class Curator
      * authenticated Context object.
      * 
      * @param dso the DSpace object
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public void curate(DSpaceObject dso) throws IOException
     {
@@ -274,7 +274,7 @@ public class Curator
      * @param id an object Id
      * @param queueId name of a queue. If queue does not exist, it will
      *                be created automatically.
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public void queue(Context c, String id, String queueId) throws IOException
     {
@@ -391,11 +391,11 @@ public class Curator
     }
 
     /**
-     * Run task for entire Site (including all Communities, Collections & Items)
+     * Run task for entire Site (including all Communities, Collections and Items)
      * @param tr TaskRunner
      * @param site DSpace Site object
      * @return true if successful, false otherwise
-     * @throws IOException 
+     * @throws IOException if IO error
      */
     protected boolean doSite(TaskRunner tr, Site site) throws IOException
     {
@@ -443,7 +443,7 @@ public class Curator
      * @param tr TaskRunner
      * @param comm Community
      * @return true if successful, false otherwise
-     * @throws IOException 
+     * @throws IOException if IO error
      */
     protected boolean doCommunity(TaskRunner tr, Community comm) throws IOException
     {
@@ -473,7 +473,7 @@ public class Curator
      * @param tr TaskRunner
      * @param coll Collection
      * @return true if successful, false otherwise
-     * @throws IOException 
+     * @throws IOException if IO error
      */
     protected boolean doCollection(TaskRunner tr, Collection coll) throws IOException
     {

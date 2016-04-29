@@ -27,17 +27,18 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Public interface to the embargo subsystem.
  * <p>
  * Configuration properties: (with examples)
- *   <br/># DC metadata field to hold the user-supplied embargo terms
- *   <br/>embargo.field.terms = dc.embargo.terms
- *   <br/># DC metadata field to hold computed "lift date" of embargo
- *   <br/>embargo.field.lift = dc.date.available
- *   <br/># String to indicate indefinite (forever) embargo in terms
- *   <br/>embargo.terms.open = Indefinite
- *   <br/># implementation of embargo setter plugin
- *   <br/>plugin.single.org.dspace.embargo.EmbargoSetter = edu.my.Setter
- *   <br/># implementation of embargo lifter plugin
- *   <br/>plugin.single.org.dspace.embargo.EmbargoLifter = edu.my.Lifter
- *
+ * {@code
+ *   # DC metadata field to hold the user-supplied embargo terms
+ *   embargo.field.terms = dc.embargo.terms
+ *   # DC metadata field to hold computed "lift date" of embargo
+ *   embargo.field.lift = dc.date.available
+ *   # String to indicate indefinite (forever) embargo in terms
+ *   embargo.terms.open = Indefinite
+ *   # implementation of embargo setter plugin
+ *   plugin.single.org.dspace.embargo.EmbargoSetter = edu.my.Setter
+ *   # implementation of embargo lifter plugin
+ *   plugin.single.org.dspace.embargo.EmbargoLifter = edu.my.Lifter
+ * }
  * @author Larry Stone
  * @author Richard Rodgers
  */

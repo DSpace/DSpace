@@ -77,7 +77,7 @@ public abstract class AbstractCurationTask implements CurationTask
      * DSOs or just all Items, respectively.
      * 
      * @param dso current DSpaceObject
-     * @throws IOException
+     * @throws IOException if IO error
      */
     protected void distribute(DSpaceObject dso) throws IOException
     {
@@ -137,8 +137,8 @@ public abstract class AbstractCurationTask implements CurationTask
      * <code>distribute</code> method is used.
      * 
      * @param dso the DSpaceObject
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     protected void performObject(DSpaceObject dso) throws SQLException, IOException
     {
@@ -163,8 +163,8 @@ public abstract class AbstractCurationTask implements CurationTask
      * <code>distribute</code> method is used.
      * 
      * @param item the DSpace Item
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     protected void performItem(Item item) throws SQLException, IOException
     {
@@ -187,7 +187,7 @@ public abstract class AbstractCurationTask implements CurationTask
      *        canonical id of object
      * @return dso
      *        DSpace object, or null if no object with id exists
-     * @throws IOException
+     * @throws IOException if IO error
      */
     protected DSpaceObject dereference(Context ctx, String id) throws IOException
     {

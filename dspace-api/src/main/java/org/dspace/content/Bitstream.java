@@ -269,7 +269,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * Get the bundles this bitstream appears in
      * 
      * @return array of <code>Bundle</code> s this bitstream appears in
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<Bundle> getBundles() throws SQLException
     {
@@ -312,7 +312,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Set the asset store number where this bitstream is stored
      *
-     * @return the asset store number of the bitstream
+     * @param storeNumber asset store number of the bitstream
      */
     public void setStoreNumber(int storeNumber) {
         this.storeNumber = storeNumber;
@@ -337,7 +337,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      *
      * @param desc
      *            the user's description of the format
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public void setUserFormatDescription(Context context, String desc) throws SQLException
     {
@@ -363,7 +363,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * @param f
      *            the format of this bitstream, or <code>null</code> for
      *            unknown
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public void setFormat(Context context, BitstreamFormat f) throws SQLException
     {

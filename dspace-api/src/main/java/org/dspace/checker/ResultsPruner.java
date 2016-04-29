@@ -72,7 +72,7 @@ public final class ResultsPruner
      * @param propsFile
      *            to configure the results pruner.
      * @return the configured results pruner.
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if file doesn't exist
      *             it the configuration file cannot be found.
      */
     public static ResultsPruner getPruner(Context context, String propsFile)
@@ -113,7 +113,7 @@ public final class ResultsPruner
      * properties.
      * 
      * @param props
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if file doesn't exist
      */
     public static ResultsPruner getPruner(Context context, Properties props)
     throws FileNotFoundException
@@ -211,8 +211,7 @@ public final class ResultsPruner
      *            before bitstreams with the specified result type in the
      *            checksum history is removed.
      * 
-     * @throws ParseException
-     *             if the duration cannot be parsed into a long value.
+     * @throws ParseException if the duration cannot be parsed into a long value.
      */
     public void addInterested(ChecksumResultCode result, String duration)
             throws ParseException

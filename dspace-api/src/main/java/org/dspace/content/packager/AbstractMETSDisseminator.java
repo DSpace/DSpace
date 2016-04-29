@@ -86,7 +86,7 @@ import org.jdom.output.XMLOutputter;
 
 /**
  * Base class for disseminator of
- * METS (Metadata Encoding & Transmission Standard) Package.<br>
+ * METS (Metadata Encoding and Transmission Standard) Package.<br>
  *   See <a href="http://www.loc.gov/standards/mets/">http://www.loc.gov/standards/mets/</a>
  * <p>
  * This is a generic packager framework intended to be subclassed to create
@@ -305,10 +305,10 @@ public abstract class AbstractMETSDisseminator
      * @param dso The DSpace Object
      * @param params Parameters to the Packager script
      * @param pkg Package output stream
-     * @throws PackageValidationException
-     * @throws AuthorizeException
-     * @throws SQLException
-     * @throws IOException
+     * @throws PackageValidationException if package validation error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     protected void writeZipPackage(Context context, DSpaceObject dso,
             PackageParameters params, OutputStream pkg)
@@ -552,11 +552,11 @@ public abstract class AbstractMETSDisseminator
      * 
      * @return mdSec element or null if xwalk returns empty results.
      * 
-     * @throws SQLException
-     * @throws PackageValidationException
-     * @throws CrosswalkException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws PackageValidationException if package validation error
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     protected MdSec makeMdSec(Context context, DSpaceObject dso, Class mdSecClass,
                               String typeSpec, PackageParameters params,
@@ -1190,10 +1190,10 @@ public abstract class AbstractMETSDisseminator
     }
 
     /**
-     * Create a <div> element with <mptr> which references a child
+     * Create a {@code <div>} element with {@code <mptr>} which references a child
      * object via its handle (and via a local file name, when recursively disseminating
      * all child objects).
-     * @param type - type attr value for the <div>
+     * @param type - type attr value for the {@code <div>}
      * @param dso - object for which to create the div
      * @param params
      * @return a new {@code Div} with {@code dso} as child.
@@ -1356,12 +1356,12 @@ public abstract class AbstractMETSDisseminator
     }
 
     /**
-     * Cleanup our license file reference links, as Deposit Licenses & CC Licenses can be
+     * Cleanup our license file reference links, as Deposit Licenses and CC Licenses can be
      * added two ways (and we only want to add them to zip package *once*):
      * (1) Added as a normal Bitstream (assuming LICENSE and CC_LICENSE bundles will be included in pkg)
      * (2) Added via a 'rightsMD' crosswalk (as they are rights information/metadata on an Item)
      * <p>
-     * So, if they are being added by *both*, then we want to just link the rightsMD <mdRef> entry so
+     * So, if they are being added by *both*, then we want to just link the rightsMD {@code <mdRef>} entry so
      * that it points to the Bitstream location.  This implementation is a bit 'hackish', but it's
      * the best we can do, as the Harvard METS API doesn't allow us to go back and crawl an entire
      * METS file to look for these inconsistencies/duplications.
@@ -1369,10 +1369,10 @@ public abstract class AbstractMETSDisseminator
      * @param context current DSpace Context
      * @param params current Packager Parameters
      * @param dso current DSpace Object
-     * @param mdRef the rightsMD <mdRef> element
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @param mdRef the rightsMD {@code <mdRef>} element
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     protected void linkLicenseRefsToBitstreams(Context context, PackageParameters params,
             DSpaceObject dso, MdRef mdRef)

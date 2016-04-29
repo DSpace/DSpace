@@ -107,7 +107,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     /**
      * Write the document to the solr index
      * @param doc the solr document
-     * @throws java.io.IOException
+     * @throws IOException if IO error
      */
     protected void writeDocument(SolrInputDocument doc) throws IOException {
 

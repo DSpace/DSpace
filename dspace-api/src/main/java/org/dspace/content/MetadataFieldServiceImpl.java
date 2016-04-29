@@ -157,7 +157,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
      * @param element
      * @param qualifier
      * @return true if unique
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean hasElement(Context context, int fieldId, MetadataSchema metadataSchema, String element, String qualifier) throws SQLException
     {

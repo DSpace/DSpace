@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * Configuration keys, per metadata field (e.g. "dc.contributer.author")
  *
+ * {@code
  *  # names the ChoiceAuthority plugin called for this field
  *  choices.plugin.<FIELD> = name-of-plugin
  *
@@ -36,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  *  # is value "closed" to the set of these choices or are non-authority values permitted?
  *  choices.closed.<FIELD> = true | false
- *
+ * }
  * @author Larry Stone
  * @see ChoiceAuthority
  */

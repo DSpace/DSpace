@@ -40,7 +40,7 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 
 /**
- * METSRights Ingestion & Dissemination Crosswalk
+ * METSRights Ingestion and Dissemination Crosswalk
  * <p>
  * Translate between DSpace internal policies (i.e. permissions) and the
  * METSRights metadata schema
@@ -131,11 +131,11 @@ public class METSRightsCrosswalk
      * METSRights PermissionTypes.
      *
      * @param dso DSpace Object
-     * @return XML Element corresponding to the new <RightsDeclarationMD> translation
-     * @throws CrosswalkException
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @return XML Element corresponding to the new {@code <RightsDeclarationMD>} translation
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public Element disseminateElement(Context context, DSpaceObject dso)
@@ -404,10 +404,10 @@ public class METSRightsCrosswalk
      * @param context
      * @param dso
      * @param root
-     * @throws CrosswalkException
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
@@ -434,10 +434,10 @@ public class METSRightsCrosswalk
      *
      * @param context
      * @param dso
-     * @throws CrosswalkException
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      * @see RoleCrosswalk
      */
     @Override

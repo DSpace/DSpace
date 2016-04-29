@@ -132,7 +132,7 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * The map entry returned contains stage reached as the key and count of items in that stage as a value
      * @param context
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException;
 }

@@ -72,7 +72,7 @@ public interface MediaFilterService {
      * already been filtered, and if not or if overWrite is set, invokes the
      * filter.
      *
-     * @param c
+     * @param context
      *            context
      * @param item
      *            item containing bitstream to process
@@ -80,7 +80,7 @@ public interface MediaFilterService {
      *            source bitstream to process
      * @param formatFilter
      *            FormatFilter to perform filtering
-     *
+     * @throws Exception if error occurs
      * @return true if new rendition is created, false if rendition already
      *         exists and overWrite is not set
      */

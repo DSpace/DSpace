@@ -96,7 +96,7 @@ public class BrowserScope
      * exception
      *
      * @param dso       the container object; a Community or Collection
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public void setBrowseContainer(DSpaceObject dso)
         throws BrowseException
@@ -397,7 +397,7 @@ public class BrowserScope
      * Obtain the sort option
      *
      * @return  the sort option
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public SortOption getSortOption()
         throws BrowseException

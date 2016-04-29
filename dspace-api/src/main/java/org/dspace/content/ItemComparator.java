@@ -71,8 +71,8 @@ public class ItemComparator implements Comparator, Serializable
      * language.
      *
      * <p>
-     * Return >= 1 if the first is lexicographically greater than the second; <=
-     * -1 if the second is lexicographically greater than the first, and 0
+     * Return greater than or equal to 1 if the first is lexicographically greater than the second; 
+     * less than or equal to -1 if the second is lexicographically greater than the first, and 0
      * otherwise.
      * </p>
      *
@@ -82,8 +82,8 @@ public class ItemComparator implements Comparator, Serializable
      * @param second
      *            The second object to compare. Must be an object of type
      *            org.dspace.content.Item.
-     * @return >= 1 if the first is lexicographically greater than the second; <=
-     *         -1 if the second is lexicographically greater than the first, and
+     * @return greater than or equal 1 if the first is lexicographically greater than the second; 
+     *         less than or equal -1 if the second is lexicographically greater than the first, and
      *         0 otherwise.
      */
     @Override

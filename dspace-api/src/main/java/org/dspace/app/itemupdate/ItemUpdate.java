@@ -113,7 +113,7 @@ public class ItemUpdate {
    
     /**
      * 
-     * @param argv
+     * @param argv commandline args
      */
     public static void main(String[] argv)
     {
@@ -392,6 +392,16 @@ public class ItemUpdate {
         System.exit(status);
     }
 
+    /**
+     * process an archive
+     * @param context DSpace Context
+     * @param sourceDirPath source path
+     * @param itemField item field
+     * @param metadataIndexName index name
+     * @param alterProvenance whether to alter provenance
+     * @param isTest test flag
+     * @throws Exception if error
+     */
     protected void processArchive(Context context, String sourceDirPath, String itemField,
     		String metadataIndexName, boolean alterProvenance, boolean isTest)
     throws Exception
@@ -511,8 +521,8 @@ public class ItemUpdate {
      * 
      * @param sourceDir - the original source directory
      * @return the directory of the undo archive
-     * @throws FileNotFoundException
-     * @throws IOException
+     * @throws FileNotFoundException if file doesn't exist
+     * @throws IOException if IO error
      */
     protected File initUndoArchive(File sourceDir)
 	throws FileNotFoundException, IOException
@@ -555,6 +565,12 @@ public class ItemUpdate {
 	
 	//private void write
 
+    /**
+     * Set EPerson doing import
+     * @param context DSpace Context
+     * @param eperson EPerson obj
+     * @throws Exception if error
+     */
     protected void setEPerson(Context context, String eperson)
     throws Exception
     {
@@ -589,7 +605,7 @@ public class ItemUpdate {
      *   poor man's logging
 	 *   As with ItemImport, API logging goes through log4j to the DSpace.log files
 	 *   whereas the batch logging goes to the console to be captured there.
-     * @param s
+     * @param s String
      */
     static void pr(String s)
     {
@@ -598,7 +614,7 @@ public class ItemUpdate {
     
     /**
      *  print if verbose flag is set
-     * @param s
+     * @param s String
      */
     static void prv(String s)
     {

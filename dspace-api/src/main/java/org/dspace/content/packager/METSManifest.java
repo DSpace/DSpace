@@ -65,7 +65,7 @@ import org.jdom.xpath.XPath;
  * <br> eg. <code>mets.xsd.dc =  http://purl.org/dc/elements/1.1/ dc.xsd</code>
  * <br>Add a separate config entry for each schema.
  * </LI>
- * <p><LI>Crosswalk plugin mappings:
+ * <LI>Crosswalk plugin mappings:
  * These tell it the name of the crosswalk plugin to invoke for metadata sections
  * with a particular value of <code>MDTYPE</code> (or <code>OTHERMDTYPE</code>)
  * By default, the crosswalk mechanism will look for a plugin with the
@@ -83,8 +83,6 @@ import org.jdom.xpath.XPath;
  * @author WeiHua Huang
  * @author Rita Lee
  * @author Larry Stone
- * @see org.dspace.content.packager.MetsSubmission
- * @see org.dspace.app.mets.FederatedMETSImport
  */
 public class METSManifest
 {
@@ -154,7 +152,7 @@ public class METSManifest
     /** all mdRef elements in the manifest */
     protected List mdFiles = null;
 
-    /** <file> elements in "original" file group (bundle) */
+    /** {@code <file>} elements in "original" file group (bundle) */
     protected List<Element> contentFiles = null;
     protected List<Element> bundleFiles = null;
 
@@ -788,7 +786,7 @@ public class METSManifest
      * in the first {@code <structMap>}.
      *
      * @return Element which is the DSpace Object Contents {@code <div>}
-     * @throws MetadataValidationException
+     * @throws MetadataValidationException if metadata validation error
      */
     public Element getObjStructDiv()
         throws MetadataValidationException
@@ -820,7 +818,7 @@ public class METSManifest
      * These {@code <div>}s reference the location of any child objects METS manifests.
      * 
      * @return a List of {@code Element}s, each a {@code <div>}.  May be empty but NOT null.
-     * @throws MetadataValidationException
+     * @throws MetadataValidationException if metadata validation error
      */
     public List getChildObjDivs()
             throws MetadataValidationException
@@ -837,7 +835,7 @@ public class METSManifest
      * These file paths are located in the {@code <mptr>} where @LOCTYPE=URL
      *
      * @return a list of Strings, corresponding to relative file paths of children METS manifests
-     * @throws MetadataValidationException
+     * @throws MetadataValidationException if metadata validation error
      */
     public String[] getChildMetsFilePaths()
             throws MetadataValidationException
@@ -889,7 +887,7 @@ public class METSManifest
      * This parent object is the owner of current object.
      *
      * @return Link to the Parent Object (this is the Handle of that Parent)
-     * @throws MetadataValidationException
+     * @throws MetadataValidationException if metadata validation error
      */
     public String getParentOwnerLink()
         throws MetadataValidationException
@@ -1143,7 +1141,7 @@ public class METSManifest
      * Get an aray of all AMDID values for this object
      * 
      * @return
-     * @throws MetadataValidationException
+     * @throws MetadataValidationException if metadata validation error
      */
     protected String[] getAmdIDs()
         throws MetadataValidationException

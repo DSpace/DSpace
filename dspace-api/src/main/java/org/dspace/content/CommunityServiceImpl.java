@@ -488,9 +488,9 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
      * Internal method to remove the community and all its children from the
      * database, and perform any pre/post-cleanup
      *
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     protected void rawDelete(Context context, Community community) throws SQLException, AuthorizeException, IOException
     {

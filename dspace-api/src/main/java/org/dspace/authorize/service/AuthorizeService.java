@@ -48,7 +48,7 @@ public interface AuthorizeService {
      * @param actions
      *         array of action IDs from
      *         <code>org.dspace.core.Constants</code>
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *         if any one of the specified actions cannot be performed by
      *         the current user on the given object.
      */
@@ -65,7 +65,7 @@ public interface AuthorizeService {
      *         a DSpaceObject
      * @param action
      *         action to perform from <code>org.dspace.core.Constants</code>
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *         if the user is denied
      */
     public void authorizeAction(Context c, DSpaceObject o, int action) throws AuthorizeException, SQLException;
@@ -84,7 +84,7 @@ public interface AuthorizeService {
      *         object can be used
      * @param action
      *         action to perform from <code>org.dspace.core.Constants</code>
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *         if the user is denied
      */
     public void authorizeAction(Context c, DSpaceObject o, int action, boolean useInheritance)
@@ -106,7 +106,7 @@ public interface AuthorizeService {
      *         object can be used
      * @param action
      *         action to perform from <code>org.dspace.core.Constants</code>
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *         if the user is denied
      */
     public void authorizeAction(Context c, EPerson e, DSpaceObject o, int action, boolean useInheritance)
@@ -216,7 +216,7 @@ public interface AuthorizeService {
      *         ID of action from <code>org.dspace.core.Constants</code>
      * @param e
      *         eperson who can perform the action
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *         if current user in context is not authorized to add policies
      */
     public void addPolicy(Context c, DSpaceObject o, int actionID, EPerson e) throws SQLException, AuthorizeException;
@@ -235,7 +235,7 @@ public interface AuthorizeService {
      *         eperson who can perform the action
      * @param type
      *         policy type, deafult types are declared in the ResourcePolicy class
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *         if current user in context is not authorized to add policies
      */
     public void addPolicy(Context c, DSpaceObject o, int actionID, EPerson e, String type) throws SQLException, AuthorizeException;
@@ -251,9 +251,9 @@ public interface AuthorizeService {
      *         ID of action from <code>org.dspace.core.Constants</code>
      * @param g
      *         group to add policy for
-     * @throws SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *         if the current user is not authorized to add this policy
      */
     public void addPolicy(Context c, DSpaceObject o, int actionID, Group g) throws SQLException, AuthorizeException;
@@ -271,9 +271,9 @@ public interface AuthorizeService {
      *         group to add policy for
      * @param type
      *         policy type, deafult types are declared in the ResourcePolicy class
-     * @throws SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *         if the current user is not authorized to add this policy
      */
     public void addPolicy(Context c, DSpaceObject o, int actionID, Group g, String type) throws SQLException, AuthorizeException;
@@ -320,7 +320,7 @@ public interface AuthorizeService {
      *         DSpaceObject policies relate to
      * @param actionID
      *         action (defined in class Constants)
-     * @throws SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
      */
     public List<ResourcePolicy> getPoliciesActionFilter(Context c, DSpaceObject o, int actionID) throws SQLException;
@@ -334,9 +334,9 @@ public interface AuthorizeService {
      *         source of policies
      * @param dest
      *         destination of inherited policies
-     * @throws SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *         if the current user is not authorized to add these policies
      */
     public void inheritPolicies(Context c, DSpaceObject src, DSpaceObject dest) throws SQLException, AuthorizeException;
@@ -350,9 +350,9 @@ public interface AuthorizeService {
      *         List of ResourcePolicy objects
      * @param dest
      *         object to have policies added
-     * @throws SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *         if the current user is not authorized to add these policies
      */
     public void addPolicies(Context c, List<ResourcePolicy> policies, DSpaceObject dest) throws SQLException, AuthorizeException;
@@ -364,7 +364,7 @@ public interface AuthorizeService {
      *         DSpace context
      * @param o
      *         object to remove policies for
-     * @throws SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
      */
     public void removeAllPolicies(Context c, DSpaceObject o) throws SQLException, AuthorizeException;
@@ -378,7 +378,7 @@ public interface AuthorizeService {
      *         DSpace context
      * @param o
      *         object to remove policies for
-     * @throws SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
      */
     public void removeAllPoliciesByDSOAndTypeNotEqualsTo(Context c, DSpaceObject o, String type) throws SQLException, AuthorizeException;
@@ -392,7 +392,7 @@ public interface AuthorizeService {
      *         object to remove policies for
      * @param type
      *         policy type
-     * @throws SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
      */
     public void removeAllPoliciesByDSOAndType(Context c, DSpaceObject o, String type) throws SQLException, AuthorizeException;
@@ -408,7 +408,7 @@ public interface AuthorizeService {
      * @param actionID
      *         ID of action to match from
      *         <code>org.dspace.core.Constants</code>, or -1=all
-     * @throws SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
      */
     public void removePoliciesActionFilter(Context context, DSpaceObject dso, int actionID) throws SQLException, AuthorizeException;
@@ -421,7 +421,7 @@ public interface AuthorizeService {
      *         current context
      * @param group
      *         the group
-     * @throws SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
      */
     public void removeGroupPolicies(Context c, Group group) throws SQLException;
@@ -436,7 +436,7 @@ public interface AuthorizeService {
      *         the object
      * @param g
      *         the group
-     * @throws SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
      */
     public void removeGroupPolicies(Context c, DSpaceObject o, Group g) throws SQLException, AuthorizeException;
@@ -451,7 +451,7 @@ public interface AuthorizeService {
      *         the object
      * @param e
      *         the eperson
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
      */
     public void removeEPersonPolicies(Context c, DSpaceObject o, EPerson e) throws SQLException, AuthorizeException;
@@ -468,7 +468,7 @@ public interface AuthorizeService {
      *         ID of action from <code>org.dspace.core.Constants</code>
      * @return array of <code>Group</code>s that can perform the specified
      *         action on the specified object
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
      */
     public List<Group> getAuthorizedGroups(Context c, DSpaceObject o, int actionID) throws java.sql.SQLException;
@@ -488,7 +488,7 @@ public interface AuthorizeService {
      * @param policyID
      *         ID of an existing policy. If -1 is specified, this parameter will be ignored
      * @return true if such a policy exists, false otherwise
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      *         if there's a database problem
      */
     public boolean isAnIdenticalPolicyAlreadyInPlace(Context c, DSpaceObject o, Group group, int actionID, int policyID) throws SQLException;
@@ -505,8 +505,8 @@ public interface AuthorizeService {
      * @param reason
      * @param dso
      * @param owningCollection
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void generateAutomaticPolicies(Context context, Date embargoDate, String reason, DSpaceObject dso, Collection owningCollection) throws SQLException, AuthorizeException;
 

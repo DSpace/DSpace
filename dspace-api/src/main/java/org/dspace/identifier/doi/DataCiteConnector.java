@@ -749,7 +749,7 @@ implements DOIConnector
      * @param req
      * @param doi
      * @return
-     * @throws DOIIdentifierException 
+     * @throws DOIIdentifierException if DOI error
      */
     protected DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
             throws DOIIdentifierException

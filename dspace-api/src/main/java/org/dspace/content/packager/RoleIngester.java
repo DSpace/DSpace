@@ -66,9 +66,9 @@ public class RoleIngester implements PackageIngester
      *          the Parent DSpaceObject
      * @param document
      *          the XML Document
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws PackageException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws PackageException if packaging error
      */
     void ingestDocument(Context context, DSpaceObject parent,
             PackageParameters params, Document document)
@@ -433,9 +433,9 @@ public class RoleIngester implements PackageIngester
      *          the Parent DSpaceObject
      * @param stream
      *          the XML Document InputStream
-     * @throws PackageException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws PackageException if packaging error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void ingestStream(Context context, DSpaceObject parent,
             PackageParameters params, InputStream stream)

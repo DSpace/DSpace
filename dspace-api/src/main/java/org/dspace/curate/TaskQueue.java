@@ -37,7 +37,7 @@ public interface TaskQueue {
      *        the name of the queue on which to write
      * @param entry
      *        the task entry
-     * @throws IOException
+     * @throws IOException if IO error
      */
     void enqueue(String queueName, TaskQueueEntry entry) throws IOException;
 
@@ -48,7 +48,7 @@ public interface TaskQueue {
      *        the name of the queue on which to write
      * @param entrySet
      *        the set of task entries
-     * @throws IOException
+     * @throws IOException if IO error
      */
     void enqueue(String queueName, Set<TaskQueueEntry> entrySet) throws IOException;
     
@@ -64,7 +64,7 @@ public interface TaskQueue {
      *        a token which must be presented to release the queue
      * @return set
      *        the current set of queued task entries
-     * @throws IOException
+     * @throws IOException if IO error
      */
     Set<TaskQueueEntry> dequeue(String queueName, long ticket) throws IOException;
 

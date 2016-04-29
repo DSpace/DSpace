@@ -28,7 +28,7 @@ import org.jdom.Element;
 
 /**
  * Packager plugin to ingest a
- * METS (Metadata Encoding & Transmission Standard) package
+ * METS (Metadata Encoding and Transmission Standard) package
  * that conforms to the DSpace METS SIP (Submission Information Package) Profile.
  * See <a href="http://www.loc.gov/standards/mets/">http://www.loc.gov/standards/mets/</a>
  * for more information on METS, and

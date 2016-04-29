@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The Legacy Plugin Service is a very simple component container (based on the
- * legacy PluginManager class from <=5.x). It reads defined "plugins" (interfaces)
- * from config file(s) and makes them available to the API. (@TODO: Someday, this
+ * legacy PluginManager class from 5.x or below). It reads defined "plugins" (interfaces)
+ * from config file(s) and makes them available to the API. (TODO: Someday, this
  * entire "plugin" framework needs to be replaced by Spring Beans.)
  * <p>
  * It creates and organizes components (plugins), and helps select a plugin in

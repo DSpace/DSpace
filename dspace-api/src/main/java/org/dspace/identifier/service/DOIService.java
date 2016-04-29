@@ -76,7 +76,7 @@ public interface DOIService {
      * @param statuses The statuses the DOI should <b>not</b> be in, @{link DOIIdentifierProvider.DELETED}.
      * @param dsoIsNotNull Boolean whether all DOIs should be excluded where the DSpaceObject is NULL.
      * @return null or a list of DOIs
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     public List<DOI> getSimilarDOIsNotInState(Context context, String doiPattern, List<Integer> statuses, boolean dsoIsNotNull)
             throws SQLException;

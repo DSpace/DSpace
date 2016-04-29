@@ -93,8 +93,7 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
      * @param checksumResultCode
      *            result code records must have for them to be deleted.
      * @return number of records deleted.
-     * @throws java.sql.SQLException
-     *             if database error occurs.
+     * @throws SQLException if database error occurs.
      */
     @Override
     public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode checksumResultCode) throws SQLException

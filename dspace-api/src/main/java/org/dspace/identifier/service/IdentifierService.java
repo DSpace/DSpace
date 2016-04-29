@@ -61,8 +61,8 @@ public interface IdentifierService {
      *
      * @param context
      * @param identifier
-     * @throws org.dspace.identifier.IdentifierNotFoundException
-     * @throws org.dspace.identifier.IdentifierNotResolvableException
+     * @throws IdentifierNotFoundException if identifier not found
+     * @throws IdentifierNotResolvableException if identifier not resolvable
      */
     DSpaceObject resolve(Context context, String identifier) throws IdentifierNotFoundException, IdentifierNotResolvableException;
 
@@ -72,9 +72,9 @@ public interface IdentifierService {
      *
      * @param context
      * @param dso
-     * @throws org.dspace.authorize.AuthorizeException
-     * @throws java.sql.SQLException
-     * @throws org.dspace.identifier.IdentifierException
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IdentifierException if identifier error
      */
     void reserve(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException;
 
@@ -87,9 +87,9 @@ public interface IdentifierService {
      * @param context
      * @param dso
      * @param identifier
-     * @throws org.dspace.authorize.AuthorizeException
-     * @throws java.sql.SQLException
-     * @throws IdentifierException
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IdentifierException if identifier error
      */
     void reserve(Context context, DSpaceObject dso, String identifier) throws AuthorizeException, SQLException, IdentifierException;
 
@@ -97,9 +97,9 @@ public interface IdentifierService {
      *
      * @param context
      * @param dso
-     * @throws org.dspace.authorize.AuthorizeException
-     * @throws java.sql.SQLException
-     * @throws IdentifierException
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IdentifierException if identifier error
      */
     void register(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException;
 
@@ -113,9 +113,9 @@ public interface IdentifierService {
      * @param context
      * @param dso
      * @param identifier
-     * @throws org.dspace.authorize.AuthorizeException
-     * @throws java.sql.SQLException
-     * @throws IdentifierException
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IdentifierException if identifier error
      */
     void register(Context context, DSpaceObject dso, String identifier) throws AuthorizeException, SQLException, IdentifierException;
 
@@ -125,9 +125,9 @@ public interface IdentifierService {
      *
      * @param context
      * @param dso
-     * @throws org.dspace.authorize.AuthorizeException
-     * @throws java.sql.SQLException
-     * @throws IdentifierException
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IdentifierException if identifier error
      */
     void delete(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException;
 
@@ -139,9 +139,9 @@ public interface IdentifierService {
      * @param context
      * @param dso
      * @param identifier
-     * @throws org.dspace.authorize.AuthorizeException
-     * @throws java.sql.SQLException
-     * @throws IdentifierException
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IdentifierException if identifier error
      */
     void delete(Context context, DSpaceObject dso, String identifier) throws AuthorizeException, SQLException, IdentifierException;
 

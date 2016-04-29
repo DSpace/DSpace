@@ -106,8 +106,12 @@ public class PDFPackager
      * @param params  package parameters (none recognized)
      * @param license  may be null, which takes default license.
      * @return workspace item created by ingest.
-     * @throws PackageException if package is unacceptable or there is
-     *  a fatal error turning it into an Item.
+     * @throws PackageValidationException if package invalid
+     * @throws CrosswalkException if crosswalking fails
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws WorkflowException if workflow error
      */
     @Override
     public DSpaceObject ingest(Context context, DSpaceObject parent,

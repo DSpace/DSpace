@@ -240,7 +240,7 @@ public class ClamScan extends AbstractCurationTask
      * @param the InputStream to read
      * @param the item handle for reporting results
      * @return a ScanResult representing the server response
-     * @throws IOException
+     * @throws IOException if IO error
      */
     final byte[] buffer = new byte[DEFAULT_CHUNK_SIZE];;
     protected int scan(Bitstream bitstream, InputStream inputstream, String itemHandle)

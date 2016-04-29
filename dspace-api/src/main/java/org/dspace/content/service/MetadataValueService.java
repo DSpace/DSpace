@@ -30,7 +30,7 @@ public interface MetadataValueService {
      *
      * @param context
      *            DSpace context object
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     public MetadataValue create(Context context, DSpaceObject dso, MetadataField metadataField) throws SQLException;
 
@@ -41,7 +41,7 @@ public interface MetadataValueService {
      * @param valueId database key id of value
      * @return recalled metadata value
      * @throws java.io.IOException
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public MetadataValue find(Context context, int valueId)
             throws IOException, SQLException;
@@ -53,8 +53,8 @@ public interface MetadataValueService {
      * @param context dspace context
      * @param metadataField metadata field whose values to look for
      * @return a collection of metadata values
-     * @throws IOException
-     * @throws SQLException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
      */
     public List<MetadataValue> findByField(Context context, MetadataField metadataField)
             throws IOException, SQLException;
@@ -63,7 +63,7 @@ public interface MetadataValueService {
      * Update the metadata value in the database.
      *
      * @param context dspace context
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public void update(Context context, MetadataValue metadataValue) throws SQLException;
 
@@ -73,7 +73,7 @@ public interface MetadataValueService {
      * Delete the metadata field.
      *
      * @param context dspace context
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public void delete(Context context, MetadataValue metadataValue) throws SQLException;
 
@@ -87,7 +87,7 @@ public interface MetadataValueService {
      * @param context
      * @param metadataFieldId unique identifier of the interesting field.
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public MetadataValue getMinimum(Context context, int metadataFieldId)
             throws SQLException;

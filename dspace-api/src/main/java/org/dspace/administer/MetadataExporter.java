@@ -39,13 +39,14 @@ import org.xml.sax.SAXException;
  * from the metadata schemas for the repository.
  * 
  * The form of the XML is as follows
- * 
+ * {@code
  * <metadata-schemas>
  *   <schema>
  *     <name>dc</name>
  *     <namespace>http://dublincore.org/documents/dcmi-terms/</namespace>
  *   </schema>
  * </metadata-schemas>
+ * }
  */
 public class MetadataExporter
 {
@@ -54,12 +55,12 @@ public class MetadataExporter
     protected static MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
     /**
-     * @param args
-     * @throws ParseException 
-     * @throws SAXException 
-     * @throws IOException 
-     * @throws SQLException 
-     * @throws RegistryExportException 
+     * @param args commandline arguments
+     * @throws ParseException if parser error 
+     * @throws SAXException if XML parse error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws RegistryExportException if export error
      */
     public static void main(String[] args) throws ParseException, SQLException, IOException, SAXException, RegistryExportException
     {
@@ -91,6 +92,15 @@ public class MetadataExporter
         saveRegistry(file, schema);
     }
 
+    /**
+     * Save a registry to a filepath
+     * @param file filepath
+     * @param schema schema definition to save
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws SAXException if XML error
+     * @throws RegistryExportException if export error
+     */
     public static void saveRegistry(String file, String schema) throws SQLException, IOException, SAXException, RegistryExportException
     {
         // create a context
@@ -145,12 +155,12 @@ public class MetadataExporter
     
     /**
      * Serialize the schema registry. If the parameter 'schema' is null or empty, save all schemas
-     * @param context
-     * @param xmlSerializer
-     * @param schema
-     * @throws SQLException
-     * @throws SAXException
-     * @throws RegistryExportException
+     * @param context DSpace Context
+     * @param xmlSerializer XML serializer
+     * @param schema schema (may be null to save all)
+     * @throws SQLException if database error
+     * @throws SAXException if XML error
+     * @throws RegistryExportException if export error
      */
     public static void saveSchema(Context context, XMLSerializer xmlSerializer, String schema) throws SQLException, SAXException, RegistryExportException
     {
@@ -176,10 +186,10 @@ public class MetadataExporter
     /**
      * Serialize a single schema (namespace) registry entry
      * 
-     * @param xmlSerializer
-     * @param mdSchema
-     * @throws SAXException
-     * @throws RegistryExportException
+     * @param xmlSerializer XML serializer
+     * @param mdSchema DSpace metadata schema
+     * @throws SAXException if XML error
+     * @throws RegistryExportException if export error
      */
     private static void saveSchema(XMLSerializer xmlSerializer, MetadataSchema mdSchema) throws SAXException, RegistryExportException
     {
@@ -223,13 +233,13 @@ public class MetadataExporter
     /**
      * Serialize a single metadata field registry entry to xml
      * 
-     * @param context
-     * @param xmlSerializer
-     * @param mdField
-     * @throws SAXException
-     * @throws RegistryExportException
-     * @throws SQLException
-     * @throws IOException 
+     * @param context DSpace context
+     * @param xmlSerializer xml serializer
+     * @param mdField DSpace metadata field
+     * @throws SAXException if XML error
+     * @throws RegistryExportException if export error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     private static void saveType(Context context, XMLSerializer xmlSerializer, MetadataField mdField) throws SAXException, RegistryExportException, SQLException, IOException
     {
@@ -291,11 +301,16 @@ public class MetadataExporter
         xmlSerializer.endElement("dc-type");
     }
     
+    static Map<Integer, String> schemaMap = new HashMap<Integer, String>();
     /**
      * Helper method to retrieve a schema name for the field.
      * Caches the name after looking up the id.
+     * @param context DSpace Context
+     * @param mdField DSpace metadata field
+     * @return name of schema
+     * @throws SQLException if database error
+     * @throws RegistryExportException if export error
      */
-    static Map<Integer, String> schemaMap = new HashMap<Integer, String>();
     private static String getSchemaName(Context context, MetadataField mdField) throws SQLException, RegistryExportException
     {
         // Get name from cache

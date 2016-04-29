@@ -257,7 +257,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * Get the communities this collection appears in
      *
      * @return array of <code>Community</code> objects
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<Community> getCommunities() throws SQLException
     {

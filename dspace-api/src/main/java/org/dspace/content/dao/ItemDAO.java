@@ -22,7 +22,7 @@ import java.util.UUID;
 /**
  * Database Access Object interface class for the Item object.
  * The implementation of this class is responsible for all database calls for the Item object and is autowired by spring
- * This class should only be accessed from a single service & should never be exposed outside of the API
+ * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -63,7 +63,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
      * @param includeArchived whether to include archived items in count
      * @param includeWithdrawn whether to include withdrawn items in count
      * @return item count
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
     
@@ -78,7 +78,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
      * @param includeArchived whether to include archived items in count
      * @param includeWithdrawn whether to include withdrawn items in count
      * @return item count
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     public int countItems(Context context, List<Collection> collections, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
 
@@ -99,7 +99,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
      * Count total number of items (rows in item table)
      * @param context
      * @return total count
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     int countRows(Context context) throws SQLException;
 
@@ -109,7 +109,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
      * @param includeArchived whether to include archived items in count
      * @param includeWithdrawn whether to include withdrawn items in count
      * @return count of items
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
     

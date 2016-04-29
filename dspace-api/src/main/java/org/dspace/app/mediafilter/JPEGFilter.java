@@ -27,7 +27,7 @@ import org.dspace.core.ConfigurationManager;
  * thumbnail.maxwidth, thumbnail.maxheight, the size we want our thumbnail to be
  * no bigger than. Creates only JPEGs.
  *
- * @author Jason Sherman <jsherman@usao.edu>
+ * @author Jason Sherman jsherman@usao.edu
  */
 public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
 {

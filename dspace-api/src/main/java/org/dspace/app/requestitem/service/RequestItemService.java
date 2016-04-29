@@ -26,7 +26,7 @@ public interface RequestItemService {
      * Generate a request item representing the request and put it into the DB
      * @param context
      * @return the token of the request item
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     public String createRequest(Context context, Bitstream bitstream, Item item, boolean allFiles, String reqEmail, String reqName, String reqMessage)
             throws SQLException;

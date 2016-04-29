@@ -415,12 +415,12 @@ public class DCInput
 	 * The closed attribute of the vocabulary tag for this field as set in 
 	 * input-forms.xml
 	 * 
-	 * <code> 
+	 * {@code 
 	 * <field>
 	 *     .....
 	 *     <vocabulary closed="true">nsrc</vocabulary>
 	 * </field>
-	 * </code>
+	 * }
 	 * @return the closedVocabulary flags: true if the entry should be restricted 
 	 *         only to vocabulary terms, false otherwise
 	 */

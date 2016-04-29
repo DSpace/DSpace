@@ -111,9 +111,9 @@ public class PolicySet
      * @param clearOnly
      *            if <code>true</code>, just delete policies for matching
      *            objects
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if database problem
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if current user is not authorized to change these policies
      */
     public static void setPolicies(Context c, int containerType,
@@ -139,8 +139,8 @@ public class PolicySet
      * @param description
      * @param startDate
      * @param endDate
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public static void setPolicies(Context c, int containerType,
                                    UUID containerID, int contentType, int actionID, UUID groupID,
@@ -175,9 +175,9 @@ public class PolicySet
      *            objects
      * @param filter
      *            if non-null, only process bitstreams whose names contain filter
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if database problem
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if current user is not authorized to change these policies
      */
     public static void setPoliciesFilter(Context c, int containerType,
@@ -215,9 +215,9 @@ public class PolicySet
      * @param description
      * @param startDate
      * @param endDate
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if database problem
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if current user is not authorized to change these policies
      */
     public static void setPoliciesFilter(Context c, int containerType,
