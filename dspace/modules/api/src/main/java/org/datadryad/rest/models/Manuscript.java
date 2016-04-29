@@ -79,6 +79,10 @@ public class Manuscript {
     public static final String STATUS_PUBLISHED = "published";
     public static final String STATUS_INVALID = "invalid";
 
+    public static final List<String> VALID_STATUSES = Arrays.asList(
+            STATUS_SUBMITTED, STATUS_ACCEPTED, STATUS_REJECTED, STATUS_NEEDS_REVISION, STATUS_PUBLISHED, STATUS_INVALID
+    );
+
     public static final List<String> SUBMITTED_STATUSES = Arrays.asList(
             STATUS_SUBMITTED,
             "revision in review",
@@ -446,11 +450,13 @@ public class Manuscript {
 
     @JsonIgnore
     public Boolean isValid() {
-        // Required fields are: manuscriptID, status, authors (though author identifiers are optional), and title. All other fields are optional.
-        if ((manuscriptId == null) || (manuscriptId.length() == 0)) {
-            log.debug("Manuscript is invalid: Manuscript ID not available");
-            return false;
-        }
+        // Required fields are: status, authors (though author identifiers are optional), and title. All other fields are optional.
+
+        // Updated 04/28/16: Manuscripts can come from CrossRef API, which means that they don't have a manuscript ID.
+//        if ((manuscriptId == null) || (manuscriptId.length() == 0)) {
+//            log.debug("Manuscript is invalid: Manuscript ID not available");
+//            return false;
+//        }
 
         if ((status == null) || (status.length() == 0)) {
             log.debug("Manuscript is invalid: Article Status not available");
@@ -474,6 +480,14 @@ public class Manuscript {
 
         // TODO: if corresponding author present, must be one of the authors
         return true;
+    }
+
+    @JsonIgnore
+    public static Boolean statusIsValid(String status) {
+        if (status == null) {
+            return false;
+        }
+        return VALID_STATUSES.contains(status);
     }
 
     private static String findDryadDOI(String searchString) {
