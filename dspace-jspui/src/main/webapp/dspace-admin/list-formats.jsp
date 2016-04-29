@@ -84,16 +84,19 @@
     for (BitstreamFormat format : formats)
     {
         List<String> extensions = format.getExtensions();
-        StringBuilder extValue = new StringBuilder(256);
-
-        for (String extension : extensions)
+        StringBuilder extValueBuilder = new StringBuilder(256);
+        if (null != extensions)
         {
-            if (extValue.length() > 0)
+            for (String extension : extensions)
             {
-                extValue.append(", ");
+                if (extValueBuilder.length() > 0)
+                {
+                    extValueBuilder.append(", ");
+                }
+                extValueBuilder.append(extension);
             }
-            extValue.append(extension);
         }
+        String extValue = extValueBuilder.toString();
 %>
         <tr>
             <td>
