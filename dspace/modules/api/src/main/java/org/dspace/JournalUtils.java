@@ -331,14 +331,15 @@ public class JournalUtils {
         }
     }
 
-    public static List<Manuscript> getManuscriptsMatchingID(String journalCode, String manuscriptId) {
-        journalCode = cleanJournalCode(journalCode);
+    // NOTE: identifier can be either journalCode or ISSN
+    public static List<Manuscript> getManuscriptsMatchingID(String identifier, String manuscriptId) {
+        identifier = cleanJournalCode(identifier);
         ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscriptId);
+        StoragePath storagePath = StoragePath.createManuscriptPath(identifier, manuscriptId);
 
         try {
             OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
-            List<DryadJournalConcept> journalConceptList = organizationStorage.getResults(storagePath, journalCode, 0);
+            List<DryadJournalConcept> journalConceptList = organizationStorage.getResults(storagePath, identifier, 0);
             if (journalConceptList.size() > 0) {
                 ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
                 manuscripts.addAll(manuscriptStorage.getManuscriptsMatchingPath(storagePath, 10));
