@@ -70,8 +70,6 @@ public abstract class MappingMetadata {
 
 	// Patter to extract the converter name if any
 	private static final Pattern converterPattern = Pattern.compile(".*\\((.*)\\)");
-	
-	private static final Pattern simpleHandlePattern = Pattern.compile(".*,?(\\$simple\\-handle\\(handle\\)),?.*");
 
 	// Load configured fields from google-metadata.properties
 	public void init(String configuration) {

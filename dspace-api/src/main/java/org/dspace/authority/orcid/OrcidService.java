@@ -14,7 +14,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.URLEncoder;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -50,19 +49,21 @@ import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.orcid.jaxb.Funding;
+import org.dspace.authority.orcid.jaxb.FundingExternalIdentifier;
+import org.dspace.authority.orcid.jaxb.FundingExternalIdentifiers;
 import org.dspace.authority.orcid.jaxb.FundingList;
 import org.dspace.authority.orcid.jaxb.OrcidActivities;
+import org.dspace.authority.orcid.jaxb.OrcidBio;
 import org.dspace.authority.orcid.jaxb.OrcidMessage;
 import org.dspace.authority.orcid.jaxb.OrcidProfile;
 import org.dspace.authority.orcid.jaxb.OrcidSearchResult;
 import org.dspace.authority.orcid.jaxb.OrcidSearchResults;
 import org.dspace.authority.orcid.jaxb.OrcidWork;
 import org.dspace.authority.orcid.jaxb.OrcidWorks;
+import org.dspace.authority.orcid.jaxb.WorkExternalIdentifier;
+import org.dspace.authority.orcid.jaxb.WorkExternalIdentifiers;
 import org.dspace.authority.rest.RestSource;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCPersonName;
-import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -91,11 +92,15 @@ public class OrcidService extends RestSource {
 
 	private static final String WORK_CREATE_ENDPOINT = "/orcid-works";
 	private static final String PROFILE_CREATE_ENDPOINT = "/orcid-profile";
+	private static final String FUNDING_CREATE_ENDPOINT = "/funding";
+	
 	private static final String READ_PROFILE_ENDPOINT = "/orcid-profile";
 	private static final String READ_WORKS_ENDPOINT = "/orcid-works";
+	private static final String READ_FUNDING_ENDPOINT = "/funding";
+	private static final String READ_BIO_ENDPOINT = "/orcid-bio";
+	
 	private static final String BIO_UPDATE_ENDPOINT = "/orcid-bio";
-	private static final String SEARCH_ENDPOINT = "search/orcid-bio/";
-	private static final String FUNDING_CREATE_ENDPOINT = "/funding";
+	private static final String SEARCH_ENDPOINT = "search/orcid-bio/";	
 
 	private static final String READ_PUBLIC_SCOPE = "/read-public";
 	private static final String PROFILE_CREATE_SCOPE = "/orcid-profile/create";
@@ -145,14 +150,17 @@ public class OrcidService extends RestSource {
 	 */
 	public OrcidProfile getProfile(String id) {
 
-		OrcidAccessToken token;
+		OrcidAccessToken token = null;
 		try {
 			token = getMemberSearchToken();
 		} catch (IOException e) {
 			throw new IllegalStateException(e.getMessage(), e);
 		}
-		
-		return getProfile(id, token.getAccess_token());
+		String access_token = null;
+		if(token != null) {
+		    access_token = token.getAccess_token();
+		}
+        return getProfile(id, access_token);
 	}
 
 	/**
@@ -167,29 +175,37 @@ public class OrcidService extends RestSource {
 	 * @param token
 	 * @return
 	 */
-	public OrcidProfile getProfile(String id, String token) {
-		if (token == null) {
-			OrcidAccessToken atoken;
-			try {
-				atoken = getMemberSearchToken();
-			} catch (IOException e) {
-				throw new IllegalStateException(e.getMessage(), e);
-			}
-			token = atoken.getAccess_token();
-		}
-		
-		WebTarget target = restConnector.getClientRest(id + READ_PROFILE_ENDPOINT);
-		String response = target.request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-				.accept(MediaType.APPLICATION_XML).acceptEncoding("UTF-8").get(String.class);
-		OrcidMessage message = null;
-		try {
-			StringReader sr = new StringReader(response);
-			message = (OrcidMessage) orcidMessageContext.createUnmarshaller().unmarshal(sr);
-		} catch (JAXBException e) {
-			log.error(e);
-		}
-		return message.getOrcidProfile();
-	}
+    public OrcidProfile getProfile(String id, String token)
+    {
+
+        WebTarget target = restConnector
+                .getClientRest(id + READ_PROFILE_ENDPOINT);
+        String response;
+        if (token != null)
+        {
+            response = target.request()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                    .accept(MediaType.APPLICATION_XML).acceptEncoding("UTF-8")
+                    .get(String.class);
+        }
+        else
+        {
+            response = target.request().accept(MediaType.APPLICATION_XML)
+                    .acceptEncoding("UTF-8").get(String.class);
+        }
+        OrcidMessage message = null;
+        try
+        {
+            StringReader sr = new StringReader(response);
+            message = (OrcidMessage) orcidMessageContext.createUnmarshaller()
+                    .unmarshal(sr);
+        }
+        catch (JAXBException e)
+        {
+            log.error(e);
+        }
+        return message.getOrcidProfile();
+    }
 
 	public OrcidWorks getWorks(String id, String token) {
 
@@ -206,6 +222,31 @@ public class OrcidService extends RestSource {
 		return message.getOrcidProfile().getOrcidActivities().getOrcidWorks();
 	}
 
+	//ALERT!! Now ORCID do not show private funding (different behaviour from read works and fundiglist!!!)
+    public FundingList getFundings(String id, String token)
+    {
+
+        WebTarget target = restConnector
+                .getClientRest(id + READ_FUNDING_ENDPOINT);
+        String response = target.request()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .accept(MediaType.APPLICATION_XML).acceptEncoding("UTF-8")
+                .get(String.class);
+        OrcidMessage message = null;
+        try
+        {
+            StringReader sr = new StringReader(response);
+            message = (OrcidMessage) orcidMessageContext.createUnmarshaller()
+                    .unmarshal(sr);
+        }
+        catch (JAXBException e)
+        {
+            log.error(e);
+        }
+        return message.getOrcidProfile().getOrcidActivities().getFundingList();
+    }
+	   
+	   
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -533,7 +574,11 @@ public class OrcidService extends RestSource {
 	 * @throws JsonProcessingException
 	 */
 	private OrcidAccessToken getAccessToken(String code, String codeOrScope, String grantType) throws IOException, JsonProcessingException {
-		Client client = ClientBuilder.newClient(restConnector.getClientConfig());
+		if(StringUtils.isBlank(clientID) || StringUtils.isBlank(clientSecretKey)) {
+		    return null;
+		}
+	    
+	    Client client = ClientBuilder.newClient(restConnector.getClientConfig());	    
 		WebTarget target = client.target(tokenURL);
 		Form form = new Form();
 		form.param("client_id", clientID);
@@ -665,13 +710,17 @@ public class OrcidService extends RestSource {
 	 * Member API, require '/orcid-works/create' scope.
 	 * 
 	 * 
-	 * @param id
+	 * @param idsa
 	 * @param token
 	 * @param work
+	 * @param handle
+	 * 
+	 * @return putcode
+	 * 
 	 * @throws IOException
 	 * @throws JAXBException
 	 */
-	public OrcidMessage appendWork(String id, String token, OrcidWork work) throws IOException, JAXBException {
+	public String appendWork(String id, String token, OrcidWork work, String handle) throws IOException, JAXBException {
 		WebTarget target = restConnector.getClientRest(id + WORK_CREATE_ENDPOINT);
 
 		Builder builder = target.request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
@@ -685,11 +734,51 @@ public class OrcidService extends RestSource {
 
 		Entity<String> entity = Entity.entity(sw.toString(), APPLICATION_ORCID_XML);
 		if(testMode) {
-			return new OrcidMessage();
+			return "put-code";
 		}
 		Response response = builder.post(entity);
 
-		return getOrcidMessage(response);
+		OrcidMessage message = getOrcidMessage(response);
+		if(message == null) {
+           
+            if (StringUtils.isNotEmpty(handle))
+            {
+                // retrieve the orcid works by hand
+                OrcidWorks orcidWorks = getWorks(id, token);
+
+                if (orcidWorks != null)
+                {
+                    for (OrcidWork justWork : orcidWorks.getOrcidWork())
+                    {
+                        WorkExternalIdentifiers extIds = justWork.getWorkExternalIdentifiers();
+                        if(extIds!=null) {
+                            for (WorkExternalIdentifier extId : extIds.getWorkExternalIdentifier())
+                            {
+                                if("handle".equals(extId.getWorkExternalIdentifierType())) {
+                                    if(handle.trim().equals(extId.getWorkExternalIdentifierId().trim())) {
+                                        return justWork.getPutCode().toString();                                        
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                }
+            }
+            else
+            {
+                log.warn("No handle found for " + id);
+            }
+		}
+		
+        String putCode = null; 
+        try {
+            putCode = message.getOrcidProfile().getOrcidActivities().getOrcidWorks().getOrcidWork().get(0).getPutCode().toString();
+        }
+        catch(Exception e) {
+            log.warn("No put-code for owner for orcid " + id);
+        }
+        return putCode;
 	}
 	
 	//Fundings
@@ -763,14 +852,17 @@ public class OrcidService extends RestSource {
 	 * 
 	 * Member API, require '/orcid-works/create' scope.
 	 * 
-	 * 
 	 * @param id
 	 * @param token
 	 * @param work
+	 * @param uuid
+	 * 
+	 * @return putcode
+	 * 
 	 * @throws IOException
 	 * @throws JAXBException
 	 */
-	public OrcidMessage appendFunding(String id, String token, Funding funding) throws IOException, JAXBException {
+	public String appendFunding(String id, String token, Funding funding, String uuid) throws IOException, JAXBException {
 		WebTarget target = restConnector.getClientRest(id + FUNDING_CREATE_ENDPOINT);
 
 		Builder builder = target.request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
@@ -785,15 +877,123 @@ public class OrcidService extends RestSource {
 		Entity<String> entity = Entity.entity(sw.toString(), APPLICATION_ORCID_XML);
 
 		if(testMode) {
-			return new OrcidMessage();
+			return "put-code";
 		}
 		Response response = builder.post(entity);
 
-		return getOrcidMessage(response);
+		
+	      OrcidMessage message = getOrcidMessage(response);
+	        if(message == null) {
+	           
+	            if (StringUtils.isNotEmpty(uuid))
+	            {
+	                // retrieve the orcid funding by hand
+	                FundingList fundings = getFundings(id, token);
+
+	                if (fundings != null)
+	                {
+	                    
+	                    for (Funding justWork : fundings.getFunding())
+	                    {
+	                        FundingExternalIdentifiers extIds = justWork.getFundingExternalIdentifiers();
+	                        if(extIds!=null) {
+	                            for (FundingExternalIdentifier extId : extIds.getFundingExternalIdentifier())
+	                            {
+	                                if("uuid".equals(extId.getFundingExternalIdentifierType())) {
+	                                    if(uuid.trim().equals(extId.getFundingExternalIdentifierValue().trim())) {
+	                                        return justWork.getPutCode().toString();                                        
+	                                    }
+	                                }
+	                            }
+	                        }
+	                    }
+	                    
+	                }
+	            }
+	            else
+	            {
+	                log.warn("No uuid found for " + id);
+	            }
+	        }
+	        
+	        String putCode = null; 
+	        try {
+	            putCode = message.getOrcidProfile().getOrcidActivities().getFundingList().getFunding().get(0).getPutCode().toString();
+	        }
+	        catch(Exception e) {
+	            log.warn("No put-code for owner for orcid " + id);
+	        }
+	        return putCode;
 	}
 
-	
+	/**
+     * Returns the fields set as "Public" in the bio portion of the ORCID Record
+     * for the scholar represented by the specified orcid_id. When used with an
+     * access token and the Member API, limited-access data is also returned. 
+     * 
+     * Public API
+     * 
+     * @param id
+     * @return
+     */
+    public OrcidBio getBio(String id) {
 
+        OrcidAccessToken token = null;
+        try {
+            token = getMemberSearchToken();
+        } catch (IOException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+        String access_token = null;
+        if(token != null) {
+            access_token = token.getAccess_token();
+        }
+        return getBio(id, access_token);
+    }
+
+    /**
+     * Returns the fields set as "Public" in the bio portion of the ORCID Record
+     * for the scholar represented by the specified orcid_id. When used with an
+     * access token and the Member API, limited-access data is also returned. 
+     * 
+     * Member API
+     * 
+     * @param id
+     * @param token
+     * @return
+     */
+    public OrcidBio getBio(String id, String token)
+    {
+
+        WebTarget target = restConnector
+                .getClientRest(id + READ_BIO_ENDPOINT);
+        String response;
+        if (token != null)
+        {
+            response = target.request()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                    .accept(MediaType.APPLICATION_XML).acceptEncoding("UTF-8")
+                    .get(String.class);
+        }
+        else
+        {
+            response = target.request().accept(MediaType.APPLICATION_XML)
+                    .acceptEncoding("UTF-8").get(String.class);
+        }
+        OrcidMessage message = null;
+        try
+        {
+            StringReader sr = new StringReader(response);
+            message = (OrcidMessage) orcidMessageContext.createUnmarshaller()
+                    .unmarshal(sr);
+        }
+        catch (JAXBException e)
+        {
+            log.error(e);
+        }
+        return message.getOrcidProfile().getOrcidBio();
+    }
+	
 	/**
 	 * Get message from orcid response
 	 * 
@@ -801,7 +1001,7 @@ public class OrcidService extends RestSource {
 	 * @return
 	 */
 	private OrcidMessage getOrcidMessage(Response response) {
-		OrcidMessage message = null;
+		OrcidMessage message = null;		
 		if (response.hasEntity()) {
 			try {
 				Unmarshaller um = orcidMessageContext.createUnmarshaller();
@@ -812,7 +1012,7 @@ public class OrcidService extends RestSource {
 			} catch (JAXBException e) {
 				log.info("Problem unmarshalling return value " + e);
 			}
-		}
+		} 
 		if (response.getStatus() != HttpStatus.SC_OK && response.getStatus() != HttpStatus.SC_CREATED) {
 			if(message!=null && message.getErrorDesc() != null && StringUtils.isNotBlank(message.getErrorDesc().getContent())) {
 				throw new RuntimeException(message.getErrorDesc().getContent());	

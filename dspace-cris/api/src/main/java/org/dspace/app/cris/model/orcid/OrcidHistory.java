@@ -65,6 +65,8 @@ public class OrcidHistory extends IdentifiableObject {
     @Type(type="org.hibernate.type.StringClobType")
     private String responseMessage;
     
+    private String putCode;
+    
 	@Override
 	public Integer getId() {
 		return id;
@@ -130,4 +132,14 @@ public class OrcidHistory extends IdentifiableObject {
 	public void setEntityUuid(String entityUuid) {
 		this.entityUuid = entityUuid;
 	}
+
+    public String getPutCode()
+    {
+        return putCode;
+    }
+
+    public void setPutCode(String putCode)
+    {
+        this.putCode = putCode;
+    }
 }

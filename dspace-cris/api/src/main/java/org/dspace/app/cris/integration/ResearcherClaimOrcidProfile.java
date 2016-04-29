@@ -53,7 +53,7 @@ public class ResearcherClaimOrcidProfile implements ExtraLoggedInAction {
 		String scopeMetadata = ConfigurationManager.getProperty("authentication-oauth",
 				"application-client-scope");
 		if (StringUtils.isNotBlank(scopeMetadata) && StringUtils.isNotBlank(token)) {
-			for (String scopeConfigurated : OAuthUtils.decodeScopes(scope)) {
+			for (String scopeConfigurated : OAuthUtils.decodeScopes(scopeMetadata)) {
 				// clear all token
 				List<RPProperty> rppp = rp.getAnagrafica4view()
 						.get("system-orcid-token" + scopeConfigurated.replace("/", "-"));
@@ -68,7 +68,7 @@ public class ResearcherClaimOrcidProfile implements ExtraLoggedInAction {
 		applicationService.saveOrUpdate(ResearcherPage.class, rp);
 		
 		// rebuild token
-		if (StringUtils.isNotBlank(scopeMetadata) && StringUtils.isNotBlank(token)) {
+		if (StringUtils.isNotBlank(scope) && StringUtils.isNotBlank(token)) {
 			for (String scopeConfigurated : OAuthUtils.decodeScopes(scope)) {
 				ResearcherPageUtils.buildTextValue(rp, token,
 						"system-orcid-token" + scopeConfigurated.replace("/", "-"));

@@ -113,7 +113,7 @@ public class EditItemServlet extends DSpaceServlet
 
         // See if an item ID or Handle was passed in
         Item itemToEdit = null;
-        context.setRequiredItemWrapper(false);
+        context.turnOffItemWrapper();
         if (internalID > 0)
         {
             itemToEdit = Item.find(context, internalID);
@@ -135,7 +135,7 @@ public class EditItemServlet extends DSpaceServlet
                 showError = true;
             }
         }
-        context.setRequiredItemWrapper(true);
+        context.restoreItemWrapperState();
         
         // Show edit form if appropriate
         if (itemToEdit != null)
@@ -187,10 +187,10 @@ public class EditItemServlet extends DSpaceServlet
          * indicating what needs to be done (from the constants above.)
          */
         int action = UIUtil.getIntParameter(request, "action");
-        context.setRequiredItemWrapper(false);
+        context.turnOffItemWrapper();
         Item item = Item.find(context, UIUtil.getIntParameter(request,
                 "item_id"));
-        context.setRequiredItemWrapper(true);
+        context.restoreItemWrapperState();
         String handle = HandleManager.findHandle(context, item);
 
         // now check to see if person can edit item
@@ -875,7 +875,9 @@ public class EditItemServlet extends DSpaceServlet
             // Wrap multipart request to get the submission info
             FileUploadRequest wrapper = new FileUploadRequest(request);
             Bitstream b = null;
+            context.turnOffItemWrapper();
             Item item = Item.find(context, UIUtil.getIntParameter(wrapper, "item_id"));
+            context.restoreItemWrapperState();
             File temp = wrapper.getFile("file");
 
             // Read the temp file as logo

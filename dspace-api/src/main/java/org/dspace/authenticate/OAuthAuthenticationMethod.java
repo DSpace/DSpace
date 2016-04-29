@@ -66,6 +66,7 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
 
         String orcid = (String) request.getAttribute("orcid");
         String token = (String) request.getAttribute("access_token");
+        String scope = (String) request.getAttribute("scope");
 //        String refreshToken = (String) request.getAttribute("refresh_token");
         if (request == null||orcid==null)
         {
@@ -89,7 +90,7 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
         OrcidService orcidObject = OrcidService.getOrcid();
         if(orcid!=null)
         {            	
-        	if(StringUtils.isNotBlank(token)) {
+        	if(StringUtils.isNotBlank(token) && StringUtils.contains(scope, "/orcid-profile")) {
         		profile = orcidObject.getProfile(orcid,token);	
         	}
         	else {

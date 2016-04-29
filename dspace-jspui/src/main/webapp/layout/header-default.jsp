@@ -45,7 +45,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title><%= siteName %>: <%= title %></title>
+        <title><%= title %> | <%= siteName %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="Generator" content="<%= generator %>" />
