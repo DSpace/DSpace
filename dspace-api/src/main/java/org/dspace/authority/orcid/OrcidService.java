@@ -756,7 +756,7 @@ public class OrcidService extends RestSource {
                     {
                         if (StringUtils.equals(
                                 justWork.getSource().getSourceName().getContent(),
-                                sourceClientName))
+                                getSourceClientName()))
                         {
                             WorkExternalIdentifiers extIds = justWork
                                     .getWorkExternalIdentifiers();
@@ -923,7 +923,7 @@ public class OrcidService extends RestSource {
                     {
                         if (StringUtils.equals(justWork.getSource()
                                 .getSourceName().getContent(),
-                                sourceClientName))
+                                getSourceClientName()))
                         {
                             FundingExternalIdentifiers extIds = justWork
                                     .getFundingExternalIdentifiers();
