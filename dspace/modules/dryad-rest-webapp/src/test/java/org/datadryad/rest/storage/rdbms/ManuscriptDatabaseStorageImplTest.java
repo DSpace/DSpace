@@ -51,7 +51,7 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
             journalConcept.setJournalID(TEST_ORGANIZATION_CODE);
             Context context = new Context();
             JournalUtils.addDryadJournalConcept(context, journalConcept);
-            organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, TEST_ORGANIZATION_CODE);
+            organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, TEST_ORGANIZATION_CODE);
             context.complete();
         } catch (Exception ex) {
             fail("Exception setting up test organization: " + ex);

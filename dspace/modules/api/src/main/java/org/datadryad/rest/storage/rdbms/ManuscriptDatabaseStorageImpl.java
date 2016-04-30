@@ -16,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Organization;
@@ -173,7 +172,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     }
 
     private static TableRow getTableRowByManuscriptId(Context context, String msid, String organizationCode) throws SQLException, IOException {
-        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, organizationCode);
+        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (organization == null) {
             return null;
         } else {
@@ -234,12 +233,12 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                 }
             }
         }
-        return existingRow;
+        return finalRows;
     }
 
     private static List<Manuscript> getManuscripts(Context context, String organizationCode, int limit) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, organizationCode);
+        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (organization == null) {
             return manuscripts;
         } else {
@@ -258,7 +257,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     private static List<Manuscript> getManuscriptsMatchingQuery(Context context, String organizationCode, String searchParam, int limit) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, organizationCode);
+        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (organization == null) {
             return manuscripts;
         } else {
@@ -282,7 +281,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         String manuscriptID = path.getManuscriptId();
         try {
             Context context = getContext();
-            Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, path.getOrganizationCode());
+            Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, path.getOrganizationCode());
             if (organization != null) {
                 Integer organizationId = organization.organizationId;
                 TableRowIterator rows = null;
@@ -307,8 +306,26 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         return manuscripts;
     }
 
+    public List<Manuscript> getManuscriptsMatchingManuscript(Manuscript manuscript) throws StorageException {
+        List<Manuscript> manuscripts = new ArrayList<Manuscript>();
+        try {
+            Context context = getContext();
+            List<TableRow> rows = getTableRowsMatchingManuscript(context, manuscript);
+            for (TableRow row : rows) {
+                manuscripts.add(manuscriptFromTableRow(row));
+            }
+            completeContext(context);
+        } catch (Exception ex) {
+            throw new StorageException("Exception finding manuscript", ex);
+        }
+        if (manuscripts.size() == 0) {
+            throw new StorageException("No matching manuscripts found");
+        }
+        return manuscripts;
+    }
+
     private static void insertManuscript(Context context, Manuscript manuscript, String organizationCode) throws SQLException, IOException {
-        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, organizationCode);
+        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (organization != null) {
             Integer organizationId = organization.organizationId;
             TableRow row = tableRowFromManuscript(manuscript, organizationId);
@@ -333,7 +350,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if(manuscript.getManuscriptId() == null) {
             throw new SQLException("NULL ID");
         }
-        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, organizationCode);
+        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (organization != null) {
             Integer organizationId = organization.organizationId;
             Integer manuscriptId = getManuscriptInternalId(context, manuscript.getManuscriptId(), organizationId);
@@ -348,9 +365,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     public Boolean objectExists(StoragePath path, Manuscript manuscript) throws StorageException {
         try {
             Context context = getContext();
-            TableRow row = getTableRowMatchingManuscript(context, manuscript);
             completeContext(context);
-            return row != null;
+            return getTableRowsMatchingManuscript(context, manuscript).size() > 0;
         } catch (SQLException ex) {
             throw new StorageException("Exception finding manuscript", ex);
         } catch (IOException ex) {
@@ -449,11 +465,12 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         Context context = null;
         try {
             context = getContext();
-            TableRow existingRow = getTableRowMatchingManuscript(context, manuscript);
-            if (existingRow == null) {
+            List<TableRow> rows = getTableRowsMatchingManuscript(context, manuscript);
+            if (rows.size() == 0) {
                 throw new StorageException("Unable to update, manuscript does not exist");
+            } else {
+                updateTableRowFromManuscript(context, manuscript, rows.get(0));
             }
-            updateTableRowFromManuscript(context, manuscript, existingRow);
         } catch (SQLException ex) {
             throw new StorageException("Exception saving manuscript", ex);
         } catch (IOException ex) {

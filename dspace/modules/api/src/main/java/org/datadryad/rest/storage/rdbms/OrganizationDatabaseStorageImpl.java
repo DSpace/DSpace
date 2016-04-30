@@ -8,7 +8,6 @@ import java.lang.Integer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
@@ -20,7 +19,6 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.JournalUtils;
 
 /**
@@ -104,9 +102,9 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         }
     }
 
-    public static Organization getOrganizationByCode(Context context, String code) throws SQLException {
+    public static Organization getOrganizationByCodeOrISSN(Context context, String codeOrISSN) throws SQLException {
         String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE UPPER(code) = UPPER(?) OR UPPER(issn) = UPPER(?)";
-        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, code, code);
+        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, codeOrISSN, codeOrISSN);
         return organizationFromTableRow(row);
     }
 
@@ -192,7 +190,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         Context context = null;
         try {
             context = getContext();
-            Organization organization = getOrganizationByCode(context, organizationCode);
+            Organization organization = getOrganizationByCodeOrISSN(context, organizationCode);
             if (organizationCode.equals(organization.organizationISSN)) {
                 // this is an ISSN, replace organizationCode with the organization's code.
                 organizationCode = organization.organizationCode;
