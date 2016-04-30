@@ -39,7 +39,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     private static Logger log = Logger.getLogger(ManuscriptDatabaseStorageImpl.class);
 
     private static final ObjectMapper mapper;
-    private static final ObjectWriter writer;
     private static final ObjectReader reader;
 
     // Database objects
@@ -75,7 +74,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     static {
         mapper = new ObjectMapper();
         mapper.setConfig(mapper.getSerializationConfig().with(new SimpleDateFormat("yyyy-MM-dd")));
-        writer = mapper.writerWithType(Manuscript.class).withDefaultPrettyPrinter();
         reader = mapper.reader(Manuscript.class);
     }
 
@@ -152,11 +150,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     static TableRow tableRowFromManuscript(Manuscript manuscript, Integer organizationId) throws IOException {
         if(manuscript != null) {
-            String json_data = writer.writeValueAsString(manuscript);
             TableRow row = new TableRow(MANUSCRIPT_TABLE, MANUSCRIPT_COLUMNS);
             row.setColumn(COLUMN_ORGANIZATION_ID, organizationId);
             row.setColumn(COLUMN_MSID, manuscript.getManuscriptId());
-            row.setColumn(COLUMN_JSON_DATA, json_data);
+            row.setColumn(COLUMN_JSON_DATA, manuscript.toString());
             row.setColumn(COLUMN_DATE_ADDED, new Date());
             row.setColumn(COLUMN_STATUS, manuscript.getStatus());
             return row;
@@ -228,6 +225,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                         double score = JournalUtils.getHamrScore(databaseTitle, manuscriptTitle);
                         log.error("comparing " + databaseManuscript.getTitle() + " to " + manuscript.getTitle() + ": " + String.valueOf(score));
                         if (score > 0.9) {
+                            String old_metadata = databaseManuscript.toString();
+                            databaseManuscript.optionalProperties.put(Manuscript.JOURNAL_METADATA, old_metadata);
+                            row.setColumn(COLUMN_JSON_DATA, databaseManuscript.toString());
                             existingRow = row;
                         }
                     }
@@ -322,8 +322,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     private static void updateTableRowFromManuscript(Context context, Manuscript manuscript, TableRow existingRow) throws SQLException, IOException {
         if (existingRow != null) {
-            String json_data = writer.writeValueAsString(manuscript);
-            existingRow.setColumn(COLUMN_JSON_DATA, json_data);
+            existingRow.setColumn(COLUMN_JSON_DATA, manuscript.toString());
             existingRow.setColumn(COLUMN_STATUS, manuscript.getStatus());
             existingRow.setColumn(COLUMN_DATE_ADDED, new Date());
             DatabaseManager.update(context, existingRow);
