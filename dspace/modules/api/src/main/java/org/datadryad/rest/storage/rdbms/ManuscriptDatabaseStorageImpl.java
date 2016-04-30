@@ -183,7 +183,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
-    private static TableRow getTableRowMatchingManuscript(Context context, Manuscript manuscript) throws SQLException, IOException {
+    private static List<TableRow> getTableRowsMatchingManuscript(Context context, Manuscript manuscript) throws SQLException, IOException {
+        ArrayList<TableRow> finalRows = new ArrayList<TableRow>();
         Organization organization = manuscript.getOrganization();
         if (organization == null) {
             return null;
@@ -202,7 +203,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                 existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE);
             }
         }
-        if (existingRow == null) {
+        if (existingRow != null) {
+            finalRows.add(existingRow);
+        } else {
             // try looking it up by authors and title:
             // first, query database for entries that have all surnames of authors in the json_data
             // then, compare the title of those entries with the one we're looking for.
@@ -224,10 +227,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                         double score = JournalUtils.getHamrScore(databaseTitle, manuscriptTitle);
                         log.error("comparing " + databaseManuscript.getTitle() + " to " + manuscript.getTitle() + ": " + String.valueOf(score));
                         if (score > 0.9) {
-                            String old_metadata = databaseManuscript.toString();
-                            databaseManuscript.optionalProperties.put(Manuscript.JOURNAL_METADATA, old_metadata);
-                            row.setColumn(COLUMN_JSON_DATA, databaseManuscript.toString());
-                            existingRow = row;
+                            finalRows.add(row);
                         }
                     }
                 }
