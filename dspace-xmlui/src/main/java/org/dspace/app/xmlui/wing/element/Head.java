@@ -27,7 +27,7 @@ public class Head extends TextContainer implements StructuralElement
     public static final String E_HEAD = "head";
 
     /** The head's name */
-    private String name;
+    private final String name;
 
     /**
      * Construct a new head.
@@ -37,6 +37,7 @@ public class Head extends TextContainer implements StructuralElement
      * @param name
      *            (May be null) a local identifier used to differentiate the
      *            element from its siblings.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Head(WingContext context, String name) throws WingException
     {
@@ -57,7 +58,9 @@ public class Head extends TextContainer implements StructuralElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler,
             NamespaceSupport namespaces) throws SAXException
     {

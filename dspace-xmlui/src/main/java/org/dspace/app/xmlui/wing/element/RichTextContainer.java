@@ -189,7 +189,7 @@ public abstract class RichTextContainer extends TextContainer
      *  		  (May be null) Special rendering instructions
      * @param name
      *            Name of the link.
-     * @throws org.dspace.app.xmlui.wing.WingException
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addXref(String target, Message key, String rend, String name) throws WingException
     {
@@ -239,6 +239,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) The target reference for the image if the image
      *            is to operate as a link.
      * @param title
+     *            Title for the figure.
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.

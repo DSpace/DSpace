@@ -16,7 +16,7 @@ import java.util.Map;
  * are referenced.
  *
  * <p>The specific implementation of ObjectManager that is used is determined by the
- * {@link WingComponent} that is creating the reference.
+ * Wing component that is creating the reference.
  *
  * @author Scott Phillips
  */

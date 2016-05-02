@@ -541,7 +541,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            type of list. In the absence of this attribute, the type of a
      *            list will be inferred from the presence and content of labels
      *            on its items. Accepted values are found at
-     *            org.dspace.app.xmlui.xmltool.List.TYPES
+     *            {@link org.dspace.app.xmlui.wing.element.List#TYPES}
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
@@ -569,7 +569,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            type of list. In the absence of this attribute, the type of a
      *            list will be inferred from the presence and content of labels
      *            on its items. Accepted values are found at
-     *            {@link org.dspace.app.xmlui.xmltool.List.TYPES}
+     *            {@link org.dspace.app.xmlui.wing.element.List#TYPES}
      *
      * @return A new List
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
