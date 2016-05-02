@@ -207,7 +207,7 @@ public class ApproveRejectReviewItem {
                     item.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", "Approved by ApproveRejectReviewItem based on metadata for " + manuscriptNumber + " on " + DCDate.getCurrent().toString() + " (GMT)");
                     item.update();
                 } else { // reject
-                    String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error, please contact us at help@datadryad.org.";
+                    String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error or wish to re-submit your data associated with a different journal, please contact us at help@datadryad.org.";
                     EPerson ePerson = EPerson.findByEmail(c, ConfigurationManager.getProperty("system.curator.account"));
                     //Also reject all the data files
                     Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
