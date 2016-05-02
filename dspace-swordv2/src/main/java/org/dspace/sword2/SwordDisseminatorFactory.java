@@ -13,6 +13,7 @@ import org.swordapp.server.UriRegistry;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.core.factory.CoreServiceFactory;
 
 public class SwordDisseminatorFactory
@@ -78,20 +79,28 @@ public class SwordDisseminatorFactory
                     {
                         if (accept != null)
                         {
+                            // Find first accept format that this disseminator works with
+                            String disseminateFormat = null;
                             for (Float q : accept.keySet())
                             {
                                 for (String format : accept.get(q))
                                 {
-                                    if (!disseminator
-                                            .disseminatesContentType(format))
+                                    if (disseminator.disseminatesContentType(format))
                                     {
-                                        disseminator = null;
-                                    }
-                                    else
-                                    {
-                                        disseminator.setContentType(format);
+                                        disseminateFormat = format;
+                                        break;
                                     }
                                 }
+                            }
+
+                            if(StringUtils.isNotEmpty(disseminateFormat))
+                            {
+                                disseminator.setContentType(disseminateFormat);
+                            }
+                            else
+                            {
+                                // No matching disseminator found
+                                disseminator = null;
                             }
                         }
                     }
