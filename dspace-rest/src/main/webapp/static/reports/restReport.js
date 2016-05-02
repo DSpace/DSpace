@@ -10,6 +10,9 @@ var Report = function() {
 	this.COLL_LIMIT = 500;
 	this.COUNT_LIMIT = 500;
 	this.ITEM_LIMIT = 100;
+        this.ROOTPATH = "/xmlui/handle/"
+        //this.ROOTPATH = "/jspui/handle/"
+	//this.ROOTPATH = "/handle/"
 
 	//Override this to return obj.id for DSpace 5 versions
 	this.getId = function(obj) {
