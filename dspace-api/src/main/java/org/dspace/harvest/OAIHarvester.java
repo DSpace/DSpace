@@ -292,7 +292,7 @@ public class OAIHarvester {
 			harvestedCollection.update(ourContext, harvestRow);
 
 			// expiration timer starts
-			int expirationInterval = configurationService.getIntProperty("oai.harvester.threadTimeout");
+			int expirationInterval =  DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("oai.harvester.threadTimeout");
 	    	if (expirationInterval == 0)
             {
                 expirationInterval = 24;
