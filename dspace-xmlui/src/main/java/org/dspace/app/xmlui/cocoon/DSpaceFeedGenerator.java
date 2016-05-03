@@ -293,7 +293,8 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             }
 
             BrowseEngine be = new BrowseEngine(context);
-            this.recentSubmissionItems = be.browseMini(scope).getItemResults();
+            List<Item> browseItemResults = be.browseMini(scope).getBrowseItemResults();
+            this.recentSubmissionItems = browseItemResults.toArray(new Item[browseItemResults.size()]);
 
             // filter out Items that are not world-readable
             if (!includeRestrictedItems)
