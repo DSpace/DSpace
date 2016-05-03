@@ -248,7 +248,13 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
                 String.valueOf(bitstream.getSequenceID()), getIdentifiers(context, bitstream)));
 
-        bitstream.getBundles().clear();
+        //Remove our bitstream from all our bundles
+        final List<Bundle> bundles = bitstream.getBundles();
+        for (Bundle bundle : bundles) {
+            bundle.getBitstreams().remove(bitstream);
+        }
+        //Remove all bundles from the bitstream object, clearing the connection in 2 ways
+        bundles.clear();
 
 
         // Remove policies
