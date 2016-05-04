@@ -121,7 +121,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     private DSpaceValidity validity = null;
     
     /** The cache of recently submitted items */
-    private Item recentSubmissionItems[];
+    private List<Item> recentSubmissionItems;
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
@@ -234,7 +234,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         
             SyndicationFeed feed = new SyndicationFeed(SyndicationFeed.UITYPE_XMLUI);
             feed.populate(ObjectModelHelper.getRequest(objectModel), context,
-                          dso, getRecentlySubmittedItems(context,dso), FeedUtils.i18nLabels);
+                          dso, new ArrayList<DSpaceObject>(getRecentlySubmittedItems(context,dso)), FeedUtils.i18nLabels);
             feed.setType(this.format);
             Document dom = feed.outputW3CDom();
             FeedUtils.unmangleI18N(dom);
@@ -259,7 +259,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      * @return recently submitted Items within the indicated scope
      */
     @SuppressWarnings("unchecked")
-    private Item[] getRecentlySubmittedItems(Context context, DSpaceObject dso)
+    private List<Item> getRecentlySubmittedItems(Context context, DSpaceObject dso)
             throws SQLException
     {
         if (recentSubmissionItems != null)
@@ -294,7 +294,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
             BrowseEngine be = new BrowseEngine(context);
             List<Item> browseItemResults = be.browseMini(scope).getBrowseItemResults();
-            this.recentSubmissionItems = browseItemResults.toArray(new Item[browseItemResults.size()]);
+            this.recentSubmissionItems = browseItemResults;
 
             // filter out Items that are not world-readable
             if (!includeRestrictedItems)
@@ -312,7 +312,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                         }
                     }
                 }
-                this.recentSubmissionItems = result.toArray(new Item[result.size()]);
+                this.recentSubmissionItems = result;
             }
         }
         catch (BrowseException bex)
