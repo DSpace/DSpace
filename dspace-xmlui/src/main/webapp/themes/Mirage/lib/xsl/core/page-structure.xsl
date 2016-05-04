@@ -168,7 +168,7 @@
               </xsl:attribute>
             </meta>
 
-            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='ROBOTS']">
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='ROBOTS'][not(@qualifier)]">
                 <meta name="ROBOTS">
                     <xsl:attribute name="content">
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='ROBOTS']"/>
