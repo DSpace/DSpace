@@ -234,7 +234,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         
             SyndicationFeed feed = new SyndicationFeed(SyndicationFeed.UITYPE_XMLUI);
             feed.populate(ObjectModelHelper.getRequest(objectModel), context,
-                          dso, new ArrayList<DSpaceObject>(getRecentlySubmittedItems(context,dso)), FeedUtils.i18nLabels);
+                          dso, getRecentlySubmittedItems(context,dso), FeedUtils.i18nLabels);
             feed.setType(this.format);
             Document dom = feed.outputW3CDom();
             FeedUtils.unmangleI18N(dom);

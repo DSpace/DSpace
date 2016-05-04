@@ -167,7 +167,7 @@ public class SyndicationFeed
      * Fills in the feed and entry-level metadata from DSpace objects.
      */
     public void populate(HttpServletRequest request, Context context, DSpaceObject dso,
-                         List<DSpaceObject> items, Map<String, String> labels)
+                         List<?extends DSpaceObject> items, Map<String, String> labels)
     {
         String logoURL = null;
         String objectURL = null;

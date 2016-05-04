@@ -244,7 +244,7 @@ public class FeedServlet extends DSpaceServlet
         if (feed == null)
         {
                 feed = new SyndicationFeed(SyndicationFeed.UITYPE_JSPUI);
-                feed.populate(request, context, dso, new ArrayList<DSpaceObject>(getItems(context, dso)), labelMap);
+                feed.populate(request, context, dso, getItems(context, dso), labelMap);
         	if (feedCache != null)
         	{
                         cache(cacheKey, new CacheFeed(feed));
