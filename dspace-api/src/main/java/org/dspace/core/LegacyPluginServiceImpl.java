@@ -90,7 +90,7 @@ public class LegacyPluginServiceImpl implements PluginService
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
-    private LegacyPluginServiceImpl() {
+    protected LegacyPluginServiceImpl() {
     }
 
     /**
