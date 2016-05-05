@@ -64,7 +64,7 @@ public class Figure extends TextContainer implements StructuralElement
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
-     * @throws WingException
+     * @throws WingException passed through.
      */
     protected Figure(WingContext context, String source, String target,
             String rend) throws WingException

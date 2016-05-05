@@ -224,18 +224,22 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
 
     /**
      * Generate a URL for the given base URL with the given parameters. This is
-     * a convenance method to make it easier to generate URL references with
+     * a convenience method to make it easier to generate URL references with
      * parameters.
      * 
-     * Example
+     * <p>Example:
+     *
+     * <pre>{@code
      * Map<String,String> parameters = new Map<String,String>();
      * parameters.put("arg1","value1");
      * parameters.put("arg2","value2");
      * parameters.put("arg3","value3");
      * String url = genrateURL("/my/url",parameters);
-     * 
+     * }</pre>
+     *
      * would result in the string:
-     * url == "/my/url?arg1=value1&arg2=value2&arg3=value3"
+     *
+     * <pre>{@code url == "/my/url?arg1=value1&arg2=value2&arg3=value3"}</pre>
      * 
      * @param baseURL The baseURL without any parameters.
      * @param parameters The parameters to be encoded on in the URL.

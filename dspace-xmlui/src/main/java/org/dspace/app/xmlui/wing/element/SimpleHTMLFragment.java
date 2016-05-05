@@ -68,7 +68,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	 *            paragraphs delimeters.
 	 * @param fragment
 	 *            (Required) The HTML Fragment to be translated into DRI.
-	 * @throws WingException
+	 * @throws WingException passed through.
 	 */
 	protected SimpleHTMLFragment(WingContext context, boolean blankLines,
 			String fragment) throws WingException {
@@ -522,7 +522,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	 * following email, point #1:
 	 *
 	 * <a href="http://www.servlets.com/archive/servlet/ReadMsg?msgId=491592&listName=jdom-interest">
-     *   http://www.servlets.com/archive/servlet/ReadMsg?msgId=491592&listName=jdom-interest
+     *   {@literal http://www.servlets.com/archive/servlet/ReadMsg?msgId=491592&listName=jdom-interest}
      * </a>
 	 *
 	 * <p>I, Scott Phillips, checked the JDOM CVS source tree on 3-8-2006 and the

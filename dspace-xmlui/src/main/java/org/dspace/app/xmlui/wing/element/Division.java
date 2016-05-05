@@ -164,7 +164,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     public static final String[] METHODS = { METHOD_GET, METHOD_POST,
             METHOD_MULTIPART };
 
-    /** The possible pagination types: simple & masked */
+    /** The possible pagination types: simple and masked */
     public static final String PAGINATION_SIMPLE = "simple";
 
     public static final String PAGINATION_MASKED = "masked";

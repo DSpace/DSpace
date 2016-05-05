@@ -29,10 +29,10 @@ import org.xml.sax.SAXException;
  * document. Unfortunately, there is no real definition of what this is. So
  * we just kind of made it up based upon what we saw for the item profile.
  * 
- * The basic structure is simply two parts, the descriptive metadata and a 
+ * The basic structure is simply two parts:  the descriptive metadata and a
  * structural map. The descriptive metadata is a place to put metadata about 
  * the whole repository. The structural map is used to map relationships
- * between communities & collections in dspace. 
+ * between communities and collections in DSpace.
  * 
  * @author Scott Phillips
  */

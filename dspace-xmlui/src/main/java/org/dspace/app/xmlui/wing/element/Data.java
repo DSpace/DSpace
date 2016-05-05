@@ -71,7 +71,7 @@ public class Data extends AbstractWingElement
      *            where to route SAX events and what i18n catalogue to use.
      * @param message
      *            (Required) translatable data
-     * @throws WingException
+     * @throws WingException passed through.
      */
     protected Data(WingContext context, Message message)
             throws WingException
@@ -89,7 +89,7 @@ public class Data extends AbstractWingElement
      *            where to route SAX events and what i18n catalogue to use.
      * @param characters
      *            (Required) Untranslated character data.
-     * @throws WingException
+     * @throws WingException passed through.
      */
     protected Data(WingContext context, String characters) throws WingException
     {

@@ -49,7 +49,7 @@ public class Options extends AbstractWingElement implements
 
     /**
      * Add a new sublist to this item. Note that an item may contain either
-     * characters (with formating & fields) or lists but not both.
+     * characters (with formating and fields) or lists but not both.
      * 
      * @param name
      *            (Required) a local identifier used to differentiate the
@@ -74,7 +74,7 @@ public class Options extends AbstractWingElement implements
 
     /**
      * Add a new sublist to this item. Note that an item may contain either
-     * characters (with formating & fields) or lists but not both.
+     * characters (with formating and fields) or lists but not both.
      * 
      * @param name
      *            (Required) a local identifier used to differentiate the

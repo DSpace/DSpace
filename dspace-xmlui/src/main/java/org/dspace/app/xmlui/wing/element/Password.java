@@ -35,6 +35,7 @@ public class Password extends Field
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Password(WingContext context, String name, String rend)
             throws WingException

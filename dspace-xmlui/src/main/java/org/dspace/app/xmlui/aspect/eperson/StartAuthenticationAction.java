@@ -23,28 +23,32 @@ import org.dspace.app.xmlui.utils.AuthenticationUtil;
 /**
  * 
  * This action will start the necessary steps to authenticate a user. After the user 
- * successfuly authenticates, the user will resume this request with all parameters
+ * successfully authenticates, the user will resume this request with all parameters
  * and attributes intact. An optional message can be added that will be displayed
  * on the login form. This could be used to provide a reason why the user is being
  * queried for a user name and password.
- * 
- * Possible parameters are:
- * 
- * header: An i18n message that will be used as the header for the message.
- * 
- * message: An i18n message tag.
- * 
- * characters: Characters to be displayed, possibly for untranslated error messages
- * 
- * 
+ *
+ * <p>Possible parameters are:
+ *
+ * <ul>
+ *  <li>header: An i18n message that will be used as the header for the message.
+ *  <li>message: An i18n message tag.
+ *  <li>characters: Characters to be displayed, possibly for untranslated error messages
+ * </ul>
+ *
+ * <p>Example:
+ * <pre>
+ * {@code
  * <map:action name="StartAuthenticationAction" src="org.dspace.app.xmlui.eperson.StartAuthenticationAction"/>
  * 
- * 
  * <map:act type="StartAuthenticationAction"/>
- * 
+ * }
+ * </pre>
  * 
  * Typically, this is used in conjunction with the AuthenticatedSelector as:
- * 
+ *
+ * <pre>
+ * {@code
  * <map:select type="AuthenticatedSelector">
  *   <map:when test="eperson">
  *     ...
@@ -55,6 +59,8 @@ import org.dspace.app.xmlui.utils.AuthenticationUtil;
  *     </map:act>
  *   </map:otherwise>
  * </map:select>
+ * }
+ * </pre>
  * 
  * @author Scott Phillips
  */
@@ -63,7 +69,15 @@ public class StartAuthenticationAction extends AbstractAction
 {
     /**
      * Redirect the user to the login page.
+     * @param redirector redirector.
+     * @param resolver source resolver.
+     * @param objectModel object model.
+     * @param source source.
+     * @param parameters sitemap parameters.
+     * @return result of the action.
+     * @throws java.lang.Exception passed through.
      */
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver,
             Map objectModel, String source, Parameters parameters)
             throws Exception

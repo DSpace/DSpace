@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
 
 /**
  * This is an adapter which translates DSpace containers 
- * (communities & collections) into METS documents. This adapter follows
+ * (communities and collections) into METS documents. This adapter follows
  * the DSpace METS profile, however that profile does not define how a
  * community or collection should be described, but we make the obvious 
  * decisions to deviate when necessary from the profile.

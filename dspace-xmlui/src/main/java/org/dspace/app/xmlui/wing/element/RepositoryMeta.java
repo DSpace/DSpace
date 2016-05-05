@@ -44,7 +44,7 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
     private boolean merged = false;
     
     /** The registered repositories on this page */
-    private Map<String,String> repositories = new HashMap<String,String>();
+    private Map<String,String> repositories = new HashMap<>();
 
     /**
      * Construct a new RepositoryMeta
@@ -52,6 +52,7 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
      * @param context
      *            (Required) The context this element is contained in, such as
      *            where to route SAX events and what i18n catalogue to use.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected RepositoryMeta(WingContext context) throws WingException
     {
@@ -78,6 +79,7 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
      *            The element's attributes
      * @return True if this WingElement is equivalent to the given SAX Event.
      */
+    @Override
     public boolean mergeEqual(String namespace, String localName, String qName,
             Attributes attributes) throws SAXException, WingException
     {
@@ -87,11 +89,7 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
             return false;
         }
 
-        if (!E_REPOSITORY_META.equals(localName))
-        {
-            return false;
-        }
-        return true;
+        return E_REPOSITORY_META.equals(localName);
     }
 
     /**
@@ -111,6 +109,7 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
      *            The element's attributes
      * @return The child element
      */
+    @Override
     public WingMergeableElement mergeChild(String namespace, String localName,
             String qName, Attributes attributes) throws SAXException,
             WingException
@@ -140,6 +139,7 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
     /**
      * Inform this element that it is being merged with an existing element.
      */
+    @Override
     public Attributes merge(Attributes attributes) throws SAXException,
             WingException
     {
@@ -161,6 +161,7 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler,
             LexicalHandler lexicalHandler, NamespaceSupport namespaces)
             throws SAXException

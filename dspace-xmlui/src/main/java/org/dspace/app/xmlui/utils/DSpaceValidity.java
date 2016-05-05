@@ -26,10 +26,10 @@ import org.dspace.eperson.Group;
  * This is a validity object specifically implemented for the caching 
  * needs of DSpace, Manakin, and Cocoon.
  * 
- * <p>The basic idea is that each time a DSpace object rendered by a Cocoon
- * component the object and everything about it that makes it unique should 
+ * <p>The basic idea is that, each time a DSpace object is rendered by a Cocoon
+ * component, the object and everything about it that makes it unique should
  * be reflected in the validity object for the component. By following this 
- * principle if the object has been updated externally then the cache will be
+ * principle, if the object has been updated externally then the cache will be
  * invalidated.
  * 
  * <p>This DSpaceValidity object makes this processes easier by abstracting out
@@ -215,14 +215,19 @@ public class DSpaceValidity implements SourceValidity
      * validity object is created.
      * 
      * Below are the following transitive rules for adding 
-     * objects, i.e. if an item is added then all the items 
-     * bundles & bitstreams will also be added.
+     * objects, i.e. if an item is added then all the item's
+     * bundles and bitstreams will also be added.
      * 
-     * Communities -> logo bitstream
-     * Collection -> logo bitstream
-     * Item -> bundles -> bitstream
-     * Bundles -> bitstreams
-     * EPeople -> groups
+     * <p>
+     * {@literal Communities -> logo bitstream}
+     * <br>
+     * {@literal Collection -> logo bitstream}
+     * <br>
+     * {@literal Item -> bundles -> bitstream}
+     * <br>
+     * {@literal Bundles -> bitstreams}
+     * <br>
+     * {@literal EPeople -> groups}
      * 
      * @param context
      *          session context.
@@ -410,8 +415,9 @@ public class DSpaceValidity implements SourceValidity
     
     /**
      * Determine if the cache is still valid
-     * @return {@link SourceValidity.VALID}, {@link SourceValidity.UNKNOWN},
-     *          or {@link SourceValidity.INVALID}.
+     * @return {@link org.apache.excalibur.source.SourceValidity#VALID},
+     *         {@link org.apache.excalibur.source.SourceValidity#UNKNOWN},
+     *         or {@link org.apache.excalibur.source.SourceValidity#INVALID}.
      */
     @Override
     public int isValid()
@@ -446,7 +452,8 @@ public class DSpaceValidity implements SourceValidity
      * 
      * @param otherObject 
      *          The other validity object.
-     * @return {@link SourceValidity.VALID} or {@link SourceValidity.INVALID}.
+     * @return {@link org.apache.excalibur.source.SourceValidity#VALID}
+     *         or {@link org.apache.excalibur.source.SourceValidity#INVALID}.
      */
     @Override
     public int isValid(SourceValidity otherObject)

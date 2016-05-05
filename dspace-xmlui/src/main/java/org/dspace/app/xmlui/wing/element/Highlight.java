@@ -58,11 +58,11 @@ public class Highlight extends RichTextContainer implements StructuralElement
      * events should be routed to the contentHandler found in the WingContext.
      * 
      * @param contentHandler
-     *            (Required) The registered contentHandler where SAX events
-     *            should be routed too.
+     *            (Required) The registered contentHandler to which SAX events
+     *            should be routed.
      * @param lexicalHandler
-     *            (Required) The registered lexicalHandler where lexical 
-     *            events (such as CDATA, DTD, etc) should be routed too.
+     *            (Required) The registered lexicalHandler to which lexical
+     *            events (such as CDATA, DTD, etc) should be routed.
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.

@@ -57,7 +57,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 
 public abstract class AbstractAdapter
 {
-    /** Namespace declaration for METS & XLINK */
+    /** Namespace declaration for METS and XLINK */
     public static final String METS_URI = "http://www.loc.gov/METS/";
     public static final Namespace METS = new Namespace(METS_URI);
     public static final String XLINK_URI = "http://www.w3.org/TR/xlink/";

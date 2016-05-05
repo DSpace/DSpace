@@ -38,24 +38,26 @@ public class Metadata extends TextContainer implements MetadataElement
     public static final String A_LANGUAGE = "lang";
 
     /** The metadata's element */
-    private String element;
+    private final String element;
 
     /** The metadata's qualifier */
-    private String qualifier;
+    private final String qualifier;
 
     /** The metadata's language */
-    private String language;
+    private final String language;
     
     /** 
      * Determine the additive model for the metadata, should 
      * the metadata always be added to the document or only if 
      * it does not already exist?
      */
-    private boolean allowMultiple;
+    private final boolean allowMultiple;
 
     /**
 	 * Construct a new metadata.
 	 * 
+     * @param context
+     *            (Required) The request context.
 	 * @param element
 	 *            (Required) The element of this metadata
 	 * @param qualifier
@@ -65,6 +67,7 @@ public class Metadata extends TextContainer implements MetadataElement
 	 * @param allowMultiple
 	 *            (Required) Are multiple metadata elements with the same element,
 	 *            qualifier, and language allowed?
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
 	 */
     protected Metadata(WingContext context, String element, String qualifier,
             String language, boolean allowMultiple) throws WingException
@@ -80,6 +83,8 @@ public class Metadata extends TextContainer implements MetadataElement
      * If an metadata with the same element, qualifier, and language exist
      * within the document should this metadata element be added into the
      * document or should only one metadata be allowed.
+     *
+     * @return true if multiple values are allowed.
      */
     protected boolean allowMultiple()
     {
@@ -162,7 +167,9 @@ public class Metadata extends TextContainer implements MetadataElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler,
             NamespaceSupport namespaces) throws SAXException
     {
