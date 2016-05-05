@@ -156,7 +156,9 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
         StoragePath path = manuscriptPath1;
         ManuscriptDatabaseStorageImpl instance = new ManuscriptDatabaseStorageImpl();
         instance.deleteObject(path);
-        Manuscript dummyManuscript = new Manuscript(TEST_MANUSCRIPT_ID_1, "accepted");
+        Manuscript dummyManuscript = new Manuscript();
+        dummyManuscript.setManuscriptId(TEST_MANUSCRIPT_ID_1);
+        dummyManuscript.setStatus(Manuscript.STATUS_ACCEPTED);
         Boolean exists = instance.objectExists(path, dummyManuscript);
         assertFalse("Deleted object should not exist", exists);
     }

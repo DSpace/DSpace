@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
+import org.dspace.JournalUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.datadryad.rest.legacymodels.LegacyManuscript;
@@ -185,19 +186,15 @@ public class Manuscript {
 
     public Manuscript() {} // JAXB needs this
 
-    public Manuscript(String manuscriptId, String status) {
-        this.manuscriptId = manuscriptId;
-        this.status = status;
-    }
-
     public Manuscript(DryadJournalConcept journalConcept) {
         this.journalConcept = journalConcept;
+        this.setOrganization(new Organization(journalConcept));
     }
 
     public Manuscript(LegacyManuscript legacyManuscript) {
-        this.organization = new Organization();
-        this.organization.organizationName = legacyManuscript.Journal;
-        this.organization.organizationCode = legacyManuscript.Journal_Code;
+        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(legacyManuscript.Journal_Code);
+        this.setJournalConcept(journalConcept);
+        this.setOrganization(new Organization(journalConcept));
         // Required fields are: manuscriptID, status, authors (though author identifiers are optional), and title. All other fields are optional.
         this.manuscriptId = legacyManuscript.Submission_Metadata.Manuscript;
         this.title = legacyManuscript.Submission_Metadata.Article_Title;

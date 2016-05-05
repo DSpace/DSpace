@@ -3,7 +3,9 @@ package org.dspace.workflow;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
+import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Manuscript;
+import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
@@ -72,8 +74,11 @@ public class ApproveRejectReviewItem {
                 System.out.println("No journal code was given. This is needed to match the manuscript number with an item in review.");
                 System.exit(1);
             }
-            Manuscript manuscript = new Manuscript(manuscriptNumber, approved ? Manuscript.STATUS_ACCEPTED : Manuscript.STATUS_REJECTED);
-            manuscript.getOrganization().organizationCode = journalCode;
+            DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(journalCode);
+            String status = approved ? Manuscript.STATUS_ACCEPTED : Manuscript.STATUS_REJECTED;
+            Manuscript manuscript = new Manuscript(journalConcept);
+            manuscript.setManuscriptId(manuscriptNumber);
+            manuscript.setStatus(status);
             reviewManuscript(manuscript);
         } else if(line.hasOption('i')) {
             // get a WorkflowItem using a workflow ID
