@@ -141,6 +141,50 @@
 			</modules>
 		</profile>
 
+        <!--
+            Builds XOAI Gateway WAR for DSpace
+         -->
+         <profile>
+             <id>dspace-xoai-api</id>
+             <activation>
+                 <file>
+                     <exists>../dspace-xoai-api/pom.xml</exists>
+                 </file>
+             </activation>
+             <modules>
+                 <module>../dspace-xoai-api</module>
+             </modules>
+         </profile>
+
+         <!--
+            Builds XOAI Gateway WAR for DSpace
+         -->
+         <profile>
+             <id>dspace-xoai-webapp</id>
+             <activation>
+                 <file>
+                     <exists>../dspace-xoai-webapp/pom.xml</exists>
+                 </file>
+             </activation>
+             <modules>
+                 <module>../dspace-xoai-webapp</module>
+             </modules>
+         </profile>
+
+         <!--
+            Builds XOAI Gateway WAR for DSpace
+         -->
+         <profile>
+             <id>dspace-xoai</id>
+             <activation>
+                 <file>
+                     <exists>../dspace-xoai/pom.xml</exists>
+                 </file>
+             </activation>
+             <modules>
+                 <module>../dspace-xoai</module>
+             </modules>
+         </profile>
 
 		<!--
     		Builds dataone-mn Gateway WAR for DSpace
@@ -819,6 +863,10 @@
 	  <artifactId>dspace-stats</artifactId>
 	  <version>1.7.2</version>
 	</dependency>
+    <dependency>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace-xoai-api</artifactId>
+    </dependency>
 	<dependency>
 	  <groupId>org.dspace</groupId>
 	  <artifactId>dspace-api-lang</artifactId>

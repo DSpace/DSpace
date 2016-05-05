@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="static/style.xsl"?><OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2016-04-08T15:23:12Z</responseDate>
+    <request verb="ListSets">http://192.168.111.223:9999/xoai/request</request>
+    <ListSets>
+        <set>
+            <setSpec>com_10255_1</setSpec>
+            <setName>Main</setName>
+        </set>
+        <set>
+            <setSpec>col_10255_2</setSpec>
+            <setName>Dryad Data Files</setName>
+        </set>
+        <set>
+            <setSpec>col_10255_3</setSpec>
+            <setName>Dryad Data Packages</setName>
+        </set>
+        <set>
+            <setSpec>col_10255_dryad.148</setSpec>
+            <setName>BIRDD</setName>
+        </set>
+        <set>
+            <setSpec>col_10255_dryad.2027</setSpec>
+            <setName>KNB</setName>
+        </set>
+        <set>
+            <setSpec>col_10255_dryad.2171</setSpec>
+            <setName>TreeBASE</setName>
+        </set>
+        <set>
+            <setSpec>col_10255_dryad.7871</setSpec>
+            <setName>DryadLab Packages</setName>
+        </set>
+        <set>
+            <setSpec>col_10255_dryad.7872</setSpec>
+            <setName>DryadLab Activities</setName>
+        </set>
+    </ListSets>
+</OAI-PMH>

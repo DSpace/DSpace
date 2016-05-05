@@ -35,6 +35,7 @@
       <core name="authority" instanceDir="authority" />
       <core name="dataoneMNlog" instanceDir="dataoneMNlog" />
       <core name="responselogging" instanceDir="responselogging" />
+      <core name="xoai" instanceDir="xoai" />      
 </cores>
   
 </solr>

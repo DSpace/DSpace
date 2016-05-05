@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2016-04-04T18:14:18Z</responseDate>
+  <request verb="ListIdentifiers" set="hdl_10255_3" from="2010-01-01" metadataPrefix="oai_dc">http://api.datadryad.org/oai/request</request>
+  <ListIdentifiers>
+    <header>
+      <identifier>oai::doi:10.5061/dryad.12</identifier>
+      <datestamp>2011-08-02T20:00:05Z</datestamp>
+      <setSpec>com_10255_1</setSpec>
+      <setSpec>col_10255_3</setSpec>
+    </header>
+    <header>
+      <identifier>oai::doi:10.5061/dryad.18/1</identifier>
+      <datestamp>2011-08-02T21:02:49Z</datestamp>
+      <setSpec>com_10255_1</setSpec>
+      <setSpec>col_10255_2</setSpec>
+    </header>
+    <header>
+      <identifier>oai::doi:10.5061/dryad.18/2</identifier>
+      <datestamp>2015-10-21T16:12:14Z</datestamp>
+      <setSpec>com_10255_1</setSpec>
+      <setSpec>col_10255_2</setSpec>
+    </header>
+  </ListIdentifiers>
+</OAI-PMH>

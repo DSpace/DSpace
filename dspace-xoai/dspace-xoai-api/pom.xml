@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>dspace-xoai</artifactId>
+		<groupId>org.dspace</groupId>
+		<version>1.8.2</version>
+	</parent>
+	<artifactId>dspace-xoai-api</artifactId>
+	<name>Lyncode XOAI :: API and Implementation</name>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<description>XOAI API</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.lyncode</groupId>
+			<artifactId>xoai</artifactId>
+			<version>2.2.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+            <version>1.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.5.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.5.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>13.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.lyncode</groupId>
+			<artifactId>builder-commons</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.lyncode</groupId>
+			<artifactId>xoai-data-provider</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+
+		<!-- test classes -->
+		<dependency>
+			<groupId>org.dspace.modules</groupId>
+			<artifactId>api</artifactId>
+			<version>1.7.3-SNAPSHOT</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
+			<version>2.0.6</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<developers>
+		<developer>
+			<name>DSpace @ Lyncode</name>
+			<email>dspace@lyncode.com</email>
+			<organization>Lyncode</organization>
+			<organizationUrl>http://www.lyncode.com</organizationUrl>
+		</developer>
+	</developers>
+</project>

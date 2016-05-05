@@ -152,7 +152,7 @@ public class PaypalImpl implements PaypalService{
 //            get.addParameter("RETURNURL", ConfigurationManager.getProperty("payment-system","paypal.returnurl"));
         }
         catch (Exception e) {
-            log.error("get paypal secure token error:",e);
+            log.error("get paypal secure token error:", e);
             return null;
         }
 
@@ -160,9 +160,9 @@ public class PaypalImpl implements PaypalService{
     }
     //charge the credit card stored as a reference transaction
     public boolean submitReferenceTransaction(Context c,WorkflowItem wfi,HttpServletRequest request){
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
 
         try{
-            PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(c,wfi.getItem().getID());
             if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)){
                 //this shopping cart has already been charged
@@ -177,7 +177,7 @@ public class PaypalImpl implements PaypalService{
                  if(voucher.getCode().equals(failedVoucher)||voucher.getStatus().equals(Voucher.STATUS_USED))
                  {
                      log.debug("problem: 'payment failed' voucher has been used, rejecting payment");
-                     sendPaymentErrorEmail(c, wfi, shoppingCart, "problem: voucher has been used, rejecting payment");
+                     paymentSystemService.sendPaymentErrorEmail(c, wfi, shoppingCart, "problem: voucher has been used, rejecting payment");
                      return false;
                  }
             }
@@ -185,7 +185,7 @@ public class PaypalImpl implements PaypalService{
             if(shoppingCart.getTotal()==0)
             {
                 log.debug("shopping cart total is 0, not charging card");
-                sendPaymentWaivedEmail(c, wfi, shoppingCart);
+                paymentSystemService.sendPaymentWaivedEmail(c, wfi, shoppingCart);
                 //if the total is 0 , don't charge
                 return true;
             }
@@ -195,9 +195,8 @@ public class PaypalImpl implements PaypalService{
                 return chargeCard(c, wfi, request,shoppingCart);
             }
 
-        }catch (Exception e)
-        {
-            sendPaymentErrorEmail(c, wfi, null, "exception when submitting reference transaction " + e.getMessage());
+        } catch (Exception e) {
+            paymentSystemService.sendPaymentErrorEmail(c, wfi, null, "exception when submitting reference transaction " + e.getMessage());
             log.error("exception when submiting reference transaction ", e);
         }
         return false;
@@ -205,12 +204,13 @@ public class PaypalImpl implements PaypalService{
 
     @Override
     public boolean chargeCard(Context c, WorkflowItem wfi, HttpServletRequest request, ShoppingCart shoppingCart) {
-        //this method should get the reference code and submit it to paypal to do the actural charge process
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+//this method should get the reference code and submit it to paypal to do the actural charge process
 
         if(shoppingCart.getTransactionId()==null){
             String transactionIdAbsentError = "transaction id absent, cannot charge card";
             log.debug(transactionIdAbsentError);
-            sendPaymentErrorEmail(c, wfi, shoppingCart, transactionIdAbsentError);
+            paymentSystemService.sendPaymentErrorEmail(c, wfi, shoppingCart, transactionIdAbsentError);
             return false;
         }
         if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
@@ -220,7 +220,7 @@ public class PaypalImpl implements PaypalService{
             return true;
         }
 
-        String requestUrl = ConfigurationManager.getProperty("payment-system","paypal.payflow.link");
+        String requestUrl = ConfigurationManager.getProperty("payment-system", "paypal.payflow.link");
         try {
             PostMethod post = new PostMethod(requestUrl);
 
@@ -303,7 +303,7 @@ public class PaypalImpl implements PaypalService{
                             }
 
                             shoppingCart.update();
-                            sendPaymentApprovedEmail(c, wfi, shoppingCart);
+                            paymentSystemService.sendPaymentApprovedEmail(c, wfi, shoppingCart);
                             return true;
                         }
 
@@ -313,7 +313,7 @@ public class PaypalImpl implements PaypalService{
                     String result = "Paypal Reference Transaction Failure: "
                             + post.getStatusCode() +  ": " + post.getResponseBodyAsString();
                     log.error(result);
-                    sendPaymentRejectedEmail(c, wfi, shoppingCart);
+                    paymentSystemService.sendPaymentRejectedEmail(c, wfi, shoppingCart);
                     return false;
             }
 
@@ -321,10 +321,10 @@ public class PaypalImpl implements PaypalService{
         }
         catch (Exception e) {
             log.error("error when submit paypal reference transaction: "+e.getMessage(), e);
-            sendPaymentErrorEmail(c, wfi, null, "exception when submit reference transaction: " + e.getMessage());
+            paymentSystemService.sendPaymentErrorEmail(c, wfi, null, "exception when submit reference transaction: " + e.getMessage());
             return false;
         }
-        sendPaymentErrorEmail(c, wfi, shoppingCart, "chargeCard failed");
+        paymentSystemService.sendPaymentErrorEmail(c, wfi, shoppingCart, "chargeCard failed");
         return false;
     }
 
@@ -370,7 +370,7 @@ public class PaypalImpl implements PaypalService{
 
     public void generateVoucherForm(Division form,String voucherCode,String actionURL,String knotId) throws WingException{
 
-        List list=form.addList("voucher-list");
+        List list = form.addList("voucher-list");
         list.addLabel("Voucher Code");
         list.addItem().addText("voucher").setValue(voucherCode);
         list.addItem().addButton("submit-voucher").setValue("Apply");
@@ -514,129 +514,4 @@ public class PaypalImpl implements PaypalService{
 
     }
 
-    private void sendPaymentApprovedEmail(Context c, WorkflowItem wfi, ShoppingCart shoppingCart) {
-
-        try {
-
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_approved"));
-            email.addRecipient(wfi.getSubmitter().getEmail());
-            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.alert.recipient"));
-
-            email.addArgument(
-                    wfi.getItem().getName()
-            );
-
-            email.addArgument(
-                    wfi.getSubmitter().getFullName() + " ("  +
-                            wfi.getSubmitter().getEmail() + ")");
-
-            if(shoppingCart != null)
-            {
-                /** add details of shopping cart */
-                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
-            }
-
-            email.send();
-
-        } catch (Exception e) {
-            log.error(LogManager.getHeader(c, "Error sending payment approved submission email", "WorkflowItemId: " + wfi.getID()), e);
-        }
-
-    }
-
-    private void sendPaymentWaivedEmail(Context c, WorkflowItem wfi, ShoppingCart shoppingCart) {
-
-        try {
-
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_waived"));
-            email.addRecipient(wfi.getSubmitter().getEmail());
-            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.alert.recipient"));
-
-            email.addArgument(
-                    wfi.getItem().getName()
-            );
-
-            email.addArgument(
-                    wfi.getSubmitter().getFullName() + " ("  +
-                            wfi.getSubmitter().getEmail() + ")");
-            if(shoppingCart != null)
-            {
-                /** add details of shopping cart */
-                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
-            }
-
-            email.send();
-
-        } catch (Exception e) {
-            log.error(LogManager.getHeader(c, "Error sending payment approved submission email", "WorkflowItemId: " + wfi.getID()), e);
-        }
-
-    }
-
-    private void sendPaymentErrorEmail(Context c, WorkflowItem wfi, ShoppingCart shoppingCart, String error) {
-
-        try {
-
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_error"));
-            // only send result of shopping cart errors to administrators
-            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.alert.recipient"));
-
-            email.addArgument(
-                    wfi.getItem().getName()
-            );
-
-            email.addArgument(
-                    wfi.getSubmitter().getFullName() + " ("  +
-                            wfi.getSubmitter().getEmail() + ")");
-
-            email.addArgument(error);
-
-            if(shoppingCart != null)
-            {
-                /** add details of shopping cart */
-                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
-            }
-
-            email.send();
-
-        } catch (Exception e) {
-            log.error(LogManager.getHeader(c, "Error sending payment rejected submission email", "WorkflowItemId: " + wfi.getID()), e);
-        }
-
-    }
-
-    private void sendPaymentRejectedEmail(Context c, WorkflowItem wfi, ShoppingCart shoppingCart) {
-
-        try {
-
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_rejected"));
-            // temporarily only send result of shopping cart errors to administrators
-            email.addRecipient(wfi.getSubmitter().getEmail());
-            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.alert.recipient"));
-
-            email.addArgument(
-                    wfi.getItem().getName()
-            );
-
-            email.addArgument(
-                    wfi.getSubmitter().getFullName() + " ("  +
-                            wfi.getSubmitter().getEmail() + ")");
-
-            if(shoppingCart != null)
-            {
-                /** add details of shopping cart */
-                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-                email.addArgument(paymentSystemService.printShoppingCart(c, shoppingCart));
-            }
-
-            email.send();
-
-        } catch (Exception e) {
-            log.error(LogManager.getHeader(c, "Error sending payment rejected submission email", "WorkflowItemId: " + wfi.getID()), e);
-        }
-
-    }
 }

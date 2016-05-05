@@ -12,7 +12,7 @@
         <script type="text/javascript" src="/themes/Mirage/lib/jquery-1.3.1.min.js"> </script> 
         <script type="text/javascript" src="/themes/Mirage/lib/utils.js"> </script> 
         <script type="text/javascript" src="/themes/Mirage/lib/jquery.tooltip.js"> </script>
-        <script type="text/javascript">var referrer=document.referrer;var ezidpattern=/^.*http:\/\/ezid.cdlib.org\/id\//; var doi=referrer.replace(ezidpattern,"")</script>
+        <script type="text/javascript">var referrer=document.referrer;var ezidpattern=/10\.5061\/(dryad|DRYAD)\.[a-zA-Z0-9]+/; var doimatches=referrer.match(ezidpattern); var doi=doimatches[0];</script>
         <script type="text/javascript">var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</script>
         <script type="text/javascript">try {var pageTracker = _gat._getTracker("UA-16949847-1");pageTracker._trackPageview();} catch(err) {}</script> 
         
@@ -80,6 +80,6 @@
             <div>Last revised: 2016-04-06</div>
           </div>
         <script type="text/javascript">document.getElementById("aspect_artifactbrowser_FeedbackForm_field_page").setAttribute("value", document.referrer);</script>
-        <script type="text/javascript">if(referrer.search(ezidpattern)!=-1){document.getElementById("dryad-doi").innerHTML = doi;}</script>
+        <script type="text/javascript">if(doimatches.length!=0){document.getElementById("dryad-doi").innerHTML = doi;}</script>
     </body>
 </html>

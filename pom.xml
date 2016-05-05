@@ -87,6 +87,15 @@
          </modules>
       </profile>
 
+      <profile>
+         <id>dspace-xoai</id>
+         <activation>
+             <activeByDefault>true</activeByDefault>
+         </activation>
+         <modules>
+             <module>dspace-xoai</module>
+         </modules>
+      </profile>
 
       <!--
          Use 'mvn deploy -Paddons' while doing Continuous Integration
@@ -105,6 +114,7 @@
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
             <module>dspace-oai</module>
+			<module>dspace-xoai</module>
             <module>dspace-sword</module>
          </modules>
       </profile>
@@ -239,6 +249,19 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-webapp</artifactId>
             <version>1.7.3-SNAPSHOT</version>
+            <type>war</type>
+         </dependency>
+		<dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xoai-api</artifactId>
+            <version>1.8.2</version>
+            <!-- <version>${project.version}</version> -->
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xoai-webapp</artifactId>
+            <version>1.8.2</version>
+            <!-- <version>${project.version}</version> -->
             <type>war</type>
          </dependency>
          <dependency>

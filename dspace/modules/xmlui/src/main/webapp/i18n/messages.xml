@@ -3042,7 +3042,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
             </ul>
         </div>
     </message>
-    <message key="xmlui.Submission.submit.Checkout.help"><div><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Your payment information has been verified.<br/><br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button below.</span></div>
+    <message key="xmlui.Submission.submit.Checkout.help"><div><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Please enter your payment information below.<br/><br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button when you are finished.</span></div>
     </message>
 	<message key="xmlui.Submission.Submissions.default.reviewStep.reviewAction">Review stage</message>
 	<message key="xmlui.Submission.workflow.DryadReviewActionXMLUI.info1">Actions</message>

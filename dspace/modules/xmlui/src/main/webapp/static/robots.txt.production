@@ -14,6 +14,7 @@ Disallow: /advanced-search
 Disallow: /search
 Disallow: /browse-date
 Disallow: /community-list
+Disallow: /review
 
 # Collection-specific search/browse for Main
 Disallow: /handle/10255/1/search
