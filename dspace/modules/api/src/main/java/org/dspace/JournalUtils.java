@@ -5,16 +5,12 @@ import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
-import org.datadryad.rest.storage.rdbms.OrganizationDatabaseStorageImpl;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.core.ConfigurationManager;
@@ -198,21 +194,19 @@ public class JournalUtils {
     }
 
     public static String getCanonicalManuscriptID(Manuscript manuscript) {
-        return getCanonicalManuscriptID(manuscript.getManuscriptId(), manuscript.getOrganization().organizationCode);
+        return getCanonicalManuscriptID(manuscript.getManuscriptId(), manuscript.getJournalConcept());
     }
 
-    public static String getCanonicalManuscriptID(String manuscriptId, String journalID) {
+    public static String getCanonicalManuscriptID(String manuscriptId, DryadJournalConcept journalConcept) {
         String canonicalID = manuscriptId;
-        String regex = null;
         try {
-            DryadJournalConcept journalConcept = getJournalConceptByJournalID(journalID);
-            regex = journalConcept.getCanonicalManuscriptNumberPattern();
+            String regex = journalConcept.getCanonicalManuscriptNumberPattern();
             if (regex != null && !regex.equals("")) {
                 Matcher manuscriptMatcher = Pattern.compile(regex).matcher(canonicalID);
                 if (manuscriptMatcher.find()) {
                     canonicalID = manuscriptMatcher.group(1);
                 } else {
-                    log.error("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalID);
+                    log.error("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalConcept);
                 }
             } else {
                 // there is no regex specified, just use the manuscript.
@@ -310,11 +304,10 @@ public class JournalUtils {
     }
 
     public static Manuscript writeManuscriptToDB(Manuscript manuscript) throws StorageException {
-        String journalCode = cleanJournalCode(manuscript.getOrganization().organizationCode).toUpperCase();
-        StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscript.getManuscriptId());
+        StoragePath storagePath = StoragePath.createManuscriptPath(manuscript.getJournalConcept().getISSN(), manuscript.getManuscriptId());
 
         ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
-        List<Manuscript> manuscripts = getManuscriptsMatchingID(journalCode, manuscript.getManuscriptId());
+        List<Manuscript> manuscripts = getManuscriptsMatchingID(manuscript.getJournalConcept(), manuscript.getManuscriptId());
         // if there isn't a manuscript already in the db, create it. Otherwise, update.
         if (manuscripts.size() == 0) {
             try {
@@ -333,42 +326,28 @@ public class JournalUtils {
     }
 
     // NOTE: identifier can be either journalCode or ISSN
-    public static List<Manuscript> getManuscriptsMatchingID(String identifier, String manuscriptId) {
-        identifier = cleanJournalCode(identifier);
+    public static List<Manuscript> getManuscriptsMatchingID(DryadJournalConcept journalConcept, String manuscriptId) {
         ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        StoragePath storagePath = StoragePath.createManuscriptPath(identifier, manuscriptId);
-
+        StoragePath storagePath = StoragePath.createManuscriptPath(journalConcept.getISSN(), getCanonicalManuscriptID(manuscriptId, journalConcept));
         try {
-            OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
-            List<DryadJournalConcept> journalConceptList = organizationStorage.getResults(storagePath, identifier, 0);
-            if (journalConceptList.size() > 0) {
-                ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
-                manuscripts.addAll(manuscriptStorage.getManuscriptsMatchingPath(storagePath, 10));
-            }
+            ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
+            manuscripts.addAll(manuscriptStorage.getManuscriptsMatchingPath(storagePath, 10));
         } catch (StorageException e) {
             log.error("Exception getting manuscripts", e);
         }
         return manuscripts;
     }
 
-    public static List<Manuscript> getManuscriptsFromJournalWithStatus(DryadJournalConcept dryadJournalConcept, String status) {
-        ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        StoragePath storagePath = StoragePath.createOrganizationPath(dryadJournalConcept.getISSN());
-
-        return manuscripts;
-    }
-
     public static Manuscript getManuscriptFromManuscriptStorage (String manuscriptNumber, DryadJournalConcept journalConcept) {
         Manuscript result = null;
-        String journalID = journalConcept.getJournalID();
         if (journalConcept == null) {
-            throw new RuntimeException ("no journalID " + journalID);
+            throw new RuntimeException ("no journal " + journalConcept.getFullName());
         }
         try {
             // canonicalize the manuscriptNumber:
-            manuscriptNumber = JournalUtils.getCanonicalManuscriptID(manuscriptNumber, journalID);
+            manuscriptNumber = JournalUtils.getCanonicalManuscriptID(manuscriptNumber, journalConcept);
             // first, look for a matching manuscript in the database:
-            List<Manuscript> manuscripts = JournalUtils.getManuscriptsMatchingID(journalID, manuscriptNumber);
+            List<Manuscript> manuscripts = JournalUtils.getManuscriptsMatchingID(journalConcept, manuscriptNumber);
             if (manuscripts.size() > 0) {
                 log.info("found manuscript " + manuscriptNumber + " in database");
                 result = manuscripts.get(0);
@@ -384,14 +363,13 @@ public class JournalUtils {
             }
         } catch (Exception e) {
             //invalid journalID
-            log.error("Error getting parameters for invalid JournalID: " + journalID, e);
+            log.error("Error getting parameters for invalid journal " + journalConcept.getFullName(), e);
         }
         if (result == null) {
-            result = new Manuscript();
+            result = new Manuscript(journalConcept);
             result.setManuscriptId(manuscriptNumber);
             result.setMessage("Invalid manuscript number");
         }
-        result.setJournalConcept(journalConcept);
         return result;
     }
 

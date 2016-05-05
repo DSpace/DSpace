@@ -286,7 +286,7 @@ public class WorkflowItem implements InProgressSubmission {
                 // check to see if this matches by msid:
                 DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
                 for (int j=0; j<msids.length; j++) {
-                    String canonicalMsID = JournalUtils.getCanonicalManuscriptID(msids[j].value,manuscript.getOrganization().organizationCode);
+                    String canonicalMsID = JournalUtils.getCanonicalManuscriptID(msids[j].value,manuscript.getJournalConcept());
                     if (manuscript.getManuscriptId().equals(msids[j].value)) {
                         log.debug("matched " + item.getID() + " by msid");
                         matched = true;
