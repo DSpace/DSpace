@@ -5,7 +5,8 @@ SELECT mdfr.metadata_field_id
     ON mdsr.metadata_schema_id=mdfr.metadata_schema_id
  WHERE mdsr.short_id=$1                     -- 'dc'
    AND mdfr.element=$2                      -- 'relation'
-   AND ($3 IS NULL OR mdfr.qualifier=$3)    -- 'ispartof'
+   AND (($3 IS NULL AND mdfr.qualifier IS NULL)
+        OR (mdfr.qualifier=$3))             -- 'ispartof'
 $$
 LANGUAGE sql;
 
@@ -23,24 +24,24 @@ BEGIN
     SELECT (COALESCE(MAX(item_id), 0) + 3) INTO id3 FROM item;
     SELECT (COALESCE(MAX(id),      0) + 1) INTO id4 FROM concept;
 
-    SELECT getMetadataFieldRegistryId('prism'   , 'publicationName' , null          ) INTO PPN;
+    SELECT getMetadataFieldRegistryId('prism'   , 'publicationName' , NULL          ) INTO PPN;
     SELECT getMetadataFieldRegistryId('dc'      , 'date'            , 'accessioned' ) INTO DDA;
-    SELECT getMetadataFieldRegistryId('dc'      , 'identifier'      , null          ) INTO DCI;
+    SELECT getMetadataFieldRegistryId('dc'      , 'identifier'      , NULL          ) INTO DCI;
     SELECT getMetadataFieldRegistryId('dc'      , 'relation'        , 'ispartof'    ) INTO DRP;
-    SELECT getMetadataFieldRegistryId('journal' , 'issn'            , null          ) INTO JIN;
+    SELECT getMetadataFieldRegistryId('journal' , 'issn'            , NULL          ) INTO JIN;
 
     SELECT collection_id INTO COLF FROM collection WHERE name='Dryad Data Files';
     SELECT collection_id INTO COLP FROM collection WHERE name='Dryad Data Packages';
 
     -- data packages
     INSERT INTO item (item_id, submitter_id, in_archive, withdrawn, last_modified, owning_collection)
-        VALUES(id1,null,true,false,'2015-02-24 19:32:24.958+00',COLP);
+        VALUES(id1,NULL,true,false,'2015-02-24 19:32:24.958+00',COLP);
     INSERT INTO item (item_id, submitter_id, in_archive, withdrawn, last_modified, owning_collection)
-        VALUES(id2,null,true,false,'2015-02-25 19:32:24.958+00',COLP);
+        VALUES(id2,NULL,true,false,'2015-02-25 19:32:24.958+00',COLP);
 
     -- data files
     INSERT INTO item (item_id, submitter_id, in_archive, withdrawn, last_modified, owning_collection)
-        VALUES(id3,null,true,false,'2015-02-26 19:32:28.561+00',COLF);
+        VALUES(id3,NULL,true,false,'2015-02-26 19:32:28.561+00',COLF);
 
     -- concept metadata values
     INSERT INTO concept(id, identifier, created, modified, status, topconcept)
@@ -50,29 +51,29 @@ BEGIN
     INSERT INTO term(identifier,literalform)
         VALUES ('4718f3c5c9fd4774a98a0f12c6430a38', 'Evolution');
     INSERT INTO concept2term(concept_id,term_id,role_id)
-        VALUES ((SELECT id FROM term WHERE identifier='4718f3c5c9fd4774a98a0f12c6430a38')
-              , (SELECT id FROM concept WHERE IDENTIFIER='4718f3c5c9fd4774a98a0f12c6430a38')
-              , (SELECT id FROM concept2termrole WHERE role='prefLabel'));
+        VALUES ((SELECT id FROM term             WHERE IDENTIFIER='4718f3c5c9fd4774a98a0f12c6430a38')
+              , (SELECT id FROM concept          WHERE IDENTIFIER='4718f3c5c9fd4774a98a0f12c6430a38')
+              , (SELECT id FROM concept2termrole WHERE ROLE      ='prefLabel'                       ));
 
     -- metadata values
     INSERT INTO metadatavalue (item_id, metadata_field_id, text_value, text_lang, place, authority, confidence)
-        VALUES(id1, PPN, 'Evolution'              , null, pl, null, conf);
+        VALUES(id1, PPN, 'Evolution'              , NULL, pl, NULL, conf);
     INSERT INTO metadatavalue (item_id, metadata_field_id, text_value, text_lang, place, authority, confidence)
-        VALUES(id1, DDA, '2015-02-24T19:32:20Z'   , null, pl, null, conf);
+        VALUES(id1, DDA, '2015-02-24T19:32:20Z'   , NULL, pl, NULL, conf);
     INSERT INTO metadatavalue (item_id, metadata_field_id, text_value, text_lang, place, authority, confidence)
-        VALUES(id1, DCI, 'doi:10.5061/dryad.aaaa', null, pl, null, conf);
+        VALUES(id1, DCI, 'doi:10.5061/dryad.aaaa', NULL, pl, NULL, conf);
 
     INSERT INTO metadatavalue (item_id, metadata_field_id, text_value, text_lang, place, authority, confidence)
-        VALUES(id2, PPN, 'Evolution'              , null, pl, null, conf);
+        VALUES(id2, PPN, 'Evolution'              , NULL, pl, NULL, conf);
     INSERT INTO metadatavalue (item_id, metadata_field_id, text_value, text_lang, place, authority, confidence)
-        VALUES(id2, DDA, '2015-02-25T19:32:20Z'   , null, pl, null, conf);
+        VALUES(id2, DDA, '2015-02-25T19:32:20Z'   , NULL, pl, NULL, conf);
     INSERT INTO metadatavalue (item_id, metadata_field_id, text_value, text_lang, place, authority, confidence)
-        VALUES(id2, DCI, 'doi:10.5061/dryad.bbbb', null, pl, null, conf);
+        VALUES(id2, DCI, 'doi:10.5061/dryad.bbbb', NULL, pl, NULL, conf);
 
     INSERT INTO metadatavalue (item_id, metadata_field_id, text_value, text_lang, place, authority, confidence)
-        VALUES(id3, DCI, 'doi:10.5061/dryad.aaaa/1', null, pl, null, conf);
+        VALUES(id3, DCI, 'doi:10.5061/dryad.aaaa/1', NULL, pl, NULL, conf);
     INSERT INTO metadatavalue (item_id, metadata_field_id, text_value, text_lang, place, authority, confidence)
-        VALUES(id3, DRP, 'doi:10.5061/dryad.aaaa', null, pl, null, conf);
+        VALUES(id3, DRP, 'doi:10.5061/dryad.aaaa', NULL, pl, NULL, conf);
 
 END;
 $$ LANGUAGE 'plpgsql';

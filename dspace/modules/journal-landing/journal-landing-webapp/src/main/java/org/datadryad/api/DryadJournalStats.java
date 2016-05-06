@@ -8,7 +8,6 @@
 package org.datadryad.api;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.dspace.app.xmlui.aspect.journal.landing.Const;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -33,7 +32,6 @@ import java.util.List;
 public class DryadJournalStats {
 
     private static Logger log = Logger.getLogger(DryadJournalStats.class);
-
 
     /**
      * Executes query to Postgres to get archived data file item ids for a given

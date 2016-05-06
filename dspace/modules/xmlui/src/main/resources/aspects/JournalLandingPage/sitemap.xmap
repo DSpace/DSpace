@@ -51,8 +51,10 @@
                         <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                     </map:transform>
                     <map:transform src="solr-cinclude.xsl" type="xslt"/>
+                    <map:transform type="cinclude">
+                        <map:parameter name="parallel" value="true"/>
+                    </map:transform>
                 </map:act>
-                <map:transform src="solr-postprocess.xsl" type="xslt"/>
             </map:match>
 
             <map:match type="wildcard" pattern="journal/debug/references/*">
@@ -64,9 +66,11 @@
                         <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                     </map:transform>
                     <map:transform src="solr-cinclude.xsl" type="xslt"/>
+                    <map:transform type="cinclude">
+                        <map:parameter name="parallel" value="true"/>
+                    </map:transform>
+                    <map:transform src="solr-postprocess.xsl" type="xslt"/>
                 </map:act>
-                <map:transform src="solr-postprocess.xsl" type="xslt"/>
-                <map:transform type="ReferenceHandler"/>
             </map:match>
 
             <!--

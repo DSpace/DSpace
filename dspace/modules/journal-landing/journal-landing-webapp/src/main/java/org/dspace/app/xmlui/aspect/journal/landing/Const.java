@@ -20,7 +20,6 @@ public class Const {
     public static final String PARAM_JOURNAL_ISSN = "journalISSN";
     public static final String PARAM_JOURNAL_NAME = "journalName";
     public static final String PARAM_JOURNAL_ABBR = "journalAbbr";
-    public static final String PARAM_CONCEPT_ID   = "conceptID";
 
     // banner
     public static final String BANNER_DIV_OUTER = "journal-landing-banner-outer";

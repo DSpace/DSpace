@@ -69,7 +69,7 @@ public class JournalStats extends AbstractDSpaceTransformer
 
     private static final Message T_panel_head = message("xmlui.JournalLandingPage.JournalSearch.panel_head");
 
-    private final static SimpleDateFormat fmt = new SimpleDateFormat(fmtDateView);
+    private final static SimpleDateFormat fmt = new SimpleDateFormat(Const.fmtDateView);
 
     private static final String solrStatsUrl = ConfigurationManager.getProperty("landing-page.stats.base");
     protected static final int displayCount = ConfigurationManager.getIntProperty("landing-page.stats.item-count");
