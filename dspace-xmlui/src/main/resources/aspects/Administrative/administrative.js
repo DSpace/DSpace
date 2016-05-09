@@ -2377,6 +2377,12 @@ function doEditPolicy(objectType,objectID,policyID)
         	if (cocoon.request.get("action_id"))
         		actionID = cocoon.request.get("action_id");
         	page = 0;
+
+        	name = cocoon.request.get("name");
+        	description = cocoon.request.get("description");
+        	startDate = cocoon.request.get("start_date");
+        	endDate = cocoon.request.get("end_date");
+			
         }
         else if (cocoon.request.get("submit_save"))
         {
