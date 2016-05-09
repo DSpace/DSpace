@@ -2399,6 +2399,7 @@ function doEditPolicy(objectType,objectID,policyID)
         	if (cocoon.request.get("action_id"))
         		actionID = Integer.parseInt(cocoon.request.get("action_id"));
         	page = 0;
+			
         }
         else if (cocoon.request.get("submit_save"))
         {
