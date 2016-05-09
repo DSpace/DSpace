@@ -238,11 +238,9 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
-						<div><span class="publication-date">2015-12-16</span>
-						                            <a href="http://blog.datadryad.org/2015/12/15/new-pricing-structure-with-simplified-terms-and-increased-size-limits/">
-						                                <img alt="" src="/themes/Mirage/images/watering-can.png" />
-						                                <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">New Dryad pricing structure for 2016 with simplified terms and increased size limits</p>
-						                                <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn more &#187;</p>
+						<div><span class="publication-date">2016-05-09</span>
+						                            <a href="/pages/membershipMeeting2016">
+						                                <img alt="2016 Dryad Virtual Community Meeting" src="/themes/Mirage/images/membershipMeeting2016_carousel.png" />
 						                            </a>
 						                        </div>
                         <div><span class="publication-date">2015-04-14</span>
