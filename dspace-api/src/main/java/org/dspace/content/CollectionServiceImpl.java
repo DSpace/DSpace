@@ -551,17 +551,18 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void removeItem(Context context, Collection collection, Item item) throws SQLException, AuthorizeException, IOException {
-                // Check authorisation
+        // Check authorisation
         authorizeService.authorizeAction(context, collection, Constants.REMOVE);
 
-        //Remove the item from the collection
-        item.removeCollection(collection);
-
         //Check if we orphaned our poor item
-        if (item.getCollections().isEmpty())
+        if (item.getCollections().size() == 1)
         {
             // Orphan; delete it
             itemService.delete(context, item);
+        } else {
+            //Remove the item from the collection if we have multiple collections
+            item.removeCollection(collection);
+
         }
 
         context.addEvent(new Event(Event.REMOVE, Constants.COLLECTION,
