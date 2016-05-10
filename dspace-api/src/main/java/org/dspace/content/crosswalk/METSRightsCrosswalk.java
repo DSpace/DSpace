@@ -500,7 +500,7 @@ public class METSRightsCrosswalk
                     if(ANONYMOUS_CONTEXTCLASS.equals(contextClass))
                     {
                         //get DSpace Anonymous group, ID=0
-                        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);;
+                        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
                         if(anonGroup==null)
                         {
                             throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Anonymous Group is missing from the database.");
@@ -511,7 +511,7 @@ public class METSRightsCrosswalk
                     else if(ADMIN_CONTEXTCLASS.equals(contextClass))
                     {
                         //get DSpace Administrator group, ID=1
-                        Group adminGroup = groupService.findByName(context, Group.ADMIN);;
+                        Group adminGroup = groupService.findByName(context, Group.ADMIN);
                         if(adminGroup==null)
                         {
                             throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Administrator Group is missing from the database.");
