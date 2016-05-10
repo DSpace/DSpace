@@ -28,5 +28,9 @@
         <schema>dryad</schema>
         <element>curatorNotePublic</element>
     </dc-type>
+    <dc-type>
+        <schema>dryad</schema>
+        <element>citationInProgress</element>
+    </dc-type>
 
 </dspace-dc-types>
