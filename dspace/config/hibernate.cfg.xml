@@ -65,6 +65,8 @@
         <mapping class="org.dspace.workflowbasic.BasicWorkflowItem"/>
         <mapping class="org.dspace.workflowbasic.TaskListItem"/>
 
+        <mapping class="org.dspace.app.requestitem.RequestItem"/>
+
         <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.ClaimedTask"/>-->
         <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.CollectionRole"/>-->
         <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.InProgressUser"/>-->
