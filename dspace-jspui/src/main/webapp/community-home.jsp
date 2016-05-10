@@ -204,9 +204,6 @@
 <%
 	}
 %>
-	<div class="col-md-4">
-    	<%= sidebar %>
-	</div>
 </div>	
 
 <%-- Browse --%>
@@ -229,15 +226,6 @@
 %>
 			
 	</div>
-</div>
-
-<div class="row">
-
-    <%
-    	int discovery_panel_cols = 12;
-    	int discovery_facet_cols = 4;
-    %>
-	<%@ include file="discovery/static-sidebar-facet.jsp" %>
 </div>
 
 <div class="row">
@@ -359,9 +347,9 @@
     }
 %>
 </div>
+    <dspace:sidebar>
     <% if(editor_button || add_button)  // edit button(s)
     { %>
-    <dspace:sidebar>
 		 <div class="panel panel-warning">
              <div class="panel-heading">
              	<fmt:message key="jsp.admintools"/>
@@ -410,6 +398,12 @@
 			<% } %>
 			</div>
 		</div>
+		<% } %>
+		<%= sidebar %>
+		<%
+			int discovery_panel_cols = 12;
+			int discovery_facet_cols = 12;
+		%>
+		<%@ include file="discovery/static-sidebar-facet.jsp" %>
   </dspace:sidebar>
-    <% } %>
 </dspace:layout>
