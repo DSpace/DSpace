@@ -78,7 +78,7 @@
 
     <dc-type>
         <schema>journal</schema>
-        <element>customerId</element>
+        <element>customerID</element>
     </dc-type>
 
     <dc-type>
