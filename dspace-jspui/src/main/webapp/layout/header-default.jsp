@@ -40,6 +40,21 @@
     String dsVersion = Util.getSourceVersion();
     String generator = dsVersion == null ? "DSpace" : "DSpace "+dsVersion;
     String analyticsKey = ConfigurationManager.getProperty("jspui.google.analytics.key");
+
+    // use handles of parents as classes on main div
+    // Grab parents from the attributes - these should have been picked up
+    // by the HandleServlet
+    String main_classes = "";
+    {
+
+        if (null != request.getAttribute("dspaceObject.parents.handles")) {
+            List<String> handles = (List<String>) request.getAttribute("dspaceObject.parents.handles");
+
+            for (String hdl : handles) {
+                main_classes = main_classes + " hdl-" + hdl.replace('/', '-');
+            }
+        }
+    }
 %>
 
 <!DOCTYPE html>
@@ -144,8 +159,9 @@
 %>
 </header>
 
-<main id="content" role="main">
-<div class="container banner">
+<main id="content" role="main" class="<%= main_classes%>">
+
+    <div class="container banner">
 	<div class="row">
 		<div class="col-md-9 brand">
 		<h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
