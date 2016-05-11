@@ -106,3 +106,39 @@ span.batchimport-error-tab {
 span.batchimport-error-caused {
 	font-weight:bold;
 }
+
+
+/*
+ The main HTML element on pages that relate to the display of an item, collection, or community
+ is annotated with classes that correspond to the handles of the enclosing collection and community/communities.
+ Handles are 'turned' into classes by prefixing them with 'hdl-' and by replacing '/' with '-'; for example
+ the handle 123456789/abcd becomes the CSS class  hdl-123456789-abcd
+*/
+
+/* hide all browse buttons on a small collection/community by using the class for its handle */
+/* hdl-123456789-3876 corresponds to the handle  123456789/3876 */
+/*
+.hdl-123456789-3874 .browse-buttons {
+	display: none;
+}
+*/
+
+/* hide the subject browse button on the page for the community with handle 123456789/3883,
+   as well as the pages of its collections */
+/*
+.hdl-123456789-3883 .browse-buttons .subject {
+	display: none;
+}
+*/
+
+/* by default: hide the graduation browse button everywhere */
+/* but show the graduation browse button in the senior thesis community with handle 123456789/3875 */
+/*
+.browse-buttons .graduation {
+	display: none;
+}
+
+.hdl-123456789-3875 .browse-buttons .graduation {
+	display: block;
+}
+*/
