@@ -85,6 +85,16 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
             return true;
         }
         
+        try {
+            String outOfUrl = retrieveHandleOutOfUrl(identifier);
+            if(outOfUrl != null)
+                {
+                    return true;
+                }
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+        
         return false;
     }
 
