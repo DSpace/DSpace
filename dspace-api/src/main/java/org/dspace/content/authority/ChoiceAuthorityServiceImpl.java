@@ -62,7 +62,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
     private final String CHOICES_PRESENTATION_PREFIX = "choices.presentation.";
     private final String CHOICES_CLOSED_PREFIX = "choices.closed.";
 
-    private ChoiceAuthorityServiceImpl() {
+    protected ChoiceAuthorityServiceImpl() {
     }
 
     // translate tail of configuration key (supposed to be schema.element.qual)
