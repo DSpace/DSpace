@@ -1,11 +1,15 @@
 package org.dspace;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
@@ -20,9 +24,13 @@ import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.authorize.AuthorizeException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.*;
 import java.lang.Exception;
+import java.net.URL;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +46,9 @@ public class JournalUtils {
         BLACKOUT_FALSE,
         JOURNAL_NOT_INTEGRATED
     }
+
+    public final static String crossRefApiRoot = "http://api.crossref.org/";
+
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByConceptIdentifier = new HashMap<String, DryadJournalConcept>();
 
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByJournalID = new HashMap<String, DryadJournalConcept>();
@@ -383,6 +394,117 @@ public class JournalUtils {
         }
         return result;
     }
+
+    public static Manuscript getCrossRefManuscriptMatchingManuscript(Manuscript queryManuscript) {
+        String crossRefURL = null;
+        String pubDOI = queryManuscript.getPublicationDOI();
+        if (pubDOI != null && (!"".equals(StringUtils.stripToEmpty(pubDOI).replaceAll("null","")))) {
+            crossRefURL = crossRefApiRoot + "works/" + queryManuscript.getPublicationDOI();
+        } else {
+            StringBuilder queryString = new StringBuilder();
+
+            // make a query string of the authors' last names
+            ArrayList<String> lastNames = new ArrayList<String>();
+            for (Author a : queryManuscript.getAuthorList()) {
+                // replace any hyphens in the last names with spaces for tokenizing.
+                lastNames.add(a.familyName.replaceAll("-"," "));
+            }
+            queryString.append(StringUtils.join(lastNames.toArray(), " ").replaceAll("[^a-zA-Z\\s]", ""));
+            queryString.append(" ");
+
+            // append the title to the query
+            queryString.append(queryManuscript.getTitle().replaceAll("[^a-zA-Z\\s]", "").replaceAll("\\s+", " "));
+            crossRefURL = crossRefApiRoot + "journals/" + queryManuscript.getJournalISSN() + "/works?sort=score&order=desc&query=" + queryString.toString().replaceAll("\\s+", "+");
+        }
+
+        Manuscript matchedManuscript = null;
+        try {
+            URL url = new URL(crossRefURL.replaceAll("\\s+", ""));
+            ObjectMapper m = new ObjectMapper();
+            JsonNode rootNode = m.readTree(url.openStream());
+            JsonNode itemsNode = rootNode.path("message").path("items");
+            if (itemsNode != null && itemsNode.isArray()) {
+                JsonNode bestItem = itemsNode.get(0);
+                float score = bestItem.path("score").floatValue();
+                if (score > 2.0) {
+                    matchedManuscript = manuscriptFromCrossRefJSON(bestItem, queryManuscript.getJournalConcept());
+                }
+            } else {
+                itemsNode = rootNode.path("message");
+                matchedManuscript = manuscriptFromCrossRefJSON(itemsNode, queryManuscript.getJournalConcept());
+            }
+        } catch (JsonParseException e) {
+            log.debug("Couldn't find JSON matching URL " + crossRefURL);
+        } catch (NullPointerException e) {
+            log.debug("No matches returned for URL " + crossRefURL);
+        } catch (FileNotFoundException e) {
+            log.debug("CrossRef does not have data for URL " + crossRefURL);
+        } catch (Exception e) {
+            StringBuilder sb = new StringBuilder();
+            for (StackTraceElement element : e.getStackTrace()) {
+                sb.append(element.toString());
+                sb.append("\n");
+            }
+            String s = sb.toString();
+            log.error("Exception of type " + e.getClass().getName() + ": url is " + crossRefURL + "\n" + s);
+        }
+        return matchedManuscript;
+    }
+
+    public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode, DryadJournalConcept dryadJournalConcept) {
+        Manuscript manuscript = new Manuscript();
+        if (jsonNode.path("DOI") != null) {
+            manuscript.setPublicationDOI(jsonNode.path("DOI").textValue());
+        }
+
+        JsonNode authorsNode = jsonNode.path("author");
+        if (authorsNode.isArray()) {
+            for (JsonNode authorNode : authorsNode) {
+                manuscript.addAuthor(new Author(authorNode.path("family").textValue(),authorNode.path("given").textValue()));
+            }
+        }
+
+        JsonNode dateNode = jsonNode.path("created");
+        if (dateNode != null) {
+            //2016-04-11T17:53:39Z
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                if (dateNode.path("date-time") != null) {
+                    Date date = dateFormat.parse(dateNode.path("date-time").textValue());
+                    manuscript.setPublicationDate(date);
+                }
+            } catch (ParseException e) {
+                log.error("couldn't parse date: " + dateNode.path("date-time").textValue());
+            }
+        }
+        JsonNode titleNode = jsonNode.path("title");
+        if (titleNode.isArray()) {
+            manuscript.setTitle(titleNode.elements().next().textValue());
+        }
+        if (jsonNode.path("publisher") != null) {
+            manuscript.setPublisher(jsonNode.path("publisher").textValue());
+        }
+        if (jsonNode.path("volume") != null) {
+            manuscript.setJournalVolume(jsonNode.path("volume").textValue());
+        }
+        if (jsonNode.path("page") != null) {
+            manuscript.setPages(jsonNode.path("page").textValue());
+        }
+        if (jsonNode.path("issue") != null) {
+            manuscript.setJournalNumber(jsonNode.path("issue").textValue());
+        }
+
+        if (dryadJournalConcept != null) {
+            manuscript.setOrganization(new Organization(dryadJournalConcept));
+            manuscript.setJournalConcept(dryadJournalConcept);
+        }
+        manuscript.setStatus(Manuscript.STATUS_PUBLISHED);
+        if (jsonNode.path("score") != null) {
+            manuscript.optionalProperties.put("crossref-score", String.valueOf(jsonNode.path("score").floatValue()));
+        }
+        return manuscript;
+    }
+
 
     public static String cleanJournalCode(String journalCode) {
         return journalCode.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
