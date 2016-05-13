@@ -38,6 +38,7 @@
         <module>doi</module>
         <module>dataone-mn</module>
         <module>journal-submit</module>
+        <module>publication-updater</module>
         <module>versioning</module>
         <module>payment-system</module>
         <module>dryad-rest-webapp</module>
