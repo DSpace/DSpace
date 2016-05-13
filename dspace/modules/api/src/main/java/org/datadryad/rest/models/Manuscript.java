@@ -18,9 +18,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.JournalUtils;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.datadryad.rest.legacymodels.LegacyManuscript;
 import org.datadryad.api.DryadJournalConcept;
@@ -127,7 +127,7 @@ public class Manuscript {
     private Date publicationDate;
     private String dataReviewURL = "";
     private String dataAvailabilityStatement = "";
-    public Map<String, String> optionalProperties;
+    public Map<String, String> optionalProperties = new LinkedHashMap<String, String>();
 
     // indicates whether the metadata for this publication was obtained directly from the journal
     @JsonIgnore
@@ -137,11 +137,12 @@ public class Manuscript {
     private DryadJournalConcept journalConcept;
 
     private List<String> keywords = new ArrayList<String>();
-    // from PublicationBean, but not currently used
+    // from PublicationBean
     private String journalVolume = "";
     private String journalNumber = "";
     private String publisher = "";
     private String fullCitation = "";
+    private String pages = "";
     @JsonIgnore
     private String message = "";
 
@@ -594,14 +595,60 @@ public class Manuscript {
         }
     }
 
-    public String getFullCitation() {
-        return fullCitation;
+    public void setPages(String pages) {
+        this.pages = pages;
     }
 
-    public void setFullCitation(String fullCitation) {
-        if(fullCitation != null) {
-            this.fullCitation = fullCitation.trim();
+    public String getPages() {
+        return this.pages;
+    }
+
+    public String getFullCitation() {
+        if ("".equals(fullCitation)) {
+            // there won't be a full citation to make if there is no year of publication.
+            if (publicationDate == null) {
+                return "";
+            }
+            // Authors (Year) Title. Journal Volume: Pages. URL.
+            StringBuilder citation = new StringBuilder();
+            // prepare the authors
+            ArrayList<String> authorStrings = new ArrayList<String>();
+            for (Author a : authors.author) {
+                StringBuilder authorString = new StringBuilder();
+                authorString.append(a.familyName + " ");
+                for (String givenName : StringUtils.split(a.givenNames, " ")) {
+                    authorString.append(StringUtils.left(givenName,1));
+                }
+                authorStrings.add(authorString.toString());
+            }
+            citation.append(StringUtils.join(authorStrings.toArray(),", "));
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy");
+            String year = dateFormat.format(getPublicationDate());
+
+            citation.append(" (");
+            citation.append(year);
+            citation.append(") ");
+            citation.append(getTitle().trim());
+            citation.append(". ");
+            citation.append(getJournalName().trim());
+            if (!"".equals(getJournalVolume())) {
+                citation.append(" ");
+                citation.append(getJournalVolume());
+                if (!"".equals(getJournalNumber())) {
+                    citation.append("(");
+                    citation.append(getJournalNumber());
+                    citation.append(")");
+                }
+                citation.append(": ");
+                citation.append(getPages());
+                citation.append(".");
+            } else {
+                citation.append(", online in advance of print.");
+            }
+            fullCitation = citation.toString();
         }
+        return fullCitation;
     }
 
     public boolean isSkipReviewStep() {
