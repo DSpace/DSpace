@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -197,8 +198,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if (existingRow == null) {
             // try looking it up by pub doi
             String pubDOI = manuscript.getPublicationDOI();
-            log.error("Looking for a manuscript with publication DOI like " + pubDOI);
             if (!"".equals(pubDOI)) {
+                log.debug("Looking for a manuscript with publication DOI like " + pubDOI + " and organization_id like " + organizationId);
                 String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? and active = ? and json_data like '%\"publicationDOI\" : \"" + pubDOI + "\"%'";
                 existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE);
             }
@@ -212,9 +213,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             List<Author> authorList = manuscript.getAuthorList();
             StringBuilder authorString = new StringBuilder();
             for (Author author : authorList) {
-                authorString.append(" and json_data like '%\"familyName\" : \"" + author.familyName + "\"%' ");
+                authorString.append(" and json_data like '%\"familyName\" : \"" + StringEscapeUtils.escapeSql(author.familyName) + "\"%' ");
             }
-            log.error("Looking for a manuscript with authors like " + authorString.toString());
             if (!"".equals(authorString.toString())) {
                 String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? and active = ? " + authorString.toString();
                 TableRowIterator tableRowIterator = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE);
@@ -225,7 +225,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                         String databaseTitle = StringUtils.deleteWhitespace(StringUtils.upperCase(databaseManuscript.getTitle()));
                         String manuscriptTitle = StringUtils.deleteWhitespace(StringUtils.upperCase(manuscript.getTitle()));
                         double score = JournalUtils.getHamrScore(databaseTitle, manuscriptTitle);
-                        log.error("comparing " + databaseManuscript.getTitle() + " to " + manuscript.getTitle() + ": " + String.valueOf(score));
                         if (score > 0.9) {
                             finalRows.add(row);
                         }
@@ -318,9 +317,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         } catch (Exception ex) {
             throw new StorageException("Exception finding manuscript", ex);
         }
-        if (manuscripts.size() == 0) {
-            throw new StorageException("No matching manuscripts found");
-        }
         return manuscripts;
     }
 
@@ -354,6 +350,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if (organization != null) {
             Integer organizationId = organization.organizationId;
             Integer manuscriptId = getManuscriptInternalId(context, manuscript.getManuscriptId(), organizationId);
+            log.error("deleting ms " + manuscript.getManuscriptId() + " with internal ID " + manuscriptId);
             TableRow row = tableRowFromManuscript(manuscript, organizationId);
             row.setColumn(COLUMN_ID, manuscriptId);
             row.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
@@ -365,8 +362,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     public Boolean objectExists(StoragePath path, Manuscript manuscript) throws StorageException {
         try {
             Context context = getContext();
+            boolean result = getTableRowsMatchingManuscript(context, manuscript).size() > 0;
             completeContext(context);
-            return getTableRowsMatchingManuscript(context, manuscript).size() > 0;
+            return result;
         } catch (SQLException ex) {
             throw new StorageException("Exception finding manuscript", ex);
         } catch (IOException ex) {
@@ -410,9 +408,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     @Override
     protected void createObject(StoragePath path, Manuscript manuscript) throws StorageException {
         if(objectExists(path, manuscript)) {
+            log.error("object exists");
             throw new StorageException("Unable to create, manuscript already exists");
         }
-
         String organizationCode = path.getOrganizationCode();
         try {
             Context context = getContext();
@@ -449,6 +447,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             Context context = getContext();
             Manuscript manuscript = getManuscriptById(context, manuscriptId, organizationCode);
             if(manuscript == null) {
+                log.error("manuscript " + manuscriptId + " does not exist");
                 throw new StorageException("Manuscript does not exist");
             }
             deleteManuscript(context, manuscript, organizationCode);
