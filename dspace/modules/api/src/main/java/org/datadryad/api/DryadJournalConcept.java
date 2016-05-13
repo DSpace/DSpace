@@ -588,11 +588,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     }
 
     @JsonIgnore
-    public void setConceptStatusToAccepted() throws SQLException {
-        getUnderlyingConcept().setStatus(context, Concept.Status.ACCEPTED.name());
-    }
-
-    @JsonIgnore
     public Organization getOrganizationFromJournalConcept() {
         Organization organization = new Organization();
         organization.organizationId = getUnderlyingConcept().getID();
