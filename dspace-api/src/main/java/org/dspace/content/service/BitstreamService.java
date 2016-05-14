@@ -19,7 +19,8 @@ import java.util.List;
 
 /**
  * Service interface class for the Bitstream object.
- * The implementation of this class is responsible for all business logic calls for the Bitstream object and is autowired by spring
+ * The implementation of this class is responsible for all business logic calls
+ * for the Bitstream object and is autowired by Spring.
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -179,6 +180,10 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException;
 
+    /**
+     * Count all Bitstreams.
+     * @throws SQLException
+     */
     int countTotal(Context context) throws SQLException ;
 
     int countDeletedBitstreams(Context context) throws SQLException;

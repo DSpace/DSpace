@@ -460,9 +460,23 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      */
     public int countItems(Context context, Community community) throws SQLException;
 
+    /** Count all Items. */
     int countTotal(Context context) throws SQLException;
 
+    /** Count Items which are not archived and not withdrawn. */
     int countNotArchivedItems(Context context) throws SQLException;
 
+    /** Count Items which are not archived and are withdrawn. */
     int countWithdrawnItems(Context context) throws SQLException;
+
+    /**
+     * Count Items which match the specified (archived, withdrawn) state.
+     *
+     * @param context
+     * @param archived true if archived Items should be counted; false if not-archived Items should be counted.
+     * @param withdrawn true if withdrawn Items should be counted; false if not-withdrawn Items should be counted.
+     * @return count of matching Items.
+     */
+    int countItems(Context context, boolean archived, boolean withdrawn)
+            throws SQLException;
 }

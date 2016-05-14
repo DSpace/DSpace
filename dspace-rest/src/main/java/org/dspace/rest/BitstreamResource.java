@@ -68,7 +68,60 @@ public class BitstreamResource extends Resource
     protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
-    private static Logger log = Logger.getLogger(BitstreamResource.class);
+    private static final Logger log = Logger.getLogger(BitstreamResource.class);
+
+    /**
+     * Count all Bitstreams.
+     *
+     * @param headers
+     * @return a count of Bitstream objects.
+     */
+    @GET
+    @Path("/count")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public org.dspace.rest.common.Long getCount(@Context HttpHeaders headers)
+    {
+        // TODO withdrawn
+        // TODO deleted
+        // TODO [MIME type]
+        long count = -1;
+        org.dspace.core.Context context = null;
+        try {
+            context = createContext(getUser(headers));
+            count = bitstreamService.countTotal(context);
+            context.complete();
+        } catch (ContextException | SQLException e) {
+            processException("Could not count Bitstreams -- " + e, context);
+        } finally {
+            processFinally(context);
+        }
+        return new org.dspace.rest.common.Long(count);
+    }
+    /*
+                    "SELECT count(bitstream_id) AS bitstreams," +
+                    " sum(size_bytes) AS totalBytes" +
+                    " FROM bitstream" +
+                    "  JOIN bundle2bitstream USING(bitstream_id)" +
+                    "  JOIN bundle USING(bundle_id)" +
+                    "  JOIN item2bundle USING(bundle_id)" +
+                    "  JOIN item USING(item_id)" +
+                    " WHERE CAST(ITEM.WITHDRAWN AS INTEGER) = 0" +
+                    "  AND CAST(ITEM.DELETED AS INTEGER) = 0" +
+                    "  AND bundle.name = 'ORIGINAL';"
+
+                    "SELECT count(bitstream_id) AS images," +
+                    " sum(size_bytes) AS imageBytes" +
+                    " FROM bitstream" +
+                    " JOIN bitstreamformatregistry USING(bitstream_format_id)" +
+                    " JOIN bundle2bitstream USING(bitstream_id)" +
+                    " JOIN bundle USING(bundle_id)" +
+                    " JOIN item2bundle USING(bundle_id)" +
+                    " JOIN item USING(item_id)" +
+                    " WHERE bundle.name = 'ORIGINAL'" +
+                    "  AND mimetype LIKE 'image/%'" +
+                    "  AND CAST(ITEM.DELETED AS INTEGER) = 0" +
+                    "  AND CAST(ITEM.WITHDRAWN AS INTEGER) = 0;"
+    */
 
     /**
      * Return bitstream properties without file data. It can throw
@@ -219,7 +272,7 @@ public class BitstreamResource extends Resource
 
         log.info("Reading bitstreams.(offset=" + offset + ",limit=" + limit + ")");
         org.dspace.core.Context context = null;
-        List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+        List<Bitstream> bitstreams = new ArrayList<>();
 
         try
         {
@@ -465,7 +518,7 @@ public class BitstreamResource extends Resource
             }
             dspaceBitstream.setName(context, bitstream.getName());
             Integer sequenceId = bitstream.getSequenceId();
-            if (sequenceId != null && sequenceId.intValue() != -1)
+            if (sequenceId != null && sequenceId != -1)
             {
                 dspaceBitstream.setSequenceID(sequenceId);
             }

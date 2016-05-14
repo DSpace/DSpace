@@ -41,7 +41,7 @@ public class Bitstream extends DSpaceObject {
     private String description;
     private String format;
     private String mimeType;
-    private Long sizeBytes;
+    private java.lang.Long sizeBytes;
     private DSpaceObject parentObject;
     private String retrieveLink;
     private CheckSum checkSum;
@@ -139,7 +139,7 @@ public class Bitstream extends DSpaceObject {
 		this.mimeType = mimeType;
 	}
 
-	public void setSizeBytes(Long sizeBytes) {
+	public void setSizeBytes(java.lang.Long sizeBytes) {
 		this.sizeBytes = sizeBytes;
 	}
 
@@ -163,7 +163,7 @@ public class Bitstream extends DSpaceObject {
         return mimeType;
     }
 
-    public Long getSizeBytes() {
+    public java.lang.Long getSizeBytes() {
         return sizeBytes;
     }
 
