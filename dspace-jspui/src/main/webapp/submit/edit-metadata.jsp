@@ -931,11 +931,11 @@
          sb.append("<div class=\"row col-md-12\"><span class=\"input-group col-md-10\"><span class=\"input-group-addon\"><select name=\"")
            .append(fieldName)
            .append("_qualifier");
-         if (repeatable)
+         if (repeatable && j!= fieldCount-1)
            sb.append("_").append(j+1);
          if (readonly)
          {
-             sb.append("\" readonly=\"readonly\"");
+             sb.append("\" disabled=\"disabled");
          }
          sb.append("\">");
          for (int i = 0; i < qualMap.size(); i+=2)
@@ -955,17 +955,17 @@
          sb.append("</select></span><input class=\"form-control\" type=\"text\" name=\"")
            .append(fieldName)
            .append("_value");
-         if (repeatable)
+         if (repeatable && j!= fieldCount-1)
            sb.append("_").append(j+1);
          if (readonly)
          {
-             sb.append("\" readonly=\"readonly\"");
+             sb.append("\" disabled=\"disabled");
          }
          sb.append("\" size=\"34\" value=\"")
            .append(currentVal.replaceAll("\"", "&quot;"))
            .append("\"/></span>\n");
 
-         if (repeatable && !readonly && j < fieldCount - 1)
+         if (repeatable && !readonly && j < defaults.length)
          {
             // put a remove button next to filled in values
             sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
