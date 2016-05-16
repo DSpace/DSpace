@@ -122,14 +122,14 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             int organizationID = row.getIntColumn(COLUMN_ORGANIZATION_ID);
             Manuscript manuscript = reader.readValue(json_data);
             manuscript.setStatus(row.getStringColumn(COLUMN_STATUS));
-            if (manuscript.getOrganization() == null) {
-                try {
-                    Context context = getContext();
-                    manuscript.setOrganization(OrganizationDatabaseStorageImpl.getOrganizationByConceptID(context, organizationID));
-                    completeContext(context);
-                } catch (SQLException e) {
-                    log.error("couldn't find organization " + organizationID);
-                }
+            try {
+                Context context = getContext();
+                Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByConceptID(context, organizationID);
+                manuscript.setOrganization(organization);
+                manuscript.setJournalConcept(JournalUtils.getJournalConceptByISSN(organization.organizationISSN));
+                completeContext(context);
+            } catch (SQLException e) {
+                log.error("couldn't find organization " + organizationID);
             }
             return manuscript;
         } else {

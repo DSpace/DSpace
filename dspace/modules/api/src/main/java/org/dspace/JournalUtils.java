@@ -205,20 +205,20 @@ public class JournalUtils {
         return journalConceptHashMapByISSN.get(ISSN);
     }
 
-    public static String getCanonicalManuscriptID(Manuscript manuscript) {
+    public static String getCanonicalManuscriptID(Manuscript manuscript) throws ParseException {
         return getCanonicalManuscriptID(manuscript.getManuscriptId(), manuscript.getJournalConcept());
     }
 
-    public static String getCanonicalManuscriptID(String manuscriptId, DryadJournalConcept journalConcept) {
+    public static String getCanonicalManuscriptID(String manuscriptId, DryadJournalConcept journalConcept) throws ParseException {
         String canonicalID = manuscriptId;
         try {
-            String regex = journalConcept.getCanonicalManuscriptNumberPattern();
-            if (regex != null && !regex.equals("")) {
-                Matcher manuscriptMatcher = Pattern.compile(regex).matcher(canonicalID);
+            if (journalConcept != null && journalConcept.getCanonicalManuscriptNumberPattern() != null && !journalConcept.getCanonicalManuscriptNumberPattern().equals("")) {
+                Matcher manuscriptMatcher = Pattern.compile(journalConcept.getCanonicalManuscriptNumberPattern()).matcher(canonicalID);
                 if (manuscriptMatcher.find()) {
                     canonicalID = manuscriptMatcher.group(1);
                 } else {
-                    log.error("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalConcept);
+                    log.error("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalConcept.getFullName() + ": '" + journalConcept.getCanonicalManuscriptNumberPattern() + "'");
+                    throw new ParseException("'" + manuscriptId + "' does not match regex '" + journalConcept.getCanonicalManuscriptNumberPattern() + "'", 0);
                 }
             } else {
                 // there is no regex specified, just use the manuscript.
@@ -317,7 +317,6 @@ public class JournalUtils {
 
     public static Manuscript writeManuscriptToDB(Manuscript manuscript) throws StorageException {
         StoragePath storagePath = StoragePath.createManuscriptPath(manuscript.getJournalConcept().getISSN(), manuscript.getManuscriptId());
-
         ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
         List<Manuscript> manuscripts = getManuscriptsMatchingID(manuscript.getJournalConcept(), manuscript.getManuscriptId());
         // if there isn't a manuscript already in the db, create it. Otherwise, update.
@@ -337,10 +336,15 @@ public class JournalUtils {
         return manuscript;
     }
 
-    public static List<Manuscript> getStoredManuscriptsMatchingManuscript(Manuscript manuscript) {
+    public static List<Manuscript> getStoredManuscriptsMatchingManuscript(Manuscript manuscript) throws ParseException {
         ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
         try {
+            if (!"".equals(manuscript.getManuscriptId())) {
+                manuscript.setManuscriptId(getCanonicalManuscriptID(manuscript));
+            }
             return manuscriptStorage.getManuscriptsMatchingManuscript(manuscript);
+        } catch (ParseException e) {
+            throw e;
         } catch (StorageException e) {
             log.error("Exception getting manuscripts" , e);
         }
@@ -350,10 +354,12 @@ public class JournalUtils {
     // NOTE: identifier can be either journalCode or ISSN
     public static List<Manuscript> getManuscriptsMatchingID(DryadJournalConcept journalConcept, String manuscriptId) {
         ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        StoragePath storagePath = StoragePath.createManuscriptPath(journalConcept.getISSN(), getCanonicalManuscriptID(manuscriptId, journalConcept));
         try {
+            StoragePath storagePath = StoragePath.createManuscriptPath(journalConcept.getISSN(), getCanonicalManuscriptID(manuscriptId, journalConcept));
             ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
             manuscripts.addAll(manuscriptStorage.getManuscriptsMatchingPath(storagePath, 10));
+        } catch (ParseException e) {
+            log.error(e.getMessage());
         } catch (StorageException e) {
             log.error("Exception getting manuscripts", e);
         }
