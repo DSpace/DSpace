@@ -1,4 +1,4 @@
-# E-mail sent with the information filled out in a suggest form.
+# E-mail sent to curators with updated item summary.
 #
 # Parameters: {0} Journal Name
 #             {1} ISSN
