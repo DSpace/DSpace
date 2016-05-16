@@ -10,6 +10,9 @@ import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.JournalUtils;
 import org.datadryad.api.DryadJournalConcept;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
+import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 
 import javax.servlet.ServletConfig;
@@ -21,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.RuntimeException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -86,6 +90,7 @@ public class PublicationUpdater extends HttpServlet {
 
     private void updateWorkflowItems(Context context, DryadJournalConcept dryadJournalConcept) {
         ArrayList<WorkflowItem> items = new ArrayList<WorkflowItem>();
+        ArrayList<String> updatedItems = new ArrayList<String>();
         if (!"".equals(dryadJournalConcept.getISSN())) {
             try {
                 WorkflowItem[] itemArray = WorkflowItem.findAllByISSN(context, dryadJournalConcept.getISSN());
@@ -96,26 +101,103 @@ public class PublicationUpdater extends HttpServlet {
             }
             if (items.size() > 0) {
                 for (WorkflowItem wfi : items) {
-                    Item item = wfi.getItem();
-                    Manuscript queryManuscript = manuscriptFromItem(item, dryadJournalConcept);
+                    if (DryadWorkflowUtils.isDataPackage(wfi)) {
+                        String message = "";
+                        Item item = wfi.getItem();
+                        Manuscript queryManuscript = manuscriptFromItem(item, dryadJournalConcept);
 
-                    // First, compare this item with anything in manuscript metadata storage:
-                    // If this workflow item does not have a msid, it might have come from a submitter
-                    // who didn't use a journal link.
-                    List<Manuscript> databaseManuscripts = JournalUtils.getStoredManuscriptsMatchingManuscript(queryManuscript);
-                    if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
-                        updateItemMetadataFromManuscript(item, databaseManuscripts.get(0));
-                        LOGGER.error("updated item " + item.getID() + " with msid " + databaseManuscripts.get(0).getManuscriptId());
-                    }
+                        // First, compare this item with anything in manuscript metadata storage:
+                        // If this workflow item does not have a msid, it might have come from a submitter
+                        // who didn't use a journal link.
+                        List<Manuscript> databaseManuscripts = null;
+                        Manuscript databaseManuscript = null;
+                        try {
+                            if (!"".equals(queryManuscript.getManuscriptId())) {
+                                databaseManuscripts = JournalUtils.getStoredManuscriptsMatchingManuscript(queryManuscript);
+                                if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
+                                    databaseManuscript = databaseManuscripts.get(0);
+                                    message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
+                                    databaseManuscript.optionalProperties.put("provenance", message);
+                                    updateItemMetadataFromManuscript(item, databaseManuscript, context);
+                                }
+                            }
+                        } catch (ParseException e) {
+                            // do we want to collect workflow items with faulty manuscript IDs?
+                            message = "Problem: Manuscript ID is incorrect. ";
+                        }
+                        // look for this item in crossref:
+                        Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript);
+                        if (matchedManuscript != null) {
+                            // update the item's metadata
+                            String score = matchedManuscript.optionalProperties.get("crossref-score");
+                            message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
+                            matchedManuscript.optionalProperties.put("provenance", message);
+                            updateItemMetadataFromManuscript(item, matchedManuscript, context);
 
-                    // look for this item in crossref:
-                    Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript);
-                    if (matchedManuscript != null) {
-                        updateItemMetadataFromManuscript(item, matchedManuscript);
+                            // was there a manuscript record saved for this? If so, update it.
+                            if (databaseManuscript != null) {
+                                databaseManuscript.setPublicationDOI(matchedManuscript.getPublicationDOI());
+                                databaseManuscript.setPublicationDate(matchedManuscript.getPublicationDate());
+                                databaseManuscript.setStatus(Manuscript.STATUS_PUBLISHED);
+                                try {
+                                    LOGGER.debug("writing publication data back to " + databaseManuscript.getManuscriptId());
+                                    JournalUtils.writeManuscriptToDB(databaseManuscript);
+                                } catch (Exception e) {
+                                    LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
+                                }
+                            }
+                        }
+
+                        if (!"".equals(message)) {
+                            updatedItems.add(buildItemSummary(item) + "\n\t" + message);
+                        }
                     }
                 }
             }
         }
+        if (updatedItems.size() > 0) {
+            emailWorkflowItemSummary(context, updatedItems, dryadJournalConcept);
+        }
+    }
+
+    private void emailWorkflowItemSummary(Context c, ArrayList<String> updatedItems, DryadJournalConcept dryadJournalConcept) {
+        LOGGER.error("emailing about journal " + dryadJournalConcept.getFullName());
+        StringBuilder message = new StringBuilder();
+        message.append("For journal ");
+        message.append(dryadJournalConcept.getFullName());
+        message.append(":\n");
+        for (String item : updatedItems) {
+            message.append(item);
+            message.append("\n");
+        }
+        try {
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "publication_updater"));
+            email.addRecipient(ConfigurationManager.getProperty("curator.all.recipient"));
+//            # Parameters: {0} Journal Name
+//            #             {1} ISSN
+//            #             {2} Data
+            email.addArgument(dryadJournalConcept.getFullName());
+            email.addArgument(dryadJournalConcept.getISSN());
+            email.addArgument(message.toString());
+
+            email.send();
+        } catch (Exception e) {
+            LOGGER.error("Error sending publication updater email for journal " + dryadJournalConcept.getFullName());
+        }
+    }
+
+    private String buildItemSummary(Item item) {
+        DCValue[] dryadDOIs = item.getMetadata(DRYAD_DOI);
+        String dryadDOI = "";
+        if (dryadDOIs != null && dryadDOIs.length > 0) {
+            dryadDOI = dryadDOIs[0].value;
+        }
+        DCValue[] titles = item.getMetadata(TITLE);
+        String title = "";
+        if (titles != null && titles.length > 0) {
+            title = titles[0].value;
+        }
+        return "Item " + item.getID() + " with DOI " + dryadDOI + " and title \"" + title + "\":";
     }
 
     private Manuscript manuscriptFromItem(Item item, DryadJournalConcept dryadJournalConcept) {
