@@ -110,7 +110,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
 
     public static Organization getOrganizationByConceptID(Context context, int conceptID) throws SQLException {
         String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE organization_id = ?";
-        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, String.valueOf(conceptID));
+        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, conceptID);
         return organizationFromTableRow(row);
     }
 

@@ -247,7 +247,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             while(rows.hasNext()) {
                 TableRow row = rows.next();
                 Manuscript manuscript = manuscriptFromTableRow(row);
-                manuscript.setOrganization(organization);
                 manuscripts.add(manuscript);
             }
             return manuscripts;
@@ -268,7 +267,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             while(rows.hasNext()) {
                 TableRow row = rows.next();
                 Manuscript manuscript = manuscriptFromTableRow(row);
-                manuscript.setOrganization(organization);
                 manuscripts.add(manuscript);
             }
             return manuscripts;
@@ -294,7 +292,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                 while (rows.hasNext()) {
                     TableRow row = rows.next();
                     Manuscript manuscript = manuscriptFromTableRow(row);
-                    manuscript.setOrganization(organization);
                     manuscripts.add(manuscript);
                 }
             }
