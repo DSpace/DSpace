@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
+import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
@@ -323,6 +324,16 @@ public class JournalUtils {
             }
         }
         return manuscript;
+    }
+
+    public static List<Manuscript> getStoredManuscriptsMatchingManuscript(Manuscript manuscript) {
+        ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
+        try {
+            return manuscriptStorage.getManuscriptsMatchingManuscript(manuscript);
+        } catch (StorageException e) {
+            log.error("Exception getting manuscripts" , e);
+        }
+        return null;
     }
 
     // NOTE: identifier can be either journalCode or ISSN
