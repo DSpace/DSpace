@@ -3,6 +3,7 @@ package org.datadryad.publication;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.*;
+import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -40,6 +41,8 @@ public class PublicationUpdater extends HttpServlet {
     private final static String PUBLICATION_DATE = "dc.date.issued";
     private final static String TITLE = "dc.title";
     private final static String CITATION_IN_PROGRESS = "dryad.citationInProgress";
+    private final static String DRYAD_DOI = "dc.identifier";
+    private final static String PROVENANCE = "dc.description.provenance";
 
     // Timer for scheduled harvesting of publications from crossref
     private Timer myPublicationUpdaterTimer;
@@ -63,7 +66,7 @@ public class PublicationUpdater extends HttpServlet {
             context.turnOffAuthorisationSystem();
             List<DryadJournalConcept> journalConcepts = Arrays.asList(JournalUtils.getAllJournalConcepts());
             for (DryadJournalConcept dryadJournalConcept : journalConcepts) {
-                findPublishedWorkflowItems(context, dryadJournalConcept);
+                updateWorkflowItems(context, dryadJournalConcept);
             }
             context.restoreAuthSystemState();
         } catch (SQLException e) {
@@ -81,7 +84,7 @@ public class PublicationUpdater extends HttpServlet {
         }
     }
 
-    private void findPublishedWorkflowItems(Context context, DryadJournalConcept dryadJournalConcept) {
+    private void updateWorkflowItems(Context context, DryadJournalConcept dryadJournalConcept) {
         ArrayList<WorkflowItem> items = new ArrayList<WorkflowItem>();
         if (!"".equals(dryadJournalConcept.getISSN())) {
             try {
@@ -146,7 +149,7 @@ public class PublicationUpdater extends HttpServlet {
         return queryManuscript;
     }
 
-    private void updateItemMetadataFromManuscript(Item item, Manuscript manuscript) {
+    private void updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context) {
         if (!"".equals(manuscript.getPublicationDOI())) {
             item.clearMetadata(PUBLICATION_DOI);
             item.addMetadata(PUBLICATION_DOI, null, manuscript.getPublicationDOI(), null, -1);
@@ -168,7 +171,16 @@ public class PublicationUpdater extends HttpServlet {
         item.clearMetadata(CITATION_IN_PROGRESS);
         item.addMetadata(CITATION_IN_PROGRESS, null, "true", null, -1);
 
-        item.updateMetadata();
+        if (manuscript.optionalProperties.containsKey("provenance")) {
+            item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + manuscript.optionalProperties.get("provenance") + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
+        }
+
+        try {
+            item.update();
+            context.commit();
+        } catch (Exception e) {
+            LOGGER.error("couldn't save metadata: " + e.getMessage());
+        }
     }
 
     @Override
