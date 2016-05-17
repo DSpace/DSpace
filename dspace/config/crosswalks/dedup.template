@@ -1,0 +1,5 @@
+<b>Title</b>: @dc.title@<br/>
+<b>Author</b>: @dc.contributor.author@<br/>
+<b>Date issued</b>: @dc.date.issued@<br/>
+<b>Type</b>: @dc.type@<br/>
+<b>Citation</b>: @dc.identifier.citation@<br/>

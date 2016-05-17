@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,10 +18,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.EditItem;
 import org.dspace.content.InProgressSubmission;
-
+import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -104,8 +109,10 @@ public class SubmissionInfo extends HashMap
      * 
      * @throws ServletException
      *             if an error occurs
+     * @throws AuthorizeException 
+     * @throws SQLException 
      */
-    public static SubmissionInfo load(HttpServletRequest request, InProgressSubmission subItem) throws ServletException
+    public static SubmissionInfo load(Context context, HttpServletRequest request, InProgressSubmission subItem) throws ServletException, AuthorizeException, SQLException
     {
         boolean forceReload = false;
     	SubmissionInfo subInfo = new SubmissionInfo();
@@ -126,6 +133,13 @@ public class SubmissionInfo extends HashMap
         if (subItem != null)
         {
             collectionHandle = subItem.getCollection().getHandle();
+            Item item = subItem.getItem();
+            if (subItem instanceof EditItem) {
+                if (!AuthorizeManager.isAdmin(context)) {
+                    throw new AuthorizeException("Unauthorized attempt to edit ItemID " + item.getID());
+                }
+                context.turnOffAuthorisationSystem();
+            }
         }
 
         // save this collection handle to this submission info object
@@ -149,6 +163,10 @@ public class SubmissionInfo extends HashMap
         return ((this.submissionItem != null) && (this.submissionItem instanceof WorkflowItem || this.submissionItem instanceof XmlWorkflowItem));
     }
 
+    public boolean isEditing() {
+        return ((this.submissionItem != null) && (this.submissionItem instanceof EditItem));
+    }
+    
     /**
      * Return the current in progress submission
      * 

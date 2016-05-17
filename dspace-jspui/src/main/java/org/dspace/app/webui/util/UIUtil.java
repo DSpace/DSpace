@@ -12,8 +12,10 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +45,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
+import org.dspace.util.ItemUtils;
 import org.dspace.utils.DSpace;
 
 /**
@@ -53,6 +56,7 @@ import org.dspace.utils.DSpace;
  */
 public class UIUtil extends Util
 {
+    
     /** Whether to look for x-forwarded headers for logging IP addresses */
     private static Boolean useProxies;
 
@@ -586,5 +590,76 @@ public class UIUtil extends Util
         {
         	throw new JspException(sqle.getMessage(), sqle);
         }
+    }
+    
+    public static int getItemStatus(HttpServletRequest request, Item item)
+            throws SQLException
+    {
+        return ItemUtils.getItemStatus(obtainContext(request), item);
+    }
+    
+    public static String[] getUITableColumn(String module, String tab)
+    {
+        String configuration = ConfigurationManager.getProperty(module,
+                tab + ".columns");
+        if (configuration == null)
+        {
+            configuration = ConfigurationManager.getProperty("table",
+                    "default.columns");
+            if (configuration == null) {
+                return new String[0];
+            }
+        }
+        String[] columns = configuration.split(",");
+        
+        List<String> colList = new ArrayList<String>();
+
+        for(String col : columns){
+            colList.add(col);
+        }
+        
+        String[] result = new String[colList.size()];
+        result = colList.toArray(result);
+        return result;
+    }
+    
+    public static String[] getUIHiddenColumns(String module, String tab)
+    {
+        String configuration = ConfigurationManager.getProperty(module,
+                tab + ".hidden.columns");
+        if (configuration == null)
+        {
+            configuration = ConfigurationManager.getProperty("table",
+                    "default.hidden.columns");
+            if (configuration == null)
+            {
+               return new String[0];
+            }            
+        }
+        String[] result = configuration.trim().split(",");
+        return result;
+    }
+
+    public static String getUITableRenderingColumn(String module, String tab,
+            String column)
+    {
+        String result = ConfigurationManager.getProperty(module, tab
+                + ".rendering." + column);
+        if (result == null)
+        {
+            result = ConfigurationManager.getProperty("table",
+                    "default.rendering." + column);
+        }
+        return result;
+    }
+
+    public static String getUITableDefaultSort(String module, String tab)
+    {
+        
+        String sortInfo = ConfigurationManager.getProperty(module, tab + ".column.sortinfo");
+        if(StringUtils.isBlank(sortInfo)) {
+            sortInfo = null;
+        }
+        return sortInfo;
     }
 }

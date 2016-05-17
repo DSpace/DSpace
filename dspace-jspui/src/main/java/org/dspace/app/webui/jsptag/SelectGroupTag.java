@@ -125,7 +125,7 @@ public class SelectGroupTag extends TagSupport
 			}
 			
 			out.print("</select>");
-			out.print("<br/><div class=\"btn-group btn-group-justified\" role=\"group\">");
+			out.print("<br/><div class=\"btn-group\" role=\"group\">");
             String p = (multiple ? 
                     LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.SelectGroupTag.selectGroups")

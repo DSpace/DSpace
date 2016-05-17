@@ -38,7 +38,7 @@
 							<property name="mandatory" value="true"/>
 							<property name="preHtml" value="&lt;h4 class='text-primary'&gt;" />
 							<property name="postHtml" value="&lt;/h4&gt;" />
-							<property name="field" value="dc.title" />
+							<property name="field" value="name" />
 							<property name="decorator" value="title" />
 						</bean>
 					</list>
@@ -66,7 +66,7 @@
 							<property name="mandatory" value="true"/>
 							<property name="preHtml" value="&lt;h4 class='text-primary'&gt;" />
 							<property name="postHtml" value="&lt;/h4&gt;" />
-							<property name="field" value="dc.title" />
+							<property name="field" value="name" />
 							<property name="decorator" value="title" />
 						</bean>
 					</list>

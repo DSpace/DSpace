@@ -1417,4 +1417,17 @@
 </div>    		
     </form>
 
+<script type="text/javascript">
+
+j(document).ready(
+		function()
+		{			
+			<%@ include file="/deduplication/javascriptDeduplication.jsp" %>
+		}		
+);
+
+</script>
+<%@ include file="/deduplication/template.jsp" %>
+<%@ include file="/deduplication/htmlDeduplication.jsp" %>
+
 </dspace:layout>

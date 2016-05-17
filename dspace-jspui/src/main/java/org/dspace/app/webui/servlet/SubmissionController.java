@@ -36,6 +36,8 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.EditItem;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -144,7 +146,8 @@ public class SubmissionController extends DSpaceServlet
         String workspaceID = request.getParameter("resume");
         String workflowID = request.getParameter("workflow");
         String resumableFilename = request.getParameter("resumableFilename");
-
+        String itemID = request.getParameter("edit_item");
+        
         // If resuming a workspace item
         if (workspaceID != null)
         {
@@ -155,7 +158,7 @@ public class SubmissionController extends DSpaceServlet
                         .parseInt(workspaceID));
 
                 //load submission information
-                SubmissionInfo si = SubmissionInfo.load(request, wi);
+                SubmissionInfo si = SubmissionInfo.load(context, request, wi);
                 
                 //TD: Special case - If a user is resuming a submission
                 //where the submission process now has less steps, then
@@ -199,7 +202,7 @@ public class SubmissionController extends DSpaceServlet
                         .parseInt(workflowID));
 
                 //load submission information
-                SubmissionInfo si = SubmissionInfo.load(request, wi);
+                SubmissionInfo si = SubmissionInfo.load(context, request, wi);
                 
                 // start over at beginning of first workflow step
                 setBeginningOfStep(request, true);
@@ -212,7 +215,26 @@ public class SubmissionController extends DSpaceServlet
                 JSPManager
                         .showInvalidIDError(request, response, workflowID, -1);
             }
-        }
+        } 
+        else if (itemID != null) // if editing an item
+        {
+            try {
+                // load the item
+                Item item = Item.find(context, Integer.parseInt(itemID));
+
+                EditItem editItem = new EditItem(item);
+                // load submission information
+                SubmissionInfo si = SubmissionInfo.load(context, request, editItem);
+                // start over at beginning of first workflow step
+                setBeginningOfStep(request, true);
+                request.setAttribute("bitstreampoliciesmode", true);
+
+                doStep(context, request, response, si, WORKFLOW_FIRST_STEP);
+            } catch (NumberFormatException nfe) {
+                log.warn(LogManager.getHeader(context, "bad_item_id", "bad_id=" + itemID));
+                JSPManager.showInvalidIDError(request, response, itemID, -1);
+            }
+        }      
         else if (!StringUtils.isEmpty(resumableFilename)) // if resumable.js asks whether a part of af file was received
         {
             if (request.getMethod().equals("GET"))
@@ -1026,7 +1048,7 @@ public class SubmissionController extends DSpaceServlet
      * @return filled-out submission info, or null
      */
     public static SubmissionInfo getSubmissionInfo(Context context,
-            HttpServletRequest request) throws SQLException, ServletException
+            HttpServletRequest request) throws SQLException, ServletException, AuthorizeException
     {
         SubmissionInfo info = null;
         
@@ -1045,19 +1067,19 @@ public class SubmissionController extends DSpaceServlet
             {
                 int workflowID = UIUtil.getIntParameter(request, "workflow_id");
                 
-                info = SubmissionInfo.load(request, WorkflowItem.find(context, workflowID));
+                info = SubmissionInfo.load(context, request, WorkflowItem.find(context, workflowID));
             }
             else if(request.getParameter("workspace_item_id") != null)
             {
                 int workspaceID = UIUtil.getIntParameter(request,
                         "workspace_item_id");
                 
-                info = SubmissionInfo.load(request, WorkspaceItem.find(context, workspaceID));
+                info = SubmissionInfo.load(context, request, WorkspaceItem.find(context, workspaceID));
             }
             else
             {
                 //by default, initialize Submission Info with no item
-                info = SubmissionInfo.load(request, null);
+                info = SubmissionInfo.load(context, request, null);
             }
             
             // We must have a submission object if after the first step,
@@ -1315,7 +1337,7 @@ public class SubmissionController extends DSpaceServlet
      * @return HTML hidden parameters
      */
     public static String getSubmissionParameters(Context context,
-            HttpServletRequest request) throws SQLException, ServletException
+            HttpServletRequest request) throws SQLException, ServletException, AuthorizeException
     {
         SubmissionInfo si = getSubmissionInfo(context, request);
 
