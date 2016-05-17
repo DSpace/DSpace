@@ -35,6 +35,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.rdf.RDFUtil;
 import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -47,6 +48,7 @@ public class MetadataConverterPlugin implements ConverterPlugin
     public final static String METADATA_PREFIXES_KEY = "rdf.metadata.prefixes";
     
     private final static Logger log = Logger.getLogger(MetadataConverterPlugin.class);
+    @Autowired(required=true)
     protected ConfigurationService configurationService;
     
     @Override
