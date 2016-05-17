@@ -6,6 +6,7 @@ import org.datadryad.rest.models.Address;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.CorrespondingAuthor;
 import org.datadryad.rest.models.Manuscript;
+import org.dspace.JournalUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -161,6 +162,7 @@ public class EmailParser {
 
         manuscript.getOrganization().organizationCode = dataForXML.remove(Manuscript.JOURNAL_CODE);
         manuscript.getOrganization().organizationName = dataForXML.remove(Manuscript.JOURNAL);
+        manuscript.setJournalConcept(JournalUtils.getJournalConceptByJournalName(manuscript.getOrganization().organizationName));
 
         CorrespondingAuthor correspondingAuthor = manuscript.getCorrespondingAuthor();
         correspondingAuthor.author = new Author((String) dataForXML.remove(Manuscript.CORRESPONDING_AUTHOR));
