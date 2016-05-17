@@ -279,7 +279,7 @@ public class PublicationUpdater extends HttpServlet {
         // schedule harvesting to the number of days set in the configuration:
         // timers are set in units of milliseconds.
         int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("publication.updater.timer"));
-        myPublicationUpdaterTimer.schedule(new PublicationHarvester(), 0, 1000 * 60 * 60 * 24 * timerInterval);
+//        myPublicationUpdaterTimer.schedule(new PublicationHarvester(), 0, 1000 * 60 * 60 * 24 * timerInterval);
     }
 
     /**
