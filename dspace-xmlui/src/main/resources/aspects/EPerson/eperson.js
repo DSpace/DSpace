@@ -343,7 +343,7 @@ function doUpdateProfile()
 	            for (var i = 0; i < names.length; i++)
 	            {
 	            	var collectionID = cocoon.request.get(names[i]);
-	                var collection = getCollectionService().find(getDSContext(),collectionID);
+	                var collection = getCollectionService().find(getDSContext(),UUID.fromString(collectionID));
 	                if (collection != null)
                         getSubscribeService().unsubscribe(getDSContext(),getEPerson(),collection);
 	            }
