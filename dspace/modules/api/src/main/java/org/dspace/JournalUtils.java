@@ -1,20 +1,21 @@
 package org.dspace;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
+import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
-import org.datadryad.rest.storage.rdbms.OrganizationDatabaseStorageImpl;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.core.ConfigurationManager;
@@ -23,9 +24,13 @@ import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.authorize.AuthorizeException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.*;
 import java.lang.Exception;
+import java.net.URL;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,6 +46,9 @@ public class JournalUtils {
         BLACKOUT_FALSE,
         JOURNAL_NOT_INTEGRATED
     }
+
+    public final static String crossRefApiRoot = "http://api.crossref.org/";
+
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByConceptIdentifier = new HashMap<String, DryadJournalConcept>();
 
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByJournalID = new HashMap<String, DryadJournalConcept>();
@@ -197,22 +205,20 @@ public class JournalUtils {
         return journalConceptHashMapByISSN.get(ISSN);
     }
 
-    public static String getCanonicalManuscriptID(Manuscript manuscript) {
-        return getCanonicalManuscriptID(manuscript.getManuscriptId(), manuscript.getOrganization().organizationCode);
+    public static String getCanonicalManuscriptID(Manuscript manuscript) throws ParseException {
+        return getCanonicalManuscriptID(manuscript.getManuscriptId(), manuscript.getJournalConcept());
     }
 
-    public static String getCanonicalManuscriptID(String manuscriptId, String journalID) {
+    public static String getCanonicalManuscriptID(String manuscriptId, DryadJournalConcept journalConcept) throws ParseException {
         String canonicalID = manuscriptId;
-        String regex = null;
         try {
-            DryadJournalConcept journalConcept = getJournalConceptByJournalID(journalID);
-            regex = journalConcept.getCanonicalManuscriptNumberPattern();
-            if (regex != null && !regex.equals("")) {
-                Matcher manuscriptMatcher = Pattern.compile(regex).matcher(canonicalID);
+            if (journalConcept != null && journalConcept.getCanonicalManuscriptNumberPattern() != null && !journalConcept.getCanonicalManuscriptNumberPattern().equals("")) {
+                Matcher manuscriptMatcher = Pattern.compile(journalConcept.getCanonicalManuscriptNumberPattern()).matcher(canonicalID);
                 if (manuscriptMatcher.find()) {
                     canonicalID = manuscriptMatcher.group(1);
                 } else {
-                    log.error("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalID);
+                    log.error("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalConcept.getFullName() + ": '" + journalConcept.getCanonicalManuscriptNumberPattern() + "'");
+                    throw new ParseException("'" + manuscriptId + "' does not match regex '" + journalConcept.getCanonicalManuscriptNumberPattern() + "'", 0);
                 }
             } else {
                 // there is no regex specified, just use the manuscript.
@@ -309,12 +315,10 @@ public class JournalUtils {
                 action == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
     }
 
-    public static void writeManuscriptToDB(Manuscript manuscript) throws StorageException {
-        String journalCode = cleanJournalCode(manuscript.getOrganization().organizationCode).toUpperCase();
-        StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscript.getManuscriptId());
-
+    public static Manuscript writeManuscriptToDB(Manuscript manuscript) throws StorageException {
+        StoragePath storagePath = StoragePath.createManuscriptPath(manuscript.getJournalConcept().getISSN(), manuscript.getManuscriptId());
         ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
-        List<Manuscript> manuscripts = getManuscriptsMatchingID(journalCode, manuscript.getManuscriptId());
+        List<Manuscript> manuscripts = getManuscriptsMatchingID(manuscript.getJournalConcept(), manuscript.getManuscriptId());
         // if there isn't a manuscript already in the db, create it. Otherwise, update.
         if (manuscripts.size() == 0) {
             try {
@@ -329,20 +333,33 @@ public class JournalUtils {
                 log.error("Exception updating manuscript", ex);
             }
         }
+        return manuscript;
     }
 
-    public static List<Manuscript> getManuscriptsMatchingID(String journalCode, String manuscriptId) {
-        journalCode = cleanJournalCode(journalCode);
-        ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscriptId);
-
+    public static List<Manuscript> getStoredManuscriptsMatchingManuscript(Manuscript manuscript) throws ParseException {
+        ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
         try {
-            OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
-            List<DryadJournalConcept> journalConceptList = organizationStorage.getResults(storagePath, journalCode, 0);
-            if (journalConceptList.size() > 0) {
-                ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
-                manuscripts.addAll(manuscriptStorage.getManuscriptsMatchingPath(storagePath, 10));
+            if (!"".equals(manuscript.getManuscriptId())) {
+                manuscript.setManuscriptId(getCanonicalManuscriptID(manuscript));
             }
+            return manuscriptStorage.getManuscriptsMatchingManuscript(manuscript);
+        } catch (ParseException e) {
+            throw e;
+        } catch (StorageException e) {
+            log.error("Exception getting manuscripts" , e);
+        }
+        return null;
+    }
+
+    // NOTE: identifier can be either journalCode or ISSN
+    public static List<Manuscript> getManuscriptsMatchingID(DryadJournalConcept journalConcept, String manuscriptId) {
+        ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
+        try {
+            StoragePath storagePath = StoragePath.createManuscriptPath(journalConcept.getISSN(), getCanonicalManuscriptID(manuscriptId, journalConcept));
+            ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
+            manuscripts.addAll(manuscriptStorage.getManuscriptsMatchingPath(storagePath, 10));
+        } catch (ParseException e) {
+            log.error(e.getMessage());
         } catch (StorageException e) {
             log.error("Exception getting manuscripts", e);
         }
@@ -351,15 +368,14 @@ public class JournalUtils {
 
     public static Manuscript getManuscriptFromManuscriptStorage (String manuscriptNumber, DryadJournalConcept journalConcept) {
         Manuscript result = null;
-        String journalID = journalConcept.getJournalID();
         if (journalConcept == null) {
-            throw new RuntimeException ("no journalID " + journalID);
+            throw new RuntimeException ("no journal " + journalConcept.getFullName());
         }
         try {
             // canonicalize the manuscriptNumber:
-            manuscriptNumber = JournalUtils.getCanonicalManuscriptID(manuscriptNumber, journalID);
+            manuscriptNumber = JournalUtils.getCanonicalManuscriptID(manuscriptNumber, journalConcept);
             // first, look for a matching manuscript in the database:
-            List<Manuscript> manuscripts = JournalUtils.getManuscriptsMatchingID(journalID, manuscriptNumber);
+            List<Manuscript> manuscripts = JournalUtils.getManuscriptsMatchingID(journalConcept, manuscriptNumber);
             if (manuscripts.size() > 0) {
                 log.info("found manuscript " + manuscriptNumber + " in database");
                 result = manuscripts.get(0);
@@ -375,16 +391,126 @@ public class JournalUtils {
             }
         } catch (Exception e) {
             //invalid journalID
-            log.error("Error getting parameters for invalid JournalID: " + journalID, e);
+            log.error("Error getting parameters for invalid journal " + journalConcept.getFullName(), e);
         }
         if (result == null) {
-            result = new Manuscript();
+            result = new Manuscript(journalConcept);
             result.setManuscriptId(manuscriptNumber);
             result.setMessage("Invalid manuscript number");
         }
-        result.setJournalConcept(journalConcept);
         return result;
     }
+
+    public static Manuscript getCrossRefManuscriptMatchingManuscript(Manuscript queryManuscript) {
+        String crossRefURL = null;
+        String pubDOI = queryManuscript.getPublicationDOI();
+        if (pubDOI != null && (!"".equals(StringUtils.stripToEmpty(pubDOI).replaceAll("null","")))) {
+            crossRefURL = crossRefApiRoot + "works/" + queryManuscript.getPublicationDOI();
+        } else {
+            StringBuilder queryString = new StringBuilder();
+
+            // make a query string of the authors' last names
+            ArrayList<String> lastNames = new ArrayList<String>();
+            for (Author a : queryManuscript.getAuthorList()) {
+                // replace any hyphens in the last names with spaces for tokenizing.
+                lastNames.add(a.familyName.replaceAll("-"," "));
+            }
+            queryString.append(StringUtils.join(lastNames.toArray(), " ").replaceAll("[^a-zA-Z\\s]", ""));
+            queryString.append(" ");
+
+            // append the title to the query
+            queryString.append(queryManuscript.getTitle().replaceAll("[^a-zA-Z\\s]", "").replaceAll("\\s+", " "));
+            crossRefURL = crossRefApiRoot + "journals/" + queryManuscript.getJournalISSN() + "/works?sort=score&order=desc&query=" + queryString.toString().replaceAll("\\s+", "+");
+        }
+
+        Manuscript matchedManuscript = null;
+        try {
+            URL url = new URL(crossRefURL.replaceAll("\\s+", ""));
+            ObjectMapper m = new ObjectMapper();
+            JsonNode rootNode = m.readTree(url.openStream());
+            JsonNode itemsNode = rootNode.path("message").path("items");
+            if (itemsNode != null && itemsNode.isArray()) {
+                JsonNode bestItem = itemsNode.get(0);
+                float score = bestItem.path("score").floatValue();
+                if (score > 2.0) {
+                    matchedManuscript = manuscriptFromCrossRefJSON(bestItem, queryManuscript.getJournalConcept());
+                }
+            } else {
+                itemsNode = rootNode.path("message");
+                matchedManuscript = manuscriptFromCrossRefJSON(itemsNode, queryManuscript.getJournalConcept());
+            }
+        } catch (JsonParseException e) {
+            log.debug("Couldn't find JSON matching URL " + crossRefURL);
+        } catch (NullPointerException e) {
+            log.debug("No matches returned for URL " + crossRefURL);
+        } catch (FileNotFoundException e) {
+            log.debug("CrossRef does not have data for URL " + crossRefURL);
+        } catch (Exception e) {
+            StringBuilder sb = new StringBuilder();
+            for (StackTraceElement element : e.getStackTrace()) {
+                sb.append(element.toString());
+                sb.append("\n");
+            }
+            String s = sb.toString();
+            log.error("Exception of type " + e.getClass().getName() + ": url is " + crossRefURL + "\n" + s);
+        }
+        return matchedManuscript;
+    }
+
+    public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode, DryadJournalConcept dryadJournalConcept) {
+        Manuscript manuscript = new Manuscript();
+        if (jsonNode.path("DOI") != null) {
+            manuscript.setPublicationDOI(jsonNode.path("DOI").textValue());
+        }
+
+        JsonNode authorsNode = jsonNode.path("author");
+        if (authorsNode.isArray()) {
+            for (JsonNode authorNode : authorsNode) {
+                manuscript.addAuthor(new Author(authorNode.path("family").textValue(),authorNode.path("given").textValue()));
+            }
+        }
+
+        JsonNode dateNode = jsonNode.path("created");
+        if (dateNode != null) {
+            //2016-04-11T17:53:39Z
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                if (dateNode.path("date-time") != null) {
+                    Date date = dateFormat.parse(dateNode.path("date-time").textValue());
+                    manuscript.setPublicationDate(date);
+                }
+            } catch (ParseException e) {
+                log.error("couldn't parse date: " + dateNode.path("date-time").textValue());
+            }
+        }
+        JsonNode titleNode = jsonNode.path("title");
+        if (titleNode.isArray()) {
+            manuscript.setTitle(titleNode.elements().next().textValue());
+        }
+        if (jsonNode.path("publisher") != null) {
+            manuscript.setPublisher(jsonNode.path("publisher").textValue());
+        }
+        if (jsonNode.path("volume") != null) {
+            manuscript.setJournalVolume(jsonNode.path("volume").textValue());
+        }
+        if (jsonNode.path("page") != null) {
+            manuscript.setPages(jsonNode.path("page").textValue());
+        }
+        if (jsonNode.path("issue") != null) {
+            manuscript.setJournalNumber(jsonNode.path("issue").textValue());
+        }
+
+        if (dryadJournalConcept != null) {
+            manuscript.setOrganization(new Organization(dryadJournalConcept));
+            manuscript.setJournalConcept(dryadJournalConcept);
+        }
+        manuscript.setStatus(Manuscript.STATUS_PUBLISHED);
+        if (jsonNode.path("score") != null) {
+            manuscript.optionalProperties.put("crossref-score", String.valueOf(jsonNode.path("score").floatValue()));
+        }
+        return manuscript;
+    }
+
 
     public static String cleanJournalCode(String journalCode) {
         return journalCode.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();

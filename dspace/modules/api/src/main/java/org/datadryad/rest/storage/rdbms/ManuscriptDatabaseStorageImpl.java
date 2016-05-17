@@ -11,21 +11,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Date;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
+import org.dspace.JournalUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.datadryad.rest.storage.rdbms.OrganizationDatabaseStorageImpl;
 import java.text.SimpleDateFormat;
 
 /**
@@ -36,7 +39,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     private static Logger log = Logger.getLogger(ManuscriptDatabaseStorageImpl.class);
 
     private static final ObjectMapper mapper;
-    private static final ObjectWriter writer;
     private static final ObjectReader reader;
 
     // Database objects
@@ -72,7 +74,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     static {
         mapper = new ObjectMapper();
         mapper.setConfig(mapper.getSerializationConfig().with(new SimpleDateFormat("yyyy-MM-dd")));
-        writer = mapper.writerWithType(Manuscript.class).withDefaultPrettyPrinter();
         reader = mapper.reader(Manuscript.class);
     }
 
@@ -102,13 +103,12 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         return context;
     }
 
-    private static void completeContext(Context context) throws SQLException {
+    private static void completeContext(Context context) {
         try {
             context.complete();
         } catch (SQLException ex) {
             // Abort the context to force a new connection
             abortContext(context);
-            throw ex;
         }
     }
 
@@ -116,13 +116,20 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         context.abort();
     }
 
-    static Manuscript manuscriptFromTableRow(TableRow row) throws IOException {
+    private static Manuscript manuscriptFromTableRow(TableRow row) throws IOException {
         if(row != null) {
             String json_data = row.getStringColumn(COLUMN_JSON_DATA);
+            int organizationID = row.getIntColumn(COLUMN_ORGANIZATION_ID);
             Manuscript manuscript = reader.readValue(json_data);
             manuscript.setStatus(row.getStringColumn(COLUMN_STATUS));
-            if (manuscript.getOrganization() == null) {
-                manuscript.setOrganization(new Organization());
+            try {
+                Context context = getContext();
+                Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByConceptID(context, organizationID);
+                manuscript.setOrganization(organization);
+                manuscript.setJournalConcept(JournalUtils.getJournalConceptByISSN(organization.organizationISSN));
+                completeContext(context);
+            } catch (SQLException e) {
+                log.error("couldn't find organization " + organizationID);
             }
             return manuscript;
         } else {
@@ -143,11 +150,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     static TableRow tableRowFromManuscript(Manuscript manuscript, Integer organizationId) throws IOException {
         if(manuscript != null) {
-            String json_data = writer.writeValueAsString(manuscript);
             TableRow row = new TableRow(MANUSCRIPT_TABLE, MANUSCRIPT_COLUMNS);
             row.setColumn(COLUMN_ORGANIZATION_ID, organizationId);
             row.setColumn(COLUMN_MSID, manuscript.getManuscriptId());
-            row.setColumn(COLUMN_JSON_DATA, json_data);
+            row.setColumn(COLUMN_JSON_DATA, manuscript.toString());
             row.setColumn(COLUMN_DATE_ADDED, new Date());
             row.setColumn(COLUMN_STATUS, manuscript.getStatus());
             return row;
@@ -157,25 +163,81 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     }
 
     private static Manuscript getManuscriptById(Context context, String msid, String organizationCode) throws SQLException, IOException {
-        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, organizationCode);
+        Manuscript manuscript = null;
+        TableRow row = getTableRowByManuscriptId(context, msid, organizationCode);
+        if (row != null) {
+            manuscript = manuscriptFromTableRow(row);
+            manuscript.getOrganization().organizationCode = organizationCode;
+        }
+        return manuscript;
+    }
+
+    private static TableRow getTableRowByManuscriptId(Context context, String msid, String organizationCode) throws SQLException, IOException {
+        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (organization == null) {
             return null;
         } else {
             Integer organizationId = organization.organizationId;
             String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
             TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
-            Manuscript manuscript = null;
-            if (row != null) {
-                manuscript = manuscriptFromTableRow(row);
-                manuscript.getOrganization().organizationCode = organizationCode;
-            }
-            return manuscript;
+            return row;
         }
+    }
+
+    private static List<TableRow> getTableRowsMatchingManuscript(Context context, Manuscript manuscript) throws SQLException, IOException {
+        ArrayList<TableRow> finalRows = new ArrayList<TableRow>();
+        Organization organization = manuscript.getOrganization();
+        if (organization == null) {
+            return null;
+        }
+        TableRow existingRow = null;
+        Integer organizationId = organization.organizationId;
+        if (manuscript.getManuscriptId() != null) {
+            existingRow = getTableRowByManuscriptId(context, manuscript.getManuscriptId(), organization.organizationCode);
+        }
+        if (existingRow == null) {
+            // try looking it up by pub doi
+            String pubDOI = manuscript.getPublicationDOI();
+            if (!"".equals(pubDOI)) {
+                log.debug("Looking for a manuscript with publication DOI like " + pubDOI + " and organization_id like " + organizationId);
+                String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? and active = ? and json_data like '%\"publicationDOI\" : \"" + pubDOI + "\"%'";
+                existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE);
+            }
+        }
+        if (existingRow != null) {
+            finalRows.add(existingRow);
+        } else {
+            // try looking it up by authors and title:
+            // first, query database for entries that have all surnames of authors in the json_data
+            // then, compare the title of those entries with the one we're looking for.
+            List<Author> authorList = manuscript.getAuthorList();
+            StringBuilder authorString = new StringBuilder();
+            for (Author author : authorList) {
+                authorString.append(" and json_data like '%\"familyName\" : \"" + StringEscapeUtils.escapeSql(author.familyName) + "\"%' ");
+            }
+            if (!"".equals(authorString.toString())) {
+                String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? and active = ? " + authorString.toString();
+                TableRowIterator tableRowIterator = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE);
+                if (tableRowIterator != null) {
+                    List<TableRow> rows = tableRowIterator.toList();
+                    for (TableRow row : rows) {
+                        Manuscript databaseManuscript = manuscriptFromTableRow(row);
+                        String databaseTitle = StringUtils.deleteWhitespace(StringUtils.upperCase(databaseManuscript.getTitle()));
+                        String manuscriptTitle = StringUtils.deleteWhitespace(StringUtils.upperCase(manuscript.getTitle()));
+                        double score = JournalUtils.getHamrScore(databaseTitle, manuscriptTitle);
+                        if (score > 0.9) {
+                            finalRows.add(row);
+                        }
+                    }
+                }
+            }
+        }
+        return finalRows;
     }
 
     private static List<Manuscript> getManuscripts(Context context, String organizationCode, int limit) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, organizationCode);
+        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (organization == null) {
             return manuscripts;
         } else {
@@ -185,7 +247,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             while(rows.hasNext()) {
                 TableRow row = rows.next();
                 Manuscript manuscript = manuscriptFromTableRow(row);
-                manuscript.setOrganization(organization);
                 manuscripts.add(manuscript);
             }
             return manuscripts;
@@ -194,7 +255,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     private static List<Manuscript> getManuscriptsMatchingQuery(Context context, String organizationCode, String searchParam, int limit) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, organizationCode);
+        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (organization == null) {
             return manuscripts;
         } else {
@@ -206,7 +267,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             while(rows.hasNext()) {
                 TableRow row = rows.next();
                 Manuscript manuscript = manuscriptFromTableRow(row);
-                manuscript.setOrganization(organization);
                 manuscripts.add(manuscript);
             }
             return manuscripts;
@@ -215,17 +275,23 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     public List<Manuscript> getManuscriptsMatchingPath(StoragePath path, int limit) throws StorageException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
+        String manuscriptID = path.getManuscriptId();
         try {
             Context context = getContext();
-            Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, path.getOrganizationCode());
+            Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, path.getOrganizationCode());
             if (organization != null) {
                 Integer organizationId = organization.organizationId;
-                String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ? AND msid like ? ORDER BY manuscript_id DESC LIMIT ? ";
-                TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, path.getManuscriptId(), limit);
+                TableRowIterator rows = null;
+                if (manuscriptID != null) {
+                    String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ? AND msid like ? ORDER BY manuscript_id DESC LIMIT ? ";
+                    rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, manuscriptID, limit);
+                } else {
+                    String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ? ORDER BY manuscript_id DESC LIMIT ? ";
+                    rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, limit);
+                }
                 while (rows.hasNext()) {
                     TableRow row = rows.next();
                     Manuscript manuscript = manuscriptFromTableRow(row);
-                    manuscript.setOrganization(organization);
                     manuscripts.add(manuscript);
                 }
             }
@@ -236,35 +302,40 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         return manuscripts;
     }
 
+    public List<Manuscript> getManuscriptsMatchingManuscript(Manuscript manuscript) throws StorageException {
+        List<Manuscript> manuscripts = new ArrayList<Manuscript>();
+        try {
+            Context context = getContext();
+            List<TableRow> rows = getTableRowsMatchingManuscript(context, manuscript);
+            for (TableRow row : rows) {
+                manuscripts.add(manuscriptFromTableRow(row));
+            }
+            completeContext(context);
+        } catch (Exception ex) {
+            throw new StorageException("Exception finding manuscript", ex);
+        }
+        return manuscripts;
+    }
+
     private static void insertManuscript(Context context, Manuscript manuscript, String organizationCode) throws SQLException, IOException {
-        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, organizationCode);
+        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (organization != null) {
             Integer organizationId = organization.organizationId;
             TableRow row = tableRowFromManuscript(manuscript, organizationId);
-            row.setColumn(COLUMN_VERSION, 1);
-            row.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
             if (row != null) {
+                row.setColumn(COLUMN_VERSION, 1);
+                row.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
                 DatabaseManager.insert(context, row);
             }
         }
     }
 
-    private static void updateManuscript(Context context, Manuscript manuscript, String organizationCode) throws SQLException, IOException {
-        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, organizationCode);
-        if (organization != null) {
-            Integer organizationId = organization.organizationId;
-            // Fetch original row
-            String msid = manuscript.getManuscriptId();
-            String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
-            TableRow existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
-
-            if (existingRow != null) {
-                String json_data = writer.writeValueAsString(manuscript);
-                existingRow.setColumn(COLUMN_JSON_DATA, json_data);
-                existingRow.setColumn(COLUMN_STATUS, manuscript.getStatus());
-                existingRow.setColumn(COLUMN_DATE_ADDED, new Date());
-                DatabaseManager.update(context, existingRow);
-            }
+    private static void updateTableRowFromManuscript(Context context, Manuscript manuscript, TableRow existingRow) throws SQLException, IOException {
+        if (existingRow != null) {
+            existingRow.setColumn(COLUMN_JSON_DATA, manuscript.toString());
+            existingRow.setColumn(COLUMN_STATUS, manuscript.getStatus());
+            existingRow.setColumn(COLUMN_DATE_ADDED, new Date());
+            DatabaseManager.update(context, existingRow);
         }
     }
 
@@ -272,10 +343,11 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if(manuscript.getManuscriptId() == null) {
             throw new SQLException("NULL ID");
         }
-        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCode(context, organizationCode);
+        Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (organization != null) {
             Integer organizationId = organization.organizationId;
             Integer manuscriptId = getManuscriptInternalId(context, manuscript.getManuscriptId(), organizationId);
+            log.error("deleting ms " + manuscript.getManuscriptId() + " with internal ID " + manuscriptId);
             TableRow row = tableRowFromManuscript(manuscript, organizationId);
             row.setColumn(COLUMN_ID, manuscriptId);
             row.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
@@ -285,13 +357,11 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     @Override
     public Boolean objectExists(StoragePath path, Manuscript manuscript) throws StorageException {
-        String msid = manuscript.getManuscriptId();
-        String organizationCode = path.getOrganizationCode();
         try {
             Context context = getContext();
-            Manuscript databaseManuscript = getManuscriptById(context, msid, organizationCode);
+            boolean result = getTableRowsMatchingManuscript(context, manuscript).size() > 0;
             completeContext(context);
-            return databaseManuscript != null;
+            return result;
         } catch (SQLException ex) {
             throw new StorageException("Exception finding manuscript", ex);
         } catch (IOException ex) {
@@ -335,9 +405,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     @Override
     protected void createObject(StoragePath path, Manuscript manuscript) throws StorageException {
         if(objectExists(path, manuscript)) {
+            log.error("object exists");
             throw new StorageException("Unable to create, manuscript already exists");
         }
-
         String organizationCode = path.getOrganizationCode();
         try {
             Context context = getContext();
@@ -374,6 +444,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             Context context = getContext();
             Manuscript manuscript = getManuscriptById(context, manuscriptId, organizationCode);
             if(manuscript == null) {
+                log.error("manuscript " + manuscriptId + " does not exist");
                 throw new StorageException("Manuscript does not exist");
             }
             deleteManuscript(context, manuscript, organizationCode);
@@ -387,24 +458,22 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     @Override
     protected void updateObject(StoragePath path, Manuscript manuscript) throws StorageException {
-        if(!objectExists(path, manuscript)){
-            throw new StorageException("Unable to update, manuscript does not exist");
-        }
-
-        String organizationCode = path.getOrganizationCode();
-        String manuscriptId = path.getManuscriptId();
-        if(!manuscriptId.equals(manuscript.getManuscriptId())) {
-            throw new StorageException("Unable to change manuscript ID in update - use delete and create instead");
-        }
-
+        Context context = null;
         try {
-            Context context = getContext();
-            updateManuscript(context, manuscript, organizationCode);
-            completeContext(context);
+            context = getContext();
+            List<TableRow> rows = getTableRowsMatchingManuscript(context, manuscript);
+            if (rows.size() == 0) {
+                throw new StorageException("Unable to update, manuscript does not exist");
+            } else {
+                updateTableRowFromManuscript(context, manuscript, rows.get(0));
+            }
         } catch (SQLException ex) {
             throw new StorageException("Exception saving manuscript", ex);
         } catch (IOException ex) {
             throw new StorageException("Exception writing manuscript", ex);
+        }
+        finally {
+            completeContext(context);
         }
     }
 }

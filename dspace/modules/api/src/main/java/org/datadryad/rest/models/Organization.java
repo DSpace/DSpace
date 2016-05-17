@@ -2,6 +2,8 @@
  */
 package org.datadryad.rest.models;
 
+import org.datadryad.api.DryadJournalConcept;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -20,6 +22,16 @@ public class Organization {
     public String organizationCode = "";
     public String organizationName = "";
     public String organizationISSN = "";
+
+    public Organization() {
+    }
+
+    public Organization(DryadJournalConcept dryadJournalConcept) {
+        organizationId = new Integer(dryadJournalConcept.getConceptID());
+        organizationCode = dryadJournalConcept.getJournalID();
+        organizationName = dryadJournalConcept.getFullName();
+        organizationISSN = dryadJournalConcept.getISSN();
+    }
 
     public Boolean isValid() {
         return (organizationCode != null && organizationCode.length() > 0);

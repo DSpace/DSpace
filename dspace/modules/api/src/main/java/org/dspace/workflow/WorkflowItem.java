@@ -189,6 +189,11 @@ public class WorkflowItem implements InProgressSubmission {
         return findAllByJournalName(c, journalName);
     }
 
+    public static WorkflowItem[] findAllByISSN(Context c, String ISSN) throws SQLException, AuthorizeException, IOException {
+        String journalName = JournalUtils.getJournalConceptByISSN(ISSN).getFullName();
+        return findAllByJournalName(c, journalName);
+    }
+
     public static WorkflowItem[] findAllByJournalName(Context c, String journalName) throws SQLException, AuthorizeException, IOException {
         List<WorkflowItem> wfItems = new ArrayList<WorkflowItem>();
 
@@ -281,7 +286,6 @@ public class WorkflowItem implements InProgressSubmission {
                 // check to see if this matches by msid:
                 DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
                 for (int j=0; j<msids.length; j++) {
-                    String canonicalMsID = JournalUtils.getCanonicalManuscriptID(msids[j].value,manuscript.getOrganization().organizationCode);
                     if (manuscript.getManuscriptId().equals(msids[j].value)) {
                         log.debug("matched " + item.getID() + " by msid");
                         matched = true;

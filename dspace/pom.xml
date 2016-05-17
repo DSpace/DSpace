@@ -338,6 +338,18 @@
 		</profile>
 
 		<profile>
+			<id>publication-updater</id>
+			<activation>
+				<file>
+					<exists>../publication-updater/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../publication-updater</module>
+			</modules>
+		</profile>
+
+		<profile>
 			<id>dspace-ui-shared</id>
 			<activation>
 				<file>

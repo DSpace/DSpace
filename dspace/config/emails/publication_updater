@@ -1,0 +1,12 @@
+# E-mail sent to curators with updated item summary.
+#
+# Parameters: {0} Journal Name
+#             {1} ISSN
+#             {2} Data
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Data packages have been published for {0} ({1})
+
+{2}
+
+

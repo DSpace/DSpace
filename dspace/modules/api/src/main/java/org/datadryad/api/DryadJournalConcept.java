@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.content.authority.Term;
-import org.dspace.content.authority.AuthorityObject;
 import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
@@ -13,7 +12,6 @@ import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.StorageException;
 import org.dspace.JournalUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -60,8 +58,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     public static Properties journalMetadata;
     private static Properties defaultMetadataValues;
-
-    private Context context = null;
 
     private static Logger log = Logger.getLogger(DryadJournalConcept.class);
 
@@ -203,8 +199,9 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     @JsonIgnore
     private void setConceptMetadataValue(String mdString, String value) {
+        Context context = null;
         try {
-            Context context = new Context();
+            context = new Context();
             context.turnOffAuthorisationSystem();
             Concept underlyingConcept = getUnderlyingConcept(context);
             AuthorityMetadataValue[] metadataValues = underlyingConcept.getMetadata(mdString);
@@ -361,9 +358,10 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     }
 
     public void setStatus(String status) {
+        Context context = null;
         if (Concept.Status.CANDIDATE.name().equals(status) || Concept.Status.ACCEPTED.name().equals(status)) {
             try {
-                Context context = new Context();
+                context = new Context();
                 Concept concept = getUnderlyingConcept(context);
                 concept.setStatus(context, status);
                 context.complete();
@@ -583,11 +581,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     @JsonIgnore
     public Boolean isAccepted() {
         return Concept.Status.ACCEPTED.name().equals(getStatus());
-    }
-
-    @JsonIgnore
-    public void setConceptStatusToAccepted() throws SQLException {
-        getUnderlyingConcept().setStatus(context, Concept.Status.ACCEPTED.name());
     }
 
     @JsonIgnore
