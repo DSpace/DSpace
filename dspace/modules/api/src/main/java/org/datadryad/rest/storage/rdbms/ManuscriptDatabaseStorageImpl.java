@@ -7,10 +7,7 @@ import java.io.IOException;
 import java.lang.Exception;
 import java.lang.Integer;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Date;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -122,6 +119,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             int organizationID = row.getIntColumn(COLUMN_ORGANIZATION_ID);
             Manuscript manuscript = reader.readValue(json_data);
             manuscript.setStatus(row.getStringColumn(COLUMN_STATUS));
+            if (manuscript.optionalProperties == null) {
+                manuscript.optionalProperties = new LinkedHashMap<String, String>();
+            }
             try {
                 Context context = getContext();
                 Organization organization = OrganizationDatabaseStorageImpl.getOrganizationByConceptID(context, organizationID);

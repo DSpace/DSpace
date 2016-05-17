@@ -296,7 +296,9 @@ public class Manuscript {
     }
 
     public void setPublicationDOI(String doi) {
-        if (doi != null && doi.startsWith("doi:")) {
+        if (doi == null || "".equals(doi)) {
+            this.publicationDOI = "";
+        } else if (doi.startsWith("doi:")) {
             this.publicationDOI = doi;
         } else {
             this.publicationDOI = "doi:" + doi;
