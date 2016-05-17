@@ -296,7 +296,11 @@ public class Manuscript {
     }
 
     public void setPublicationDOI(String doi) {
-        this.publicationDOI = doi;
+        if (doi != null && doi.startsWith("doi:")) {
+            this.publicationDOI = doi;
+        } else {
+            this.publicationDOI = "doi:" + doi;
+        }
     }
 
     public Date getPublicationDate() {
