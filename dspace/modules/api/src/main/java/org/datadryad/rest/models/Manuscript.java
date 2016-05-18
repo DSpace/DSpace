@@ -243,6 +243,9 @@ public class Manuscript {
     }
 
     public String getManuscriptId() {
+        if (manuscriptId == null) {
+            manuscriptId = "";
+        }
         return manuscriptId;
     }
 
@@ -292,6 +295,9 @@ public class Manuscript {
     }
 
     public String getPublicationDOI() {
+        if (publicationDOI == null) {
+            publicationDOI = "";
+        }
         return publicationDOI;
     }
 
