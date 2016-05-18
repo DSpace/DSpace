@@ -668,9 +668,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Delete bitstream logo
         setLogo(context, collection, null);
 
-        // Remove all authorization policies
-        authorizeService.removeAllPolicies(context, collection);
-
         Iterator<WorkspaceItem> workspaceItems = workspaceItemService.findByCollection(context, collection).iterator();
         while (workspaceItems.hasNext()) {
             WorkspaceItem workspaceItem = workspaceItems.next();
@@ -737,6 +734,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             owningCommunities.remove();
             owningCommunity.getCollections().remove(collection);
         }
+
+        // Remove all authorization policies
+        authorizeService.removeAllPolicies(context, collection);
 
         collectionDAO.delete(context, collection);
     }
