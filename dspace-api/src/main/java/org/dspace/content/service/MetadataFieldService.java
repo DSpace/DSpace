@@ -111,4 +111,12 @@ public interface MetadataFieldService {
      * @throws AuthorizeException
      */
     public void delete(Context context, MetadataField metadataField) throws SQLException, AuthorizeException;
+
+    /**
+     * Split the given string into its schema, element, and Qualifier components
+     *
+     * @param str metadata field
+     * @return array 3 element array
+     */
+    public String[] fromString(String str);
 }

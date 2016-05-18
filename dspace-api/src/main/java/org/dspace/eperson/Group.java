@@ -249,4 +249,9 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
         permanent = permanence;
         setModified();
     }
+
+    public String toString() {
+        return Constants.typeText[getType()] + "." + getName();
+    }
+
 }

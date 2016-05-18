@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -114,5 +115,14 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     @Override
     public int countTotal(Context context) throws SQLException {
         return metadataValueDAO.countRows(context);
+    }
+
+    @Override
+    public List<String> collectValues(List<MetadataValue> vals) {
+        ArrayList<String> list = new ArrayList<String>();
+        for (MetadataValue v : vals) {
+            list.add(v.getValue());
+        }
+        return list;
     }
 }

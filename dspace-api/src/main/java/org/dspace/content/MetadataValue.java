@@ -13,6 +13,9 @@ import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * Database access class representing a Dublin Core metadata value.
  * It represents a value of a given <code>MetadataField</code> on an Item.
@@ -262,6 +265,5 @@ public class MetadataValue
         hash = 47 * hash + this.getDSpaceObject().getID().hashCode();
         return hash;
     }
-
 
 }
