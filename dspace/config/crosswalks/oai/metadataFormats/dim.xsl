@@ -21,7 +21,7 @@
         </dim:dim>
     </xsl:template>
 
-    <xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element/doc:element/doc:field[@name='value']">
+    <xsl:template match="/doc:metadata/doc:element/doc:element/doc:element/doc:field[@name='value']">
         <xsl:call-template name="dimfield">
             <xsl:with-param name="mdschema" select="../../../@name"/>
             <xsl:with-param name="element" select="../../@name"/>
@@ -33,7 +33,7 @@
         </xsl:call-template>
     </xsl:template>
 
-    <xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element/doc:element/doc:element/doc:field[@name='value']">
+    <xsl:template match="/doc:metadata/doc:element/doc:element/doc:element/doc:element/doc:field[@name='value']">
         <xsl:call-template name="dimfield">
             <xsl:with-param name="mdschema" select="../../../../@name"/>
             <xsl:with-param name="element" select="../../../@name"/>
