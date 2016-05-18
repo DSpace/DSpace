@@ -181,7 +181,7 @@ public class RecentSubmissionTransformer extends AbstractDSpaceTransformer {
 
     protected String getBaseUrl(DSpaceObject dso) throws SQLException {
         String url = contextPath;
-        if(dso != null && dso.equals(siteService.findSite(context)))
+        if(dso != null && !dso.equals(siteService.findSite(context)))
         {
             url += "/handle/" + dso.getHandle();
         }
