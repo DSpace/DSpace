@@ -48,8 +48,11 @@ public interface MediaFilterService {
      * Iterate through the item's bitstreams in the ORIGINAL bundle, applying
      * filters if possible.
      *
+     * @param context context
+     * @param myItem item
      * @return true if any bitstreams processed,
      *         false if none
+     * @throws Exception if error
      */
     public boolean filterItem(Context context, Item myItem) throws Exception;
 
@@ -60,8 +63,12 @@ public interface MediaFilterService {
      * instantiated.  Exceptions from filtering will be logged to STDOUT and
      * swallowed.
      *
+     * @param c context
+     * @param myItem item
+     * @param myBitstream bitstream
      * @return true if bitstream processed,
      *         false if no applicable filter or already processed
+     * @throws Exception if error
      */
     public boolean filterBitstream(Context c, Item myItem, Bitstream myBitstream) throws Exception;
 
@@ -72,7 +79,7 @@ public interface MediaFilterService {
      * already been filtered, and if not or if overWrite is set, invokes the
      * filter.
      *
-     * @param c
+     * @param context
      *            context
      * @param item
      *            item containing bitstream to process
@@ -80,7 +87,7 @@ public interface MediaFilterService {
      *            source bitstream to process
      * @param formatFilter
      *            FormatFilter to perform filtering
-     *
+     * @throws Exception if error occurs
      * @return true if new rendition is created, false if rendition already
      *         exists and overWrite is not set
      */

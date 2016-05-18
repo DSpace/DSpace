@@ -27,7 +27,7 @@ public abstract class UpdateBitstreamsAction implements UpdateAction {
 	/**
 	 *        Set variable to indicate that the dc.description.provenance field may 
 	 *        be changed as a result of Bitstream changes by ItemUpdate
-	 * @param alterProvenance
+	 * @param alterProvenance whether to alter provenance
 	 */
 	public void setAlterProvenance(boolean alterProvenance)
 	{

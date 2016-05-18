@@ -38,7 +38,7 @@ public class ItemListConfig
 	 * Create a new instance of the Item list configuration.  This loads
 	 * all the required information from configuration
 	 * 
-	 * @throws BrowseException
+	 * @throws BrowseException if count error
 	 */
 	public ItemListConfig()
 		throws BrowseException
@@ -97,7 +97,8 @@ public class ItemListConfig
 	/**
 	 * What metadata is to go in the given column number?
 	 * 
-	 * @param col
+	 * @param col column
+         * @return array of metadata
 	 */
 	public String[] getMetadata(int col)
 	{
@@ -113,6 +114,7 @@ public class ItemListConfig
      * @param mfield	the string representation of the metadata
      * @param init	the default value of the array elements
      * @return	a three element array with schema, element and qualifier respectively
+     * @throws IOException if IO error
      */
     public final String[] interpretField(String mfield, String init)
     	throws IOException

@@ -914,7 +914,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      * @param qualifier metadata field qualifier
      * @param value field value or Item.ANY to match any value
      * @return an iterator over the items matching that authority value
-     * @throws SQLException, AuthorizeException, IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      *
      */
     @Override

@@ -228,7 +228,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
      *         object can be used
      * @return <code>true</code> if user is authorized to perform the given
      *         action, <code>false</code> otherwise
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean authorize(Context c, DSpaceObject o, int action, EPerson e, boolean useInheritance) throws SQLException
     {
@@ -623,8 +623,8 @@ public class AuthorizeServiceImpl implements AuthorizeService
      * @param reason
      * @param dso
      * @param owningCollection
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void generateAutomaticPolicies(Context context, Date embargoDate,

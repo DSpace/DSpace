@@ -23,6 +23,12 @@ import org.jdom.Document;
  */
 public class CommandRunner
 {
+    /**
+     * 
+     * @param args commandline args
+     * @throws IOException if IO error
+     * @throws FileNotFoundException if file doesn't exist
+     */
     public static void main(String[] args)
             throws FileNotFoundException, IOException
     {
@@ -46,11 +52,10 @@ public class CommandRunner
     /**
      * Read a file of command lines and execute each in turn.
      *
-     * @param doc details of recognized commands.
      * @param script the file of command lines to be executed.
-     * @return
-     * @throws FileNotFoundException
-     * @throws IOException 
+     * @return status code
+     * @throws IOException if IO error
+     * @throws FileNotFoundException if file doesn't exist
      */
     static int runManyCommands(String script)
             throws FileNotFoundException, IOException

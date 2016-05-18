@@ -157,6 +157,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
      * When there are no results, an
      * empty list is returned, but never <code>null</code>.
      *
+     * @param context context
      * @param dso the  DSpace Object whose metadata to export.
      * @return results of crosswalk as list of XML elements.
      *
@@ -181,6 +182,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
      * This is typically the root element of a document.
      * <p>
      *
+     * @param context context
      * @param dso the  DSpace Object whose metadata to export.
      * @return root Element of the target metadata, never <code>null</code>
      *
@@ -323,6 +325,11 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
      * Ingest a whole document.  Build Document object around root element,
      * and feed that to the transformation, since it may get handled
      * differently than a List of metadata elements.
+     * @param createMissingMetadataFields whether to create missing fields
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
@@ -336,6 +343,12 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
      * Translation produces a list of DIM "field" elements;
      * these correspond directly to Item.addMetadata() calls so
      * they are simply executed.
+     * @param createMissingMetadataFields whether to create missing fields
+     * @param dimList List of elements
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, List<Element> dimList, boolean createMissingMetadataFields)

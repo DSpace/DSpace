@@ -72,6 +72,9 @@ public class LocaleOrderingFilter implements TextFilter
     /**
      * We don't need to use the language parameter, so map this to
      * the standard sort string filter
+     * @param str string
+     * @param lang language
+     * @return string
      */
     @Override
     public String filter(String str, String lang)

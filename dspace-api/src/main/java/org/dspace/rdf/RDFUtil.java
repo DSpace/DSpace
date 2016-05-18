@@ -157,7 +157,7 @@ public class RDFUtil {
      * @return The converted data or null if the conversion result is empty.
      *         Remember to close the model as soon as you don't need it anymore.
      * @throws RDFMissingIdentifierException If no identifier could be generated.
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      * @throws ItemNotArchivedException If you want to convert an Item that is
      *                                  not archived.
      * @throws ItemWithdrawnException If you want to convert an Item that is 
@@ -219,7 +219,7 @@ public class RDFUtil {
      * @return The converted data or null if the conversion result is empty.
      *         Remember to close the model as soon as you don't need it anymore.
      * @throws RDFMissingIdentifierException If no identifier could be generated.
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      * @throws ItemNotArchivedException If you want to convert an Item that is
      *                                  not archived.
      * @throws ItemWithdrawnException If you want to convert an Item that is 
@@ -271,7 +271,7 @@ public class RDFUtil {
      *                anonymous user here, as the triple store probably provides 
      *                a public SPARQL endpoint.
      * @param dso The DSpaceObjet to check.
-     * @throws SQLException
+     * @throws SQLException if database error
      * @throws ItemNotArchivedException If {@code dso} is an Item and is not
      *                                  archived.
      * @throws ItemWithdrawnException If {@code dso} is an Item and is withdrawn.
@@ -315,7 +315,7 @@ public class RDFUtil {
      * @return true if {@link #isPublic(Context, DSpaceObject) 
      * isPublic(Context, DSpaceObject)} doesn't throw an exception, false if it 
      * did.
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     public static boolean isPublicBoolean(Context context, DSpaceObject dso) 
             throws SQLException
@@ -345,7 +345,7 @@ public class RDFUtil {
      * @param type DSpaceObject type (e.g. {@link Constants#ITEM Constants.ITEM}).
      * @param id Id of the DspaceObject.
      * @param handle Handle of the DSpaceObject.
-     * @throws SQLException
+     * @throws SQLException if database error
      * @throws RDFMissingIdentifierException In case that no Identifier could be generated.
      */
     public static void delete(Context ctx, int type, UUID id, String handle, List<String> identifiers)

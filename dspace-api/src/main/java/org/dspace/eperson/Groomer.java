@@ -162,7 +162,7 @@ public class Groomer
     /**
      * List accounts having no password salt.
      *
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     private static void findUnsalted()
             throws SQLException

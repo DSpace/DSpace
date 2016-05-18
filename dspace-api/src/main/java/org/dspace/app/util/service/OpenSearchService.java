@@ -55,7 +55,7 @@ public interface OpenSearchService {
      *
      * @param scope - null for entire repository, or handle or community or collection
      * @return document the service document
-     * @throws java.io.IOException
+     * @throws IOException if IO error
      */
     public Document getDescriptionDoc(String scope) throws IOException;
 
@@ -71,6 +71,7 @@ public interface OpenSearchService {
     /**
      * Returns a formatted set of search results as a string
      *
+     * @param context DSpace Context
      * @param format results format - html, rss or atom
      * @param query - the search query
      * @param totalResults - the hit count
@@ -80,7 +81,7 @@ public interface OpenSearchService {
      * @param results the retreived DSpace objects satisfying search
      * @param labels labels to apply - format specific
      * @return formatted search results
-     * @throws java.io.IOException
+     * @throws IOException if IO error
      */
     public String getResultsString(Context context, String format, String query, int totalResults, int start, int pageSize,
                                           DSpaceObject scope, DSpaceObject[] results,
@@ -88,6 +89,7 @@ public interface OpenSearchService {
     /**
      * Returns a formatted set of search results as a document
      *
+     * @param context DSpace Context
      * @param format results format - html, rss or atom
      * @param query - the search query
      * @param totalResults - the hit count
@@ -97,7 +99,7 @@ public interface OpenSearchService {
      * @param results the retreived DSpace objects satisfying search
      * @param labels labels to apply - format specific
      * @return formatted search results
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public Document getResultsDoc(Context context, String format, String query, int totalResults, int start, int pageSize,
                                          DSpaceObject scope, DSpaceObject[] results, Map<String, String> labels)

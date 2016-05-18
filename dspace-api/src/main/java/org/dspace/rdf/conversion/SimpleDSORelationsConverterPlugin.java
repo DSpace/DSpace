@@ -525,7 +525,7 @@ implements ConverterPlugin
      * @param bitstream Bitstream for which a URL should be generated.
      * @return The link to the URL or null if the Bistream is is a Community or 
      * Collection logo.
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     public String bitstreamURI(Context context, Bitstream bitstream)
             throws SQLException

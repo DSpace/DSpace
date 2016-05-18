@@ -140,9 +140,9 @@ public class DOIIdentifierProviderTest
     /**
     * Create a fresh Item, installed in the repository.
     *
-    * @throws SQLException
-    * @throws AuthorizeException
-    * @throws IOException
+    * @throws SQLException if database error
+    * @throws AuthorizeException if authorization error
+    * @throws IOException if IO error
     */
     private Item newItem()
             throws SQLException, AuthorizeException, IOException, IllegalAccessException, IdentifierException, WorkflowException
@@ -209,7 +209,7 @@ public class DOIIdentifierProviderTest
      * @param metadata Whether the DOI should be included in the metadata of the item.
      * @param doi The doi or null if we should generate one.
      * @return the DOI
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     public String createDOI(Item item, Integer status, boolean metadata, String doi)
             throws SQLException, IdentifierException, AuthorizeException

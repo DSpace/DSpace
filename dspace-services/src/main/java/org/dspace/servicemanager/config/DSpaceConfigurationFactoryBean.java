@@ -41,8 +41,8 @@ import org.springframework.util.Assert;
  * with PropertiesLoaderSupport. This allows the configuration object to behave
  * like a normal java.util.Properties object which can be passed on to
  * setProperties() method allowing PropertyOverrideConfigurer and
- * PropertyPlaceholderConfigurer to take advantage of Commons Configuration.
- * <p/> Internally a CompositeConfiguration object is used for merging multiple
+ * PropertyPlaceholderConfigurer to take advantage of Commons Configuration.<br>
+ * Internally a CompositeConfiguration object is used for merging multiple
  * Configuration objects.
  *
  * @see java.util.Properties
@@ -63,7 +63,7 @@ public class DSpaceConfigurationFactoryBean implements InitializingBean, Factory
 
     /**
      * Initialize all properties via the passed in DSpace ConfigurationService
-     * @param configurationService
+     * @param configurationService current DSpace configuration service
      */
 	public DSpaceConfigurationFactoryBean(ConfigurationService configurationService)
     {
@@ -73,7 +73,7 @@ public class DSpaceConfigurationFactoryBean implements InitializingBean, Factory
 
     /**
      * Initialize all properties via the passed in Commons Configuration
-     * @param configuration
+     * @param configuration Commons configuration
      */
 	public DSpaceConfigurationFactoryBean(Configuration configuration) {
 		Assert.notNull(configuration);
@@ -83,6 +83,7 @@ public class DSpaceConfigurationFactoryBean implements InitializingBean, Factory
 	/**
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
+        @Override
 	public Object getObject() throws Exception {
 		return (configuration != null) ? ConfigurationConverter.getProperties(configuration) : null;
 	}
@@ -90,6 +91,7 @@ public class DSpaceConfigurationFactoryBean implements InitializingBean, Factory
 	/**
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
+        @Override
 	public Class getObjectType() {
 		return java.util.Properties.class;
 	}
@@ -97,6 +99,7 @@ public class DSpaceConfigurationFactoryBean implements InitializingBean, Factory
 	/**
 	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
 	 */
+        @Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -139,7 +142,7 @@ public class DSpaceConfigurationFactoryBean implements InitializingBean, Factory
 	/**
 	 * Set the commons configurations objects which will be used as properties.
 	 *
-	 * @param configurations
+	 * @param configurations array of Commons Configuration objects
 	 */
 	public void setConfigurations(Configuration[] configurations) {
 		this.configurations = configurations;
@@ -154,12 +157,16 @@ public class DSpaceConfigurationFactoryBean implements InitializingBean, Factory
 	 * internally create a PropertiesConfiguration object based on the URL
 	 * retrieved from the given Resources.
 	 *
-	 * @param locations
+	 * @param locations array of resource locations
 	 */
 	public void setLocations(Resource[] locations) {
 		this.locations = locations;
 	}
 
+        /**
+         * Return whether to throw an exception if a configuration is missing.
+         * @return true if exception should be throw, false otherwise.
+         */
 	public boolean isThrowExceptionOnMissing() {
 		return throwExceptionOnMissing;
 	}
@@ -167,7 +174,8 @@ public class DSpaceConfigurationFactoryBean implements InitializingBean, Factory
 	/**
 	 * Set the underlying Commons CompositeConfiguration throwExceptionOnMissing
 	 * flag.
-	 * @param throwExceptionOnMissing
+         * @see org.apache.commons.configuration.AbstractConfiguration
+	 * @param throwExceptionOnMissing whether to throw an exception if a config is missing
 	 */
 	public void setThrowExceptionOnMissing(boolean throwExceptionOnMissing) {
 		this.throwExceptionOnMissing = throwExceptionOnMissing;
@@ -176,7 +184,7 @@ public class DSpaceConfigurationFactoryBean implements InitializingBean, Factory
 	/**
 	 * Getter for the underlying CompositeConfiguration object.
 	 *
-	 * @return
+	 * @return CompositeConfiguration object
 	 */
 	public CompositeConfiguration getConfiguration() {
 		return configuration;

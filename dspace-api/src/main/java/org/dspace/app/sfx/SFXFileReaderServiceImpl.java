@@ -140,7 +140,7 @@ public class SFXFileReaderServiceImpl implements SFXFileReaderService {
      * @param e    DOM node of the mapping pair in the XML file (field element)
      * @param item The item to process, from which metadata values will be taken
      * @return assembled OpenURL query.
-     * @throws IOException
+     * @throws IOException if IO error
      */
     protected String processFields(Node e, Item item) throws IOException {
         NodeList cl = e.getChildNodes();

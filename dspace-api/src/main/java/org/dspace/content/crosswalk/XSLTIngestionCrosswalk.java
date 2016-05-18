@@ -126,6 +126,11 @@ public class XSLTIngestionCrosswalk
      * Translation produces a list of DIM "field" elements;
      * these correspond directly to Item.addMetadata() calls so
      * they are simply executed.
+     * @param createMissingMetadataFields whether to create missing fields
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, List<Element> metadata,
@@ -155,6 +160,11 @@ public class XSLTIngestionCrosswalk
      * Ingest a whole document.  Build Document object around root element,
      * and feed that to the transformation, since it may get handled
      * differently than a List of metadata elements.
+     * @param createMissingMetadataFields whether to create missing fields
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
@@ -207,6 +217,11 @@ public class XSLTIngestionCrosswalk
      * @param context the context
      * @param dso object into which to ingest metadata
      * @param  dim root of a DIM expression
+     * @param createMissingMetadataFields whether to create missing fields
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
 
     public static void ingestDIM(Context context, DSpaceObject dso, Element dim, boolean createMissingMetadataFields)
@@ -275,7 +290,9 @@ public class XSLTIngestionCrosswalk
 
     /**
      * Simple command-line rig for testing the DIM output of a stylesheet.
-     * Usage:  java XSLTIngestionCrosswalk  <crosswalk-name> <input-file>
+     * Usage: {@code java XSLTIngestionCrosswalk  <crosswalk-name> <input-file>}
+     * @param argv arguments
+     * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception
     {

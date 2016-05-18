@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * Configuration keys, per metadata field (e.g. "dc.contributer.author")
  *
+ *  {@code
  *  # is field authority controlled (i.e. store authority, confidence values)?
  *  authority.controlled.<FIELD> = true
  *
@@ -44,7 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *  authority.minconfidence.SCHEMA.ELEMENT.QUALIFIER = SYMBOL
  *    e.g.
  *  authority.minconfidence.dc.contributor.author = accepted
- *
+ *  }
  * NOTE: There is *expected* to be a "choices" (see ChoiceAuthorityManager)
  * configuration for each authority-controlled field.
  *
@@ -215,6 +216,7 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService
     /**
      * Give the minimal level of confidence required to consider valid an authority value
      * for the given metadata.
+     * @param metadataField metadata field
      * @return the minimal valid level of confidence for the given metadata
      */
     @Override

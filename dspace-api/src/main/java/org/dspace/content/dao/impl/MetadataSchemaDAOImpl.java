@@ -38,7 +38,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * @param context DSpace context
      * @param namespace namespace URI to match
      * @return metadata schema object or null if none found.
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public MetadataSchema findByNamespace(Context context, String namespace) throws SQLException
@@ -66,9 +66,10 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * number of times in the current schema.
      *
      * @param context DSpace context
+     * @param metadataSchemaId schema id
      * @param namespace namespace URI to match
      * @return true of false
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public boolean uniqueNamespace(Context context, int metadataSchemaId, String namespace) throws SQLException
@@ -87,9 +88,10 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * Return true if and only if the passed name is unique.
      *
      * @param context DSpace context
+     * @param metadataSchemaId schema id
      * @param name  short name of schema
      * @return true of false
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public boolean uniqueShortName(Context context, int metadataSchemaId, String name) throws SQLException
@@ -112,7 +114,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * @param shortName
      *            the short name for the schema
      * @return the metadata schema object
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public MetadataSchema find(Context context, String shortName) throws SQLException

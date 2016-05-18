@@ -16,6 +16,7 @@ import java.sql.SQLException;
  * Interface representing a Database connection, this class should only be access by the context object.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> class type
  */
 public interface DBConnection<T> {
 

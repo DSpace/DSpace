@@ -22,6 +22,7 @@ import java.util.UUID;
  * Each DAO should extend this class to prevent code duplication.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> class type
  */
 public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
@@ -93,7 +94,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @param context
      * @param query
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<T> findMany(Context context, Query query) throws SQLException {
         @SuppressWarnings("unchecked")

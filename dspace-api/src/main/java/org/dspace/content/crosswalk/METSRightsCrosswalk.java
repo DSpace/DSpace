@@ -40,7 +40,7 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 
 /**
- * METSRights Ingestion & Dissemination Crosswalk
+ * METSRights Ingestion and Dissemination Crosswalk
  * <p>
  * Translate between DSpace internal policies (i.e. permissions) and the
  * METSRights metadata schema
@@ -130,12 +130,13 @@ public class METSRightsCrosswalk
      * policies (permissions) for the provided object, and translates them into
      * METSRights PermissionTypes.
      *
+     * @param context context
      * @param dso DSpace Object
-     * @return XML Element corresponding to the new <RightsDeclarationMD> translation
-     * @throws CrosswalkException
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @return XML Element corresponding to the new {@code <RightsDeclarationMD>} translation
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public Element disseminateElement(Context context, DSpaceObject dso)
@@ -404,10 +405,11 @@ public class METSRightsCrosswalk
      * @param context
      * @param dso
      * @param root
-     * @throws CrosswalkException
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param createMissingMetadataFields
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
@@ -432,12 +434,14 @@ public class METSRightsCrosswalk
      * conjunction with another Crosswalk which can create/restore missing
      * Groups or EPeople (e.g. RoleCrosswalk).
      *
-     * @param context
-     * @param dso
-     * @throws CrosswalkException
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param context context
+     * @param dso Dspace object
+     * @param ml list of elements
+     * @param createMissingMetadataFields whether to create missing fields
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      * @see RoleCrosswalk
      */
     @Override

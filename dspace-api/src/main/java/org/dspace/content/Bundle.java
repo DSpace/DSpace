@@ -88,9 +88,11 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Set the name of the bundle
      * 
+     * @param context context
      * @param name
      *            string name of the bundle (ORIGINAL, TEXT, THUMBNAIL) are the
      *            values currently used
+     * @throws SQLException if database error
      */
     public void setName(Context context, String name) throws SQLException
     {
@@ -197,6 +199,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * return type found in Constants
+     * @return bundle type
      */
     @Override
     public int getType()

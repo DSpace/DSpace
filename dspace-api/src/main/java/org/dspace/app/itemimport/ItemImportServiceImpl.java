@@ -175,10 +175,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      * @param mycollections The collections the items are inserted to
      * @param sourceDir The filepath to the file to read data from
      * @param mapFile The filepath to mapfile to be generated
-     * @param template
+     * @param template whether to use collection template item as starting point
      * @param inputType The type of the input data (bibtex, csv, etc.)
      * @param workingDir The path to create temporary files (for command line or UI based)
-     * @throws Exception
+     * @throws Exception if error occurs
      */
     @Override
     public void addBTEItems(Context c, List<Collection> mycollections,
@@ -457,10 +457,14 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * item? try and add it to the archive.
+     * @param c current Context
      * @param mycollections - add item to these Collections.
      * @param path - directory containing the item directories.
      * @param itemname handle - non-null means we have a pre-defined handle already
      * @param mapOut - mapfile we're writing
+     * @param template whether to use collection template item as starting point
+     * @return Item
+     * @throws Exception if error occurs
      */
     protected Item addItem(Context c, List<Collection> mycollections, String path,
             String itemname, PrintWriter mapOut, boolean template) throws Exception
@@ -765,6 +769,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      * @param path The path to the data directory for this item
      * @param filename The collections file filename. Should be "collections"
      * @return A list of collections in which to insert the item or null
+     * @throws IOException if IO error
+     * @throws SQLException if database error
      */
 
     protected List<Collection> processCollectionFile(Context c, String path, String filename) throws IOException, SQLException
@@ -827,7 +833,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     }
 
     /**
-     * Read in the handle file or return null if empty or doesn't exist
+     * Read in the handle file contents or return null if empty or doesn't exist
+     * @param c DSpace context
+     * @param i DSpace item
+     * @param path path to handle file
+     * @param filename name of file
+     * @return handle file contents or null if doesn't exist
      */
     protected String processHandleFile(Context c, Item i, String path, String filename)
     {
@@ -886,6 +897,14 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      * Given a contents file and an item, stuffing it with bitstreams from the
      * contents file Returns a List of Strings with lines from the contents
      * file that request non-default bitstream permission
+     * @param c DSpace Context
+     * @param i DSpace item
+     * @param path path as string
+     * @param filename file name
+     * @return List of Strings
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     protected List<String> processContentsFile(Context c, Item i, String path,
             String filename) throws SQLException, IOException,
@@ -1129,14 +1148,15 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * each entry represents a bitstream....
-     * @param c
-     * @param i
-     * @param path
-     * @param fileName
-     * @param bundleName
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @param c DSpace Context
+     * @param i Dspace Item
+     * @param path path to file
+     * @param fileName file name
+     * @param bundleName bundle name
+     * @param primary if primary bitstream
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     protected void processContentFileEntry(Context c, Item i, String path,
             String fileName, String bundleName, boolean primary) throws SQLException,
@@ -1209,14 +1229,15 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     /**
      * Register the bitstream file into DSpace
      *
-     * @param c
-     * @param i
-     * @param assetstore
+     * @param c DSpace Context
+     * @param i DSpace Item
+     * @param assetstore assetstore number
      * @param bitstreamPath the full filepath expressed in the contents file
-     * @param bundleName
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @param bundleName bundle name
+     * @param description bitstream description
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     protected void registerBitstream(Context c, Item i, int assetstore,
             String bitstreamPath, String bundleName, String description )
@@ -1281,19 +1302,21 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      * Process the Options to apply to the Item. The options are tab delimited
      *
      * Options:
+     *    {@code
      *      48217870-MIT.pdf        permissions: -r 'MIT Users'     description: Full printable version (MIT only)
      *      permissions:[r|w]-['group name']
      *      description: 'the description of the file'
-     *
+     *    }
      *      where:
+     *    {@code
      *          [r|w] (meaning: read|write)
      *          ['MIT Users'] (the group name)
-     *
-     * @param c
-     * @param myItem
-     * @param options
-     * @throws SQLException
-     * @throws AuthorizeException
+     *    }
+     * @param c DSpace Context
+     * @param myItem DSpace Item
+     * @param options List of option strings
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     protected void processOptions(Context c, Item myItem, List<String> options)
             throws SQLException, AuthorizeException
@@ -1447,12 +1470,13 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     /**
      * Set the Permission on a Bitstream.
      *
-     * @param c
-     * @param g
-     * @param actionID
-     * @param bs
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param c DSpace Context
+     * @param g Dspace Group
+     * @param actionID action identifier
+     * @param bs Bitstream
+     * @see org.dspace.core.Constants
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     protected void setPermission(Context c, Group g, int actionID, Bitstream bs)
             throws SQLException, AuthorizeException
@@ -1488,9 +1512,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     // XML utility methods
     /**
      * Lookup an attribute from a DOM node.
-     * @param n
-     * @param name
-     * @return
+     * @param n node
+     * @param name attribute name
+     * @return attribute value
      */
     private String getAttributeValue(Node n, String name)
     {
@@ -1512,8 +1536,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * Return the String value of a Node.
-     * @param node
-     * @return
+     * @param node node
+     * @return string value
      */
     protected String getStringValue(Node node)
     {
@@ -1539,6 +1563,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      *            the filename to load from
      *
      * @return the DOM representation of the XML file
+     * @throws IOException if IO error
+     * @throws ParserConfigurationException if config error
+     * @throws SAXException if XML error
      */
     protected Document loadXML(String filename) throws IOException,
             ParserConfigurationException, SAXException
@@ -1721,7 +1748,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      * @param resumeDir In case of a resume request, the directory that containsthe old mapfile and data 
      * @param inputType The input type of the data (bibtex, csv, etc.), in case of local file
      * @param context The context
-     * @throws Exception
+     * @param template whether to use template item
+     * @throws Exception if error
      */
     @Override
     public void processUIImport(String filepath, Collection owningCollection, String[] otherCollections, String resumeDir, String inputType, Context context, final boolean template) throws Exception

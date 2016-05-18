@@ -74,6 +74,7 @@ public interface AuthenticationMethod {
      * @param username
      *            Username, if available.  May be null.
      * @return true if new ePerson should be created.
+     * @throws SQLException if database error
      */
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
@@ -92,6 +93,7 @@ public interface AuthenticationMethod {
      * @param eperson
      *            newly created EPerson record - email + information from the
      *            registration form will have been filled out.
+     * @throws SQLException if database error
      */
     public void initEPerson(Context context,
                             HttpServletRequest request,
@@ -111,6 +113,7 @@ public interface AuthenticationMethod {
      * @param username
      *            Username, if available.  May be null.
      * @return true if this method allows user to change ePerson password.
+     * @throws SQLException if database error
      */
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
@@ -149,6 +152,7 @@ public interface AuthenticationMethod {
      * 
      * @return array of EPerson-group IDs, possibly 0-length, but never
      *         <code>null</code>.
+     * @throws SQLException if database error
      */
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request)
         throws SQLException;
@@ -185,6 +189,7 @@ public interface AuthenticationMethod {
      * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
      * <br>NO_SUCH_USER    - user not found using this method.
      * <br>BAD_ARGS        - user/pw not appropriate for this method
+     * @throws SQLException if database error
      */
 
     public int authenticate(Context context,

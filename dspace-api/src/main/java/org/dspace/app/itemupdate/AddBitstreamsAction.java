@@ -46,17 +46,17 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
 	}
 	
 	/**
-	 * 	Adds bitstreams from the archive as listed in the contents file.
+	 * Adds bitstreams from the archive as listed in the contents file.
 	 * 
-	 *  @param context
-	 *  @param itarch
-	 *  @param isTest
-	 *  @param suppressUndo
-	 *  @throws IllegalArgumentException
-	 *  @throws ParseException
-	 *  @throws IOException
-	 *  @throws AuthorizeException
-	 *  @throws SQLException
+	 * @param context DSpace Context
+	 * @param itarch Item Archive
+	 * @param isTest test flag
+	 * @param suppressUndo undo flag
+	 * @throws IOException if IO error
+         * @throws IllegalArgumentException if arg exception
+         * @throws SQLException if database error
+         * @throws AuthorizeException if authorization error
+         * @throws ParseException if parse error
 	 */
 	@Override
     public void execute(Context context, ItemArchive itarch, boolean isTest,
@@ -117,6 +117,22 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
 	        }
 	}
 		
+        /**
+         * Add bitstream
+         * @param context DSpace Context
+         * @param itarch Item Archive
+         * @param item DSpace Item
+         * @param dir directory
+         * @param ce contents entry for bitstream
+         * @param suppressUndo undo flag
+         * @param isTest test flag
+         * @return bundle name
+         * @throws IOException if IO error
+         * @throws IllegalArgumentException if arg exception
+         * @throws SQLException if database error
+         * @throws AuthorizeException if authorization error
+         * @throws ParseException if parse error
+         */
 	protected String addBitstream(Context context, ItemArchive itarch, Item item, File dir,
 			                  ContentsEntry ce, boolean suppressUndo, boolean isTest)
 	throws IOException, IllegalArgumentException, SQLException, AuthorizeException, ParseException

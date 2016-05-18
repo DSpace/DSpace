@@ -153,11 +153,12 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
      * database constraint.
      *
      * @param context dspace context
+     * @param fieldId field id
      * @param metadataSchema metadataSchema
-     * @param element
-     * @param qualifier
+     * @param element element
+     * @param qualifier qualifier
      * @return true if unique
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean hasElement(Context context, int fieldId, MetadataSchema metadataSchema, String element, String qualifier) throws SQLException
     {

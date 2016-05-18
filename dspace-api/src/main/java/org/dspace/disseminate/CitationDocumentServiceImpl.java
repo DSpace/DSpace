@@ -253,7 +253,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     /**
      * Should the citation page be the first page of the document, or the last page?
-     * default => true. true => first page, false => last page
+     * default = true. true = first page, false = last page
      * citation_as_first_page=true
      */
     protected Boolean citationAsFirstPage = null;

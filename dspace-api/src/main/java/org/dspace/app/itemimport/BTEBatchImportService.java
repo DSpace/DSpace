@@ -20,7 +20,7 @@ import java.util.Map;
 
 
 /**
- * This class acts as a Service in the procedure ot batch import using the Biblio-Transformation-Engine
+ * This class acts as a Service in the procedure to batch import using the Biblio-Transformation-Engine
  */
 public class BTEBatchImportService
 {
@@ -39,7 +39,7 @@ public class BTEBatchImportService
 
     /**
      * Setter method for dataLoaders parameter
-     * @param dataLoaders
+     * @param dataLoaders map of data loaders
      */
     public void setDataLoaders(Map<String, DataLoader> dataLoaders)
     {
@@ -47,7 +47,7 @@ public class BTEBatchImportService
     }
 
     /**
-     * 
+     * Get data loaders
      * @return the map of DataLoaders
      */
     public Map<String, DataLoader> getDataLoaders()
@@ -56,7 +56,7 @@ public class BTEBatchImportService
     }
 
     /**
-     * 
+     * Get output map
      * @return the outputMapping
      */
 	public Map<String, String> getOutputMap() {
@@ -65,20 +65,32 @@ public class BTEBatchImportService
 
 	/**
 	 * Setter method for the outputMapping
-	 * @param outputMapping
+	 * @param outputMap the output mapping
 	 */
 	public void setOutputMap(Map<String, String> outputMap) {
 		this.outputMap = outputMap;
 	}
 
+        /**
+         * Get transformation engine
+         * @return transformation engine
+         */
 	public TransformationEngine getTransformationEngine() {
 		return transformationEngine;
 	}
 
+        /**
+         * set transformation engine
+         * @param transformationEngine transformation engine
+         */
 	public void setTransformationEngine(TransformationEngine transformationEngine) {
 		this.transformationEngine = transformationEngine;
 	}
 	
+        /**
+         * Getter of file data loaders
+         * @return List of file data loaders
+         */
 	public List<String> getFileDataLoaders(){
 		List<String> result = new ArrayList<String>();
 				

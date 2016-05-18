@@ -203,6 +203,7 @@ public class ResourcePolicy{
 
     /**
      * assign an EPerson to this policy
+     * @param eperson Eperson
      */
     public void setEPerson(EPerson eperson)
     {
@@ -221,6 +222,7 @@ public class ResourcePolicy{
 
     /**
      * sets ID for Group referred to by this policy
+     * @param epersonGroup Group
      */
     public void setGroup(Group epersonGroup)
     {

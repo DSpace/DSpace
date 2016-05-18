@@ -93,9 +93,9 @@ public class EZIDIdentifierProviderTest
     /**
      * Create a fresh Item, installed in the repository.
      *
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     private Item newItem(Context ctx)
             throws SQLException, AuthorizeException, IOException, WorkflowException {
@@ -403,7 +403,7 @@ public class EZIDIdentifierProviderTest
 
     /**
      * Test of crosswalkMetadata method, of class EZIDIdentifierProvider.
-     * @throws Exception
+     * @throws Exception if error
      */
     @Test
     public void testCrosswalkMetadata()

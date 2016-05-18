@@ -23,6 +23,7 @@ import java.util.List;
  * Each DSO Database Access Objects should extend this class to prevent code duplication.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> class type
  */
 public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends AbstractHibernateDAO<T>
 {

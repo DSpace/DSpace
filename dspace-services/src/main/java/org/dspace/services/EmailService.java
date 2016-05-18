@@ -18,6 +18,7 @@ public interface EmailService
 {
     /**
      * Provide a reference to the JavaMail session.
+     * @return JavaMail session
      */
     Session getSession();
 }

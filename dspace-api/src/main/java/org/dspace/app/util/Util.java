@@ -89,6 +89,7 @@ public class Util {
          * @param encoding
          *            character encoding, e.g. UTF-8
          * @return the encoded string
+         * @throws java.io.UnsupportedEncodingException if encoding error
          */
         public static String encodeBitstreamName(String stringIn, String encoding) throws java.io.UnsupportedEncodingException {
             // FIXME: This should be moved elsewhere, as it is used outside the UI
@@ -164,6 +165,7 @@ public class Util {
          * @param stringIn
          *                input string to encode
          * @return the encoded string
+         * @throws java.io.UnsupportedEncodingException if encoding error
          */
         public static String encodeBitstreamName(String stringIn) throws java.io.UnsupportedEncodingException {
                 return encodeBitstreamName(stringIn, Constants.DEFAULT_ENCODING);
@@ -455,7 +457,10 @@ public class Util {
      *            A String with the element name of the metadata field
      * @param qualifier
      *            A String with the qualifier name of the metadata field
+     * @param locale locale
      * @return A list of the respective "displayed-values"
+     * @throws SQLException if database error
+     * @throws DCInputsReaderException if reader error
      */
 
     public static List<String> getControlledVocabulariesDisplayValueLocalized(

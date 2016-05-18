@@ -119,6 +119,8 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
 
     /**
      * Create an authority based on a given orcid bio
+     * @param bio Bio
+     * @return OrcidAuthorityValue
      */
     public static OrcidAuthorityValue create(Bio bio) {
         OrcidAuthorityValue authority = OrcidAuthorityValue.create();

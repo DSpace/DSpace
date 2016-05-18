@@ -250,6 +250,11 @@ public class XSLTDisseminationCrosswalk
     /**
      * Disseminate the DSpace item, collection, or community.
      *
+     * @param context context
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      * @see DisseminationCrosswalk
      */
     @Override
@@ -321,6 +326,8 @@ public class XSLTDisseminationCrosswalk
      * Generate an intermediate representation of a DSpace object.
      *
      * @param dso The dspace object to build a representation of.
+     * @param dcvs list of metadata
+     * @return element
      */
     public static Element createDIM(DSpaceObject dso, List<MockMetadataValue> dcvs)
     {
@@ -343,6 +350,7 @@ public class XSLTDisseminationCrosswalk
      * Generate an intermediate representation of a DSpace object.
      *
      * @param dso The dspace object to build a representation of.
+     * @return element
      */
     public static Element createDIM(DSpaceObject dso)
     {
@@ -515,7 +523,9 @@ public class XSLTDisseminationCrosswalk
 
     /**
      * Simple command-line rig for testing the DIM output of a stylesheet.
-     * Usage:  java XSLTDisseminationCrosswalk  <crosswalk-name> <handle> [output-file]
+     * Usage:  {@code java XSLTDisseminationCrosswalk  <crosswalk-name> <handle> [output-file]}
+     * @param argv arguments
+     * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception
     {

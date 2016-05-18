@@ -46,6 +46,11 @@ public class CommunityFiliator
         handleService = HandleServiceFactory.getInstance().getHandleService();
     }
 
+    /**
+     *
+     * @param argv arguments
+     * @throws Exception if error
+     */
     public static void main(String[] argv) throws Exception
     {
         // create an options object and populate it
@@ -174,6 +179,15 @@ public class CommunityFiliator
         }
     }
 
+    /**
+     *
+     * @param c context
+     * @param parent parent Community
+     * @param child child community
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorize error
+     * @throws IOException if IO error
+     */
     public void filiate(Context c, Community parent, Community child)
             throws SQLException, AuthorizeException, IOException
     {
@@ -212,6 +226,15 @@ public class CommunityFiliator
                 + "' is parent of community: '" + child.getID() + "'");
     }
 
+    /**
+     *
+     * @param c context
+     * @param parent parent Community
+     * @param child child community
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorize error
+     * @throws IOException if IO error
+     */
     public void defiliate(Context c, Community parent, Community child)
             throws SQLException, AuthorizeException, IOException
     {
@@ -250,6 +273,13 @@ public class CommunityFiliator
                 + "'");
     }
 
+    /**
+     * Find a community by ID
+     * @param c context
+     * @param communityID community ID
+     * @return Community object
+     * @throws SQLException if database error
+     */
     protected Community resolveCommunity(Context c, String communityID)
             throws SQLException
     {

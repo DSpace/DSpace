@@ -34,8 +34,8 @@ import java.util.*;
  * core in RDF schema / contents - text file, listing one file per line / file1
  * - files contained in the item / file2 / ...
  * <P>
- * issues -doesn't handle special characters in metadata (needs to turn &'s into
- * &amp;, etc.)
+ * issues -doesn't handle special characters in metadata (needs to turn {@code &'s} into
+ * {@code &amp;}, etc.)
  * <P>
  * Modified by David Little, UCSD Libraries 12/21/04 to allow the registration
  * of files (bitstreams) into DSpace.

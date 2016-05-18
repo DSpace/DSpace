@@ -34,6 +34,8 @@ public class ScriptLauncher
      * Execute the DSpace script launcher
      *
      * @param args Any parameters required to be passed to the scripts it executes
+     * @throws IOException if IO error
+     * @throws FileNotFoundException if file doesn't exist
      */
     public static void main(String[] args)
             throws FileNotFoundException, IOException
@@ -90,8 +92,8 @@ public class ScriptLauncher
 
     /**
      * Recognize and execute a single command.
-     * @param doc
-     * @param args
+     * @param doc Document
+     * @param args arguments
      */
     static int runOneCommand(Document commandConfigs, String[] args)
     {
@@ -275,6 +277,7 @@ public class ScriptLauncher
 
     /**
      * Display the commands that the current launcher config file knows about
+     * @param commandConfigs configs as Document
      */
     private static void display(Document commandConfigs)
     {

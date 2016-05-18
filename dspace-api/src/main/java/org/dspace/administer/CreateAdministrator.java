@@ -59,6 +59,7 @@ public final class CreateAdministrator
      * 
      * @param argv
      *            command-line arguments
+     * @throws Exception if error
      */
     public static void main(String[] argv)
     	throws Exception
@@ -92,7 +93,7 @@ public final class CreateAdministrator
     /** 
      * constructor, which just creates and object with a ready context
      * 
-     * @throws Exception
+     * @throws Exception if error
      */
     protected CreateAdministrator()
     	throws Exception
@@ -106,7 +107,7 @@ public final class CreateAdministrator
      * Method which will negotiate with the user via the command line to 
      * obtain the administrator's details
      * 
-     * @throws Exception
+     * @throws Exception if error
      */
     protected void negotiateAdministratorDetails()
     	throws Exception
@@ -228,7 +229,7 @@ public final class CreateAdministrator
      * @param language preferred language
      * @param pw	desired password
      * 
-     * @throws Exception
+     * @throws Exception if error
      */
     protected void createAdministrator(String email, String first, String last,
     		String language, String pw)

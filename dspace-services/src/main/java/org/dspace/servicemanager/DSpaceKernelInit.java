@@ -28,6 +28,7 @@ public class DSpaceKernelInit {
     /**
      * Creates or retrieves a DSpace Kernel with the given name.
      *
+     * @param name kernel name (or null for default kernel)
      * @return a DSpace Kernel
      * @throws IllegalStateException if the Kernel cannot be created
      */

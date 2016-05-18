@@ -25,7 +25,7 @@ import org.dspace.core.Context;
  * and add it to the expected place) just with an empty list of used metadata
  * fields because there are none.
  * 
- * @author Christian Scheible <christian.scheible@uni-konstanz.de>
+ * @author Christian Scheible christian.scheible@uni-konstanz.de
  * 
  */
 public class SolrServiceContentInOriginalBundleFilterPlugin implements SolrServiceIndexPlugin
