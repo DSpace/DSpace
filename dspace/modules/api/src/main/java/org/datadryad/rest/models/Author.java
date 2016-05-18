@@ -74,7 +74,7 @@ public class Author {
 
     public final String fullName() {
         String name = familyName;
-        if (givenNames != null) {
+        if (!"".equals(givenNames)) {
             name = familyName + ", " + givenNames;
         }
         return name;
