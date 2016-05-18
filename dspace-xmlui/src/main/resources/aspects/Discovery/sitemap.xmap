@@ -42,6 +42,8 @@ and the recent submissions listing
 
             <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
             <map:transformer name="RecentSubmissionTransformer" src="org.dspace.app.xmlui.aspect.discovery.recentSubmissions.RecentSubmissionTransformer"/>
+
+            <map:transformer name="RobotsNoIndexTransformer" src="org.dspace.app.xmlui.aspect.discovery.RobotsNoIndexTransformer"/>
         </map:transformers>
                
         <map:actions>
@@ -157,11 +159,17 @@ and the recent submissions listing
                                 <map:parameter name="javascript.static#1" value="loadJQuery.js"/>
                                 <map:parameter name="javascript.static#2" value="static/js/discovery/search-controls.js"/>
                             </map:transform>
+
+                            <!--adds the "no index" robots meta tag to the page-->
+                            <map:transform type="RobotsNoIndexTransformer"/>
                             <map:serialize type="xml"/>
 						</map:match>
 
                         <map:match pattern="handle/*/*/search-filter">
                             <map:transform type="SearchFacetFilter"/>
+
+                            <!--adds the "no index" robots meta tag to the page-->
+                            <map:transform type="RobotsNoIndexTransformer"/>
                             <map:serialize type="xml"/>
                         </map:match>
 
