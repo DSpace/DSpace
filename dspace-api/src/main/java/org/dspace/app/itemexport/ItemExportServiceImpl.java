@@ -808,7 +808,7 @@ public class ItemExportServiceImpl implements ItemExportService
                     "A dspace.cfg entry for 'org.dspace.app.itemexport.download.dir' does not exist.");
         }
         File result = new File(downloadDir + System.getProperty("file.separator") + ePerson.getID());
-        if(!result.exists())
+        if(!result.exists() && ePerson.getLegacyId()!=null)
         {
             //Check for the old identifier
             result = new File(downloadDir + System.getProperty("file.separator") + ePerson.getLegacyId());
