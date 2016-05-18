@@ -99,6 +99,8 @@ public class ItemArchive {
         {
             is = new FileInputStream(new File(dir, DUBLIN_CORE_XML));
             itarch.dtomList = MetadataUtilities.loadDublinCore(getDocumentBuilder(), is);
+            
+            //The code to search for local schema files was copied from org.dspace.app.itemimport.ItemImportServiceImpl.java
             File file[] = dir.listFiles(
                 new FilenameFilter()
                 {
