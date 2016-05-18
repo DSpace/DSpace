@@ -7,9 +7,6 @@
  */
 package org.dspace.app.statistics;
 
-import org.apache.commons.lang.time.DateUtils;
-import org.dspace.core.ConfigurationManager;
-
 import java.text.DateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -18,6 +15,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import org.apache.commons.lang.time.DateUtils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Helper class for loading the analysis / report files from the reports directory
@@ -231,8 +231,8 @@ public class StatisticsLoader
         }
 
         // Create new maps for the monthly analysis / reports
-        Map<String, StatsFile> newMonthlyAnalysis = new HashMap<String, StatsFile>();
-        Map<String, StatsFile> newMonthlyReports  = new HashMap<String, StatsFile>();
+        Map<String, StatsFile> newMonthlyAnalysis = new HashMap<>();
+        Map<String, StatsFile> newMonthlyReports  = new HashMap<>();
 
         StatsFile newGeneralAnalysis = null;
         StatsFile newGeneralReport = null;
@@ -348,13 +348,12 @@ public class StatisticsLoader
      */
     private static File[] getAnalysisAndReportFileList()
     {
-        File reportDir = new File(ConfigurationManager.getProperty("log.dir"));
-        if (reportDir != null)
-        {
-            return reportDir.listFiles(new AnalysisAndReportFilter());
-        }
-
-        return null;
+        ConfigurationService cfg = DSpaceServicesFactory
+                .getInstance()
+                .getConfigurationService();
+        File dspaceDir = new File(cfg.getProperty("dspace.dir"));
+        File reportDir = new File(dspaceDir, "log"); // FIXME assumption!
+        return reportDir.listFiles(new AnalysisAndReportFilter());
     }
 
     /**

@@ -20,7 +20,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class allows the running of the DSpace statistic tools
@@ -35,7 +36,11 @@ import org.dspace.core.ConfigurationManager;
 
 public class CreateStatReport {
 
-	/**Current date and time*/
+    /**DSpace configuration*/
+    private static final ConfigurationService configuration
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    /**Current date and time*/
 	private static Calendar calendar = null;
 	
 	/**Reporting start date and time*/
@@ -53,8 +58,9 @@ public class CreateStatReport {
 	/**User context*/
 	private static Context context;
 
-    /** the config file from which to configure the analyser */
-    private static String configFile = ConfigurationManager.getProperty("dspace.dir") +
+    /** the configuration file from which to configure the analyser */
+    private static final String configFile
+            = configuration.getProperty("dspace.dir") +
                             File.separator + "config" + File.separator +
                             "dstat.cfg";
 
@@ -95,9 +101,10 @@ public class CreateStatReport {
         context.setIgnoreAuthorization(true);
         
         //get paths to directories
-        outputLogDirectory = ConfigurationManager.getProperty("log.dir") + File.separator;
-        outputReportDirectory = ConfigurationManager.getProperty("report.dir") + File.separator;
-        
+        outputLogDirectory = configuration.getProperty("dspace.dir")
+                + File.separator + "log" + File.separator; // FIXME assumption!
+        outputReportDirectory = configuration.getProperty("report.dir") + File.separator;
+
         //read in command line variable to determine which statistic to run
 		CommandLineParser parser = new PosixParser();
 		Options options = new Options();

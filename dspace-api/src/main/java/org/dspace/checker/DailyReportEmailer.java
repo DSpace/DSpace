@@ -190,7 +190,8 @@ public class DailyReportEmailer
             int numBitstreams = 0;
 
             // create a temporary file in the log directory
-            String dirLocation = ConfigurationManager.getProperty("log.dir");
+            String dirLocation = ConfigurationManager.getProperty("dspace.dir")
+                    + File.separator + "log"; // FIXME assumption!
             File directory = new File(dirLocation);
 
             if (directory.exists() && directory.isDirectory())
