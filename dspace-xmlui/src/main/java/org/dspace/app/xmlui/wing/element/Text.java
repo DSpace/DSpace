@@ -91,8 +91,7 @@ public class Text extends Field
     {
         this.params.enableDeleteOperation();
     }
-    
-    
+
     /** ******************************************************************** */
     /** Raw Values * */
     /** ******************************************************************** */
@@ -164,5 +163,17 @@ public class Text extends Field
         Instance instance = new Instance(context);
         instances.add(instance);
         return instance;
+    }
+    
+    /**
+    * Set the value's language
+    */
+    public Value setLanguageValue(String lang) throws WingException
+    {
+    	this.removeValueOfType(Value.TYPE_LANG);
+    	Value value = new Value(context, Value.TYPE_LANG);
+    	value.addContent(lang);
+    	values.add(value);
+    	return value;
     }
 }
