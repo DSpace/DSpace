@@ -66,7 +66,7 @@ public class Author {
             } else {
                 // there is only one word in the name: assign it to the familyName?
                 this.familyName = authorString;
-                this.givenNames = null;
+                this.givenNames = "";
             }
         }
         return;
