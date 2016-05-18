@@ -1,12 +1,13 @@
-# E-mail sent to curators with updated item summary.
+# E-mail sent to curators about packages that have been published.
 #
-# Parameters: {0} Journal Name
-#             {1} ISSN
-#             {2} Data
+# Parameters: {0} Subject message
+#             {1} Journal Name
+#             {2} ISSN
+#             {3} Data
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: Data packages have been published for {0} ({1})
+Subject: {0} for {1} ({2})
 
-{2}
+{3}
 
 
