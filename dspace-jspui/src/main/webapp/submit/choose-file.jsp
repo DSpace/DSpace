@@ -425,6 +425,10 @@
             %>
                 query:{workflow_id:'<%= subInfo.getSubmissionItem().getID()%>'}
             <%
+            } else if (subInfo.isEditing()) {
+            %>
+                query:{edit_item:'<%= subInfo.getSubmissionItem().getID()%>'}
+            <%
             } else {
             %>
                 query:{workspace_item_id:'<%= subInfo.getSubmissionItem().getID()%>'}
@@ -576,7 +580,9 @@
                         }
                     %>   
                         <input class="btn btn-primary col-md-<%= 12 / (col + 2) %>" type="submit" name="<%=UploadStep.SUBMIT_UPLOAD_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
-        </div>                
+        </div>
+        
+        <input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>                
     </form>
 <%
   if (bSherpa)

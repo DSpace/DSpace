@@ -9,7 +9,6 @@ package org.dspace.submit;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.util.SubmissionInfo;
+import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 
@@ -360,5 +361,45 @@ public abstract class AbstractProcessingStep
         // set info to request
         request.setAttribute("submission.page", Integer.valueOf(pageNumber));
     }
+    
+    /**
+     * Get the configuration of the current step from parameters in the request, 
+     * along with the current SubmissionInfo object. 
+     * If there is a problem, <code>null</code> is returned.
+     * 
+     * @param request
+     *            HTTP request
+     * @param si
+     *            The current SubmissionInfo object
+     * 
+     * @return the current SubmissionStepConfig
+     */
+    public static SubmissionStepConfig getCurrentStepConfig(
+            HttpServletRequest request, SubmissionInfo si)
+    {
+        int stepNum = -1;
+        SubmissionStepConfig step = (SubmissionStepConfig) request
+                .getAttribute("step");
 
+        if (step == null)
+        {
+            // try and get it as a parameter
+            stepNum = Util.getIntParameter(request, "step");
+
+            // if something is wrong, return null
+            if (stepNum < 0 || si == null || si.getSubmissionConfig() == null)
+            {
+                return null;
+            }
+            else
+            {
+                return si.getSubmissionConfig().getStep(stepNum);
+            }
+        }
+        else
+        {
+            return step;
+        }
+    }
+    
 }

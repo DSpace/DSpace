@@ -216,6 +216,8 @@
 					    <input class="btn btn-primary col-md-6" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
 				<%  }  %>
 					</div>
+					
+		<input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>					
     </form>
 
 </dspace:layout>

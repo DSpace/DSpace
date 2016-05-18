@@ -122,5 +122,6 @@
         
         <input class="btn btn-warning col-md-6" type="submit" name="prune" value="<fmt:message key="jsp.submit.verify-prune.proceed.button"/>" />
 		<input class="btn btn-default col-md-6" type="submit" name="do_not_prune" value="<fmt:message key="jsp.submit.verify-prune.notproceed.button"/>" />
+		<input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>
     </form>
 </dspace:layout>

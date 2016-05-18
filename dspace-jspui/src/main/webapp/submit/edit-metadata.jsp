@@ -1260,7 +1260,7 @@
        }
 
        // ignore inputs invisible in this scope
-       if (!inputs[z].isVisible(scope))
+       if (!si.isEditing() && !inputs[z].isVisible(scope))
        {
            if (inputs[z].isReadOnly(scope))
            {
@@ -1415,7 +1415,9 @@
     <%  }  %>
     		</div><br/>
 </div>    		
-    </form>
+
+	<input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>
+</form>
 
 <script type="text/javascript">
 

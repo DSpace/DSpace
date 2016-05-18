@@ -82,7 +82,9 @@
 						<input class="btn btn-default col-md-6" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.select-collection.cancel"/>" />
 						<input class="btn btn-primary col-md-6" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
 					</div>
-				</div>		
+				</div>
+				
+		<input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>		
     </form>
 <%  } else { %>
 	<p class="alert alert-warning"><fmt:message key="jsp.submit.select-collection.none-authorized"/></p>

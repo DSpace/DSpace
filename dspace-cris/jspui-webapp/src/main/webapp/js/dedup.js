@@ -34,8 +34,7 @@ fnServerObjectToArrayDedup = function (tableid, typeID, check)
             	duplicationData[tableid] = new Object();
             	duplicationData["dedupnotecontainer"] = new Object();
     			var duplicates = json.potentialDuplicates;
-    			if (duplicates!=null && 
-    					(duplicates.length > 0 || (check && rejs!=null && rejs.length > 0)))
+    			if (duplicates!=null && duplicates.length > 0)
     			{
 						for (var i = 0, iLen = duplicates.length; i < iLen; i++) {
 							duplicationData[tableid][''

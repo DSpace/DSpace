@@ -61,6 +61,7 @@
                 <input type="submit" name="submit_retry" value="<fmt:message key="jsp.submit.upload-error.retry.button"/>" />
             </p>
         </center>
+        <input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>
     </form>
 
 </dspace:layout>

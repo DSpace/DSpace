@@ -23,11 +23,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.functors.SwitchClosure;
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.app.util.Util;
 import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSONUploadResponse;
@@ -147,9 +149,18 @@ public class SubmissionController extends DSpaceServlet
         String workflowID = request.getParameter("workflow");
         String resumableFilename = request.getParameter("resumableFilename");
         String itemID = request.getParameter("edit_item");
+        int codeCallerPage = Util.getIntParameter(request, "pageCallerID");
+        request.setAttribute("pageCallerID", codeCallerPage);
         
+        if (!StringUtils.isEmpty(resumableFilename)) // if resumable.js asks whether a part of af file was received
+        {
+            if (request.getMethod().equals("GET"))
+            {
+                DoGetResumable(request, response);
+            }
+        }
         // If resuming a workspace item
-        if (workspaceID != null)
+        else if (workspaceID != null)
         {
             try
             {
@@ -225,35 +236,33 @@ public class SubmissionController extends DSpaceServlet
                 EditItem editItem = new EditItem(item);
                 // load submission information
                 SubmissionInfo si = SubmissionInfo.load(context, request, editItem);
+                
                 // start over at beginning of first workflow step
-                setBeginningOfStep(request, true);
-                request.setAttribute("bitstreampoliciesmode", true);
-
+                setBeginningOfStep(request, true);                                
+                request.setAttribute("edititemmode", true);
+                
                 doStep(context, request, response, si, WORKFLOW_FIRST_STEP);
             } catch (NumberFormatException nfe) {
                 log.warn(LogManager.getHeader(context, "bad_item_id", "bad_id=" + itemID));
                 JSPManager.showInvalidIDError(request, response, itemID, -1);
             }
         }      
-        else if (!StringUtils.isEmpty(resumableFilename)) // if resumable.js asks whether a part of af file was received
-        {
-            if (request.getMethod().equals("GET"))
-            {
-                DoGetResumable(request, response);
-            }
-        }
         else
         {
             // otherwise, forward to doDSPost() to do usual processing
             doDSPost(context, request, response);
         }
 
+        
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+        int codeCallerPage = Util.getIntParameter(request, "pageCallerID");
+        request.setAttribute("pageCallerID", codeCallerPage);
+        
     	// Configuration of current step in Item Submission Process
         SubmissionStepConfig currentStepConfig;
         
@@ -487,7 +496,7 @@ public class SubmissionController extends DSpaceServlet
         }
 
         // if this is the furthest step the user has been to, save that info
-        if (!subInfo.isInWorkflow() && (currentStepConfig.getStepNumber() > getStepReached(subInfo)))
+        if (!subInfo.isInWorkflow() && !subInfo.isEditing() && (currentStepConfig.getStepNumber() > getStepReached(subInfo)))
         {
             // update submission info
             userHasReached(subInfo, currentStepConfig.getStepNumber());
@@ -598,10 +607,15 @@ public class SubmissionController extends DSpaceServlet
                
                 // save our current Submission information into the Request object
                 saveSubmissionInfo(request, subInfo);
-    
-                // forward to completion JSP
-                showProgressAwareJSP(request, response, subInfo, COMPLETE_JSP);
-        
+
+                if (subInfo.isEditing()) {
+                    exitFromSubmissionPage(request, response, subInfo);
+                    
+                }
+                else {
+                    // forward to completion JSP
+                    showProgressAwareJSP(request, response, subInfo, COMPLETE_JSP);
+                }
             }
         }
     }
@@ -642,7 +656,7 @@ public class SubmissionController extends DSpaceServlet
         // default value if we are in workflow
         double stepAndPageReached = -1;
         
-        if (!subInfo.isInWorkflow())
+        if (!subInfo.isInWorkflow() && !subInfo.isEditing())
         {
             stepAndPageReached = Double.parseDouble(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
         }
@@ -762,7 +776,7 @@ public class SubmissionController extends DSpaceServlet
 
             // Integrity check: make sure they aren't going
             // forward or backward too far
-            if ((!subInfo.isInWorkflow() && nextStep < FIRST_STEP) ||
+            if ((!subInfo.isEditing() && !subInfo.isInWorkflow() && nextStep < FIRST_STEP) ||
                     (subInfo.isInWorkflow() && nextStep < WORKFLOW_FIRST_STEP))
             {
                 nextStep = -1;
@@ -770,7 +784,7 @@ public class SubmissionController extends DSpaceServlet
             }
 
             // if trying to jump to a step you haven't been to yet
-            if (!subInfo.isInWorkflow() && (nextStep > getStepReached(subInfo)))
+            if (!subInfo.isEditing() && !subInfo.isInWorkflow() && (nextStep > getStepReached(subInfo)))
             {
                 nextStep = -1;
             }
@@ -805,7 +819,7 @@ public class SubmissionController extends DSpaceServlet
             // default value if we are in workflow
             double stepAndPageReached = -1;
             
-            if (!subInfo.isInWorkflow())
+            if (!subInfo.isInWorkflow() && !subInfo.isEditing())
             {
                 stepAndPageReached = Double.parseDouble(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
             }
@@ -882,6 +896,25 @@ public class SubmissionController extends DSpaceServlet
                 // since we haven't created an item yet.
                 JSPManager.showJSP(request, response,
                         "/submit/cancelled-removed.jsp");
+            }
+            else if (subInfo.isEditing()) 
+            {
+                int result = doSaveCurrentState(context, request, response, subInfo, stepConfig);
+
+                if (request instanceof FileUploadRequest) {
+                    FileUploadRequest fur = (FileUploadRequest) request;
+                    request = fur.getOriginalRequest();
+                }
+
+                if (result != AbstractProcessingStep.STATUS_COMPLETE) {
+                    int currStep = stepConfig.getStepNumber();
+                    doStep(context, request, response, subInfo, currStep);
+                } else {
+                    // Save submission for later - just show message
+                    saveSubmissionInfo(request, subInfo);
+                    exitFromSubmissionPage(request, response, subInfo);
+                }
+
             }
             else
             {
@@ -1075,6 +1108,16 @@ public class SubmissionController extends DSpaceServlet
                         "workspace_item_id");
                 
                 info = SubmissionInfo.load(context, request, WorkspaceItem.find(context, workspaceID));
+            }
+            else if (request.getParameter("edit_item") != null) 
+            {
+                int itemID = UIUtil.getIntParameter(request, "edit_item");
+                // load the item
+                Item item = Item.find(context, itemID);
+
+                EditItem editItem = new EditItem(item);
+                // load submission information
+                info = SubmissionInfo.load(context, request, editItem);
             }
             else
             {
@@ -1345,7 +1388,11 @@ public class SubmissionController extends DSpaceServlet
 
         String info = "";
 
-        if ((si.getSubmissionItem() != null) && si.isInWorkflow())
+        if ((si.getSubmissionItem() != null) && si.isEditing()) {
+            info = info + "<input type=\"hidden\" name=\"edit_item\" value=\"" + si.getSubmissionItem().getID()
+                    + "\"/>";
+        } 
+        else if ((si.getSubmissionItem() != null) && si.isInWorkflow())
         {
             info = info
                     + "<input type=\"hidden\" name=\"workflow_id\" value=\""
@@ -1408,7 +1455,7 @@ public class SubmissionController extends DSpaceServlet
     private void userHasReached(SubmissionInfo subInfo, int step)
             throws SQLException, AuthorizeException, IOException
     {
-        if (!subInfo.isInWorkflow() && subInfo.getSubmissionItem() != null)
+        if (!subInfo.isInWorkflow() && !subInfo.isEditing() && subInfo.getSubmissionItem() != null)
         {
             WorkspaceItem wi = (WorkspaceItem) subInfo.getSubmissionItem();
 
@@ -1456,7 +1503,7 @@ public class SubmissionController extends DSpaceServlet
      */
     public static int getStepReached(SubmissionInfo subInfo)
     {
-        if (subInfo == null || subInfo.isInWorkflow() || subInfo.getSubmissionItem() == null)
+        if (subInfo == null || subInfo.isEditing() || subInfo.isInWorkflow() || subInfo.getSubmissionItem() == null)
         {
             return -1;
         }
@@ -1816,4 +1863,23 @@ public class SubmissionController extends DSpaceServlet
         return (path.delete());
     }
 
+    private void exitFromSubmissionPage(HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+                    throws IOException
+    {
+        Integer exitCode = subInfo.getCodeCallerPage();
+        String exitPath = "/tools/edit-item?item_id="
+                + subInfo.getSubmissionItem().getItem().getID();
+        switch (exitCode)
+        {
+        case 0:
+            exitPath = "/handle/"
+                    + subInfo.getSubmissionItem().getItem().getHandle();
+            break;
+        default:
+            break;
+        }
+        response.sendRedirect(response
+                .encodeRedirectURL(request.getContextPath() + exitPath));
+    }
 }
