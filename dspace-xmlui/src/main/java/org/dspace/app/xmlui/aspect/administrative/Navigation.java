@@ -7,11 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Map;
-
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
@@ -47,6 +42,11 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * 
@@ -94,6 +94,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_account_export			 		= message("xmlui.administrative.Navigation.account_export");
 
     private static final Message T_my_account                       = message("xmlui.EPerson.Navigation.my_account");
+
+    private static final Message T_context_liveimport	= message("xmlui.administrative.Navigation.context_liveimport");
 
     /** Cached validity object */
 	private SourceValidity validity;
@@ -324,6 +326,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
             admin.addItemXref(contextPath+"/statistics", T_statistics);
             admin.addItemXref(contextPath+ "/admin/curate", T_administrative_curation);
+
+            admin.addItemXref(contextPath+"/liveimport", T_context_liveimport);
         }
     }
     

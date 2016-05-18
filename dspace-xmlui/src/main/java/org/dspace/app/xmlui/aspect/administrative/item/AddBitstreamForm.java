@@ -12,20 +12,13 @@ import java.sql.SQLException;
 import java.util.UUID;
 import org.apache.commons.lang.ArrayUtils;
 
+import org.dspace.app.xmlui.aspect.administrative.importer.external.fileaccess.FileAccessUI;
 import org.dspace.app.xmlui.aspect.submission.submit.AccessStepUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.File;
-import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -35,6 +28,10 @@ import org.dspace.content.service.ItemService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.UUID;
 
 /**
  * 
@@ -143,7 +140,10 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
                 upload.addItem().addContent(T_no_bundles);
             }
 
-            // EMBARGO FIELD
+            FileAccessUI.addAccessSelection(upload, "file-access", false);
+            FileAccessUI.addEmbargoDateField(upload, "");
+
+        // EMBARGO FIELD
             // if AdvancedAccessPolicy=false: add Embargo Fields.
             if(!isAdvancedFormEnabled){
                 AccessStepUtil asu = new AccessStepUtil(context);

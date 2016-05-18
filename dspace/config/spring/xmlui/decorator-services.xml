@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+              http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+              http://www.springframework.org/schema/context
+              http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+       default-autowire-candidates="*Service">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+    <context:component-scan base-package="org.dspace.app.xmlui.objectmanager.plugins.adapter.decorators"/>
+    <context:component-scan base-package="org.dspace.app.xmlui.aspect.administrative.plugins"/>
+
+    <!--<bean id="FileAccessEditBitstreamFormService" class="org.dspace.app.xmlui.aspect.administrative.plugins.FileAccesEditBitstreamForm" autowire="byType"/>-->
+
+</beans>

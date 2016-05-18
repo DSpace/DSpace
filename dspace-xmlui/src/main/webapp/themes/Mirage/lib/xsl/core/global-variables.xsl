@@ -57,4 +57,6 @@
     <xsl:variable name='identifier_handle'
                   select='//dri:meta/dri:pageMeta/dri:metadata[@element="identifier" and @qualifier="handle"]'/>
 
+    <xsl:variable name="DRI" select="/dri:document"/>
+
 </xsl:stylesheet>

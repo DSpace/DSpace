@@ -207,6 +207,17 @@
            <workflow-editable>true</workflow-editable>
        </step>
         -->
+
+       <!--Additional step for the live import. This should be enabled to display the live import
+       <step>
+           <heading>submit.progressbar.liveimport</heading>
+           <processing-class>org.dspace.submit.step.LiveImportStep</processing-class>
+           <jspui-binding>org.dspace.app.webui.submit.step.JSPStartSubmissionLookupStep</jspui-binding>
+           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LiveImportStep</xmlui-binding>
+           <workflow-editable>true</workflow-editable>
+       </step>
+       -->
+
       <!--Step 2 will be to Describe the item.-->
       <step>
         <heading>submit.progressbar.describe</heading>
@@ -243,6 +254,17 @@
            <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
            <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadWithEmbargoStep</jspui-binding>
            <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadWithEmbargoStep</xmlui-binding>
+           <workflow-editable>true</workflow-editable>
+       </step>
+       -->
+
+
+       <!-- Step 4 Upload Item with ScienceDirect Embargo Features
+            to enable this step, please make sure to comment-out the previous step "UploadStep"
+       <step>
+           <heading>submit.progressbar.upload</heading>
+           <processing-class>org.dspace.submit.step.ElsevierUploadStep</processing-class>
+           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.ElsevierUploadStep</xmlui-binding>
            <workflow-editable>true</workflow-editable>
        </step>
        -->

@@ -37,6 +37,7 @@
     <xsl:import href="preprocess/communitylist.xsl"/>
     <xsl:import href="preprocess/itemview.xsl"/>
     <xsl:import href="preprocess/navigation.xsl"/>
+    <xsl:import href="preprocess/elsevier-import.xsl"/>
     <xsl:output indent="yes"/>
 
 </xsl:stylesheet>

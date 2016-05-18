@@ -87,5 +87,5 @@
         </xsl:if>
     </xsl:variable>
 
-
+    <xsl:variable name="DRI" select="/dri:document"/>
 </xsl:stylesheet>

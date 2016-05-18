@@ -40,6 +40,7 @@
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/community-list.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/collection-list.xsl"/>
+    <xsl:import href="lib/xsl/aspect/sciencedirect/elsevier-embed.xsl"/>
     <xsl:output indent="yes"/>
     
 

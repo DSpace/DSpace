@@ -93,17 +93,16 @@
     </xsl:template>
 
     <xsl:template match="dri:div[@n='lookup-modal']" priority="2">
-        <div id="lookup-search-results" class="modal fade hidden" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close close-modal-results">&#215;</button>
-                        <h4 class="modal-title">Publication Results</h4>
+        <div id="lookup-search-results" class="hidden" role="dialog">
+            <div>
+                <div>
+                    <div>
+                        <h4 >Publication Results</h4>
                     </div>
                     <div class="modal-body">
                         <p/>
                     </div>
-                    <div class="modal-footer">
+                    <div>
                         <button class="ds-button-field btn btn-default pull-left" id="publication-pagination-previous">Previous results</button>
                         <button class="ds-button-field btn btn-default pull-left" id="publication-pagination-next">Next results</button>
                         <button type="button" class="btn btn-default close-modal-results">Close</button>
@@ -112,4 +111,33 @@
             </div>
         </div>
     </xsl:template>
+    
+    <xsl:template match="dri:xref">
+        <a>
+            <xsl:if test="@target">
+                <xsl:attribute name="href"><xsl:value-of select="@target"/></xsl:attribute>
+            </xsl:if>
+
+            <xsl:if test="@rend">
+                <xsl:attribute name="class"><xsl:value-of select="@rend"/></xsl:attribute>
+            </xsl:if>
+
+            <xsl:if test="@n">
+                <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
+            </xsl:if>
+
+            <xsl:if test="@onclick">
+                <xsl:attribute name="onclick"><xsl:value-of select="@onclick"/></xsl:attribute>
+            </xsl:if>
+
+            <xsl:if test="@rend='external'">
+                <xsl:attribute name="target">
+                    <xsl:text>_blank</xsl:text>
+                </xsl:attribute>
+            </xsl:if>
+
+            <xsl:apply-templates />
+        </a>
+    </xsl:template>
+
 </xsl:stylesheet>

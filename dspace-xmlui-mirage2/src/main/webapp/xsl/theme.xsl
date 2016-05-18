@@ -48,6 +48,8 @@
     <xsl:import href="aspect/discovery/discovery.xsl"/>
     <xsl:import href="aspect/artifactbrowser/one-offs.xsl"/>
     <xsl:import href="aspect/submission/submission.xsl"/>
+    <xsl:import href="aspect/sciencedirect/elsevier-embed.xsl"/>
+    <xsl:import href="aspect/sciencedirect/elsevier-lookup.xsl"/>
     <xsl:output indent="yes"/>
 
 

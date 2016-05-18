@@ -7,15 +7,8 @@
  */
 package org.dspace.app.xmlui.objectmanager;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.dspace.app.util.Util;
+import org.dspace.app.xmlui.objectmanager.plugins.adapter.decorators.AdapterDecoratorManager;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.Namespace;
 import org.dspace.app.xmlui.wing.WingException;
@@ -24,6 +17,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.xml.sax.ContentHandler;
@@ -31,6 +25,14 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -463,6 +465,10 @@ public abstract class AbstractAdapter
         	attributes.put("CHECKSUMTYPE", checksumType);
         }
         attributes.put("SIZE", String.valueOf(size));
+
+        AdapterDecoratorManager manager = AdapterDecoratorManager.getInstance();
+        manager.decorateAttribute(context, Constants.BITSTREAM, AdapterDecoratorManager.FILE, attributes, item, bitstream, fileID, groupID, admID);
+
         startElement(METS,"file",attributes);
         
         

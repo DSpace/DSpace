@@ -1,0 +1,114 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+    <map:components>
+        <map:transformers>
+            <map:transformer name="ElsevierEmbed" src="org.dspace.app.xmlui.aspect.ScienceDirect.ElsevierEmbed"/>
+
+            <map:transformer name="LiveImportForm" src="org.dspace.app.xmlui.aspect.administrative.importer.external.scidir.LiveImportForm" />
+            <map:transformer name="LiveImportResult" src="org.dspace.app.xmlui.aspect.administrative.importer.external.scidir.LiveImportResult" />
+            <map:transformer name="LiveImportSelected" src="org.dspace.app.xmlui.aspect.administrative.importer.external.scidir.LiveImportSelected" />
+
+            <map:transformer name="NoticeTransformer" src="org.dspace.app.xmlui.aspect.general.NoticeTransformer"/>
+        </map:transformers>
+
+        <map:matchers default="wildcard">
+            <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+            <map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
+        </map:matchers>
+
+        <map:actions>
+            <map:action name="LiveImportAction" src="org.dspace.app.xmlui.aspect.administrative.importer.external.scidir.LiveImportAction"/>
+        </map:actions>
+    </map:components>
+
+
+    <map:pipelines>
+        <map:pipeline>
+            <map:generate/>
+
+            <map:match pattern="handle/*/*">
+                <map:match type="HandleAuthorizedMatcher" pattern="READ">
+                    <map:match type="HandleTypeMatcher" pattern="item">
+                        <map:transform type="IncludePageMeta">
+                            <map:parameter name="javascript.static#1" value="static/js/entitlement.js"/>
+                        </map:transform>
+                    </map:match>
+                </map:match>
+            </map:match>
+
+            <map:match pattern="handle/*/*/elsevier-embed/**">
+                <map:match type="HandleAuthorizedMatcher" pattern="READ">
+                    <map:match type="HandleTypeMatcher" pattern="item">
+                        <map:transform type="ElsevierEmbed">
+                            <map:parameter name="handle" value="{../../1}/{../../2}"/>
+                            <map:parameter name="pii" value="{../../3}"/>
+                            <!-- 1x ../ per map:match parent-->
+                        </map:transform>
+                        <map:serialize type="xml"/>
+                    </map:match>
+                </map:match>
+            </map:match>
+
+            <map:match pattern="liveimport">
+                <map:select type="AuthenticatedSelector">
+                    <map:when test="administrator">
+                        <map:transform type="LiveImportForm"/>
+                    </map:when>
+                    <map:otherwise>
+                        <map:act type="StartAuthentication"/>
+                    </map:otherwise>
+                </map:select>
+            </map:match>
+
+            <map:match pattern="liveimport/result">
+                <map:select type="AuthenticatedSelector">
+                    <map:when test="administrator">
+                        <map:transform type="LiveImportResult"/>
+                    </map:when>
+                    <map:otherwise>
+                        <map:act type="StartAuthentication"/>
+                    </map:otherwise>
+                </map:select>
+            </map:match>
+
+            <map:match pattern="liveimport/selected">
+                <map:select type="AuthenticatedSelector">
+                    <map:when test="administrator">
+                        <map:transform type="LiveImportSelected"/>
+                    </map:when>
+                    <map:otherwise>
+                        <map:act type="StartAuthentication"/>
+                    </map:otherwise>
+                </map:select>
+            </map:match>
+
+            <map:match pattern="liveimport/import">
+                <map:select type="AuthenticatedSelector">
+                    <map:when test="administrator">
+                        <map:act type="LiveImportAction">
+                            <map:transform type="NoticeTransformer">
+                                <map:parameter name="outcome" value="{outcome}"/>
+                                <map:parameter name="message" value="{message}"/>
+                            </map:transform>
+                        </map:act>
+                        <map:transform type="LiveImportForm"/>
+                    </map:when>
+                    <map:otherwise>
+                        <map:act type="StartAuthentication"/>
+                    </map:otherwise>
+                </map:select>
+            </map:match>
+
+            <map:serialize type="xml"/>
+        </map:pipeline>
+    </map:pipelines>
+</map:sitemap>

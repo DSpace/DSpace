@@ -18,6 +18,7 @@ public class MetadatumDTO {
     private String element;
     private String qualifier;
     private String value;
+    private String language;
 
     public MetadatumDTO() {
     }
@@ -52,5 +53,17 @@ public class MetadatumDTO {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getField() {
+        return schema + "." + element + (qualifier==null?"":("." + qualifier));
     }
 }

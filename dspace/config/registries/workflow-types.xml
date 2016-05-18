@@ -20,4 +20,24 @@
     <scope_note>Metadata field used for the score review</scope_note>
   </dc-type>
 
+  <dc-type>
+    <schema>workflow</schema>
+    <element>fileaccess</element>
+    <scope_note>Metadata field used for the file access</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>workflow</schema>
+    <element>fileaccess</element>
+    <qualifier>date</qualifier>
+    <scope_note>Metadata field used for the embargo date</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>workflow</schema>
+    <element>fileaccess</element>
+    <qualifier>overruled</qualifier>
+    <scope_note>Metadata field used to indicate if the Elsevier permissions were manually overruled during the upload step </scope_note>
+  </dc-type>
+
 </dspace-dc-types>

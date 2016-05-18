@@ -450,7 +450,7 @@ public class UploadWithEmbargoStep extends UploadStep
      * @param bitstream The bitstream to link to
      * @returns a String link to the bitstream
      */
-    private String makeBitstreamLink(Item item, Bitstream bitstream)
+    protected String makeBitstreamLink(Item item, Bitstream bitstream)
     {
         String name = bitstream.getName();
         StringBuilder result = new StringBuilder(contextPath);

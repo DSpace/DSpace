@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+
+<!--
+  - dcterms-types.xml
+  -
+  - Version:  $Revision$
+  -
+  - Date:     $Date$
+  -
+  - DCTerms registry contributed to eventually replace dublin-core-types.xml
+  - 
+  - <dc-type>
+  -   <schema></schema>
+  -   <element></element>
+  -   
+  -   <scope_note></scope_note>
+  - </dc-type>
+  -->
+
+<!-- start of XML -->
+
+<dspace-dc-types>
+  
+  <dspace-header>
+    <title>Elsevier Science Direct</title>
+  </dspace-header>
+
+  <dc-schema>
+    <name>elsevier</name>
+    <namespace>http://atmire.com/elsevier/</namespace>
+  </dc-schema>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>identifier</element>
+    <qualifier>doi</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>identifier</element>
+    <qualifier>eid</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>identifier</element>
+    <qualifier>pii</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>identifier</element>
+    <qualifier>scopusid</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>identifier</element>
+    <qualifier>scopuseid</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>identifier</element>
+    <qualifier>pubmedid</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>volume</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>issue</element>
+    <qualifier>identifier</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>issue</element>
+    <qualifier>name</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>coverdate</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>coverdisplaydate</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>startingpage</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>endingpage</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>openaccess</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>openaccessflag</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>openaccessarticle</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>openarchivearticle</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>openaccessuserlicense</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>url</element>
+    <qualifier>scidir</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>url</element>
+    <qualifier>self</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>url</element>
+    <qualifier>abstract</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>edition</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>teaser</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>teaser</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>elsevier</schema>
+    <element>aggregationtype</element>
+    <!-- unqualified -->
+    <scope_note></scope_note>
+  </dc-type>
+
+
+</dspace-dc-types>

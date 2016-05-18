@@ -537,6 +537,12 @@
                 <xsl:attribute name="onclick"><xsl:value-of select="@onclick"/></xsl:attribute>
             </xsl:if>
 
+            <xsl:if test="@rend='external'">
+                <xsl:attribute name="target">
+                    <xsl:text>_blank</xsl:text>
+                </xsl:attribute>
+            </xsl:if>
+
             <xsl:apply-templates />
         </a>
     </xsl:template>
