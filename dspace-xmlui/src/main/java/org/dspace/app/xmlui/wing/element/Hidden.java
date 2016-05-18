@@ -37,6 +37,7 @@ public class Hidden extends Field
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Hidden(WingContext context, String name, String rend)
             throws WingException
@@ -51,6 +52,8 @@ public class Hidden extends Field
 
     /**
      * Set the raw value of the field removing any previous raw values.
+     * @return a new Value.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Value setValue() throws WingException
     {
@@ -65,6 +68,7 @@ public class Hidden extends Field
      * 
      * @param characters
      *            (May be null) Field value as a string
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setValue(String characters) throws WingException
     {
@@ -77,6 +81,7 @@ public class Hidden extends Field
      * 
      * @param integer
      *            Field value as an integer
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setValue(int integer) throws WingException
     {
@@ -89,6 +94,7 @@ public class Hidden extends Field
      * @param message
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setValue(Message message) throws WingException
     {

@@ -10,7 +10,6 @@ package org.dspace.app.xmlui.wing.element;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,28 +35,27 @@ import org.xml.sax.helpers.NamespaceSupport;
 /**
  * This class represents data that is translated from simple HTML or plain text.
  * 
- * This class represents a simple HTML fragment. It allows for user-supplied
+ * <p>This class represents a simple HTML fragment. It allows for user-supplied
  * HTML to be translated on the fly into DRI.
  * 
- * At the present time it only supports the following tags: h1, h2, h3, h4, h5,
- * p, a, b, i, u, ol, li and img. Each are translated into their DRI equivalents, note
- * the "h" tags are translated into a paragraph of rend=heading.
+ * <p>At the present time it only supports the following tags: h1, h2, h3, h4, h5,
+ * p, a, b, i, u, ol, li and img. Each are translated into their DRI equivalents.
+ * Note that the "h" tags are translated into a paragraph of rend=heading.
  * 
- * If the linkbreaks flag is set then line breaks are treated as paragraphs. This 
+ * <p>If the {@code linkbreaks} flag is set then line breaks are treated as paragraphs. This
  * allows plain text files to also be included and they will be mapped into DRI as 
  * well.
  * 
  * @author Scott Phillips
  * @author Jay Paz
  */
-
 public class SimpleHTMLFragment extends AbstractWingElement {
 
 	/** The HTML Fragment */
-	private String fragment;
+	private final String fragment;
 
 	/** Determine if blank lines mark a new paragraph */
-	private boolean blankLines;
+	private final boolean blankLines;
 
 	/**
 	 * Construct a fragment object for translating into DRI.
@@ -70,7 +68,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	 *            paragraphs delimeters.
 	 * @param fragment
 	 *            (Required) The HTML Fragment to be translated into DRI.
-	 * @throws WingException
+	 * @throws WingException passed through.
 	 */
 	protected SimpleHTMLFragment(WingContext context, boolean blankLines,
 			String fragment) throws WingException {
@@ -91,7 +89,9 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	 * @param namespaces
 	 *            (Required) SAX Helper class to keep track of namespaces able
 	 *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException on I/O error.
 	 */
+    @Override
 	public void toSAX(ContentHandler contentHandler,
 			LexicalHandler lexicalHandler, NamespaceSupport namespaces)
 			throws SAXException {
@@ -153,7 +153,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			// If it's an element replace the content with a text node.
 			Element element = (Element) content;
 
-			if (element.getContent().size() == 0) {
+			if (element.getContent().isEmpty()) {
 				// The element contains nothing, we can use shorthand notation
 				// for it.
 				StringBuilder replacement = new StringBuilder().append("<").append(element.getName());
@@ -273,7 +273,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	 *            removed.
 	 */
 	private void limitAttributes(Element element, String... names) {
-		Map<String, String> attributes = new HashMap<String, String>();
+		Map<String, String> attributes = new HashMap<>();
 		for (String name : names) {
 			String value = element.getAttributeValue(name);
 			if (value != null)
@@ -451,7 +451,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 		// Ensure that all top level elements are encapsulated inside
 		// a block level element (i.e. a paragraph)
 		if (parent.isRootElement()) {
-			List<Content> removed = new ArrayList<Content>();
+			List<Content> removed = new ArrayList<>();
 			for (int i = 0; i < parent.getContentSize(); i++) {
 				Content current = parent.getContent(i);
 				
@@ -517,24 +517,25 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	 * from the originating HTML fragment, 2) to get around a JDOM bug where it
 	 * can not output SAX events for just a document fragment. Since it only
 	 * works with documents this class was created to filter out the events.
-	 * 
-	 * As far as I can tell, the first time the bug was identified is in the
+	 *
+	 * <p>As far as I can tell, the first time the bug was identified is in the
 	 * following email, point #1:
-	 * 
-	 * http://www.servlets.com/archive/servlet/ReadMsg?msgId=491592&listName=jdom-interest
-	 * 
-	 * I, Scott Phillips, checked the JDOM CVS source tree on 3-8-2006 and the
-	 * bug had not been patch at that time.
-	 * 
+	 *
+	 * <a href="http://www.servlets.com/archive/servlet/ReadMsg?msgId=491592&listName=jdom-interest">
+     *   {@literal http://www.servlets.com/archive/servlet/ReadMsg?msgId=491592&listName=jdom-interest}
+     * </a>
+	 *
+	 * <p>I, Scott Phillips, checked the JDOM CVS source tree on 3-8-2006 and the
+	 * bug had not been patched at that time.
 	 */
 	public static class SAXFilter implements ContentHandler, LexicalHandler {
 
 		private final String URI = WingConstants.DRI.URI;
 
-		private ContentHandler contentHandler;
+		private final ContentHandler contentHandler;
 
 		// private LexicalHandler lexicalHandler; may be used in the future
-		private NamespaceSupport namespaces;
+		private final NamespaceSupport namespaces;
 
 		public SAXFilter(ContentHandler contentHandler,
 				LexicalHandler lexicalHandler, NamespaceSupport namespaces) {
@@ -566,84 +567,102 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 
 		/** ContentHandler methods: */
 
+        @Override
 		public void endDocument() {
 			// Filter out endDocument events
 		}
 
+        @Override
 		public void startDocument() {
 			// filter out startDocument events
 		}
 
+        @Override
 		public void characters(char[] ch, int start, int length)
 				throws SAXException {
 			contentHandler.characters(ch, start, length);
 		}
 
+        @Override
 		public void endElement(String uri, String localName, String qName)
 				throws SAXException {
 
 			contentHandler.endElement(URI, localName, qName(localName));
 		}
 
+        @Override
 		public void endPrefixMapping(String prefix) throws SAXException {
 			// No namespaces may be declared.
 		}
 
+        @Override
 		public void ignorableWhitespace(char[] ch, int start, int length)
 				throws SAXException {
 			contentHandler.ignorableWhitespace(ch, start, length);
 		}
 
+        @Override
 		public void processingInstruction(String target, String data)
 				throws SAXException {
 			// filter out processing instructions
 		}
 
+        @Override
 		public void setDocumentLocator(Locator locator) {
 			// filter out document locators
 		}
 
+        @Override
 		public void skippedEntity(String name) throws SAXException {
 			contentHandler.skippedEntity(name);
 		}
 
+        @Override
 		public void startElement(String uri, String localName, String qName,
 				Attributes atts) throws SAXException {
 			contentHandler.startElement(URI, localName, qName(localName), atts);
 		}
 
+        @Override
 		public void startPrefixMapping(String prefix, String uri)
 				throws SAXException {
 			// No namespaces can be declared.
 		}
 
-		/** Lexical Handler methods: */
+		/* Lexical Handler methods: */
 
+        @Override
 		public void startDTD(String name, String publicId, String systemId)
 				throws SAXException {
 			// filter out DTDs
 		}
 
+        @Override
 		public void endDTD() throws SAXException {
 			// filter out DTDs
 		}
 
+        @Override
 		public void startEntity(String name) throws SAXException {
 			// filter out Entities
 		}
 
+        @Override
 		public void endEntity(String name) throws SAXException {
 			// filter out Entities
 		}
 
+        @Override
 		public void startCDATA() throws SAXException {
 			// filter out CDATA
 		}
 
+        @Override
 		public void endCDATA() throws SAXException {
 			// filter out CDATA
 		}
 
+        @Override
 		public void comment(char[] ch, int start, int length)
 				throws SAXException {
 			// filter out comments;

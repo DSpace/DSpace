@@ -21,32 +21,34 @@ import org.dspace.authorize.AuthorizeException;
  * this transformer is used after an action has been performed to let the
  * user know if an operation succeeded or failed.
  * 
- * The possible paramaters are:
- * 
- * outcome: The outcome determines whether the notice is positive or negative. 
+ * <p>The possible parameters are:
+ *
+ * <p>outcome: The outcome determines whether the notice is positive or negative.
  * Possible values are: "success", "failure", or "neutral". If no values are 
  * supplied then neutral is assumed.
- * 
- * header: An i18n dictionary key referencing the text that should be used
+ *
+ * <p>header: An i18n dictionary key referencing the text that should be used
  * as a header for this notice.
  * 
- * message: An i18n dictionary key referencing the text that should be used as
+ * <p>message: An i18n dictionary key referencing the text that should be used as
  * the content for this notice. 
  * 
- * characters: Plain text string that should be used as the content for this
+ * <p>characters: Plain text string that should be used as the content for this
  * notice. Normally, all messages should be i18n dictionary keys, however this
  * parameter is useful for error messages that are not necessarily translated.
  * 
- * All parameters are optional but you must supply at least the message or the 
- * characters
+ * <p>All parameters are optional but you must supply at least the message or the
+ * characters.
  *
- *
- * 
- * Example:
+ * <p>Example:
+ * <pre>
+ * {@code
  * <map:transformer type="notice">
  *   <map:parameter name="outcome" value="success"/>
  *   <map:parameter name="message" value="xmlui.<aspect>.<class>.<type>"/>
  * </map:transformer>
+ * }
+ * </pre>
  * 
  * @author Scott Phillips
  * @author Alexey Maslov
@@ -60,7 +62,11 @@ public class NoticeTransformer extends AbstractDSpaceTransformer
 	
 	/**
 	 * Add the notice div to the body.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
+    @Override
 	public void addBody(Body body) throws WingException, SQLException, AuthorizeException 
 	{
 		String outcome = parameters.getParameter("outcome",null);
