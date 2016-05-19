@@ -476,7 +476,9 @@ public class METSRightsCrosswalk
                 	ResourcePolicy rp = resourcePolicyService.create(context);
             		SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
             		
-            		//also get reference to the <Permissions> element
+            		// get reference to the <Permissions> element
+            		// Note: we are assuming here that there will only ever be ONE <Permissions>
+            		//  element. Currently there are no known use cases for multiple.
                     Element permsElement = element.getChild("Permissions", METSRights_NS);
                     
                     if (element.getAttributeValue("rpName") != null)
