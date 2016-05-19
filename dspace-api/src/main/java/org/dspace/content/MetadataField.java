@@ -261,7 +261,7 @@ public class MetadataField
     }
 
     /**
-     * Clear a metadata field.
+     * Find a metadata field.
      *
      * @param mdString
      *        the schema.element[.qualifier] in a string
