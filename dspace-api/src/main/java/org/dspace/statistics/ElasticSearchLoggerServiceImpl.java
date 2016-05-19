@@ -212,6 +212,10 @@ public class ElasticSearchLoggerServiceImpl implements ElasticSearchLoggerServic
                 }
             }
 
+            if (!isUseProxies() && request.getHeader("X-Forwarded-For") != null){
+                log.warn("X-Forwarded-For header detected but useProxies is not enabled. If your dspace is behind a proxy set it to true");
+            }
+
             XContentBuilder docBuilder = null;
 
 
@@ -328,6 +332,10 @@ public class ElasticSearchLoggerServiceImpl implements ElasticSearchLoggerServic
                         ip = xfip.trim();
                     }
                 }
+            }
+
+            if (!isUseProxies() && xforwardedfor != null){
+                log.warn("X-Forwarded-For header detected but useProxies is not enabled. If your dspace is behind a proxy set it to true");
             }
 
             XContentBuilder docBuilder = null;
