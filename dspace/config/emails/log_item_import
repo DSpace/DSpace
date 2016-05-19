@@ -1,0 +1,20 @@
+# Email sent to DSpace admin when error attempt on batch script ItemImportMainOA
+#
+#	Parameters: {0} statistics info script
+#				{1} import operation stack trace
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: [DSpace]: Operation import summary    
+
+DSpace - Operation import summary
+
+  {0}
+  
+Stack trace:  
+
+  {1}
+  
+--------------------------------------------------
+
+DSpace Team

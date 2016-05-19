@@ -356,7 +356,7 @@ public class BitstreamStorageManager
 	 * @throws IOException
 	 */
 	public static int register(Context context, int assetstore,
-				String bitstreamPath) throws SQLException, IOException {
+				String bitstreamPath, boolean computeMD5) throws SQLException, IOException {
 
 		// mark this bitstream as a registered bitstream
 		String sInternalId = REGISTERED_FLAG + bitstreamPath;
@@ -405,7 +405,7 @@ public class BitstreamStorageManager
 		// FIXME this is a first class HACK! for the reasons described above
 		if (file instanceof LocalFile) 
 		{
-
+		    if (computeMD5) {
 			// get MD5 on the file for local file
 			DigestInputStream dis = null;
 			try 
@@ -438,6 +438,12 @@ public class BitstreamStorageManager
 			bitstream.setColumn("checksum", Utils.toHex(dis.getMessageDigest()
 					.digest()));
 			dis.close();
+		    }
+		    else {
+                if (!file.exists()) {
+                    log.error("File: " + file.getAbsolutePath() + " to be registered not found");
+                }
+            }
 		} 
 		else if (file instanceof SRBFile)
 		{
@@ -499,6 +505,16 @@ public class BitstreamStorageManager
 	    }
 	    return false;
 	}
+	
+    public static String absolutePath(Context context, int id)
+            throws SQLException, IOException
+    {
+        TableRow bitstream = DatabaseManager.find(context, "bitstream", id);
+
+        GeneralFile file = getFile(bitstream);
+
+        return (file != null) ? file.getAbsolutePath() : null;
+    }
 
     /**
      * Retrieve the bits for the bitstream with ID. If the bitstream does not

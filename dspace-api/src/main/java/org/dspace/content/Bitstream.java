@@ -231,12 +231,12 @@ public class Bitstream extends DSpaceObject
      * @throws SQLException
      */
     static Bitstream register(Context context, 
-    		int assetstore, String bitstreamPath)
+    		int assetstore, String bitstreamPath, boolean computeMD5)
         	throws IOException, SQLException
     {
         // Store the bits
         int bitstreamID = BitstreamStorageManager.register(
-        		context, assetstore, bitstreamPath);
+        		context, assetstore, bitstreamPath, computeMD5);
 
         log.info(LogManager.getHeader(context,
             "create_bitstream",
@@ -735,6 +735,11 @@ public class Bitstream extends DSpaceObject
     {
         //Also fire a modified event since the bitstream HAS been modified
         ourContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null, getIdentifiers(ourContext)));
+        modified = true;
+    }
+    
+    public void setMD5Value(String valueMD5) {
+        bRow.setColumn("checksum", valueMD5);
         modified = true;
     }
 }

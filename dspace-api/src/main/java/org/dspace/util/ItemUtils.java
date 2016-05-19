@@ -1,17 +1,22 @@
 package org.dspace.util;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.workflow.WorkflowItem;
 
 public class ItemUtils
 {
@@ -98,5 +103,43 @@ public class ItemUtils
             }
         }
         return null;
+    }
+    
+    public static void removeOrWithdrawn(Context context, Item item)
+            throws SQLException, AuthorizeException, IOException
+    {
+        // Find item in workspace or workflow...
+        InProgressSubmission inprogress = WorkspaceItem.findByItem(context,
+                item);
+        if (inprogress == null)
+        {
+            inprogress = WorkflowItem.findByItem(context, item);
+        }
+        // if we have an item that has been public at some time, better to keep
+        // it for history
+        if (item.getHandle() != null)
+        {
+
+            // Reopened
+            if (inprogress != null)
+            {
+                item.setOwningCollection(inprogress.getCollection());
+            }
+            item.withdraw();
+            item.update();
+
+            // Delete wrapper
+            if (inprogress != null)
+            {
+                inprogress.deleteWrapper();
+            }
+
+        }
+        else
+        {
+            inprogress.deleteWrapper();
+            item.delete();
+
+        }
     }
 }
