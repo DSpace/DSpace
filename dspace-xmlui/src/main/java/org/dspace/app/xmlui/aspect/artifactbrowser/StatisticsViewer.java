@@ -76,7 +76,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
 
     /**
      * Get the caching key for this report.
+     * @return the key.
      */
+    @Override
     public Serializable getKey()
     {
         initialise();
@@ -91,7 +93,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
 
     /**
      * Generate the validity for this cached entry.
+     * @return the validity.
      */
+    @Override
     public SourceValidity getValidity()
     {
         if (validity == null)
@@ -151,16 +155,17 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * Add additional navigation options. This is to allow selection of a monthly report
-     * 
-     * @param options
-     * @throws SAXException
-     * @throws WingException
-     * @throws UIException
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * Add additional navigation options. This is to allow selection of a monthly report.
+     *
+     * @param options new options.
+     * @throws SAXException passed through.
+     * @throws WingException passed through.
+     * @throws UIException passed through.
+     * @throws SQLException passed through.
+     * @throws IOException passed through.
+     * @throws AuthorizeException passed through.
      */
+    @Override
     public void addOptions(Options options) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
@@ -181,16 +186,17 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * Add title, etc. metadata
-     * 
-     * @param pageMeta
-     * @throws SAXException
-     * @throws WingException
-     * @throws UIException
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * Add title, etc. metadata.
+     *
+     * @param pageMeta new metadata.
+     * @throws SAXException passed through.
+     * @throws WingException passed through.
+     * @throws UIException passed through.
+     * @throws SQLException passed through.
+     * @throws IOException passed through.
+     * @throws AuthorizeException passed through.
      */
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException, UIException,
                                                       SQLException, IOException, AuthorizeException
     {
@@ -202,16 +208,17 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * Output the body of the report
+     * Output the body of the report.
      * 
-     * @param body
-     * @throws SAXException
-     * @throws WingException
-     * @throws UIException
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @param body the body.
+     * @throws SAXException passed through.
+     * @throws WingException passed through.
+     * @throws UIException passed through.
+     * @throws SQLException passed through.
+     * @throws IOException passed through.
+     * @throws AuthorizeException passed through.
      */
+    @Override
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException,
             IOException, AuthorizeException
     {
@@ -259,7 +266,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * Initialise the member variables from the request
+     * Initialise the member variables from the request.
      */
     private void initialise()
     {
@@ -273,8 +280,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * Clear the member variables so that the instance can be reused
+     * Clear the member variables so that the instance can be reused.
      */
+    @Override
     public void recycle()
     {
         initialised = false;
@@ -284,7 +292,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * Implementation of the Report interface, to output the statistics data for xmlui
+     * Implementation of the Report interface, to output the statistics data for XMLUI.
      * Note that all methods that return Strings return 'null' in this implementation, as
      * all the outputting is done directly using the Wing framework.
      */
@@ -323,12 +331,14 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         /**
          * Get the header for the report - currently not supported.
          */
+        @Override
         public String header()
         {
             return header("");
         }
 
         // Currently not supported
+        @Override
         public String header(String title)
         {
             return "";
@@ -338,6 +348,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
          * Add the main title to the report.
          * @return null.
          */
+        @Override
         public String mainTitle()
         {
             try
@@ -355,6 +366,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
          * Output the date range for this report.
          * @return null.
          */
+        @Override
         public String dateRange()
         {
             StringBuilder content = new StringBuilder();
@@ -393,9 +405,10 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
 
         /**
          * Output the section header.
-         * @param title
+         * @param title the title of the section.
          * @return null.
          */
+        @Override
         public String sectionHeader(String title)
         {
             try
@@ -412,9 +425,10 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
 
         /**
          * Output the current statistics block.
-         * @param content
+         * @param content the current statistics.
          * @return null.
          */
+        @Override
         public String statBlock(Statistics content)
         {
             Stat[] stats = content.getStats();
@@ -484,10 +498,11 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
 
         /**
          * Output any information about the lower boundary restriction for
-	 * this section.
-         * @param floor
+         * this section.
+         * @param floor boundary.
          * @return null.
          */
+        @Override
         public String floorInfo(int floor)
         {
             try
@@ -508,9 +523,10 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         /**
          * Output an explanation for this section.
          * 
-         * @param explanation
+         * @param explanation the explanation.
          * @return null.
          */
+        @Override
         public String blockExplanation(String explanation)
         {
             try
@@ -533,6 +549,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
          * 
          * @return an empty string.
          */
+        @Override
         public String footer()
         {
             return "";
@@ -541,9 +558,10 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         /**
          * Set the main title for this report
          * 
-         * @param name
-         * @param serverName
+         * @param name instance name.
+         * @param serverName name of the server.
          */
+        @Override
         public void setMainTitle(String name, String serverName)
         {
             mainTitle = "Statistics for " + name;
@@ -561,10 +579,11 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * Add a block to report on
+         * Add a block to report on.
          *
-         * @param stat
+         * @param stat the block to add.
          */
+        @Override
         public void addBlock(Statistics stat)
         {
             blocks.add(stat);
@@ -575,6 +594,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
          * Render the statistics into an XML stream.
          * @return null.
          */
+        @Override
         public String render()
         {
             Pattern space = Pattern.compile(" ");
@@ -614,18 +634,20 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * Set the start date for this report
-         * @param start
+         * Set the start date for this report.
+         * @param start the date.
          */
+        @Override
         public void setStartDate(Date start)
         {
             this.start = start;
         }
 
         /**
-         * Set the end date for this report
-         * @param end
+         * Set the end date for this report.
+         * @param end the end.
          */
+        @Override
         public void setEndDate(Date end)
         {
             this.end = end;

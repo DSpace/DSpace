@@ -53,6 +53,7 @@ public class Xref extends TextContainer implements StructuralElement
      * @param name
      *            (May be null) a local identifier used to differentiate the
      *            element from its siblings.
+     * @throws org.dspace.app.xmlui.wing.WingException never.
      */
     protected Xref(WingContext context, String target, String rend, String name) throws WingException
     {
@@ -89,6 +90,7 @@ public class Xref extends TextContainer implements StructuralElement
      *            the xref.
      * @param rend
      *            (May be null) A special rendering instruction for this xref.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Xref(WingContext context, String target, String rend) throws WingException
     {
@@ -103,6 +105,7 @@ public class Xref extends TextContainer implements StructuralElement
      * @param target
      *            (Required) A target URL for the references a destination for
      *            the xref.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Xref(WingContext context, String target) throws WingException
     {
@@ -122,7 +125,9 @@ public class Xref extends TextContainer implements StructuralElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler, 
             NamespaceSupport namespaces) throws SAXException
     {

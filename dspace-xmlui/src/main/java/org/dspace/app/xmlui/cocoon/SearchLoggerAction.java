@@ -80,7 +80,10 @@ public abstract class SearchLoggerAction extends AbstractAction {
      * handle if present or the scope parameter is given. If no scope is
      * specified then null is returned.
      *
+     * @param context session context.
+     * @param objectModel Cocoon object model.
      * @return The current scope.
+     * @throws java.sql.SQLException passed through.
      */
     protected DSpaceObject getScope(Context context, Map objectModel) throws SQLException
     {
@@ -102,6 +105,5 @@ public abstract class SearchLoggerAction extends AbstractAction {
 
         return dso;
     }
-
 
 }

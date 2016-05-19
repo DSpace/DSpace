@@ -161,7 +161,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     /**
      * Add the item's title and trail links to the page's metadata.
-     * @throws org.xml.sax.SAXException
+     * @throws org.xml.sax.SAXException passed through.
      * @throws org.dspace.app.xmlui.wing.WingException if a crosswalk fails.
      * @throws org.dspace.app.xmlui.utils.UIException passed through.
      * @throws java.sql.SQLException passed through.

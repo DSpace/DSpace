@@ -82,7 +82,9 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
+     * @return the key.
      */
+    @Override
     public Serializable getKey() {
         try {
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -102,11 +104,13 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
     /**
      * Generate the cache validity object.
-     * <p/>
+     * <p>
      * The validity object will include the collection being viewed and
      * all recently submitted items. This does not include the community / collection
      * hierarchy, when this changes they will not be reflected in the cache.
+     * @return validity.
      */
+    @Override
     public SourceValidity getValidity() {
         if (this.validity == null) {
 

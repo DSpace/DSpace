@@ -8,9 +8,7 @@
 package org.dspace.app.xmlui.aspect.statisticsElasticSearch;
 
 import org.apache.cocoon.environment.Request;
-import org.apache.commons.validator.routines.DateValidator;
 import org.apache.log4j.Logger;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 
@@ -111,6 +109,10 @@ public class ReportGenerator
 
 
     /**
+     * Build the report generation form.
+     *
+     * @param parentDivision build it here.
+     * @param request user request.
      * @see org.dspace.app.xmlui.cocoon.DSpaceTransformer#addBody(Body)
      */
     public void addReportGeneratorForm(Division parentDivision, Request request) {

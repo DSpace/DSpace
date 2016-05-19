@@ -110,6 +110,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
 
 	
+    @Override
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
@@ -119,6 +120,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
     }
 	
 	
+    @Override
 	public void addBody(Body body) throws WingException, SQLException 
 	{
 		// Get our parameters & state
@@ -243,6 +245,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	 * @param div The division to add the form too.
 	 * @param schemaName The schemaName currently being operated on.
 	 * @param errors A list of errors from previous attempts at adding new fields.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
 	 */
 	public void addNewFieldForm(Division div, String schemaName, java.util.List<String> errors) throws WingException
 	{
@@ -283,12 +286,14 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	
 
 	/**
-	 * Update an existing field by promting the user for it's values.
+	 * Update an existing field by prompting the user for its values.
 	 *  
 	 * @param div The division to add the form too.
 	 * @param schemaName The schemaName currently being operated on.
 	 * @param fieldID The id of the field being updated.
-	 * @param errors A list of errors from previous attempts at updaating the field.
+	 * @param errors A list of errors from previous attempts at updating the field.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws java.sql.SQLException passed through.
 	 */
 	public void addUpdateFieldForm(Division div, String schemaName, int fieldID, java.util.List<String> errors) throws WingException, SQLException
 	{
@@ -350,15 +355,15 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	}
 	
 	/**
-	 * Determine if there were any special errors and display approparte 
-	 * text. Because of the inline nature of the element and qualifier 
+	 * Determine if there were any special errors and display appropriate
+	 * text. Because of the in-line nature of the element and qualifier
 	 * fields these errors can not be placed on the field. Instead they 
 	 * have to be added as separate items above the field.
 	 * 
 	 * @param form The form to add errors to.
 	 * @param errors A list of errors.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
 	 */
-	
 	public void addFieldErrors(List form, java.util.List<String> errors) throws WingException 
 	{
 		if (errors.contains("duplicate_field"))

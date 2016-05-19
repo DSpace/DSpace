@@ -55,50 +55,59 @@ import org.dspace.core.LogManager;
 
 /**
  * The BitstreamReader will query DSpace for a particular bitstream and transmit
- * it to the user. There are several methods of specifing the bitstream to be
- * delivered. You may reference a bitstream by either it's id or attempt to
+ * it to the user. There are several methods of specifying the bitstream to be
+ * delivered. You may reference a bitstream by its id or attempt to
  * resolve the bitstream's name.
  *
- *  /bitstream/{handle}/{sequence}/{name}
+ *  <p>/bitstream/{handle}/{sequence}/{name}
  *
- *  &lt;map:read type="BitstreamReader">
- *    &lt;map:parameter name="handle" value="{1}/{2}"/&gt;
- *    &lt;map:parameter name="sequence" value="{3}"/&gt;
- *    &lt;map:parameter name="name" value="{4}"/&gt;
- *  &lt;/map:read&gt;
+ *  <pre>{@code
+ *  <map:read type="BitstreamReader">
+ *    <map:parameter name="handle" value="{1}/{2}"/>
+ *    <map:parameter name="sequence" value="{3}"/>
+ *    <map:parameter name="name" value="{4}"/>
+ *  </map:read>
+ * }</pre>
  *
- *  When no handle is assigned yet you can access a bitstream
- *  using it's internal ID.
+ *  When no handle is assigned yet, you can access a bitstream
+ *  using its internal ID.
  *
- *  /bitstream/id/{bitstreamID}/{sequence}/{name}
+ *  <p>/bitstream/id/{bitstreamID}/{sequence}/{name}
  *
- *  &lt;map:read type="BitstreamReader">
- *    &lt;map:parameter name="bitstreamID" value="{1}"/&gt;
- *    &lt;map:parameter name="sequence" value="{2}"/&gt;
- *  &lt;/map:read&gt;
+ * <pre>{@code
+ *  <map:read type="BitstreamReader">
+ *    <map:parameter name="bitstreamID" value="{1}"/>
+ *    <map:parameter name="sequence" value="{2}"/>
+ *  </map:read>
+ * }</pre>
  *
  *  Alternatively, you can access the bitstream via a name instead
- *  of directly through it's sequence.
+ *  of directly through its sequence.
  *
- *  /html/{handle}/{name}
+ *  <p>/html/{handle}/{name}
  *
- *  &lt;map:read type="BitstreamReader"&gt;
- *    &lt;map:parameter name="handle" value="{1}/{2}"/&gt;
- *    &lt;map:parameter name="name" value="{3}"/&gt;
- *  &lt;/map:read&gt;
+ * <pre>{@code
+ *  <map:read type="BitstreamReader">
+ *    <map:parameter name="handle" value="{1}/{2}"/>
+ *    <map:parameter name="name" value="{3}"/>
+ *  </map:read>
+ * }</pre>
  *
  *  Again when no handle is available you can also access it
- *  via an internal itemID & name.
+ *  via an internal itemID and name.
  *
- *  /html/id/{itemID}/{name}
+ *  <p>/html/id/{itemID}/{name}
  *
- *  &lt;map:read type="BitstreamReader"&gt;
- *    &lt;map:parameter name="itemID" value="{1}"/&gt;
- *    &lt;map:parameter name="name" value="{2}"/&gt;
- *  &lt;/map:read&gt;
+ * <pre>{@code
+ *  <map:read type="BitstreamReader">
+ *    <map:parameter name="itemID" value="{1}"/>
+ *    <map:parameter name="name" value="{2}"/>
+ *  </map:read>
+ * }</pre>
  *
- * Added request-item support. 
- * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
+ * <p>
+ * Added request-item support.<br>
+ * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt<br>
  * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
  * 
  * @author Scott Phillips
@@ -174,10 +183,18 @@ public class BitstreamReader extends AbstractReader implements Recyclable
      * Set up the bitstream reader.
      *
      * See the class description for information on configuration options.
+     * @param resolver source resolver.
+     * @param objectModel Cocoon object model.
+     * @param src source to read.
+     * @param par Reader parameters.
+     * @throws org.apache.cocoon.ProcessingException passed through.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws java.io.IOException passed through.
      */
+    @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
-            Parameters par) throws ProcessingException, SAXException,
-            IOException
+            Parameters par)
+            throws ProcessingException, SAXException, IOException
     {
         super.setup(resolver, objectModel, src, par);
 
@@ -566,7 +583,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
          * 2) We accept partial downloads, thus if you lose a connection halfway
          * through most web browser will enable you to resume downloading the
          * bitstream.
+     * @throws java.io.IOException passed through.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.apache.cocoon.ProcessingException passed through.
          */
+    @Override
     public void generate() throws IOException, SAXException,
             ProcessingException
     {
@@ -744,7 +765,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
     /**
      * Returns the mime-type of the bitstream.
+     * @return the type.
      */
+    @Override
     public String getMimeType()
     {
         return this.bitstreamMimeType;
@@ -753,6 +776,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     /**
          * Recycle
          */
+    @Override
     public void recycle() {
         this.response = null;
         this.request = null;

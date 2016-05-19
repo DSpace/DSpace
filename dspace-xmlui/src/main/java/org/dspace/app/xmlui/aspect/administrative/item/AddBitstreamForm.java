@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
 /**
  * 
  * Show a form that allows the user to upload a new bitstream. The 
- * user can select the new bitstream's bundle (which is unchangable 
+ * user can select the new bitstream's bundle (which is unchangeable
  * after upload) and a description for the file.
  * 
  * @author Scott Phillips
@@ -73,6 +73,7 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
+    @Override
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
         pageMeta.addMetadata("title").addContent(T_title);
@@ -83,6 +84,7 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
         pageMeta.addMetadata("javascript", "static").addContent("static/js/editItemUtil.js");
     }
 
+    @Override
 	public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException
 	{
             isAdvancedFormEnabled=DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
@@ -172,10 +174,10 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
          * Performs an authorization check that the current user has privileges 
          * @param item DSO item being evaluated
          * @param select DRI wing select box that is being added to
-         * @param bundleName 
+         * @param bundleName the new bundle name.
          * @return boolean indicating whether user can upload to bundle
-         * @throws SQLException
-         * @throws WingException
+         * @throws SQLException passed through.
+         * @throws WingException passed through.
          */
         public boolean addBundleOption(org.dspace.content.Item item, Select select, String bundleName) throws SQLException, WingException
 	{

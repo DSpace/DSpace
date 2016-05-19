@@ -52,10 +52,8 @@ import org.dspace.eperson.EPerson;
  *
  * @author Scott Phillips
  */
-
 public class AuthenticateAction extends AbstractAction
 {
-
     /**
      * Attempt to authenticate the user. 
      * @param redirector redirector.
@@ -64,7 +62,7 @@ public class AuthenticateAction extends AbstractAction
      * @param source source
      * @param parameters sitemap parameters.
      * @return result of the action.
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception on error.
      */
     @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
