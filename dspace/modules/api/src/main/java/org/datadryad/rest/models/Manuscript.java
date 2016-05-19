@@ -243,6 +243,9 @@ public class Manuscript {
     }
 
     public String getManuscriptId() {
+        if (manuscriptId == null) {
+            manuscriptId = "";
+        }
         return manuscriptId;
     }
 
@@ -292,6 +295,9 @@ public class Manuscript {
     }
 
     public String getPublicationDOI() {
+        if (publicationDOI == null) {
+            publicationDOI = "";
+        }
         return publicationDOI;
     }
 
@@ -621,8 +627,17 @@ public class Manuscript {
             ArrayList<String> authorStrings = new ArrayList<String>();
             for (Author a : authors.author) {
                 StringBuilder authorString = new StringBuilder();
-                authorString.append(a.familyName + " ");
-                for (String givenName : StringUtils.split(a.givenNames, " ")) {
+                String authorFamilyName = a.familyName;
+                if (authorFamilyName == null) {
+                    authorFamilyName = "";
+                }
+                authorString.append(authorFamilyName);
+                authorString.append(" ");
+                String authorGivenName = a.givenNames;
+                if (authorGivenName == null) {
+                    authorGivenName = "";
+                }
+                for (String givenName : StringUtils.split(authorGivenName, " ")) {
                     authorString.append(StringUtils.left(givenName,1));
                 }
                 authorStrings.add(authorString.toString());

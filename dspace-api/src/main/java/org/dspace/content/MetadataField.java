@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -257,6 +258,23 @@ public class MetadataField
 
         log.info(LogManager.getHeader(context, "create_metadata_field",
                 "metadata_field_id=" + row.getIntColumn("metadata_field_id")));
+    }
+
+    /**
+     * Find a metadata field.
+     *
+     * @param mdString
+     *        the schema.element[.qualifier] in a string
+     */
+    public static MetadataField findByElement(Context context, String mdString) throws SQLException {
+        String[] tokens = StringUtils.split(mdString, ".");
+        String schema = tokens[0];
+        String element = tokens[1];
+        String qualifier = null;
+        if (tokens.length > 2) {
+            qualifier = tokens[2];
+        }
+        return findByElement(context, schema, element, qualifier);
     }
 
     public static MetadataField findByElement(Context context, String schemaName, String element, String qualifier) throws SQLException {
