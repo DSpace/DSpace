@@ -229,7 +229,10 @@ public class XOAI
                     log.error(e.getMessage(), e);
                 }
                 i++;
-                if (i % 100 == 0) System.out.println(i+" items imported so far...");
+                if (i % 100 == 0) {
+		    server.commit();
+		    System.out.println(i+" items imported so far...");
+		}
             }
             System.out.println("Total: "+i+" items");
             server.commit();
