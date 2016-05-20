@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Required;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.WorkspaceItemService;
 
 /**
  *
@@ -39,6 +41,8 @@ public class VersioningServiceImpl implements VersioningService {
     protected VersionDAO versionDAO;
     @Autowired(required = true)
     private ItemService itemService;
+    @Autowired(required = true)
+    private WorkspaceItemService workspaceItemService;
     private DefaultItemVersionProvider provider;
 
     @Required
@@ -129,7 +133,16 @@ public class VersioningServiceImpl implements VersioningService {
             
             // Completely delete the item
             if (item != null) {
-                itemService.delete(c, item);
+                // DS-1814 introduce the possibility that submitter can create
+                // new versions. To avoid authorithation problems we need to
+                // check whether a corresponding workspaceItem exists.
+                WorkspaceItem wsi = workspaceItemService.findByItem(c, item);
+                if (wsi != null)
+                {
+                    workspaceItemService.deleteAll(c, wsi);
+                } else {
+                    itemService.delete(c, item);
+                }
             }
         }catch (Exception e) {
             c.abort();

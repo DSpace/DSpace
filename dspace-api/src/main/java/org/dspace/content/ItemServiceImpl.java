@@ -408,7 +408,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public void update(Context context, Item item) throws SQLException, AuthorizeException {
         // Check authorisation
         // only do write authorization if user is not an editor
-        if (!canEdit(context, item) && !canCreateNewVersion(context, item))
+        if (!canEdit(context, item))
         {
             authorizeService.authorizeAction(context, item, Constants.WRITE);
         }
@@ -885,7 +885,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         return collectionService.canEditBoolean(context, item.getOwningCollection(), false);
     }
-    
+
     @Override
     public boolean canCreateNewVersion(Context context, Item item) throws SQLException{
         if (authorizeService.isAdmin(context, item)) 
