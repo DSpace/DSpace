@@ -72,6 +72,9 @@ public class Collection extends DSpaceObject {
             List<org.dspace.content.Community> parentCommunities = collection.getCommunities();
             for(org.dspace.content.Community parentCommunity : parentCommunities) {
                 this.addParentCommunityList(new Community(parentCommunity, servletContext, null, context));
+                for(org.dspace.content.Community ancestor: parentCommunity.getParentCommunities()) {
+                    this.addParentCommunityList(new Community(ancestor, servletContext, null, context));                    
+                }
             }
         } else {
             this.addExpand("parentCommunityList");
