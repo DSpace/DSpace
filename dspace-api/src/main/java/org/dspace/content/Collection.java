@@ -259,7 +259,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * Get the communities this collection appears in
      * 
      * See DS-2766 for some documented assumptions about collection parents.
-     * In DSpace6x, the assumption is that a collection exists in only one community/subcommunity.
+     * In DSpace6x, the assumption is that a collection exists in only one community/subcommunity. 
      *
      * @return array of <code>Community</code> objects
      * @throws SQLException if database error
