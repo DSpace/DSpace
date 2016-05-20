@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.sql.DataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.identifier.DOI;
@@ -65,12 +66,12 @@ public class V6_0_2016_04_01_0002__DS_2199_Move_IdentifiersIT
             throws SQLException
     {
         // Set up a DBMS connection
-        cnctn = DSpaceServicesFactory.getInstance().getServiceManager()
-                .getServiceByName("dataSource", BasicDataSource.class)
-                .getConnection();
+        DataSource ds = DSpaceServicesFactory.getInstance().getServiceManager()
+                .getServiceByName("dataSource", BasicDataSource.class);
+        cnctn = ds.getConnection();
 
         // Define the database.
-        DatabaseUtilsHelpers.updateDatabase();
+        DatabaseUtilsHelpers.updateDatabase(ds, cnctn);
 
         // Look up schemas
         int oldSchema = -1;
@@ -106,7 +107,6 @@ public class V6_0_2016_04_01_0002__DS_2199_Move_IdentifiersIT
         newField = lookUpField(cnctn, newSchema,
                 V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.NEW_ELEMENT,
                 V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.NEW_QUALIFIER);
-
     }
 
     @After
@@ -118,6 +118,7 @@ public class V6_0_2016_04_01_0002__DS_2199_Move_IdentifiersIT
 
     /**
      * Test of migrate method, of class V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.
+     * @throws java.lang.Exception passed through.
      */
     @Test
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
