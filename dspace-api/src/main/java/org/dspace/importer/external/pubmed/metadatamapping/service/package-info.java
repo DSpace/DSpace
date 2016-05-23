@@ -6,6 +6,8 @@
  * http://www.dspace.org/license/
  */
 /**
+ * Pubmed specific implementations of any metadatamapping services ({@link org.dspace.importer.external.metadatamapping.service})
  * @author Roeland Dillen (roeland at atmire dot com)
+ * @author Jonas Van Goolen (jonas at atmire dot com)
  */
 package org.dspace.importer.external.pubmed.metadatamapping.service;

@@ -136,7 +136,7 @@ public abstract class AbstractRemoteMetadataSource {
      *                 the public methods of this class.
      * @param <T>      return type. Generics for type safety.
      * @return The result of the call
-     * @throws com.atmire.import_citations.configuration.SourceException if something unrecoverable happens (e.g. network failures)
+     * @throws org.dspace.importer.external.MetadataSourceException if something unrecoverable happens (e.g. network failures)
      */
     protected <T> T retry(Callable<T> callable) throws MetadataSourceException {
 
