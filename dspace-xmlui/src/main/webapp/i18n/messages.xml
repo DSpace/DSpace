@@ -843,7 +843,7 @@
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
 	<message key="xmlui.Submission.submit.UploadStep.column0">Primary</message>
 	<message key="xmlui.Submission.submit.UploadStep.column1">  </message>
-	<message key="xmlui.Submission.submit.UploadStep.column2">File</message>
+	<message key="xmlui.Submission.submit.UploadStep.column2">Filename</message>
 	<message key="xmlui.Submission.submit.UploadStep.column3">Size</message>
 	<message key="xmlui.Submission.submit.UploadStep.column4">Description</message>
 	<message key="xmlui.Submission.submit.UploadStep.column5">Format</message>
