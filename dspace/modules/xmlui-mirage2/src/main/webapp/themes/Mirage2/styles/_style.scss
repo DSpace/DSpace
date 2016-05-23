@@ -384,6 +384,14 @@ input[name='lookup_dc_subject_classification']{
     color: #FF9900;
 }
 
+p.important-para{
+   border:solid 5px red;
+   color: white;
+   background-color: red;
+   font-weight: bold;
+   width: 420px;
+}
+
 //example mixin to set the text-selection style
 @mixin selection {
     ::-moz-selection { @content; }
