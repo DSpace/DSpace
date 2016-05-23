@@ -47,6 +47,7 @@ public class SimpleDispatcher implements BitstreamDispatcher
     /**
      * Creates a new SimpleDispatcher.
      * 
+     * @param context Context
      * @param startTime
      *            timestamp for beginning of checker process
      * @param looping
@@ -71,6 +72,7 @@ public class SimpleDispatcher implements BitstreamDispatcher
     /**
      * Selects the next candidate bitstream.
      * 
+     * @throws SQLException if database error
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
     @Override

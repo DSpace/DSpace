@@ -43,10 +43,11 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
      *            DSpace context object
      * @param mimeType
      *            MIME type value
+     * @param includeInternal whether to include internal mimetypes
      *
      * @return the corresponding bitstream format, or <code>null</code> if
      *         there's no bitstream format with the given MIMEtype.
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public BitstreamFormat findByMIMEType(Context context, String mimeType, boolean includeInternal) throws SQLException
@@ -72,7 +73,7 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
      *
      * @return the corresponding bitstream format, or <code>null</code> if
      *         there's no bitstream format with the given short description
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public BitstreamFormat findByShortDescription(Context context,

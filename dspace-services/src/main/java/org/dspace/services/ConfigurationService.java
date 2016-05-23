@@ -18,12 +18,12 @@ import org.apache.commons.configuration.Configuration;
  * <p>
  * The configuration files are properties files which look like this for
  * simple values:
- * <xmp>
+ * {@code
  * thing.name = aaronz
  * thing.number = 1234
  * thing.on = true
  * thing.value = abc,def,ghi
- * </xmp>
+ * }
  * For these simple cases the service will automatically translate the 
  * settings into strings, booleans, numbers and arrays as requested
  * in the various {@link #getPropertyAsType(String, Class)} methods.
@@ -32,19 +32,19 @@ import org.apache.commons.configuration.Configuration;
  * <p>
  * The first allows setting of a parameter on any DSpace service by the 
  * given name:
- * <xmp>
+ * {@code
  * emailEnabled@org.dspace.Service = true
  * adminUser@org.dspace.impl.MyService = aaronz
- * </xmp>
+ * }
  * This should be used sparingly and really only by system admins (not 
  * developers).  Developers should be using simple config values to 
  * expose service configurations.
  * <p>
  * The second allows controlling the implementation used for a service 
  * interface or provider:
- * <xmp>
+ * {@code
  * $org.dspace.Service = org.dspace.impl.MyService
- * </xmp>
+ * }
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -54,7 +54,7 @@ public interface ConfigurationService {
      * Get a configuration property (setting) from the system as a 
      * specified type.
      * 
-     * @param <T>
+     * @param <T> class type
      * @param name the property name
      * @param type the type to return the property as
      * @return the property value OR null if none is found
@@ -66,7 +66,7 @@ public interface ConfigurationService {
      * Get a configuration property (setting) from the system, or return
      * a default value if none is found.
      * 
-     * @param <T>
+     * @param <T> class type
      * @param name the property name
      * @param defaultValue the value to return if this name is not found
      * @return the property value OR null if none is found
@@ -78,7 +78,7 @@ public interface ConfigurationService {
      * Get a configuration property (setting) from the system, or return 
      * (and possibly store) a default value if none is found.
      * 
-     * @param <T>
+     * @param <T> class type
      * @param name the property name
      * @param defaultValue the value to return if this name is not found
      * @param setDefaultIfNotFound if this is true and the config value 
@@ -216,7 +216,7 @@ public interface ConfigurationService {
      * Convenience method - get all configuration properties (settings)
      * from the system.
      *
-     * @return all the configuration properties in a properties object (name -> value)
+     * @return all the configuration properties in a properties object (name to value)
      */
     public Properties getProperties();
 

@@ -302,6 +302,7 @@ public final class ProviderStack<T> {
     /**
      * Check to make sure all providers are refreshed and any that are 
      * no longer valid are flushed out of the list.
+     * @return list of valid providers
      */
     protected List<T> refresh() {
         ArrayList<T> l = new ArrayList<T>();

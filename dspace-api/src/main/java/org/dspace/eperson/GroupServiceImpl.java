@@ -271,7 +271,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         return groupDAO.findByName(context, name);
     }
 
-    /** DEPRECATED: Please use findAll(Context context, List<MetadataField> metadataSortFields) instead */
+    /** DEPRECATED: Please use {@code findAll(Context context, List<MetadataField> metadataSortFields)} instead */
     @Override
     @Deprecated
     public List<Group> findAll(Context context, int sortField) throws SQLException {

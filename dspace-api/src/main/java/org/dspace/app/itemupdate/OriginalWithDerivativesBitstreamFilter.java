@@ -30,8 +30,8 @@ public class OriginalWithDerivativesBitstreamFilter extends BitstreamFilter
 	/**
 	 * 	Tests bitstream for membership in specified bundles (ORIGINAL, TEXT, THUMBNAIL)
 	 * 
-	 * @param bitstream
-	 * @throws BitstreamFilterException
+	 * @param bitstream Bitstream
+	 * @throws BitstreamFilterException if error
 	 * @return true if bitstream is in specified bundles
 	 */
 	@Override

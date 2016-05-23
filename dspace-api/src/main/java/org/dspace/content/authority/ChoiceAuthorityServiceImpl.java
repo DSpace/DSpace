@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * Configuration keys, per metadata field (e.g. "dc.contributer.author")
  *
+ * {@code
  *  # names the ChoiceAuthority plugin called for this field
  *  choices.plugin.<FIELD> = name-of-plugin
  *
@@ -36,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  *  # is value "closed" to the set of these choices or are non-authority values permitted?
  *  choices.closed.<FIELD> = true | false
- *
+ * }
  * @author Larry Stone
  * @see ChoiceAuthority
  */
@@ -62,7 +63,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
     private final String CHOICES_PRESENTATION_PREFIX = "choices.presentation.";
     private final String CHOICES_CLOSED_PREFIX = "choices.closed.";
 
-    private ChoiceAuthorityServiceImpl() {
+    protected ChoiceAuthorityServiceImpl() {
     }
 
     // translate tail of configuration key (supposed to be schema.element.qual)

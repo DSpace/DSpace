@@ -53,7 +53,7 @@ public class BrowseEngine
      * for the Browse Engine, based on the brand of the provided DBMS.
      *
      * @param context       the DSpace context
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public BrowseEngine(Context context)
         throws BrowseException
@@ -73,7 +73,7 @@ public class BrowseEngine
      *
      * @param bs    the scope of the browse
      * @return      the results of the browse
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public BrowseInfo browse(BrowserScope bs)
         throws BrowseException
@@ -111,6 +111,7 @@ public class BrowseEngine
      *
      * @param bs    the scope of the browse
      * @return      the results of the browse
+     * @throws BrowseException if browse error
      */
     public BrowseInfo browseMini(BrowserScope bs)
         throws BrowseException
@@ -196,7 +197,7 @@ public class BrowseEngine
      *
      * @param bs        the scope of the browse
      * @return          the results of the browse
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private BrowseInfo browseByItem(BrowserScope bs)
         throws BrowseException
@@ -395,7 +396,7 @@ public class BrowseEngine
      *
      * @param bs        the scope of the browse
      * @return          the results of the browse
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private BrowseInfo browseByValue(BrowserScope bs)
         throws BrowseException
@@ -562,7 +563,7 @@ public class BrowseEngine
      * Return the focus value.
      *
      * @return  the focus value to use
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private String getJumpToValue()
         throws BrowseException
@@ -627,8 +628,9 @@ public class BrowseEngine
     /**
      * Convert the value into an offset into the table for this browse
      *
+     * @param value value
      * @return  the focus value to use
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private int getOffsetForValue(String value)
         throws BrowseException
@@ -662,8 +664,9 @@ public class BrowseEngine
     /**
      * Convert the value into an offset into the table for this browse
      *
+     * @param value value
      * @return  the focus value to use
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private int getOffsetForDistinctValue(String value)
         throws BrowseException
@@ -685,7 +688,7 @@ public class BrowseEngine
      *
      * @param value a focus value to normalize
      * @return  the normalized focus value
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private String normalizeJumpToValue(String value)
         throws BrowseException
@@ -712,9 +715,9 @@ public class BrowseEngine
      * Get the total number of results for the browse.  This is the same as
      * calling getTotalResults(false)
      *
-     * @return
-     * @throws SQLException
-     * @throws BrowseException
+     * @return total
+     * @throws SQLException if database error
+     * @throws BrowseException if browse error
      */
     private int getTotalResults()
         throws SQLException, BrowseException
@@ -728,8 +731,8 @@ public class BrowseEngine
      *
      * @param distinct  is this a distinct browse or not
      * @return          the total number of results available in this type of browse
-     * @throws SQLException
-     * @throws BrowseException
+     * @throws SQLException if database error
+     * @throws BrowseException if browse error
      */
     private int getTotalResults(boolean distinct)
         throws SQLException, BrowseException

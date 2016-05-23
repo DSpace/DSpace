@@ -41,8 +41,10 @@ public class XMLUtils {
 
     /**
      * @param xml The starting context (a Node or a Document, for example).
+     * @param singleNodeXPath xpath
      * @return node.getTextContent() on the node that matches singleNodeXPath
      * null if nothing matches the NodeListXPath
+     * @throws XPathExpressionException if xpath error
      */
     public static String getTextContent(Node xml, String singleNodeXPath) throws XPathExpressionException {
         String text = null;
@@ -56,8 +58,10 @@ public class XMLUtils {
 
     /**
      * @param xml The starting context (a Node or a Document, for example).
+     * @param NodeListXPath xpath
      * @return A Node matches the NodeListXPath
      * null if nothing matches the NodeListXPath
+     * @throws XPathExpressionException if xpath error
      */
     public static Node getNode(Node xml, String NodeListXPath) throws XPathExpressionException {
         Node result = null;
@@ -71,8 +75,10 @@ public class XMLUtils {
 
     /**
      * @param xml The starting context (a Node or a Document, for example).
+     * @param NodeListXPath xpath
      * @return A NodeList containing the nodes that match the NodeListXPath
      * null if nothing matches the NodeListXPath
+     * @throws XPathExpressionException if xpath error
      */
     public static NodeList getNodeList(Node xml, String NodeListXPath) throws XPathExpressionException {
         NodeList nodeList = null;
@@ -93,6 +99,8 @@ public class XMLUtils {
      * that are element nodes:
      * node.getNodeType() == Node.ELEMENT_NODE
      * node instanceof Element
+     * @param nodeList NodeList
+     * @return iterator over nodes
      */
     public static Iterator<Node> getNodeListIterator(final NodeList nodeList) {
         return new Iterator<Node>() {

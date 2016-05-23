@@ -159,6 +159,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 *         <br>
 	 *         NO_SUCH_USER - user not found using this method. <br>
 	 *         BAD_ARGS - user/pw not appropriate for this method
+         * @throws SQLException if database error
 	 */
 	@Override
     public int authenticate(Context context, String username, String password,
@@ -266,7 +267,7 @@ public class ShibAuthentication implements AuthenticationMethod
      * 
      * The values extracted (a user may have multiple roles) will be used to look
      * up which groups to place the user into. The groups are defined as
-     * "authentication.shib.role.<role-name>" which is a comma separated list of
+     * {@code authentication.shib.role.<role-name>} which is a comma separated list of
      * DSpace groups. 
      * 
      * @param context
@@ -400,6 +401,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 *            HTTP request, in case anything in that is used to decide
 	 * @param email
 	 *            e-mail address of user attempting to register
+         * @throws SQLException if database error
 	 * 
 	 */
 	@Override
@@ -434,6 +436,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 *            HTTP request, in case anything in that is used to decide
 	 * @param username
 	 *            e-mail address of user attempting to register
+         * @throws SQLException if database error
 	 * 
 	 */
 	@Override
@@ -456,6 +459,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param eperson
 	 *            newly created EPerson record - email + information from the
 	 *            registration form will have been filled out.
+         * @throws SQLException if database error
 	 * 
 	 */
 	@Override
@@ -578,6 +582,8 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param context The DSpace database context
 	 * @param request The current HTTP Request
 	 * @return The EPerson identified or null.
+         * @throws SQLException if database error
+         * @throws AuthorizeException if authorization error
 	 */
     protected EPerson findEPerson(Context context, HttpServletRequest request) throws SQLException, AuthorizeException {
 
@@ -676,6 +682,8 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param context The current DSpace database context
 	 * @param request The current HTTP Request
 	 * @return A new eperson object or null if unable to create a new eperson.
+         * @throws SQLException if database error
+	 * @throws AuthorizeException if authorization error
 	 */
     protected EPerson registerNewEPerson(Context context, HttpServletRequest request) throws SQLException, AuthorizeException {
 
@@ -765,6 +773,8 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param context The current DSpace database context
 	 * @param request The current HTTP Request
 	 * @param eperson The eperson object to update.
+         * @throws SQLException if database error
+	 * @throws AuthorizeException if authorization error
 	 */
     protected void updateEPerson(Context context, HttpServletRequest request, EPerson eperson) throws SQLException, AuthorizeException {
 
@@ -855,6 +865,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param password The password
 	 * @param request The HTTP Request
 	 * @return A valid DSpace Authentication Method status code.
+         * @throws SQLException if database error
 	 */
 	protected int swordCompatibility(Context context, String username, String password, HttpServletRequest request) throws SQLException {
 
@@ -902,7 +913,8 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * the field will be automatically created.
 	 * 
 	 * It is safe to call this methods multiple times.
-     * @param context
+         * @param context context
+         * @throws SQLException if database error
 	 */
     protected synchronized void initialize(Context context) throws SQLException {
 
@@ -964,8 +976,9 @@ public class ShibAuthentication implements AuthenticationMethod
      * Check if a MetadataField for an eperson is available.
 	 * 
 	 * @param metadataName The name of the metadata field.
-     * @param context
+         * @param context context
 	 * @return True if a valid metadata field, otherwise false.
+         * @throws SQLException if database error
 	 */
 	protected synchronized boolean checkIfEpersonMetadataFieldExists(Context context, String metadataName) throws SQLException {
 
@@ -984,10 +997,12 @@ public class ShibAuthentication implements AuthenticationMethod
     protected final String COLUMN_NAME_REGEX = "^[_A-Za-z0-9]+$";
 	
 	/**
-     * Automattically create a new metadataField for an eperson
+         * Automatically create a new metadataField for an eperson
 	 * 
+         * @param context context
 	 * @param metadataName The name of the new metadata field.
 	 * @return True if successful, otherwise false.
+         * @throws SQLException if database error
 	 */
     protected synchronized boolean autoCreateEpersonMetadataField(Context context, String metadataName) throws SQLException {
 

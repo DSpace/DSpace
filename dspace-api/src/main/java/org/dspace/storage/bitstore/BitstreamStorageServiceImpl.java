@@ -143,7 +143,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 	 * @return The ID of the registered bitstream
 	 * @exception SQLException
 	 *                If a problem occurs accessing the RDBMS
-	 * @throws IOException
+	 * @throws IOException if IO error
 	 */
 	@Override
     public UUID register(Context context, Bitstream bitstream, int assetstore,
@@ -339,7 +339,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      * @param context
      * @param bitstream the bitstream to be cloned
      * @return id of the clone bitstream.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
 	@Override
     public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException {

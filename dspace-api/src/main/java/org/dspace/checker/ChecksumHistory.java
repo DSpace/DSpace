@@ -12,7 +12,6 @@ import org.dspace.content.Bitstream;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * <p>
@@ -169,6 +168,7 @@ public class ChecksumHistory
 
     /**
      * Return the processing result.
+     * @return result
      */
     public ChecksumResult getResult()
     {

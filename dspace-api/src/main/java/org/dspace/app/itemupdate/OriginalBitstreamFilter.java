@@ -27,10 +27,10 @@ public class OriginalBitstreamFilter extends BitstreamFilterByBundleName
 	
 	/**
 	 *   Tests bitstreams for containment in an ORIGINAL bundle
-	 *  
+	 *  @param bitstream Bitstream
 	 *  @return true if the bitstream is in the ORIGINAL bundle
 	 *  
-	 *  @throws BitstreamFilterException
+	 *  @throws BitstreamFilterException if filter error
 	 */
 	@Override
     public boolean accept(Bitstream bitstream)

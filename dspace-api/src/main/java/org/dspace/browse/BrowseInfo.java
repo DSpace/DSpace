@@ -256,7 +256,7 @@ public class BrowseInfo
      * exception
      *
      * @param dso		the container object; a Community or Collection
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public void setBrowseContainer(DSpaceObject dso)
     	throws BrowseException
@@ -575,6 +575,7 @@ public class BrowseInfo
 
     /**
      * True if this browse was cached.
+     * @return true/false
      */
     public boolean wasCached()
     {
@@ -684,6 +685,7 @@ public class BrowseInfo
 	/**
 	 * Utility method for obtaining a string representation of the browse.  This is
 	 * useful only for debug
+         * @return String representation
 	 */
     public String toString()
     {
@@ -836,7 +838,7 @@ public class BrowseInfo
      *
      * @param config
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     private String fullListingString(ItemListConfig config)
     	throws SQLException

@@ -8,6 +8,10 @@
 
 package org.dspace.rdf.storage;
 
+import org.dspace.identifier.service.DOIService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
+
 /**
  * Extends the DOIURIGenerator but uses handles as fallback to DOIs.
  * @author pbecker
@@ -16,7 +20,16 @@ public class DOIHandleURIGenerator
 extends DOIURIGenerator
 implements URIGenerator
 {
+    protected static URIGenerator fallback;
 
-    protected final static URIGenerator fallback = new HandleURIGenerator();
+    @Required
+    public static void setFallback(URIGenerator fallback) {
+        DOIURIGenerator.fallback = fallback;
+    }
+    
+    @Autowired(required=true)
+    public void setDoiService(DOIService doiService) {
+        this.doiService = doiService;
+    }
     
 }

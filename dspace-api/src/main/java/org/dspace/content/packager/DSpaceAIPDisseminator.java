@@ -201,9 +201,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
      * @param dso current DSpace Object
      * @param params Packager Parameters
      * @return List of crosswalk names to run
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if error
      */
     @Override
     public MetsHdr makeMetsHdr(Context context, DSpaceObject dso,
@@ -255,9 +253,9 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
      * @param dso current DSpace Object
      * @param params Packager Parameters
      * @return List of crosswalk names to run
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public String [] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
@@ -284,9 +282,9 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
      * @param dso current DSpace Object
      * @param params Packager Parameters
      * @return List of crosswalk names to run
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
@@ -324,9 +322,9 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
      * @param dso current DSpace Object
      * @param params Packager Parameters
      * @return List of crosswalk names to run
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params)
@@ -353,9 +351,9 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
      * @param dso current DSpace Object
      * @param params Packager Parameters
      * @return List of crosswalk names to run
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params)
@@ -383,9 +381,9 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
      * @param dso current DSpace Object
      * @param params Packager Parameters
      * @return List of crosswalk names to run
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public String[] getRightsMdTypes(Context context, DSpaceObject dso, PackageParameters params)
@@ -452,9 +450,9 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
      * @param dso Current DSpace object
      * @param params Packager Parameters
      * @param mets METS manifest
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      * @throws MetsException
      */
     @Override

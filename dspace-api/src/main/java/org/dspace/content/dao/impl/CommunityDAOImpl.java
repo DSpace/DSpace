@@ -43,10 +43,11 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
      * Get a list of all communities in the system. These are alphabetically
      * sorted by community name.
      *
-     * @param context
-     *            DSpace context object
+     * @param context DSpace context object
+     * @param sortField sort field
      *
      * @return the communities in the system
+     * @throws SQLException if database error
      */
     @Override
     public List<Community> findAll(Context context, MetadataField sortField) throws SQLException

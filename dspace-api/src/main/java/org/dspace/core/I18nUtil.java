@@ -97,7 +97,8 @@ public class I18nUtil
      * Get the Locale for a specified EPerson. If the language is missing,
      * return the default Locale for the repository.
      *
-     * @param ep
+     * @param ep Eperson
+     * @return Locale
      */
     public static Locale getEPersonLocale(EPerson ep)
     {

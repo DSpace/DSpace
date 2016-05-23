@@ -34,7 +34,7 @@ public interface SearchService {
      *            DSpace Context object.
      * @param query
      *            the discovery query object.
-     * @throws SearchServiceException
+     * @throws SearchServiceException if search error
      */
     DiscoverResult search(Context context, DiscoverQuery query)
             throws SearchServiceException;
@@ -50,7 +50,7 @@ public interface SearchService {
      *            within this object)
      * @param query
      *            the discovery query object
-     * @throws SearchServiceException
+     * @throws SearchServiceException if search error
      */
     DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query)
             throws SearchServiceException;
@@ -64,7 +64,7 @@ public interface SearchService {
      * @param includeWithdrawn
      *            use <code>true</code> to include in the results also withdrawn
      *            items that match the query.
-     * @throws SearchServiceException
+     * @throws SearchServiceException if search error
      */
     DiscoverResult search(Context context, DiscoverQuery query,
             boolean includeWithdrawn) throws SearchServiceException;
@@ -82,7 +82,7 @@ public interface SearchService {
      *            use <code>true</code> to include in the results also withdrawn
      *            items that match the query
      * 
-     * @throws SearchServiceException
+     * @throws SearchServiceException if search error
      */
     DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query, boolean includeWithdrawn) throws SearchServiceException;
 
@@ -101,7 +101,7 @@ public interface SearchService {
      * @param field the field of the filter query
      * @param value the filter query value
      * @return a filter query
-     * @throws SQLException ...
+     * @throws SQLException if database error
      */
     DiscoverFilterQuery toFilterQuery(Context context, String field, String operator, String value) throws SQLException;
 

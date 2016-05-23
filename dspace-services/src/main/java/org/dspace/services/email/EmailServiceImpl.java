@@ -39,7 +39,10 @@ public class EmailServiceImpl
 
     private ConfigurationService cfg = null;
 
-    /** Inject the ConfigurationService */
+    /**
+     * Inject/set the ConfigurationService
+     * @param cfg the configurationService object
+     */
     @Autowired
     @Required
     public void setCfg(ConfigurationService cfg)

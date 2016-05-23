@@ -150,7 +150,7 @@ public class DSpaceCSVLine implements Serializable
      * Write this line out as a CSV formatted string, in the order given by the headings provided
      *
      * @param headings The headings which define the order the elements must be presented in
-     * @param fieldSeparator
+     * @param fieldSeparator field separator
      * @return The CSV formatted String
      */
     protected String toCSV(List<String> headings, String fieldSeparator)
@@ -179,7 +179,7 @@ public class DSpaceCSVLine implements Serializable
      * Internal method to create a CSV formatted String joining a given set of elements
      *
      * @param values The values to create the string from
-     * @param valueSeparator
+     * @param valueSeparator value separator
      * @return The line as a CSV formatted String
      */
     protected String valueToCSV(List<String> values, String valueSeparator)

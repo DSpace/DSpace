@@ -56,7 +56,6 @@ public class LicenseUtils
      * {x} any addition argument supplied wrapped in the
      * LicenseArgumentFormatter based on his type (map key)
      * 
-     * @see license.LicenseArgumentFormatter
      * @param locale
      * @param collection
      * @param item
@@ -125,9 +124,9 @@ public class LicenseUtils
      *            the item object of the license
      * @param licenseText
      *            the license the user granted
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     public static void grantLicense(Context context, Item item,
             String licenseText) throws SQLException, IOException,

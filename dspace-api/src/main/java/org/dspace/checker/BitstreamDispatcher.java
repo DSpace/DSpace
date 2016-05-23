@@ -50,6 +50,7 @@ public interface BitstreamDispatcher
      * 
      * @return the next bitstream id, or BitstreamDispatcher.SENTINEL if there
      *         isn't another value
+     * @throws SQLException if database error
      * 
      */
     public Bitstream next() throws SQLException;

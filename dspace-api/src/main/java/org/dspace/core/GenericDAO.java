@@ -17,6 +17,7 @@ import java.util.UUID;
  * The default hibernate implementation offers up a class that implements all these methods.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> class type
  */
 public interface GenericDAO<T>
 {
@@ -32,7 +33,7 @@ public interface GenericDAO<T>
      * @param context
      * @param clazz the desired type.
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<T> findAll(Context context, Class<T> clazz) throws SQLException;
 
@@ -42,7 +43,7 @@ public interface GenericDAO<T>
      * @param context
      * @param query
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public T findUnique(Context context, String query) throws SQLException;
 
@@ -56,7 +57,7 @@ public interface GenericDAO<T>
      * @param context
      * @param query
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<T> findMany(Context context, String query) throws SQLException;
 }

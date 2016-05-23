@@ -24,7 +24,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.XMLConstants;
@@ -65,7 +64,7 @@ import org.dspace.curate.Suspendable;
  * Intended use: cataloging tool in workflow and general curation.
  * The task uses a URL 'template' to compose the service call, e.g.
  * 
- * http://www.sherpa.ac.uk/romeo/api29.php?issn={dc.identifier.issn}
+ * {@code http://www.sherpa.ac.uk/romeo/api29.php?issn=\{dc.identifier.issn\}}
  * 
  * Task will substitute the value of the passed item's metadata field
  * in the {parameter} position. If multiple values are present in the
@@ -74,19 +73,19 @@ import org.dspace.curate.Suspendable;
  * The task uses another property (the datamap) to determine what data
  * to extract from the service response and how to use it, e.g.
  * 
- * //publisher/name=>dc.publisher,//romeocolour
+ * {@code //publisher/name=>dc.publisher,//romeocolour}
  * 
  * Task will evaluate the left-hand side (or entire token) of each
  * comma-separated token in the property as an XPath 1.0 expression into
- * the response document, and if there is a mapping symbol (e.g.'=>') and
+ * the response document, and if there is a mapping symbol (e.g. {@code '=>'}) and
  * value, it will assign the response document value(s) to the named
  * metadata field in the passed item. If the response document contains
  * multiple values, they will all be assigned to the item field. The
  * mapping symbol governs the nature of metadata field assignment:
  * 
- * '->' mapping will add to any existing values in the item field
- * '=>' mapping will replace any existing values in the item field
- * '~>' mapping will add *only* if item field has no existing values
+ * {@code '->'} mapping will add to any existing values in the item field
+ * {@code '=>'} mapping will replace any existing values in the item field
+ * {@code '~>'} mapping will add *only* if item field has no existing values
  * 
  * Unmapped data (without a mapping symbol) will simply be added to the task
  * result string, prepended by the XPath expression (a little prettified).
@@ -95,21 +94,21 @@ import org.dspace.curate.Suspendable;
  * 
  * A very rudimentary facility for transformation of data is supported, e.g.
  * 
- * http://www.crossref.org/openurl/?id={doi:dc.relation.isversionof}&format=unixref
+ * {@code http://www.crossref.org/openurl/?id=\{doi:dc.relation.isversionof\}&format=unixref}
  *
  * The 'doi:' prefix will cause the task to look for a 'transform' with that
  * name, which is applied to the metadata value before parameter substitution
  * occurs. Transforms are defined in a task property such as the following:
  * 
- * transform.doi = match 10. trunc 60
+ * {@code transform.doi = match 10. trunc 60}
  * 
  * This means exclude the value string up to the occurrence of '10.', then
  * truncate after 60 characters. The only transform functions currently defined:
  * 
- * 'cut' <number> = remove number leading characters
- * 'trunc' <number> = remove trailing characters after number length
- * 'match' <pattern> = start match at pattern
- * 'text' <characters> = append literal characters (enclose in ' ' when whitespace needed)
+ * {@code 'cut' <number>} = remove number leading characters
+ * {@code 'trunc' <number>} = remove trailing characters after number length
+ * {@code 'match' <pattern>} = start match at pattern
+ * {@code 'text' <characters>} = append literal characters (enclose in ' ' when whitespace needed)
  * 
  * If the transform results in an invalid state (e.g. cutting more characters
  * than are in the value), the condition will be logged and the 
@@ -117,7 +116,7 @@ import org.dspace.curate.Suspendable;
  *
  * Transforms may also be used in datamaps, e.g.
  * 
- * //publisher/name=>shorten:dc.publisher,//romeocolour
+ * {@code //publisher/name=>shorten:dc.publisher,//romeocolour}
  *  
  * which would apply the 'shorten' transform to the service response value(s)
  * prior to metadata field assignment.
@@ -125,7 +124,7 @@ import org.dspace.curate.Suspendable;
  * An optional property 'headers' may be defined to stipulate any HTTP headers
  * required in the service call. The property syntax is double-pipe separated headers:
  * 
- * Accept: text/xml||Cache-Control: no-cache
+ * {@code Accept: text/xml||Cache-Control: no-cache}
  * 
  * @author richardrodgers
  */
@@ -214,7 +213,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
      * Perform the curation task upon passed DSO
      *
      * @param dso the DSpace object
-     * @throws IOException
+     * @throws IOException if IO error
      */
     @Override
     public int perform(DSpaceObject dso) throws IOException  {

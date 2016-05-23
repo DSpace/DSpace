@@ -30,9 +30,13 @@ public interface MetadataFieldService {
      *
      * @param context
      *            DSpace context object
-     * @throws IOException
-     * @throws AuthorizeException
-     * @throws SQLException
+     * @param metadataSchema schema
+     * @param scopeNote scope note
+     * @param element element
+     * @param qualifier qualifier
+     * @return new MetadataField
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
      * @throws NonUniqueMetadataException
      */
     public MetadataField create(Context context, MetadataSchema metadataSchema, String element, String qualifier, String scopeNote)
@@ -47,7 +51,7 @@ public interface MetadataFieldService {
      * @param id
      *            the metadata field ID
      * @return the metadata field object
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public MetadataField find(Context context, int id) throws SQLException;
 
@@ -59,7 +63,7 @@ public interface MetadataFieldService {
      * @param element element name
      * @param qualifier qualifier (may be ANY or null)
      * @return recalled metadata field
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public MetadataField findByElement(Context context, MetadataSchema metadataSchema, String element, String qualifier)
             throws SQLException;
@@ -75,7 +79,7 @@ public interface MetadataFieldService {
      *
      * @param context dspace context
      * @return an array of all the Dublin Core types
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<MetadataField> findAll(Context context) throws SQLException;
 
@@ -85,7 +89,7 @@ public interface MetadataFieldService {
      * @param context dspace context
      * @param metadataSchema the metadata schema for which we want all our metadata fields
      * @return array of metadata fields
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<MetadataField> findAllInSchema(Context context, MetadataSchema metadataSchema)
             throws SQLException;
@@ -95,10 +99,11 @@ public interface MetadataFieldService {
      * Update the metadata field in the database.
      *
      * @param context dspace context
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param metadataField metadata field
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      * @throws NonUniqueMetadataException
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public void update(Context context, MetadataField metadataField)
             throws SQLException, AuthorizeException, NonUniqueMetadataException, IOException;
@@ -107,8 +112,9 @@ public interface MetadataFieldService {
      * Delete the metadata field.
      *
      * @param context dspace context
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param metadataField metadata field
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void delete(Context context, MetadataField metadataField) throws SQLException, AuthorizeException;
 }

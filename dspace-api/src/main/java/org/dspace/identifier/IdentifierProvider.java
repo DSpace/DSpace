@@ -62,7 +62,7 @@ public abstract class IdentifierProvider {
      * @param context
      * @param item object to be named.
      * @return existing identifier of {@code item} if it has one, else a new identifier.
-     * @throws IdentifierException 
+     * @throws IdentifierException if identifier error
      */
     public abstract String register(Context context, DSpaceObject item) throws IdentifierException;
 
@@ -72,7 +72,7 @@ public abstract class IdentifierProvider {
      * @param context
      * @param dso object to be named.
      * @return existing identifier of {@code dso} if it has one, else a new identifier.
-     * @throws IdentifierException 
+     * @throws IdentifierException if identifier error
      */
     public abstract String mint(Context context, DSpaceObject dso) throws IdentifierException;
 
@@ -83,8 +83,8 @@ public abstract class IdentifierProvider {
      * @param identifier to be resolved.
      * @param attributes additional information for resolving {@code identifier}.
      * @return the named object.
-     * @throws IdentifierNotFoundException
-     * @throws IdentifierNotResolvableException 
+     * @throws IdentifierNotFoundException if identifier not found
+     * @throws IdentifierNotResolvableException if identifier not resolvable 
      */
     public abstract DSpaceObject resolve(Context context, String identifier, String... attributes) throws IdentifierNotFoundException, IdentifierNotResolvableException;;
 
@@ -94,8 +94,8 @@ public abstract class IdentifierProvider {
      * @param context
      * @param object The object to be looked up.
      * @return identifier for {@code object}.
-     * @throws IdentifierNotFoundException
-     * @throws IdentifierNotResolvableException 
+     * @throws IdentifierNotFoundException if identifier not found
+     * @throws IdentifierNotResolvableException if identifier not resolvable 
      */
     public abstract String lookup(Context context, DSpaceObject object) throws IdentifierNotFoundException, IdentifierNotResolvableException;;
 
@@ -104,7 +104,7 @@ public abstract class IdentifierProvider {
      * 
      * @param context
      * @param dso object to lose its identity.
-     * @throws IdentifierException 
+     * @throws IdentifierException if identifier error
      */
     public abstract void delete(Context context, DSpaceObject dso) throws IdentifierException;
 
@@ -114,7 +114,7 @@ public abstract class IdentifierProvider {
      * @param context
      * @param dso object to be de-identified.
      * @param identifier to be removed.
-     * @throws IdentifierException 
+     * @throws IdentifierException if identifier error
      */
     public abstract void delete(Context context, DSpaceObject dso, String identifier) throws IdentifierException;
 
@@ -124,7 +124,7 @@ public abstract class IdentifierProvider {
      * @param context
      * @param dso object to be identified.
      * @param identifier to be set on the object.
-     * @throws IdentifierException 
+     * @throws IdentifierException if identifier error
      */
     public abstract void reserve(Context context, DSpaceObject dso, String identifier) throws IdentifierException;
 
@@ -134,6 +134,7 @@ public abstract class IdentifierProvider {
      * @param context
      * @param object to be identified.
      * @param identifier to be created.
+     * @throws IdentifierException if identifier error
      */
     public abstract void register(Context context, DSpaceObject object, String identifier)
             throws IdentifierException;

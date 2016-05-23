@@ -91,19 +91,19 @@ public class List extends AbstractWingElement implements WingMergeableElement,
             TYPE_BULLETED, TYPE_GLOSS, TYPE_PROGRESS, TYPE_FORM, TYPE_DSO_LIST };
 
     /** The list's name */
-    private String name;
+    private final String name;
 
     /** The list's type, see types above. * */
-    private String type;
+    private final String type;
 
     /** Any special rendering instructions * */
-    private String rend;
+    private final String rend;
 
     /** The lists head * */
     private Head head;
 
     /** All content of this container, items & lists */
-    private java.util.List<AbstractWingElement> contents = new ArrayList<AbstractWingElement>();
+    private java.util.List<AbstractWingElement> contents = new ArrayList<>();
 
     /**
      * Construct a new list.
@@ -123,6 +123,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      *            (May be null) a rendering hint used to override the default
      *            display of the element. There are a set of predefined
      *            rendering values, see the class documentation above.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected List(WingContext context, String name, String type, String rend)
             throws WingException
@@ -143,12 +144,14 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * Set the head element which is the label associated with this list. This
      * method should be called before any other elements have been added to the
      * list.
+     * @return the new Head.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Head setHead() throws WingException
     {
-        Head head = new Head(context, null);
-        this.head = head;
-        return head;
+        Head newHead = new Head(context, null);
+        this.head = newHead;
+        return newHead;
     }
 
     /**
@@ -159,11 +162,12 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * @param characters
      *            (Required) Untranslated character data to be included as the
      *            list's head.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setHead(String characters) throws WingException
     {
-        Head head = setHead();
-        head.addContent(characters);
+        Head newHead = setHead();
+        newHead.addContent(characters);
     }
 
     /**
@@ -174,11 +178,12 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * @param key
      *            (Required) Key to the i18n catalogue to translate the content
      *            into the language preferred by the user.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setHead(Message key) throws WingException
     {
-        Head head = setHead();
-        head.addContent(key);
+        Head newHead = setHead();
+        newHead.addContent(key);
     }
 
     /**
@@ -192,6 +197,8 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @return the new Label.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Label addLabel(String name, String rend) throws WingException
     {
@@ -207,6 +214,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * 
      * @param characters
      *            (Required) Untranslated character data to be included.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addLabel(String characters) throws WingException
     {
@@ -224,6 +232,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * bullet. This version of label provides no textual label but may be used 
      * to indicate some implicit labeling such as ordered lists.
      * 
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addLabel() throws WingException
     {
@@ -239,6 +248,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * @param key
      *            (Required) Key to the i18n catalogue to translate the content
      *            into the language preferred by the user.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addLabel(Message key) throws WingException
     {
@@ -253,6 +263,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * Add an empty unnamed item.
      * 
      * @return a new Item
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Item addItem() throws WingException
     {
@@ -273,6 +284,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      *            (May be null) a rendering hint used to override the default
      *            display of the element. *
      * @return a new Item
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Item addItem(String name, String rend) throws WingException
     {
@@ -286,6 +298,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * 
      * @param characters
      *            (Required) Untranslated character data to be included.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addItem(String characters) throws WingException
     {
@@ -302,6 +315,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * @param key
      *            (Required) Key to the i18n catalogue to translate the content
      *            into the language preferred by the user.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addItem(Message key) throws WingException
     {
@@ -320,6 +334,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * @param characters
      *            (Required) Untranslated character data to be included as the
      *            link's body.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addItemXref(String target, String characters)
             throws WingException
@@ -337,6 +352,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * @param key
      *            (Required) i18n key for translating content into the user's
      *            preferred language.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addItemXref(String target, Message key) throws WingException
     {
@@ -358,6 +374,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return A new sub list.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public List addList(String name, String type, String rend)
             throws WingException
@@ -377,6 +394,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      *            (May be null) determines the list type. If this is blank the
      *            list type is inferred from the context and use.
      * @return A new sub list.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public List addList(String name, String type)
             throws WingException
@@ -393,14 +411,13 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      *            (Required) a local identifier used to differentiate the
      *            element from its siblings.
      * @return A new sub list.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public List addList(String name) throws WingException
     {
         return addList(name, null, null);
     }
-    
-    
-    
+
     /**
      * Determine if the given SAX startElement event is equivalent to this list.
      * 
@@ -414,6 +431,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      *            The element's attributes
      * @return True if this list is equivalent to the given SAX Event.
      */
+    @Override
     public boolean mergeEqual(String namespace, String localName, String qName,
             Attributes attributes)
     {
@@ -426,16 +444,12 @@ public class List extends AbstractWingElement implements WingMergeableElement,
         {
             return false;
         }
-        String name = attributes.getValue(A_NAME);
-        if (name == null)
+        String theName = attributes.getValue(A_NAME);
+        if (theName == null)
         {
             return false;
         }
-        if (!name.equals(this.name))
-        {
-            return false;
-        }
-        return true;
+        return theName.equals(this.name);
     }
 
     /**
@@ -455,6 +469,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      *            The element's attributes
      * @return The child element
      */
+    @Override
     public WingMergeableElement mergeChild(String namespace, String localName,
             String qName, Attributes attributes) throws SAXException,
             WingException
@@ -491,6 +506,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * 
      * @return The attributes for this merged element
      */
+    @Override
     public Attributes merge(Attributes attributes) throws SAXException,
             WingException
     {
@@ -512,6 +528,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler, 
             NamespaceSupport namespaces) throws SAXException
     {
@@ -550,9 +567,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
         }
     }
 
-    /**
-     * dispose
-     */
+    @Override
     public void dispose()
     {
         if (head != null)

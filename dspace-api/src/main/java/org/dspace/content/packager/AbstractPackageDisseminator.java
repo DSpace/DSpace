@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author Tim Donohue
  * @see PackageDisseminator
- * @see PluginService
+ * @see org.dspace.core.service.PluginService
  */
 public abstract class AbstractPackageDisseminator
         implements PackageDisseminator
@@ -76,6 +76,10 @@ public abstract class AbstractPackageDisseminator
      *          packages will be written to the same directory as this File.
      * @throws PackageValidationException if package cannot be created or there is
      *  a fatal error in creating it.
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public List<File> disseminateAll(Context context, DSpaceObject dso,

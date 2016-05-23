@@ -244,6 +244,9 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     
     @Override
     public int countItems(Context context, List<Collection> collections, boolean includeArchived, boolean includeWithdrawn) throws SQLException {
+        if (collections.size() == 0) {
+            return 0;
+        }
         Query query = createQuery(context, "select count(distinct i) from Item i " +
                                             "join i.collections collection " +
                                             "WHERE collection IN (:collections) AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn");

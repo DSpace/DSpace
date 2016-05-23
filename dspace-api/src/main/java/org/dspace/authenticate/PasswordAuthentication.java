@@ -59,6 +59,8 @@ public class PasswordAuthentication
      * <p>
      * Example - aber.ac.uk domain : @aber.ac.uk
      * Example - MIT domain and all .ac.uk domains: @mit.edu, .ac.uk
+     * @param email email
+     * @throws SQLException if database error
      */
     @Override
     public boolean canSelfRegister(Context context,
@@ -95,6 +97,7 @@ public class PasswordAuthentication
 
     /**
      *  Nothing extra to initialize.
+     * @throws SQLException if database error
      */
     @Override
     public void initEPerson(Context context, HttpServletRequest request,
@@ -105,6 +108,7 @@ public class PasswordAuthentication
 
     /**
      * We always allow the user to change their password.
+     * @throws SQLException if database error
      */
     @Override
     public boolean allowSetPassword(Context context,
@@ -196,6 +200,7 @@ public class PasswordAuthentication
      * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
      * <br>NO_SUCH_USER    - no EPerson with matching email address.
      * <br>BAD_ARGS        - missing username, or user matched but cannot login.
+     * @throws SQLException if database error
      */
     @Override
     public int authenticate(Context context,

@@ -29,7 +29,7 @@ import org.dspace.core.Utils;
 
 /**
  * Command line access to the checksum checker. Options are listed in the 
- * documentation for the main method.</p>
+ * documentation for the main method.
  * 
  * @author Jim Downing
  * @author Grace Carpenter
@@ -72,6 +72,7 @@ public final class ChecksumChecker
      *            <dt>-p</dt>
      *            <dd>Don't prune results before running checker</dd>
      *            </dl>
+     * @throws SQLException if error
      */
     public static void main(String[] args) throws SQLException {
         // set up command line parser

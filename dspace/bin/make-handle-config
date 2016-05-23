@@ -51,6 +51,7 @@ echo "Writing simple Handle server configuration"
 
 # Read parameters from DSpace config
 dshostname=`$BINDIR/dspace dsprop --property dspace.hostname`
+dshostip=`host $dshostname | awk '/has address/ { print $4; exit }'`
 dsname=`$BINDIR/dspace dsprop --property dspace.name`
 handle=`$BINDIR/dspace dsprop --property handle.prefix`
 handledir=`$BINDIR/dspace dsprop --property handle.dir`
@@ -60,7 +61,7 @@ contactemail=`$BINDIR/dspace dsprop --property mail.admin`
 # Write the options to a file we can pipe into the setup tool
 echo "1" >$tempfile   # 1 = non-caching server, 2 = caching server
 echo "" >>$tempfile   # Primary server?  Default = y (n = mirror server)
-echo $dshostname >>$tempfile   # IP address
+echo $dshostip >>$tempfile   # IP address
 echo "" >>$tempfile   # Port to listen to (default=2641)
 echo "" >>$tempfile   # Port for HTTP i/f to listen to (default=8000)
 echo "" >>$tempfile   # Log all accesses?  ("y" or "n", default=n)

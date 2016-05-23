@@ -38,8 +38,8 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      *            the bits to put in the bitstream
      *
      * @return the newly created bitstream
-     * @throws java.io.IOException
-     * @throws SQLException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
      */
     public Bitstream create(Context context, InputStream is) throws IOException, SQLException;
 
@@ -57,8 +57,9 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      *            the bits to put in the bitstream
      *
      * @return the newly created bitstream
-     * @throws java.io.IOException
-     * @throws SQLException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public Bitstream create(Context context, Bundle bundle, InputStream is) throws IOException, SQLException, AuthorizeException;
 
@@ -68,11 +69,13 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * format.
      *
      * @param  context DSpace context object
+     * @param bundle The bundle in which our bitstream should be added.
      * @param assetstore corresponds to an assetstore in dspace.cfg
      * @param bitstreamPath the path and filename relative to the assetstore
      * @return  the newly registered bitstream
-     * @throws IOException
-     * @throws SQLException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public Bitstream register(Context context, Bundle bundle, int assetstore, String bitstreamPath)
             throws IOException, SQLException, AuthorizeException;
@@ -86,8 +89,9 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * @param assetstore corresponds to an assetstore in dspace.cfg
      * @param bitstreamPath the path and filename relative to the assetstore
      * @return  the newly registered bitstream
-     * @throws IOException
-     * @throws SQLException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public Bitstream register(Context context, int assetstore, String bitstreamPath)
         	throws IOException, SQLException, AuthorizeException;
@@ -96,17 +100,22 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * Set the user's format description. This implies that the format of the
      * bitstream is uncertain, and the format is set to "unknown."
      *
+     * @param  context DSpace context object
+     * @param  bitstream DSpace bitstream
      * @param desc
      *            the user's description of the format
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public void setUserFormatDescription(Context context, Bitstream bitstream, String desc) throws SQLException;
 
     /**
      * Get the description of the format - either the user's or the description
      * of the format defined by the system.
-     *
+     * 
+     * @param  context DSpace context object
+     * @param  bitstream DSpace bitstream
      * @return a description of the format.
+     * @throws SQLException if database error
      */
     public String getFormatDescription(Context context, Bitstream bitstream) throws SQLException;
 
@@ -115,20 +124,24 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * description, it is cleared. Passing in <code>null</code> sets the type
      * of this bitstream to "unknown".
      *
+     * @param  context DSpace context object
+     * @param  bitstream DSpace bitstream
      * @param bitstreamFormat
      *            the format of this bitstream, or <code>null</code> for
      *            unknown
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public void setFormat(Context context, Bitstream bitstream, BitstreamFormat bitstreamFormat) throws SQLException;
 
     /**
      * Retrieve the contents of the bitstream
      *
+     * @param  context DSpace context object
+     * @param  bitstream DSpace bitstream
      * @return a stream from which the bitstream can be read.
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public InputStream retrieve(Context context, Bitstream bitstream) throws IOException, SQLException, AuthorizeException;
 
@@ -137,6 +150,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * filesystem than in assetstore). More about registered items:
      * https://wiki.duraspace.org/display/DSDOC3x/Registering+(not+Importing)+Bitstreams+via+Simple+Archive+Format
      *
+     * @param  bitstream DSpace bitstream
      * @return true if the bitstream is registered, false otherwise
      */
     public boolean isRegisteredBitstream(Bitstream bitstream);
@@ -145,7 +159,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * Retrieve all bitstreams with the deleted flag set to true
      * @param context the dspace context
      * @return a list of all bitstreams that have been "deleted"
-     * @throws SQLException ...
+     * @throws SQLException if database error
      */
     public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException;
 
@@ -154,8 +168,8 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * Remove a bitstream that has been set to "deleted" from the database
      * @param context the dspace context
      * @param bitstream the bitstream to deleted from the database
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void expunge(Context context, Bitstream bitstream) throws SQLException, AuthorizeException;
 
@@ -179,7 +193,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException;
 
-    int countTotal(Context context) throws SQLException ;
+    int countTotal(Context context) throws SQLException;
 
     int countDeletedBitstreams(Context context) throws SQLException;
 

@@ -47,9 +47,9 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
      *
      * @param context
      *            DSpace context object
-     *
+     * @param order order by MetadataField
      * @return the collections in the system
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public List<Collection> findAll(Context context, MetadataField order) throws SQLException

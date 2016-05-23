@@ -35,6 +35,7 @@ public interface StreamDisseminationCrosswalk
     /**
      * Predicate: Can this disseminator crosswalk the given object.
      *
+     * @param context context
      * @param dso  dspace object, e.g. an <code>Item</code>.
      * @return true when disseminator is capable of producing metadata.
      */

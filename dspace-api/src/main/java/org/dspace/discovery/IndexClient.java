@@ -33,7 +33,7 @@ public class IndexClient {
      *
      * @param args the command-line arguments, none used
      * @throws java.io.IOException
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      *
      */
     public static void main(String[] args) throws SQLException, IOException, SearchServiceException {

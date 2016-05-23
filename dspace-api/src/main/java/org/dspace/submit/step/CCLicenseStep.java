@@ -10,7 +10,7 @@ package org.dspace.submit.step;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.HashMap;
-
+import org.apache.commons.lang3.*;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -272,7 +272,7 @@ public class CCLicenseStep extends AbstractProcessingStep
     		}
     		return STATUS_COMPLETE;
     	}
-    	else if (licenseclass.equals("xmlui.Submission.submit.CCLicenseStep.select_change"))
+    	else if (StringUtils.isBlank(licenseclass) || licenseclass.equals("xmlui.Submission.submit.CCLicenseStep.select_change"))
     	{
     		removeRequiredAttributes(session);    
     		return STATUS_COMPLETE;

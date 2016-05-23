@@ -46,7 +46,7 @@ import org.xml.sax.SAXException;
  * an XML file.
  * 
  * The XML file structure needs to be:
- * 
+ * {@code
  * <import_structure>
  *     <community>
  *         <name>....</name>
@@ -56,7 +56,7 @@ import org.xml.sax.SAXException;
  *         </collection>
  *     </community>
  * </import_structure>
- * 
+ * }
  * it can be arbitrarily deep, and supports all the metadata elements
  * that make up the community and collection metadata.  See the system
  * documentation for more details
@@ -88,10 +88,12 @@ public class StructBuilder
      * 
      * This is of the form:
      * 
-     * StructBuilder -f [xml source] -e [administrator email] -o [output file]
+     * {@code StructBuilder -f [xml source] -e [administrator email] -o [output file]}
      * 
      * The output file will contain exactly the same as the source xml document, but
      * with the handle for each imported item added as an attribute.
+     * @param argv commandline arguments
+     * @throws Exception if an error occurs
      */
     public static void main(String[] argv) 
     	throws Exception
@@ -203,7 +205,7 @@ public class StructBuilder
      * fails it generates an error and ceases execution
      * 
      * @param	document	the XML document object
-     * @throws TransformerException
+     * @throws TransformerException if transformer error
      * 
      */
     private static void validate(org.w3c.dom.Document document)

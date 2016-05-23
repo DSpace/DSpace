@@ -45,6 +45,7 @@ public interface InProgressSubmission
      * Get the submitter
      * 
      * @return the submitting e-person
+     * @throws SQLException if database error
      */
     EPerson getSubmitter() throws SQLException;
 

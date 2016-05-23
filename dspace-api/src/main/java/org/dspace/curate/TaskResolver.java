@@ -41,24 +41,24 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * dspace/config/modules/curate.cfg property "script.dir". A catalog of
  * scripted tasks named 'task.catalog" is kept in this directory.
  * Each task has a 'descriptor' property with value syntax:
- * <engine>|<relFilePath>|<implClassCtor>
+ * {@code <engine>|<relFilePath>|<implClassCtor>}
  * An example property:
  * 
- * linkchecker = ruby|rubytask.rb|LinkChecker.new
+ * {@code linkchecker = ruby|rubytask.rb|LinkChecker.new}
  * 
  * This descriptor means that a 'ruby' script engine will be created,
- * a script file named 'rubytask.rb' in the directory <script.dir> will be
+ * a script file named 'rubytask.rb' in the directory {@code <script.dir>} will be
  * loaded and the resolver will expect an evaluation of 'LinkChecker.new' will 
  * provide a correct implementation object.
  * 
  * Script files may embed their descriptors to facilitate deployment.
  * To accomplish this, a script must include the descriptor string with syntax:
- * $td=<descriptor> somewhere on a comment line. for example:
+ * {@code $td=<descriptor>} somewhere on a comment line. for example:
  * 
- * # My descriptor $td=ruby|rubytask.rb|LinkChecker.new
+ * {@code My descriptor $td=ruby|rubytask.rb|LinkChecker.new}
  * 
- * For portability, the <relFilePath> component may be omitted in this context.
- * Thus, $td=ruby||LinkChecker.new will be expanded to a descriptor
+ * For portability, the {@code <relFilePath>} component may be omitted in this context.
+ * Thus, {@code$td=ruby||LinkChecker.new} will be expanded to a descriptor
  * with the name of the embedding file.
  * 
  * @author richardrodgers

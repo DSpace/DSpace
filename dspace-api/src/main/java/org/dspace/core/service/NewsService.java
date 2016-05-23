@@ -19,6 +19,7 @@ public interface NewsService {
      *
      * @param newsFile
      *        name of the news file to read in, relative to the news file path.
+     * @return contents
      */
     public String readNewsFile(String newsFile);
 
@@ -29,12 +30,14 @@ public interface NewsService {
      *        name of the news file to read in, relative to the news file path.
      * @param news
      *            the text to be written to the file.
+     * @return string
      */
     public String writeNewsFile(String newsFile, String news);
 
     /**
      * Get the path for the news files.
      *
+     * @return path
      */
     public String getNewsFilePath();
 

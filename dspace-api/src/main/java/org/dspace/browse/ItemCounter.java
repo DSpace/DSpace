@@ -51,8 +51,8 @@ public class ItemCounter
     /**
      * Construct a new item counter which will use the give DSpace Context
      * 
-     * @param context
-     * @throws ItemCountException
+     * @param context current context
+     * @throws ItemCountException if count error
      */
     public ItemCounter(Context context)
             throws ItemCountException
@@ -70,9 +70,9 @@ public class ItemCounter
      * cached value if it exists.  If it is equal to 'false' it will count
      * the number of items in the container in real time.
      * 
-     * @param dso
-     * @throws ItemCountException
-     * @throws SQLException 
+     * @param dso DSpaceObject
+     * @return count
+     * @throws ItemCountException when error occurs
      */
     public int getCount(DSpaceObject dso)
             throws ItemCountException

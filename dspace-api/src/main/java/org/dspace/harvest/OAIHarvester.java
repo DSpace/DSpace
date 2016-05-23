@@ -695,7 +695,7 @@ public class OAIHarvester {
      * @throws TransformerException
      * @throws SAXException
      * @throws ParserConfigurationException
-     * @throws IOException
+     * @throws IOException if IO error
      */
     private String oaiGetDateGranularity(String oaiSource) throws IOException, ParserConfigurationException, SAXException, TransformerException
     {

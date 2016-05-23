@@ -81,7 +81,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     /**
      * Initializes a ConfigurationService based on the provided home directory
      * for DSpace
-     * @param providedHome
+     * @param providedHome provided home directory
      */
     public DSpaceConfigurationService(String providedHome) {
 		loadInitialConfig(providedHome);
@@ -148,7 +148,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      * Returns property value as an Object.
      * If property is not found, null is returned.
      *
-     * @see org.dspace.services.ConfigurationService#getPropertyValue(java.lang.Object)
+     * @see org.dspace.services.ConfigurationService#getPropertyValue(java.lang.String)
      */
     @Override
     public Object getPropertyValue(String name) {
@@ -376,7 +376,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      * This only adds/updates configurations, if you wish to first clear all
      * existing configurations, see clear() method.
      *
-     * @param properties a map of key -> value settings
+     * @param properties a map of key to value settings
      * @return the list of changed configuration keys
      */
     public String[] loadConfiguration(Map<String, Object> properties) {
@@ -408,8 +408,8 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
     /**
      * Loads (i.e. Adds) a single additional config setting into the system.
-     * @param key
-     * @param value
+     * @param key configuration key to add
+     * @param value configuration value to add
      * @return true if the config is new or changed
      */
     public boolean loadConfig(String key, Object value) {
@@ -564,9 +564,9 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      * <ol>
      *  <li>the value of the system property {@code dspace.dir} if defined;</li>
      *  <li>else the value of {@code providedHome} if not null;</li>
-     *  <li>else the servlet container's home + "/dspace/" if defined (see {@link getCatalina()});</li>
+     *  <li>else the servlet container's home + "/dspace/" if defined (see {@link DSpaceConfigurationService#getCatalina()});</li>
      *  <li>else the user's home directory if defined;</li>
-     *  <li>else "/".
+     *  <li>else "/".</li>
      * </ol>
      * @param providedHome provided home directory (may be null)
      * @return full path to DSpace home
@@ -633,7 +633,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     /**
      * Returns whether a given path seems to have the required DSpace configurations
      * in order to make it a valid DSpace home directory
-     * @param path
+     * @param path path to validate
      * @return true if path seems valid, false otherwise
      */
     protected boolean isValidDSpaceHome(String path)

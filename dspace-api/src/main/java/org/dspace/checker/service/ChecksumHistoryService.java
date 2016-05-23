@@ -35,11 +35,13 @@ public interface ChecksumHistoryService {
     /**
      * Prune the history records from the database.
      *
+     * @param context context
      * @param interests
      *            set of results and the duration of time before they are
      *            removed from the database
      *
      * @return number of bitstreams deleted
+     * @throws SQLException if database error
      */
     public int prune(Context context, Map<ChecksumResultCode, Long> interests) throws SQLException;
 }

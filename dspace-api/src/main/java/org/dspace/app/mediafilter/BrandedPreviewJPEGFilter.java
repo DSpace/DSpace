@@ -7,14 +7,7 @@
  */
 package org.dspace.app.mediafilter;
 
-import java.awt.Graphics2D;
-import java.awt.Color;
 import java.awt.image.*;
-import java.awt.RenderingHints;
-import java.awt.Transparency;
-import java.awt.Font;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
@@ -29,7 +22,7 @@ import org.dspace.app.mediafilter.JPEGFilter;
  * thumbnail.maxwidth, thumbnail.maxheight, the size we want our thumbnail to be
  * no bigger than. Creates only JPEGs.
  *
- * @author Jason Sherman <jsherman@usao.edu>
+ * @author Jason Sherman jsherman@usao.edu
  */
 public class BrandedPreviewJPEGFilter extends MediaFilter
 {
@@ -69,10 +62,13 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
 
    
     /**
+     * @param currentItem item
      * @param source
      *            source input stream
+     * @param verbose verbose mode
      * 
      * @return InputStream the resulting input stream
+     * @throws Exception if error
      */
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
