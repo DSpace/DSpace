@@ -288,7 +288,7 @@ public class FeedServlet extends DSpaceServlet
     }
     
     // returns recently changed items, checking for accessibility
-    private Item[] getItems(Context context, DSpaceObject dso)
+    private List<Item> getItems(Context context, DSpaceObject dso)
     		throws IOException, SQLException
     {
     	try
@@ -326,12 +326,9 @@ public class FeedServlet extends DSpaceServlet
     		BrowseEngine be = new BrowseEngine(context);
     		BrowseInfo bi = be.browseMini(scope);
     		List<Item> results = bi.getResults();
-    		Item[] resultsArray;
             if (includeAll)
             {
-            	resultsArray = new Item[results.size()];
-            	resultsArray = results.toArray(resultsArray);
-                return resultsArray;
+                return results;
             }
             else
                 {
@@ -351,9 +348,7 @@ public class FeedServlet extends DSpaceServlet
                         }
                     }
                 }
-                resultsArray = new Item[items.size()];
-            	resultsArray = items.toArray(resultsArray);
-                return resultsArray;
+                return items;
                 }
             }
         catch (SortException se)

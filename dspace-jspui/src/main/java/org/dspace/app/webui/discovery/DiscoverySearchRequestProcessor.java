@@ -182,9 +182,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
 
         // format and return results
         Map<String, String> labelMap = getLabels(request);
-        DSpaceObject[] dsoResults = new DSpaceObject[qResults
-                .getDspaceObjects().size()];
-        qResults.getDspaceObjects().toArray(dsoResults);
+        List<DSpaceObject> dsoResults = qResults.getDspaceObjects();
         Document resultsDoc = openSearchService.getResultsDoc(context, format, query,
                 (int) qResults.getTotalSearchResults(), qResults.getStart(),
                 qResults.getMaxResults(), container, dsoResults, labelMap);
