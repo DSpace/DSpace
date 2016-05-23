@@ -30,7 +30,7 @@ public class ThemeResourceReader extends SafeResourceReader
         implements CacheableProcessingComponent, Configurable
 {
     // Default whitelist of file extensions that are allowed in an XMLUI theme
-    protected String[] DEFAULT_WHITELIST = new String[]{"css", "js", "json", "gif", "jpg", "jpeg", "png", "ico", "bmp", "htm", "html", "svg", "ttf", "woff"};
+    protected String[] DEFAULT_WHITELIST = new String[]{"css", "js", "json", "gif", "jpg", "jpeg", "png", "ico", "bmp", "htm", "html", "svg", "ttf", "woff", "hbs"};
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     @Override
