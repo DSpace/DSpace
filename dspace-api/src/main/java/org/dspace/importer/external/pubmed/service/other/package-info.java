@@ -7,6 +7,7 @@
  */
 
 /**
+ * Pubmed specific implementations of the generalised {@link org.dspace.importer.external.service.other} classes
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 package org.dspace.importer.external.pubmed.service.other;
