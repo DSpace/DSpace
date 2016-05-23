@@ -36,7 +36,7 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.statistics.content.StatisticsBSAdapter;
+import org.dspace.statistics.SolrLogger;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
@@ -1040,11 +1040,12 @@ public class ItemAdapter extends AbstractAdapter
         long size = bitstream.getSize();
         Long views = null;
 
-        StatisticsBSAdapter statBSAdapter = new StatisticsBSAdapter();
+        // LIBDRUM-405 and LIBDRUM-460
         try
         {
-            views = statBSAdapter.getNumberOfVisits(
-                    StatisticsBSAdapter.BITSTREAM_VISITS, item);
+            views = SolrLogger.queryTotal("id: " + bitstream.getID(),
+                    "type: " + Constants.BITSTREAM + " AND -isBot:true")
+                    .getCount();
         }
         catch (SolrServerException e1)
         {
