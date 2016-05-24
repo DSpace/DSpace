@@ -7,6 +7,7 @@
     http://www.dspace.org/license/
 
 --%>
+<%@page import="org.dspace.app.util.SubmissionConfig"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.io.IOException" %>
@@ -44,7 +45,8 @@
 
 	//get submission information object
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
-    
+
+	boolean last = SubmissionController.isLastStep(request, subInfo);
 	//get list of review JSPs from VerifyServlet
 	HashMap reviewJSPs = (HashMap) request.getAttribute("submission.review");
 
@@ -99,7 +101,11 @@
         <div class="col-md-6 pull-right btn-group">
 			<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.previous"/>" />
           	<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.cancelsave"/>" />
+          	<% if (last) { %>
+          	<input class="btn btn-primary col-md-4" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.complete"/>" />
+          	<% } else { %>
           	<input class="btn btn-primary col-md-4" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.next"/>" />
+          	<% } %>
         </div>
 
     </form>
