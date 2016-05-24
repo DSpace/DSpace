@@ -24,7 +24,7 @@ public class DSpaceTemplateItemService implements TemplateItemService {
         	// NOW.YYYY-MM-DD SUBMITTER RESEARCHER CURRENTUSER.fullname / email / phone
             if (StringUtils.startsWith(md[n].value, "###") 
             		&& StringUtils.endsWith(md[n].value, "###")) {
-            	String[] splitted = md[n].value.split("\\.", 2);
+            	String[] splitted = md[n].value.substring(3, md[n].value.length()-3).split("\\.", 2);
             	TemplateValueGenerator gen = generators.get(splitted[0]);
             	if (gen != null) {
 	            	String extraParams = null;
