@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.metadatamapping.service;
+package org.dspace.importer.external.metadatamapping.transform;
 
 /**
  * Represents an interface to do processing of metadataValues

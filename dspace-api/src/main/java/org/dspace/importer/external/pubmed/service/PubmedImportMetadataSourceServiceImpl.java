@@ -6,15 +6,15 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external.pubmed.service.other;
+package org.dspace.importer.external.pubmed.service;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.dspace.content.Item;
-import org.dspace.importer.external.MetadataSourceException;
-import org.dspace.importer.external.Query;
+import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.jaxen.JaxenException;
@@ -34,7 +34,7 @@ import java.util.concurrent.Callable;
 /**
  * Implements a data source for querying pubmed central
  */
-public class ImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
+public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
     private String baseAddress;
 
     private WebTarget pubmedWebTarget;

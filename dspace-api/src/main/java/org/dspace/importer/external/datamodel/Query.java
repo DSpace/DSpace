@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external;
+package org.dspace.importer.external.datamodel;
 
 import org.apache.commons.collections.map.MultiValueMap;
 

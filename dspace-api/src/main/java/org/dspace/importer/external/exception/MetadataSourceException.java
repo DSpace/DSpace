@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external;
+package org.dspace.importer.external.exception;
 
 /** Represents a problem with the input source: e.g. cannot connect to the source.
  * @author Roeland Dillen (roeland at atmire dot com)

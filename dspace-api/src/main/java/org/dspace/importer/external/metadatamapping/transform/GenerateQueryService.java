@@ -5,11 +5,11 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.metadatamapping.service;
+package org.dspace.importer.external.metadatamapping.transform;
 
 import org.dspace.content.Item;
-import org.dspace.importer.external.Query;
-import org.dspace.importer.external.MetadataSourceException;
+import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.exception.MetadataSourceException;
 
 /**
  * Represent a service to generate a query based on an item

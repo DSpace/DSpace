@@ -6,11 +6,11 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external.service.other;
+package org.dspace.importer.external.service.components;
 
 import org.apache.log4j.Logger;
-import org.dspace.importer.external.MetadataSourceException;
-import org.dspace.importer.external.SourceExceptionHandler;
+import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.exception.SourceExceptionHandler;
 
 import javax.annotation.Resource;
 import java.util.LinkedHashMap;
@@ -136,7 +136,7 @@ public abstract class AbstractRemoteMetadataSource {
      *                 the public methods of this class.
      * @param <T>      return type. Generics for type safety.
      * @return The result of the call
-     * @throws org.dspace.importer.external.MetadataSourceException if something unrecoverable happens (e.g. network failures)
+     * @throws org.dspace.importer.external.exception.MetadataSourceException if something unrecoverable happens (e.g. network failures)
      */
     protected <T> T retry(Callable<T> callable) throws MetadataSourceException {
 
@@ -185,7 +185,7 @@ public abstract class AbstractRemoteMetadataSource {
     }
 
     /**
-     * Handles a given exception or throws on a {@link org.dspace.importer.external.MetadataSourceException} if no ExceptionHandler is set
+     * Handles a given exception or throws on a {@link org.dspace.importer.external.exception.MetadataSourceException} if no ExceptionHandler is set
      * @param retry The number of retries before the exception was thrown on
      * @param exception The exception to handle
      * @param operationId The id of the operation that threw the exception
@@ -204,8 +204,8 @@ public abstract class AbstractRemoteMetadataSource {
     }
 
     /** Retrieve a list of SourceExceptionHandler objects that have an instanceof the exception configured to them.
-     * @param exception The exception to base the retrieval of {@link org.dspace.importer.external.SourceExceptionHandler} on
-     * @return a list of {@link org.dspace.importer.external.SourceExceptionHandler} objects
+     * @param exception The exception to base the retrieval of {@link org.dspace.importer.external.exception.SourceExceptionHandler} on
+     * @return a list of {@link org.dspace.importer.external.exception.SourceExceptionHandler} objects
      */
     protected List<SourceExceptionHandler> getExceptionHandler(Exception exception) {
         for (Class aClass : exceptionHandlersMap.keySet()) {
@@ -220,7 +220,7 @@ public abstract class AbstractRemoteMetadataSource {
      * @param retry The number of retries before the exception was thrown on
      * @param exception The exception to throw
      * @param operationId The id of the operation that threw the exception
-     * @return a list of {@link org.dspace.importer.external.SourceExceptionHandler} objects
+     * @return a list of {@link org.dspace.importer.external.exception.SourceExceptionHandler} objects
      * @throws MetadataSourceException
      */
     protected void throwSourceException(int retry, Exception exception, String operationId) throws MetadataSourceException {
