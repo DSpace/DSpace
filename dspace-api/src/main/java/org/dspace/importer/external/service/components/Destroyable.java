@@ -5,7 +5,17 @@
  *
  * http://www.dspace.org/license/
  */
+
+package org.dspace.importer.external.service.components;
+
 /**
  * @author Roeland Dillen (roeland at atmire dot com)
  */
-package org.dspace.importer.external.service.other;
+public interface Destroyable {
+
+    /**
+     * Destroy the object
+     * @throws Exception
+     */
+    public void destroy() throws Exception;
+}

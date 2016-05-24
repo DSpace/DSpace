@@ -10,11 +10,11 @@ package org.dspace.importer.external.service;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
-import org.dspace.importer.external.MetadataSourceException;
-import org.dspace.importer.external.Query;
+import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.datamodel.ImportRecord;
-import org.dspace.importer.external.service.other.Destroyable;
-import org.dspace.importer.external.service.other.MetadataSource;
+import org.dspace.importer.external.service.components.Destroyable;
+import org.dspace.importer.external.service.components.MetadataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;

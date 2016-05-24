@@ -11,9 +11,9 @@ package org.dspace.importer.external.service;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
-import org.dspace.importer.external.metadatamapping.service.GenerateQueryService;
-import org.dspace.importer.external.service.other.MetadataSource;
-import org.dspace.importer.external.service.other.AbstractRemoteMetadataSource;
+import org.dspace.importer.external.service.components.MetadataSource;
+import org.dspace.importer.external.service.components.AbstractRemoteMetadataSource;
+import org.dspace.importer.external.metadatamapping.transform.GenerateQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -40,7 +40,7 @@ public abstract class AbstractImportMetadataSourceService<RecordType> extends Ab
 	}
 
     /**
-     * Set the {@link GenerateQueryService} used to create a {@link org.dspace.importer.external.Query} for a DSpace {@link org.dspace.content.Item}
+     * Set the {@link GenerateQueryService} used to create a {@link org.dspace.importer.external.datamodel.Query} for a DSpace {@link org.dspace.content.Item}
      * @param generateQueryForItem
      */
     @Autowired

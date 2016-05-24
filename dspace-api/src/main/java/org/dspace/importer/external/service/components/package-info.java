@@ -5,17 +5,8 @@
  *
  * http://www.dspace.org/license/
  */
-
-package org.dspace.importer.external.service.other;
-
 /**
+ * Service components that are aggregated/used in the {@link org.dspace.importer.external.service.AbstractImportMetadataSourceService} and {@link org.dspace.importer.external.service.ImportService}
  * @author Roeland Dillen (roeland at atmire dot com)
  */
-public interface Destroyable {
-
-    /**
-     * Destroy the object
-     * @throws Exception
-     */
-    public void destroy() throws Exception;
-}
+package org.dspace.importer.external.service.components;

@@ -6,11 +6,11 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external.service.other;
+package org.dspace.importer.external.service.components;
 
 import org.dspace.content.Item;
-import org.dspace.importer.external.MetadataSourceException;
-import org.dspace.importer.external.Query;
+import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.datamodel.ImportRecord;
 
 import java.util.Collection;

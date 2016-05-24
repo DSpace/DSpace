@@ -5,10 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.metadatamapping.processor;
+package org.dspace.importer.external.metadatamapping.transform;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.importer.external.metadatamapping.service.MetadataProcessorService;
 
 /**
  * Removes the last point from an author name, this is required for the SAP lookup

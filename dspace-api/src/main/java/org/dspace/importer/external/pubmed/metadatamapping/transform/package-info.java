@@ -7,9 +7,7 @@
  */
 
 /**
- * Services (interfaces) to retrieve and process metadata.
- * Interfaces only. These should be individually implemented for specific subsets of external importers.
- * @author Roeland Dillen (roeland at atmire dot com)
+ * Pubmed implementation of specific {@link org.dspace.importer.external.metadatamapping.transform} classes
  * @author Jonas Van Goolen (jonas at atmire dot com)
  */
-package org.dspace.importer.external.metadatamapping.service;
+package org.dspace.importer.external.pubmed.metadatamapping.transform;
