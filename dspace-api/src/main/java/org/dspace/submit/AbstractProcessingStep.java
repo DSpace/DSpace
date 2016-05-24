@@ -361,4 +361,8 @@ public abstract class AbstractProcessingStep
         request.setAttribute("submission.page", Integer.valueOf(pageNumber));
     }
 
+	public String getHeading(HttpServletRequest request, SubmissionInfo subInfo, int pageNumber, String heading) {
+		return heading;
+	}
+
 }

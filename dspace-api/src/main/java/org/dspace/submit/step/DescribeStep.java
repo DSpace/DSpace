@@ -87,8 +87,27 @@ public class DescribeStep extends AbstractProcessingStep
         getInputsReader();
     }
 
-   
+    public String getHeading(HttpServletRequest request, SubmissionInfo subInfo, int pageNumber, String heading) {
+        try
+        {
+            // get the item and current page
+            Item item = subInfo.getSubmissionItem().getItem();
 
+            // lookup applicable inputs
+            Collection c = subInfo.getSubmissionItem().getCollection();
+            
+        	String customHeading = inputsReader.getInputs(c.getHandle()).getHeading(pageNumber);
+            if (StringUtils.isNotBlank(customHeading)) {
+            	return customHeading;
+            }
+        }
+        catch (DCInputsReaderException | NullPointerException e)
+        {
+        	return heading;
+        }
+    	return heading;
+	}
+    
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)
