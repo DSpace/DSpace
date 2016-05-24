@@ -48,7 +48,7 @@ import it.cilea.osd.jdyna.utils.HashUtil;
  */
 public class CrisConsumer implements Consumer {
 
-	private static final String SOURCE_INTERNAL = "INTERNAL-SUBMISSION";
+	public static final String SOURCE_INTERNAL = "INTERNAL-SUBMISSION";
 
 	private static final Logger log = Logger.getLogger(CrisConsumer.class);
 
@@ -79,6 +79,7 @@ public class CrisConsumer implements Consumer {
 			Set<String> listAuthoritiesManager = ChoiceAuthorityManager.getManager().getAuthorities();
 
 			Map<String, List<Metadatum>> toBuild = new HashMap<String, List<Metadatum>>();
+			Map<String, List<Metadatum>> toUpdate = new HashMap<String, List<Metadatum>>();
 			Map<String, String> toBuildType = new HashMap<String, String>();
 			Map<String, CRISAuthority> toBuildChoice = new HashMap<String, CRISAuthority>();
 			Map<String, String> toBuildMetadata = new HashMap<String, String>();
@@ -144,7 +145,9 @@ public class CrisConsumer implements Consumer {
 			}
 			
 			Map<String, String> toBuildAuthority = new HashMap<String, String>();
-
+			Map<String, ACrisObject> createdObjects = new HashMap<String, ACrisObject>();
+			Map<String, ACrisObject> referencedObjects = new HashMap<String, ACrisObject>();
+			
 			for (String authorityKey : toBuild.keySet()) {
 
 				String rpKey = null;
@@ -161,7 +164,6 @@ public class CrisConsumer implements Consumer {
 				} else {
 					// build a simple RP
 					rp = choiceAuthorityObject.getNewCrisObject();
-					
 					SolrQuery query = new SolrQuery();
 					
 					if(choiceAuthorityObject.getCRISTargetTypeID()==-1) {
@@ -217,28 +219,25 @@ public class CrisConsumer implements Consumer {
 						
 						ResearcherPageUtils.buildTextValue(rp, MetadatumAuthority.get(0).value, prefix+rp.getMetadataFieldTitle());
 						
-						ImportAuthorityFiller filler = new DSpace().getSingletonService(AuthoritiesFillerConfig.class).getFiller(typeAuthority);
-						if (filler != null) {
-							filler.fillRecord(authorityKey, rp);
-						}
-
 						boolean activateNewObject = ConfigurationManager.getBooleanProperty("cris",
                                  "import.submission.enabled.entity." + toBuildMetadata.get(authorityKey), "import.submission.enabled.entity");
 						if(activateNewObject) {
 							rp.setStatus(true);
 						}
 						
-						
 						try {
 							applicationService.saveOrUpdate(crisTargetClass, rp);
-							log.info("Build new ResearcherProfile sourceId/sourceRef:" + authorityKey+"/"+typeAuthority);
+							log.info("Build new CRIS Object ["+crisTargetClass+"] sourceId/sourceRef:" + authorityKey+" / "+typeAuthority);
 						}
 						catch(Exception ex) {
 							log.error(ex.getMessage(), ex);
 						}
 						rpKey = rp.getCrisID();
+						createdObjects.put(authorityKey, rp);
 					}
-
+					else {
+						referencedObjects.put(authorityKey, rp);
+					}
 				}
 				
 				if (StringUtils.isNotBlank(rpKey)) {
@@ -256,6 +255,39 @@ public class CrisConsumer implements Consumer {
 			}
 			item.update();
 			ctx.getDBConnection().commit();
+			
+			Map<String, ACrisObject> extraUpdateObjects = new HashMap<String, ACrisObject>();
+			AuthoritiesFillerConfig fillerConfig = new DSpace().getSingletonService(AuthoritiesFillerConfig.class);
+			
+			for (String authorityKey : toBuild.keySet()) {
+				// enhrich the new cris objects as much as possible
+				ACrisObject rp = createdObjects.get(authorityKey);
+				boolean isUpdate = false;
+				if (rp == null) {
+					rp = referencedObjects.get(authorityKey);
+					isUpdate = true;
+				}
+				String typeAuthority = toBuildType.get(authorityKey);
+				ImportAuthorityFiller filler = fillerConfig.getFiller(typeAuthority);
+				System.out.println("crisconsumer -> filler -> "+typeAuthority);
+				System.out.println("crisconsumer -> filler -> "+ rp != null + " " +rp);
+				System.out.println("crisconsumer -> filler -> "+ authorityKey);
+				if (filler != null && 
+						(!isUpdate || filler.allowsUpdate(ctx, item, toBuild.get(authorityKey), authorityKey, rp))) {
+					filler.fillRecord(ctx, item, toBuild.get(authorityKey), authorityKey, rp);
+					extraUpdateObjects.put(authorityKey, rp);
+				}
+				// update is done at the end to assure that all the new entities are full populated before the final indexing
+				// applicationService.saveOrUpdate(rp.getCRISTargetClass(), rp);
+			}
+			
+			for (ACrisObject rp : extraUpdateObjects.values()) {
+				// persist the information, this will produce reindexing of the new entity with the full information
+				if (rp == null) {
+					continue;
+				}
+				applicationService.saveOrUpdate(rp.getCRISTargetClass(), rp);
+			}
 			ctx.restoreAuthSystemState();
 		}
 	}
