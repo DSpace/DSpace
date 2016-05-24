@@ -26,6 +26,7 @@
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
 
 <%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.util.SubmissionConfig" %>
@@ -65,10 +66,13 @@
     {
         workflowMode = true;
     }
+    
+    Collection collection = subInfo.getSubmissionItem().getCollection();
 %>
 
+<div class="container">
 <!--Progress Bar-->
-<div class="row container btn-group">
+<div class="row btn-group">
 <%    
     //get progress bar info, used to build progress bar
 	HashMap progressBarInfo = (HashMap) subInfo.getProgressBarInfo();
@@ -150,3 +154,11 @@
    }
 %>
         </div>
+
+<div class="row">
+	<p class="alert alert-info">
+		<fmt:message key="jsp.submit.progressbar.submitting-in">
+			<fmt:param><%=collection.getName() %></fmt:param>
+		</fmt:message></p>
+</div>
+</div>
