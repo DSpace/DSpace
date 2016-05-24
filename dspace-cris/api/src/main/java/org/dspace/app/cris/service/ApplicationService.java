@@ -43,6 +43,7 @@ import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.services.ConfigurationService;
 import org.hibernate.Session;
 
+import it.cilea.osd.common.core.SingleTimeStampInfo;
 import it.cilea.osd.common.model.Identifiable;
 import it.cilea.osd.jdyna.dao.TabDao;
 import it.cilea.osd.jdyna.model.Containable;
@@ -822,14 +823,25 @@ public class ApplicationService extends ExtendedTabService
 	private <T extends ACrisObject> boolean isExpiredCache(Class<T> model, Element element, Integer objectId,
 			ACrisObject rp) {
 		Date now = new Date();
-		boolean result = rp == null
-				|| (rp.getTimeStampInfo().getTimestampLastModified() != null
-				&& (now.getTime() - element.getLastAccessTime() > 1000 && !rp.getTimeStampInfo()
-						.getTimestampLastModified().getTimestamp().equals(uniqueLastModifiedTimeStamp(model, objectId))));
-		if (!result) {
-			element.updateAccessStatistics();
+		if (rp == null) {
+			return true;
 		}
-		return result;
+		SingleTimeStampInfo timestampLastModified = rp.getTimeStampInfo().getTimestampLastModified();
+		long lastModCache = timestampLastModified != null?timestampLastModified.getTimestamp().getTime():-1;
+		
+		if ( now.getTime() - element.getLastAccessTime() > 1000) {
+			Date uniqueLastModifiedTimeStamp = uniqueLastModifiedTimeStamp(model, objectId);
+			long lastModDb = uniqueLastModifiedTimeStamp != null? uniqueLastModifiedTimeStamp.getTime():-1;
+			if (lastModCache == lastModDb) {
+				element.updateAccessStatistics();
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+		element.updateAccessStatistics();
+		return false;
 	}
 
 	@Override
