@@ -117,6 +117,7 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+    	context.turnOffItemWrapper();
         // First we find the collection which was selected
         int id = Util.getIntParameter(request, "collectionid");
         String titolo = request.getParameter("search_title");
@@ -125,32 +126,38 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
         String uuidSubmission = request.getParameter("suuid");
         String uuidLookup = request.getParameter("iuuid");
         String fuuidLookup = request.getParameter("fuuid");
-
-        if (StringUtils.isBlank(uuidSubmission))
-        {
-            return STATUS_NO_SUUID;
-        }
-
-        SubmissionLookupDTO submissionDTO = slService.getSubmissionLookupDTO(
-                request, uuidSubmission);
-
-        if (submissionDTO == null)
-        {
-            return STATUS_SUBMISSION_EXPIRED;
-        }
-
+        boolean forceEmpty = Util.getBoolParameter(request, "forceEmpty");
+        
         ItemSubmissionLookupDTO itemLookup = null;
-        if (fuuidLookup == null || fuuidLookup.isEmpty())
-        {
-            if (StringUtils.isNotBlank(uuidLookup))
-            {
-                itemLookup = submissionDTO.getLookupItem(uuidLookup);
-                if (itemLookup == null)
-                {
-                    return STATUS_SUBMISSION_EXPIRED;
-                }
-            }
+        SubmissionLookupDTO submissionDTO = null;
+        
+        if (!forceEmpty) {
+	        if (StringUtils.isBlank(uuidSubmission))
+	        {
+	            return STATUS_NO_SUUID;
+	        }
+	
+	        submissionDTO = slService.getSubmissionLookupDTO(
+	                request, uuidSubmission);
+	
+	        if (submissionDTO == null)
+	        {
+	            return STATUS_SUBMISSION_EXPIRED;
+	        }
+	
+	        if (fuuidLookup == null || fuuidLookup.isEmpty())
+	        {
+	            if (StringUtils.isNotBlank(uuidLookup))
+	            {
+	                itemLookup = submissionDTO.getLookupItem(uuidLookup);
+	                if (itemLookup == null)
+	                {
+	                    return STATUS_SUBMISSION_EXPIRED;
+	                }
+	            }
+	        }
         }
+        
         // if the user didn't select a collection,
         // send him/her back to "select a collection" page
         if (id < 0)
