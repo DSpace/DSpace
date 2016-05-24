@@ -753,6 +753,7 @@
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.button">Filter</message>
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.loading">Please wait while the controlled vocabulary is loading.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">There was an issue when loading the controlled vocabulary, please try again later.</message>
+	<message key="xmlui.Submission.submit.DescribeStep.language">Language</message>
 
 
     <!-- org.dspace.app.xmlui.Submission.submit.AccessStep -->
