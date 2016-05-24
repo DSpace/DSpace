@@ -2380,7 +2380,7 @@ function doEditPolicy(objectType,objectID,policyID)
                 var name = names.nextElement();
                 var match = null;
 
-	        if ((match = name.match(/submit_group_id_(\d+)/)) != null)
+	        if ((match = name.match(/submit_group_id_([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/)) != null)
 			{
 	        	groupID = UUID.fromString(match[1]);
 			}
