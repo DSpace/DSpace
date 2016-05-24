@@ -6,9 +6,9 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external;
+package org.dspace.importer.external.exception;
 
-import org.dspace.importer.external.service.other.AbstractRemoteMetadataSource;
+import org.dspace.importer.external.service.components.AbstractRemoteMetadataSource;
 
 /**
  * Represent a  handler that forces implementations to define their own behaviour for exceptions originating from

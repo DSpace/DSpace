@@ -6,15 +6,15 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external.pubmed.metadatamapping.service;
+package org.dspace.importer.external.pubmed.metadatamapping.transform;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.importer.external.MetadataSourceException;
-import org.dspace.importer.external.Query;
-import org.dspace.importer.external.metadatamapping.service.GenerateQueryService;
+import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.metadatamapping.transform.GenerateQueryService;
 
 import java.util.List;
 

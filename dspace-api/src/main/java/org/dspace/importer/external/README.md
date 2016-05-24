@@ -38,9 +38,9 @@ This modular design also allows it to be completely independent of the user inte
 
 # Implementation of an import source <a name="Example-implementation"></a> #
 
-Each importer implementation must at least implement interface *org.dspace.importer.external.service.other.MetadataSource* and implement the inherited methods.
+Each importer implementation must at least implement interface *org.dspace.importer.external.service.components.MetadataSource* and implement the inherited methods.
 
-One can also choose to implement class *org.dspace.importer.external.service.other.Source* next to the MetadataSource interface. This class contains functionality to handle request timeouts and to retry requests.
+One can also choose to implement class *org.dspace.importer.external.service.components.AbstractRemoteMetadataSource* next to the MetadataSource interface. This class contains functionality to handle request timeouts and to retry requests.
 
 A third option is to implement class *org.dspace.importer.external.service.AbstractImportSourceService*. This class already implements both the MetadataSource interface and Source class. AbstractImportSourceService has a generic type set 'RecordType'. In the importer implementation this type set should be the class of the records received from the remote source's response (e.g. when using axiom to get the records from the remote source's XML response, the importer implementation's type set is *org.apache.axiom.om.OMElement*). 
 
@@ -48,7 +48,7 @@ Implementing the AbstractImportSourceService allows the importer implementation 
 
 ## Inherited methods <a name="Inherited-methods"></a> ##
 
-Method getImportSource() should return a unique identifier. Importer implementations should not be called directly, but class *org.dspace.importer.external.service.ImportService* should be called instead. This class contains the same methods as the importer implementatons, but with an extra parameter 'url'. This url parameter should contain the same identifier that is returned by the getImportSource() method of the importer implementation you want to use.
+Method getImportSource() should return a unique identifier. Importer implementations should not be called directly, but class *org.dspace.importer.external.service.ImportService* should be called instead. This class contains the same methods as the importer implementations, but with an extra parameter 'url'. This url parameter should contain the same identifier that is returned by the getImportSource() method of the importer implementation you want to use.
 
 The other inherited methods are used to query the remote source. 
 

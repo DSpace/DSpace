@@ -6,9 +6,10 @@
  * http://www.dspace.org/license/
  */
 
-/** Package containing datamodel classes which are constructed/used during the retrieval of Records
- *  Strictly data-centric classes
+/**
+ * Pubmed implementation of specific {@link org.dspace.importer.external.metadatamapping.contributor} classes,
+ * defining the mapping between the retrieved record and dspace metadata
  * @author Roeland Dillen (roeland at atmire dot com)
  * @author Jonas Van Goolen (jonas at atmire dot com)
  */
-package org.dspace.importer.external.datamodel;
+package org.dspace.importer.external.pubmed.metadatamapping.contributor;

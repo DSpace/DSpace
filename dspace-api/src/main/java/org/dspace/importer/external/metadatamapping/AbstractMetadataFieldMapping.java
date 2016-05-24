@@ -10,7 +10,7 @@ package org.dspace.importer.external.metadatamapping;
 
 import org.apache.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
-import org.dspace.importer.external.metadatamapping.service.MetadataProcessorService;
+import org.dspace.importer.external.metadatamapping.transform.MetadataProcessorService;
 
 import java.util.Collection;
 import java.util.LinkedList;

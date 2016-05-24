@@ -6,9 +6,8 @@
  * http://www.dspace.org/license/
  */
 
-/** Package containing datamodel classes which are constructed/used during the retrieval of Records
- *  Strictly data-centric classes
- * @author Roeland Dillen (roeland at atmire dot com)
+/**
+ * Transformer classes used by services classes (Such as processing/generating queries, altering results, etc)
  * @author Jonas Van Goolen (jonas at atmire dot com)
  */
-package org.dspace.importer.external.datamodel;
+package org.dspace.importer.external.metadatamapping.transform;
