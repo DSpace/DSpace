@@ -110,10 +110,8 @@ public abstract class CRISAuthority<T extends ACrisObject> implements ChoiceAuth
         try
         {
             init();
-            if (query != null && query.length() > 2)
+            if (query == null || query.length() > 2)
             {
-                String luceneQuery = ClientUtils.escapeQueryChars(query.toLowerCase()) + "*";
-                luceneQuery = luceneQuery.replaceAll("\\\\ "," ");
                 DiscoverQuery discoverQuery = new DiscoverQuery();
                 discoverQuery.setDSpaceObjectFilter(getCRISTargetTypeID());
                 String filter = configurationService.getProperty("cris."
@@ -133,14 +131,21 @@ public abstract class CRISAuthority<T extends ACrisObject> implements ChoiceAuth
                         discoverQuery.addFilterQueries(MessageFormat.format(filter,  field.substring(field.lastIndexOf("_") + 1)));
                     }
                 }
-                discoverQuery
-                        .setQuery("{!lucene q.op=AND df=crisauthoritylookup}("
-                                + luceneQuery
-                                + ") OR (\""
-                                + luceneQuery.substring(0,
-                                        luceneQuery.length() - 1) + "\")");
-                
-                discoverQuery.setMaxResults(50);
+                if (query == null) {
+                	discoverQuery.setQuery("*:*");
+                	discoverQuery.setMaxResults(500);
+                }
+                else {
+                	String luceneQuery = ClientUtils.escapeQueryChars(query.toLowerCase()) + "*";
+	                luceneQuery = luceneQuery.replaceAll("\\\\ "," ");
+	                discoverQuery
+	                        .setQuery("{!lucene q.op=AND df=crisauthoritylookup}("
+	                                + luceneQuery
+	                                + ") OR (\""
+	                                + luceneQuery.substring(0,
+	                                        luceneQuery.length() - 1) + "\")");
+	                discoverQuery.setMaxResults(50);
+                }
                 discoverQuery.setSortField("crisauthoritylookup_sort", SORT_ORDER.asc);
                 
                 DiscoverResult result = searchService.search(null,

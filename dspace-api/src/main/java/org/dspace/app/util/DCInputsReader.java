@@ -68,6 +68,8 @@ public class DCInputsReader
      * definition file
      */
     private Map<String, List<List<Map<String, String>>>> formDefns  = null;
+    
+    private Map<String, List<String>> formHeadings = null;
 
     /**
      * Reference to the value-pairs map, computed from the forms definition file
@@ -108,7 +110,8 @@ public class DCInputsReader
         whichForms = new HashMap<String, String>();
         formDefns  = new HashMap<String, List<List<Map<String, String>>>>();
         valuePairs = new HashMap<String, List<String>>();
-
+        formHeadings =  new HashMap<String, List<String>>();
+        
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
         try
@@ -172,11 +175,12 @@ public class DCInputsReader
         }
         // cache miss - construct new DCInputSet
         List<List<Map<String, String>>> pages = formDefns.get(formName);
+        List<String> headings = formHeadings.get(formName);
         if ( pages == null )
         {
                 throw new DCInputsReaderException("Missing the " + formName  + " form");
         }
-        lastInputSet = new DCInputSet(formName, pages, valuePairs);
+        lastInputSet = new DCInputSet(formName, headings, pages, valuePairs);
         return lastInputSet;
     }
     
@@ -307,6 +311,8 @@ public class DCInputsReader
                         }
                         List<List<Map<String, String>>> pages = new ArrayList<List<Map<String, String>>>(); // the form contains pages
                         formDefns.put(formName, pages);
+                        List<String> headings = new ArrayList<String>();
+                        formHeadings.put(formName, headings);
                         NodeList pl = nd.getChildNodes();
                         int lenpg = pl.getLength();
                         for (int j = 0; j < lenpg; j++)
@@ -320,6 +326,8 @@ public class DCInputsReader
                                         {
                                                 throw new SAXException("Form " + formName + " has no identified pages");
                                         }
+                                        String head = getAttribute(npg, "heading");
+                                        headings.add(head);
                                         List<Map<String, String>> page = new ArrayList<Map<String, String>>();
                                         pages.add(page);
                                         NodeList flds = npg.getChildNodes();

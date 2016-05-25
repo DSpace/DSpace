@@ -22,13 +22,19 @@ public class DCInputSet
 {
 	/** name of the input set  */
 	private String formName = null; 
+	
+	/** custom heading for the page */
+	private String[] headings = null;
+	
 	/** the inputs ordered by page and row position */
 	private DCInput[][] inputPages = null;
 	
 	/** constructor */
-	public DCInputSet(String formName, List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
+	public DCInputSet(String formName, List<String> headings, List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
 	{
 		this.formName = formName;
+		this.headings = new String[headings.size()];
+		this.headings = headings.toArray(this.headings);
 		inputPages = new DCInput[pages.size()][];
 		for ( int i = 0; i < inputPages.length; i++ )
 		{
@@ -159,4 +165,8 @@ public class DCInputSet
 
     	return true;
     }
+
+	public String getHeading(int page) {
+		return headings[page -1];
+	}
 }

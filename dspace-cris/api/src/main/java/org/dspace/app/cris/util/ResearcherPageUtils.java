@@ -46,12 +46,14 @@ import it.cilea.osd.jdyna.model.ANestedObject;
 import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
 import it.cilea.osd.jdyna.model.ANestedProperty;
 import it.cilea.osd.jdyna.model.ATypeNestedObject;
+import it.cilea.osd.jdyna.model.AValue;
 import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.model.Property;
 import it.cilea.osd.jdyna.value.EmbeddedLinkValue;
 import it.cilea.osd.jdyna.value.LinkValue;
 import it.cilea.osd.jdyna.value.TextValue;
 import it.cilea.osd.jdyna.widget.WidgetLink;
+import it.cilea.osd.jdyna.widget.WidgetTesto;
 
 
 /**
@@ -620,12 +622,27 @@ return decorator.generateDisplayValue(alternativeName, rp);
 				String valueToSet, String pdefKey) {
 		buildTextValue(ro, valueToSet, pdefKey, VisibilityConstants.PUBLIC);
 	}
-	
-	public static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void buildTextValue(ACrisObject<P, TP, NP, NTP, ACNO, ATNO> ro, String valueToSet, String pdefKey, Integer visibility) {
+
+	public static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void buildGenericValue(ACrisObject<P, TP, NP, NTP, ACNO, ATNO> ro, Object valueToSet, String pdefKey, Integer visibility) {
 
 		TP pdef = applicationService.findPropertiesDefinitionByShortName(ro.getClassPropertiesDefinition(), pdefKey);
         if (pdef == null) {
         	log.warn("Property "+pdefKey+ " not found");
+        	return;
+        }
+        AValue avalue = pdef.getRendering().getInstanceValore();
+
+        avalue.setOggetto(valueToSet);                 
+        P prop = ro.createProprieta(pdef);
+        prop.setValue(avalue);
+        prop.setVisibility(visibility);
+	}
+	
+	public static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void buildTextValue(ACrisObject<P, TP, NP, NTP, ACNO, ATNO> ro, String valueToSet, String pdefKey, Integer visibility) {
+
+		TP pdef = applicationService.findPropertiesDefinitionByShortName(ro.getClassPropertiesDefinition(), pdefKey);
+        if (pdef == null || !(pdef.getRendering() instanceof WidgetTesto)) {
+        	log.warn("Property "+pdefKey+ " not found or not a text");
         	return;
         }
         TextValue text = new TextValue();
@@ -640,7 +657,7 @@ return decorator.generateDisplayValue(alternativeName, rp);
 		void buildLinkValue(ACrisObject<P, TP, NP, NTP, ACNO, ATNO> ro, String linkDescr, String linkURL, String pdefKey, Integer visibility) {
 
 		TP pdef = applicationService.findPropertiesDefinitionByShortName(ro.getClassPropertiesDefinition(), pdefKey);
-        if (pdef == null && pdef.getRendering() instanceof WidgetLink) {
+        if (pdef == null || !(pdef.getRendering() instanceof WidgetLink)) {
         	log.warn("Property "+pdefKey+ " not found or not a link");
         	return;
         }

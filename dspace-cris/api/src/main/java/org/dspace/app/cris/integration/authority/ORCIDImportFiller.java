@@ -7,14 +7,20 @@
  */
 package org.dspace.app.cris.integration.authority;
 
+import java.util.List;
+
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
+import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
+import org.dspace.core.Context;
 
-public class ORCIDImportFiller implements ImportAuthorityFiller {
+public class ORCIDImportFiller extends ItemMetadataImportFiller {
 
 	@Override
-	public void fillRecord(String ORCID, ACrisObject crisObject) {
+	public void fillRecord(Context context, Item item, List<Metadatum> metadata, String ORCID, ACrisObject crisObject) {
 		OrcidPreferencesUtils.populateRP((ResearcherPage) crisObject, ORCID);
+		super.fillRecord(context, item, metadata, ORCID, crisObject);
 	}
 }

@@ -402,4 +402,7 @@ public abstract class AbstractProcessingStep
         }
     }
     
+    public String getHeading(HttpServletRequest request, SubmissionInfo subInfo, int pageNumber, String heading) {
+		return heading;
+	}
 }

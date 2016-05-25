@@ -543,6 +543,7 @@
    <field name="cris-uuid" type="string" indexed="true" stored="true" omitNorms="true" />
    <field name="cris-sourceid" type="string" indexed="true" stored="true" omitNorms="true" />
    <field name="cris-sourceref" type="string" indexed="true" stored="true" omitNorms="true" />
+   <field name="crisdo.type" type="string" indexed="true" stored="true" omitNorms="true" />
    <dynamicField name="relationpreference.*" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
    <field name="crisauthoritylookup" type="text" indexed="true" stored="true" multiValued="true"/>
    <copyField source="crisrp.fullName" dest="crisauthoritylookup"/>

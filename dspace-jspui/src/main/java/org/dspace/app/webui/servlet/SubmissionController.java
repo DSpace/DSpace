@@ -260,10 +260,11 @@ public class SubmissionController extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+    	context.turnOffItemWrapper();
         int codeCallerPage = Util.getIntParameter(request, "pageCallerID");
         request.setAttribute("pageCallerID", codeCallerPage);
-        
-    	// Configuration of current step in Item Submission Process
+
+        // Configuration of current step in Item Submission Process
         SubmissionStepConfig currentStepConfig;
         
         //need to find out what type of form we are dealing with
@@ -934,8 +935,8 @@ public class SubmissionController extends DSpaceServlet
                     setReachedStepAndPage(subInfo, currStep, currPage);
                 }
                 
-                //commit & close context
-                context.complete();
+                //commit
+                context.commit();
                 
                 // save changes to submission info & step info for JSP
                 saveSubmissionInfo(request, subInfo);
@@ -1246,7 +1247,16 @@ public class SubmissionController extends DSpaceServlet
 
         return ((step != null) && (getPreviousVisibleStep(request, si) == null));
     }
-    
+
+    public static boolean isLastStep(HttpServletRequest request,
+            SubmissionInfo si)
+    {
+        SubmissionStepConfig step = getCurrentStepConfig(request, si);
+
+		return ((step != null) && ((getNextVisibleStep(request, si) == null)
+				|| ("complete".equals(getNextVisibleStep(request, si).getId()))));
+    }
+
     /**
      * Return the previous "visibile" step in the item submission
      * process if any, <code>null</code> otherwise.
@@ -1283,6 +1293,33 @@ public class SubmissionController extends DSpaceServlet
             }
         }
         return previousStep;
+    }
+
+    public static SubmissionStepConfig getNextVisibleStep(HttpServletRequest request,
+            SubmissionInfo si)
+    {
+        SubmissionStepConfig step = getCurrentStepConfig(request, si);
+
+        SubmissionStepConfig currentStepConfig = step, nextStep = null;
+
+        int currentStepNum = step.getStepNumber();
+        
+        //need to find a previous step that is VISIBLE to the user!
+        while(currentStepConfig != null)
+        {
+            // update the current step & do this previous step
+            currentStepNum++;
+        
+            //get previous step
+            currentStepConfig = si.getSubmissionConfig().getStep(currentStepNum);
+        
+            if(currentStepConfig.isVisible())
+            {
+                nextStep = currentStepConfig;
+                break;
+            }
+        }
+        return nextStep;
     }
 
     /**

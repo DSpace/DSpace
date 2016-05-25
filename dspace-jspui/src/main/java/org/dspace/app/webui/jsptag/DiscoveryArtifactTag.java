@@ -243,7 +243,10 @@ public class DiscoveryArtifactTag extends BodyTagSupport {
 		}
 		if ((!founded && dvfc.isMandatory()) || (founded && dvfc.getDecorator() != null)) {
             Metadatum[] arrayDcMetadataValue = artifact
-                    .getMetadataValueInDCFormat(field);            
+                    .getMetadataValueInDCFormat(field);      
+            if (arrayDcMetadataValue == null || arrayDcMetadataValue.length == 0) {
+            	return;
+            }
 			if (StringUtils.isNotBlank(displayStrategyName)) {
 				IDisplayMetadataValueStrategy strategy = (IDisplayMetadataValueStrategy) PluginManager
 						.getNamedPlugin(IDisplayMetadataValueStrategy.class, displayStrategyName);
@@ -260,11 +263,10 @@ public class DiscoveryArtifactTag extends BodyTagSupport {
 					}
 				}
 
-                metadata = strategy.getMetadataDisplay(request, -1, viewFull,
+				metadata = strategy.getMetadataDisplay(request, -1, viewFull,
                         browseIndex, 0, field,
                         arrayDcMetadataValue, artifact,
                         false, false, pageContext);
-
 			} else {
 				if (!founded) {
                     metadataValue = artifact.getMetadataValue(field);

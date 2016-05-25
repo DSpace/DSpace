@@ -512,12 +512,12 @@ public class SubmissionInfo extends HashMap
                         .getStep(i);
                 String stepNumber = Integer.toString(currentStep
                         .getStepNumber());
-                String stepHeading = currentStep.getHeading();
 
                 // as long as this step is visible, include it in
                 // the Progress Bar
                 if (currentStep.isVisible())
                 {
+                	String stepHeading = null;
                     // default to just one page in this step
                     int numPages = 1;
 
@@ -534,6 +534,18 @@ public class SubmissionInfo extends HashMap
 
                         // get number of pages from servlet
                         numPages = step.getNumberOfPages(request, subInfo);
+                        
+	                    // save each of the step's pages to the progress bar
+	                    for (int j = 1; j <= numPages; j++)
+	                    {
+	                        String pageNumber = Integer.toString(j);
+	                        stepHeading = step.getHeading(request, subInfo, j, currentStep.getHeading());
+	                        
+	                        // store ("stepNumber.pageNumber", Heading) for each
+	                        // page in the step
+	                        progressBarInfo.put(stepNumber + "." + pageNumber,
+	                                stepHeading);
+	                    }// end for each page
                     }
                     catch (Exception e)
                     {
@@ -542,17 +554,6 @@ public class SubmissionInfo extends HashMap
                                         + currentStep.getProcessingClassName()
                                         + "' Error:", e);
                     }
-
-                    // save each of the step's pages to the progress bar
-                    for (int j = 1; j <= numPages; j++)
-                    {
-                        String pageNumber = Integer.toString(j);
-
-                        // store ("stepNumber.pageNumber", Heading) for each
-                        // page in the step
-                        progressBarInfo.put(stepNumber + "." + pageNumber,
-                                stepHeading);
-                    }// end for each page
                 }
             }// end for each step
 

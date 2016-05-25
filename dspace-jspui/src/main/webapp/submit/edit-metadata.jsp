@@ -16,6 +16,7 @@
   -    submission.page   - the step in submission
   --%>
 
+<%@page import="org.apache.commons.lang.StringUtils"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.ArrayList" %>
@@ -163,13 +164,14 @@
             
             if (authority)
             { 
-                sb.append(" <img id=\""+confIndID+"\" title=\"")
-                  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.authority.confidence.description."+confidenceSymbol))
-                  .append("\" class=\"pull-left ds-authority-confidence cf-")                  
-                  // set confidence to cf-blank if authority is empty
-                  .append(authorityValue==null||authorityValue.length()==0 ? "blank" : confidenceSymbol)
-                  .append(" \" src=\"").append(contextPath).append("/image/confidence/invisible.gif\" />");
-                  
+                if (!isSelect) {
+	            	sb.append(" <img id=\""+confIndID+"\" title=\"")
+	                  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.authority.confidence.description."+confidenceSymbol))
+	                  .append("\" class=\"pull-left ds-authority-confidence cf-")                  
+	                  // set confidence to cf-blank if authority is empty
+	                  .append(authorityValue==null||authorityValue.length()==0 ? "blank" : confidenceSymbol)
+	                  .append(" \" src=\"").append(contextPath).append("/image/confidence/invisible.gif\" />");
+                }
                    
                 sb.append("<input type=\"text\" value=\"").append(authorityValue!=null?authorityValue:"")
                   .append("\" id=\"").append(authorityName)
@@ -210,7 +212,7 @@
                    .append("_id\" name=\"").append(fieldInput)
                    .append("\" size=\"").append(String.valueOf(repeatable ? 6 : 1))
                    .append(repeatable ? "\" multiple>\n" :"\">\n");
-                Choices cs = cam.getMatches(fieldName, "", collectionID, 0, 0, null);
+                Choices cs = cam.getMatches(fieldName, null, collectionID, 0, 0, null);
                 // prepend unselected empty value when nothing can be selected.
                 if (!repeatable && cs.defaultSelected < 0 && dcvs.length == 0)
                     sb.append("<option value=\"\"><!-- empty --></option>\n");
@@ -219,7 +221,8 @@
                     boolean selected = false;
                     for (Metadatum dcv : dcvs)
                     {
-                        if (dcv.value.equals(cs.values[i].value))
+                        if ((dcv.authority == null && dcv.value.equals(StringUtils.trim(cs.values[i].value))) ||
+                        		(dcv.authority != null && dcv.authority.equals(StringUtils.trim(cs.values[i].authority))))
                             selected = true;
                     }
                     sb.append("<option value=\"")
@@ -1009,7 +1012,7 @@
         .append(label)
         .append("</label>");
 
-      sb.append("<span class=\"col-md-8\">")
+      sb.append("<div class=\"col-md-10\"><div class=\"row col-md-12\"><div class=\"col-md-10\">")
         .append("<select class=\"form-control\" name=\"")
         .append(fieldName)
         .append("\"");
@@ -1039,7 +1042,7 @@
            .append("</option>");
       }
 
-      sb.append("</select></span></div><br/>");
+      sb.append("</select></div></div></div></div><br/>");
       out.write(sb.toString());
     }
     
@@ -1055,12 +1058,12 @@
       .append(label)
       .append("</label>");
 
-      sb.append("<span class=\"col-md-8\">")
+      sb.append("<div class=\"col-md-10\"><div class=\"row col-md-12\"><div class=\"col-md-10\">")
         .append(doAuthority(pageContext, fieldName, 0,  defaults.length,
                               fieldName, null, Choices.CF_UNSET, false, repeatable,
                               defaults, null, collectionID))
 
-        .append("</span></div><br/>");
+        .append("</div></div></div></div><br/>");
       out.write(sb.toString());
     }
 
@@ -1089,12 +1092,12 @@
         	  .append(label)
         	  .append("</label>");
      		
-            sb.append("<div class=\"col-md-10\">");
+            sb.append("<div class=\"col-md-10\"><div class=\"col-md-12 row\">");
 
             if(numColumns > 1)
-                sb.append("<div class=\"row col-md-"+(12 / numColumns)+"\">");
+                sb.append("<div class=\"col-md-"+(12 / numColumns)+"\">");
             else
-                sb.append("<div class=\"row col-md-12\">");
+                sb.append("<div class=\"col-md-12\">");
 
             //flag that lets us know when we are in Column2
             boolean inColumn2 = false;
@@ -1156,7 +1159,7 @@
                    
             }//end for each value
 
-            sb.append("</div></div></div><br/>");
+            sb.append("</div></div></div></div><br/>");
             
             out.write(sb.toString());
           }//end doList

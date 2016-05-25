@@ -563,8 +563,7 @@
 				<entry value="pisbn" key="dc.identifier.isbn" />
 				<entry value="sissn" key="dc.identifier.issn" />
 				<entry value="jeissn" key="dc.identifier.eissn" />
-				<entry value="journal" key="dc.relation.ispartofjournal" />
-				<entry value="title" key="dc.title" />
+				<entry value="journal" key="dc.relation.ispartof" />				<entry value="title" key="dc.title" />
 				<entry value="issued" key="dc.date.issued" />
 				<entry value="language" key="dc.language.iso" />
 				<entry value="subtype" key="dc.type" />

@@ -16,6 +16,7 @@ import it.cilea.osd.jdyna.model.Property;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 
 public class ResearchObjectAuthorityLookupSolrIndexer implements CrisServiceIndexPlugin
@@ -28,11 +29,14 @@ public class ResearchObjectAuthorityLookupSolrIndexer implements CrisServiceInde
     {
 
         String result = "";               
+        String typeName;
         Integer type = crisObject.getType();
         if (type > CrisConstants.CRIS_DYNAMIC_TYPE_ID_START)
         {
             result = crisObject.getName();
+            typeName = ((ResearchObject) crisObject).getAuthorityPrefix();
             document.addField("crisdo.name", result);
+            document.addField("crisdo.type", typeName);
         }
     }
 

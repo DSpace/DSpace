@@ -322,7 +322,8 @@
 				</property>
 				<property name="listenerOnPreInsert">
 					<list>
-						<ref local="nestedPositionListener" />		
+						<ref local="nestedPositionListener" />
+						<ref local="UUIDListener" />		
 					</list>
 				</property>				
 			</bean>
@@ -1618,9 +1619,6 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="eventListeners">
 			<map>
-				<entry key="save-update">					
-					<ref local="UUIDListener" />	
-				</entry>
 				<entry key="pre-insert">		
 					<ref local="RPListener" />	
 				</entry>				
