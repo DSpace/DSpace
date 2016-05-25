@@ -75,12 +75,10 @@ public class Collection extends DSpaceObject {
                 //The parentCommunityList is the list of community/subcommunity ancestors for a collection  
                 //Retrieve the set of ancestors for the parentCommunity and append each one to the list
                 
-                if (parentCommunity.getParentCommunities().size() > 0) {
-                  for(org.dspace.content.Community ancestor = parentCommunity.getParentCommunities().get(0); 
-                          ancestor.getParentCommunities().size() > 0; 
-                          ancestor = ancestor.getParentCommunities().get(0)) {
+                for(org.dspace.content.Community ancestor = parentCommunity.getParentCommunities().isEmpty() ? null : parentCommunity.getParentCommunities().get(0); 
+                          ancestor != null; 
+                          ancestor = ancestor.getParentCommunities().isEmpty() ? null : ancestor.getParentCommunities().get(0)) {
                     this.addParentCommunityList(new Community(ancestor, servletContext, null, context));                    
-                  }                    
                 }
             }
         } else {
