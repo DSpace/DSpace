@@ -269,9 +269,9 @@ public class CrisConsumer implements Consumer {
 				}
 				String typeAuthority = toBuildType.get(authorityKey);
 				ImportAuthorityFiller filler = fillerConfig.getFiller(typeAuthority);
-				System.out.println("crisconsumer -> filler -> "+typeAuthority);
-				System.out.println("crisconsumer -> filler -> "+ rp != null + " " +rp);
-				System.out.println("crisconsumer -> filler -> "+ authorityKey);
+				log.debug("crisconsumer -> filler -> "+typeAuthority);
+				log.debug("crisconsumer -> filler -> "+ rp != null + " " +rp);
+				log.debug("crisconsumer -> filler -> "+ authorityKey);
 				if (filler != null && 
 						(!isUpdate || filler.allowsUpdate(ctx, item, toBuild.get(authorityKey), authorityKey, rp))) {
 					filler.fillRecord(ctx, item, toBuild.get(authorityKey), authorityKey, rp);
