@@ -1518,3 +1518,7 @@ ol.ds-ordered-list ol.ds-ordered-list ol.ds-ordered-list {
 #aspect_submission_StepTransformer_div_StartSubmissionLookupStep #aspect_submission_StepTransformer_item_publication-title{
     margin-bottom:5px;
 }
+
+.break-all{
+    word-break: break-all;
+}
