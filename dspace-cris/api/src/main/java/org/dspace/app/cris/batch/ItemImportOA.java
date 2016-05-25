@@ -131,6 +131,8 @@ public class ItemImportOA
 
     private String[] metadataClean = null;
 
+    private String sourceRef = null;
+    
     public static void main(String[] argv)
     {
         Context context = null;
@@ -193,6 +195,8 @@ public class ItemImportOA
                 "send submission through collection's workflow step two");
         options.addOption("z", "published", false,
                 "send submission through item's deposit");
+        options.addOption("R", "sourceref", true,
+                "name of the source");
 
         CommandLine line = parser.parse(options, argv);
 
@@ -200,7 +204,7 @@ public class ItemImportOA
         int epersonID = -1; // db ID
         String[] collections = null; // db ID or handles
         String handle = null;
-        int imp_record_id = 0;
+        String imp_record_id = null;
         int item_id = 0;
         int imp_id = 0;
 
@@ -276,7 +280,7 @@ public class ItemImportOA
 
         if (line.hasOption('i')) // record ID
         {
-            imp_record_id = Integer.parseInt(line.getOptionValue('i').trim());
+            imp_record_id = line.getOptionValue('i').trim();
         }
         if (line.hasOption('o')) // item ID (replace or delete)
         {
@@ -311,6 +315,11 @@ public class ItemImportOA
             clearOldBitstream = true;
         }
 
+        if (line.hasOption('R'))
+        {
+            myLoader.setSourceRef(line.getOptionValue('R'));
+        }
+        
         // now validate
         // must have a command set
         EPerson currUser = myLoader.batchJob;
@@ -424,9 +433,16 @@ public class ItemImportOA
                 item_id = myLoader.addItem(context, mycollections, imp_id,
                         handle, clearOldBitstream);
 
-                DatabaseManager.updateQuery(context,
-                        "INSERT INTO imp_record_to_item " + "VALUES ( ? , ? )",
-                        imp_record_id, item_id);
+                if(StringUtils.isNotBlank(myLoader.getSourceRef())) {
+                    DatabaseManager.updateQuery(context,
+                        "INSERT INTO imp_record_to_item " + "VALUES ( ? , ?,  ?)",
+                        imp_record_id, item_id, myLoader.getSourceRef());
+                }
+                else {
+                    DatabaseManager.updateQuery(context,
+                            "INSERT INTO imp_record_to_item " + "VALUES ( ? , ?,  null)",
+                            imp_record_id, item_id);                    
+                }
             }
             else if (command.equals("replace"))
             {
@@ -466,7 +482,7 @@ public class ItemImportOA
     }
 
     private void replaceItems(Context c, Collection[] mycollections,
-            int imp_record_id, int item_id, int imp_id,
+            String imp_record_id, int item_id, int imp_id,
             boolean clearOldBitstream) throws Exception
     {
 
@@ -1338,6 +1354,16 @@ public class ItemImportOA
     public void setBatchJob(EPerson batchJob)
     {
         this.batchJob = batchJob;
+    }
+
+    public String getSourceRef()
+    {
+        return sourceRef;
+    }
+
+    public void setSourceRef(String sourceRef)
+    {
+        this.sourceRef = sourceRef;
     }
 
 }

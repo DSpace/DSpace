@@ -313,7 +313,7 @@ public class ItemImportMainOA
             AtomicInteger row_discarded, int numOfThread, TableRowIterator rows)
                     throws SQLException
     {
-        Map<Integer, Integer> ledger = new HashMap<>();
+        Map<String, Integer> ledger = new HashMap<>();
         List<ItemImportThread> workers = new ArrayList<>(numOfThread);
         for (int i = 0; i < numOfThread; i++)
         {
@@ -334,15 +334,16 @@ public class ItemImportMainOA
                 ItemImportThread worker = null;
                 if (cardinality > 1)
                 {
+                    String impRecordId = row_data.getStringColumn("imp_record_id");
                     if (ledger.containsKey(
-                            row_data.getIntColumn("imp_record_id")))
+                            impRecordId))
                     {
                         worker = workers.get(ledger
-                                .get(row_data.getIntColumn("imp_record_id")));
+                                .get(impRecordId));
                     }
                     else
                     {
-                        ledger.put(row_data.getIntColumn("imp_record_id"), i);
+                        ledger.put(impRecordId, i);
                         worker = workers.get(i);
                         i++;
                     }
@@ -389,7 +390,7 @@ public class ItemImportMainOA
         }
 
         int imp_id = 0;
-        int record_id = 0;
+        String record_id = null;
         int epersonId = 0;
         int collectionId = 0;
         int itemId = 0;
@@ -397,13 +398,14 @@ public class ItemImportMainOA
         String operation = "";
         String op = "";
         String handle = null;
+        String sourceref = null;
 
         List<String> argvTemp = new LinkedList<String>();
 
         // ID temporary import table
         imp_id = row_data.getIntColumn("imp_id");
         // ID external
-        record_id = row_data.getIntColumn("imp_record_id");
+        record_id = row_data.getStringColumn("imp_record_id");
         // ID of the user to attach the publication
         epersonId = row_data.getIntColumn("imp_eperson_id");
         // ID of the collection 
@@ -416,7 +418,9 @@ public class ItemImportMainOA
 
         // handle related to the item
         handle = row_data.getStringColumn("handle");
-
+        
+        sourceref = row_data.getStringColumn("imp_sourceref");
+        
         if (!operation.equals(""))
         {
 
@@ -433,8 +437,7 @@ public class ItemImportMainOA
                 else
                 {
 
-                    TableRow record_item = DatabaseManager.find(subcontext,
-                            "imp_record_to_item", record_id);
+                    TableRow record_item = DatabaseManager.querySingleTable(subcontext, "imp_record_to_item", "select * from imp_record_to_item where imp_record_id = ? and imp_sourceref = ?", record_id, sourceref);
                     if (record_item != null)
                     {
                         itemId = record_item.getIntColumn("imp_item_id");
@@ -464,6 +467,7 @@ public class ItemImportMainOA
                 argvTemp.add("-e " + epersonId);
                 argvTemp.add("-c " + collectionId);
                 argvTemp.add("-i " + record_id);
+                argvTemp.add("-R " + sourceref);
 
                 if (status != null && status.length() != 0)
                 {
