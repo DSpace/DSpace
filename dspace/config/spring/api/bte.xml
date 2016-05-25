@@ -17,6 +17,7 @@
 			    <!-- Specify here any data loaders that you want to have access to in the command line batch import.
 			    	Key is the name that you need to specify in the "-i" option in the command line script when "-b"
 			    	option is used (which means BTE Batch import) -->
+			    <!-- <entry key="pubmedEuropeXML" value-ref="pubmedEuropeFileDataLoader"/> -->
 				<entry key="pubmedXML" value-ref="pubmedFileDataLoader" />
 				<entry key="crossrefXML" value-ref="crossRefFileDataLoader" />
 				<entry key="arxivXML" value-ref="arXivFileDataLoader" />
@@ -110,10 +111,14 @@
 	            	Dataloaders must either extend the "NetworkSubmissionLookupDataLoader" abstract class
 	            	or conform to "FileDataLoader" interface of BTE -->
 	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
+	            <!-- <entry key="pubmedEurope" value-ref="pubmedEuropeOnlineDataLoader"/> -->	            
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
 	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
 	            <entry key="cinii" value-ref="ciniiOnlineDataLoader"/>
+<!-- 	            <entry key="scopus" value-ref="scopusOnlineDataLoader"/>
+	            <entry key="wos" value-ref="wosOnlineDataLoader"/> -->
 	            <entry key="pubmedXML" value-ref="pubmedFileDataLoader"/>
+	            <!-- <entry key="pubmedEuropeXML" value-ref="pubmedEuropeFileDataLoader"/> -->
 	            <entry key="crossRefXML" value-ref="crossRefFileDataLoader"/>
 	            <entry key="arXivXML" value-ref="arXivFileDataLoader"/>
 	            <entry key="ciniiXML" value-ref="ciniiFileDataLoader"/>
@@ -556,7 +561,9 @@
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry value="jissn" key="dc.identifier.issn" />
 				<entry value="pisbn" key="dc.identifier.isbn" />
-				<entry value="journal" key="dc.source" />
+				<entry value="sissn" key="dc.identifier.issn" />
+				<entry value="jeissn" key="dc.identifier.eissn" />
+				<entry value="journal" key="dc.relation.ispartofjournal" />
 				<entry value="title" key="dc.title" />
 				<entry value="issued" key="dc.date.issued" />
 				<entry value="language" key="dc.language.iso" />
@@ -564,37 +571,233 @@
 				<entry value="authors" key="dc.contributor.author" />
 				<entry value="editors" key="dc.contributor.editor" />
 				<entry value="translators" key="dc.contributor.other" />
+				<entry value="investigators" key="dc.contributor.other" />
 				<entry value="chairs" key="dc.contributor.other" />
 				<entry value="abstract" key="dc.description.abstract" />
+				<entry value="description" key="dc.description" />
 				<entry value="allkeywords" key="dc.subject" />
 				<entry value="arxivCategory" key="dc.subject" />
-				<entry value="doi" key="dc.identifier" />
+				<entry value="doi" key="dc.identifier.doi" />
 				<entry value="publisher" key="dc.publisher" />
+				<entry value="pubmedID" key="dc.identifier.pmid" />
+				<entry value="pubmedcentralID" key="dc.identifier.pmcid" />
+				<entry value="uri" key="dc.identifier.uri" />
+				<entry value="url" key="dc.identifier.url" />
+				<entry value="issue" key="dc.relation.issue" />
+				<entry value="volume" key="dc.relation.volume" />
+				<entry value="firstpage" key="dc.description.startpage" />
+				<entry value="lastpage" key="dc.description.endpage" />
+				<entry value="editionnumber" key="dc.relation.edition" />
+				<entry value="seriestitle" key="dc.relation.ispartofjournal" />
+				<entry value="booktitle" key="dc.relation.ispartofbook" />
+				<entry value="meshheadings" key="dc.subject.mesh" />
+				<entry value="meshqualifiers" key="dc.subject.meshqualifier" />
+				
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
 				<!-- 
 				<entry value="url" key="" />
 				<entry value="note" key="" />
 				<entry value="fulltextUrl" key="" />
 				<entry value="authorsWithAffiliation" key="" />
-				<entry value="pubmedID" key="" />
 				<entry value="publicationStatus" key="" />
 				<entry value="jeissn" key="" />
-				<entry value="volume" key="" />
-				<entry value="issue" key="" />
-				<entry value="firstpage" key="" />
-				<entry value="lastpage" key="" />
 				<entry value="eisbn" key="" />
-				<entry value="editionnumber" key="" />
-				<entry value="seriestitle" key="" />
-				<entry value="volumetitle" key="" />
+
 				<entry value="titleAlternative" key="" />
 				<entry value="authorAlternative" key="" />
 				<entry value="ncid" key="" />
 				<entry value="naid" key="" />
 				 -->
 				 
+				 
 			</map>
 		</constructor-arg>
 	</bean>
 
+	<!-- SCOPUS Data Loaders -->
+	<bean id="scopusOnlineDataLoader"
+		class="org.dspace.submit.lookup.ScopusOnlineDataLoader"
+		scope="prototype">
+		<property name="searchProvider" value="false" />
+		<!-- Uncomment the following line if you want to define the max results 
+			returned by the Scopus free text (by author, title) search. Default value 
+			is 10 -->
+		<!-- <property name="maxResults" value="10" /> -->
+		<property name="fieldMap" ref="scopusInputMap" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+	</bean>
+
+	<alias name="scopusOnlineDataLoader"
+		alias="org.dspace.submit.lookup.ScopusOnlineDataLoader" />
+
+	<bean name="scopusInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="eid" value="eid" />
+				<entry key="doi" value="doi" />
+				<entry key="issn" value="jissn" />
+				<entry key="eissn" value="jeissn" />
+				<entry key="isbn" value="pisbn" />
+				<entry key="journalTitle" value="journal" />
+				<entry key="title" value="title" />
+				<entry key="year" value="issued" />
+				<entry key="volume" value="volume" />
+				<entry key="issue" value="issue" />
+				<entry key="edition" value="edition" />
+				<entry key="startPage" value="firstpage" />
+				<entry key="endPage" value="lastpage" />
+				<entry key="authors" value="authors" />
+				<entry key="chairs" value="chairs" />
+				<entry key="affiliations" value="affiliations" />
+				<entry key="articleNumber" value="articleNumber" />
+				<entry key="authorsWithAffiliations" value="authorsWithAffiliations" />
+				<entry key="displayUrl" value="scopusUrl" />
+				<entry key="citationCount" value="scopusCitation" />
+				<entry key="citationUrl" value="scopusCitationUrl" />
+				<entry key="url" value="url" />
+				<entry key="classificationASJC" value="classificationASJC" />
+				<entry key="keywords" value="keywords" />
+				<entry key="language" value="language" />
+				<entry key="abstracts" value="abstract" />
+				<entry key="abstractita" value="abstractita" />
+				<entry key="abstracteng" value="abstracteng" />
+				<entry key="abstractfre" value="abstractfre" />
+				<entry key="abstractger" value="abstractger" />
+				<entry key="abstractesp" value="abstractesp" />
+				<!-- <entry key="issueDate" value="issued" /> -->
+				<entry key="medium" value="medium" />
+				<entry key="titleAlternative" value="titlealternative" />
+				<entry key="issueTitle" value="issuetitle" />
+				<entry key="conferenceName" value="conferenceName" />
+				<entry key="conferenceNumber" value="conferenceNumber" />
+				<entry key="conferencePlace" value="conferencePlace" />
+				<entry key="conferenceYear" value="conferenceYear" />
+				<entry key="conferenceSponsor" value="sponsor" />
+				<entry key="conferenceTarget" value="conferencetarget" />
+				<entry key="supplement" value="supplement" />
+				<entry key="scpId" value="scopusid" />
+				<entry key="medlineId" value="medlineid" />
+				<entry key="bookTitle" value="booktitle" />
+				<!-- <entry key="#sourceAuthor" value="" /> -->
+				<!-- <entry key="#sourceTranslator" value="" /> -->
+				<entry key="publisherName" value="publisher" />
+				<entry key="publisherPlace" value="publisherPlace" />
+				<entry key="publisherCountry" value="publisherCountry" />
+				<entry key="internationalAuthor" value="internationalauthor" />
+				<entry key="itemType" value="subtype" />
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<!-- WOS Data Loaders -->
+	<bean id="wosOnlineDataLoader" class="org.dspace.submit.lookup.WOSOnlineDataLoader"
+		scope="prototype">
+		<property name="searchProvider" value="false" />
+		<!-- Uncomment the following line if you want to define the max results 
+			returned by the Scopus free text (by author, title) search. Default value 
+			is 10 -->
+		<!-- <property name="maxResults" value="10" /> -->
+		<property name="fieldMap" ref="wosInputMap" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+	</bean>
+
+	<alias name="wosOnlineDataLoader"
+		alias="org.dspace.submit.lookup.WOSOnlineDataLoader" />
+
+	<bean name="wosInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="isiId" value="isiId" />
+				<entry key="doi" value="doi" />
+				<entry key="issn" value="jissn" />
+				<entry key="journalTitle" value="journal" />
+				<entry key="title" value="title" />
+				<entry key="year" value="issued" />
+				<entry key="volume" value="volume" />
+				<entry key="issue" value="issue" />
+				<entry key="startPage" value="firstpage" />
+				<entry key="endPage" value="lastpage" />
+				<entry key="authors" value="authors" />
+				<entry key="citationCount" value="wosCitation" />
+				<entry key="keywords" value="keywords" />
+				<entry key="language" value="language" />
+				<entry key="abstracts" value="abstract" />
+				<entry key="abstractita" value="abstractita" />
+				<entry key="abstracteng" value="abstracteng" />
+				<entry key="abstractfre" value="abstractfre" />
+				<entry key="abstractger" value="abstractger" />
+				<entry key="abstractesp" value="abstractesp" />
+				<entry key="publisherName" value="publisher" />
+				<entry key="publisherPlace" value="publisherPlace" />
+				<entry key="publisherCountry" value="publisherCountry" />
+				<entry key="itemType" value="subtype" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- PubMedEurope -->
+	<bean id="pubmedEuropeOnlineDataLoader" class="org.dspace.submit.lookup.PubmedEuropeOnlineDataLoader">
+		<property name="searchProvider" value="false" />
+		<property name="fieldMap" ref="pubmedEuropeInputMap" />
+	</bean>
+
+	<bean id="pubmedEuropeFileDataLoader" class="org.dspace.submit.lookup.PubmedEuropeFileDataLoader">
+		<property name="fieldMap" ref="pubmedEuropeInputMap" />
+	</bean>
+	<bean name="pubmedEuropeInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="pmid" value="pubmedID" />
+				<entry key="pmcid" value="pubmedcentralID" />
+				<entry key="doi" value="doi" />
+				<entry key="ISSN" value="jissn" />
+				<entry key="EISSN" value="jeissn" />
+				<entry key="jTitle" value="journal" />
+				<entry key="startPage" value="firstpage" />
+				<entry key="endPage" value="lastpage" />
+				<entry key="title" value="title" />
+				<entry key="pubDate" value="issued" />
+				<entry key="volume" value="volume" />
+				<entry key="issue" value="issue" />
+				<entry key="language" value="language" />				
+				<entry key="pubType" value="subtype" />
+				<entry key="keyword" value="keywords" />
+				<entry key="primaryMeshHeading" value="meshheadings" />
+				<entry key="secondaryMeshHeading" value="meshqualifiers" />
+				<entry key="abstractText" value="abstract" />
+				<entry key="author" value="authors" />
+				<entry key="investigator" value="investigators" />
+				<entry key="publisher" value="publisher" />
+				<entry key="series" value="seriestitle" />
+				<entry key="bookTitle" value="booktitle" />
+				<entry key="isbn" value="pisbn" />
+				<entry key="sISSN" value="sissn" />
+				<entry key="edition" value="editionnumber" />
+				<entry key="url" value="url" />
+				<entry key="uri" value="uri" />
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean name="pubmedFeedPhase1TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="pubmedEuropeDataLoader"/>
+    	<property name="workflow" ref="phase1LinearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+  	</bean>
+  	<bean name="pubmedEuropeDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
+	    <property name="dataloadersMap">
+	        <map>
+	            <entry key="pubmedEurope" value-ref="pubmedEuropeOnlineDataLoader"/>
+			</map>
+	    </property>
+	</bean>
+	<bean name="pubmedFeedTransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="submissionItemDataLoader"/>
+    	<property name="workflow" ref="phase2linearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator"/>
+  	</bean>
+	<bean name="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
+		<property name="outputMap" ref="outputMap"/>
+		<property name="sourceIdMetadata" value="dc.identifier.pmid" />		
+	</bean>
 </beans>

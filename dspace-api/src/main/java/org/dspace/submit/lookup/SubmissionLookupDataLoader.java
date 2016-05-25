@@ -30,6 +30,8 @@ public interface SubmissionLookupDataLoader extends DataLoader
     public final static String DOI = "doi";
 
     public final static String PUBMED = "pubmed";
+    
+    public final static String PUBMEDEUROPE = "pubmedEurope";
 
     public final static String ARXIV = "arxiv";
 
@@ -37,9 +39,11 @@ public interface SubmissionLookupDataLoader extends DataLoader
 
     public final static String SCOPUSEID = "scopuseid";
 
+    public final static String WOSID = "isiid";
+    
     public final static String CINII = "cinii";
 
-    public final static String TYPE = "type";
+    public final static String TYPE = "subtype";
 
     List<String> getSupportedIdentifiers();
 
