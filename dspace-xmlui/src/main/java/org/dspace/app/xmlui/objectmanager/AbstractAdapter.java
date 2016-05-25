@@ -432,8 +432,9 @@ public abstract class AbstractAdapter
 
 	/**
      * Generate a METS file element for a given bitstream.
-     * 
+     *
      * @param context
+     *            session context.
      * @param item
      *            If the bitstream is associated with an item, provide the item,
      *            otherwise leave null.
@@ -580,14 +581,17 @@ public abstract class AbstractAdapter
     /**
      * Return a dissemination crosswalk for the given name.
      * 
-     * @param crosswalkName
+     * @param crosswalkName name of crosswalk plugin to be looked up.
      * @return The crosswalk.
      * @throws org.dspace.app.xmlui.wing.WingException if crosswalk not found.
      */
     public final DisseminationCrosswalk getDisseminationCrosswalk(String crosswalkName) throws WingException 
     {
     	// FIXME add some caching here
-    	DisseminationCrosswalk crosswalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(DisseminationCrosswalk.class, crosswalkName);
+    	DisseminationCrosswalk crosswalk
+                = (DisseminationCrosswalk) CoreServiceFactory.getInstance()
+                        .getPluginService()
+                        .getNamedPlugin(DisseminationCrosswalk.class, crosswalkName);
 
 	    if (crosswalk == null)
         {

@@ -37,15 +37,12 @@ import org.dspace.core.Constants;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 
-
 /**
- * 
  * FIXME: add documentation
  * 
  * @author Alexey maslov
  */
 public class FlowAuthorizationUtils {
-
 
 	protected static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 	protected static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -61,9 +58,8 @@ public class FlowAuthorizationUtils {
 	//example language string
 //	private static final Message T_add_eperson_success_notice =
 //		new Message("default","xmlui.administrative.FlowUtils.add-eperson-success-notice");
-	
-	
-	/**
+
+    /**
 	 * Resolve an identifier submitted into the item lookup box. If it contains a slash, it's assumed to be a
 	 * handle and is resolved by that mechanism into an item, collection or community. Otherwise, it's assumed
 	 * to be an item and looked up by ID. 
@@ -71,8 +67,9 @@ public class FlowAuthorizationUtils {
 	 * @param context The current DSpace context.
 	 * @param identifier The identifier that is to be resolved.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
 	 */
-	public static FlowResult resolveItemIdentifier(Context context, String identifier) throws SQLException 
+	public static FlowResult resolveItemIdentifier(Context context, String identifier) throws SQLException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
@@ -119,8 +116,7 @@ public class FlowAuthorizationUtils {
 		result.addError("identifier");
 		return result;	
 	}
-	
-	
+
 	/**
 	 * Process the editing of an existing or a newly created policy. 
 	 * 
@@ -130,10 +126,17 @@ public class FlowAuthorizationUtils {
 	 * @param policyID The ID of the policy being edited (-1 if a new policy is being created)
 	 * @param groupID The ID of the group to be associated with this policy
 	 * @param actionID The ID of the action (dependent on the objectType) to be associated with this policy
+     * @param name name the policy.
+     * @param description describe the policy.
+     * @param startDateParam when the policy starts to apply.
+     * @param endDateParam when the policy no longer applies.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
 	public static FlowResult processEditPolicy(Context context, int objectType, UUID objectID, int policyID, UUID groupID, int actionID,
-                                                    String name, String description, String startDateParam, String endDateParam) throws SQLException, AuthorizeException
+                                                    String name, String description, String startDateParam, String endDateParam)
+            throws SQLException, AuthorizeException
 	{
 		FlowResult result = new FlowResult();
 		boolean added = false;
@@ -217,10 +220,6 @@ public class FlowAuthorizationUtils {
                 return result;
             }
         }
-
-
-            
-
 
         /* If the policy doesn't exist, create a new one and set its parent resource */
 		DSpaceObject policyParent = null;
@@ -325,18 +324,18 @@ public class FlowAuthorizationUtils {
 		return result;
 	}
 
-
-
-
     /**
 	 * Delete the policies specified by the policyIDs parameter. This assumes that the
 	 * deletion has been confirmed.
 	 * 
 	 * @param context The current DSpace context
 	 * @param policyIDs The unique ids of the policies being deleted.
-	 * @return A process result's object.   
+	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
-	public static FlowResult processDeletePolicies(Context context, String[] policyIDs) throws NumberFormatException, SQLException, AuthorizeException
+	public static FlowResult processDeletePolicies(Context context, String[] policyIDs)
+            throws NumberFormatException, SQLException, AuthorizeException
 	{
 		FlowResult result = new FlowResult();
 	
@@ -354,24 +353,29 @@ public class FlowAuthorizationUtils {
 		
 		return result;
 	}
-	
-	
+
 	/**
-	 * Process addition of a several authorizations at once, as entered in the wildcard/advanced authorizations tool 
-	 * 
+	 * Process addition of a several authorizations at once, as entered in the wildcard/advanced authorizations tool.
+	 *
 	 * @param context The current DSpace context.
 	 * @param groupIDs The IDs of the groups to be associated with the newly created policies
 	 * @param actionID The ID of the action to be associated with the policies
 	 * @param resourceID Whether the policies will apply to Items or Bitstreams
 	 * @param collectionIDs The IDs of the collections that the policies will be applied to 
+     * @param name name the policy.
+     * @param description describe the policy.
+     * @param startDateParam start enforcing the policy now.
+     * @param endDateParam stop enforcing the policy now.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
 	public static FlowResult processAdvancedPolicyAdd(Context context, String[] groupIDs, int actionID,
-			int resourceID, String [] collectionIDs, String name, String description, String startDateParam, String endDateParam) throws NumberFormatException, SQLException, AuthorizeException
+			int resourceID, String [] collectionIDs, String name, String description, String startDateParam, String endDateParam)
+            throws NumberFormatException, SQLException, AuthorizeException
 	{
 	    AuthorizeUtil.requireAdminRole(context);
 		FlowResult result = new FlowResult();
-
 
         if(groupIDs==null){
             result.setContinue(false);
@@ -425,9 +429,6 @@ public class FlowAuthorizationUtils {
         }
         // end check dates
 
-
-
-		
 		for (String groupID : groupIDs) 
 		{
 			for (String collectionID : collectionIDs) 
@@ -460,6 +461,8 @@ public class FlowAuthorizationUtils {
 	 * @param resourceID Whether the policies will apply to Items or Bitstreams
 	 * @param collectionIDs The IDs of the collections that the policy wipe will be applied to 
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
 	public static FlowResult processAdvancedPolicyDelete(Context context, int resourceID, String [] collectionIDs) 
 			throws NumberFormatException, SQLException, AuthorizeException

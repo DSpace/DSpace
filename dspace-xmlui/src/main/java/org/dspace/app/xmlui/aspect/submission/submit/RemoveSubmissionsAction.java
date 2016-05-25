@@ -34,15 +34,18 @@ public class RemoveSubmissionsAction extends AbstractAction
 	protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     /**
-     * Remove all selected submissions
+     * Remove all selected submissions.
      *
-     * @param redirector
-     * @param resolver
+     * @param redirector unused.
+     * @param resolver unused.
      * @param objectModel
      *            Cocoon's object model
-     * @param source
-     * @param parameters
+     * @param source unused.
+     * @param parameters unused.
+     * @return null.
+     * @throws java.lang.Exception passed through.
      */
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {

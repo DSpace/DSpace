@@ -29,7 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Action that fires a search event & redirect the user to the view page of the object clicked on in the search results
+ * Action that fires a search event and redirects the user to the view page of
+ * the object clicked on in the search results.
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)

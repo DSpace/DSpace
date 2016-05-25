@@ -63,10 +63,11 @@ public class AuthenticatedSelector extends AbstractLogEnabled implements
 
     /**
      * Determine if the authenticated eperson matches the given expression.
-     * @param expression the given expression.
-     * @param objectModel object model.
-     * @param parameters sitemap parameters.
-     * @return
+     *
+     * @param expression "eperson" or "administrator".
+     * @param objectModel Cocoon object model.
+     * @param parameters unused.
+     * @return whether the eperson is authenticated or an administrator.
      */
     @Override
     public boolean select(String expression, Map objectModel,

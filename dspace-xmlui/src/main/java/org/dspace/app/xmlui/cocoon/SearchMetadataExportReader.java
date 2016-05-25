@@ -45,14 +45,10 @@ import org.dspace.content.*;
 import org.dspace.content.DSpaceObject;
 import org.dspace.discovery.*;
 
-
 /**
- *
  * SearchMetadataExportReader that generates a CSV of search
- * result metadata using MetadataExport
- *
+ * result metadata using MetadataExport.
  */
-
 public class SearchMetadataExportReader extends AbstractReader implements Recyclable
 {	
      /**
@@ -97,10 +93,19 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
     
     /**
      * Set up the export reader.
-     * 
      * See the class description for information on configuration options.
+     *
+     * @param resolver source resolver.
+     * @param objectModel Cocoon object model.
+     * @param src source to read.
+     * @param par Reader parameters.
+     * @throws org.apache.cocoon.ProcessingException on error.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws java.io.IOException passed through.
      */
-    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters par) throws ProcessingException, SAXException, IOException
+    @Override
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters par)
+            throws ProcessingException, SAXException, IOException
     {
         super.setup(resolver, objectModel, src, par);
 
@@ -168,7 +173,11 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
     
     /**
 	 * Write the CSV.
+     * @throws java.io.IOException passed through.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.apache.cocoon.ProcessingException passed through.
 	 */
+    @Override
     public void generate() throws IOException, SAXException, ProcessingException
     {
         response.setContentType("text/csv; charset=UTF-8");
@@ -181,20 +190,29 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
     /**
 	 * Recycle
 	 */
+    @Override
     public void recycle() {        
         this.response = null;
         this.request = null;
     }
     
     /**
-     * Save and return the search results as a csv file
+     * Save and return the search results as a CSV file.
      * 
-     * @params context, objectModel, query, scopeString, filters
-     * 
-     * @throws IOException, UIException, SearchServiceException, SQLException
+     * @param context session context.
+     * @param objectModel Cocoon object model.
+     * @param query search parameters.
+     * @param scopeString scope of the search.
+     * @param filters search filters.
+     * @return wrapper for the CSV file.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws org.dspace.discovery.SearchServiceException passed through.
+     * @throws java.sql.SQLException passed through.
      */
-    public DSpaceCSV exportMetadata(Context context, Map objectModel, String query, String scopeString, String filters) throws IOException, UIException, SearchServiceException, SQLException
-    {	
+    public DSpaceCSV exportMetadata(Context context, Map objectModel, String query, String scopeString, String filters)
+            throws IOException, UIException, SearchServiceException, SQLException
+    {
     	DiscoverResult qResults = new DiscoverResult();
     	
     	DiscoverQuery qArgs = new DiscoverQuery();

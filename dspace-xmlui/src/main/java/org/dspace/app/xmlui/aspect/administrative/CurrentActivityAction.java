@@ -89,7 +89,16 @@ public class CurrentActivityAction extends AbstractAction
 	
     /**
      * Record this current event.
+     *
+     * @param redirector unused.
+     * @param resolver unused.
+     * @param objectModel Cocoon object model.
+     * @param source unused.
+     * @param parameters unused.
+     * @return null.
+     * @throws java.lang.Exception passed through.
      */
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
@@ -190,7 +199,10 @@ public class CurrentActivityAction extends AbstractAction
     	public String puser = null;
     	
     	/**
-    	 * Construct a new activity event, grabing various bits of data about the request from the context and request.
+    	 * Construct a new activity event, grabbing various bits of data about
+         * the request from the context and request.
+         * @param context session context.
+         * @param request current request.
     	 */
     	public Event(Context context, Request request)
     	{
@@ -277,6 +289,7 @@ public class CurrentActivityAction extends AbstractAction
     	
     	/**
     	 * Is this event anonymous?
+         * @return true if session has no EPerson ID.
     	 */
     	public boolean isAnonymous()
     	{
@@ -285,6 +298,7 @@ public class CurrentActivityAction extends AbstractAction
     	
     	/**
     	 * Is this event from a bot?
+         * @return true if user agent matches a bot string.
     	 */
     	public boolean isBot()
     	{

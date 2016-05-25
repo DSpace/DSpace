@@ -49,9 +49,10 @@ public class ContextUtil
      * for this HTTP request, it is re-used, otherwise it is created.
      * 
      * @param objectModel
-     *            the cocoon Objectmodel
+     *            the cocoon object model.
      * 
      * @return a context object
+     * @throws java.sql.SQLException passed through.
      */
     public static Context obtainContext(Map objectModel) throws SQLException
     {
@@ -79,9 +80,10 @@ public class ContextUtil
      * for this HTTP request, it is re-used, otherwise it is created.
      * 
      * @param request
-     *            the cocoon or servlet request object
+     *            the Cocoon or Servlet request object
      * 
      * @return a context object
+     * @throws java.sql.SQLException passed through.
      */
     public static Context obtainContext(HttpServletRequest request) throws SQLException
     {
@@ -132,12 +134,12 @@ public class ContextUtil
         return context;
     }
 
-    
     /**
      * Check if a context exists for this request, if so complete the context.
      * 
      * @param request
      *            The request object 
+     * @throws javax.servlet.ServletException on failure.
      */
     public static void completeContext(HttpServletRequest request) throws ServletException
     {
@@ -156,6 +158,11 @@ public class ContextUtil
     	}
     }
 
+    /**
+     * Abort the context of a request.
+     *
+     * @param request the request to be aborted.
+     */
 	public static void abortContext(HttpServletRequest request)
 	{
     	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);

@@ -50,6 +50,7 @@ public class HandleUtil
      * @param objectModel
      *            The cocoon model.
      * @return A DSpace handle, or null if none found.
+     * @throws java.sql.SQLException passed through.
      */
     public static DSpaceObject obtainHandle(Map objectModel)
             throws SQLException
@@ -104,11 +105,11 @@ public class HandleUtil
      * @param parent
      *            The Handle to test against.
      * @return The matched DSO object or null if none found.
+     * @throws java.sql.SQLException passed through.
      */
     public static boolean inheritsFrom(DSpaceObject dso, String parent)
             throws SQLException
     {
-
         DSpaceObject current = dso;
 
         while (current != null)
@@ -152,9 +153,12 @@ public class HandleUtil
      * If the terminal object in the trail is the passed object, do not link to
      * it, because that is (presumably) the page at which the user has arrived.
      *
-     * @param dso the DSpace who's parents we wil add to the pageMeta
+     * @param context session context.
+     * @param dso the DSpace who's parents we will add to the pageMeta
      * @param pageMeta the object to which we link our trial
      * @param contextPath The context path
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public static void buildHandleTrail(Context context, DSpaceObject dso, PageMeta pageMeta,
                                         String contextPath) throws SQLException, WingException
@@ -162,22 +166,25 @@ public class HandleUtil
         buildHandleTrail(context, dso, pageMeta, contextPath, false);
     }
 
-        /**
-        * Build a list of trail metadata starting with the owning collection and
-        * ending with the root level parent. If the Object is an item, a bundle,
-        * or a bitstream, then the object is not included, but its collection and
-        * community parents are. However, if the item is a community or collection
-        * then it is included along with all parents.
-        *
-        * <p>
-        * If the terminal object in the trail is the passed object, do not link to
-        * it, because that is (presumably) the page at which the user has arrived.
-        *
-        * @param dso the DSpace who's parents we wil add to the pageMeta
-        * @param pageMeta the object to which we link our trial
-        * @param contextPath The context path
-        * @param linkOriginalObject whether or not to make a link of the original object
-        */
+    /**
+     * Build a list of trail metadata starting with the owning collection and
+     * ending with the root level parent. If the Object is an item, a bundle,
+     * or a bitstream, then the object is not included, but its collection and
+     * community parents are. However, if the item is a community or collection
+     * then it is included along with all parents.
+     *
+     * <p>
+     * If the terminal object in the trail is the passed object, do not link to
+     * it, because that is (presumably) the page at which the user has arrived.
+     *
+     * @param context session context.
+     * @param dso the DSpace who's parents we will add to the pageMeta
+     * @param pageMeta the object to which we link our trial
+     * @param contextPath The context path
+     * @param linkOriginalObject whether or not to make a link of the original object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     */
     public static void buildHandleTrail(Context context, DSpaceObject dso, PageMeta pageMeta,
             String contextPath, boolean linkOriginalObject) throws SQLException, WingException
     {

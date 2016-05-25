@@ -55,10 +55,14 @@ public class VersionManager {
      *
      * @param context The DSpace context
      * @param itemID  The id of the to-be-versioned item
+     * @param summary summary.
      * @return A result object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
      */
-    // Versioning
-    public static FlowResult processCreateNewVersion(Context context, UUID itemID, String summary) throws SQLException, AuthorizeException, IOException {
+    public static FlowResult processCreateNewVersion(Context context, UUID itemID, String summary)
+            throws SQLException, AuthorizeException, IOException {
         FlowResult result = new FlowResult();
         try {
             result.setContinue(false);
@@ -87,9 +91,12 @@ public class VersionManager {
      *
      * @param context The DSpace context
      * @param itemID  The id of the to-be-versioned item
+     * @param summary summary.
      * @return A result object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
      */
-    // Versioning
     public static FlowResult processUpdateVersion(Context context, UUID itemID, String summary) throws SQLException, AuthorizeException, IOException {
 
         FlowResult result = new FlowResult();
@@ -119,9 +126,12 @@ public class VersionManager {
      *
      * @param versionID id of the version to restore
      * @param context   The DSpace context
+     * @param summary summary.
      * @return A result object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
      */
-    // Versioning
     public static FlowResult processRestoreVersion(Context context, int versionID, String summary) throws SQLException, AuthorizeException, IOException {
         FlowResult result = new FlowResult();
         try {
@@ -144,11 +154,16 @@ public class VersionManager {
      * Delete version(s)
      *
      * @param context    The DSpace context
+     * @param itemId the item to be reduced.
      * @param versionIDs list of versionIDs to delete
      * @return A result object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
      */
-    // Versioning
-    public static FlowResult processDeleteVersions(Context context, UUID itemId, String[] versionIDs) throws SQLException, AuthorizeException, IOException, UIException {
+    public static FlowResult processDeleteVersions(Context context, UUID itemId, String[] versionIDs)
+            throws SQLException, AuthorizeException, IOException, UIException {
         FlowResult result = new FlowResult();
         try {
             result.setContinue(false);

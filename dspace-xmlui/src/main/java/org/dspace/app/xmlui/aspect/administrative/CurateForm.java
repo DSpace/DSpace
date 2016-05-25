@@ -59,8 +59,8 @@ public class CurateForm extends AbstractDSpaceTransformer
     /**
      * Initialize the page metadata and breadcrumb trail
      *
-     * @param pageMeta
-     * @throws WingException
+     * @param pageMeta the metadata.
+     * @throws WingException passed through.
      */
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException

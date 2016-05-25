@@ -160,7 +160,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
      * @param objectModel TBD
      * @param src TBD
      * @param parameters sitemap parameters.
-     * @throws org.apache.cocoon.ProcessingException
+     * @throws org.apache.cocoon.ProcessingException passed through.
      * @throws org.xml.sax.SAXException passed through.
      * @throws java.io.IOException passed through.
 	 */

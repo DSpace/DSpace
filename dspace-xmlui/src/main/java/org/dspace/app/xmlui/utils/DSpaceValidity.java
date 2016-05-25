@@ -140,7 +140,7 @@ public class DSpaceValidity implements SourceValidity
      * 
      * <p>Examples: "1 day" or "12 hours" or "1 hour" or "30 minutes"
      * 
-     * @see setAssumedValidityDelay(long)
+     * @see #setAssumedValidityDelay(long)
      * 
      * @param delay The delay time in a variable scale.
      */
@@ -379,7 +379,7 @@ public class DSpaceValidity implements SourceValidity
     }
 
     /**
-     * This method is used during serializion. When Tomcat is shutdown, Cocoon's in-memory 
+     * This method is used during serialization. When Tomcat is shutdown, Cocoon's in-memory
      * cache is serialized and written to disk to later be read back into memory on start 
      * up. When this class is read back into memory the readObject(stream) method will be 
      * called.
@@ -389,9 +389,9 @@ public class DSpaceValidity implements SourceValidity
      * will never be assumed valid. Only after it has been checked once will the regular assume
      * validity mechanism be used.
      * 
-     * @param in
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * @param in stream for reading serialized data.
+     * @throws IOException passed through.
+     * @throws ClassNotFoundException passed through.
      */
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
     {
