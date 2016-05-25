@@ -72,8 +72,8 @@ public class Collection extends DSpaceObject {
             List<org.dspace.content.Community> parentCommunities = collection.getCommunities();
             for(org.dspace.content.Community parentCommunity : parentCommunities) {
                 this.addParentCommunityList(new Community(parentCommunity, servletContext, null, context));
-                //See DS-2766 for an interpretation of this field.  This code assumes a collection lives in only one community.  
-                //This method will return the community ancestor chain for this collection.
+                //The parentCommunityList is the list of community/subcommunity ancestors for a collection  
+                //Retrieve the set of ancestors for the parentCommunity and append each one to the list
                 for(org.dspace.content.Community ancestor: parentCommunity.getParentCommunities()) {
                     this.addParentCommunityList(new Community(ancestor, servletContext, null, context));                    
                 }
