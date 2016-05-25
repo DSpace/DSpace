@@ -66,15 +66,15 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller {
 		int idx = 0;
 		for (Metadatum m : metadata) {
 			String mdString = m.schema +"." + m.element +(m.qualifier != null?"."+m.qualifier:"");
-			System.out.println("fillRecord -> "+ mdString);
-			System.out.println("fillRecord -> "+ crisObject.getAnagrafica4view());
+			log.debug("fillRecord -> "+ mdString);
+			log.debug("fillRecord -> "+ crisObject.getAnagrafica4view());
 			ItemMetadataImportFillerConfiguration conf = configurations.get(mdString);
 			if (conf != null) {
 				for (Entry<String, MappingDetails> entry : conf.getMapping().entrySet()) {
 					String mdInput = entry.getKey();
-					System.out.println("fillRecord -> conf -> "+ mdInput);
+					log.debug("fillRecord -> conf -> "+ mdInput);
 					MappingDetails details = entry.getValue();
-					System.out.println("fillRecord -> conf -> "+ details.getShortName());
+					log.debug("fillRecord -> conf -> "+ details.getShortName());
 					List<? extends Property> props = (List<? extends Property>) crisObject.getAnagrafica4view().get(details.getShortName());
 					String prefix = "";
 					if (crisObject instanceof ResearchObject) {
