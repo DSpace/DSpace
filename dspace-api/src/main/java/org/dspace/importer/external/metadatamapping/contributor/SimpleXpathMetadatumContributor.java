@@ -106,7 +106,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
 
     /**
      * Return query used to create an xpathExpression on, this query is used to
-     * @return
+     * @return the query this instance is based on
      */
     public String getQuery() {
         return query;

@@ -10,9 +10,9 @@ package org.dspace.importer.external.metadatamapping.transform;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Removes the last point from an author name, this is required for the SAP lookup
+ * Removes the last point from an author name.
  *
- * User: kevin (kevin at atmire.com)
+ * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class AuthorMetadataProcessorService implements MetadataProcessorService {
 

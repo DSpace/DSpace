@@ -25,7 +25,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * This is achieved by classifying exceptions as fatal or as non fatal/retryable.
  * Evidently only subclasses can make the proper determination of what is retryable and what isn't.
  * This is useful in case the service employs throttling and to deal with general network issues.
- * @author: Antoine Snyers (antoine at atmire dot com)
+ * @author Roeland Dillen (roeland at atmire dot com)
+ * @author Antoine Snyers (antoine at atmire dot com)
  */
 public abstract class AbstractRemoteMetadataSource {
 
@@ -220,12 +221,11 @@ public abstract class AbstractRemoteMetadataSource {
      * @param retry The number of retries before the exception was thrown on
      * @param exception The exception to throw
      * @param operationId The id of the operation that threw the exception
-     * @return a list of {@link org.dspace.importer.external.exception.SourceExceptionHandler} objects
      * @throws MetadataSourceException
      */
     protected void throwSourceException(int retry, Exception exception, String operationId) throws MetadataSourceException {
         throwSourceExceptionHook();
-        log.error("Source exception " + exception.getMessage());
+        log.error("Source exception " + exception.getMessage(),exception);
         throw new MetadataSourceException("At retry of operation " + operationId + " " + retry, exception);
     }
 
