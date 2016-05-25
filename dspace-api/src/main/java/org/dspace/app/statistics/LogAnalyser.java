@@ -8,7 +8,6 @@
 package org.dspace.app.statistics;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverQuery;
@@ -30,6 +29,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class performs all the actual analysis of a given set of DSpace log
@@ -178,25 +179,32 @@ public class LogAnalyser
    
    /** process timing clock */
    private static Calendar startTime = null;
-   
+
+   /////////////////////////
+   // Needful services
+   /////////////////////////
+   private static final ConfigurationService configuration
+           = DSpaceServicesFactory.getInstance().getConfigurationService();
+
    /////////////////////////
    // command line options
    ////////////////////////
    
    /** the log directory to be analysed */
-   private static String logDir = ConfigurationManager.getProperty("log.dir");  
-        
+   private static String logDir = configuration.getProperty("dspace.dir")
+           + File.separator + "log"; // FIXME assumption!
+
    /** the regex to describe the file name format */
    private static String fileTemplate = "dspace\\.log.*";
         
    /** the config file from which to configure the analyser */
-   private static String configFile = ConfigurationManager.getProperty("dspace.dir") + 
+   private static String configFile = configuration.getProperty("dspace.dir") +
                             File.separator + "config" + File.separator +
                             "dstat.cfg";
    
    /** the output file to which to write aggregation data */
-   private static String outFile = ConfigurationManager.getProperty("log.dir") + File.separator + "dstat.dat";
-   
+   private static String outFile = logDir + File.separator + "dstat.dat";
+
    /** the starting date of the report */
    private static Date startDate = null;
         
@@ -514,9 +522,9 @@ public class LogAnalyser
         }
         
         // now do the host name and url lookup
-        hostName = ConfigurationManager.getProperty("dspace.hostname").trim();
-        name = ConfigurationManager.getProperty("dspace.name").trim();
-        url = ConfigurationManager.getProperty("dspace.url").trim();
+        hostName = configuration.getProperty("dspace.hostname").trim();
+        name = configuration.getProperty("dspace.name").trim();
+        url = configuration.getProperty("dspace.url").trim();
         if ((url != null) && (!url.endsWith("/")))
         {
                 url = url + "/";

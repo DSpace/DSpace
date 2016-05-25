@@ -10,10 +10,7 @@ package org.dspace.health;
 import java.text.SimpleDateFormat;
 import org.apache.commons.io.FileUtils;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.storage.bitstore.BitstreamStorageServiceImpl;
 import org.dspace.storage.bitstore.DSBitStoreService;
-import org.dspace.storage.bitstore.factory.StorageServiceFactory;
-import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.dspace.utils.DSpace;
 
 import java.io.File;
@@ -53,7 +50,7 @@ public class InfoCheck extends Check {
                 ConfigurationManager.getProperty("search.dir"),
                 "Search dir size", },
             new String[] {
-                ConfigurationManager.getProperty("log.dir"),
+                ConfigurationManager.getProperty("dspace.dir") + File.separator + "log", // FIXME assumption!
                 "Log dir size", }, })
         {
             try {

@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Serialize {@link UsageEvent} data to a file as Tab delimited. In dspace.cfg
- * specify the path to the file as the value of
+ * Serialize {@link UsageEvent} data to a file as Tab delimited. In
+ * {@code dspace.cfg} specify the path to the file as the value of
  * {@code usageEvent.tabFileLogger.file}.  If that path is not absolute, it
- * will be interpreted as relative to the directory named in {@code log.dir}.
+ * will be interpreted as relative to the directory {@code ${dspace.dir}/log}.
  * If no name is configured, it defaults to "usage-events.tsv".  If the file is
  * new or empty, a column heading record will be written when the file is opened.
  * 
@@ -65,7 +65,8 @@ public class TabFileUsageEventListener
         String logDir = null;
         if (!new File(logPath).isAbsolute())
         {
-            logDir = configurationService.getProperty("log.dir");
+            logDir = configurationService.getProperty("dspace.dir")
+                    + File.separator + "log"; // FIXME assumption!
         }
 
         File logFile = new File(logDir, logPath);
