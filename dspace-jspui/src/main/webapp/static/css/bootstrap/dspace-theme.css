@@ -106,3 +106,7 @@ span.batchimport-error-tab {
 span.batchimport-error-caused {
 	font-weight:bold;
 }
+
+.break-all{
+    word-break: break-all;
+}

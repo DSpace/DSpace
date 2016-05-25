@@ -926,7 +926,7 @@ public class ItemTag extends TagSupport
             			handle = "db-id/" + item.getID();
             		}
 
-            		out.print("<tr><td headers=\"t1\" class=\"standard\">");
+            		out.print("<tr><td headers=\"t1\" class=\"standard break-all\">");
                     out.print("<a target=\"_blank\" href=\"");
                     out.print(request.getContextPath());
                     out.print("/html/");
@@ -941,7 +941,7 @@ public class ItemTag extends TagSupport
                     
             		if (multiFile)
             		{
-            			out.print("</td><td headers=\"t2\" class=\"standard\">");
+            			out.print("</td><td headers=\"t2\" class=\"standard break-all\">");
 
             			String desc = primaryBitstream.getDescription();
             			out.print((desc != null) ? desc : "");
@@ -1016,7 +1016,7 @@ public class ItemTag extends TagSupport
                                             Constants.DEFAULT_ENCODING) + "\">";
 
             					out
-                                    .print("<tr><td headers=\"t1\" class=\"standard\">");
+                                    .print("<tr><td headers=\"t1\" class=\"standard break-all\">");
                                 out.print("<a ");
             					out.print(bsLink);
             					out.print(b.getName());
@@ -1098,7 +1098,7 @@ public class ItemTag extends TagSupport
             					if (multiFile)
             					{
             						out
-                                        .print("</td><td headers=\"t2\" class=\"standard\">");
+                                        .print("</td><td headers=\"t2\" class=\"standard break-all\">");
 
             						String desc = b.getDescription();
             						out.print((desc != null) ? desc : "");
