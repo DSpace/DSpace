@@ -12,7 +12,7 @@ import org.dspace.importer.external.service.components.AbstractRemoteMetadataSou
 
 /**
  * Represent a  handler that forces implementations to define their own behaviour for exceptions originating from
- * @author: Antoine Snyers (antoine at atmire dot com)
+ * @author Antoine Snyers (antoine at atmire dot com)
  */
 public abstract interface SourceExceptionHandler<T extends AbstractRemoteMetadataSource> {
 

@@ -23,7 +23,7 @@ import java.util.List;
  * Represents a service that generates the pubmed query which is used to retrieve the records.
  * This is based on a given item.
  *
- * @author jonas - (jonas at atmire dot com)
+ * @author Jonas - (jonas at atmire dot com)
  */
 public class GeneratePubmedQueryService implements GenerateQueryService {
 

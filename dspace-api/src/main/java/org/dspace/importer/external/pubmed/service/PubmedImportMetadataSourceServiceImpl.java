@@ -33,6 +33,8 @@ import java.util.concurrent.Callable;
 
 /**
  * Implements a data source for querying pubmed central
+ *
+ * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
     private String baseAddress;

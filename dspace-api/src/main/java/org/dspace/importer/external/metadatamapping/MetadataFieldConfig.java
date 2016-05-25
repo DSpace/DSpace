@@ -8,10 +8,10 @@
 package org.dspace.importer.external.metadatamapping;
 
 /**
- * @author Roeland Dillen (roeland at atmire dot com)
- *
  * A generalised configuration for metadatafields.
  * This is used to make the link between values and the actual MetadatumDTO object.
+ *
+ * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class MetadataFieldConfig {
     private String schema;

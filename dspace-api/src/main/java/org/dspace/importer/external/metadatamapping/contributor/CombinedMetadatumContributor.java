@@ -64,7 +64,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
      * MetadatumContributor.contributeMetadata(t) for each MetadatumContributor in the metadatumContributors list.
      * We assume that each contributor returns the same amount of Metadatum objects
      * @param t the object we are trying to translate
-     * @return
+     * @return a collection of metadata composed by each MetadataContributor
      */
     @Override
     public Collection<MetadatumDTO> contributeMetadata(T t) {
