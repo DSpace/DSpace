@@ -10,7 +10,19 @@
 
 # Introduction <a name="Introduction"></a> #
 
-This documentation explains the features and the usage of the importer framework. 
+This documentation explains the features and the usage of the importer framework.
+Enabling the framework can be achieved by removing the comment block from the following step in item-submission.xml
+Implementation specific or additional configuration can be found in their related documentation, if any. (Some implementations use other submission steps altogether, so make sure to double check)
+
+```
+<step>
+   <heading>submit.progressbar.lookup</heading>
+   <processing-class>org.dspace.submit.step.XMLUIStartSubmissionLookupStep</processing-class>
+   <jspui-binding>org.dspace.app.webui.submit.step.JSPStartSubmissionLookupStep</jspui-binding>
+   <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.StartSubmissionLookupStep</xmlui-binding>
+   <workflow-editable>true</workflow-editable>
+</step>
+```
 
 ## Features <a name="Features"></a> ##
 
