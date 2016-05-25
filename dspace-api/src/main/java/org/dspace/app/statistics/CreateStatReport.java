@@ -95,7 +95,7 @@ public class CreateStatReport {
         context.setIgnoreAuthorization(true);
         
         //get paths to directories
-        outputLogDirectory = ConfigurationManager.getProperty("log.dir") + File.separator;
+        outputLogDirectory = ConfigurationManager.getProperty("log.report.dir") + File.separator;
         outputReportDirectory = ConfigurationManager.getProperty("report.dir") + File.separator;
         
         //read in command line variable to determine which statistic to run

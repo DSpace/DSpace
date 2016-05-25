@@ -65,7 +65,7 @@ public class TabFileUsageEventListener
         String logDir = null;
         if (!new File(logPath).isAbsolute())
         {
-            logDir = configurationService.getProperty("log.dir");
+            logDir = configurationService.getProperty("log.report.dir");
         }
 
         File logFile = new File(logDir, logPath);
