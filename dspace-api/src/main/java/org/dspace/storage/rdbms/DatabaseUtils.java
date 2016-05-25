@@ -570,6 +570,14 @@ public class DatabaseUtils
             return null;
         }
 
+        if(tableExists(connection, "imp_record")) {
+            return "5.5.1.1";
+        }
+        
+        if(tableExists(connection, "dedup_reject")) {
+            return "5.5.1.0";
+        }
+        
         if(tableColumnExists(connection, "cris_metrics", "last", null, null)) {
             return "5.4.0.1";
         }

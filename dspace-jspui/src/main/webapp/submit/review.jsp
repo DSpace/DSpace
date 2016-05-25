@@ -108,6 +108,7 @@
           	<% } %>
         </div>
 
+		<input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>
     </form>
 
 </dspace:layout>

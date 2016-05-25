@@ -18,10 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
+import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.DCInput;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -29,12 +28,13 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.content.Metadatum;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
@@ -176,27 +176,20 @@ public class DescribeStep extends AbstractProcessingStep
 
         	// Allow the clearing out of the metadata defined for other document types, provided it can change anytime
         	
-            if (!inputs[i]
+            if (!subInfo.isEditing() && !inputs[i]
                     .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
                             : DCInput.SUBMISSION_SCOPE))
             {
                 continue;
             }
-	        if (inputs[i].getInputType().equals("qualdrop_value"))
-	        {
-		        @SuppressWarnings("unchecked") // This cast is correct
-		        List<String> pairs = inputs[i].getPairs();
-		        for (int j = 0; j < pairs.size(); j += 2)
-		        {
-			        String qualifier = pairs.get(j+1);
-			        item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
-		        }
-	        }
-	        else
-	        {
-		        String qualifier = inputs[i].getQualifier();
-		        item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
-	        }
+            String qualifier = inputs[i].getQualifier();
+            if (qualifier == null
+                    && inputs[i].getInputType().equals("qualdrop_value"))
+            {
+                qualifier = Item.ANY;
+            }
+            item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(),
+                    qualifier, Item.ANY);
         }
 
         // Clear required-field errors first since missing authority
@@ -215,7 +208,7 @@ public class DescribeStep extends AbstractProcessingStep
             	continue;
             }
 
-            if (!inputs[j]
+            if (!subInfo.isEditing() && !inputs[j]
                         .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
                                 : DCInput.SUBMISSION_SCOPE))
             {
@@ -332,7 +325,7 @@ public class DescribeStep extends AbstractProcessingStep
             {
             	// Do not check the required attribute if it is not visible or not allowed for the document type
             	String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
-                if ( !( inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType) ) )
+                if (!subInfo.isEditing() && !( inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType) ) )
                 {
                 	continue;
                 }
@@ -370,6 +363,16 @@ public class DescribeStep extends AbstractProcessingStep
         // if one or more fields errored out, return
         else if (getErrorFields(request) != null && getErrorFields(request).size() > 0)
         {
+            if (!subInfo.isEditing() && !subInfo.isInWorkflow()
+                    && subInfo.getSubmissionItem() != null)
+            {
+                WorkspaceItem wi = (WorkspaceItem) subInfo.getSubmissionItem();
+                wi.setStageReached(AbstractProcessingStep.getCurrentStepConfig(
+                        request, subInfo).getStepNumber());
+                wi.setPageReached(currentPage);
+                wi.update();
+                context.commit();
+            }
             return STATUS_MISSING_REQUIRED_FIELDS;
         }
 

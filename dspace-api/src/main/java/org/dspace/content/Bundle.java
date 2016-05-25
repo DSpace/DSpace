@@ -405,7 +405,7 @@ public class Bundle extends DSpaceObject
         // check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
-        Bitstream b = Bitstream.register(ourContext, assetstore, bitstreamPath);
+        Bitstream b = Bitstream.register(ourContext, assetstore, bitstreamPath, true);
 
         // FIXME: Set permissions for bitstream
 
@@ -831,5 +831,29 @@ public class Bundle extends DSpaceObject
     public void updateLastModified()
     {
         modified = true;
+    }
+    
+    /**
+     * Create a new bitstream in this bundle. This method is for registering
+     * bitstreams.
+     *
+     * @param assetstore corresponds to an assetstore in dspace.cfg
+     * @param bitstreamPath the path and filename relative to the assetstore 
+     * @return  the newly created bitstream
+     * @throws IOException
+     * @throws SQLException
+     */
+    public Bitstream registerBitstream(int assetstore, String bitstreamPath, boolean computeMD5)
+        throws AuthorizeException, IOException, SQLException
+    {
+        // check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
+
+        Bitstream b = Bitstream.register(ourContext, assetstore, bitstreamPath, computeMD5);
+
+        // FIXME: Set permissions for bitstream
+
+        addBitstream(b);
+        return b;
     }
 }

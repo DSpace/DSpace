@@ -64,6 +64,7 @@ import org.dspace.authority.orcid.jaxb.WorkExternalIdentifier;
 import org.dspace.authority.orcid.jaxb.WorkExternalIdentifiers;
 import org.dspace.authority.rest.RestSource;
 import org.dspace.content.DCPersonName;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -108,6 +109,8 @@ public class OrcidService extends RestSource {
 	public static final String MESSAGE_VERSION = "1.2";
 
 	private static OrcidService orcid;
+	
+	private static String sourceClientName;
 
 	private final JAXBContext orcidMessageContext;
 
@@ -125,6 +128,8 @@ public class OrcidService extends RestSource {
 	public static OrcidService getOrcid() {
 		if (orcid == null) {
 			orcid = new DSpace().getServiceManager().getServiceByName("OrcidSource", OrcidService.class);
+            sourceClientName = ConfigurationManager.getProperty(
+                    "authentication-oauth", "application-client-name");
 		}
 		return orcid;
 	}
@@ -222,7 +227,6 @@ public class OrcidService extends RestSource {
 		return message.getOrcidProfile().getOrcidActivities().getOrcidWorks();
 	}
 
-	//ALERT!! Now ORCID do not show private funding (different behaviour from read works and fundiglist!!!)
     public FundingList getFundings(String id, String token)
     {
 
@@ -750,13 +754,28 @@ public class OrcidService extends RestSource {
                 {
                     for (OrcidWork justWork : orcidWorks.getOrcidWork())
                     {
-                        WorkExternalIdentifiers extIds = justWork.getWorkExternalIdentifiers();
-                        if(extIds!=null) {
-                            for (WorkExternalIdentifier extId : extIds.getWorkExternalIdentifier())
+                        if (StringUtils.equals(
+                                justWork.getSource().getSourceName().getContent(),
+                                getSourceClientName()))
+                        {
+                            WorkExternalIdentifiers extIds = justWork
+                                    .getWorkExternalIdentifiers();
+                            if (extIds != null)
                             {
-                                if("handle".equals(extId.getWorkExternalIdentifierType())) {
-                                    if(handle.trim().equals(extId.getWorkExternalIdentifierId().trim())) {
-                                        return justWork.getPutCode().toString();                                        
+                                for (WorkExternalIdentifier extId : extIds
+                                        .getWorkExternalIdentifier())
+                                {
+                                    if ("handle".equals(extId
+                                            .getWorkExternalIdentifierType()))
+                                    {
+                                        if (handle.trim()
+                                                .equals(extId
+                                                        .getWorkExternalIdentifierId()
+                                                        .trim()))
+                                        {
+                                            return justWork.getPutCode()
+                                                    .toString();
+                                        }
                                     }
                                 }
                             }
@@ -862,69 +881,96 @@ public class OrcidService extends RestSource {
 	 * @throws IOException
 	 * @throws JAXBException
 	 */
-	public String appendFunding(String id, String token, Funding funding, String uuid) throws IOException, JAXBException {
-		WebTarget target = restConnector.getClientRest(id + FUNDING_CREATE_ENDPOINT);
+    public String appendFunding(String id, String token, Funding funding,
+            String uuid) throws IOException, JAXBException
+    {
+        WebTarget target = restConnector
+                .getClientRest(id + FUNDING_CREATE_ENDPOINT);
 
-		Builder builder = target.request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        Builder builder = target.request().header(HttpHeaders.AUTHORIZATION,
+                "Bearer " + token);
 
-		StringWriter sw = new StringWriter();
-		Marshaller marshaller = orcidMessageContext.createMarshaller();
+        StringWriter sw = new StringWriter();
+        Marshaller marshaller = orcidMessageContext.createMarshaller();
 
-		validate(marshaller);
+        validate(marshaller);
 
-		marshaller.marshal(wrapFunding(funding), sw);
+        marshaller.marshal(wrapFunding(funding), sw);
 
-		Entity<String> entity = Entity.entity(sw.toString(), APPLICATION_ORCID_XML);
+        Entity<String> entity = Entity.entity(sw.toString(),
+                APPLICATION_ORCID_XML);
 
-		if(testMode) {
-			return "put-code";
-		}
-		Response response = builder.post(entity);
+        if (testMode)
+        {
+            return "put-code";
+        }
+        Response response = builder.post(entity);
 
-		
-	      OrcidMessage message = getOrcidMessage(response);
-	        if(message == null) {
-	           
-	            if (StringUtils.isNotEmpty(uuid))
-	            {
-	                // retrieve the orcid funding by hand
-	                FundingList fundings = getFundings(id, token);
+        OrcidMessage message = getOrcidMessage(response);
+        //usually a POST return empty entity
+        if (message == null)
+        {
 
-	                if (fundings != null)
-	                {
-	                    
-	                    for (Funding justWork : fundings.getFunding())
-	                    {
-	                        FundingExternalIdentifiers extIds = justWork.getFundingExternalIdentifiers();
-	                        if(extIds!=null) {
-	                            for (FundingExternalIdentifier extId : extIds.getFundingExternalIdentifier())
-	                            {
-	                                if("uuid".equals(extId.getFundingExternalIdentifierType())) {
-	                                    if(uuid.trim().equals(extId.getFundingExternalIdentifierValue().trim())) {
-	                                        return justWork.getPutCode().toString();                                        
-	                                    }
-	                                }
-	                            }
-	                        }
-	                    }
-	                    
-	                }
-	            }
-	            else
-	            {
-	                log.warn("No uuid found for " + id);
-	            }
-	        }
-	        
-	        String putCode = null; 
-	        try {
-	            putCode = message.getOrcidProfile().getOrcidActivities().getFundingList().getFunding().get(0).getPutCode().toString();
-	        }
-	        catch(Exception e) {
-	            log.warn("No put-code for owner for orcid " + id);
-	        }
-	        return putCode;
-	}
+            if (StringUtils.isNotEmpty(uuid))
+            {
+                // retrieve the orcid funding by hand
+                FundingList fundings = getFundings(id, token);
+
+                if (fundings != null)
+                {
+
+                    for (Funding justWork : fundings.getFunding())
+                    {
+                        if (StringUtils.equals(justWork.getSource()
+                                .getSourceName().getContent(),
+                                getSourceClientName()))
+                        {
+                            FundingExternalIdentifiers extIds = justWork
+                                    .getFundingExternalIdentifiers();
+                            if (extIds != null)
+                            {
+                                for (FundingExternalIdentifier extId : extIds
+                                        .getFundingExternalIdentifier())
+                                {
+                                    if ("uuid".equals(extId
+                                            .getFundingExternalIdentifierType()))
+                                    {
+                                        if (uuid.trim()
+                                                .equals(extId
+                                                        .getFundingExternalIdentifierValue()
+                                                        .trim()))
+                                        {
+                                            return justWork.getPutCode()
+                                                    .toString();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+            else
+            {
+                log.warn("No uuid found for " + id);
+            }
+        }
+
+        //manage single putcode
+        String putCode = null;
+        try
+        {
+            putCode = message.getOrcidProfile().getOrcidActivities()
+                    .getFundingList().getFunding().get(0).getPutCode()
+                    .toString();
+        }
+        catch (Exception e)
+        {
+            log.warn("No put-code for owner for orcid " + id);
+        }
+        return putCode;
+    }
 
 	/**
      * Returns the fields set as "Public" in the bio portion of the ORCID Record
@@ -1078,5 +1124,14 @@ public class OrcidService extends RestSource {
         }
 
 	    
+    }
+
+    public static String getSourceClientName()
+    {
+        if(sourceClientName==null) {
+            sourceClientName = ConfigurationManager.getProperty(
+                    "authentication-oauth", "application-client-name");
+        }
+        return sourceClientName;
     }
 }

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,10 +18,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.EditItem;
 import org.dspace.content.InProgressSubmission;
-
+import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -77,6 +82,8 @@ public class SubmissionInfo extends HashMap
     /** Reader for submission process configuration file * */
     private static SubmissionConfigReader submissionConfigReader;
     
+    private Integer codeCallerPage;
+        
     /**
      * Default Constructor - PRIVATE
      * <p>
@@ -104,12 +111,15 @@ public class SubmissionInfo extends HashMap
      * 
      * @throws ServletException
      *             if an error occurs
+     * @throws AuthorizeException 
+     * @throws SQLException 
      */
-    public static SubmissionInfo load(HttpServletRequest request, InProgressSubmission subItem) throws ServletException
+    public static SubmissionInfo load(Context context, HttpServletRequest request, InProgressSubmission subItem) throws ServletException, AuthorizeException, SQLException
     {
         boolean forceReload = false;
-    	SubmissionInfo subInfo = new SubmissionInfo();
         
+    	SubmissionInfo subInfo = new SubmissionInfo();
+    	
         // load SubmissionConfigReader only the first time
         // or if we're using a different UI now.
         if (submissionConfigReader == null)
@@ -118,14 +128,27 @@ public class SubmissionInfo extends HashMap
             forceReload=true;
         }
 
+        int codeCallerPage = Util.getIntParameter(request, "pageCallerID");
+        if(codeCallerPage==-1) {
+            codeCallerPage = (Integer)request.getAttribute("pageCallerID");
+        }
+        subInfo.setCodeCallerPage(codeCallerPage);
+        
         // save the item which is going through the submission process
         subInfo.setSubmissionItem(subItem);
-
+        
         // Only if the submission item is created can we set its collection
         String collectionHandle = SubmissionConfigReader.DEFAULT_COLLECTION;
         if (subItem != null)
         {
             collectionHandle = subItem.getCollection().getHandle();
+            Item item = subItem.getItem();
+            if (subItem instanceof EditItem) {
+                if (!AuthorizeManager.isAdmin(context)) {
+                    throw new AuthorizeException("Unauthorized attempt to edit ItemID " + item.getID());
+                }
+                context.turnOffAuthorisationSystem();
+            }
         }
 
         // save this collection handle to this submission info object
@@ -149,6 +172,10 @@ public class SubmissionInfo extends HashMap
         return ((this.submissionItem != null) && (this.submissionItem instanceof WorkflowItem || this.submissionItem instanceof XmlWorkflowItem));
     }
 
+    public boolean isEditing() {
+        return ((this.submissionItem != null) && (this.submissionItem instanceof EditItem));
+    }
+    
     /**
      * Return the current in progress submission
      * 
@@ -604,7 +631,7 @@ public class SubmissionInfo extends HashMap
             // first, try to load from cache
             subInfo.submissionConfig = loadSubmissionConfigFromCache(request
                     .getSession(), subInfo.getCollectionHandle(), subInfo
-                    .isInWorkflow());
+                    .isInWorkflow() || subInfo.isEditing());
         }
 
         if (subInfo.submissionConfig == null || forceReload)
@@ -613,12 +640,12 @@ public class SubmissionInfo extends HashMap
             // (by reading the XML config file)
             subInfo.submissionConfig = submissionConfigReader
                     .getSubmissionConfig(subInfo.getCollectionHandle(), subInfo
-                            .isInWorkflow());
+                            .isInWorkflow() || subInfo.isEditing());
 
             // cache this new submission process configuration
             saveSubmissionConfigToCache(request.getSession(),
                     subInfo.submissionConfig, subInfo.getCollectionHandle(),
-                    subInfo.isInWorkflow());
+                    subInfo.isInWorkflow() || subInfo.isEditing());
 
             // also must force reload Progress Bar info,
             // since it's based on the Submission config
@@ -699,6 +726,15 @@ public class SubmissionInfo extends HashMap
             return null;
         }
     }
-    
-}
 
+    public Integer getCodeCallerPage()
+    {
+        return codeCallerPage;
+    }
+
+    public void setCodeCallerPage(Integer codeCallerPage)
+    {
+        this.codeCallerPage = codeCallerPage;
+    }
+
+}

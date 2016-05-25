@@ -275,6 +275,31 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
         return result;
     }
     
+    public static List<Integer> findAllItemIDs(Context context)
+            throws SQLException
+    {
+        String myQuery = "SELECT item_id FROM item";
+        TableRowIterator rows = null;
+        List<Integer> result = new ArrayList<Integer>();
+        try
+        {
+            rows = DatabaseManager.query(context, myQuery);
+            while (rows.hasNext())
+            {
+                TableRow row = rows.next();
+                result.add(row.getIntColumn("item_id"));
+            }
+        }
+        finally
+        {
+            if (rows != null)
+            {
+                rows.close();
+            }
+        }
+        return result;
+    }
+    
     /**
      * Find all the items in the archive by a given submitter. The order is
      * indeterminate. Only items with the "in archive" flag set are included.
@@ -1283,7 +1308,7 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
      * @throws AuthorizeException
      * @throws IOException
      */
-    void delete() throws SQLException, AuthorizeException, IOException
+    public void delete() throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation here. If we don't, it may happen that we remove the
         // metadata but when getting to the point of removing the bundles we get an exception
@@ -1993,25 +2018,48 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
         return adminObject;
     }
     
-    public DSpaceObject getParentObject() throws SQLException
+    public Collection getParentObject() throws SQLException
     {
-        Collection ownCollection = getOwningCollection();
-        if (ownCollection != null)
+        Collection col = getOwningCollection();
+        if (col == null)
         {
-            return ownCollection;
-        }
-        else
-        {
-            // is a template item?
-            TableRow qResult = DatabaseManager.querySingle(ourContext,
-                       "SELECT collection_id FROM collection " +
-                       "WHERE template_item_id = ?",getID());
-            if (qResult != null)
+            // try to check workspaceitem
+            TableRow row = DatabaseManager
+                    .querySingle(
+                            ourContext,
+                            "SELECT collection_id FROM workspaceitem where item_id = ?",
+                            getID());
+            if (row == null)
             {
-                return Collection.find(ourContext,qResult.getIntColumn("collection_id"));
+                row = DatabaseManager
+                        .querySingle(
+                                ourContext,
+                                "SELECT collection_id FROM workflowitem where item_id = ?",
+                                getID());
             }
-            return null;
+
+            if (row != null)
+            {
+                col = Collection.find(ourContext,
+                        row.getIntColumn("collection_id"));
+            }
+            if (col == null)
+            {
+                // is a template item?
+                TableRow qResult = DatabaseManager.querySingle(ourContext,
+                           "SELECT collection_id FROM collection " +
+                           "WHERE template_item_id = ?",getID());
+                if (qResult != null)
+                {
+                    return Collection.find(ourContext,qResult.getIntColumn("collection_id"));
+                }         
+                log.debug(
+                        "Item "
+                                + getID()
+                                + " in uno stato sconosciuto (no owning collection, no workspace, no workflow, no template)");
+            }
         }
+        return col;
     }
 
     /**

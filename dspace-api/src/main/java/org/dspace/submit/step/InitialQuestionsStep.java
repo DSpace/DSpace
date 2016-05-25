@@ -109,7 +109,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
                 .getBooleanProperty("webui.submit.blocktheses")
                 && Util.getBoolParameter(request, "is_thesis");
 
-        if (subInfo.isInWorkflow())
+        if (subInfo.isInWorkflow() || subInfo.isEditing())
         {
             // Thesis question does not appear in workflow mode..
             isThesis = false;

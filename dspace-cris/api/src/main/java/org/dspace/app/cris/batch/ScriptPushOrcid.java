@@ -7,7 +7,6 @@
  */
 package org.dspace.app.cris.batch;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,8 +14,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.mail.MessagingException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -32,23 +29,15 @@ import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.integration.PushToORCID;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
-import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
-import org.dspace.app.cris.model.jdyna.RPProperty;
-import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.authority.orcid.OrcidService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.utils.DSpace;
-
-import it.cilea.osd.jdyna.value.BooleanValue;
-import it.cilea.osd.jdyna.value.TextValue;
 
 public class ScriptPushOrcid {
 
@@ -80,13 +69,14 @@ public class ScriptPushOrcid {
 			Options options = new Options();
 			options.addOption("h", "help", false, "help");
 			options.addOption("c", "check_credentials", false, "Check client credentials");
-			options.addOption("a", "all_researcher", false, "Work on all researchers pages (ADMIN MODE)");
-			options.addOption("s", "single_researcher", true, "Work on single researcher (ADMIN MODE)");
+			options.addOption("a", "all_researcher", false, "Work on all researchers pages (ADMIN MODE default PUT method)");
+			options.addOption("s", "single_researcher", true, "Work on single researcher (ADMIN MODE default PUT method)");
 			options.addOption("d", "MODE_DATE", true,
-					"Script work only on RP names modified after this date (ADMIN MODE)");
+					"Script work only on RP names modified after this date (ADMIN MODE default PUT method)");
 			options.addOption("D", "MODE_HOUR", true,
-					"Script work only on RP names modified in this hours range (ADMIN MODE)");
-
+					"Script work only on RP names modified in this hours range (ADMIN MODE default PUT method)");
+			options.addOption("p", "post", false, "works/fundings send with a PUT call (using only with -a and -s - ADMIN MODE default POST method)");
+			
 			CommandLine line = parser.parse(options, args);
 
 			if (line.hasOption('h')) {
@@ -119,6 +109,11 @@ public class ScriptPushOrcid {
 				System.exit(1);
 			}
 
+            String mode = "PUT";
+            if (line.hasOption('p')) {
+                mode = "POST";
+            }
+            
 			List<ResearcherPage> rps = null;
 			if (line.getOptions() == null || line.getOptions().length == 0) {
 				List<OrcidQueue> queue = applicationService.getList(OrcidQueue.class);
@@ -188,7 +183,7 @@ public class ScriptPushOrcid {
 						log.error("Error retrieving documents", e);
 					}
 				}
-				PushToORCID.prepareAndSend(context, rps, relationPreferenceService, searchService, applicationService);
+				PushToORCID.prepareAndSend(context, rps, relationPreferenceService, searchService, applicationService, mode);
 			} else {
 				if (line.hasOption('s')) {
 					// get researcher by parameter
@@ -205,7 +200,7 @@ public class ScriptPushOrcid {
 					ResearcherPage researcher = applicationService.getEntityByCrisId(rp, ResearcherPage.class);
 					rps.add(researcher);
 					PushToORCID.prepareAndSend(context, rps, relationPreferenceService, searchService,
-							applicationService);
+							applicationService, mode);
 				} else {
 					System.out.println("\n\nUSAGE:\n ScriptPushOrcid [-a|-s <researcher_identifier>] \n");
 					System.out.println("Option a or s is needed - run with no option works on cris_queue table");

@@ -7,7 +7,8 @@
  */
 package org.dspace.storage.rdbms;
 
-import java.io.*;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
@@ -20,17 +21,21 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
+
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -318,6 +323,72 @@ public class DatabaseManager
         }
     }
 
+    
+    /**
+     * Return an iterator with the results of the query.
+     * 
+     * @param context
+     *            The context object
+     * @param query
+     *            The SQL query
+     * @param offset
+     *            The number of elements to skip
+     * @param limit
+     *            The number's limit for elements to return
+     * @param parameters
+     *            A set of SQL parameters to be included in query. The order of 
+     *            the parameters must correspond to the order of their reference 
+     *            within the query.
+     * @return A TableRowIterator with the results of the query
+     * @exception SQLException
+     *                If a database error occurs
+     */
+    public static TableRowIterator query(Context context, StringBuffer query,
+            int offset, int limit, Serializable[] parameters) throws SQLException    
+    {
+        List<Serializable> params = new LinkedList<Serializable>(Arrays.asList(parameters));
+        
+        applyOffsetAndLimit(query,params,offset,limit);
+        
+        if (log.isDebugEnabled())
+        {
+            StringBuffer sb = new StringBuffer();
+            
+            for (Object o : params){
+                sb.append(o.toString()+",");
+            }
+            
+            log.debug("Running query \"" + query.toString() + "\"  with parameters: " + sb.substring(0,sb.length()-1));
+        }
+
+        PreparedStatement statement = context.getDBConnection().prepareStatement(query.toString());
+        try
+        {
+            loadParameters(statement,params.toArray());
+
+            TableRowIterator retTRI = new TableRowIterator(statement.executeQuery());
+
+            retTRI.setStatement(statement);
+            return retTRI;
+        }
+        catch (SQLException sqle)
+        {
+            if (statement != null)
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException s)
+                {
+                }
+            }
+
+            throw sqle;
+        }
+    }
+    
+    
     /**
      * Return the single row result to this query, or null if no result. If more
      * than one row results, only the first is returned.

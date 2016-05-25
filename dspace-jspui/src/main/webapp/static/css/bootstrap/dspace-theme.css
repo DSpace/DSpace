@@ -232,3 +232,30 @@ footer.navbar-bottom {
 
 .a-filter-applied-remove {   
 }
+
+.media.identifier_signature {
+	color: white;
+	background: #505050;
+}
+
+.media.title_signature {
+	color: white;
+	background: #4285f4;
+}
+
+.media.identifier_signature a {
+	color: white;
+}
+
+.media.title_signature a {
+	color: white;
+}
+
+.tabsignature {
+	padding: 1em;
+}
+
+.media.dedup, .media.dedup a {
+	color: white;
+	background: gray;
+}
