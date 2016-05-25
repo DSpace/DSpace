@@ -148,6 +148,7 @@
             boolean authority = mam.isAuthorityControlled(fieldName);
             boolean required = authority && mam.isAuthorityRequired(fieldName);
             boolean isSelect = "select".equals(cam.getPresentation(fieldName)) && !isName;
+            boolean isNone = "none".equals(cam.getPresentation(fieldName));
 
             // if this is not the only or last input, append index to input @names
             String authorityName = fieldName + "_authority";
@@ -164,7 +165,7 @@
             
             if (authority)
             { 
-                if (!isSelect) {
+                if (!isSelect && !isNone) {
 	            	sb.append(" <img id=\""+confIndID+"\" title=\"")
 	                  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.authority.confidence.description."+confidenceSymbol))
 	                  .append("\" class=\"pull-left ds-authority-confidence cf-")                  
@@ -235,7 +236,7 @@
             }
 
               // use lookup for any other presentation style (i.e "select")
-            else
+            else if (!isNone)
             {
                 if (inputBlock != null)
                     sb.insert(0, inputBlock);
