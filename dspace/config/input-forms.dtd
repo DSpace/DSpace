@@ -15,7 +15,7 @@
  <!ELEMENT page (field)+ >
  <!ATTLIST page 
  		   number NMTOKEN #REQUIRED
- 		   heading CDATA>
+ 		   heading CDATA #IMPLIED>
  <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, label, type-bind?, input-type, hint, required?, vocabulary?, visibility?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
