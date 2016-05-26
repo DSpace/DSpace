@@ -18,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.submit.JSPStep;
@@ -27,6 +28,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.submit.lookup.SubmissionLookupDataLoader;
@@ -157,6 +159,11 @@ public class JSPStartSubmissionLookupStep extends JSPStep
                 collections = Collection.findAuthorizedOptimized(context,
                         Constants.ADD);
             }
+            
+            String excludeHandles = ConfigurationManager.getProperty("submissions.exclude.community");
+			if (excludeHandles != null) {
+				collections = filterOut(excludeHandles.split(","), collections);
+			}
 
             // save collections to request for JSP
             request.setAttribute("collections", collections);
@@ -177,7 +184,26 @@ public class JSPStartSubmissionLookupStep extends JSPStep
         }
     }
 
-    /**
+    private Collection[] filterOut(String[] handles, Collection[] collections) throws SQLException {
+    	List<Collection> filteredCollections = new ArrayList<Collection>();
+    	for (Collection c : collections) {
+    		boolean filter = false;
+    		for (String h : handles) {
+    			if (StringUtils.equals(c.getParentObject().getHandle(), h.trim())){
+    				filter = true;
+    				break;
+    			}
+    		}
+    		if (!filter) {
+    			filteredCollections.add(c);
+    		}
+    	}
+    	Collection[] filteredArray = new Collection[filteredCollections.size()];
+    	filteredArray = filteredCollections.toArray(filteredArray);
+    	return filteredArray;
+	}
+
+	/**
      * Do any post-processing after the step's backend processing occurred (in
      * the doProcessing() method).
      * <P>
