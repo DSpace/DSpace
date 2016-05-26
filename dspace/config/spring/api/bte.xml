@@ -575,41 +575,6 @@
             </constructor-arg>
 	</bean>
 	
-	<!-- Scopus -->
-	<bean id="scopusOnlineDataLoader" class="org.dspace.submit.lookup.ScopusOnlineDataLoader">
-		<property name="searchProvider" value="false" />
-		<property name="fieldMap" ref="scopusInputMap" />
-	</bean>	
-
-	<bean name="scopusInputMap" class="java.util.HashMap" scope="prototype">
-            <constructor-arg>
-                <map key-type="java.lang.String" value-type="java.lang.String">
-                    <entry key="url" value="url" />
-                    <entry key="eid" value="eid" />
-                    <entry key="doi" value="doi" />
-                    <entry key="pmid" value="pubmedID" />
-                    <entry key="title" value="title" />
-                    <entry key="scopusType" value="subtype" />
-                    <entry key="sourceTitle" value="sourceTitle" />
-                    <entry key="isbn" value="pisbn" />
-                    <entry key="issn" value="jissn" />
-                    <entry key="eissn" value="eissn" />
-                    <entry key="issued" value="issued" />
-                    <entry key="volume" value="volume" />
-                    <entry key="issue" value="issue" />
-                    <entry key="spage" value="firstpage" />
-                    <entry key="epage" value="lastpage" />
-                    <entry key="description" value="abstract" />
-                    <entry key="scopusKeywords" value="keywords" />
-                    <entry key="articlenumber" value="articlenumber" />                    
-                    <entry key="authors" value="authors" />
-					<entry key="authorUrl" value="authorUrl" />
-					<entry key="authorScopusid" value="authorScopusID" />
-					<entry key="orcid" value="orcid" />
-                </map>
-            </constructor-arg>
-	</bean>
-	
 	<!-- **************************************************************************************************** -->
 	<!-- Output Mapping 																					  -->
 	<!-- **************************************************************************************************** -->
@@ -682,6 +647,44 @@
 			</map>
 		</constructor-arg>
 	</bean>
+	
+	<!-- Scopus -->
+	<bean id="scopusOnlineDataLoader" class="org.dspace.submit.lookup.ScopusOnlineDataLoader" scope="prototype">
+		<property name="searchProvider" value="false" />
+		<property name="fieldMap" ref="scopusInputMap" />
+	</bean>	
+	
+	<alias name="scopusOnlineDataLoader"
+		alias="org.dspace.submit.lookup.ScopusOnlineDataLoader" />
+
+	<bean name="scopusInputMap" class="java.util.HashMap" scope="prototype">
+            <constructor-arg>
+                <map key-type="java.lang.String" value-type="java.lang.String">
+                    <entry key="url" value="url" />
+                    <entry key="eid" value="eid" />
+                    <entry key="doi" value="doi" />
+                    <entry key="pmid" value="pubmedID" />
+                    <entry key="title" value="title" />
+                    <entry key="scopusType" value="subtype" />
+                    <entry key="sourceTitle" value="sourceTitle" />
+                    <entry key="isbn" value="pisbn" />
+                    <entry key="issn" value="jissn" />
+                    <entry key="eissn" value="eissn" />
+                    <entry key="issued" value="issued" />
+                    <entry key="volume" value="volume" />
+                    <entry key="issue" value="issue" />
+                    <entry key="spage" value="firstpage" />
+                    <entry key="epage" value="lastpage" />
+                    <entry key="description" value="abstract" />
+                    <entry key="scopusKeywords" value="keywords" />
+                    <entry key="articlenumber" value="articlenumber" />                    
+                    <entry key="authors" value="authors" />
+					<entry key="authorUrl" value="authorUrl" />
+					<entry key="authorScopusid" value="authorScopusID" />
+					<entry key="orcid" value="orcid" />
+                </map>
+            </constructor-arg>
+	</bean>
 
 	<!-- SCOPUS scival Data Loaders -->
 	<bean id="scivalOnlineDataLoader"
@@ -696,7 +699,7 @@
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
 	</bean>
 
-	<alias name="scopusOnlineDataLoader"
+	<alias name="scivalOnlineDataLoader"
 		alias="org.dspace.submit.lookup.SciValOnlineDataLoader" />
 
 	<bean name="scivalInputMap" class="java.util.HashMap" scope="prototype">
