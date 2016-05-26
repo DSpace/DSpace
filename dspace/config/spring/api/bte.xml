@@ -109,6 +109,7 @@
 	            <!-- Specify here any data loaders you want to include in the submission lookup process.
 	            	Dataloaders must either extend the "NetworkSubmissionLookupDataLoader" abstract class
 	            	or conform to "FileDataLoader" interface of BTE -->
+	            <entry key="scopus" value-ref="scopusOnlineDataLoader"/>	            	
 	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
 	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
@@ -134,7 +135,9 @@
 			<list>
 			    <ref bean="mapConverter_arxivSubject"/>
 			    <ref bean="mapConverter_pubstatusPubmed"/>
-				<ref bean="mapConverter_classificationASJC" />			    
+				<ref bean="mapConverter_classificationASJC" />
+			    <ref bean="mapConverter_scopusType"/>
+			    <ref bean="splitValue"/>							    
 			    <ref bean="removeLastDot"/>
 			</list>
 		</property>
@@ -152,6 +155,20 @@
 	        </list>
 	    </property>
 	</bean>
+	
+	<!-- Converts an input value to an output one -->
+	<bean name="mapConverter_scopusType" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
+	    <constructor-arg value="mapConverter_scopusType Modifier"/>
+	    <property name="converterNameFile" value="mapConverter-scopusType.properties"/>
+	    <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+	    <property name="fieldKeys">
+	        <list>
+	            <!-- Specify the internal BTE keys that this modifier needs to be applied for -->
+	        	<value>scopusType</value>
+	        </list>
+	    </property>
+	</bean>
+	
 	
 	<!-- Converts an input value to an output one -->
 	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
@@ -190,6 +207,17 @@
 	        </list>
 	    </property>
 	</bean>
+
+	<!-- Remove the last dot in the specified field keys -->
+	<bean name="splitValue" class="org.dspace.submit.lookup.SplitValueModifier">
+	    <constructor-arg value="SplitValue Modifier"/>
+	    <property name="fieldKeys">
+	        <list>
+	        	<value>scopusKeywords</value>
+	        </list>
+	    </property>
+	    <property name="separator" value="|" />
+	</bean>	
 	
 	<!-- **************************************************************************************************** -->
 	<!-- Submission Lookup Transformation Engine (phase 2) 													  -->
@@ -226,6 +254,7 @@
 	            <entry key="allkeywords">
 	                <list>
 						<value>keywords</value>
+						<value>scopusKeywords</value>
 						<value>mesh</value>
 						<value>arxivCategory</value>
 						<value>wosCategory</value>
@@ -540,7 +569,42 @@
                 </map>
             </constructor-arg>
 	</bean>
+	
+	<!-- Scopus -->
+	<bean id="scopusOnlineDataLoader" class="org.dspace.submit.lookup.ScopusOnlineDataLoader">
+		<property name="searchProvider" value="false" />
+		<property name="fieldMap" ref="scopusInputMap" />
+	</bean>	
 
+	<bean name="scopusInputMap" class="java.util.HashMap" scope="prototype">
+            <constructor-arg>
+                <map key-type="java.lang.String" value-type="java.lang.String">
+                    <entry key="url" value="url" />
+                    <entry key="eid" value="eid" />
+                    <entry key="doi" value="doi" />
+                    <entry key="pmid" value="pubmedID" />
+                    <entry key="title" value="title" />
+                    <entry key="scopusType" value="subtype" />
+                    <entry key="sourceTitle" value="sourceTitle" />
+                    <entry key="isbn" value="pisbn" />
+                    <entry key="issn" value="jissn" />
+                    <entry key="eissn" value="eissn" />
+                    <entry key="issued" value="issued" />
+                    <entry key="volume" value="volume" />
+                    <entry key="issue" value="issue" />
+                    <entry key="spage" value="firstpage" />
+                    <entry key="epage" value="lastpage" />
+                    <entry key="description" value="abstract" />
+                    <entry key="scopusKeywords" value="keywords" />
+                    <entry key="articlenumber" value="articlenumber" />                    
+                    <entry key="authors" value="authors" />
+					<entry key="authorUrl" value="authorUrl" />
+					<entry key="authorScopusid" value="authorScopusID" />
+					<entry key="orcid" value="orcid" />
+                </map>
+            </constructor-arg>
+	</bean>
+	
 	<!-- **************************************************************************************************** -->
 	<!-- Output Mapping 																					  -->
 	<!-- **************************************************************************************************** -->
@@ -555,8 +619,16 @@
 		<constructor-arg>
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry value="jissn" key="dc.identifier.issn" />
+				<entry value="eissn" key="dc.identifier.eissn" />				
 				<entry value="pisbn" key="dc.identifier.isbn" />
+				<entry value="url" key="dc.identifier.url" />
+				<entry value="pubmedID" key="dc.identifier.pmid" />				
+				<entry value="firstpage" key="dc.relation.startpage" />
+				<entry value="lastpage" key="dc.relation.lastpage" />
+				<entry value="eisbn" key="" />
 				<entry value="journal" key="dc.source" />
+				<entry value="sourceTitle" key="dc.relation.ispartof" />
+				<entry value="bookChapter.sourceTitle" key="dc.relation.ispartofbook" />
 				<entry value="title" key="dc.title" />
 				<entry value="issued" key="dc.date.issued" />
 				<entry value="language" key="dc.language.iso" />
@@ -570,6 +642,9 @@
 				<entry value="arxivCategory" key="dc.subject" />
 				<entry value="doi" key="dc.identifier" />
 				<entry value="publisher" key="dc.publisher" />
+				<entry value="volume" key="dc.relation.volume" />
+				<entry value="issue" key="dc.relation.issue" />
+				<entry value="articlenumber" key="dc.relation.article" />
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
 				<!-- 
 				<entry value="url" key="" />
@@ -581,8 +656,6 @@
 				<entry value="jeissn" key="" />
 				<entry value="volume" key="" />
 				<entry value="issue" key="" />
-				<entry value="firstpage" key="" />
-				<entry value="lastpage" key="" />
 				<entry value="eisbn" key="" />
 				<entry value="editionnumber" key="" />
 				<entry value="seriestitle" key="" />

@@ -36,6 +36,8 @@ public interface SubmissionLookupDataLoader extends DataLoader
     public final static String REPEC = "repec";
 
     public final static String SCOPUSEID = "scopuseid";
+    
+    public final static String ORCID = "orciid";    
 
     public final static String CINII = "cinii";
 
