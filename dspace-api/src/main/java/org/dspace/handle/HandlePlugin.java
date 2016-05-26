@@ -30,6 +30,8 @@ import org.dspace.core.Context;
 
 import cz.cuni.mff.ufal.dspace.handle.PIDConfiguration;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 /**
  * Extension to the CNRI Handle Server that translates requests to resolve
  * handles into DSpace API calls. The implementation simply stubs out most of
@@ -552,15 +554,15 @@ class ResolvedHandle {
             key = AbstractPIDService.HANDLE_FIELDS.REPORTEMAIL.toString();
             setValue(key, reportemail);
         }
-        if (null != datasetName) {
+        if (isNotBlank(datasetName)) {
             key = AbstractPIDService.HANDLE_FIELDS.DATASETNAME.toString();
             setValue(key, datasetName);
         }
-        if (null != datasetVersion) {
+        if (isNotBlank(datasetVersion)) {
             key = AbstractPIDService.HANDLE_FIELDS.DATASETVERSION.toString();
             setValue(key, datasetVersion);
         }
-        if (null != query) {
+        if (isNotBlank(query)) {
             key = AbstractPIDService.HANDLE_FIELDS.QUERY.toString();
             setValue(key, query);
         }

@@ -7,6 +7,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 /**
  * Created by okosarko on 13.10.15.
  */
@@ -62,9 +64,15 @@ public class Handle {
         this.submitdate = splits[3];
         this.reportemail = splits[4];
         if(splits.length == 9){
-            this.datasetName = splits[5];
-            this.datasetVersion = splits[6];
-            this.query = splits[7];
+            if(isNotBlank(splits[5])) {
+                this.datasetName = splits[5];
+            }
+            if(isNotBlank(splits[6])) {
+                this.datasetVersion = splits[6];
+            }
+            if(isNotBlank(splits[7])) {
+                this.query = splits[7];
+            }
         }
         this.subprefix = handle.split("/",2)[1].split("-",2)[0];
     }
