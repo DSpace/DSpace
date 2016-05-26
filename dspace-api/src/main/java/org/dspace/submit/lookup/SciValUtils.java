@@ -14,7 +14,7 @@ import org.dspace.app.util.XMLUtils;
 import org.dspace.submit.util.SubmissionLookupPublication;
 import org.w3c.dom.Element;
 
-public class ScopusUtils {
+public class SciValUtils {
 
 	public static Record convertScopusDomToRecord(Element article) {
 		MutableRecord record = new SubmissionLookupPublication("");

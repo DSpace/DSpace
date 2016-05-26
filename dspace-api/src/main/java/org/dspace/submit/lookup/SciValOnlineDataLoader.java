@@ -16,13 +16,13 @@ import org.dspace.services.ConfigurationService;
 import gr.ekt.bte.core.Record;
 
 
-public class ScopusOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
+public class SciValOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
 
-	private static Logger log = Logger.getLogger(ScopusOnlineDataLoader.class);
+	private static Logger log = Logger.getLogger(SciValOnlineDataLoader.class);
 
 	private boolean searchProvider = true;
 
-	private ScopusService scopusService = new ScopusService();
+	private SciValService scopusService = new SciValService();
 
 	private ConfigurationService configurationService;
 	
@@ -44,7 +44,7 @@ public class ScopusOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
 		this.searchProvider = searchProvider;
 	}
 
-	public void setScopusService(ScopusService scopusService) {
+	public void setScopusService(SciValService scopusService) {
 		this.scopusService = scopusService;
 	}
 

@@ -30,9 +30,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-public class ScopusService {
+public class SciValService {
     
-	private static Logger log = Logger.getLogger(ScopusService.class);
+	private static Logger log = Logger.getLogger(SciValService.class);
 
 	private final String REQUEST_HEAD_SINGLE = "<?xml version=\"1.0\" encoding=\"utf-8\"?><soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:msap=\"sais.scivalcontent.comm\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\">"
 			+ "<soapenv:Header/><soapenv:Body><msap:match soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><matchrequest xsi:type=\"msap:MatchRequest\"><requestmetadata soapenc:arrayType=\"msap:RequestMetadata[1]\" xsi:type=\"msap:RequestMetadataArray\">";
@@ -148,7 +148,7 @@ public class ScopusService {
 						List<Element> items = XMLUtils.getElementList(resultmetadata, "item");
 						int tot = items.size();
 						for (int i = 0; i < tot; i++) {
-							Record scopusItem = ScopusUtils.convertScopusDomToRecord(items.get(i));
+							Record scopusItem = SciValUtils.convertScopusDomToRecord(items.get(i));
 							results.add(scopusItem);
 						}
 			        }
@@ -195,7 +195,7 @@ public class ScopusService {
 		        int tot = items.size();
 		        for (int i = 0; i < tot; i++)
 		        {
-					Record scopusItem = ScopusUtils.convertScopusDomToRecord(items.get(i));
+					Record scopusItem = SciValUtils.convertScopusDomToRecord(items.get(i));
 		        	results.add(scopusItem);			        	
 		        }
 			} catch (Exception e) {
@@ -242,7 +242,7 @@ public class ScopusService {
 					Document inDoc = builder.parse(responseStream);
 					Element xmlRoot = inDoc.getDocumentElement();
 
-					fsi = ScopusUtils.convertFullScopusDomToRecord(xmlRoot);
+					fsi = SciValUtils.convertFullScopusDomToRecord(xmlRoot);
 
 				} catch (ParserConfigurationException e) {
 
@@ -270,7 +270,7 @@ public class ScopusService {
 				Document inDoc = builder.parse(responseStream);
 				Element xmlRoot = inDoc.getDocumentElement();
 
-				fsi = ScopusUtils.convertFullScopusDomToRecord(xmlRoot);
+				fsi = SciValUtils.convertFullScopusDomToRecord(xmlRoot);
 
 			} catch (ParserConfigurationException e) {
 

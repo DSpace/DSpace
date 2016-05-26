@@ -616,7 +616,7 @@
 
 	<!-- SCOPUS Data Loaders -->
 	<bean id="scopusOnlineDataLoader"
-		class="org.dspace.submit.lookup.ScopusOnlineDataLoader"
+		class="org.dspace.submit.lookup.SciValOnlineDataLoader"
 		scope="prototype">
 		<property name="searchProvider" value="false" />
 		<!-- Uncomment the following line if you want to define the max results 
@@ -628,7 +628,7 @@
 	</bean>
 
 	<alias name="scopusOnlineDataLoader"
-		alias="org.dspace.submit.lookup.ScopusOnlineDataLoader" />
+		alias="org.dspace.submit.lookup.SciValOnlineDataLoader" />
 
 	<bean name="scopusInputMap" class="java.util.HashMap" scope="prototype">
 		<constructor-arg>
