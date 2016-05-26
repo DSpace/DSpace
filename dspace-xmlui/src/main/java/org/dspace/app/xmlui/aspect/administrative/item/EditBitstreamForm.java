@@ -23,7 +23,6 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -32,13 +31,14 @@ import org.dspace.content.Bundle;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
  * 
- * Show a form allowing the user to edit a bitstream's metadata, the description & format.
- * 
+ * Show a form allowing the user to edit a bitstream's metadata, the description
+ * and format.
+ *
  * @author Scott Phillips
  */
 public class EditBitstreamForm extends AbstractDSpaceTransformer
@@ -74,6 +74,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
+    @Override
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
 		pageMeta.addMetadata("title").addContent(T_title);
@@ -84,11 +85,12 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
         pageMeta.addMetadata("javascript", "static").addContent("static/js/editItemUtil.js");
 	}
 
+    @Override
 	public void addBody(Body body) throws SAXException, WingException,
 	UIException, SQLException, IOException, AuthorizeException
 	{
 
-        isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        isAdvancedFormEnabled= DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
 		// Get our parameters
 		UUID bitstreamID = UUID.fromString(parameters.getParameter("bitstreamID", null));

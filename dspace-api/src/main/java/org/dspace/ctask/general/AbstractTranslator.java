@@ -11,14 +11,16 @@ import org.apache.log4j.Logger;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Distributive;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * MicrosoftTranslator translates stuff
@@ -42,6 +44,9 @@ public abstract class AbstractTranslator extends AbstractCurationTask
     private static Logger log = Logger.getLogger(AbstractTranslator.class);
 
     protected List<String> results = new ArrayList<String>();
+    
+    private final transient ConfigurationService configurationService
+             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
 
     @Override
@@ -50,12 +55,10 @@ public abstract class AbstractTranslator extends AbstractCurationTask
         super.init(curator, taskId);
 
         // Load configuration
-        authLang = ConfigurationManager.getProperty("default.locale");
-        authLangField = ConfigurationManager.getProperty(PLUGIN_PREFIX, "translate.field.language");
-        String toTranslateStr = ConfigurationManager.getProperty(PLUGIN_PREFIX, "translate.field.targets");
-        String langsStr = ConfigurationManager.getProperty(PLUGIN_PREFIX, "translate.language.targets");
-        toTranslate = toTranslateStr.split(",");
-        langs = langsStr.split(",");
+        authLang = configurationService.getProperty("default.locale");
+        authLangField = configurationService.getProperty(PLUGIN_PREFIX + ".field.language");
+        String[] toTranslate = configurationService.getArrayProperty(PLUGIN_PREFIX + ".field.targets");
+        String[] langs = configurationService.getArrayProperty(PLUGIN_PREFIX + ".language.targets");
 
         if(!(toTranslate.length > 0 && langs.length > 0))
         {
@@ -184,7 +187,7 @@ public abstract class AbstractTranslator extends AbstractCurationTask
         /*
          * Override this method in your translator
          * Only needed to set key, etc.
-         * apiKey = ConfigurationManager.getProperty(PLUGIN_PREFIX, "translate.api.key.[service]");
+         * apiKey = ConfigurationManager.getProperty(PLUGIN_PREFIX, "translator.api.key.[service]");
          *
          */
     }

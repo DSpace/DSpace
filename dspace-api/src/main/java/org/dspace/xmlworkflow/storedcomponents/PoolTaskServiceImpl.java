@@ -40,6 +40,11 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     @Autowired(required = true)
     protected InProgressUserService inProgressUserService;
 
+    protected PoolTaskServiceImpl()
+    {
+
+    }
+
     @Override
     public List<PoolTask> findByEperson(Context context, EPerson ePerson) throws SQLException, AuthorizeException, IOException {
         List<PoolTask> result = poolTaskDAO.findByEPerson(context, ePerson);

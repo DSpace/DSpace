@@ -8,7 +8,7 @@
 package org.dspace.authenticate.factory;
 
 import org.dspace.authenticate.service.AuthenticationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the authenticate package, use AuthenticateServiceFactory.getInstance() to retrieve an implementation
@@ -21,6 +21,6 @@ public abstract class AuthenticateServiceFactory {
 
     public static AuthenticateServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("authenticateServiceFactory", AuthenticateServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("authenticateServiceFactory", AuthenticateServiceFactory.class);
     }
 }

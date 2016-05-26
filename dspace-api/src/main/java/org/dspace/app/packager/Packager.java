@@ -29,7 +29,8 @@ import org.dspace.content.packager.PackageParameters;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -164,6 +165,7 @@ public class Packager
         String[] parents = null;
         String identifier = null;
         PackageParameters pkgParams = new PackageParameters();
+        PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
 
         //initialize a new packager -- we'll add all our current params as settings
         Packager myPackager = new Packager();
@@ -182,7 +184,7 @@ public class Packager
                 System.out.println("--------------------------------------------------------------");
                 System.out.println("(These options may be specified using --option as described above)");
 
-                PackageIngester sip = (PackageIngester) PluginManager
+                PackageIngester sip = (PackageIngester) pluginService
                     .getNamedPlugin(PackageIngester.class, line.getOptionValue('t'));
 
                 if (sip != null)
@@ -195,7 +197,7 @@ public class Packager
                     System.out.println("\nNo valid Submission plugin found for " + line.getOptionValue('t') + " type.");
                 }
 
-                PackageDisseminator dip = (PackageDisseminator) PluginManager
+                PackageDisseminator dip = (PackageDisseminator) pluginService
                     .getNamedPlugin(PackageDisseminator.class, line.getOptionValue('t'));
 
                 if (dip != null)
@@ -212,7 +214,7 @@ public class Packager
             else  //otherwise, display list of valid packager types
             {
                 System.out.println("\nAvailable Submission Package (SIP) types:");
-                String pn[] = PluginManager
+                String pn[] = pluginService
                         .getAllPluginNames(PackageIngester.class);
                 for (int i = 0; i < pn.length; ++i)
                 {
@@ -220,7 +222,7 @@ public class Packager
                 }
                 System.out
                         .println("\nAvailable Dissemination Package (DIP) types:");
-                pn = PluginManager.getAllPluginNames(PackageDisseminator.class);
+                pn = pluginService.getAllPluginNames(PackageDisseminator.class);
                 for (int i = 0; i < pn.length; ++i)
                 {
                     System.out.println("  " + pn[i]);
@@ -329,7 +331,7 @@ public class Packager
         //If we are in REPLACE mode
         if(pkgParams.replaceModeEnabled())
         {
-            PackageIngester sip = (PackageIngester) PluginManager
+            PackageIngester sip = (PackageIngester) pluginService
                     .getNamedPlugin(PackageIngester.class, myPackager.packageType);
             if (sip == null)
             {
@@ -392,7 +394,7 @@ public class Packager
         //else if normal SUBMIT mode (or basic RESTORE mode -- which is a special type of submission)
         else if (myPackager.submit || pkgParams.restoreModeEnabled())
         {
-            PackageIngester sip = (PackageIngester) PluginManager
+            PackageIngester sip = (PackageIngester) pluginService
                     .getNamedPlugin(PackageIngester.class, myPackager.packageType);
             if (sip == null)
             {
@@ -444,7 +446,7 @@ public class Packager
         else
         {
             //retrieve specified package disseminator
-            PackageDisseminator dip = (PackageDisseminator) PluginManager
+            PackageDisseminator dip = (PackageDisseminator) pluginService
                 .getNamedPlugin(PackageDisseminator.class, myPackager.packageType);
             if (dip == null)
             {
@@ -476,12 +478,12 @@ public class Packager
      * @param pkgParams Parameters to pass to individual packager instances
      * @param sourceFile location of the source package to ingest
      * @param parentObjs Parent DSpace object(s) to attach new object to
-     * @throws IOException
-     * @throws SQLException
-     * @throws FileNotFoundException
-     * @throws AuthorizeException
-     * @throws CrosswalkException
-     * @throws PackageException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws FileNotFoundException if file doesn't exist
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
+     * @throws PackageException if packaging error
      */
     protected void ingest(Context context, PackageIngester sip, PackageParameters pkgParams, String sourceFile, DSpaceObject parentObjs[])
             throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException, PackageException
@@ -615,12 +617,12 @@ public class Packager
      * @param dso DSpace Object to disseminate as a package
      * @param pkgParams Parameters to pass to individual packager instances
      * @param outputFile File where final package should be saved
-     * @throws IOException
-     * @throws SQLException
-     * @throws FileNotFoundException
-     * @throws AuthorizeException
-     * @throws CrosswalkException
-     * @throws PackageException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws FileNotFoundException if file doesn't exist
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
+     * @throws PackageException if packaging error
      */
     protected void disseminate(Context context, PackageDisseminator dip,
 			       DSpaceObject dso, PackageParameters pkgParams,
@@ -697,12 +699,12 @@ public class Packager
      * @param pkgParams Parameters to pass to individual packager instances
      * @param sourceFile location of the source package to ingest as the replacement
      * @param objToReplace DSpace object to replace (may be null if it will be specified in the package itself)
-     * @throws IOException
-     * @throws SQLException
-     * @throws FileNotFoundException
-     * @throws AuthorizeException
-     * @throws CrosswalkException
-     * @throws PackageException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws FileNotFoundException if file doesn't exist
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
+     * @throws PackageException if packaging error
      */
     protected void replace(Context context, PackageIngester sip, PackageParameters pkgParams, String sourceFile, DSpaceObject objToReplace)
             throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException, PackageException

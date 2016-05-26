@@ -7,22 +7,20 @@
  */
 package org.dspace.eperson.dao.impl;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.MetadataField;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDSODAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.GroupDAO;
-import org.hibernate.FlushMode;
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.type.StandardBasicTypes;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Group object.
@@ -31,10 +29,15 @@ import java.util.*;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements GroupDAO {
+public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements GroupDAO
+{
+    protected GroupDAOImpl()
+    {
+        super();
+    }
 
     @Override
-    public Group findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException
+    public List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException
     {
         StringBuilder queryBuilder = new StringBuilder();
         String groupTableName = "g";
@@ -47,23 +50,32 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         query.setParameter(metadataField.toString(), metadataField.getFieldID());
         query.setParameter("queryParam", searchValue);
 
-        return uniqueResult(query);
+        return list(query);
     }
 
     @Override
-    public List<Group> findAll(Context context, List<MetadataField> sortFields, String sortColumn) throws SQLException
+    public List<Group> findAll(Context context, List<MetadataField> sortMetadataFields) throws SQLException
     {
         StringBuilder queryBuilder = new StringBuilder();
         String groupTableName = "g";
         queryBuilder.append("SELECT ").append(groupTableName).append(" FROM Group as ").append(groupTableName);
 
-        addMetadataLeftJoin(queryBuilder, groupTableName, sortFields);
-        addMetadataSortQuery(queryBuilder, sortFields, Collections.singletonList(sortColumn));
+        addMetadataLeftJoin(queryBuilder, groupTableName, sortMetadataFields);
+        addMetadataSortQuery(queryBuilder, sortMetadataFields, null);
 
         Query query = createQuery(context, queryBuilder.toString());
-        for (MetadataField sortField : sortFields) {
+        for (MetadataField sortField : sortMetadataFields) {
             query.setParameter(sortField.toString(), sortField.getFieldID());
         }
+        return list(query);
+    }
+
+    @Override
+    public List<Group> findAll(Context context) throws SQLException {
+        Query query = createQuery(context,
+                "SELECT g FROM Group g ORDER BY g.name ASC");
+        query.setCacheable(true);
+
         return list(query);
     }
 
@@ -71,65 +83,75 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     public List<Group> findByEPerson(Context context, EPerson ePerson) throws SQLException {
         Query query = createQuery(context, "from Group where (from EPerson e where e.id = :eperson_id) in elements(epeople)");
         query.setParameter("eperson_id", ePerson.getID());
+        query.setCacheable(true);
+
         return list(query);
     }
 
     @Override
-    public List<Group> search(Context context, String query, List<MetadataField> queryFields, int offset, int limit) throws SQLException {
-        String groupTableName = "g";
-        String queryString = "SELECT " + groupTableName + " FROM Group as " + groupTableName;
-        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, ListUtils.EMPTY_LIST, null);
+    public Group findByName(final Context context, final String name) throws SQLException {
+        Query query = createQuery(context,
+                "SELECT g from Group g " +
+                "where g.name = :name ");
 
-        if(0 <= offset)
-        {
-            hibernateQuery.setFirstResult(offset);
-        }
-        if(0 <= limit)
-        {
-            hibernateQuery.setMaxResults(limit);
-        }
-        return list(hibernateQuery);
+        query.setParameter("name", name);
+        query.setCacheable(true);
+
+        return uniqueResult(query);
     }
 
     @Override
-    public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException {
-        String groupTableName = "g";
-        String queryString = "SELECT count(*) FROM Group as " + groupTableName;
-        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, ListUtils.EMPTY_LIST, null);
+    public Group findByNameAndEPerson(Context context, String groupName, EPerson ePerson) throws SQLException {
+        if(groupName == null || ePerson == null) {
+            return null;
+        } else {
+            Query query = createQuery(context,
+                    "SELECT DISTINCT g FROM Group g " +
+                            "LEFT JOIN g.epeople p " +
+                            "WHERE g.name = :name AND " +
+                            "(p.id = :eperson_id OR " +
+                            "EXISTS ( " +
+                                "SELECT 1 FROM Group2GroupCache gc " +
+                                "JOIN gc.parent p " +
+                                "JOIN gc.child c " +
+                                "JOIN c.epeople cp " +
+                                "WHERE p.id = g.id AND cp.id = :eperson_id " +
+                                ") " +
+                            ")");
 
-        return count(hibernateQuery);
+            query.setParameter("name", groupName);
+            query.setParameter("eperson_id", ePerson.getID());
+            query.setCacheable(true);
+
+            return uniqueResult(query);
+        }
     }
 
-    protected Query getSearchQuery(Context context, String queryString, String queryParam, List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField) throws SQLException {
+    @Override
+    public List<Group> findByNameLike(final Context context, final String groupName, final int offset, final int limit) throws SQLException {
+        Query query = createQuery(context,
+                "SELECT g FROM Group g WHERE lower(g.name) LIKE lower(:name)");
+        query.setParameter("name", "%" + StringUtils.trimToEmpty(groupName) + "%");
 
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append(queryString);
-        Set<MetadataField> metadataFieldsToJoin = new LinkedHashSet<>();
-        metadataFieldsToJoin.addAll(queryFields);
-        if(CollectionUtils.isNotEmpty(sortFields))
+        if(0 <= offset)
         {
-            metadataFieldsToJoin.addAll(sortFields);
+            query.setFirstResult(offset);
+        }
+        if(0 <= limit)
+        {
+            query.setMaxResults(limit);
         }
 
-        if(!CollectionUtils.isEmpty(metadataFieldsToJoin)) {
-            addMetadataLeftJoin(queryBuilder, "g", metadataFieldsToJoin);
-        }
-        if(queryParam != null) {
-            addMetadataValueWhereQuery(queryBuilder, queryFields, "like", null);
-        }
-        if(!CollectionUtils.isEmpty(sortFields)) {
-            addMetadataSortQuery(queryBuilder, sortFields, Collections.singletonList(sortField));
-        }
+        return list(query);
+    }
 
-        Query query = createQuery(context, queryBuilder.toString());
-        if(StringUtils.isNotBlank(queryParam)) {
-            query.setParameter("queryParam", "%"+queryParam+"%");
-        }
-        for (MetadataField metadataField : metadataFieldsToJoin) {
-            query.setParameter(metadataField.toString(), metadataField.getFieldID());
-        }
+    @Override
+    public int countByNameLike(final Context context, final String groupName) throws SQLException {
+        Query query = createQuery(context,
+                "SELECT count(*) FROM Group g WHERE lower(g.name) LIKE lower(:name)");
+        query.setParameter("name", "%" + groupName + "%");
 
-        return query;
+        return count(query);
     }
 
     @Override
@@ -142,15 +164,25 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
 
 
     @Override
-    public List getGroup2GroupResults(Context context, boolean flushQueries) throws SQLException {
-        SQLQuery sqlQuery = getHibernateSession(context).createSQLQuery("SELECT parent_id, child_id FROM Group2Group");
-        sqlQuery.addScalar("parent_id", StandardBasicTypes.UUID_BINARY);
-        sqlQuery.addScalar("child_id", StandardBasicTypes.UUID_BINARY);
-        if(flushQueries){
-            //Optional, flush queries when executing, could be usefull since you are using native queries & these sometimes require this option.
-            sqlQuery.setFlushMode(FlushMode.ALWAYS);
-        }
-        return sqlQuery.list();
+    public List<Pair<UUID, UUID>> getGroup2GroupResults(Context context, boolean flushQueries) throws SQLException {
+
+        Query query = createQuery(context, "SELECT new org.apache.commons.lang3.tuple.ImmutablePair(g.id, c.id) " +
+                "FROM Group g " +
+                "JOIN g.groups c ");
+
+        @SuppressWarnings("unchecked")
+        List<Pair<UUID, UUID>> results = query.list();
+        return results;
+    }
+
+    @Override
+    public List<Group> getEmptyGroups(Context context) throws SQLException {
+        return list(createQuery(context, "SELECT g from Group g where g.epeople is EMPTY"));
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Group"));
     }
 
 }

@@ -9,11 +9,11 @@ package org.dspace.disseminate;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.dspace.authorize.AuthorizeException;
@@ -23,10 +23,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.disseminate.service.CitationDocumentService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -71,21 +71,9 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected final Set<String> SVG_MIMES = new HashSet<String>();
 
     /**
-     * Comma separated list of collections handles to enable citation for.
-     * webui.citation.enabled_collections, default empty/none. ex: =1811/123, 1811/345
-     */
-    protected String citationEnabledCollections = null;
-
-    /**
-     * Comma separated list of community handles to enable citation for.
-     * webui.citation.enabled_communties, default empty/none. ex: =1811/123, 1811/345
-     */
-    protected String citationEnabledCommunities = null;
-
-    /**
      * List of all enabled collections, inherited/determined for those under communities.
      */
-    protected ArrayList<String> citationEnabledCollectionsList;
+    protected List<String> citationEnabledCollectionsList;
 
     protected File tempDir;
 
@@ -102,6 +90,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected CommunityService communityService;
     @Autowired(required = true)
     protected ItemService itemService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     @Autowired(required = true)
     protected HandleService handleService;
@@ -130,27 +120,22 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
 
         //Load enabled collections
-        citationEnabledCollections = ConfigurationManager.getProperty("disseminate-citation", "enabled_collections");
-        citationEnabledCollectionsList = new ArrayList<String>();
-        if(citationEnabledCollections != null && citationEnabledCollections.length() > 0) {
-            String[] collectionChunks = citationEnabledCollections.split(",");
-            for(String collectionString : collectionChunks) {
-                citationEnabledCollectionsList.add(collectionString.trim());
-            }
-
-        }
+        String[] citationEnabledCollections = configurationService.getArrayProperty("citation-page.enabled_collections");
+        citationEnabledCollectionsList = Arrays.asList(citationEnabledCollections);
 
         //Load enabled communities, and add to collection-list
-        citationEnabledCommunities = ConfigurationManager.getProperty("disseminate-citation", "enabled_communities");
+        String[] citationEnabledCommunities = configurationService.getArrayProperty("citation-page.enabled_communities");
         if(citationEnabledCollectionsList == null) {
             citationEnabledCollectionsList = new ArrayList<String>();
         }
 
-        if(citationEnabledCommunities != null && citationEnabledCommunities.length() > 0) {
-            try {
-                String[] communityChunks = citationEnabledCommunities.split(",");
-                for(String communityString : communityChunks) {
-                    Context context = new Context();
+        if(citationEnabledCommunities != null && citationEnabledCommunities.length > 0)
+        {
+            Context context = null;
+            try
+            {
+                context = new Context();
+                for(String communityString : citationEnabledCommunities) {
                     DSpaceObject dsoCommunity = handleService.resolveToObject(context, communityString.trim());
                     if(dsoCommunity instanceof Community) {
                         Community community = (Community)dsoCommunity;
@@ -162,38 +147,36 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
                     } else {
                         log.error("Invalid community for citation.enabled_communities, value:" + communityString.trim());
                     }
-                    context.abort();
-
                 }
             } catch (SQLException e) {
                 log.error(e.getMessage());
             }
-
+            finally {
+                if (context!=null)
+                    context.abort();
+            }
         }
 
         // Configurable text/fields, we'll set sane defaults
-        String header1Config = ConfigurationManager.getProperty("disseminate-citation", "header1");
-        if(StringUtils.isNotBlank(header1Config)) {
-            header1 = header1Config.split(",");
-        } else {
+        header1 = configurationService.getArrayProperty("citation-page.header1");
+        if (header1==null || header1.length==0)
+        {
             header1 = new String[]{"DSpace Institution", ""};
         }
 
-        String header2Config = ConfigurationManager.getProperty("disseminate-citation", "header2");
-        if(StringUtils.isNotBlank(header2Config)) {
-            header2 = header2Config.split(",");
-        } else {
+        header2 = configurationService.getArrayProperty("citation-page.header2");
+        if (header2==null || header2.length==0)
+        {
             header2 = new String[]{"DSpace Repository", "http://dspace.org"};
         }
 
-        String fieldsConfig = ConfigurationManager.getProperty("disseminate-citation", "fields");
-        if(StringUtils.isNotBlank(fieldsConfig)) {
-            fields = fieldsConfig.split(",");
-        } else {
+        fields = configurationService.getArrayProperty("citation-page.fields");
+        if (fields==null || fields.length==0)
+        {
             fields = new String[]{"dc.date.issued", "dc.title", "dc.creator", "dc.contributor.author", "dc.publisher", "_line_", "dc.identifier.citation", "dc.identifier.uri"};
         }
 
-        String footerConfig = ConfigurationManager.getProperty("disseminate-citation", "footer");
+        String footerConfig = configurationService.getProperty("citation-page.footer");
         if(StringUtils.isNotBlank(footerConfig)) {
             footer = footerConfig;
         } else {
@@ -201,7 +184,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         }
 
         //Ensure a temp directory is available
-        String tempDirString = ConfigurationManager.getProperty("dspace.dir") + "/temp";
+        String tempDirString = configurationService.getProperty("dspace.dir") + File.pathSeparator + "temp";
         tempDir = new File(tempDirString);
         if(!tempDir.exists()) {
             boolean success = tempDir.mkdir();
@@ -218,13 +201,13 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     /**
      * Boolean to determine is citation-functionality is enabled globally for entire site.
-     * config/module/disseminate-citation: enable_globally, default false. true=on, false=off
+     * config/module/citation-page: enable_globally, default false. true=on, false=off
      */
     protected Boolean citationEnabledGlobally = null;
 
     protected boolean isCitationEnabledGlobally() {
         if(citationEnabledGlobally == null) {
-            citationEnabledGlobally = ConfigurationManager.getBooleanProperty("disseminate-citation", "enable_globally", false);
+            citationEnabledGlobally = configurationService.getBooleanProperty("citation-page.enable_globally", false);
         }
 
         return citationEnabledGlobally;
@@ -270,14 +253,14 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     /**
      * Should the citation page be the first page of the document, or the last page?
-     * default => true. true => first page, false => last page
+     * default = true. true = first page, false = last page
      * citation_as_first_page=true
      */
     protected Boolean citationAsFirstPage = null;
 
     protected Boolean isCitationFirstPage() {
         if(citationAsFirstPage == null) {
-            citationAsFirstPage = ConfigurationManager.getBooleanProperty("disseminate-citation", "citation_as_first_page", true);
+            citationAsFirstPage = configurationService.getBooleanProperty("citation-page.citation_as_first_page", true);
         }
 
         return citationAsFirstPage;
@@ -291,13 +274,13 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     @Override
     public File makeCitedDocument(Context context, Bitstream bitstream)
-            throws IOException, SQLException, AuthorizeException, COSVisitorException {
+            throws IOException, SQLException, AuthorizeException {
         PDDocument document = new PDDocument();
         PDDocument sourceDocument = new PDDocument();
         try {
             Item item = (Item) bitstreamService.getParentObject(context, bitstream);
             sourceDocument = sourceDocument.load(bitstreamService.retrieve(context, bitstream));
-            PDPage coverPage = new PDPage(PDPage.PAGE_SIZE_LETTER);
+            PDPage coverPage = new PDPage(PDRectangle.LETTER); // TODO: needs to be configurable
             generateCoverPage(context, document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);
 
@@ -309,7 +292,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         }
     }
 
-    protected void generateCoverPage(Context context, PDDocument document, PDPage coverPage, Item item) throws IOException, COSVisitorException {
+    protected void generateCoverPage(Context context, PDDocument document, PDPage coverPage, Item item) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, coverPage);
         try {
             int ypos = 760;
@@ -377,7 +360,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     }
 
     protected void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDPage coverPage) {
-        List<PDPage> sourcePageList = sourceDocument.getDocumentCatalog().getAllPages();
+        PDPageTree sourcePageList = sourceDocument.getDocumentCatalog().getPages();
 
         if (isCitationFirstPage()) {
             //citation as cover page
@@ -392,7 +375,6 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             }
             document.addPage(coverPage);
         }
-        sourcePageList.clear();
     }
 
     @Override
@@ -400,7 +382,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
                                     int startX, int startY, PDFont pdfFont, float fontSize) throws IOException {
         float leading = 1.5f * fontSize;
 
-        PDRectangle mediabox = page.findMediaBox();
+        PDRectangle mediabox = page.getMediaBox();
         float margin = 72;
         float width = mediabox.getWidth() - 2*margin;
 
@@ -491,7 +473,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         final int rows = content.length;
         final int cols = content[0].length;
         final float rowHeight = 20f;
-        final float tableWidth = page.findMediaBox().getWidth()-(2*margin);
+        final float tableWidth = page.getMediaBox().getWidth()-(2*margin);
         final float tableHeight = rowHeight * rows;
         final float colWidth = tableWidth/(float)cols;
         final float cellMargin=5f;

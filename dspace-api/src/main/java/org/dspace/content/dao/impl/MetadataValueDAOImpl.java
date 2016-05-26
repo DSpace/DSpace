@@ -26,7 +26,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> implements MetadataValueDAO {
+public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> implements MetadataValueDAO
+{
+    protected MetadataValueDAOImpl()
+    {
+        super();
+    }
 
 
     @Override
@@ -65,5 +70,10 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
         query.setParameter("metadata_field_id", metadataFieldId);
         query.setMaxResults(1);
         return (MetadataValue) query.uniqueResult();
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM MetadataValue"));
     }
 }

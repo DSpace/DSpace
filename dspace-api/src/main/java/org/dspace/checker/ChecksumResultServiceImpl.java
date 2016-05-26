@@ -27,12 +27,19 @@ public class ChecksumResultServiceImpl implements ChecksumResultService {
     @Autowired(required = true)
     private ChecksumResultDAO checksumResultDAO;
 
+    protected ChecksumResultServiceImpl()
+    {
+
+    }
+
     /**
      * Get the result description for the given result code
      *
+     * @param context Context
      * @param code
      *            to get the description for.
      * @return the found description.
+     * @throws SQLException if database error
      */
     @Override
     public ChecksumResult findByCode(Context context, ChecksumResultCode code) throws SQLException
@@ -43,7 +50,9 @@ public class ChecksumResultServiceImpl implements ChecksumResultService {
     /**
      * Get a list of all the possible result codes.
      *
+     * @param context Context
      * @return a list of all the result codes
+     * @throws SQLException if database error
      */
     @Override
     public List<ChecksumResult> findAll(Context context) throws SQLException {

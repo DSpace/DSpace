@@ -9,10 +9,11 @@ package org.dspace.event;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.ArrayUtils;
 
 import org.apache.commons.pool2.KeyedObjectPool;
 import org.apache.commons.pool2.KeyedPooledObjectFactory;
@@ -22,9 +23,10 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.event.service.EventService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Class for managing the content event environment. The EventManager mainly
@@ -48,15 +50,18 @@ public class EventServiceImpl implements EventService
 
     protected Map<String, Integer> consumerIndicies = null;
 
-    protected String CONSUMER_PFX = "event.consumer.";
+    protected String CONSUMER_PFX = "event.consumer";
+    
+    private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
 
     protected EventServiceImpl()
     {
         initPool();
-        log.info("Event Dispatcher Pool Initialized");
+        log.info("EventService dispatcher pool initialized");
     }
 
-    protected void initPool()
+    private void initPool()
     {
 
         if (dispatcherPool == null)
@@ -87,7 +92,7 @@ public class EventServiceImpl implements EventService
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                log.error("Could not initialize EventService dispatcher pool", e);
             }
 
         }
@@ -126,7 +131,7 @@ public class EventServiceImpl implements EventService
         }
         catch (Exception e)
         {
-            log.error(e.getMessage(), e);
+            throw new IllegalStateException("Unable to return dispatcher named " + key, e);
         }
     }
 
@@ -140,7 +145,8 @@ public class EventServiceImpl implements EventService
 
     protected void enumerateConsumers()
     {
-        Enumeration propertyNames = ConfigurationManager.propertyNames();
+        // Get all configs starting with CONSUMER_PFX
+        List<String> propertyNames = configurationService.getPropertyKeys(CONSUMER_PFX);
         int bitSetIndex = 0;
 
         if (consumerIndicies == null)
@@ -148,13 +154,11 @@ public class EventServiceImpl implements EventService
             consumerIndicies = new HashMap<String, Integer>();
         }
 
-        while (propertyNames.hasMoreElements())
+        for(String ckey : propertyNames)
         {
-            String ckey = ((String) propertyNames.nextElement()).trim();
-
-            if (ckey.startsWith(CONSUMER_PFX) && ckey.endsWith(".class"))
+            if (ckey.endsWith(".class"))
             {
-                String consumerName = ckey.substring(CONSUMER_PFX.length(),
+                String consumerName = ckey.substring(CONSUMER_PFX.length()+1,
                         ckey.length() - 6);
 
                 consumerIndicies.put(consumerName, (Integer) bitSetIndex);
@@ -167,7 +171,7 @@ public class EventServiceImpl implements EventService
     {
 
         // Prefix of keys in DSpace Configuration
-        private static final String PROP_PFX = "event.dispatcher.";
+        private static final String PROP_PFX = "event.dispatcher";
 
         // Cache of event dispatchers, keyed by name, for re-use.
         protected Map<String, String> dispatchers = new HashMap<String, String>();
@@ -175,7 +179,6 @@ public class EventServiceImpl implements EventService
         public DispatcherPoolFactory()
         {
             parseEventConfig();
-            log.info("");
         }
 
         public PooledObject<Dispatcher> wrap(Dispatcher d) {
@@ -201,37 +204,23 @@ public class EventServiceImpl implements EventService
                     dispatcher = (Dispatcher) dc.newInstance(args);
 
                     // OK, now get its list of consumers/filters
-                    String consumerKey = PROP_PFX + dispatcherName
+                    String consumerKey = PROP_PFX + "." + dispatcherName
                             + ".consumers";
-                    String consumerList = ConfigurationManager
-                            .getProperty(consumerKey);
-                    if (consumerList == null)
+                    String[] consumers = configurationService
+                            .getArrayProperty(consumerKey);
+                    if (ArrayUtils.isEmpty(consumers))
                     {
                         throw new IllegalStateException(
                                 "No Configuration entry found for consumer list of event Dispatcher: \""
                                         + consumerKey + "\"");
                     }
 
-                    // Consumer list format:
-                    // <consumer-name>:<mode>, ...
-                    String[] consumerStanza = consumerList.trim().split(
-                            "\\s*,\\s*");
-
-                    // I think this should be a fatal error.. --lcs
-                    if (consumerStanza.length < 1)
-                    {
-                        throw new IllegalStateException(
-                                "Cannot initialize Dispatcher, malformed Configuration value for "
-                                        + consumerKey);
-                    }
-
                     ConsumerProfile consumerProfile = null;
 
-                    // parts: 0 is name, part 1 is mode.
-                    for (int i = 0; i < consumerStanza.length; i++)
+                    for (String consumer : consumers)
                     {
                         consumerProfile = ConsumerProfile
-                                .makeConsumerProfile(consumerStanza[i]);
+                                .makeConsumerProfile(consumer);
                         consumerProfile.getConsumer().initialize();
 
                         dispatcher.addConsumerProfile(consumerProfile);
@@ -334,37 +323,24 @@ public class EventServiceImpl implements EventService
          * 
          * <pre>
          *  # class of dispatcher &quot;default&quot;
-         *  event.dispatcher.default = org.dspace.event.BasicDispatcher
-         *  # list of consumers followed by filters for each, format is
-         *  #   &lt;consumerClass&gt;:&lt;filter&gt;[:&lt;anotherFilter&gt;..] , ...
-         *  #  and each filter is expressed as:
-         *  #    &lt;objectType&gt;[|&lt;objectType&gt; ...] + &lt;eventType&gt;[|&lt;eventType&gt; ..]
-         *  org.dspace.event.TestConsumer:all+all, \
-         *  org.dspace.eperson.SubscribeConsumer:Item+CREATE|DELETE:Collection+ADD, ...
+         *  event.dispatcher.default.class = org.dspace.event.BasicDispatcher
          * </pre>
          * 
          */
         private void parseEventConfig()
         {
-            Enumeration propertyNames = ConfigurationManager.propertyNames();
-            while (propertyNames.hasMoreElements())
+            // Get all configs starting with PROP_PFX
+            List<String> propertyNames = configurationService.getPropertyKeys(PROP_PFX);
+            
+            for(String ckey : propertyNames)
             {
-                String ckey = ((String) propertyNames.nextElement()).trim();
-
-                if (ckey.startsWith(PROP_PFX) && ckey.endsWith(".class"))
+                // If it ends with ".class", append it to our list of dispatcher classes
+                if (ckey.endsWith(".class"))
                 {
-                    String name = ckey.substring(PROP_PFX.length(), ckey
+                    String name = ckey.substring(PROP_PFX.length()+1, ckey
                             .length() - 6);
-                    String dispatcherClass = ConfigurationManager
+                    String dispatcherClass = configurationService
                             .getProperty(ckey);
-
-                    // Can we grab all of the consumers configured for this
-                    // dispatcher
-                    // and store them also? Then there is no
-                    // ConfigurationManager call
-                    // upon other makeObject(key) requests resulting in a faster
-                    // pool
-                    // get.
 
                     dispatchers.put(name, dispatcherClass);
 

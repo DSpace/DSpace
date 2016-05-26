@@ -7,19 +7,12 @@
  */
 package org.dspace.authorize;
 
-import java.sql.SQLException;
-import java.util.*;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -30,6 +23,9 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * AuthorizeManager handles all authorization checks for DSpace. For better
@@ -60,6 +56,11 @@ public class AuthorizeServiceImpl implements AuthorizeService
     protected WorkspaceItemService workspaceItemService;
     @Autowired(required = true)
     protected WorkflowItemService workflowItemService;
+
+    protected AuthorizeServiceImpl()
+    {
+
+    }
 
     @Override
     public void authorizeAnyOf(Context c, DSpaceObject o, int[] actions)throws AuthorizeException, SQLException
@@ -227,7 +228,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
      *         object can be used
      * @return <code>true</code> if user is authorized to perform the given
      *         action, <code>false</code> otherwise
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean authorize(Context c, DSpaceObject o, int action, EPerson e, boolean useInheritance) throws SQLException
     {
@@ -414,7 +415,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
             return false; // anonymous users can't be admins....
         } else
         {
-            return groupService.isMember(c, groupService.findByName(c, Group.ADMIN));
+            return groupService.isMember(c, Group.ADMIN);
         }
     }
 
@@ -622,8 +623,8 @@ public class AuthorizeServiceImpl implements AuthorizeService
      * @param reason
      * @param dso
      * @param owningCollection
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void generateAutomaticPolicies(Context context, Date embargoDate,

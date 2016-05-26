@@ -7,17 +7,22 @@
  */
 package org.dspace.content.crosswalk;
 
+import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
@@ -28,7 +33,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -36,8 +41,10 @@ import org.jdom.Namespace;
 import org.jdom.Verifier;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.jdom.transform.XSLTransformException;
-import org.jdom.transform.XSLTransformer;
+import org.jdom.transform.JDOMResult;
+import org.jdom.transform.JDOMSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configurable XSLT-driven dissemination Crosswalk
@@ -65,16 +72,15 @@ import org.jdom.transform.XSLTransformer;
  * @author Larry Stone
  * @author Scott Phillips
  * @author Pascal-Nicolas Becker
- * @version $Revision$
  * @see XSLTCrosswalk
  */
 public class XSLTDisseminationCrosswalk
     extends XSLTCrosswalk
-    implements DisseminationCrosswalk
+    implements ParameterizedDisseminationCrosswalk
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(XSLTDisseminationCrosswalk.class);
-    
+    private static final Logger LOG = LoggerFactory.getLogger(XSLTDisseminationCrosswalk.class);
+
     /** DSpace context, will be created if XSLTDisseminationCrosswalk had been started by command-line. */
     private static Context context;
 
@@ -84,7 +90,7 @@ public class XSLTDisseminationCrosswalk
     protected static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
-    private static String aliases[] = makeAliases(DIRECTION);
+    private static final String aliases[] = makeAliases(DIRECTION);
 
     public static String[] getPluginNames()
     {
@@ -110,8 +116,8 @@ public class XSLTDisseminationCrosswalk
         String myAlias = getPluginInstanceName();
         if (myAlias == null)
         {
-            log.error("Must use PluginManager to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
-            throw new CrosswalkInternalException("Must use PluginManager to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
+            LOG.error("Must use PluginService to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
+            throw new CrosswalkInternalException("Must use PluginService to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
         }
 
         // all configs for this plugin instance start with this:
@@ -122,13 +128,13 @@ public class XSLTDisseminationCrosswalk
         schemaLocation = ConfigurationManager.getProperty(prefix+"schemaLocation");
         if (schemaLocation == null)
         {
-            log.warn("No schemaLocation for crosswalk="+myAlias+", key="+prefix+"schemaLocation");
+            LOG.warn("No schemaLocation for crosswalk="+myAlias+", key="+prefix+"schemaLocation");
         }
-        
+
         // sanity check: schemaLocation should have space.
         else if (schemaLocation.length() > 0 && schemaLocation.indexOf(' ') < 0)
         {
-            log.warn("Possible INVALID schemaLocation (no space found) for crosswalk="+
+            LOG.warn("Possible INVALID schemaLocation (no space found) for crosswalk="+
                       myAlias+", key="+prefix+"schemaLocation"+
                       "\n\tCorrect format is \"{namespace} {schema-URL}\"");
         }
@@ -137,7 +143,7 @@ public class XSLTDisseminationCrosswalk
         //  crosswalk.diss.{PLUGIN_NAME}.namespace.{PREFIX} = {URI}
         String nsPrefix = prefix + "namespace.";
         Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
-        List<Namespace> nsList = new ArrayList<Namespace>();
+        List<Namespace> nsList = new ArrayList<>();
         while (pe.hasMoreElements())
         {
             String key = pe.nextElement();
@@ -166,7 +172,7 @@ public class XSLTDisseminationCrosswalk
         }
         catch (CrosswalkInternalException e)
         {
-            log.error(e.toString());
+            LOG.error(e.toString());
         }
         return (Namespace[]) ArrayUtils.clone(namespaces);
     }
@@ -185,18 +191,21 @@ public class XSLTDisseminationCrosswalk
         }
         catch (CrosswalkInternalException e)
         {
-            log.error(e.toString());
+            LOG.error(e.toString());
         }
         return schemaLocation;
     }
 
-    /**
-     * Disseminate the DSpace item, collection, or community.
-     *
-     * @see DisseminationCrosswalk
-     */
     @Override
     public Element disseminateElement(Context context, DSpaceObject dso)
+            throws CrosswalkException, IOException, SQLException, AuthorizeException
+    {
+        return disseminateElement(context, dso, new HashMap());
+    }
+
+    @Override
+    public Element disseminateElement(Context context, DSpaceObject dso,
+            Map<String, String> parameters)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -210,23 +219,30 @@ public class XSLTDisseminationCrosswalk
 
         init();
 
-        XSLTransformer xform = getTransformer(DIRECTION);
+        Transformer xform = getTransformer(DIRECTION);
         if (xform == null)
         {
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
         }
 
+        for (Map.Entry<String, String> parameter : parameters.entrySet())
+        {
+            LOG.debug("Setting parameter {} to {}", parameter.getKey(), parameter.getValue());
+            xform.setParameter(parameter.getKey(), parameter.getValue());
+        }
+
         try
         {
             Document ddim = new Document(createDIM(dso));
-            Document result = xform.transform(ddim);
-            Element root = result.getRootElement();
+            JDOMResult result = new JDOMResult();
+            xform.transform(new JDOMSource(ddim), result);
+            Element root = result.getDocument().getRootElement();
             root.detach();
             return root;
         }
-        catch (XSLTransformException e)
+        catch (TransformerException e)
         {
-            log.error("Got error: "+e.toString());
+            LOG.error("Got error: "+e.toString());
             throw new CrosswalkInternalException("XSL translation failed: "+e.toString(), e);
         }
     }
@@ -234,6 +250,11 @@ public class XSLTDisseminationCrosswalk
     /**
      * Disseminate the DSpace item, collection, or community.
      *
+     * @param context context
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      * @see DisseminationCrosswalk
      */
     @Override
@@ -251,7 +272,7 @@ public class XSLTDisseminationCrosswalk
 
         init();
 
-        XSLTransformer xform = getTransformer(DIRECTION);
+        Transformer xform = getTransformer(DIRECTION);
         if (xform == null)
         {
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
@@ -259,11 +280,13 @@ public class XSLTDisseminationCrosswalk
 
         try
         {
-            return xform.transform(createDIM(dso).getChildren());
+            JDOMResult result = new JDOMResult();
+            xform.transform(new JDOMSource(createDIM(dso).getChildren()), result);
+            return result.getResult();
         }
-        catch (XSLTransformException e)
+        catch (TransformerException e)
         {
-            log.error("Got error: "+e.toString());
+            LOG.error("Got error: "+e.toString());
             throw new CrosswalkInternalException("XSL translation failed: "+e.toString(), e);
         }
     }
@@ -294,7 +317,7 @@ public class XSLTDisseminationCrosswalk
         }
         catch (CrosswalkInternalException e)
         {
-            log.error(e.toString());
+            LOG.error(e.toString());
         }
         return preferList;
     }
@@ -303,6 +326,8 @@ public class XSLTDisseminationCrosswalk
      * Generate an intermediate representation of a DSpace object.
      *
      * @param dso The dspace object to build a representation of.
+     * @param dcvs list of metadata
+     * @return element
      */
     public static Element createDIM(DSpaceObject dso, List<MockMetadataValue> dcvs)
     {
@@ -325,6 +350,7 @@ public class XSLTDisseminationCrosswalk
      * Generate an intermediate representation of a DSpace object.
      *
      * @param dso The dspace object to build a representation of.
+     * @return element
      */
     public static Element createDIM(DSpaceObject dso)
     {
@@ -478,9 +504,9 @@ public class XSLTDisseminationCrosswalk
         }
         else
         {
-            if (log.isDebugEnabled())
+            if (LOG.isDebugEnabled())
             {
-                log.debug("Filtering out non-XML characters in string, reason=" + reason);
+                LOG.debug("Filtering out non-XML characters in string, reason=" + reason);
             }
             StringBuffer result = new StringBuffer(value.length());
             for (int i = 0; i < value.length(); ++i)
@@ -494,21 +520,23 @@ public class XSLTDisseminationCrosswalk
             return result.toString();
         }
     }
-    
+
     /**
      * Simple command-line rig for testing the DIM output of a stylesheet.
-     * Usage:  java XSLTDisseminationCrosswalk  <crosswalk-name> <handle> [output-file]
+     * Usage:  {@code java XSLTDisseminationCrosswalk  <crosswalk-name> <handle> [output-file]}
+     * @param argv arguments
+     * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception
     {
-        log.error("started.");
+        LOG.error("started.");
         if (argv.length < 2 || argv.length > 3)
         {
             System.err.println("Usage:  java XSLTDisseminationCrosswalk <crosswalk-name> <handle> [output-file]");
-            log.error("You started Dissemination Crosswalk Test/Export with a wrong number of parameters.");
+            LOG.error("You started Dissemination Crosswalk Test/Export with a wrong number of parameters.");
             System.exit(1);
         }
-        
+
         String xwalkname = argv[0];
         String handle = argv[1];
         OutputStream out = System.out;
@@ -520,23 +548,26 @@ public class XSLTDisseminationCrosswalk
             }
             catch (FileNotFoundException e)
             {
-                System.err.println("Can't write to the specified file: " + e.getMessage());
+                System.err.format("Can't write to the specified file: %s%n",
+                        e.getMessage());
                 System.err.println("Will write output to stdout.");
             }
         }
         
-        DisseminationCrosswalk xwalk = (DisseminationCrosswalk)PluginManager.getNamedPlugin(
-                DisseminationCrosswalk.class, xwalkname);
+        DisseminationCrosswalk xwalk
+                = (DisseminationCrosswalk) CoreServiceFactory.getInstance()
+                        .getPluginService()
+                        .getNamedPlugin(DisseminationCrosswalk.class, xwalkname);
         if (xwalk == null)
         {
-            System.err.println("Error: Cannot find a DisseminationCrosswalk plugin for: \"" + xwalkname + "\"");
-            log.error("Cannot find the Dissemination Crosswalk plugin.");
+            System.err.format("Error: Cannot find a DisseminationCrosswalk plugin for: \"%s\"%n", xwalkname);
+            LOG.error("Cannot find the Dissemination Crosswalk plugin.");
             System.exit(1);
         }
-        
+
         context = new Context();
         context.turnOffAuthorisationSystem();
-        
+
         DSpaceObject dso = null;
         try
         {
@@ -547,26 +578,26 @@ public class XSLTDisseminationCrosswalk
             System.err.println("Error: A problem with the database connection occurred, check logs for further information.");
             System.exit(1);
         }
-        
+
         if (null == dso)
         {
-            System.err.println("Can't find a DSpaceObject with the handle \"" + handle + "\"");
+            System.err.format("Can't find a DSpaceObject with the handle \"%s\"%n", handle);
             System.exit(1);
         }
-        
+
         if (!xwalk.canDisseminate(dso))
         {
             System.err.println("Dissemination Crosswalk can't disseminate this DSpaceObject.");
-            log.error("Dissemination Crosswalk can't disseminate this DSpaceObject.");
+            LOG.error("Dissemination Crosswalk can't disseminate this DSpaceObject.");
             System.exit(1);
         }
-        
+
         Element root = null;
         try
         {
             root = xwalk.disseminateElement(context, dso);
         }
-        catch (Exception e)
+        catch (CrosswalkException | IOException | SQLException | AuthorizeException e)
         {
             // as this script is for testing dissemination crosswalks, we want
             // verbose information in case of an exception.
@@ -574,14 +605,16 @@ public class XSLTDisseminationCrosswalk
             System.err.println("=== Error Message ===");
             System.err.println(e.getMessage());
             System.err.println("===  Stack Trace  ===");
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             System.err.println("=====================");
-            log.error("Caught: " + e.toString() + ".");
-            log.error(e.getMessage());
-            log.error(e.getStackTrace());
+            LOG.error("Caught: {}.", e.toString());
+            LOG.error(e.getMessage());
+            CharArrayWriter traceWriter = new CharArrayWriter(2048);
+            e.printStackTrace(new PrintWriter(traceWriter));
+            LOG.error(traceWriter.toString());
             System.exit(1);
         }
-    
+
         try
         {
             XMLOutputter xmlout = new XMLOutputter(Format.getPrettyFormat());
@@ -596,14 +629,16 @@ public class XSLTDisseminationCrosswalk
             System.err.println("=== Error Message ===");
             System.err.println(e.getMessage());
             System.err.println("===  Stack Trace  ===");
-            System.err.println(e.getStackTrace());
+            e.printStackTrace(System.err);
             System.err.println("=====================");
-            log.error("Caught: " + e.toString() + ".");
-            log.error(e.getMessage());
-            log.error(e.getStackTrace());
+            LOG.error("Caught: {}.", e.toString());
+            LOG.error(e.getMessage());
+            CharArrayWriter traceWriter = new CharArrayWriter(2048);
+            e.printStackTrace(new PrintWriter(traceWriter));
+            LOG.error(traceWriter.toString());
             System.exit(1);
         }
-        
+
         context.complete();
         if (out instanceof FileOutputStream)
         {

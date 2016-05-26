@@ -112,7 +112,9 @@
                 <!-- Collection ID for context -->
                 <xsl:choose>
                     <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='choice'][@qualifier='collection']">
+                        <xsl:text>'</xsl:text>
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='choice'][@qualifier='collection']"/>
+                        <xsl:text>'</xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:text>-1</xsl:text>

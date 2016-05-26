@@ -8,6 +8,7 @@
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.UUID;
@@ -24,7 +25,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.OAIHarvester;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
 
@@ -215,12 +216,12 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 	
 	    // Add an entry for each instance of ingestion crosswalks configured for harvesting 
         String metaString = "harvester.oai.metadataformats.";
-        Enumeration pe = ConfigurationManager.propertyNames("oai");
+        Enumeration pe = Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys("oai"));
         while (pe.hasMoreElements())
         {
             String key = (String)pe.nextElement();
             if (key.startsWith(metaString)) {
-            	String metadataString = ConfigurationManager.getProperty("oai", key);
+            	String metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("oai." + key);
             	String metadataKey = key.substring(metaString.length());
             	String displayName;
 

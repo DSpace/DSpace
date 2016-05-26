@@ -28,6 +28,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
@@ -36,9 +37,10 @@
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="org.dspace.browse.ItemCounter"%>
 <%@ page import="org.dspace.content.*"%>
-<%@ page import="org.dspace.core.ConfigurationManager"%>
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.eperson.Group"     %>
+<%@ page import="org.dspace.services.ConfigurationService" %>
+<%@ page import="org.dspace.services.factory.DSpaceServicesFactory" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%
@@ -89,11 +91,16 @@
 
     Bitstream logo = collection.getLogo();
     
-    boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
+    ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    
+    boolean feedEnabled = configurationService.getBooleanProperty("webui.feed.enable");
     String feedData = "NONE";
     if (feedEnabled)
     {
-        feedData = "coll:" + ConfigurationManager.getProperty("webui.feed.formats");
+        // FeedData is expected to be a comma separated list
+        String[] formats = configurationService.getArrayProperty("webui.feed.formats");
+        String allFormats = StringUtils.join(formats, ",");
+        feedData = "coll:" + allFormats;
     }
     
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
@@ -110,7 +117,7 @@
     <div class="well">
     <div class="row"><div class="col-md-8"><h2><%= name %>
 <%
-            if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+            if(configurationService.getBooleanProperty("webui.strengths.show"))
             {
 %>
                 : [<%= ic.getCount(collection) %>]
@@ -366,7 +373,7 @@
 <%  } %>
 
 <%
-	if (rs != null)
+	if (rs != null && rs.count() > 0)
 	{
 %>
 	<h3><fmt:message key="jsp.collection-home.recentsub"/></h3>

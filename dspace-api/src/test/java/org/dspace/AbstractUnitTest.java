@@ -9,53 +9,39 @@ package org.dspace;
 
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.net.URL;
 import java.sql.SQLException;
-import java.util.Properties;
-import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.util.MockUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
 
 
 /**
- * This is the base class for Unit Tests. It contains some generic mocks and
+ * This is the base class for most Unit Tests. It contains some generic mocks and
  * utilities that are needed by most of the unit tests developed for DSpace.
+ * <P>
+ * NOTE: This base class also performs in-memory (H2) database initialization.
+ * If your tests don't need that, you may wish to just use AbstractDSpaceTest.
  *
+ * @see AbstractDSpaceTest
  * @author pvillega
  */
-public class AbstractUnitTest
+public class AbstractUnitTest extends AbstractDSpaceTest
 {
     /** log4j category */
     private static final Logger log = Logger.getLogger(AbstractUnitTest.class);
-
-    //Below there are static variables shared by all the instances of the class
-    
-    /**
-     * Test properties.
-     */
-    protected static Properties testProps;
-
-    //Below there are variables used in each test
 
     /**
      * Context mock object to use in the tests.
@@ -67,75 +53,43 @@ public class AbstractUnitTest
      */
     protected EPerson eperson;
 
-    protected static DSpaceKernelImpl kernelImpl;
-
+    /**
+     * This service is used by the majority of DSO-based Unit tests, which
+     * is why it is initialized here.
+     */
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     /** 
      * This method will be run before the first test as per @BeforeClass. It will
      * initialize shared resources required for all tests of this class.
-     *
-     * Due to the way Maven works, unit tests can't be run from a POM package,
-     * which forbids us to run the tests from the Assembly and Configuration
-     * package. On the other hand we need a structure of folders to run the tests,
-     * like "solr", "report", etc.  This will be provided by a JAR assembly
-     * built out of files from various modules -- see the dspace-parent POM.
-     *
-     * This method will load a few properties for derived test classes.
-     * 
-     * The ConfigurationManager will be initialized to load the test
-     * "dspace.cfg".
+     * <p>
+     * NOTE: Per JUnit, "The @BeforeClass methods of superclasses will be run before those the current class."
+     * http://junit.org/apidocs/org/junit/BeforeClass.html
+     * <p>
+     * This method builds on the initialization in AbstractDSpaceTest, and
+     * initializes the in-memory database for tests that need it.
      */
     @BeforeClass
-    public static void initOnce()
+    public static void initDatabase()
     {
+        // Clear our old flyway object. Because this DB is in-memory, its
+        // data is lost when the last connection is closed. So, we need
+        // to (re)start Flyway from scratch for each Unit Test class.
+        DatabaseUtils.clearFlywayDBCache();
+
         try
         {
-            //set a standard time zone for the tests
-            TimeZone.setDefault(TimeZone.getTimeZone("Europe/Dublin"));
-
-            //load the properties of the tests
-            testProps = new Properties();
-            URL properties = AbstractUnitTest.class.getClassLoader()
-                    .getResource("test-config.properties");
-            testProps.load(properties.openStream());
-
-            //load the test configuration file
-            ConfigurationManager.loadConfig(null);
-
-            // Initialise the service manager kernel
-            kernelImpl = DSpaceKernelInit.getKernel(null);
-            if (!kernelImpl.isRunning())
-            {
-                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
-            }
-            // Clear our old flyway object. Because this DB is in-memory, its
-            // data is lost when the last connection is closed. So, we need
-            // to (re)start Flyway from scratch for each Unit Test class.
-            DatabaseUtils.clearFlywayDBCache();
-
-            try
-            {
-                // Update/Initialize the database to latest version (via Flyway)
-                DatabaseUtils.updateDatabase();
-            }
-            catch(SQLException se)
-            {
-                log.error("Error initializing database", se);
-                fail("Error initializing database: " + se.getMessage());
-            }
-
-            // Initialize mock indexer (which does nothing, since Solr isn't running)
-            new MockIndexEventConsumer();
-            
-            // Initialize mock Util class
-            new MockUtil();
-        } 
-        catch (IOException ex)
-        {
-            log.error("Error initializing tests", ex);
-            fail("Error initializing tests: " + ex.getMessage());
+            // Update/Initialize the database to latest version (via Flyway)
+            DatabaseUtils.updateDatabase();
         }
+        catch(SQLException se)
+        {
+            log.error("Error initializing database", se);
+            fail("Error initializing database: " + se.getMessage());
+        }
+
+        // Initialize mock indexer (which does nothing, since Solr isn't running)
+        new MockIndexEventConsumer();
     }
 
     /**
@@ -205,23 +159,6 @@ public class AbstractUnitTest
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * This method will be run after all tests finish as per @AfterClass. It will
-     * clean resources initialized by the @BeforeClass methods.
-     *
-     */
-    @AfterClass
-    public static void destroyOnce() throws SQLException {
-        //we clear the properties
-        testProps.clear();
-        testProps = null;
-
-        //Also clear out the kernel & nullify (so JUnit will clean it up)
-        if (kernelImpl!=null)
-            kernelImpl.destroy();
-        kernelImpl = null;
     }
 
     /**

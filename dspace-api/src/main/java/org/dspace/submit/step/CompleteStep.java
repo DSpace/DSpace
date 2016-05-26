@@ -13,11 +13,11 @@ import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.StringUtils;
 
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.SubmissionInfo;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.WorkspaceItem;
@@ -87,16 +87,7 @@ public class CompleteStep extends AbstractProcessingStep
         boolean success = false;
         try
         {
-            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
-                try{
-                    workflowService.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
-                }catch (Exception e){
-                    log.error(LogManager.getHeader(context, "Error while starting xml workflow", "Item id: " + subInfo.getSubmissionItem().getItem().getID()), e);
-                    throw new ServletException(e);
-                }
-            }else{
-                workflowService.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
-            }
+            workflowService.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
             success = true;
         }
         catch (Exception e)

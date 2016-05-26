@@ -7,7 +7,7 @@
  */
 package org.dspace.workflow.factory;
 
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
 
@@ -24,6 +24,6 @@ public abstract class WorkflowServiceFactory {
 
     public static WorkflowServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("workflowServiceFactory", WorkflowServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("workflowServiceFactory", WorkflowServiceFactory.class);
     }
 }

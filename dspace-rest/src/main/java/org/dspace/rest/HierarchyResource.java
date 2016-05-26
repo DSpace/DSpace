@@ -17,22 +17,23 @@ import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.rest.common.HierarchyCollection;
 import org.dspace.rest.common.HierarchyCommunity;
 import org.dspace.rest.common.HierarchySite;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.HttpHeaders;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 /*
  * This class retrieves the community hierarchy in an optimized format.
@@ -46,7 +47,8 @@ public class HierarchyResource extends Resource {
     protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    
     /**
     * @param headers
      *            If you want to access to collection under logged user into
@@ -71,8 +73,8 @@ public class HierarchyResource extends Resource {
 		HierarchySite repo = new HierarchySite();
 		
         try {
-            context = createContext(getUser(headers));
-            if (ConfigurationManager.getBooleanProperty("rest", "rest-hierarchy-authenticate", true) == false) {
+            context = createContext();
+            if (!configurationService.getBooleanProperty("rest.hierarchy-authenticate", true)) {
                 context.turnOffAuthorisationSystem();            	
             }
 

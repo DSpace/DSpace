@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -41,18 +42,23 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.identifier.DOI;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
+import org.dspace.identifier.service.DOIService;
+import org.dspace.identifier.service.IdentifierService;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
 import org.dspace.plugin.ItemHomeProcessor;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
@@ -77,11 +83,6 @@ public class HandleServlet extends DSpaceServlet
     /** log4j category */
     private static final Logger log = Logger.getLogger(HandleServlet.class);
 
-    /** For obtaining &lt;meta&gt; elements to put in the &lt;head&gt; */
-    private final transient DisseminationCrosswalk xHTMLHeadCrosswalk
-             = (DisseminationCrosswalk) PluginManager
-                .getNamedPlugin(DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
-
     // services API
     private final transient HandleService handleService
              = HandleServiceFactory.getInstance().getHandleService();
@@ -91,13 +92,27 @@ public class HandleServlet extends DSpaceServlet
     
     private final transient ItemService itemService
              = ContentServiceFactory.getInstance().getItemService();
-    
+
     private final transient CommunityService communityService
              = ContentServiceFactory.getInstance().getCommunityService();
     
     private final transient CollectionService collectionService
              = ContentServiceFactory.getInstance().getCollectionService();
+    
+    private final transient PluginService pluginService
+             = CoreServiceFactory.getInstance().getPluginService();
+    
+    /** For obtaining &lt;meta&gt; elements to put in the &lt;head&gt; */
+    private final transient DisseminationCrosswalk xHTMLHeadCrosswalk
+             = (DisseminationCrosswalk) pluginService
+                .getNamedPlugin(DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
 
+    private final transient IdentifierService identifierService
+            = IdentifierServiceFactory.getInstance().getIdentifierService();
+    
+    private final transient DOIService doiService
+            = IdentifierServiceFactory.getInstance().getDOIService();
+    
     @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -439,6 +454,38 @@ public class HandleServlet extends DSpaceServlet
         {
             throw new ServletException(ce);
         }
+        
+        // lookup if we have a DOI
+        String doi = null;
+        if (identifierService != null)
+        {
+            doi = identifierService.lookup(UIUtil.obtainContext(request), item, DOI.class);
+        }
+        if (doi != null)
+        {
+            try
+            {
+                doi = doiService.DOIToExternalForm(doi);
+            }
+            catch (Exception ex)
+            {
+                doi = null;
+                log.error("Unable to convert DOI '" + doi + "' into external form.", ex);
+            }
+        }
+        
+        // use handle as preferred Identifier if not configured otherwise.    
+        String preferredIdentifier = null;
+        if (item.getHandle() != null) {
+            preferredIdentifier = handleService.getCanonicalForm(item.getHandle());
+        }
+        if ("doi".equalsIgnoreCase(ConfigurationManager.getProperty("webui.preferred.identifier")))
+        {
+            if (doi != null)
+            {
+                preferredIdentifier = doi;
+            }
+        }
 
         // Enable suggest link or not
         boolean suggestEnable = false;
@@ -464,7 +511,7 @@ public class HandleServlet extends DSpaceServlet
         }
 
         // Fire usage event.
-        new DSpace().getEventService().fireEvent(
+        DSpaceServicesFactory.getInstance().getEventService().fireEvent(
             		new UsageEvent(
             				UsageEvent.Action.VIEW,
             				request,
@@ -477,6 +524,8 @@ public class HandleServlet extends DSpaceServlet
         request.setAttribute("item", item);
         request.setAttribute("collections", collections);
         request.setAttribute("dspace.layout.head", headMetadata);
+        request.setAttribute("doi", doi);
+        request.setAttribute("preferred_identifier", preferredIdentifier);
         JSPManager.showJSP(request, response, "/display-item.jsp");
     }
     
@@ -486,7 +535,7 @@ public class HandleServlet extends DSpaceServlet
     {
         try
         {
-            ItemHomeProcessor[] chp = (ItemHomeProcessor[]) PluginManager.getPluginSequence(ItemHomeProcessor.class);
+            ItemHomeProcessor[] chp = (ItemHomeProcessor[]) pluginService.getPluginSequence(ItemHomeProcessor.class);
             for (int i = 0; i < chp.length; i++)
             {
                 chp[i].process(context, request, response, item);
@@ -555,7 +604,7 @@ public class HandleServlet extends DSpaceServlet
             }
 
             // Fire usage event.
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
             		new UsageEvent(
             				UsageEvent.Action.VIEW,
             				request,
@@ -576,7 +625,7 @@ public class HandleServlet extends DSpaceServlet
     {
     	try
     	{
-    		CommunityHomeProcessor[] chp = (CommunityHomeProcessor[]) PluginManager.getPluginSequence(CommunityHomeProcessor.class);
+    		CommunityHomeProcessor[] chp = (CommunityHomeProcessor[]) pluginService.getPluginSequence(CommunityHomeProcessor.class);
     		for (int i = 0; i < chp.length; i++)
     		{
     			chp[i].process(context, request, response, community);
@@ -696,7 +745,7 @@ public class HandleServlet extends DSpaceServlet
             }
 
             // Fire usage event.
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
             		new UsageEvent(
             				UsageEvent.Action.VIEW,
             				request,
@@ -723,7 +772,7 @@ public class HandleServlet extends DSpaceServlet
     {
     	try
     	{
-    		CollectionHomeProcessor[] chp = (CollectionHomeProcessor[]) PluginManager.getPluginSequence(CollectionHomeProcessor.class);
+    		CollectionHomeProcessor[] chp = (CollectionHomeProcessor[]) pluginService.getPluginSequence(CollectionHomeProcessor.class);
     		for (int i = 0; i < chp.length; i++)
     		{
     			chp[i].process(context, request, response, collection);
@@ -811,21 +860,11 @@ public class HandleServlet extends DSpaceServlet
     {
         // Find all the "parent" communities for the community
         List<Community> parents = communityService.getAllParents(context, c);
-
-        // put into an array in reverse order
-        List<Community> reversedParents = new ArrayList<>();
-        int index = parents.size() - 1;
-
-        for (int i = 0; i < parents.size(); i++)
-        {
-            reversedParents.add(parents.get(index - i));
-        }
-
+        parents = Lists.reverse(parents);
         if (include)
         {
-            reversedParents.add(0, c);
+            parents.add(c);
         }
-
-        return reversedParents;
+        return parents;
     }
 }

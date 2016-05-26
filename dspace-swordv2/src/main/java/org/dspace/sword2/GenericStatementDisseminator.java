@@ -10,7 +10,6 @@ package org.dspace.sword2;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.swordapp.server.OriginalDeposit;
 import org.swordapp.server.ResourcePart;
@@ -22,6 +21,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.ArrayUtils;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 public abstract class GenericStatementDisseminator
         implements SwordStatementDisseminator
@@ -177,15 +178,14 @@ public abstract class GenericStatementDisseminator
 
     private List<String> getIncludeBundles()
     {
-        String cfg = ConfigurationManager
-                .getProperty("swordv2-server", "statement.bundles");
-        if (cfg == null || "".equals(cfg))
+        String[] bundles = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getArrayProperty("swordv2-server.statement.bundles");
+        if (ArrayUtils.isEmpty(bundles))
         {
-            cfg = "ORIGINAL, SWORD";
+            bundles = new String[] {"ORIGINAL", "SWORD"};
         }
-        String[] bits = cfg.split(",");
         List<String> include = new ArrayList<String>();
-        for (String bit : bits)
+        for (String bit : bundles)
         {
             String bundleName = bit.trim().toUpperCase();
             if (!include.contains(bundleName))
@@ -198,8 +198,8 @@ public abstract class GenericStatementDisseminator
 
     private String getOriginalDepositsBundle()
     {
-        String swordBundle = ConfigurationManager
-                .getProperty("swordv2-server", "bundle.name");
+        String swordBundle = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getProperty("swordv2-server.bundle.name");
         if (swordBundle == null)
         {
             swordBundle = "SWORD";

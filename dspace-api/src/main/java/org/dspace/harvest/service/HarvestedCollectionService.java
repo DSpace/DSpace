@@ -57,14 +57,14 @@ public interface HarvestedCollectionService {
     /** Find all collections that are set up for harvesting
      *
      * return: list of collection id's
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<HarvestedCollection> findAll(Context context) throws SQLException;
 
     /** Find all collections that are ready for harvesting
      *
      * return: list of collection id's
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<HarvestedCollection> findReady(Context context) throws SQLException;
 
@@ -72,18 +72,18 @@ public interface HarvestedCollectionService {
      * Find all collections with the specified status flag.
      * @param context
      * @param status see HarvestInstance.STATUS_...
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<HarvestedCollection> findByStatus(Context context, int status) throws SQLException;
 
     /** Find the collection that was harvested the longest time ago.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public HarvestedCollection findOldestHarvest (Context context) throws SQLException;
 
 
     /** Find the collection that was harvested most recently.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public HarvestedCollection findNewestHarvest (Context context) throws SQLException;
 

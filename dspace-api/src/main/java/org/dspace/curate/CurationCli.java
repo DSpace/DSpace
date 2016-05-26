@@ -19,7 +19,7 @@ import org.apache.commons.cli.PosixParser;
 
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.curate.factory.CurateServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -232,7 +232,7 @@ public class CurationCli
         else
         {
             // process the task queue
-            TaskQueue queue = (TaskQueue)PluginManager.getSinglePlugin("curate", TaskQueue.class);
+            TaskQueue queue = (TaskQueue) CoreServiceFactory.getInstance().getPluginService().getSinglePlugin(TaskQueue.class);
             if (queue == null)
             {
                 System.out.println("No implementation configured for queue");

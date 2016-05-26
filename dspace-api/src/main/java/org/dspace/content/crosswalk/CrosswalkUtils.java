@@ -28,6 +28,14 @@ public class CrosswalkUtils {
     /**
      * Scans metadata for elements not defined in this DSpace instance. It then takes action based
      * on a configurable parameter (fail, ignore, add).
+     * @param context context
+     * @param schema schema
+     * @param element element
+     * @param qualifier qualifier
+     * @param forceCreate force create flag 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
      */
     public static void checkMetadata(Context context, String schema, String element, String qualifier, boolean forceCreate) throws SQLException, AuthorizeException, CrosswalkException {
         // The two options, with three possibilities each: add, ignore, fail

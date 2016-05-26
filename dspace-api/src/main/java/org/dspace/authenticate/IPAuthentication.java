@@ -8,7 +8,11 @@
 package org.dspace.authenticate;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +26,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Adds users to special groups based on IP address. Configuration parameter
@@ -80,24 +85,20 @@ public class IPAuthentication implements AuthenticationMethod
         ipMatcherGroupNames = new HashMap<>();
         groupService = EPersonServiceFactory.getInstance().getGroupService();
 
-        Enumeration e = ConfigurationManager.propertyNames("authentication-ip");
+        List<String> propNames = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys("authentication-ip");
 
-        while (e.hasMoreElements())
+        for(String propName : propNames)
         {
-            String propName = (String) e.nextElement();
-            if (propName.startsWith("ip."))
-            {
-                String[] nameParts = propName.split("\\.");
+            String[] nameParts = propName.split("\\.");
 
-                if (nameParts.length == 2)
-                {
-                    addMatchers(nameParts[1], ConfigurationManager.getProperty("authentication-ip", propName));
-                }
-                else
-                {
-                    log.warn("Malformed configuration property name: "
-                            + propName);
-                }
+            if (nameParts.length == 2)
+            {
+                addMatchers(nameParts[1], DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty(propName));
+            }
+            else
+            {
+                log.warn("Malformed configuration property name: "
+                        + propName);
             }
         }
     }
@@ -110,11 +111,9 @@ public class IPAuthentication implements AuthenticationMethod
      * @param ipRanges
      *            IP ranges
      */
-    protected void addMatchers(String groupName, String ipRanges)
+    protected void addMatchers(String groupName, String[] ipRanges)
     {
-        String[] ranges = ipRanges.split("\\s*,\\s*");
-
-        for (String entry : ranges)
+        for (String entry : ipRanges)
         {
             try
             {

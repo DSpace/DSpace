@@ -42,13 +42,20 @@
             <exclude>LICENSE_HEADER</exclude>
          </excludes>
       </fileSet>
+      <!-- If local.cfg is in the root folder, copy it to config folder -->
+      <fileSet>
+         <directory>..</directory>
+         <outputDirectory>config</outputDirectory>
+         <includes>
+            <include>local.cfg</include>
+         </includes>
+         <filtered>true</filtered>
+      </fileSet>
       <!-- Copy necessary subdirectories to resulting directory -->
       <!-- First, copy over our configurations -->
       <fileSet>
          <directory>config</directory>
          <outputDirectory>config</outputDirectory>
-         <!-- Filter all config files -->
-         <filtered>true</filtered>
       </fileSet>
       <!-- Then, copy over all other necessary directories -->
       <fileSet>
@@ -75,6 +82,7 @@
             <include>*:jar:*</include>
          </includes>
          <outputDirectory>lib</outputDirectory>
+         <useProjectArtifact>false</useProjectArtifact>
       </dependencySet>
    </dependencySets>
 

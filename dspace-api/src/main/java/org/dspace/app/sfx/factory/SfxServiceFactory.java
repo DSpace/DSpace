@@ -8,7 +8,7 @@
 package org.dspace.app.sfx.factory;
 
 import org.dspace.app.sfx.service.SFXFileReaderService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the sfx package, use SfxServiceFactory.getInstance() to retrieve an implementation
@@ -20,6 +20,6 @@ public abstract class SfxServiceFactory {
     public abstract SFXFileReaderService getSfxFileReaderService();
 
     public static SfxServiceFactory getInstance(){
-        return new DSpace().getServiceManager().getServiceByName("sfxServiceFactory", SfxServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("sfxServiceFactory", SfxServiceFactory.class);
     }
 }

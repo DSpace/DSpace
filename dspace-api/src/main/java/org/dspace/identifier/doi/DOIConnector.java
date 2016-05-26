@@ -27,15 +27,9 @@ public interface DOIConnector {
     public boolean isDOIReserved(Context context, String doi)
             throws DOIIdentifierException;
     
-    public boolean isDOIReserved(Context context, DSpaceObject dso, String doi)
-            throws DOIIdentifierException;
-    
     public boolean isDOIRegistered(Context context, String doi)
             throws DOIIdentifierException;
     
-    public boolean isDOIRegistered(Context context, DSpaceObject dso, String doi)
-            throws DOIIdentifierException;
-
     /**
      * Sends the DELETE-Request to the DOI registry.
      * 
@@ -46,8 +40,7 @@ public interface DOIConnector {
      * 
      * @param context
      * @param doi
-     * @return
-     * @throws DOIIdentifierException 
+     * @throws DOIIdentifierException if DOI error
      */
     public void deleteDOI(Context context, String doi)
             throws DOIIdentifierException;
@@ -63,8 +56,7 @@ public interface DOIConnector {
      * @param context
      * @param dso
      * @param doi
-     * @return
-     * @throws DOIIdentifierException 
+     * @throws DOIIdentifierException if DOI error
      */
     public void reserveDOI(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException;
@@ -80,8 +72,7 @@ public interface DOIConnector {
      * @param context
      * @param dso
      * @param doi
-     * @return
-     * @throws DOIIdentifierException 
+     * @throws DOIIdentifierException if DOI error
      */
     public void registerDOI(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException;
@@ -95,8 +86,7 @@ public interface DOIConnector {
      * @param context
      * @param dso
      * @param doi
-     * @return
-     * @throws IdentifierException 
+     * @throws DOIIdentifierException if DOI error
      */
     public void updateMetadata(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException;

@@ -1480,7 +1480,9 @@ public class CommunityTest extends AbstractDSpaceObjectTest
     public void testCountItems() throws Exception 
     {
         //0 by default
-        assertTrue("testCountItems 0", communityService.countItems(context, c) == 0);
+        assertTrue("testCountItems 0", itemService.countItems(context, c) == 0);
+        
+        //NOTE: a more thorough test of item counting is in ITCommunityCollection integration test
     }
 
     /**

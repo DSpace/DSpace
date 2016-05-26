@@ -146,6 +146,11 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
     /**
      * This generates a &lt;head&gt; element around the metadata; in general
      * this will probably not be used
+     * @param context context
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public Element disseminateElement(Context context, DSpaceObject dso)
@@ -161,6 +166,11 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
     /**
      * Return &lt;meta&gt; elements that can be put in the &lt;head&gt; element
      * of an XHTML document.
+     * @param context context
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso) throws CrosswalkException,

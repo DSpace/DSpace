@@ -22,16 +22,15 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.content.*;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.rdf.RDFConfiguration;
 import org.dspace.rdf.RDFUtil;
 import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -53,90 +52,17 @@ implements ConverterPlugin
 
     
     private static final Logger log = Logger.getLogger(SimpleDSORelationsConverterPlugin.class);
-    protected ConfigurationService configurationService;
     
-    protected String[] site2community;
-    protected String[] community2site;
-    protected String[] community2subcommunity;
-    protected String[] subcommunity2community;
-    protected String[] community2collection;
-    protected String[] collection2community;
-    protected String[] collection2item;
-    protected String[] item2collection;
-    protected String[] item2bitstream;
-
-    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
-
-    public SimpleDSORelationsConverterPlugin()
-    {
-        site2community = RDFConfiguration.loadConfigurationArray(SIMPLE_RELATIONS_SITE2COMMUNITY_KEY);
-        community2site = RDFConfiguration.loadConfigurationArray(SIMPLE_RELATIONS_COMMUNITY2SITE_KEY);
-        community2subcommunity = RDFConfiguration.loadConfigurationArray(SIMPLE_RELATIONS_COMMUNITY2SUBCOMMUNITY_KEY);
-        subcommunity2community = RDFConfiguration.loadConfigurationArray(SIMPLE_RELATIONS_SUBCOMMUNITY2COMMUNITY_KEY);
-        community2collection = RDFConfiguration.loadConfigurationArray(SIMPLE_RELATIONS_COMMUNITY2COLLECTION_KEY);
-        collection2community = RDFConfiguration.loadConfigurationArray(SIMPLE_RELATIONS_COLLECTION2COMMUNITY_KEY);
-        collection2item = RDFConfiguration.loadConfigurationArray(SIMPLE_RELATIONS_COLLECTION2ITEM_KEY);
-        item2collection = RDFConfiguration.loadConfigurationArray(SIMPLE_RELATIONS_ITEM2COLLECTION_KEY);
-        item2bitstream = RDFConfiguration.loadConfigurationArray(SIMPLE_RELATIONS_ITEM2BITSTREAM_KEY);
-        
-        if (site2community == null)
-        {
-            log.warn("SimpleDSORelationsConverterPlugin was unable to load "
-                    + "configuration to convert relation between the repository "
-                    + "the repository (SITE) and the top communities.");
-        }
-        if (community2site == null)
-        {
-            log.warn("SimpleDSORelationsConverterPlugin was unable to load "
-                    + "configuration to convert relation between "
-                    + "the top communities and the repository (SITE).");
-        }
-        if (community2subcommunity == null)
-        {
-            log.warn("SimpleDSORelationsConverterPlugin was unable to load "
-                    + "configuration to convert relation between "
-                    + "communities and subcommunities.");
-        }
-        if (subcommunity2community == null)
-        {
-            log.warn("SimpleDSORelationsConverterPlugin was unable to load "
-                    + "configuration to convert relation between "
-                    + "subcommunities and communities.");
-        }
-        if (community2collection == null)
-        {
-            log.warn("SimpleDSORelationsConverterPlugin was unable to load "
-                    + "configuration to convert relation between "
-                    + "communities and collections.");
-        }
-        if (collection2community == null)
-        {
-            log.warn("SimpleDSORelationsConverterPlugin was unable to load "
-                    + "configuration to convert relation between "
-                    + "collections and communities.");
-        }
-        if (collection2item == null)
-        {
-            log.warn("SimpleDSORelationsConverterPlugin was unable to load "
-                    + "configuration to convert relation between "
-                    + "collections and items");
-        }
-        if (item2collection == null)
-        {
-            log.warn("SimpleDSORelationsConverterPlugin was unable to load "
-                    + "configuration to convert relation between "
-                    + "items and collections");
-        }
-        if (item2bitstream == null)
-        {
-            log.warn("SimpleDSORelationsConverterPlugin was unable to load "
-                    + "configuration to convert relation between "
-                    + "items and bitstreams.");
-        }
-    }
+    @Autowired(required=true)
+    protected BitstreamService bitstreamService;
+    @Autowired(required=true)
+    protected ItemService itemService;
+    @Autowired(required=true)
+    protected CommunityService communityService;
+    @Autowired(required=true)
+    protected SiteService siteService;
+    @Autowired(required=true)
+    protected ConfigurationService configurationService;
     
     /**
      * Loads the prefixes that should be used by the 
@@ -210,7 +136,8 @@ implements ConverterPlugin
     public Model convertSite(Context context, Site site)
             throws SQLException
     {
-        if (site2community == null)
+        String[] site2community = configurationService.getArrayProperty(SIMPLE_RELATIONS_SITE2COMMUNITY_KEY);
+        if (site2community == null || site2community.length == 0)
         {
             log.info("Either there was a problem loading the configuration or "
                     + "linking from the repository (SITE) to the top level "
@@ -262,33 +189,52 @@ implements ConverterPlugin
     public Model convertCommunity(Context context, Community community)
             throws SQLException
     {
-        if (community2site == null)
+        String[] community2site = configurationService.getArrayProperty(SIMPLE_RELATIONS_COMMUNITY2SITE_KEY);
+        if (community2site == null || community2site.length == 0)
         {
             log.info("Either there was a problem loading the configuration or "
                     + "linking from the top level communities to the repository "
                     + "(SITE) is disabled. Won't link from the top level "
                     + "communities to the repository (SITE).");
+            // don't return here, as we might have to add other links.
+            // ensure community2site is not null
+            community2site = new String[] {};
         }
-        if (community2subcommunity == null)
+        
+        String[] community2subcommunity = configurationService.getArrayProperty(SIMPLE_RELATIONS_COMMUNITY2SUBCOMMUNITY_KEY);
+        if (community2subcommunity == null || community2subcommunity.length == 0)
         {
             log.info("Either there was a problem loading the configuration or "
                     + "linking from communities to subcommunities was disabled. "
                     + "Won't link from communities to subcommunities.");
+            // don't return here, as we might have to add other links.
+            // ensure community2subcommunity is not null
+            community2subcommunity = new String[] {};
         }
-        if (subcommunity2community == null)
+        
+        String[] subcommunity2community = configurationService.getArrayProperty(SIMPLE_RELATIONS_SUBCOMMUNITY2COMMUNITY_KEY);
+        if (subcommunity2community == null || subcommunity2community.length == 0)
         {
             log.info("Either there was a problem loading the configuration or "
                     + "linking from subcommunities to communities was disabled. "
                     + "Won't link from subcommunities to communities.");
+            // don't return here, as we might have to add other links.
+            // ensure subcommunity2community is not null
+            subcommunity2community = new String[] {};
         }
-        if (community2collection == null)
+        
+        String[] community2collection = configurationService.getArrayProperty(SIMPLE_RELATIONS_COMMUNITY2COLLECTION_KEY);
+        if (community2collection == null || community2collection.length == 0)
         {
             log.info("Either there was a problem loading the configuration or "
                     + "linking from communities to collections was disabled. "
                     + "Won't link from collections to subcommunities.");
+            // don't return here, as we might have to add other links.
+            // ensure community2collection is not null
+            community2collection = new String[] {};
         }
-        if (community2site == null && community2subcommunity == null
-                && subcommunity2community == null && community2collection == null)
+        if (community2site.length == 0 && community2subcommunity.length == 0
+                && subcommunity2community.length == 0 && community2collection.length == 0)
         {
             return null;
         }
@@ -393,19 +339,28 @@ implements ConverterPlugin
     public Model convertCollection(Context context, Collection collection)
             throws SQLException
     {
-        if (collection2community == null)
+        String[] collection2community = configurationService.getArrayProperty(SIMPLE_RELATIONS_COLLECTION2COMMUNITY_KEY);
+        if (collection2community == null || collection2community.length == 0)
         {
             log.info("Either there was a problem loading the configuration or "
                     + "linking from collections to communities was disabled. "
                     + "Won't link from collections to communities.");
+            // don't return here, as we might have to link to items.
+            // ensure collection2community is not null
+            collection2community = new String[] {};
         }
-        if (collection2item == null)
+        
+        String[] collection2item = configurationService.getArrayProperty(SIMPLE_RELATIONS_COLLECTION2ITEM_KEY);
+        if (collection2item == null || collection2item.length == 0)
         {
             log.info("Either there was a problem loading the configuration or "
                     + "linking from collections to items was disabled. "
                     + "Won't link from collections to items.");
+            // don't return here, as we might have to link to communities.
+            // ensure collection2item is not null
+            collection2item = new String[] {};
         }
-        if (collection2community == null && collection2item == null)
+        if (collection2community.length == 0 && collection2item.length == 0)
         {
             return null;
         }
@@ -468,19 +423,29 @@ implements ConverterPlugin
     public Model convertItem(Context context, Item item)
             throws SQLException
     {
-        if (item2collection == null)
+        String[] item2collection = configurationService.getArrayProperty(SIMPLE_RELATIONS_ITEM2COLLECTION_KEY);
+        if (item2collection == null || item2collection.length == 0)
         {
             log.info("Either there was a problem loading the configuration or "
                     + "linking from items to collections was disabled. "
                     + "Won't link from items to collections.");
+            // don't return here, as we might have to link to bitstreams.
+            // ensure item2collection is not null
+            item2collection = new String[] {};
         }
-        if (item2bitstream == null)
+        
+        String[] item2bitstream = configurationService.getArrayProperty(SIMPLE_RELATIONS_ITEM2BITSTREAM_KEY);
+        if (item2bitstream == null || item2bitstream.length == 0)
         {
             log.info("Either there was a problem loading the configuration or "
                     + "linking from items to bitstreams was disabled. "
                     + "Won't link from items to bitstreams.");
+            // don't return here, as we might have to link to collections.
+            // ensure item2bitstream is not null
+            item2bitstream = new String[] {};
         }
-        if (item2collection == null && item2bitstream == null)
+
+        if (item2collection.length == 0 && item2bitstream.length == 0)
         {
             return null;
         }
@@ -560,7 +525,7 @@ implements ConverterPlugin
      * @param bitstream Bitstream for which a URL should be generated.
      * @return The link to the URL or null if the Bistream is is a Community or 
      * Collection logo.
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     public String bitstreamURI(Context context, Bitstream bitstream)
             throws SQLException

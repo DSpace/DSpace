@@ -21,7 +21,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -32,6 +32,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 import java.sql.SQLException;
 import java.util.*;
+import org.dspace.versioning.service.VersionHistoryService;
 
 /**
  *
@@ -57,6 +58,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
+    protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected WorkflowItemService workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
@@ -72,7 +74,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
             if(isItemView)
             {
                 //Check if only administrators can view the item history
-                if(new DSpace().getConfigurationService().getPropertyAsType("versioning.item.history.view.admin", false))
+                if(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyAsType("versioning.item.history.view.admin", false))
                 {
                     return;
                 }
@@ -84,7 +86,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
 
 
-        VersionHistory versionHistory = retrieveVersionHistory(item);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
         if(versionHistory!=null)
         {
             Division main = createMain(body);
@@ -125,12 +127,6 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
     }
 
-    private VersionHistory retrieveVersionHistory(Item item) throws WingException, SQLException
-    {
-        return versioningService.findVersionHistory(context, item);
-    }
-
-
     private Division createMain(Body body) throws WingException
     {
         Division main = body.addInteractiveDivision("view-verion-history", contextPath+"/item/versionhistory", Division.METHOD_POST, "view version history");
@@ -140,6 +136,14 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
     private void createTable(Division main, VersionHistory history, boolean isItemView, Item item) throws WingException, SQLException
     {
+        Boolean isVisible = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("versioning.item.history.include.submitter", Boolean.FALSE);
+        boolean isAdmin = authorizeService.isAdmin(context,item.getOwningCollection());
+        if(isAdmin)
+        {
+            isVisible = true; // override it, always visible for admins.
+        }
+
+
         Table table = main.addTable("versionhistory", 1, 1);
         
         Row header = table.addRow(Row.ROLE_HEADER);
@@ -149,7 +153,10 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
         }
         header.addCell().addContent(T_column1);
         header.addCell().addContent(T_column2);
-        header.addCell().addContent(T_column3);
+        if(isVisible)
+        {
+            header.addCell().addContent(T_column3);
+        }
         header.addCell().addContent(T_column4);
         header.addCell().addContent(T_column5);
 
@@ -160,10 +167,9 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
         if(history != null)
         {
-            for(Version version : history.getVersions())
+            for(Version version : versioningService.getVersionsByHistory(context, history))
             {
-
-                //Skip items currently in submission
+                // Skip items currently in submission
                 if(isItemInSubmission(version.getItem()))
                 {
                     continue;
@@ -180,15 +186,18 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
                 row.addCell().addContent(version.getVersionNumber());
                 addItemIdentifier(row.addCell(), item, version);
 
-                EPerson editor = version.getEPerson();
-                row.addCell().addXref("mailto:" + editor.getEmail(), editor.getFullName());
+                if(isVisible)
+                {
+                    EPerson editor = version.getEPerson();
+                    row.addCell().addXref("mailto:" + editor.getEmail(), editor.getFullName()); // this one needs to be gone then.
+                }
                 row.addCell().addContent(new DCDate(version.getVersionDate()).toString());
                 row.addCell().addContent(version.getSummary());
 
 
                 if(!isItemView)
                 {
-                    row.addCell().addXref(contextPath + "/item/versionhistory?versioning-continue="+knot.getId()+"&versionID="+version.getId() +"&itemID="+ version.getItem().getID() + "&submit_update", T_submit_update);
+                    row.addCell().addXref(contextPath + "/item/versionhistory?versioning-continue=" + knot.getId() + "&versionID=" + version.getId() + "&itemID=" + version.getItem().getID() + "&submit_update", T_submit_update);
                 }
             }
         }
@@ -226,10 +235,13 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
         }
     }
 
-    private void addButtons(Division main, VersionHistory history) throws WingException {
+    private void addButtons(Division main, VersionHistory history)
+            throws WingException, SQLException
+    {
         Para actions = main.addPara();
 
-        if(history!=null && history.getVersions().size() > 0)
+        if(history!=null 
+                && versioningService.getVersionsByHistory(context, history).size() > 0)
         {
             actions.addButton("submit_delete").setValue(T_submit_delete);
         }

@@ -47,7 +47,7 @@ import org.purl.sword.base.SWORDErrorException;
 public class DepositServlet extends HttpServlet {
 
 	/** Sword repository */
-	protected final transient SWORDServer myRepository;
+	protected transient SWORDServer myRepository;
 
 	/** Authentication type */
 	private String authN;
@@ -64,10 +64,15 @@ public class DepositServlet extends HttpServlet {
 	/** Logger */
 	private static final Logger log = Logger.getLogger(DepositServlet.class);
 
-    public DepositServlet()
-            throws ServletException
-    {
-		// Instantiate the correct SWORD Server class
+    /**
+	 * Initialise the servlet.
+	 *
+	 * @throws ServletException if there is trouble with the upload directory.
+	 */
+    @Override
+	public void init() throws ServletException {
+
+        // Instantiate the correct SWORD Server class
 		String className = getServletContext().getInitParameter("sword-server-class");
 		if (className == null) {
 			log.fatal("Unable to read value of 'sword-server-class' from Servlet context");
@@ -85,16 +90,8 @@ public class DepositServlet extends HttpServlet {
                     "Unable to instantiate class from 'sword-server-class': "
                             + className, e);
         }
-    }
 
-    /**
-	 * Initialise the servlet
-	 * 
-	 * @throws ServletException
-	 */
-    @Override
-	public void init() throws ServletException {
-		authN = getServletContext().getInitParameter("authentication-method");
+        authN = getServletContext().getInitParameter("authentication-method");
 		if ((authN == null) || (authN.equals(""))) {
 			authN = "None";
 		}
@@ -149,18 +146,28 @@ public class DepositServlet extends HttpServlet {
 
 	/**
 	 * Process the Get request. This will return an unimplemented response.
+     * @param request the request.
+     * @param response the response.
+     * @throws javax.servlet.ServletException passed through.
+     * @throws java.io.IOException passed through.
 	 */
     @Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 		// Send a '501 Not Implemented'
 		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 
 	/**
 	 * Process a post request.
+     * @param request the request.
+     * @param response the response.
+     * @throws javax.servlet.ServletException passed through.
+     * @throws java.io.IOException passed through.
 	 */
     @Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 		// Create the Deposit request
 		Deposit d = new Deposit();
 		Date date = new Date();

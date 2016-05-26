@@ -27,12 +27,19 @@ import java.util.Set;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCache> implements Group2GroupCacheDAO {
+public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCache> implements Group2GroupCacheDAO
+{
+    protected Group2GroupCacheDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public List<Group2GroupCache> findByParent(Context context, Group group) throws SQLException {
         Criteria criteria = createCriteria(context, Group2GroupCache.class);
-        criteria.add(Restrictions.eq("parent", group));
+        criteria.add(Restrictions.eq("parent.id", group.getID()));
+        criteria.setCacheable(true);
+
         return list(criteria);
     }
 
@@ -43,18 +50,21 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
         Disjunction orDisjunction = Restrictions.or();
         for(Group group : groups)
         {
-            orDisjunction.add(Restrictions.eq("child", group));
+            orDisjunction.add(Restrictions.eq("child.id", group.getID()));
         }
 
         criteria.add(orDisjunction);
+        criteria.setCacheable(true);
+
         return list(criteria);
     }
 
     @Override
     public Group2GroupCache find(Context context, Group parent, Group child) throws SQLException {
         Criteria criteria = createCriteria(context, Group2GroupCache.class);
-        criteria.add(Restrictions.eq("parent", parent));
-        criteria.add(Restrictions.eq("child", child));
+        criteria.add(Restrictions.eq("parent.id", parent.getID()));
+        criteria.add(Restrictions.eq("child.id", child.getID()));
+        criteria.setCacheable(true);
         return uniqueResult(criteria);
     }
 

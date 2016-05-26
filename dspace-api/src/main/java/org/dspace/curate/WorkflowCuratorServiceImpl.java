@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.curate.service.WorkflowCuratorService;
@@ -33,16 +32,17 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.workflowbasic.BasicWorkflowItem;
 import org.dspace.workflowbasic.BasicWorkflowServiceImpl;
 import org.dspace.workflowbasic.service.BasicWorkflowItemService;
 import org.dspace.workflowbasic.service.BasicWorkflowService;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 // Warning - static import ahead!
 import static javax.xml.stream.XMLStreamConstants.*;
+
 
 /**
  * WorkflowCurator manages interactions between curation and workflow.
@@ -51,14 +51,11 @@ import static javax.xml.stream.XMLStreamConstants.*;
  * 
  * @author richardrodgers
  */
-public class WorkflowCuratorServiceImpl implements WorkflowCuratorService, InitializingBean {
+public class WorkflowCuratorServiceImpl implements WorkflowCuratorService
+{
     
       /** log4j logger */
     private Logger log = Logger.getLogger(WorkflowCuratorServiceImpl.class);
-    
-    protected File cfgFile = new File(ConfigurationManager.getProperty("dspace.dir") +
-                                    File.separator + "config" + File.separator +
-                                    "workflow-curation.xml");
     
     protected Map<String, TaskSet> tsMap = new HashMap<String, TaskSet>();
     
@@ -74,11 +71,22 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService, Initi
     protected BasicWorkflowService basicWorkflowService;
     @Autowired(required = true)
     protected WorkflowServiceFactory workflowServiceFactory;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        try {
-            loadTaskConfig();
+    /**
+     * Initialize the bean (after dependency injection has already taken place).
+     * Ensures the configurationService is injected, so that we can read the
+     * settings from configuration
+     * Called by "init-method" in Spring config.
+     */
+    public void init() throws Exception {
+        File cfgFile = new File(configurationService.getProperty("dspace.dir") +
+                                    File.separator + "config" + File.separator +
+                                    "workflow-curation.xml");
+        try
+        {
+            loadTaskConfig(cfgFile);
             if(workflowServiceFactory.getWorkflowService() instanceof BasicWorkflowItemService)
             {
                 basicWorkflowService = (BasicWorkflowService) workflowServiceFactory.getWorkflowService();
@@ -89,7 +97,12 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService, Initi
             log.fatal("Unable to load config: " + cfgFile.getAbsolutePath());
         }
     }
-    
+
+    protected WorkflowCuratorServiceImpl()
+    {
+
+    }
+
     @Override
     public boolean needsCuration(BasicWorkflowItem wfi) {
        return getFlowStep(wfi) != null; 
@@ -208,7 +221,7 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService, Initi
                 }
             } else if ("$siteadmin".equals(contact)) {
                 EPerson siteEp = ePersonService.findByEmail(c,
-                        ConfigurationManager.getProperty("mail.admin"));
+                        configurationService.getProperty("mail.admin"));
                 if (siteEp != null) {
                     epList.add(siteEp);
                 }
@@ -271,7 +284,7 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService, Initi
         return -1;
     }
     
-    protected void loadTaskConfig() throws IOException {
+    protected void loadTaskConfig(File cfgFile) throws IOException {
         Map<String, String> collMap = new HashMap<String, String>();
         Map<String, TaskSet> setMap = new HashMap<String, TaskSet>();
         TaskSet taskSet = null;

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.dspace.versioning.service.VersioningService;
 
 /**
  *
@@ -24,11 +25,20 @@ import java.util.List;
  * @author Fabio Bolognesi (fabio at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
+ * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
  */
 public class VersionHistoryServiceImpl implements VersionHistoryService
 {
     @Autowired(required = true)
     protected VersionHistoryDAO versionHistoryDAO;
+    
+    @Autowired(required = true)
+    private VersioningService versioningService;
+
+    protected VersionHistoryServiceImpl()
+    {
+
+    }
 
     @Override
     public VersionHistory create(Context context) throws SQLException {
@@ -52,58 +62,79 @@ public class VersionHistoryServiceImpl implements VersionHistoryService
 
     // LIST order: descending
     @Override
-    public Version getPrevious(VersionHistory versionHistory, Version version) {
-        List<Version> versions = versionHistory.getVersions();
+    public Version getPrevious(Context context, VersionHistory versionHistory, Version version)
+    throws SQLException
+    {
+        List<Version> versions = versioningService.getVersionsByHistory(context, versionHistory);
         int index = versions.indexOf(version);
-
-        if( (index+1)==versions.size()) return null;
-
-        return versions.get(index + 1);
+        if (index + 1 < versions.size())
+        {
+            return versions.get(index+1);
+        }
+        
+        return null;
     }
 
     // LIST order: descending
     @Override
-    public Version getNext(VersionHistory versionHistory, Version version)
+    public Version getNext(Context c, VersionHistory versionHistory, Version version)
+        throws SQLException
     {
-        List<Version> versions = versionHistory.getVersions();
-        int index = versionHistory.getVersions().indexOf(version);
+        List<Version> versions = versioningService.getVersionsByHistory(c, versionHistory);
+        int index = versions.indexOf(version);
 
-        if(index==0)
+        if (index -1 >= 0)
         {
-            return null;
+            return versions.get(index -1);
         }
-
-        return versions.get(index-1);
+        
+        return null;
     }
 
     @Override
-    public Version getVersion(VersionHistory versionHistory, Item item) {
-       List<Version> versions = versionHistory.getVersions();
-       for(Version v : versions)
-       {
-           if(v.getItem().getID()==item.getID())
-           {
-               return v;
-           }
-       }
-       return null;
-    }
-
-    @Override
-    public boolean hasNext(VersionHistory versionHistory, Item item)
+    public Version getVersion(Context context, VersionHistory versionHistory, Item item)
+            throws SQLException
     {
-        Version version = getVersion(versionHistory, item);
-        return hasNext(versionHistory, version);
+        Version v = versioningService.getVersion(context, item);
+        if (v != null);
+        {
+            if (versionHistory.equals(v.getVersionHistory()))
+            {
+                return v;
+            }
+        }
+        return null;
     }
-
+    
     @Override
-    public boolean hasNext(VersionHistory versionHistory, Version version)
+    public boolean hasNext(Context context, VersionHistory versionHistory, Item item)
+        throws SQLException
     {
-        return getNext(versionHistory, version)!=null;
+        Version version = getVersion(context, versionHistory, item);
+        if (version == null)
+        {
+            return false;
+        }
+        return hasNext(context, versionHistory, version);
     }
 
     @Override
-    public void add(VersionHistory versionHistory, Version version)
+    public boolean hasNext(Context context, VersionHistory versionHistory, Version version)
+            throws SQLException
+    {
+        return getNext(context, versionHistory, version)!=null;
+    }
+
+    @Override
+    public boolean hasVersionHistory(Context context, Item item)
+            throws SQLException
+    {
+        return findByItem(context, item) != null;
+    }
+    
+    @Override
+    public void add(Context context, VersionHistory versionHistory, Version version)
+            throws SQLException
     {
         List<Version> versions = versionHistory.getVersions();
         if(versions==null) versions=new ArrayList<Version>();
@@ -111,44 +142,72 @@ public class VersionHistoryServiceImpl implements VersionHistoryService
     }
 
     @Override
-    public Version getLatestVersion(VersionHistory versionHistory)
+    public Version getLatestVersion(Context context, VersionHistory versionHistory)
+            throws SQLException
     {
-        List<Version> versions = versionHistory.getVersions();
-        if(versions==null || versions.size()==0)
+        List<Version> versions = versioningService.getVersionsByHistory(context, versionHistory);
+        if(versions != null && !versions.isEmpty())
+        {
+            return versions.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public Version getFirstVersion(Context context, VersionHistory versionHistory)
+            throws SQLException
+    {
+        List<Version> versions = versioningService.getVersionsByHistory(context, versionHistory);
+
+        if (versions == null)
         {
             return null;
         }
-
-        return versions.get(0);
-    }
-
-    @Override
-    public Version getFirstVersion(VersionHistory versionHistory)
-    {
-        List<Version> versions = versionHistory.getVersions();
-        if(versions==null || versions.size()==0)
+        
+        if (versions.size()-1 >= 0)
         {
-            return null;
+            return versions.get(versions.size()-1);
         }
-
-        return versions.get(versions.size()-1);
-    }
-
-
-    @Override
-    public boolean isFirstVersion(VersionHistory versionHistory, Version version)
-    {
-        List<Version> versions = versionHistory.getVersions();
-        Version first = versions.get(versions.size()-1);
-        return first.equals(version);
+        
+        return null;
     }
 
     @Override
-    public boolean isLastVersion(VersionHistory versionHistory, Version version)
+    public boolean isFirstVersion(Context context, Item item) throws SQLException
     {
-        List<Version> versions = versionHistory.getVersions();
-        Version last = versions.get(0);
-        return last.equals(version);
+        VersionHistory vh = findByItem(context, item);
+        if (vh == null)
+        {
+            return true;
+        }
+        Version version = versioningService.getVersion(context, item);
+        return isFirstVersion(context, vh, version);
+    }
+    
+    @Override
+    public boolean isFirstVersion(Context context, VersionHistory versionHistory, Version version)
+            throws SQLException
+    {
+        return getFirstVersion(context, versionHistory).equals(version);
+    }
+    
+    @Override
+    public boolean isLastVersion(Context context, Item item) throws SQLException
+    {
+        VersionHistory vh = findByItem(context, item);
+        if (vh == null)
+        {
+            return true;
+        }
+        Version version = versioningService.getVersion(context, item);
+        return isLastVersion(context, vh, version);
+    }
+
+    @Override
+    public boolean isLastVersion(Context context, VersionHistory versionHistory, Version version)
+            throws SQLException
+    {
+        return getLatestVersion(context, versionHistory).equals(version);
     }
 
     @Override

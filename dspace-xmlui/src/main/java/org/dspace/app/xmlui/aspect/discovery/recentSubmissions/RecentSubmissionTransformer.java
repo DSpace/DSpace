@@ -21,10 +21,9 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.discovery.DiscoverResult;
 import org.xml.sax.SAXException;
 
@@ -95,10 +94,10 @@ public class RecentSubmissionTransformer extends AbstractDSpaceTransformer {
         if(isHomePage)
         {
             // Add RSS links if available
-            String formats = ConfigurationManager.getProperty("webui.feed.formats");
+            String[] formats = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.formats");
             if ( formats != null )
             {
-                for (String format : formats.split(","))
+                for (String format : formats)
                 {
                     // Remove the protocol number, i.e. just list 'rss' or' atom'
                     String[] parts = format.split("_");
@@ -182,7 +181,7 @@ public class RecentSubmissionTransformer extends AbstractDSpaceTransformer {
 
     protected String getBaseUrl(DSpaceObject dso) throws SQLException {
         String url = contextPath;
-        if(dso != null && dso.equals(siteService.findSite(context)))
+        if(dso != null && !dso.equals(siteService.findSite(context)))
         {
             url += "/handle/" + dso.getHandle();
         }

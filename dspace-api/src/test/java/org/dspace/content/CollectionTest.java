@@ -883,6 +883,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest
                     Constants.REMOVE); result = null;
             authorizeService.authorizeAction((Context) any, (Item) any,
                     Constants.WRITE); result = null;
+            authorizeService.authorizeAction((Context) any, (Item) any,
+                    Constants.DELETE); result = null;
         }};
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
@@ -1961,6 +1963,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     {
         //0 by default
         assertTrue("testCountItems 0", itemService.countItems(context, collection) == 0);
+        
+        //NOTE: a more thorough test of item counting is in ITCommunityCollection integration test
     }
 
     /**

@@ -26,7 +26,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements HandleDAO {
+public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements HandleDAO
+{
+    protected HandleDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public List<Handle> getHandlesByDSpaceObject(Context context, DSpaceObject dso) throws SQLException {
@@ -66,5 +71,10 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
         query.setString("newPrefix", newPrefix);
         query.setString("oldPrefix", oldPrefix);
         return query.executeUpdate();
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Handle"));
     }
 }

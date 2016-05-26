@@ -15,6 +15,7 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
+import org.jdom.Document;
 
 /**
  *
@@ -22,6 +23,12 @@ import java.util.List;
  */
 public class CommandRunner
 {
+    /**
+     * 
+     * @param args commandline args
+     * @throws IOException if IO error
+     * @throws FileNotFoundException if file doesn't exist
+     */
     public static void main(String[] args)
             throws FileNotFoundException, IOException
     {
@@ -45,11 +52,10 @@ public class CommandRunner
     /**
      * Read a file of command lines and execute each in turn.
      *
-     * @param doc details of recognized commands.
      * @param script the file of command lines to be executed.
-     * @return
-     * @throws FileNotFoundException
-     * @throws IOException 
+     * @return status code
+     * @throws IOException if IO error
+     * @throws FileNotFoundException if file doesn't exist
      */
     static int runManyCommands(String script)
             throws FileNotFoundException, IOException
@@ -82,13 +88,14 @@ public class CommandRunner
 
         int status = 0;
         List<String> tokens = new ArrayList<String>();
+        Document commandConfigs = ScriptLauncher.getConfig();
         while (StreamTokenizer.TT_EOF != tokenizer.nextToken())
         {
             if (StreamTokenizer.TT_EOL == tokenizer.ttype)
             {
                 if (tokens.size() > 0)
                 {
-                    status = ScriptLauncher.runOneCommand(tokens.toArray(new String[tokens.size()]));
+                    status = ScriptLauncher.runOneCommand(commandConfigs, tokens.toArray(new String[tokens.size()]));
                     if (status > 0)
                     {
                         break;

@@ -72,9 +72,9 @@ public class LicenseCleanup
 
     /**
      * @param args
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     public static void main(String[] args) throws SQLException,
             AuthorizeException, IOException
@@ -132,9 +132,9 @@ public class LicenseCleanup
     /**
      * Process Item, correcting CC-License if encountered.
      * @param item
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     protected static void handleItem(Context context, Item item) throws SQLException,
             AuthorizeException, IOException
@@ -198,9 +198,9 @@ public class LicenseCleanup
      * 
      * @param b the Bitstream to be copied.
      * @return copy of the content of {@code b}.
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public static byte[] copy(Context context, Bitstream b) throws IOException, SQLException,
             AuthorizeException

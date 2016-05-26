@@ -35,6 +35,11 @@ UPDATE eperson SET self_registered = false WHERE self_registered IS NULL;
 
 
 
+UPDATE metadatavalue SET text_value='Administrator'
+  WHERE resource_type_id=6 AND resource_id=1;
+UPDATE metadatavalue SET text_value='Anonymous'
+  WHERE resource_type_id=6 AND resource_id=0;
+
 ALTER TABLE epersongroup ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM epersongroup;
 ALTER TABLE epersongroup ADD FOREIGN KEY (uuid) REFERENCES dspaceobject;
@@ -224,6 +229,9 @@ ALTER TABLE bundle2bitstream ADD COLUMN bundle_id UUID REFERENCES Bundle(uuid);
 ALTER TABLE bundle2bitstream ADD COLUMN bitstream_id UUID REFERENCES Bitstream(uuid);
 UPDATE bundle2bitstream SET bundle_id = (SELECT bundle.uuid FROM bundle WHERE bundle2bitstream.bundle_legacy_id = bundle.bundle_id);
 UPDATE bundle2bitstream SET bitstream_id = (SELECT bitstream.uuid FROM bitstream WHERE bundle2bitstream.bitstream_legacy_id = bitstream.bitstream_id);
+ALTER TABLE bundle2bitstream RENAME COLUMN bitstream_order to bitstream_order_legacy;
+ALTER TABLE bundle2bitstream ADD COLUMN bitstream_order INTEGER;
+UPDATE bundle2bitstream SET bitstream_order = b2b_ranked.order FROM (SELECT bundle_id, bitstream_id,(rank() OVER (PARTITION BY bundle_id ORDER BY bitstream_order_legacy, bitstream_id) -1) as order FROM bundle2bitstream) b2b_ranked WHERE bundle2bitstream.bundle_id = b2b_ranked.bundle_id AND bundle2bitstream.bitstream_id = b2b_ranked.bitstream_id;
 ALTER TABLE bundle2bitstream ALTER COLUMN bundle_id SET NOT NULL;
 ALTER TABLE bundle2bitstream ALTER COLUMN bitstream_id SET NOT NULL;
 ALTER TABLE bundle2bitstream DROP COLUMN bundle_legacy_id;

@@ -16,10 +16,9 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.statistics.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -55,8 +54,18 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     private static final Message T_empty_title   = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.title");
     private static final Message T_empty_text    = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.text");
 
-    private static final SimpleDateFormat sdfDisplay = new SimpleDateFormat("MM'/'yyyy");
-    private static final SimpleDateFormat sdfLink    = new SimpleDateFormat("yyyy'-'M");
+    private static final ThreadLocal<DateFormat> sdfDisplay = new ThreadLocal<DateFormat>(){
+                @Override
+                protected DateFormat initialValue() {
+                    return new SimpleDateFormat("MM'/'yyyy");
+                }
+              };
+    private static final ThreadLocal<DateFormat> sdfLink    = new ThreadLocal<DateFormat>(){
+                @Override
+                protected DateFormat initialValue() {
+                    return new SimpleDateFormat("yyyy'-'M");
+                }
+              };
 
     private boolean initialised = false;
     private String reportDate = null;
@@ -90,7 +99,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
             try
             {
                 initialise();
-                boolean showReport = ConfigurationManager.getBooleanProperty("report.public");
+                boolean showReport = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("report.public");
 
                 // If the report isn't public
                 if (!showReport)
@@ -165,8 +174,8 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
             HashMap<String, String> params = new HashMap<String, String>();
             for (Date date : monthlyDates)
             {
-                params.put("date", sdfLink.format(date));
-                statList.addItemXref(super.generateURL("statistics", params), sdfDisplay.format(date));
+                params.put("date", sdfLink.get().format(date));
+                statList.addItemXref(super.generateURL("statistics", params), sdfDisplay.get().format(date));
             }
         }
     }
@@ -207,7 +216,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
             IOException, AuthorizeException
     {
         initialise();
-        boolean publicise = ConfigurationManager.getBooleanProperty("report.public");
+        boolean publicise = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("report.public");
 
         // Check that the reports are either public, or user is an administrator
         if (!publicise && !authorizeService.isAdmin(context))
@@ -539,7 +548,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         {
             mainTitle = "Statistics for " + name;
 
-            if (ConfigurationManager.getBooleanProperty("report.show.server", true))
+            if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("report.show.server", true))
             {
                 mainTitle += " on " + serverName;
             }

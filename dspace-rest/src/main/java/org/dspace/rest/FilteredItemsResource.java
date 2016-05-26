@@ -18,18 +18,19 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.rest.common.ItemFilter;
 import org.dspace.rest.common.ItemFilterQuery;
 import org.dspace.rest.filter.ItemFilterSet;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.HttpHeaders;
 
 import java.io.IOException;
@@ -51,7 +52,8 @@ public class FilteredItemsResource extends Resource {
     protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
-
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    
     private static Logger log = Logger.getLogger(FilteredItemsResource.class);
     
     /**
@@ -106,13 +108,13 @@ public class FilteredItemsResource extends Resource {
             @QueryParam("query_op[]") @DefaultValue("exists") List<String> query_op,
             @QueryParam("query_val[]") @DefaultValue("") List<String> query_val,
             @QueryParam("collSel[]") @DefaultValue("") List<String> collSel,
-    		@Context HttpHeaders headers, @Context HttpServletRequest request) {
+    		@Context HttpHeaders headers, @Context HttpServletRequest request, @Context ServletContext servletContext) {
         org.dspace.core.Context context = null;
         ItemFilterSet itemFilterSet = new ItemFilterSet(filters, true);
         ItemFilter result = itemFilterSet.getAllFiltersFilter();
         try {
-            context = createContext(getUser(headers));
-            if (ConfigurationManager.getBooleanProperty("rest", "rest-reporting-authenticate", true) == false) {
+            context = createContext();
+            if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
                 context.turnOffAuthorisationSystem();            	
             }
             
@@ -122,7 +124,7 @@ public class FilteredItemsResource extends Resource {
             	itemFilterQueries.add(new ItemFilterQuery(query_field.get(i), query_op.get(i), query_val.get(i)));
             }
 
-            String regexClause = ConfigurationManager.getProperty("rest", "rest-regex-clause");
+            String regexClause = configurationService.getProperty("rest.regex-clause");
             if (regexClause == null) {
             	regexClause = "";
             }
@@ -132,7 +134,7 @@ public class FilteredItemsResource extends Resource {
 
             Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, listFieldList, query_op, query_val, uuids, regexClause, offset, limit);
              
-            int count = itemFilterSet.processSaveItems(context, childItems, true, expand);
+            int count = itemFilterSet.processSaveItems(context, servletContext, childItems, true, expand);
     	    writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
     	    result.annotateQuery(query_field, query_op, query_val);
     	    result.setUnfilteredItemCount(count);

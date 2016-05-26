@@ -7,6 +7,7 @@
  */
 package org.dspace.eperson;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.content.MetadataSchema;
@@ -24,9 +25,8 @@ import java.util.List;
 
 /**
  * Class representing a group of e-people.
- * 
+ *
  * @author David Stuve
- * @version $Revision$
  */
 @Entity
 @Table(name = "epersongroup" )
@@ -44,6 +44,13 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     @Column(name="eperson_group_id", insertable = false, updatable = false)
     private Integer legacyId;
+
+    /** This Group may not be deleted or renamed. */
+    @Column
+    private Boolean permanent = false;
+
+    @Column(length = 250, unique = true)
+    private String name;
 
     /** lists of epeople and groups in the group */
     @ManyToMany(fetch = FetchType.LAZY)
@@ -70,9 +77,6 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
 
     @Transient
     private boolean groupsChanged;
-
-    @Transient
-    private transient GroupService groupService;
 
     /**
      * Protected constructor, create object using:
@@ -147,14 +151,14 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     {
         return groups;
     }
-    
+
     /**
      * Return <code>true</code> if <code>other</code> is the same Group as
      * this object, <code>false</code> otherwise
-     * 
+     *
      * @param obj
      *            object to compare to
-     * 
+     *
      * @return <code>true</code> if object passed in represents the same group
      *         as this object
      */
@@ -171,11 +175,7 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
              return false;
          }
          final Group other = (Group) obj;
-         if (!this.getID().equals(other.getID()))
-         {
-             return false;
-         }
-         return true;
+         return this.getID().equals(other.getID());
      }
 
      @Override
@@ -198,12 +198,16 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     @Override
     public String getName()
     {
-        return getGroupService().getName(this);
+        return name;
     }
 
-    public void setName(Context context, String name) throws SQLException
+    /** Change the name of this Group. */
+    void setName(String name) throws SQLException
     {
-        getGroupService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "title", null, null, name);
+        if(!StringUtils.equals(this.name, name) && !isPermanent()) {
+            this.name = name;
+            groupsChanged = true;
+        }
     }
 
     public boolean isGroupsChanged() {
@@ -223,11 +227,26 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
         return supervisedItems;
     }
 
-    private GroupService getGroupService() {
-        if(groupService == null)
-        {
-            groupService = EPersonServiceFactory.getInstance().getGroupService();
-        }
-        return groupService;
+    /**
+     * May this Group be renamed or deleted?  (The content of any group may be
+     * changed.)
+     *
+     * @return true if this Group may not be renamed or deleted.
+     */
+    public Boolean isPermanent()
+    {
+        return permanent;
+    }
+
+    /**
+     * May this Group be renamed or deleted?  (The content of any group may be
+     * changed.)
+     *
+     * @param permanence true if this group may not be renamed or deleted.
+     */
+    void setPermanent(boolean permanence)
+    {
+        permanent = permanence;
+        setModified();
     }
 }

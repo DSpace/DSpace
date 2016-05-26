@@ -18,10 +18,6 @@
     default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
-    <!-- NOTE: I am not convinced this is a good idea, it is really slow and I think possibly dangerous -AZ -->
-    <!-- 
-    <context:component-scan base-package="org.dspace" name-generator="org.dspace.servicemanager.spring.FullPathBeanNameGenerator" />
-    -->
 
     <!-- the bean processor interceptor -->
     <bean class="org.dspace.servicemanager.spring.DSpaceBeanPostProcessor" />

@@ -43,7 +43,7 @@ public class LocationUtils
     {
         if (null == countryCode)
         {
-            logger.error("Null country code");
+            logger.info("Null country code");
             return I18nUtil
                     .getMessage("org.dspace.statistics.util.LocationUtils.unknown-continent");
         }
@@ -62,7 +62,7 @@ public class LocationUtils
         String continent = countryToContinent.getProperty(countryCode);
         if (null == continent)
         {
-            logger.error("Unknown country code " + countryCode);
+            logger.info("Unknown country code " + countryCode);
             return I18nUtil
                     .getMessage("org.dspace.statistics.util.LocationUtils.unknown-continent");
         }
@@ -99,7 +99,7 @@ public class LocationUtils
 
         if (null == continentCode)
         {
-            logger.error("Null continentCode");
+            logger.info("Null continentCode");
             return I18nUtil
                     .getMessage("org.dspace.statistics.util.LocationUtils.unknown-continent");
         }
@@ -123,7 +123,7 @@ public class LocationUtils
         }
         catch (MissingResourceException e)
         {
-            logger.error("No continent code " + continentCode + " in bundle "
+            logger.info("No continent code " + continentCode + " in bundle "
                     + names.getLocale().getDisplayName());
             return I18nUtil
                     .getMessage("org.dspace.statistics.util.LocationUtils.unknown-continent");

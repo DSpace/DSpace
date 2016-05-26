@@ -8,7 +8,7 @@
 package org.dspace.event.factory;
 
 import org.dspace.event.service.EventService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the event package, use EventServiceFactory.getInstance() to retrieve an implementation
@@ -21,6 +21,6 @@ public abstract class EventServiceFactory {
 
     public static EventServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("eventServiceFactory", EventServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("eventServiceFactory", EventServiceFactory.class);
     }
 }

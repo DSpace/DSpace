@@ -9,20 +9,19 @@ package org.dspace.sword;
 
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.purl.sword.base.SWORDErrorException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
@@ -50,6 +49,9 @@ public class SWORDConfiguration
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory
             .getInstance().getBitstreamFormatService();
+    
+    protected ConfigurationService configurationService = DSpaceServicesFactory
+            .getInstance().getConfigurationService();
 
     /** whether we can support noOp */
     private boolean noOp = true;
@@ -85,47 +87,47 @@ public class SWORDConfiguration
     public SWORDConfiguration()
     {
         // set the max upload size
-        int mus = ConfigurationManager
-                .getIntProperty("sword-server", "max-upload-size");
+        int mus = configurationService
+                .getIntProperty("sword-server.max-upload-size");
         if (mus > 0)
         {
             this.maxUploadSize = mus;
         }
 
         // set the mediation value
-        this.mediated = ConfigurationManager
-                .getBooleanProperty("sword-server", "on-behalf-of.enable");
+        this.mediated = configurationService
+                .getBooleanProperty("sword-server.on-behalf-of.enable");
 
         // find out if we keep the original as bitstream
-        this.keepOriginal = ConfigurationManager
-                .getBooleanProperty("sword-server", "keep-original-package");
+        this.keepOriginal = configurationService
+                .getBooleanProperty("sword-server.keep-original-package");
 
         // get the sword bundle
-        String bundle = ConfigurationManager
-                .getProperty("sword-server", "bundle.name");
+        String bundle = configurationService
+                .getProperty("sword-server.bundle.name");
         if (bundle != null && "".equals(bundle))
         {
             this.swordBundle = bundle;
         }
 
         // find out if we keep the package as a file in specified directory
-        this.keepPackageOnFailedIngest = ConfigurationManager
-                .getBooleanProperty("sword-server", "keep-package-on-fail",
+        this.keepPackageOnFailedIngest = configurationService
+                .getBooleanProperty("sword-server.keep-package-on-fail",
                         false);
 
         // get directory path and name
-        this.failedPackageDir = ConfigurationManager
-                .getProperty("sword-server", "failed-package.dir");
+        this.failedPackageDir = configurationService
+                .getProperty("sword-server.failed-package.dir");
 
         // Get the accepted formats
-        String acceptsProperty = ConfigurationManager
-                .getProperty("sword-server", "accepts");
+        String[] acceptsFormats = configurationService
+                .getArrayProperty("sword-server.accepts");
         swordaccepts = new ArrayList<String>();
-        if (acceptsProperty == null)
+        if (acceptsFormats == null)
         {
-            acceptsProperty = "application/zip";
+            acceptsFormats = new String[]{"application/zip"};
         }
-        for (String element : acceptsProperty.split(","))
+        for (String element : acceptsFormats)
         {
             swordaccepts.add(element.trim());
         }
@@ -349,31 +351,18 @@ public class SWORDConfiguration
         String handle = col.getHandle();
 
         // build the holding maps of identifiers and q values
-        Properties props = ConfigurationManager.getProperties("sword-server");
-        Set keyset = props.keySet();
-        for (Object keyObj : keyset)
+        String acceptPackagingPrefix = "sword-server.accept-packaging";
+        List<String> keys = configurationService.getPropertyKeys(acceptPackagingPrefix);
+        for (String key : keys)
         {
-            String sw = "accept-packaging.";
-
-            if (!(keyObj instanceof String))
-            {
-                continue;
-            }
-            String key = (String) keyObj;
-
-            if (!key.startsWith(sw))
-            {
-                continue;
-            }
-
             // extract the configuration into the holding Maps
-            String suffix = key.substring(sw.length());
+            String suffix = key.substring(acceptPackagingPrefix.length()+1);
 
             String[] bits = suffix.split("\\.");
             if (bits.length == 2)
             {
                 // global settings
-                String value = props.getProperty(key);
+                String value = configurationService.getProperty(key);
                 if (bits[1].equals("identifier"))
                 {
                     identifiers.put(bits[0], value);
@@ -388,7 +377,7 @@ public class SWORDConfiguration
             if (bits.length == 3 && bits[0].equals(handle))
             {
                 // this is configuration for our collection
-                String value = props.getProperty(key);
+                String value = configurationService.getProperty(key);
                 if (bits[2].equals("identifier"))
                 {
                     identifiers.put(bits[1], value);
@@ -473,9 +462,9 @@ public class SWORDConfiguration
     public String getTempDir()
             throws DSpaceSWORDException
     {
-        return (ConfigurationManager.getProperty("upload.temp.dir") != null)
+        return (configurationService.getProperty("upload.temp.dir") != null)
                 ?
-                ConfigurationManager.getProperty("upload.temp.dir") :
+                configurationService.getProperty("upload.temp.dir") :
                 System.getProperty("java.io.tmpdir");
     }
 }

@@ -29,7 +29,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentChecksum> implements MostRecentChecksumDAO {
+public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentChecksum> implements MostRecentChecksumDAO
+{
+    protected MostRecentChecksumDAOImpl()
+    {
+        super();
+    }
 
 
     @Override

@@ -20,7 +20,7 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -28,15 +28,19 @@ import org.dspace.eperson.EPerson;
  * Unauthenticate the current user. There is no way this action will fail, 
  * so any components inside the action will be executed.
  * 
- * This action will always send an HTTP redirect to the DSpace homepage.
- * 
- * Example: 
- * 
+ * <p>This action will always send an HTTP redirect to the DSpace home page.
+ *
+ * <p>Example:
+ *
+ * <pre>
+ * {@code
  * <map:action name="UnAuthenticateAction" src="org.dspace.app.xmlui.eperson.UnAuthenticateAction"/>
  * 
  * <map:act type="UnAuthenticateAction">
  *   <map:serialize type="xml"/>
  * </map:act>
+ * }
+ * </pre>
  * 
  * @author Scott Phillips
  */
@@ -47,13 +51,16 @@ public class UnAuthenticateAction extends AbstractAction
     /**
      * Logout the current user.
      * 
-     * @param redirector
-     * @param resolver
+     * @param redirector redirector.
+     * @param resolver source resolver.
      * @param objectModel
      *            Cocoon's object model
-     * @param source
-     * @param parameters
+     * @param source source.
+     * @param parameters sitemap parameters.
+     * @return result of the action.
+     * @throws java.lang.Exception passed through.
      */
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
@@ -73,9 +80,9 @@ public class UnAuthenticateAction extends AbstractAction
         context.setCurrentUser(eperson);
         
         // Forward the user to the home page.
-        if((ConfigurationManager.getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure())) {
+        if((DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure())) {
 				StringBuffer location = new StringBuffer("http://");
-				location.append(ConfigurationManager.getProperty("dspace.hostname")).append(
+				location.append(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname")).append(
 						httpRequest.getContextPath());
 				httpResponse.sendRedirect(location.toString());
 			

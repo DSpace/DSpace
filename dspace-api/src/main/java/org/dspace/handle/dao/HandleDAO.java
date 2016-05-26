@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Database Access Object interface class for the Handle object.
  * The implementation of this class is responsible for all database calls for the Handle object and is autowired by spring
- * This class should only be accessed from a single service & should never be exposed outside of the API
+ * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -33,4 +33,6 @@ public interface HandleDAO extends GenericDAO<Handle> {
     public long countHandlesByPrefix(Context context, String prefix) throws SQLException;
 
     int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException;
+
+    int countRows(Context context) throws SQLException;
 }

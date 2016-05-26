@@ -34,7 +34,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -130,7 +130,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	                validity.add(context, subCommunity);
 	                
 	                // Include the item count in the validity, only if the value is shown.
-	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+	                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
 	                if (showCount)
 	        		{
 	                    try {	
@@ -145,7 +145,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	                validity.add(context, collection);
 	                
 	                // Include the item count in the validity, only if the value is shown.
-	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+	                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
 	                if (showCount)
 	        		{
 	                    try {
@@ -198,10 +198,10 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         HandleUtil.buildHandleTrail(context, community, pageMeta,contextPath);
         
         // Add RSS links if available
-        String formats = ConfigurationManager.getProperty("webui.feed.formats");
+        String[] formats = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.formats");
 		if ( formats != null )
 		{
-			for (String format : formats.split(","))
+			for (String format : formats)
 			{
 				// Remove the protocol number, i.e. just list 'rss' or' atom'
 				String[] parts = format.split("_");

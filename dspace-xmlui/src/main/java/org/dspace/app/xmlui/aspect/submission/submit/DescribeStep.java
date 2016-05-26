@@ -48,7 +48,7 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -258,7 +258,7 @@ public class DescribeStep extends AbstractSubmissionStep
                                 for (MetadataValue dcValue : unfiltered)
                                 {
                                         String unfilteredFieldName = dcValue.getMetadataField().getElement() + "." + dcValue.getMetadataField().getQualifier();
-                                        if ( ! inputSet.isFieldPresent(unfilteredFieldName) )
+                                        if ( ! inputSet.isFieldPresent(unfilteredFieldName, documentType) )
                                         {
                                                 filtered.add( dcValue );
                                         }
@@ -1158,7 +1158,7 @@ public class DescribeStep extends AbstractSubmissionStep
             Text text = item.addText(fieldName, "submit-text");
 
             if(dcInput.getVocabulary() != null){
-                String vocabularyUrl = new DSpace().getConfigurationService().getProperty("dspace.url");
+                String vocabularyUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url");
                 vocabularyUrl += "/JSON/controlled-vocabulary?vocabularyIdentifier=" + dcInput.getVocabulary();
                 //Also hand down the field name so our summoning script knows the field the selected value is to end up in
                 vocabularyUrl += "&metadataFieldName=" + fieldName;

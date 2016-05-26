@@ -50,21 +50,10 @@ import org.dspace.workflow.WorkflowException;
  * <P>
  * All Package ingesters should either extend this abstract class
  * or implement <code>PackageIngester</code> to better suit their needs.
- * <P>
- * WARNING: If you choose to extend this Abstract class, you must DISABLE
- * plugin instance caching for your new class in dspace.cfg. This will ensure
- * the "pkgIngestedMap" and any other global instance variables are RESET
- * for each package ingest. To DISABLE plugin instance caching, just place
- * the following configuration in your dspace.cfg:
- * <code>
- * plugin.reusable.[full-class-name] = false
- * </code>
- * For more information see the org.dspace.core.PluginManager cacheMe() method,
- * which defaults to caching all plugin class instances.
  *
  * @author Tim Donohue
  * @see PackageIngester
- * @see PluginManager
+ * @see org.dspace.core.service.PluginService
  */
 public abstract class AbstractPackageIngester
         implements PackageIngester
@@ -125,6 +114,11 @@ public abstract class AbstractPackageIngester
      *          is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>ingestAll</code>
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws WorkflowException if workflow error
      */
     @Override
     public List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
@@ -265,6 +259,11 @@ public abstract class AbstractPackageIngester
      *          is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>replaceAll</code>
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws WorkflowException if workflow error
      */
     @Override
     public List<String> replaceAll(Context context, DSpaceObject dso,

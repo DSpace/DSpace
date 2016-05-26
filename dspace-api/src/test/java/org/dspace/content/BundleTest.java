@@ -567,6 +567,8 @@ public class BundleTest extends AbstractDSpaceObjectTest
             // Allow Bundle REMOVE perms (to test remove)
             authorizeService.authorizeAction((Context) any, (Bundle) any,
                     Constants.REMOVE); result = null;
+            authorizeService.authorizeAction((Context) any, (Bundle) any,
+                    Constants.DELETE); result = null;
         }};
 
         UUID id = b.getID();

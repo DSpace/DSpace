@@ -217,7 +217,7 @@ public class FlowGroupUtils {
 	    	{
 				// All good, create the new group.
 				group = groupService.create(context);
-				group.setName(context, newName);
+				groupService.setName(group, newName);
 	    	}
 			else
 			{
@@ -245,7 +245,7 @@ public class FlowGroupUtils {
 				if (potentialDuplicate == null)
 		    	{
 					// All good, update the name
-					group.setName(context, newName);
+					groupService.setName(group, newName);
 		    	}
 				else
 				{

@@ -25,7 +25,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> implements MetadataSchemaDAO {
+public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> implements MetadataSchemaDAO
+{
+    protected MetadataSchemaDAOImpl()
+    {
+        super();
+    }
 
     /**
      * Get the schema object corresponding to this namespace URI.
@@ -33,7 +38,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * @param context DSpace context
      * @param namespace namespace URI to match
      * @return metadata schema object or null if none found.
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public MetadataSchema findByNamespace(Context context, String namespace) throws SQLException
@@ -41,6 +46,8 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
         // Grab rows from DB
         Criteria criteria = createCriteria(context, MetadataSchema.class);
         criteria.add(Restrictions.eq("namespace", namespace));
+        criteria.setCacheable(true);
+
         return uniqueResult(criteria);
     }
 
@@ -49,6 +56,8 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
         // Get all the metadataschema rows
         Criteria criteria = createCriteria(context, MetadataSchema.class);
         criteria.addOrder(Order.asc("id"));
+        criteria.setCacheable(true);
+
         return list(criteria);
     }
 
@@ -57,9 +66,10 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * number of times in the current schema.
      *
      * @param context DSpace context
+     * @param metadataSchemaId schema id
      * @param namespace namespace URI to match
      * @return true of false
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public boolean uniqueNamespace(Context context, int metadataSchemaId, String namespace) throws SQLException
@@ -69,6 +79,8 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
                 Restrictions.not(Restrictions.eq("id", metadataSchemaId)),
                 Restrictions.eq("namespace", namespace)
         ));
+        criteria.setCacheable(true);
+
         return uniqueResult(criteria) == null;
     }
 
@@ -76,9 +88,10 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * Return true if and only if the passed name is unique.
      *
      * @param context DSpace context
+     * @param metadataSchemaId schema id
      * @param name  short name of schema
      * @return true of false
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public boolean uniqueShortName(Context context, int metadataSchemaId, String name) throws SQLException
@@ -88,6 +101,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
                 Restrictions.not(Restrictions.eq("id", metadataSchemaId)),
                 Restrictions.eq("name", name)
         ));
+        criteria.setCacheable(true);
 
         return uniqueResult(criteria) == null;
     }
@@ -100,7 +114,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * @param shortName
      *            the short name for the schema
      * @return the metadata schema object
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public MetadataSchema find(Context context, String shortName) throws SQLException
@@ -109,6 +123,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
         criteria.add(
                 Restrictions.eq("name", shortName)
         );
+        criteria.setCacheable(true);
 
         return uniqueResult(criteria);
     }

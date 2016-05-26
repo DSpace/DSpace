@@ -16,7 +16,7 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -30,25 +30,27 @@ import java.util.Map;
  * Include metadata in the resulting DRI document as derived from the sitemap
  * parameters.
  *
- * Parameters should consist of a dublin core name and value. The format for
- * a parameter name must follow the form: "<element>.<qualifier>.<language>#order"
+ * <p>Parameters should consist of a Dublin Core name and value. The format for
+ * a parameter name must follow the form: "{@code <element>.<qualifier>.<language>#order}"
  * The qualifier, language, and order are all optional components. The order
  * component is an integer and is needed to ensure that parameter names are
- * unique. Since Cocoon's parameters are Hashes duplicate names are not allowed
- * the order syntax allows the sitemap programer to specify an order in which
+ * unique. Since Cocoon's parameters are {@code Hash}es, duplicate names are not allowed.
+ * The {@code order} syntax allows the sitemap programmer to specify an order in which
  * these metadata values should be placed inside the document.
  *
- * The following are a valid examples:
+ * <p>The following are a valid examples:
  *
- * <map:parameter name="theme.name.en" value="My Theme"/>
+ * <ul>
+ *  <li>{@code <map:parameter name="theme.name.en" value="My Theme"/>}</li>
  *
- * <map:parameter name="theme.path" value="/MyTheme/"/>
+ *  <li>{@code <map:parameter name="theme.path" value="/MyTheme/"/>}</li>
  *
- * <map:parameter name="theme.css#1" value="style.css"/>
+ *  <li>{@code <map:parameter name="theme.css#1" value="style.css"/>}</li>
  *
- * <map:parameter name="theme.css#2" value="style.css-ie"/>
+ *  <li>{@code <map:parameter name="theme.css#2" value="style.css-ie"/>}</li>
  *
- * <map:parameter name="theme.css#2" value="style.css-ff"/>
+ *  <li>{@code <map:parameter name="theme.css#2" value="style.css-ff"/>}</li>
+ * </ul>
  *
  * @author Scott Phillips
  * @author Roel Van Reeth (roel at atmire dot com)
@@ -67,6 +69,7 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
      *
      * @return The generated key hashes the src
      */
+    @Override
     public Serializable getKey()
     {
         String key = "";
@@ -84,6 +87,7 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
      * @return The generated validity object or <code>null</code> if the
      *         component is currently not cacheable.
      */
+    @Override
     public SourceValidity getValidity()
     {
         return NOPValidity.SHARED_INSTANCE;
@@ -93,7 +97,15 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
 
     /**
      * Extract the metadata name value pairs from the sitemap parameters.
+     * @param resolver resolver.
+     * @param objectModel objectModel.
+     * @param src source.
+     * @param parameters parameters.
+     * @throws org.apache.cocoon.ProcessingException passed through.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws java.io.IOException passed through.
      */
+    @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
             Parameters parameters) throws ProcessingException, SAXException,
             IOException
@@ -101,49 +113,46 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
         try
         {
             String[] names = parameters.getNames();
-            metadataList = new ArrayList<Metadata>();
+            metadataList = new ArrayList<>();
             for (String name : names)
             {
             	String[] nameParts = name.split("#");
 
             	String dcName = null;
             	int order = -1;
-            	if (nameParts.length == 1)
-            	{
-            		dcName = nameParts[0];
-            		order = 1;
-            	}
-            	else if (nameParts.length == 2)
-            	{
-            		dcName = nameParts[0];
-            		order = Integer.valueOf(nameParts[1]);
-            	}
-            	else
-            	{
-            		throw new ProcessingException("Unable to parse page metadata name, '" + name + "', into parts.");
-            	}
+                switch (nameParts.length)
+                {
+                case 1:
+                    dcName = nameParts[0];
+                    order = 1;
+                    break;
+                case 2:
+                    dcName = nameParts[0];
+                    order = Integer.valueOf(nameParts[1]);
+                    break;
+                default:
+                    throw new ProcessingException("Unable to parse page metadata name, '" + name + "', into parts.");
+                }
 
                 String[] dcParts = dcName.split("\\.");
                 String element = null;
                 String qualifier = null;
                 String language = null;
-                if (dcParts.length == 1)
+                switch (dcParts.length)
                 {
+                case 1:
                     element = dcParts[0];
-                }
-                else if (dcParts.length == 2)
-                {
+                    break;
+                case 2:
                     element = dcParts[0];
                     qualifier = dcParts[1];
-                }
-                else if (dcParts.length == 3)
-                {
+                    break;
+                case 3:
                     element = dcParts[0];
                     qualifier = dcParts[1];
                     language = dcParts[2];
-                }
-                else
-                {
+                    break;
+                default:
                     throw new ProcessingException("Unable to parse page metadata name, '" + name + "', into parts.");
                 }
 
@@ -171,7 +180,7 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
         }
 
         // concatenation
-        if (ConfigurationManager.getBooleanProperty("xmlui.theme.enableConcatenation",false)) {
+        if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.theme.enableConcatenation",false)) {
             metadataList = enableConcatenation();
         }
     }
@@ -183,7 +192,7 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
      */
     private List<Metadata> enableConcatenation() {
         Metadata last = null;
-        List<Metadata> newMetadataList = new ArrayList<Metadata>();
+        List<Metadata> newMetadataList = new ArrayList<>();
 
         for (Metadata metadata : metadataList)
         {
@@ -279,17 +288,15 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
         }
 
         // only valid nonempty query string is "nominify"
-        if(curval.lastIndexOf('?') != -1
-                && !"?nominify".equals(curval.substring(curval.lastIndexOf('?')))) {
-            return false;
-        }
-
-        return true;
+        return !(curval.lastIndexOf('?') != -1
+                && !"?nominify".equals(curval.substring(curval.lastIndexOf('?'))));
 
     }
     /**
      * Include the metadata in the page metadata.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         for (Metadata metadata : metadataList)
@@ -311,10 +318,10 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
      */
     static class Metadata implements Comparable<Metadata> {
 
-    	private String element;
-    	private String qualifier;
-    	private String language;
-    	private int order;
+    	private final String element;
+    	private final String qualifier;
+    	private final String language;
+    	private final int order;
     	private String value;
 
     	public Metadata(String element,String qualifier, String language, int order, String value)
@@ -367,7 +374,7 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
     		return this.value;
     	}
 
-
+        @Override
     	public int compareTo(Metadata other)
     	{
     		String myName = this.element     + "." +this.qualifier   + "." + this.language;

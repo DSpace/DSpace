@@ -29,7 +29,7 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This servlet uses the SHERPASubmitService to build an html page with the
@@ -40,8 +40,8 @@ import org.dspace.utils.DSpace;
  */
 public class SHERPAPublisherPolicyServlet extends DSpaceServlet
 {
-    private final transient SHERPASubmitService sherpaSubmitService
-            = new DSpace().getServiceManager().getServiceByName(
+    private final transient SHERPASubmitService sherpaSubmitService 
+            = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
                     SHERPASubmitService.class.getCanonicalName(),
                     SHERPASubmitService.class);
 

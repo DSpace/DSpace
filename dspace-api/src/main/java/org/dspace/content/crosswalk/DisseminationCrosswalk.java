@@ -91,6 +91,7 @@ public interface DisseminationCrosswalk
      * When there are no results, an
      * empty list is returned, but never <code>null</code>.
      *
+     * @param context context
      * @param dso the  DSpace Object whose metadata to export.
      * @return results of crosswalk as list of XML elements.
      *
@@ -110,6 +111,7 @@ public interface DisseminationCrosswalk
      * This is typically the root element of a document.
      * <p>
      *
+     * @param context context
      * @param dso the  DSpace Object whose metadata to export.
      * @return root Element of the target metadata, never <code>null</code>
      *

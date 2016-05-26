@@ -27,6 +27,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
@@ -34,8 +35,9 @@
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.ItemCounter" %>
 <%@ page import="org.dspace.content.*" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.services.ConfigurationService" %>
+<%@ page import="org.dspace.services.factory.DSpaceServicesFactory" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%
@@ -66,11 +68,16 @@
     String sidebar = comServ.getMetadata(community, "side_bar_text");
     Bitstream logo = community.getLogo();
     
-    boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
+    ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    
+    boolean feedEnabled = configurationService.getBooleanProperty("webui.feed.enable");
     String feedData = "NONE";
     if (feedEnabled)
     {
-        feedData = "comm:" + ConfigurationManager.getProperty("webui.feed.formats");
+        // FeedData is expected to be a comma separated list
+        String[] formats = configurationService.getArrayProperty("webui.feed.formats");
+        String allFormats = StringUtils.join(formats, ",");
+        feedData = "comm:" + allFormats;
     }
     
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
@@ -83,7 +90,7 @@
 	<div class="col-md-8">
         <h2><%= name %>
         <%
-            if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+            if(configurationService.getBooleanProperty("webui.strengths.show"))
             {
 %>
                 : [<%= ic.getCount(community) %>]
@@ -108,7 +115,7 @@
 <p class="copyrightText"><%= copyright %></p>
 	<div class="row">
 <%
-	if (rs != null)
+	if (rs != null  && rs.count() > 0)
 	{ %>
 	<div class="col-md-8">
         <div class="panel panel-primary">        
@@ -197,9 +204,6 @@
 <%
 	}
 %>
-	<div class="col-md-4">
-    	<%= sidebar %>
-	</div>
 </div>	
 
 <%-- Browse --%>
@@ -225,21 +229,12 @@
 </div>
 
 <div class="row">
-
-    <%
-    	int discovery_panel_cols = 12;
-    	int discovery_facet_cols = 4;
-    %>
-	<%@ include file="discovery/static-sidebar-facet.jsp" %>
-</div>
-
-<div class="row">
 	<%@ include file="discovery/static-tagcloud-facet.jsp" %>
 </div>
 	
 <div class="row">
 <%
-	boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.community-home.logos", true);
+	boolean showLogos = configurationService.getBooleanProperty("jspui.community-home.logos", true);
 	if (subcommunities.size() != 0)
     {
 %>
@@ -267,7 +262,7 @@
 	      <h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= subcommunities.get(j).getHandle() %>">
 	                <%= subcommunities.get(j).getName() %></a>
 <%
-                if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+                if (configurationService.getBooleanProperty("webui.strengths.show"))
                 {
 %>
                     [<%= ic.getCount(subcommunities.get(j)) %>]
@@ -323,7 +318,7 @@
 	      <h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= collections.get(i).getHandle() %>">
 	      <%= collections.get(i).getName() %></a>
 <%
-            if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+            if(configurationService.getBooleanProperty("webui.strengths.show"))
             {
 %>
                 [<%= ic.getCount(collections.get(i)) %>]
@@ -352,9 +347,9 @@
     }
 %>
 </div>
+    <dspace:sidebar>
     <% if(editor_button || add_button)  // edit button(s)
     { %>
-    <dspace:sidebar>
 		 <div class="panel panel-warning">
              <div class="panel-heading">
              	<fmt:message key="jsp.admintools"/>
@@ -403,6 +398,12 @@
 			<% } %>
 			</div>
 		</div>
+		<% } %>
+		<%= sidebar %>
+		<%
+			int discovery_panel_cols = 12;
+			int discovery_facet_cols = 12;
+		%>
+		<%@ include file="discovery/static-sidebar-facet.jsp" %>
   </dspace:sidebar>
-    <% } %>
 </dspace:layout>

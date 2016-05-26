@@ -38,6 +38,10 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
+    protected BitstreamFormatServiceImpl()
+    {
+
+    }
 
     /** translate support-level ID to string.  MUST keep this table in sync
      *  with support level definitions above.
@@ -55,7 +59,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
      *            ID of the bitstream format
      *
      * @return the bitstream format, or null if the ID is invalid.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     @Override
     public BitstreamFormat find(Context context, int id)

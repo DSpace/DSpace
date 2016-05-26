@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
@@ -25,7 +26,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
@@ -37,6 +37,7 @@ import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -502,7 +503,7 @@ public class FlowContainerUtils
 			collectionService.removeSubmitters(context, collection);
 		}
         else{
-            if(ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+            if(StringUtils.equals(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("workflow.framework"), "xmlworkflow"))
             {
                 WorkflowUtils.deleteRoleGroup(context, collection, roleName);
             }else{
@@ -603,7 +604,7 @@ public class FlowContainerUtils
         }
 		
 		Group role = groupService.create(context);
-		role.setName(context, "COLLECTION_"+collection.getID().toString() +"_DEFAULT_READ");
+        groupService.setName(role, "COLLECTION_"+collection.getID().toString() +"_DEFAULT_READ");
 		
 		// Remove existing privileges from the anonymous group.
 		authorizeService.removePoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
@@ -1116,7 +1117,7 @@ public class FlowContainerUtils
                 String task = request.getParameter("curate_task");
                 Curator curator = FlowCurationUtils.getCurator(task);
                 String objId = String.valueOf(dsoID);
-                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                String taskQueueName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.queuename");
                 boolean status = false;
                 Collection collection = collectionService.find(context, dsoID);
                 if (collection != null)
@@ -1177,7 +1178,7 @@ public class FlowContainerUtils
                 String task = request.getParameter("curate_task");
                 Curator curator = FlowCurationUtils.getCurator(task);
                 String objId = String.valueOf(dsoID);
-                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                String taskQueueName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.queuename");
                 boolean status = false;
                 Community community = communityService.find(context, dsoID);
                 if (community != null)

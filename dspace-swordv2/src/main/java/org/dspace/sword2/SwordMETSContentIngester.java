@@ -23,7 +23,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
@@ -104,7 +104,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
             }
             verboseDescription.append("Using package manifest format: " + cfg);
 
-            PackageIngester pi = (PackageIngester) PluginManager
+            PackageIngester pi = (PackageIngester) CoreServiceFactory.getInstance().getPluginService()
                     .getNamedPlugin(PackageIngester.class, cfg);
             verboseDescription.append("Loaded package ingester: " +
                     pi.getClass().getName());
@@ -236,7 +236,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
             }
             verboseDescription.append("Using package manifest format: " + cfg);
 
-            PackageIngester pi = (PackageIngester) PluginManager
+            PackageIngester pi = (PackageIngester) CoreServiceFactory.getInstance().getPluginService()
                     .getNamedPlugin(PackageIngester.class, cfg);
             verboseDescription.append("Loaded package ingester: " +
                     pi.getClass().getName());

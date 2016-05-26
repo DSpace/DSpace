@@ -27,8 +27,6 @@ import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.IndexBrowse;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -37,7 +35,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginConfigurationError;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 
 /**
  * Servlet for editing and deleting (expunging) items
@@ -61,7 +59,7 @@ public class ItemMapServlet extends DSpaceServlet
     {
     	try
         {
-            internalLogic = (SearchRequestProcessor) PluginManager
+            internalLogic = (SearchRequestProcessor) CoreServiceFactory.getInstance().getPluginService()
                     .getSinglePlugin(SearchRequestProcessor.class);
         }
         catch (PluginConfigurationError e)
@@ -222,16 +220,6 @@ public class ItemMapServlet extends DSpaceServlet
     				if (!itemService.isOwningCollection(myItem, myCollection))
     				{
     					collectionService.removeItem(context, myCollection, myItem);
-    					try
-    					{
-    						IndexBrowse ib = new IndexBrowse(context);
-                            ib.indexItem(myItem);
-    					}
-    					catch (BrowseException e)
-    					{
-    						log.error("caught exception: ", e);
-    						throw new ServletException(e);
-    					}
     				}
     			}
 		}
@@ -270,16 +258,6 @@ public class ItemMapServlet extends DSpaceServlet
     					if (!itemService.isOwningCollection(myItem, myCollection))
     					{
     						collectionService.addItem(context, myCollection, myItem);
-    						try
-    	    				{
-    	    					IndexBrowse ib = new IndexBrowse(context);
-    	    					ib.indexItem(myItem);
-    	    				}
-    	    				catch (BrowseException e)
-    	    				{
-    	    					log.error("caught exception: ", e);
-    	    					throw new ServletException(e);
-    	    				}
     						addedItems.add(i);
     					}
     				}

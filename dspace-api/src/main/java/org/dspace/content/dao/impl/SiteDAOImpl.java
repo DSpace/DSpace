@@ -22,7 +22,12 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class SiteDAOImpl extends AbstractHibernateDAO<Site> implements SiteDAO {
+public class SiteDAOImpl extends AbstractHibernateDAO<Site> implements SiteDAO
+{
+    protected SiteDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public Site findSite(Context context) throws SQLException {

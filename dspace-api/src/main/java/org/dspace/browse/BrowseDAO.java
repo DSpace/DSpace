@@ -44,7 +44,7 @@ public interface BrowseDAO
      * parameters you set.
      *
      * @return      the integer value of the number of results found
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public int doCountQuery() throws BrowseException;
 
@@ -55,7 +55,7 @@ public interface BrowseDAO
      * commonly used with a Distinct browse type.
      *
      * @return  List of Strings representing the single value query results
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public List<String[]> doValueQuery() throws BrowseException;
 
@@ -64,7 +64,7 @@ public interface BrowseDAO
      * representing the results of a full item browse.
      *
      * @return  List of BrowseItem objects
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public List<Item> doQuery() throws BrowseException;
 
@@ -76,7 +76,7 @@ public interface BrowseDAO
      * @param table     the table to query
      * @param itemID    the item id
      * @return          String representing the max value in the given column
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public String doMaxQuery(String column, String table, int itemID) throws BrowseException;
 
@@ -88,7 +88,7 @@ public interface BrowseDAO
      * @param value     the item id
      * @param isAscending browsing in ascending or descending order
      * @return          the offset into the table
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public int doOffsetQuery(String column, String value, boolean isAscending) throws BrowseException;
 
@@ -100,7 +100,7 @@ public interface BrowseDAO
      * @param value     the item id
      * @param isAscending browsing in ascending or descending order
      * @return          the offset into the table
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public int doDistinctOffsetQuery(String column, String value, boolean isAscending) throws BrowseException;
 
@@ -117,8 +117,8 @@ public interface BrowseDAO
     /**
      * Set whether the query should use an equals comparator when doing less than or
      * greater than comparisons.  That is, if true then comparisons will be made
-     * using the equivalent of "<=" and ">=", while if false it will use the
-     * equivalent of "<" and ">"
+     * using the equivalent of {@code <=} and {@code >=}, while if false it will use the
+     * equivalent of {@code <} and {@code >}
      *
      * @param equalsComparator  true to use, false to not.
      */
@@ -189,7 +189,7 @@ public interface BrowseDAO
      * the browse.  This will either be the "sort_value" field or one of the
      * additional sort fields defined by configuration
      *
-     * param focusField     the name of the focus field
+     * @param focusField     the name of the focus field
      */
     public void setJumpToField(String focusField);
 

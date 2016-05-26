@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Database Access Object interface class for the Community object.
  * The implementation of this class is responsible for all database calls for the Community object and is autowired by spring
- * This class should only be accessed from a single service & should never be exposed outside of the API
+ * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -36,4 +36,6 @@ public interface CommunityDAO extends DSpaceObjectLegacySupportDAO<Community> {
     public List<Community> findAuthorized(Context context, EPerson ePerson, List<Integer> actions) throws SQLException;
 
     public List<Community> findAuthorizedByGroup(Context context, EPerson currentUser, List<Integer> actions) throws SQLException;
+
+    int countRows(Context context) throws SQLException;
 }

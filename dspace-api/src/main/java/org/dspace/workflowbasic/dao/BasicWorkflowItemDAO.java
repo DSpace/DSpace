@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Database Access Object interface class for the BasicWorkflowItem object.
  * The implementation of this class is responsible for all database calls for the BasicWorkflowItem object and is autowired by spring
- * This class should only be accessed from a single service & should never be exposed outside of the API
+ * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -35,4 +35,6 @@ public interface BasicWorkflowItemDAO extends GenericDAO<BasicWorkflowItem> {
     public List<BasicWorkflowItem> findByPooledTasks(Context context, EPerson ePerson) throws SQLException;
 
     public List<BasicWorkflowItem> findByOwner(Context context, EPerson ePerson) throws SQLException;
+
+    int countRows(Context context) throws SQLException;
 }

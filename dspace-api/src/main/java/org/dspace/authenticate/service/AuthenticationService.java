@@ -128,13 +128,11 @@ public interface AuthenticationService {
      * Invokes <code>canSelfRegister()</code> of every authentication
      * method in the stack, and returns true if any of them is true.
      *
-     * @param context
-     *            DSpace context
-     * @param request
-     *            HTTP request, in case it's needed. Can be null.
-     * @param username
-     *            Username, if available.  Can be null.
+     * @param context DSpace context
+     * @param request HTTP request, in case it's needed. Can be null.
+     * @param username Username, if available.  Can be null.
      * @return true if new ePerson should be created.
+     * @throws SQLException if database error
      */
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
@@ -145,13 +143,11 @@ public interface AuthenticationService {
      * Returns true if the <code>allowSetPassword()</code> method of any
      * member of the stack returns true.
      *
-     * @param context
-     *            DSpace context
-     * @param request
-     *            HTTP request, in case it's needed. Can be null.
-     * @param username
-     *            Username, if available.  Can be null.
+     * @param context DSpace context
+     * @param request HTTP request, in case it's needed. Can be null.
+     * @param username Username, if available.  Can be null.
      * @return true if this method allows user to change ePerson password.
+     * @throws SQLException if database error
      */
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
@@ -168,15 +164,14 @@ public interface AuthenticationService {
      * Returns accumulation of groups of all the <code>getSpecialGroups()</code>
      * methods in the stack.
      *
-     * @param context
-     *  A valid DSpace context.
+     * @param context A valid DSpace context.
      *
-     * @param request
-     *  The request that started this operation, or null if not applicable.
+     * @param request The request that started this operation, or null if not applicable.
      *
      * @return Returns IDs of any groups the user authenticated by this
      * request is in implicitly -- checks for e.g. network-address dependent
      * groups.
+     * @throws SQLException if database error
      */
     public List<Group> getSpecialGroups(Context context,
                                   HttpServletRequest request) throws SQLException;

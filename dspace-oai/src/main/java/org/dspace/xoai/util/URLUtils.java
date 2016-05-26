@@ -9,9 +9,9 @@ package org.dspace.xoai.util;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
+import org.dspace.app.util.Util;
+import org.dspace.core.Constants;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * 
@@ -24,7 +24,8 @@ public class URLUtils
     public static String encode (String value) {
         try
         {
-            return URLEncoder.encode(value, "UTF-8");
+        	return Util.encodeBitstreamName(value, Constants.DEFAULT_ENCODING);
+
         }
         catch (UnsupportedEncodingException e)
         {

@@ -12,8 +12,9 @@ import java.sql.Connection;
 
 import org.dspace.administer.MetadataImporter;
 import org.dspace.administer.RegistryLoader;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.slf4j.Logger;
@@ -21,16 +22,21 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is a FlywayCallback class which automatically updates the
- * Metadata Schema Registry and Bitstream Formats Registries BEFORE
- * any Database migration occurs.
+ * Metadata Schema Registry and Bitstream Formats Registries AFTER
+ * all Database migrations occur.
  * <P>
- * The reason this runs BEFORE a migration is to ensure that any new
- * metadata fields are FIRST added to our registries, so that the
- * migrations can make use of those new metadata fields, etc.
+ * The reason this runs AFTER all migrations is that the RegistryLoader
+ * and MetadataImporter now depend on Hibernate and Hibernate cannot be
+ * initialized until the Database is fully migrated.
  * <P>
- * However, there is one exception. If this is a "fresh install" of DSpace,
- * we'll need to wait until the necessary database tables are created. In
- * that scenario we will load registries AFTER the initial migration.
+ * If a migration needs to use on one or more registry values, there are
+ * two options:
+ * <UL>
+ * <LI>Create/insert those registry values in the migration itself (via SQL or similar).</LI>
+ * <LI>Alternatively, first check for the existence of the MetadataSchemaRegistry (or similar)
+ * before running the migration logic. If the table or fields do not yet exist, you might be
+ * able to skip the migration logic entirely. See "DatabaseUtils.tableExists()" and similar methods.</LI>
+ * </UL>
  *
  * @author Tim Donohue
  */
@@ -44,13 +50,14 @@ public class DatabaseRegistryUpdater implements FlywayCallback
      */
     private void updateRegistries()
     {
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         Context context = null;
         try
         {
             context = new Context();
             context.turnOffAuthorisationSystem();
 
-            String base = ConfigurationManager.getProperty("dspace.dir")
+            String base = config.getProperty("dspace.dir")
                             + File.separator + "config" + File.separator
                             + "registries" + File.separator;
 
@@ -67,7 +74,8 @@ public class DatabaseRegistryUpdater implements FlywayCallback
             MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
 
             // Check if XML Workflow is enabled in workflow.cfg
-            if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+            String framework = config.getProperty("workflow.framework");
+            if (framework!=null && framework.equals("xmlworkflow"))
             {
                 // If so, load in the workflow metadata types as well
                 MetadataImporter.loadRegistry(base + "workflow-types.xml", true);
@@ -108,6 +116,7 @@ public class DatabaseRegistryUpdater implements FlywayCallback
 
     @Override
     public void afterMigrate(Connection connection) {
+        // Must run AFTER all migrations complete, since it is dependent on Hibernate
         updateRegistries();
     }
 

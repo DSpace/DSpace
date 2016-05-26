@@ -71,7 +71,7 @@ public class MetadataExport
         try
         {
             // Try to export the community
-            this.toExport = buildFromCommunity(c, toExport, new ArrayList<Integer>(), 0);
+            this.toExport = buildFromCommunity(c, toExport, 0);
             this.exportAll = exportAll;
         }
         catch (SQLException sqle)
@@ -86,13 +86,13 @@ public class MetadataExport
     /**
      * Build an array list of item ids that are in a community (include sub-communities and collections)
      *
+     * @param context DSpace context
      * @param community The community to build from
-     * @param itemIDs The itemID (used for recursion - use an empty ArrayList)
      * @param indent How many spaces to use when writing out the names of items added
      * @return The list of item ids
-     * @throws SQLException
+     * @throws SQLException if database error
      */
-    protected Iterator<Item> buildFromCommunity(Context context, Community community, List<Integer> itemIDs, int indent)
+    protected Iterator<Item> buildFromCommunity(Context context, Community community, int indent)
                                                                                throws SQLException
     {
         // Add all the collections
@@ -106,12 +106,7 @@ public class MetadataExport
             }
 
             Iterator<Item> items = itemService.findByCollection(context, collection);
-            if(result == null)
-            {
-                result = items;
-            }else{
-                result = Iterators.concat(result, items);
-            }
+            result = addItemsToResult(result,items);
 
         }
         // Add all the sub-communities
@@ -122,7 +117,19 @@ public class MetadataExport
             {
                 System.out.print(" ");
             }
-            buildFromCommunity(context, subCommunity, itemIDs, indent + 1);
+            Iterator<Item> items = buildFromCommunity(context, subCommunity, indent + 1);
+            result = addItemsToResult(result,items);
+        }
+
+        return result;
+    }
+
+    private Iterator<Item> addItemsToResult(Iterator<Item> result, Iterator<Item> items) {
+        if(result == null)
+        {
+            result = items;
+        }else{
+            result = Iterators.concat(result, items);
         }
 
         return result;
@@ -176,6 +183,7 @@ public class MetadataExport
 	 * main method to run the metadata exporter
 	 *
 	 * @param argv the command line arguments given
+         * @throws Exception if error occurs
 	 */
     public static void main(String[] argv) throws Exception
     {

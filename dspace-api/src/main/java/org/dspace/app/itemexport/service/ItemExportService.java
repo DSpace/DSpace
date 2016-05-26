@@ -30,8 +30,8 @@ import java.util.List;
  * core in RDF schema / contents - text file, listing one file per line / file1
  * - files contained in the item / file2 / ...
  * <P>
- * issues -doesn't handle special characters in metadata (needs to turn &'s into
- * &amp;, etc.)
+ * issues -doesn't handle special characters in metadata (needs to turn {@code &'s} into
+ * {@code &amp;}, etc.)
  * <P>
  * Modified by David Little, UCSD Libraries 12/21/04 to allow the registration
  * of files (bitstreams) into DSpace.
@@ -59,7 +59,8 @@ public interface ItemExportService {
      * @param zipFileName The name to save the zip file as
      * @param seqStart The first number in the sequence
      * @param migrate Whether to use the migrate option or not
-     * @throws Exception
+     * @param excludeBitstreams Whether to exclude bitstreams or not
+     * @throws Exception if error
      */
     public void exportAsZip(Context context, Iterator<Item> items,
                                    String destDirName, String zipFileName,
@@ -74,7 +75,8 @@ public interface ItemExportService {
      *            - the dspace object to export
      * @param context
      *            - the dspace context
-     * @throws Exception
+     * @param migrate Whether to use the migrate option or not
+     * @throws Exception if error
      */
     public void createDownloadableExport(DSpaceObject dso,
             Context context, boolean migrate) throws Exception;
@@ -87,7 +89,8 @@ public interface ItemExportService {
      *            - List containing dspace objects
      * @param context
      *            - the dspace context
-     * @throws Exception
+     * @param migrate Whether to use the migrate option or not
+     * @throws Exception if error
      */
     public void createDownloadableExport(List<DSpaceObject> dsObjects,
             Context context, boolean migrate) throws Exception;
@@ -102,7 +105,8 @@ public interface ItemExportService {
      *            - the dspace context
      * @param additionalEmail
      *            - cc email to use
-     * @throws Exception
+     * @param migrate Whether to use the migrate option or not
+     * @throws Exception if error
      */
     public void createDownloadableExport(DSpaceObject dso,
             Context context, String additionalEmail, boolean migrate) throws Exception;
@@ -117,7 +121,8 @@ public interface ItemExportService {
      *            - the dspace context
      * @param additionalEmail
      *            - cc email to use
-     * @throws Exception
+     * @param migrate Whether to use the migrate option or not
+     * @throws Exception if error
      */
     public void createDownloadableExport(List<DSpaceObject> dsObjects,
             Context context, String additionalEmail, boolean migrate) throws Exception;
@@ -126,13 +131,14 @@ public interface ItemExportService {
     /**
      * Create a file name based on the date and eperson
      *
+     * @param type Type of object (as string)
      * @param eperson
      *            - eperson who requested export and will be able to download it
      * @param date
      *            - the date the export process was created
      * @return String representing the file name in the form of
      *         'export_yyy_MMM_dd_count_epersonID'
-     * @throws Exception
+     * @throws Exception if error
      */
     public String assembleFileName(String type, EPerson eperson,
             Date date) throws Exception;
@@ -146,7 +152,7 @@ public interface ItemExportService {
      *            - the eperson who requested export archive
      * @return String representing a directory in the form of
      *         org.dspace.app.itemexport.download.dir/epersonID
-     * @throws Exception
+     * @throws Exception if error
      */
     public String getExportDownloadDirectory(EPerson ePerson)
             throws Exception;
@@ -157,7 +163,7 @@ public interface ItemExportService {
      *
      * @return String representing config file entry for
      *         org.dspace.app.itemexport.work.dir
-     * @throws Exception
+     * @throws Exception if error
      */
     public String getExportWorkDirectory() throws Exception;
 
@@ -169,7 +175,7 @@ public interface ItemExportService {
      * @param eperson
      *            the eperson requesting the download
      * @return an input stream of the file to be downloaded
-     * @throws Exception
+     * @throws Exception if error
      */
     public InputStream getExportDownloadInputStream(String fileName,
             EPerson eperson) throws Exception;
@@ -177,12 +183,24 @@ public interface ItemExportService {
     /**
      * Get the file size of the export archive represented by the file name.
      *
+     * @param context DSpace context
      * @param fileName
      *            name of the file to get the size.
-     * @throws Exception
+     * @throws Exception if error
+     * @return size as long
      */
     public long getExportFileSize(Context context, String fileName) throws Exception;
 
+    /**
+     * Get the last modified date of the export archive represented by the file name.
+     *
+     * @param context DSpace context
+     * @param fileName
+     *            name of the file to get the size.
+     * @return date as long
+     * @see java.io.File#lastModified() 
+     * @throws Exception if error
+     */
     public long getExportFileLastModified(Context context, String fileName)
             throws Exception;
 
@@ -203,10 +221,10 @@ public interface ItemExportService {
      * Reads the download directory for the eperson to see if any export
      * archives are available
      *
-     * @param eperson
+     * @param eperson EPerson object
      * @return a list of file names representing export archives that have been
      *         processed
-     * @throws Exception
+     * @throws Exception if error
      */
     public List<String> getExportsAvailable(EPerson eperson)
             throws Exception;
@@ -218,7 +236,7 @@ public interface ItemExportService {
      *
      * @param eperson
      *            - the eperson to clean up
-     * @throws Exception
+     * @throws Exception if error
      */
     public void deleteOldExportArchives(EPerson eperson) throws Exception;
 
@@ -228,7 +246,7 @@ public interface ItemExportService {
      * determine if the current exports are too old and need purgeing
      * Removes all old exports, not just those for the person doing the export.
      *
-     * @throws Exception
+     * @throws Exception if error
      */
     public void deleteOldExportArchives() throws Exception;
 
@@ -245,7 +263,7 @@ public interface ItemExportService {
      * @param fileName
      *            - the file name to be downloaded. It is added to the url in
      *            the email
-     * @throws MessagingException
+     * @throws MessagingException if error
      */
     public void emailSuccessMessage(Context context, EPerson eperson,
             String fileName) throws MessagingException;
@@ -260,11 +278,17 @@ public interface ItemExportService {
      *            - EPerson to send the error message to
      * @param error
      *            - the error message
-     * @throws MessagingException
+     * @throws MessagingException if error
      */
     public void emailErrorMessage(EPerson eperson, String error)
             throws MessagingException;
 
+    /**
+     * Zip source to target
+     * @param strSource source file
+     * @param target target file
+     * @throws Exception if error
+     */
     public void zip(String strSource, String target) throws Exception;
 
 }

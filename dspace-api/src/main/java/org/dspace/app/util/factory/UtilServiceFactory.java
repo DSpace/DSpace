@@ -10,7 +10,7 @@ package org.dspace.app.util.factory;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.app.util.service.WebAppService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the util package, use UtilServiceFactory.getInstance() to retrieve an implementation
@@ -27,7 +27,7 @@ public abstract class UtilServiceFactory
 
     public static UtilServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("appUtilServiceFactory", UtilServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("appUtilServiceFactory", UtilServiceFactory.class);
     }
 
 }

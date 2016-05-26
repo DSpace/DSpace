@@ -19,10 +19,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.json.JSONRequest;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import com.google.gson.Gson;
 
@@ -32,9 +33,11 @@ public class HandleJSONResolver extends JSONRequest
             .getLogger(HandleJSONResolver.class);
 
 	private HandleService handleService;
+        private ConfigurationService configurationService;
 
 	public HandleJSONResolver() {
 		handleService = HandleServiceFactory.getInstance().getHandleService();
+                configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 	}
 
     public void doJSONRequest(Context context, HttpServletRequest request,
@@ -77,11 +80,11 @@ public class HandleJSONResolver extends JSONRequest
             {
                 List<String> prefixes = new ArrayList<String>();
                 prefixes.add(handleService.getPrefix());
-                String additionalPrefixes = ConfigurationManager
-                        .getProperty("handle.additional.prefixes");
-                if (StringUtils.isNotBlank(additionalPrefixes))
+                String[] additionalPrefixes = configurationService
+                        .getArrayProperty("handle.additional.prefixes");
+                if (additionalPrefixes!=null)
                 {
-                    for (String apref : additionalPrefixes.split(","))
+                    for (String apref : additionalPrefixes)
                     {
                         prefixes.add(apref.trim());
                     }
@@ -90,7 +93,7 @@ public class HandleJSONResolver extends JSONRequest
             }
             else if (reqPath.startsWith("listhandles/"))
             {
-                if (ConfigurationManager.getBooleanProperty(
+                if (configurationService.getBooleanProperty(
                         "handle.hide.listhandles", true))
                 {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND);

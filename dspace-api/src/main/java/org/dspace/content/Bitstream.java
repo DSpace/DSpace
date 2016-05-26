@@ -127,8 +127,10 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Set the name of the bitstream
      * 
+     * @param context context
      * @param n
      *            the new name of the bitstream
+     * @throws SQLException if database error
      */
     public void setName(Context context, String n) throws SQLException {
         getBitstreamService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "title", null, null, n);
@@ -149,8 +151,10 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Set the source of the bitstream
      * 
+     * @param context context
      * @param n
      *            the new source of the bitstream
+     * @throws SQLException if database error
      */
     public void setSource(Context context, String n) throws SQLException {
         getBitstreamService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "source", null, null, n);
@@ -170,8 +174,10 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Set the description of the bitstream
      * 
+     * @param context context
      * @param n
      *            the new description of the bitstream
+     * @throws SQLException if database error
      */
     public void setDescription(Context context, String n) throws SQLException {
         getBitstreamService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "description", null, null, n);
@@ -238,7 +244,9 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Get the format of the bitstream
      * 
+     * @param context context
      * @return the format of this bitstream
+     * @throws SQLException if database error
      */
     public BitstreamFormat getFormat(Context context) throws SQLException
     {
@@ -255,6 +263,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * This method allows us to verify is the bitstream is still valid
      *
      * @return true if the bitstream has been deleted
+     * @throws SQLException if database error
      */
     public boolean isDeleted() throws SQLException
     {
@@ -269,7 +278,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * Get the bundles this bitstream appears in
      * 
      * @return array of <code>Bundle</code> s this bitstream appears in
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<Bundle> getBundles() throws SQLException
     {
@@ -312,7 +321,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Set the asset store number where this bitstream is stored
      *
-     * @return the asset store number of the bitstream
+     * @param storeNumber asset store number of the bitstream
      */
     public void setStoreNumber(int storeNumber) {
         this.storeNumber = storeNumber;
@@ -335,9 +344,10 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * Set the user's format description. This implies that the format of the
      * bitstream is uncertain, and the format is set to "unknown."
      *
+     * @param context
      * @param desc
      *            the user's description of the format
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public void setUserFormatDescription(Context context, String desc) throws SQLException
     {
@@ -348,7 +358,9 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * Get the description of the format - either the user's or the description
      * of the format defined by the system.
      *
+     * @param context context
      * @return a description of the format.
+     * @throws SQLException if database error
      */
     public String getFormatDescription(Context context) throws SQLException
     {
@@ -360,10 +372,11 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * description, it is cleared. Passing in <code>null</code> sets the type
      * of this bitstream to "unknown".
      *
+     * @param context context
      * @param f
      *            the format of this bitstream, or <code>null</code> for
      *            unknown
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public void setFormat(Context context, BitstreamFormat f) throws SQLException
     {

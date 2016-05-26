@@ -17,10 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
-import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
@@ -111,7 +110,7 @@ public class ContextUtil
             // Set the session ID and IP address
             String ip = request.getRemoteAddr();
             if (useProxies == null) {
-                useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
+                useProxies = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("useProxies", false);
             }
             if(useProxies && request.getHeader("X-Forwarded-For") != null)
             {

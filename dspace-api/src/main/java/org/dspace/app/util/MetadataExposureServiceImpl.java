@@ -7,19 +7,15 @@
  */
 package org.dspace.app.util;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Enumeration;
-import java.sql.SQLException;
-
 import org.apache.log4j.Logger;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Static utility class to manage configuration for exposure (hiding) of
@@ -69,15 +65,16 @@ public class MetadataExposureServiceImpl implements MetadataExposureService
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
+    protected MetadataExposureServiceImpl()
+    {
+
+    }
+
     @Override
     public boolean isHidden(Context context, String schema, String element, String qualifier)
         throws SQLException
     {
-        // the administrator's override
-        if (context != null && authorizeService.isAdmin(context))
-        {
-            return false;
-        }
+        boolean hidden = false;
 
         // for schema.element, just check schema->elementSet
         if (!isInitialized())
@@ -88,9 +85,8 @@ public class MetadataExposureServiceImpl implements MetadataExposureService
         if (qualifier == null)
         {
             Set<String> elts = hiddenElementSets.get(schema);
-            return elts == null ? false : elts.contains(element);
+            hidden = elts != null && elts.contains(element);
         }
-
         // for schema.element.qualifier, just schema->eltMap->qualSet
         else
         {
@@ -100,8 +96,15 @@ public class MetadataExposureServiceImpl implements MetadataExposureService
                 return false;
             }
             Set<String> quals = elts.get(element);
-            return quals == null ? false : quals.contains(qualifier);
+            hidden = quals != null && quals.contains(qualifier);
         }
+
+        if(hidden && context != null) {
+            // the administrator's override
+            hidden = !authorizeService.isAdmin(context);
+        }
+
+        return hidden;
     }
 
     /**

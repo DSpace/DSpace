@@ -19,6 +19,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 import org.dspace.core.service.LicenseService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,11 @@ public class LicenseServiceImpl implements LicenseService
 
     /** The default license */
     protected String license;
+
+    protected LicenseServiceImpl()
+    {
+
+    }
 
     @Override
     public void writeLicenseFile(String licenseFile,
@@ -127,7 +133,7 @@ public class LicenseServiceImpl implements LicenseService
      */
     protected void init()
     {
-        File licenseFile = new File(ConfigurationManager.getProperty("dspace.dir")
+        File licenseFile = new File(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
                 + File.separator + "config" + File.separator + "default.license");
 
         FileInputStream  fir = null;

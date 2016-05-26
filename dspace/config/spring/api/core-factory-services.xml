@@ -14,8 +14,6 @@
     <bean id="sfxServiceFactory" class="org.dspace.app.sfx.factory.SfxServiceFactoryImpl"/>
     <bean id="appUtilServiceFactory" class="org.dspace.app.util.factory.UtilServiceFactoryImpl"/>
 
-
-
     <bean id="authenticateServiceFactory" class="org.dspace.authenticate.factory.AuthenticateServiceFactoryImpl"/>
 
     <bean id="authorityServiceFactory" class="org.dspace.authority.factory.AuthorityServiceFactoryImpl"/>

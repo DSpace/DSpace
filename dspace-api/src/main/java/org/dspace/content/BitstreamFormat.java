@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.dspace.content.factory.ContentServiceFactory;
@@ -102,7 +103,7 @@ public class BitstreamFormat implements Serializable
      */
     protected BitstreamFormat()
     {
-
+        fileExtensions = new LinkedList<>();
     }
 
     /**

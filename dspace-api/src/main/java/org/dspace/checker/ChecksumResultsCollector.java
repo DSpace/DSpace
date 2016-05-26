@@ -24,8 +24,10 @@ public interface ChecksumResultsCollector
     /**
      * Collects results.
      * 
+     * @param context Context
      * @param info
      *            BitstreamInfo representing the check results.
+     * @throws SQLException if database error
      */
     void collect(Context context, MostRecentChecksum info) throws SQLException;
 }

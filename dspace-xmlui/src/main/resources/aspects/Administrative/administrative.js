@@ -15,6 +15,7 @@ importClass(Packages.org.dspace.content.service.CommunityService)
 importClass(Packages.org.dspace.content.CommunityServiceImpl)
 importClass(Packages.java.util.UUID)
 importClass(Packages.java.lang.Integer)
+importClass(Packages.org.apache.commons.lang.StringUtils)
 
 importClass(Packages.org.dspace.core.Constants);
 importClass(Packages.org.dspace.content.Bitstream);
@@ -2184,8 +2185,8 @@ function doAuthorizeContainer(containerType, containerID)
             return null;
         }
         else if (cocoon.request.get("submit_add")) {
-            // Create a new policy
-            result = doEditPolicy(containerType,containerID,null);
+            // Create a new policy (pass policyID=-1 to create a new one)
+            result = doEditPolicy(containerType,containerID,-1);
             if (result != null && result.getParameter("policyID"))
             	highlightID = result.getParameter("policyID");
         }
@@ -2355,7 +2356,7 @@ function doEditPolicy(objectType,objectID,policyID)
     var result;
     var query= "-1";
     var groupID;
-    var actionID;
+    var actionID = -1;
     var page = 0;
     var name;
     var description;
@@ -2691,7 +2692,7 @@ function doAssignCollectionRoles(collectionID)
 		{
 			result = doDeleteCollectionRole(collectionID, "DEFAULT_READ");
 		}else{
-            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+            if(StringUtils.equals(ConfigurationManager.getProperty("workflow.framework"), "xmlworkflow")){
                 if(workflow == null){
                     var collection = getCollectionService().find(getDSContext(),collectionID);
                     workflow = getXmlWorkflowFactory().getWorkflow(collection);

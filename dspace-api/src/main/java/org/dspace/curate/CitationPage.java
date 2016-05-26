@@ -196,9 +196,9 @@ public class CitationPage extends AbstractCurationTask {
      * bundle.
      * @param item The item containing the bundles being used.
      * @param bitstream The original source bitstream.
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     protected void addCitedPageToItem(File citedTemp, Bundle bundle, Bundle pBundle,
                                     Bundle dBundle, Map<String,Bitstream> displayMap, Item item,

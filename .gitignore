@@ -1,6 +1,9 @@
 ## Ignore the MVN compiled output directories from version tracking
 target/
 
+## Ignore tags index files created by Exuberant Ctags
+tags
+
 ## Ignore project files created by Eclipse
 .settings/
 .project
@@ -24,8 +27,14 @@ nb-configuration.xml
 META-INF/
 
 ## Ignore all *.properties file in root folder, EXCEPT build.properties (the default)
+## KEPT FOR BACKWARDS COMPATIBILITY WITH 5.x (build.properties is now replaced with local.cfg)
 /*.properties
 !/build.properties
+
+# Ignore a local.cfg file in root folder, if it exists
+/local.cfg
+# Also ignore it under dspace/config
+/dspace/config/local.cfg
 
 ##Mac noise
 .DS_Store

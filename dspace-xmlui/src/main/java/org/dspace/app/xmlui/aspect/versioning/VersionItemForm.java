@@ -14,16 +14,13 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
-import org.dspace.versioning.service.VersioningService;
 
 import java.sql.SQLException;
 import java.util.UUID;
@@ -104,7 +101,7 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
         Para actions = main.addPara();
 
         org.dspace.versioning.VersionHistory history = retrieveVersionHistory(item);
-        if(history!=null && versionHistoryService.hasNext(history ,item))
+        if(history!=null && versionHistoryService.hasNext(context, history ,item))
         {
             actions.addButton("submit_update_version").setValue(T_submit_update_version);
         }

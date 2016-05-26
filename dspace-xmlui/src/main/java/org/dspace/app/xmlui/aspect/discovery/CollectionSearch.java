@@ -24,7 +24,7 @@ import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -170,10 +170,10 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
         HandleUtil.buildHandleTrail(context, collection,pageMeta,contextPath);
 
         // Add RSS links if available
-        String formats = ConfigurationManager.getProperty("webui.feed.formats");
+        String[] formats = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.formats");
 		if ( formats != null )
 		{
-			for (String format : formats.split(","))
+			for (String format : formats)
 			{
 				// Remove the protocol number, i.e. just list 'rss' or' atom'
 				String[] parts = format.split("_");

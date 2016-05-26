@@ -8,6 +8,13 @@
         </step>
     </command>
     <command>
+        <name>healthcheck</name>
+        <description>Create health check report</description>
+        <step>
+            <class>org.dspace.health.Report</class>
+        </step>
+    </command>
+    <command>
         <name>checker</name>
         <description>Run the checksum checker</description>
         <step>
@@ -72,7 +79,7 @@
         <name>dsprop</name>
         <description>View a DSpace property from dspace.cfg</description>
         <step>
-            <class>org.dspace.core.ConfigurationManager</class>
+            <class>org.dspace.app.util.Configuration</class>
         </step>
     </command>
     <command>
@@ -129,13 +136,6 @@
         <description>Indexes all metadata fields that use solr authority</description>
         <step>
             <class>org.dspace.authority.indexer.AuthorityIndexClient</class>
-        </step>
-    </command>
-    <command>
-        <name>index-db-browse</name>
-        <description>General browse index command (requires extra parameters)</description>
-        <step>
-            <class>org.dspace.browse.IndexBrowse</class>
         </step>
     </command>
     <command>

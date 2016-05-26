@@ -16,11 +16,12 @@ import org.dspace.eperson.Group;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Database Access Object interface class for the Collection object.
  * The implementation of this class is responsible for all database calls for the Collection object and is autowired by spring
- * This class should only be accessed from a single service & should never be exposed outside of the API
+ * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -37,4 +38,10 @@ public interface CollectionDAO extends DSpaceObjectLegacySupportDAO<Collection> 
     public List<Collection> findAuthorized(Context context, EPerson ePerson, List<Integer> actions) throws SQLException;
 
     List<Collection> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions) throws SQLException;
+
+    List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException;
+
+    int countRows(Context context) throws SQLException;
+
+    List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
 }

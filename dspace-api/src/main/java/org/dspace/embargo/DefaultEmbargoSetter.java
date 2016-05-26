@@ -19,7 +19,6 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.embargo.factory.EmbargoServiceFactory;
@@ -27,6 +26,7 @@ import org.dspace.embargo.service.EmbargoService;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.license.CreativeCommonsServiceImpl;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Default plugin implementation of the embargo setting function.
@@ -40,17 +40,14 @@ import org.dspace.license.CreativeCommonsServiceImpl;
  */
 public class DefaultEmbargoSetter implements EmbargoSetter
 {
-    protected String termsOpen = null;
-
     protected AuthorizeService authorizeService;
     protected ResourcePolicyService resourcePolicyService;
 
     public DefaultEmbargoSetter()
     {
         super();
-        termsOpen = ConfigurationManager.getProperty("embargo.terms.open");
     }
-    
+
     /**
      * Parse the terms into a definite date. Terms are expected to consist of
      * either: a token (value configured in 'embargo.terms.open' property) to indicate
@@ -65,6 +62,8 @@ public class DefaultEmbargoSetter implements EmbargoSetter
     public DCDate parseTerms(Context context, Item item, String terms)
         throws SQLException, AuthorizeException
     {
+        String termsOpen = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("embargo.terms.open");
+
     	if (terms != null && terms.length() > 0)
     	{
     		if (termsOpen.equals(terms))

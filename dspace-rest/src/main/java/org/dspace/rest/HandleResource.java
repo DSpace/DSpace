@@ -49,7 +49,7 @@ public class HandleResource extends Resource {
         org.dspace.core.Context context = null;
 
         try {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.DSpaceObject dso = handleService.resolveToObject(context, prefix + "/" + suffix);
 
@@ -62,16 +62,16 @@ public class HandleResource extends Resource {
             if(authorizeService.authorizeActionBoolean(context, dso, org.dspace.core.Constants.READ)) {
                 switch(dso.getType()) {
                     case Constants.COMMUNITY:
-                        dSpaceObject = new Community((org.dspace.content.Community) dso, expand, context);
+                        dSpaceObject = new Community((org.dspace.content.Community) dso, servletContext, expand, context);
                         break;
                     case Constants.COLLECTION:
-                        dSpaceObject = new Collection((org.dspace.content.Collection) dso, expand, context, null, null);
+                        dSpaceObject = new Collection((org.dspace.content.Collection) dso, servletContext, expand, context, null, null);
                         break;
                     case Constants.ITEM:
-                        dSpaceObject = new Item((org.dspace.content.Item) dso, expand, context);
+                        dSpaceObject = new Item((org.dspace.content.Item) dso, servletContext, expand, context);
                         break;
                     default:
-                        dSpaceObject = new DSpaceObject(dso);
+                        dSpaceObject = new DSpaceObject(dso, servletContext);
                         break;
                 }
             } else {

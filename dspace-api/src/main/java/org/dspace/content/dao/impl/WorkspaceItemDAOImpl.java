@@ -18,9 +18,11 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.BasicTransformerAdapter;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the WorkspaceItem object.
@@ -29,7 +31,12 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> implements WorkspaceItemDAO {
+public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> implements WorkspaceItemDAO
+{
+    protected WorkspaceItemDAOImpl()
+    {
+        super();
+    }
 
 
     @Override
@@ -80,6 +87,25 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
         criteria.createAlias("supervisorGroup.epeople", "person");
         criteria.add(Restrictions.eq("person.id", ePerson.getID()));
         return list(criteria);
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) from WorkspaceItem"));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException {
+        Query query = createQuery(context,"SELECT wi.stageReached as stage_reached, count(*) as cnt from WorkspaceItem wi" +
+                " group by wi.stageReached order by wi.stageReached");
+        query.setResultTransformer(new BasicTransformerAdapter() {
+            @Override
+            public Object transformTuple(Object[] tuple, String[] aliases) {
+                return new java.util.AbstractMap.SimpleImmutableEntry((Integer) tuple[0], (Long) tuple[1]);
+            }
+        });
+        return (List<Map.Entry<Integer, Long>>)query.list();
     }
 
 }

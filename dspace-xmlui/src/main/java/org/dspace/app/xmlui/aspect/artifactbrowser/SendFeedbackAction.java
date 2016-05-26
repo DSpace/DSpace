@@ -20,7 +20,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
@@ -51,18 +51,16 @@ public class SendFeedbackAction extends AbstractAction
         // The page where the user came from
         String fromPage = request.getHeader("Referer");
         // Prevent spammers and splogbots from poisoning the feedback page
-        String host = ConfigurationManager.getProperty("dspace.hostname");
-        String allowedReferrersString = ConfigurationManager.getProperty("mail.allowed.referrers");
+        String host = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname");
+        String[] allowedReferrers = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("mail.allowed.referrers");
 
-        String[] allowedReferrersSplit = null;
         boolean validReferral = false;
 
-        if((allowedReferrersString != null) && (allowedReferrersString.length() > 0))
+        if(allowedReferrers != null)
         {
-            allowedReferrersSplit = allowedReferrersString.trim().split("\\s*,\\s*");
-            for(int i = 0; i < allowedReferrersSplit.length; i++)
+            for(String allowedReferrer : allowedReferrers)
             {
-                if(fromPage.indexOf(allowedReferrersSplit[i]) != -1)
+                if(fromPage.contains(allowedReferrer))
                 {
                     validReferral = true;
                     break;
@@ -129,7 +127,7 @@ public class SendFeedbackAction extends AbstractAction
 
         // All data is there, send the email
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "feedback"));
-        email.addRecipient(ConfigurationManager
+        email.addRecipient(DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getProperty("feedback.recipient"));
 
         email.addArgument(new Date()); // Date

@@ -24,7 +24,13 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationData> implements RegistrationDataDAO {
+public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationData> implements RegistrationDataDAO
+{
+
+    protected RegistrationDataDAOImpl()
+    {
+        super();
+    }
 
     @Override
     public RegistrationData findByEmail(Context context, String email) throws SQLException {

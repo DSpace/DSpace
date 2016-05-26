@@ -5,7 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-importClass(Packages.org.dspace.authorize.AuthorizeManager);
+importClass(Packages.org.dspace.authorize.service.AuthorizeService);
+importClass(Packages.org.dspace.authorize.factory.AuthorizeServiceFactory);
+importClass(Packages.org.dspace.content.factory.ContentServiceFactory);
 
 importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
@@ -15,6 +17,8 @@ importClass(Packages.org.dspace.app.xmlui.aspect.swordclient.SelectCollectionAct
 importClass(Packages.org.dspace.app.xmlui.aspect.swordclient.SelectPackagingAction);
 importClass(Packages.org.dspace.app.xmlui.aspect.swordclient.DepositAction);
 importClass(Packages.org.dspace.content.Item);
+
+importClass(Packages.java.util.UUID);
 
 /**
  * Simple access method to access the current cocoon object model.
@@ -107,13 +111,23 @@ function sendPageAndWait(uri,bizData,result)
     cocoon.sendPageAndWait(uri,bizData);
 }
 
+function getAuthorizeService()
+{
+    return AuthorizeServiceFactory.getInstance().getAuthorizeService();
+}
+
+function getItemService()
+{
+    return ContentServiceFactory.getInstance().getItemService();
+}
+
 
 /**
  * Return whether the currently authenticated eperson is an
  * administrator.
  */
 function isAdministrator() {
-	return AuthorizeManager.isAdmin(getDSContext());
+	return getAuthorizeService().isAdmin(getDSContext());
 }
 
 /**
@@ -137,8 +151,8 @@ function startSwordDeposit()
 {
     assertAdministrator();
 
-    var itemID = cocoon.request.get("itemID");
-    var item = Item.find(getDSContext(),itemID);
+    var itemID = UUID.fromString(cocoon.request.get("itemID"));
+    var item = getItemService().find(getDSContext(),itemID);
     var handle = item.getHandle();
     var DSClient = new DSpaceSwordClient();
     var result  = null;

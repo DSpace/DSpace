@@ -14,12 +14,10 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.handle.HandleServiceImpl;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
@@ -71,7 +69,7 @@ public class UsageLoggerAction extends AbstractAction {
 
         try {
         	
-			new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
 					new UsageEvent(
 							UsageEvent.Action.VIEW,
 							(HttpServletRequest)request,
@@ -190,9 +188,9 @@ public class UsageLoggerAction extends AbstractAction {
 
     	// Determine our the maximum number of directories that will be removed for a path.
     	int maxDepthPathSearch = 3;
-    	if (ConfigurationManager.getProperty("xmlui.html.max-depth-guess") != null)
+    	if (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.html.max-depth-guess") != null)
         {
-            maxDepthPathSearch = ConfigurationManager.getIntProperty("xmlui.html.max-depth-guess");
+            maxDepthPathSearch = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("xmlui.html.max-depth-guess");
         }
 
     	// Search for the named bitstream on this item. Each time through the loop

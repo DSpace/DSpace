@@ -47,9 +47,9 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.*;
 import org.dspace.discovery.configuration.*;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.util.MultiFormatDateParser;
-import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,7 +69,7 @@ import java.util.*;
  * collections, communities, etc. It is meant to either be invoked from the
  * command line (see dspace/bin/index-all) or via the indexContent() methods
  * within DSpace.
- * <p/>
+ * <p>
  * The Administrator can choose to run SolrIndexer in a cron that repeats
  * regularly, a failed attempt to index from the UI will be "caught" up on in
  * that cron.
@@ -123,11 +123,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     private HttpSolrServer solr = null;
 
 
+    protected SolrServiceImpl()
+    {
+
+    }
+
     protected HttpSolrServer getSolr()
     {
         if ( solr == null)
         {
-            String solrService = new DSpace().getConfigurationService().getProperty("discovery.search.server");
+            String solrService = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.search.server");
 
             UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
             if (urlValidator.isValid(solrService)||ConfigurationManager.getBooleanProperty("discovery","solr.url.validation.enabled",true))
@@ -168,8 +173,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      *
      * @param context Users Context
      * @param dso     DSpace Object (Item, Collection or Community
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if error
      */
     @Override
     public void indexContent(Context context, DSpaceObject dso)
@@ -185,8 +189,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @param context Users Context
      * @param dso     DSpace Object (Item, Collection or Community
      * @param force   Force update even if not stale.
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if error
      */
     @Override
     public void indexContent(Context context, DSpaceObject dso,
@@ -251,8 +254,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      *
      * @param context
      * @param dso     DSpace Object, can be Community, Item, or Collection
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     @Override
     public void unIndexContent(Context context, DSpaceObject dso)
@@ -266,8 +269,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @param context
      * @param dso     DSpace Object, can be Community, Item, or Collection
      * @param commit if <code>true</code> force an immediate commit on SOLR
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     @Override
     public void unIndexContent(Context context, DSpaceObject dso, boolean commit)
@@ -293,8 +296,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Unindex a Document in the Lucene index.
      * @param context the dspace context
      * @param handle the handle of the object to be deleted
-     * @throws IOException
-     * @throws SQLException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
      */
     @Override
     public void unIndexContent(Context context, String handle) throws IOException, SQLException {
@@ -305,8 +308,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Unindex a Document in the Lucene Index.
      * @param context the dspace context
      * @param handle the handle of the object to be deleted
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     @Override
     public void unIndexContent(Context context, String handle, boolean commit)
@@ -375,7 +378,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Iterates over all Items, Collections and Communities. And updates them in
      * the index. Uses decaching to control memory footprint. Uses indexContent
      * and isStale to check state of item in index.
-     * <p/>
+     * <p>
      * At first it may appear counterintuitive to have an IndexWriter/Reader
      * opened and closed on each DSO. But this allows the UI processes to step
      * in and attain a lock and write to the index even if other processes/jvms
@@ -389,10 +392,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
         try {
             Iterator<Item> items = null;
+            int itemCount = 0;
             for (items = itemService.findAllUnfiltered(context); items.hasNext();)
             {
                 Item item = items.next();
                 indexContent(context, item, force);
+                if (itemCount++ >= 1000) {
+                	context.clearCache();
+                	itemCount = 0;
+                }
             }
 
             List<Collection> collections = collectionService.findAll(context);
@@ -638,8 +646,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
 
     /**
+     * @param context DSpace context
      * @param myitem the item for which our locations are to be retrieved
-     * @return a list containing the identifiers of the communities & collections
+     * @return a list containing the identifiers of the communities and collections
      * @throws SQLException sql exception
      */
     protected List<String> getItemLocations(Context context, Item myitem)
@@ -736,8 +745,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Build a solr document for a DSpace Community.
      *
      * @param community Community to be indexed
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     protected void buildDocument(Context context, Community community)
     throws SQLException, IOException {
@@ -771,7 +780,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.title", title);
 
         //Do any additional indexing, depends on the plugins
-        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = new DSpace().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
+        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
         for (SolrServiceIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
         {
             solrServiceIndexPlugin.additionalIndex(context, community, doc);
@@ -827,7 +836,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
 
         //Do any additional indexing, depends on the plugins
-        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = new DSpace().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
+        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
         for (SolrServiceIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
         {
             solrServiceIndexPlugin.additionalIndex(context, collection, doc);
@@ -864,8 +873,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      *
      * @param context Users Context
      * @param item    The DSpace Item to be indexed
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     protected void buildDocument(Context context, Item item)
             throws SQLException, IOException {
@@ -958,14 +967,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
 
             List<String> toProjectionFields = new ArrayList<String>();
-            String projectionFieldsString = new DSpace().getConfigurationService().getProperty("discovery.index.projection");
-            if(projectionFieldsString != null){
-                if(projectionFieldsString.indexOf(",") != -1){
-                    for (int i = 0; i < projectionFieldsString.split(",").length; i++) {
-                        toProjectionFields.add(projectionFieldsString.split(",")[i].trim());
-                    }
-                } else {
-                    toProjectionFields.add(projectionFieldsString);
+            String[] projectionFields = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("discovery.index.projection");
+            if(projectionFields != null){
+                for (String field : projectionFields) {
+                    toProjectionFields.add(field.trim());
                 }
             }
 
@@ -1008,12 +1013,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 if (isAuthorityControlled && meta.getAuthority() != null
                         && meta.getConfidence() >= minConfidence)
                 {
-                    boolean ignoreAuthority = new DSpace()
-                            .getConfigurationService()
+                    boolean ignoreAuthority = DSpaceServicesFactory.getInstance().getConfigurationService()
                             .getPropertyAsType(
                                     "discovery.index.authority.ignore." + field,
-                                    new DSpace()
-                                            .getConfigurationService()
+                                    DSpaceServicesFactory.getInstance().getConfigurationService()
                                             .getPropertyAsType(
                                                     "discovery.index.authority.ignore",
                                                     new Boolean(false)), true);
@@ -1021,13 +1024,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     {
                         authority = meta.getAuthority();
 
-                        boolean ignorePrefered = new DSpace()
-                                .getConfigurationService()
+                        boolean ignorePrefered = DSpaceServicesFactory.getInstance().getConfigurationService()
                                 .getPropertyAsType(
                                         "discovery.index.authority.ignore-prefered."
                                                 + field,
-                                        new DSpace()
-                                                .getConfigurationService()
+                                        DSpaceServicesFactory.getInstance().getConfigurationService()
                                                 .getPropertyAsType(
                                                         "discovery.index.authority.ignore-prefered",
                                                         new Boolean(false)),
@@ -1039,13 +1040,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                     .getLabel(meta, meta.getLanguage());
                         }
 
-                        boolean ignoreVariants = new DSpace()
-                                .getConfigurationService()
+                        boolean ignoreVariants = DSpaceServicesFactory.getInstance().getConfigurationService()
                                 .getPropertyAsType(
                                         "discovery.index.authority.ignore-variants."
                                                 + field,
-                                        new DSpace()
-                                                .getConfigurationService()
+                                        DSpaceServicesFactory.getInstance().getConfigurationService()
                                                 .getPropertyAsType(
                                                         "discovery.index.authority.ignore-variants",
                                                         new Boolean(false)),
@@ -1070,7 +1069,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     for (DiscoverySearchFilter searchFilter : searchFilterConfigs)
                     {
                         Date date = null;
-                        String separator = new DSpace().getConfigurationService().getProperty("discovery.solr.facets.split.char");
+                        String separator = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.solr.facets.split.char");
                         if(separator == null)
                         {
                             separator = FILTER_SEPARATOR;
@@ -1387,7 +1386,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
 
         //Do any additional indexing, depends on the plugins
-        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = new DSpace().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
+        List<SolrServiceIndexPlugin> solrServiceIndexPlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
         for (SolrServiceIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
         {
             solrServiceIndexPlugin.additionalIndex(context, item, doc);
@@ -1725,7 +1724,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
 
         //Add any configured search plugins !
-        List<SolrServiceSearchPlugin> solrServiceSearchPlugins = new DSpace().getServiceManager().getServicesByType(SolrServiceSearchPlugin.class);
+        List<SolrServiceSearchPlugin> solrServiceSearchPlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrServiceSearchPlugin.class);
         for (SolrServiceSearchPlugin searchPlugin : solrServiceSearchPlugins)
         {
             searchPlugin.additionalSearchParameters(context, discoveryQuery, solrQuery);
@@ -2206,7 +2205,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
           || field.endsWith("_acid"))
         {
             //We have a filter make sure we split !
-            String separator = new DSpace().getConfigurationService().getProperty("discovery.solr.facets.split.char");
+            String separator = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.solr.facets.split.char");
             if(separator == null)
             {
                 separator = FILTER_SEPARATOR;
@@ -2239,7 +2238,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 || field.endsWith("_acid"))
         {
             //We have a filter make sure we split !
-            String separator = new DSpace().getConfigurationService().getProperty("discovery.solr.facets.split.char");
+            String separator = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.solr.facets.split.char");
             if(separator == null)
             {
                 separator = FILTER_SEPARATOR;
@@ -2274,7 +2273,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 || field.endsWith("_acid"))
         {
             //We have a filter make sure we split !
-            String separator = new DSpace().getConfigurationService().getProperty("discovery.solr.facets.split.char");
+            String separator = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("discovery.solr.facets.split.char");
             if(separator == null)
             {
                 separator = FILTER_SEPARATOR;

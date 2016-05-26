@@ -8,7 +8,7 @@
 package org.dspace.core;
 
 /**
- * Indicates fatal error in Plugin Manager configuration.
+ * Indicates fatal error in PluginService configuration.
  * <p>
  * This error is only thrown when the effect of a configuration problem
  * (<i>e.g.</i> missing value for a Single Plugin) is likely to leave
@@ -16,7 +16,7 @@ package org.dspace.core;
  *
  * @author Larry Stone
  * @version $Revision$
- * @see PluginManager
+ * @see org.dspace.core.service.PluginService
  */
 
 public class PluginConfigurationError extends Error

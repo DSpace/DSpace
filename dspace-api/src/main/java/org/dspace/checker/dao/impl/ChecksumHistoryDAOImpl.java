@@ -34,12 +34,18 @@ import org.hibernate.Query;
  */
 public class ChecksumHistoryDAOImpl extends AbstractHibernateDAO<ChecksumHistory> implements ChecksumHistoryDAO
 {
+
+    protected ChecksumHistoryDAOImpl()
+    {
+        super();
+    }
+
     @Override
     public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode resultCode) throws SQLException {
         String hql = "delete from ChecksumHistory where processEndDate < :processEndDate AND checksumResult.resultCode=:resultCode";
         Query query = createQuery(context, hql);
-        query.setParameter("processEndDate", retentionDate);
-        query.setParameter("result", resultCode);
+        query.setTimestamp("processEndDate", retentionDate);
+        query.setParameter("resultCode", resultCode);
         return query.executeUpdate();
     }
 

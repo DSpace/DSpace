@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Database Access Object interface class for the Bitstream object.
  * The implementation of this class is responsible for all database calls for the Bitstream object and is autowired by spring
- * This class should only be accessed from a single service & should never be exposed outside of the API
+ * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -41,4 +41,12 @@ public interface BitstreamDAO extends DSpaceObjectLegacySupportDAO<Bitstream> {
     public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException;
 
     public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException;
+
+    int countRows(Context context) throws SQLException;
+
+    int countDeleted(Context context) throws SQLException;
+
+    int countWithNoPolicy(Context context) throws SQLException;
+
+    List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
 }

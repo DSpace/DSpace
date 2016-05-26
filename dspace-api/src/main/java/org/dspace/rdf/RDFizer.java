@@ -39,8 +39,10 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.rdf.factory.RDFFactory;
+import org.dspace.rdf.storage.RDFStorage;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class manages the handling of RDF data in DSpace. It generates
@@ -53,39 +55,43 @@ public class RDFizer {
     
     private static final Logger log = Logger.getLogger(RDFizer.class);
     
-    protected ConfigurationService configurationService;
-    
     protected boolean stdout;
     protected boolean verbose;
     protected boolean dryrun;
     protected String lang;
     protected Context context;
+    
+    protected final ConfigurationService configurationService;
     protected final ContentServiceFactory contentServiceFactory;
     protected final CommunityService communityService;
     protected final ItemService itemService;
     protected final HandleService handleService;
+    protected final RDFStorage storage;
+
 
     /**
      * Set to remember with DSpaceObject were converted or deleted from the 
      * triplestore already. This set is helpful when converting or deleting 
-     * multiple DSpaceObjects (g.e. Communities with all Subcommunities and
+     * multiple DSpaceObjects (e.g. Communities with all Subcommunities and
      * Items).
      */
     protected Set<UUID> processed;
 
     public RDFizer()
     {
-        this.configurationService = new DSpace().getConfigurationService();
         this.stdout = false;
         this.verbose = false;
         this.dryrun = false;
         this.lang = "TURTLE";
         this.processed = new CopyOnWriteArraySet<UUID>();
         this.context = new Context(Context.READ_ONLY);
+        
+        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.contentServiceFactory = ContentServiceFactory.getInstance();
         this.communityService = contentServiceFactory.getCommunityService();
         this.itemService = contentServiceFactory.getItemService();
         this.handleService = HandleServiceFactory.getInstance().getHandleService();
+        this.storage = RDFFactory.getInstance().getRDFStorage();
     }
     
     /**
@@ -170,7 +176,7 @@ public class RDFizer {
     public void deleteAll()
     {
         report("Sending delete command to the triple store.");
-        if (!this.dryrun) RDFConfiguration.getRDFStorage().deleteAll();
+        if (!this.dryrun) storage.deleteAll();
         report("Deleted all data from the triplestore.");
     }
     
@@ -218,7 +224,7 @@ public class RDFizer {
                 report("Deleting Named Graph" + identifier);
                 if (!dryrun)
                 {
-                    RDFConfiguration.getRDFStorage().delete(identifier);
+                    storage.delete(identifier);
                 }
             }
         };
@@ -343,7 +349,7 @@ public class RDFizer {
         
         // if this method is used for conversion we should check if we have the
         // permissions to read a DSO before converting all of it decendents
-        // (g.e. check read permission on a community before converting all of
+        // (e.g. check read permission on a community before converting all of
         // its subcommunties and collections).
         // just skip items with missing permissions and report them.
         if (check)
@@ -412,9 +418,11 @@ public class RDFizer {
         }
 
 //        Currently Bundles and Bitsreams aren't supported as independent entities.
-//        The should be converted as part of an item. So we do not need to make
+//        They should be converted as part of an item. So we do not need to make
 //        the recursive call for them. An item itself will be converted as part
 //        of the callback call below.
+//        The following code is left here for the day, we decide to also convert
+//        bundles and/or bitstreams.
 //        
 //        if (dso instanceof Item)
 //        {
@@ -563,7 +571,7 @@ public class RDFizer {
                 {
                     if (!this.dryrun)
                     {
-                        RDFConfiguration.getRDFStorage().delete(identifier);
+                        storage.delete(identifier);
                     }
                     if (this.verbose)
                     {

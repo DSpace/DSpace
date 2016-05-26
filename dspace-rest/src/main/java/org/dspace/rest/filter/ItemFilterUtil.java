@@ -8,7 +8,6 @@
  package org.dspace.rest.filter;
 
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -20,8 +19,8 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import com.ibm.icu.util.Calendar;
 
@@ -30,16 +29,16 @@ public class ItemFilterUtil {
     static Logger log = Logger.getLogger(ItemFilterUtil.class);
 	public enum BundleName{ORIGINAL,TEXT,LICENSE,THUMBNAIL;}
 	
-	static String getDocumentMimeTypes() {
-		return ConfigurationManager.getProperty("rest", "rest-report-mime-document");
+	static String[] getDocumentMimeTypes() {
+		return DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("rest.report-mime-document");
 	}
 	
-	static String getSupportedDocumentMimeTypes() {
-		return ConfigurationManager.getProperty("rest", "rest-report-mime-document-supported");
+	static String[] getSupportedDocumentMimeTypes() {
+		return DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("rest.report-mime-document-supported");
 	}
 
-	static String getSupportedImageMimeTypes() {
-		return ConfigurationManager.getProperty("rest", "rest-report-mime-document-image");
+	static String[] getSupportedImageMimeTypes() {
+		return DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("rest.report-mime-document-image");
 	}
 
 	static int countOriginalBitstream(Item item) {
@@ -71,17 +70,17 @@ public class ItemFilterUtil {
 	}
 
 	
-	static int countOriginalBitstreamMime(Context context, Item item, String mimeList) {
+	static int countOriginalBitstreamMime(Context context, Item item, String[] mimeList) {
 		return countBitstreamMime(context, BundleName.ORIGINAL, item, mimeList);
 	}
-	static int countBitstreamMime(Context context, BundleName bundleName, Item item, String mimeList) {
+	static int countBitstreamMime(Context context, BundleName bundleName, Item item, String[] mimeList) {
 		int count = 0;
         for(Bundle bundle: item.getBundles()){
         	if (!bundle.getName().equals(bundleName.name())){
         		continue;
         	}
         	for(Bitstream bit: bundle.getBitstreams()) {
-            	for(String mime: mimeList.split(",")) {
+            	for(String mime: mimeList) {
                     try {
 						if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
 							count++;
@@ -95,14 +94,14 @@ public class ItemFilterUtil {
 		return count;
 	}
 
-	static int countBitstreamByDesc(BundleName bundleName, Item item, String descList) {
+	static int countBitstreamByDesc(BundleName bundleName, Item item, String[] descList) {
 		int count = 0;
         for(Bundle bundle: item.getBundles()){
         	if (!bundle.getName().equals(bundleName.name())){
         		continue;
         	}
         	for(Bitstream bit: bundle.getBitstreams()) {
-            	for(String desc: descList.split(",")) {
+            	for(String desc: descList) {
             		String bitDesc = bit.getDescription();
             		if (bitDesc == null) {
             			continue;
@@ -116,8 +115,8 @@ public class ItemFilterUtil {
 		return count;
 	}
 
-	static int countBitstreamSmallerThanMinSize(Context context, BundleName bundleName, Item item, String mimeList, String prop) {
-		long size = ConfigurationManager.getLongProperty("rest", prop);
+	static int countBitstreamSmallerThanMinSize(Context context, BundleName bundleName, Item item, String[] mimeList, String prop) {
+		long size = DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(prop);
 		int count = 0;
         try {
             for(Bundle bundle: item.getBundles()){
@@ -125,7 +124,7 @@ public class ItemFilterUtil {
             		continue;
             	}
             	for(Bitstream bit: bundle.getBitstreams()) {
-                	for(String mime: mimeList.split(",")) {
+                	for(String mime: mimeList) {
                         if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
                         	if (bit.getSize() < size) {
                             	count++;                        		
@@ -139,8 +138,8 @@ public class ItemFilterUtil {
 		return count;
 	}
 	
-	static int countBitstreamLargerThanMaxSize(Context context, BundleName bundleName, Item item, String mimeList, String prop) {
-		long size = ConfigurationManager.getLongProperty("rest", prop);
+	static int countBitstreamLargerThanMaxSize(Context context, BundleName bundleName, Item item, String[] mimeList, String prop) {
+		long size = DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(prop);
 		int count = 0;
         try {
             for(Bundle bundle: item.getBundles()){
@@ -148,7 +147,7 @@ public class ItemFilterUtil {
             		continue;
             	}
             	for(Bitstream bit: bundle.getBitstreams()) {
-                	for(String mime: mimeList.split(",")) {
+                	for(String mime: mimeList) {
                         if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
                         	if (bit.getSize() > size) {
                             	count++;                        		
@@ -183,12 +182,12 @@ public class ItemFilterUtil {
 		return count;
 	}
 
-	static boolean hasUnsupportedBundle(Item item, String bundleList) {
+	static boolean hasUnsupportedBundle(Item item, String[] bundleList) {
 		if (bundleList == null) {
 			return false;
 		}
 		ArrayList<String> bundles = new ArrayList<String>();
-		for(String bundleName: bundleList.split(",")) {
+		for(String bundleName: bundleList) {
 			bundles.add(bundleName.trim());
 		}
 		for(Bundle bundle: item.getBundles()) {
@@ -198,10 +197,10 @@ public class ItemFilterUtil {
 		}
 		return false;
 	}
-	static boolean hasOriginalBitstreamMime(Context context, Item item, String mimeList) {
+	static boolean hasOriginalBitstreamMime(Context context, Item item, String[] mimeList) {
 		return hasBitstreamMime(context, BundleName.ORIGINAL, item, mimeList);
 	}
-	static boolean hasBitstreamMime(Context context, BundleName bundleName, Item item, String mimeList) {
+	static boolean hasBitstreamMime(Context context, BundleName bundleName, Item item, String[] mimeList) {
 		return countBitstreamMime(context, bundleName, item, mimeList) > 0;
 	}
 

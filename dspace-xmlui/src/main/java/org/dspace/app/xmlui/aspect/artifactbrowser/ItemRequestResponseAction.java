@@ -31,9 +31,9 @@ import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
-import org.dspace.utils.DSpace;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -162,8 +162,7 @@ public class ItemRequestResponseAction extends AbstractAction
     	String mail = request.getParameter("email");
 
     	if(StringUtils.isNotEmpty(name)&&StringUtils.isNotEmpty(mail)){
-            RequestItemAuthor requestItemAuthor = new DSpace()
-                    .getServiceManager()
+            RequestItemAuthor requestItemAuthor = DSpaceServicesFactory.getInstance().getServiceManager()
                     .getServiceByName(RequestItemAuthorExtractor.class.getName(),
                             RequestItemAuthorExtractor.class)
                     .getRequestItemAuthor(context, item);

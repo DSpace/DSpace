@@ -63,8 +63,8 @@ if [ "$JAVA_OPTS" = "" ]; then
 fi
 
 # Read parameters from DSpace config
-handledir=`$BINDIR/dspace dsprop -property handle.dir`
-logdir=`$BINDIR/dspace dsprop -property log.dir`
+handledir=`$BINDIR/dspace dsprop --property handle.dir`
+logdir=`$BINDIR/dspace dsprop --property log.dir`
 
 # Remove lock file, in case the old Handle server did not shut down properly
 rm -f $handledir/txns/lock

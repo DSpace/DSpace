@@ -49,6 +49,7 @@ public final class ResultsPruner
      * Factory method for the default results pruner configuration using
      * dspace.cfg
      * 
+     * @param context Context
      * @return a ResultsPruner that represent the default retention policy
      */
     public static ResultsPruner getDefaultPruner(Context context)
@@ -69,10 +70,11 @@ public final class ResultsPruner
     /**
      * Factory method for ResultsPruners
      * 
+     * @param context Context
      * @param propsFile
      *            to configure the results pruner.
      * @return the configured results pruner.
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if file doesn't exist
      *             it the configuration file cannot be found.
      */
     public static ResultsPruner getPruner(Context context, String propsFile)
@@ -112,8 +114,10 @@ public final class ResultsPruner
      * Factory method for ResultsPruners (used to load ConfigurationManager
      * properties.
      * 
-     * @param props
-     * @throws FileNotFoundException
+     * @param context Context
+     * @param props Properties
+     * @return pruner
+     * @throws FileNotFoundException if file doesn't exist
      */
     public static ResultsPruner getPruner(Context context, Properties props)
     throws FileNotFoundException
@@ -177,6 +181,7 @@ public final class ResultsPruner
 
     /**
      * Default Constructor
+     * @param context Context
      */
     public ResultsPruner(Context context)
     {
@@ -211,8 +216,7 @@ public final class ResultsPruner
      *            before bitstreams with the specified result type in the
      *            checksum history is removed.
      * 
-     * @throws ParseException
-     *             if the duration cannot be parsed into a long value.
+     * @throws ParseException if the duration cannot be parsed into a long value.
      */
     public void addInterested(ChecksumResultCode result, String duration)
             throws ParseException
@@ -235,6 +239,7 @@ public final class ResultsPruner
      * registered with this object.
      * 
      * @return number of results removed.
+     * @throws SQLException if database error
      */
     public int prune() throws SQLException {
         ChecksumResultCode[] codes = ChecksumResultCode.values();

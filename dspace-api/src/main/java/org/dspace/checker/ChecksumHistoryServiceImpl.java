@@ -37,6 +37,11 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
     @Autowired(required = true)
     protected ChecksumResultService checksumResultService;
 
+    protected ChecksumHistoryServiceImpl()
+    {
+
+    }
+
     @Override
     public void updateMissingBitstreams(Context context) throws SQLException {
 //                "insert into checksum_history ( "
@@ -83,13 +88,13 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
     /**
      * Delete the history records from the database.
      *
+     * @param context Context
      * @param retentionDate
      *            any records older than this data are deleted.
      * @param checksumResultCode
      *            result code records must have for them to be deleted.
      * @return number of records deleted.
-     * @throws java.sql.SQLException
-     *             if database error occurs.
+     * @throws SQLException if database error occurs.
      */
     @Override
     public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode checksumResultCode) throws SQLException

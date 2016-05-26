@@ -400,9 +400,8 @@ public class CollectionWizardServlet extends DSpaceServlet
             g = groupService.create(context);
 
             // Name it according to our conventions
-            g
-                    .setName(context, "COLLECTION_" + collection.getID()
-                            + "_DEFAULT_ITEM_READ");
+            groupService.setName(g,
+                    "COLLECTION_" + collection.getID() + "_DEFAULT_ITEM_READ");
 
             // Give it the needed permission
             authorizeService.addPolicy(context, collection,

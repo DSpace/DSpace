@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service implementation for the WorkspaceItem object.
@@ -50,6 +51,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Autowired(required = true)
     protected WorkflowService workflowService;
 
+
+    protected WorkspaceItemServiceImpl()
+    {
+
+    }
 
     @Override
     public WorkspaceItem find(Context context, int id) throws SQLException {
@@ -100,6 +106,8 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         authorizeService.addPolicy(context, item, Constants.ADD, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
         // remove contents permission
         authorizeService.addPolicy(context, item, Constants.REMOVE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
+        // delete permission
+        authorizeService.addPolicy(context, item, Constants.DELETE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
 
 
         // Copy template if appropriate
@@ -214,6 +222,16 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         // Delete item
         itemService.delete(context, item);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return workspaceItemDAO.countRows(context);
+    }
+
+    @Override
+    public List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException {
+        return workspaceItemDAO.getStageReachedCounts(context);
     }
 
     @Override

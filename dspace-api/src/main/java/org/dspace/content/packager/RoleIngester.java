@@ -7,19 +7,7 @@
  */
 package org.dspace.content.packager;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.codec.DecoderException;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -41,6 +29,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Create EPersons and Groups from a file of external representations.
@@ -67,9 +66,9 @@ public class RoleIngester implements PackageIngester
      *          the Parent DSpaceObject
      * @param document
      *          the XML Document
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws PackageException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws PackageException if packaging error
      */
     void ingestDocument(Context context, DSpaceObject parent,
             PackageParameters params, Document document)
@@ -356,7 +355,7 @@ public class RoleIngester implements PackageIngester
                 }
 
                 // Always set the name:  parent.createBlop() is guessing
-                groupObj.setName(context, name);
+                groupService.setName(groupObj, name);
 
                 log.info("Created Group {}.", groupObj.getName());
             }
@@ -428,15 +427,12 @@ public class RoleIngester implements PackageIngester
     /**
      * Ingest roles from an InputStream.
      *
-     * @param context
-     *          DSpace Context
-     * @param parent
-     *          the Parent DSpaceObject
-     * @param stream
-     *          the XML Document InputStream
-     * @throws PackageException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param context DSpace Context
+     * @param parent the Parent DSpaceObject
+     * @param params package params
+     * @throws PackageException if packaging error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void ingestStream(Context context, DSpaceObject parent,
             PackageParameters params, InputStream stream)

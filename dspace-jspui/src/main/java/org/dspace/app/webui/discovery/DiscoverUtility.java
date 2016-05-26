@@ -583,7 +583,7 @@ public class DiscoverUtility
                             // filterquery
                             queryArgs.addFacetField(new DiscoverFacetField(
                                     facet.getIndexFieldName(), facet.getType(),
-                                    10, facet.getSortOrder()));
+                                    10, facet.getSortOrderSidebar()));
                         }
                         else
                         {
@@ -671,7 +671,7 @@ public class DiscoverUtility
                             .getIndexFieldName(),
                             DiscoveryConfigurationParameters.TYPE_TEXT,
                            limit, facet
-                                    .getSortOrder(), facetPage * facetLimit));
+                                    .getSortOrderSidebar(), facetPage * facetLimit));
                 }
             }
         }

@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.core.Constants;
 
 /**
  * The main service class used to reserve, register and resolve identifiers
@@ -40,6 +41,11 @@ public class IdentifierServiceImpl implements IdentifierService {
     protected ContentServiceFactory contentServiceFactory;
     @Autowired(required = true)
     protected HandleService handleService;
+
+    protected IdentifierServiceImpl()
+    {
+
+    }
 
     @Autowired
    @Required
@@ -62,7 +68,11 @@ public class IdentifierServiceImpl implements IdentifierService {
     public void reserve(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException {
         for (IdentifierProvider service : providers)
         {
-            service.mint(context, dso);
+            String identifier = service.mint(context, dso);
+            if (!StringUtils.isEmpty(identifier))
+            {
+                service.reserve(context, dso, identifier);
+            }
         }
         //Update our item
         contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);

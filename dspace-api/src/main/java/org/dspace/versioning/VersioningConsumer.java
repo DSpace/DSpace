@@ -18,7 +18,6 @@ import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
 
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -60,10 +59,10 @@ public class VersioningConsumer implements Consumer {
         if(st == Constants.ITEM && et == Event.INSTALL){
             Item item = (Item) event.getSubject(ctx);
             if (item != null && item.isArchived()) {
-                VersionHistory history = retrieveVersionHistory(ctx, item);
+                VersionHistory history = versionHistoryService.findByItem(ctx, item);
                 if (history != null) {
-                    Version latest = versionHistoryService.getLatestVersion(history);
-                    Version previous = versionHistoryService.getPrevious(history, latest);
+                    Version latest = versionHistoryService.getLatestVersion(ctx, history);
+                    Version previous = versionHistoryService.getPrevious(ctx, history, latest);
                     if(previous != null){
                         Item previousItem = previous.getItem();
                         if(previousItem != null){
@@ -98,8 +97,4 @@ public class VersioningConsumer implements Consumer {
         itemsToProcess = null;
     }
 
-
-    protected org.dspace.versioning.VersionHistory retrieveVersionHistory(Context c, Item item) throws SQLException {
-        return versioningService.findVersionHistory(c, item);
-    }
 }

@@ -35,6 +35,7 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 
 
 import java.io.*;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -51,7 +52,12 @@ public class StatisticsImporterElasticSearch {
     private static final Logger log = Logger.getLogger(StatisticsImporterElasticSearch.class);
 
     /** Date format */
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        }
+    };
 
     //TODO ES Client
 
@@ -130,7 +136,7 @@ public class StatisticsImporterElasticSearch {
 //                uuid = parts[0];
                 action = parts[1];
                 id = parts[2];
-                date = dateFormat.parse(parts[3]);
+                date = dateFormat.get().parse(parts[3]);
                 user = parts[4];
                 ip = parts[5];
 

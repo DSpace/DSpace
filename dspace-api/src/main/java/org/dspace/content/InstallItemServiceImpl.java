@@ -44,6 +44,11 @@ public class InstallItemServiceImpl implements InstallItemService
     @Autowired(required = true)
     protected ItemService itemService;
 
+    protected InstallItemServiceImpl()
+    {
+
+    }
+
     @Override
     public Item installItem(Context c, InProgressSubmission is)
             throws SQLException, AuthorizeException

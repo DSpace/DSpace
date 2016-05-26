@@ -17,32 +17,32 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.service.PluginService;
 import org.dspace.embargo.service.EmbargoService;
-import org.springframework.beans.factory.InitializingBean;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Public interface to the embargo subsystem.
  * <p>
  * Configuration properties: (with examples)
- *   <br/># DC metadata field to hold the user-supplied embargo terms
- *   <br/>embargo.field.terms = dc.embargo.terms
- *   <br/># DC metadata field to hold computed "lift date" of embargo
- *   <br/>embargo.field.lift = dc.date.available
- *   <br/># String to indicate indefinite (forever) embargo in terms
- *   <br/>embargo.terms.open = Indefinite
- *   <br/># implementation of embargo setter plugin
- *   <br/>plugin.single.org.dspace.embargo.EmbargoSetter = edu.my.Setter
- *   <br/># implementation of embargo lifter plugin
- *   <br/>plugin.single.org.dspace.embargo.EmbargoLifter = edu.my.Lifter
- *
+ * {@code
+ *   # DC metadata field to hold the user-supplied embargo terms
+ *   embargo.field.terms = dc.embargo.terms
+ *   # DC metadata field to hold computed "lift date" of embargo
+ *   embargo.field.lift = dc.date.available
+ *   # String to indicate indefinite (forever) embargo in terms
+ *   embargo.terms.open = Indefinite
+ *   # implementation of embargo setter plugin
+ *   plugin.single.org.dspace.embargo.EmbargoSetter = edu.my.Setter
+ *   # implementation of embargo lifter plugin
+ *   plugin.single.org.dspace.embargo.EmbargoLifter = edu.my.Lifter
+ * }
  * @author Larry Stone
  * @author Richard Rodgers
  */
-public class EmbargoServiceImpl implements EmbargoService, InitializingBean
+public class EmbargoServiceImpl implements EmbargoService
 {
 
     /** log4j category */
@@ -67,6 +67,17 @@ public class EmbargoServiceImpl implements EmbargoService, InitializingBean
 
     @Autowired(required = true)
     protected ItemService itemService;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+
+    @Autowired(required = true)
+    protected PluginService pluginService;
+
+    protected EmbargoServiceImpl()
+    {
+
+    }
 
     @Override
     public void setEmbargo(Context context, Item item)
@@ -156,14 +167,18 @@ public class EmbargoServiceImpl implements EmbargoService, InitializingBean
     }
 
 
-    // initialize - get plugins and MD field settings from config
-    @Override
-    public void afterPropertiesSet() throws Exception
+    /**
+     * Initialize the bean (after dependency injection has already taken place).
+     * Ensures the configurationService is injected, so that we can
+     * get plugins and MD field settings from config.
+     * Called by "init-method" in Spring config.
+     */
+    public void init() throws Exception
     {
         if (terms_schema == null)
         {
-            String terms = ConfigurationManager.getProperty("embargo.field.terms");
-            String lift = ConfigurationManager.getProperty("embargo.field.lift");
+            String terms = configurationService.getProperty("embargo.field.terms");
+            String lift = configurationService.getProperty("embargo.field.lift");
             if (terms == null || lift == null)
             {
                 throw new IllegalStateException("Missing one or more of the required DSpace configuration properties for EmbargoManager, check your configuration file.");
@@ -175,12 +190,12 @@ public class EmbargoServiceImpl implements EmbargoService, InitializingBean
             lift_element = getElementOf(lift);
             lift_qualifier = getQualifierOf(lift);
 
-            setter = (EmbargoSetter)PluginManager.getSinglePlugin(EmbargoSetter.class);
+            setter = (EmbargoSetter)pluginService.getSinglePlugin(EmbargoSetter.class);
             if (setter == null)
             {
                 throw new IllegalStateException("The EmbargoSetter plugin was not defined in DSpace configuration.");
             }
-            lifter = (EmbargoLifter)PluginManager.getSinglePlugin(EmbargoLifter.class);
+            lifter = (EmbargoLifter)pluginService.getSinglePlugin(EmbargoLifter.class);
             if (lifter == null)
             {
                 throw new IllegalStateException("The EmbargoLifter plugin was not defined in DSpace configuration.");

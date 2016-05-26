@@ -15,7 +15,6 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
@@ -25,7 +24,7 @@ import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.Serializable;
@@ -116,7 +115,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     }
 
     protected boolean displayStatsType(Context context, String type, DSpaceObject dso) throws SQLException {
-        ConfigurationService cs = new DSpace().getConfigurationService();
+        ConfigurationService cs = DSpaceServicesFactory.getInstance().getConfigurationService();
         return !cs.getPropertyAsType("usage-statistics.authorization.admin." + type, Boolean.TRUE) || authorizeService.isAdmin(context, dso);
 
     }

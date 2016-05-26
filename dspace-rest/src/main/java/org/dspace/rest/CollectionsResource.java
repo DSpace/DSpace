@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.browse.BrowseException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
@@ -109,13 +108,13 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
             writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
-            collection = new Collection(dspaceCollection, expand, context, limit, offset);
+            collection = new Collection(dspaceCollection, servletContext, expand, context, limit, offset);
             context.complete();
 
         }
@@ -178,7 +177,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
@@ -192,7 +191,7 @@ public class CollectionsResource extends Resource
             {
                 if (authorizeService.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
                 {
-                    Collection collection = new org.dspace.rest.common.Collection(dspaceCollection, null, context, limit,
+                    Collection collection = new org.dspace.rest.common.Collection(dspaceCollection, servletContext, null, context, limit,
                             offset);
                     collections.add(collection);
                     writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent,
@@ -264,7 +263,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
             writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
@@ -280,7 +279,7 @@ public class CollectionsResource extends Resource
                 {
                     if (itemService.isItemListedForUser(context, dspaceItem))
                     {
-                        items.add(new Item(dspaceItem, expand, context));
+                        items.add(new Item(dspaceItem, servletContext, expand, context));
                         writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                                 headers, request, context);
                     }
@@ -345,7 +344,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
@@ -366,15 +365,11 @@ public class CollectionsResource extends Resource
                 }
             }
 
-            // Index item to browse.
-            org.dspace.browse.IndexBrowse browse = new org.dspace.browse.IndexBrowse();
-            browse.indexItem(dspaceItem);
-
             log.trace("Installing item to collection(id=" + collectionId + ").");
             dspaceItem = installItemService.installItem(context, workspaceItem);
             workspaceItemService.update(context, workspaceItem);
 
-            returnItem = new Item(dspaceItem, "", context);
+            returnItem = new Item(dspaceItem, servletContext, "", context);
 
             context.complete();
 
@@ -387,10 +382,6 @@ public class CollectionsResource extends Resource
         {
             processException("Could not add item into collection(id=" + collectionId + "), AuthorizeException. Message: " + e,
                     context);
-        }
-        catch (BrowseException e)
-        {
-            processException("Could not add item into browse index, BrowseException. Message: " + e, context);
         }
         catch (ContextException e)
         {
@@ -440,7 +431,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
@@ -510,7 +501,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.DELETE);
 
@@ -580,7 +571,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Collection dspaceCollection = collectionService.findByIdOrLegacyId(context, collectionId);
             org.dspace.content.Item item = itemService.findByIdOrLegacyId(context, itemId);
@@ -676,7 +667,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             List<org.dspace.content.Collection> dspaceCollections = collectionService.findAll(context);
             //TODO, this would be more efficient with a findByName query
@@ -687,7 +678,7 @@ public class CollectionsResource extends Resource
                 {
                     if (dspaceCollection.getName().equals(name))
                     {
-                        collection = new Collection(dspaceCollection, "", context, 100, 0);
+                        collection = new Collection(dspaceCollection, servletContext, "", context, 100, 0);
                         break;
                     }
                 }
@@ -717,7 +708,7 @@ public class CollectionsResource extends Resource
         }
         else
         {
-            log.info("Collection was found with id(" + collection.getId() + ").");
+            log.info("Collection was found with id(" + collection.getUUID() + ").");
         }
         return collection;
     }

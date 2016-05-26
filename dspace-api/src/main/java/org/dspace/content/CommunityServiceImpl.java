@@ -60,6 +60,12 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     @Autowired(required = true)
     protected SiteService siteService;
 
+    protected CommunityServiceImpl()
+    {
+        super();
+
+    }
+
     @Override
     public Community create(Community parent, Context context) throws SQLException, AuthorizeException {
         return create(parent, context, null);
@@ -235,6 +241,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         log.info(LogManager.getHeader(context, "update_community",
                 "community_id=" + community.getID()));
 
+        super.update(context, community);
+
         communityDAO.save(context, community);
         if (community.isModified())
         {
@@ -262,7 +270,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             admins = groupService.create(context);
             context.restoreAuthSystemState();
 
-            admins.setName(context, "COMMUNITY_" + community.getID() + "_ADMIN");
+            groupService.setName(admins, "COMMUNITY_" + community.getID() + "_ADMIN");
             groupService.update(context, admins);
         }
 
@@ -320,6 +328,9 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     /**
      * Internal method to process subcommunities recursively
+     * @param community community
+     * @param collectionList list of collections
+     * @throws SQLException if database error
      */
     protected void addCollectionList(Community community, List<Collection> collectionList) throws SQLException
     {
@@ -480,9 +491,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
      * Internal method to remove the community and all its children from the
      * database, and perform any pre/post-cleanup
      *
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @param context context
+     * @param community community
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     protected void rawDelete(Context context, Community community) throws SQLException, AuthorizeException, IOException
     {
@@ -566,22 +579,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         }
 
         authorizeService.authorizeAction(context, community, Constants.WRITE);
-    }
-
-    @Override
-    public int countItems(Context context, Community community) throws SQLException {
-        int total = 0;
-       	// add collection counts
-        List<Collection> cols = community.getCollections();
-        for (Collection col : cols) {
-            total += itemService.countItems(context, col);
-        }
-        // add sub-community counts
-        List<Community> comms = community.getSubcommunities();
-        for (int j = 0; j < comms.size(); j++) {
-            total += countItems(context, comms.get(j));
-        }
-        return total;
     }
 
     @Override
@@ -669,5 +666,10 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     @Override
     public Community findByLegacyId(Context context, int id) throws SQLException {
         return communityDAO.findByLegacyId(context, id, Community.class);
+    }
+
+    @Override
+    public int countTotal(Context context) throws SQLException {
+        return communityDAO.countRows(context);
     }
 }

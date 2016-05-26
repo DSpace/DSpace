@@ -34,8 +34,8 @@ import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
@@ -459,7 +459,7 @@ public class DescribeStep extends AbstractProcessingStep
     public static String getDefaultLanguageQualifier()
     {
        String language = "";
-       language = ConfigurationManager.getProperty("default.language");
+       language = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("default.language");
        if (StringUtils.isEmpty(language))
        {
            language = "en";
@@ -821,7 +821,7 @@ public class DescribeStep extends AbstractProcessingStep
      *            the metadata element
      * @param qualifier
      *            the metadata qualifier, or null if unqualified
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected void readDate(Context context, HttpServletRequest request, Item item, String schema,
             String element, String qualifier) throws SQLException

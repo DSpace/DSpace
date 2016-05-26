@@ -177,6 +177,14 @@
                 </xsl:attribute>
             </meta>
 
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='ROBOTS'][not(@qualifier)]">
+                <meta name="ROBOTS">
+                    <xsl:attribute name="content">
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='ROBOTS']"/>
+                    </xsl:attribute>
+                </meta>
+            </xsl:if>
+
             <!-- Add stylesheets -->
 
             <!--TODO figure out a way to include these in the concat & minify-->
@@ -795,6 +803,13 @@
 
     <xsl:template name="addJavascript">
 
+        <script type="text/javascript"><xsl:text>
+                         if(typeof window.publication === 'undefined'){
+                            window.publication={};
+                          };
+                        window.publication.contextPath= '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/><xsl:text>';</xsl:text>
+            <xsl:text>window.publication.themePath= '</xsl:text><xsl:value-of select="$theme-path"/><xsl:text>';</xsl:text>
+        </script>
         <!--TODO concat & minify!-->
 
         <script>

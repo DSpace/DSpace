@@ -10,7 +10,8 @@ var CollReport = function() {
 	//If sortable.js is included, uncomment the following
 	//this.hasSorttable = function(){return true;}
 	
-	this.COLL_LIMIT = 25;
+	this.COLL_LIMIT = 20;
+	this.TOOBIG = 10000;
 	this.loadId = 0;
 	this.THREADS =11;
 	this.THREADSP = 11;
@@ -75,39 +76,83 @@ var CollReport = function() {
 		self.myHtmlUtil.addTh(tr, "Collection").addClass("title");
 		var thn = self.myHtmlUtil.addTh(tr, "Num Items").addClass("sorttable_numeric");
 		self.myHtmlUtil.makeTotalCol(thn);
+		thn = self.myHtmlUtil.addTh(tr, "Num Filtered").addClass("sorttable_numeric");
+		self.myHtmlUtil.makeTotalCol(thn);
 		
-		self.addCollectionRows(tbl, 0);
+		self.addCollections();
 	}
 
-	this.addCollectionRows = function(tbl, offset) {
+	this.addCollections = function() {
+		var self = this;
+		
+		$.ajax({
+			url: "/rest/hierarchy",
+			dataType: "json",
+			headers: self.myAuth.getHeaders(),
+			success: function(data){
+				if (data.community != null) {
+					$.each(data.community, function(index, comm){
+						self.addCommunity(comm, comm);
+					});					
+				}
+				self.setCollectionCounts(0);
+			},
+			error: function(xhr, status, errorThrown) {
+				alert("Error in /rest/hierarchy "+ status+ " " + errorThrown);
+			}
+		});
+	};
+
+	this.addCommunity = function(top, comm) {
+		var self = this;
+
+		if (comm.collection != null) {
+			$.each(comm.collection, function(index, coll){
+				self.addCollection(top, coll);
+			});					
+		}
+		if (comm.community != null) {
+			$.each(comm.community, function(index, scomm){
+				self.addCommunity(top, scomm);
+			});					
+	}
+	};
+
+	this.addCollection = function(top, coll) {
+		var self = this;
+
+		var tbody = $("#table tbody");
+		var index = tbody.find("tr").length;
+
+		var tr = self.myHtmlUtil.addTr(tbody);
+		tr.attr("cid", coll.id).attr("index",index).addClass(index % 2 == 0 ? "odd data" : "even data");
+		self.myHtmlUtil.addTd(tr, index + 1).addClass("num");
+		var parval = self.myHtmlUtil.getAnchor(top.name, self.ROOTPATH + top.handle); 
+		
+		self.myHtmlUtil.addTd(tr, parval).addClass("title comm");
+		self.myHtmlUtil.addTdAnchor(tr, coll.name, self.ROOTPATH + coll.handle).addClass("title");
+		var td = self.myHtmlUtil.addTd(tr, "").addClass("num").addClass("link").addClass("numCount");
+		td = self.myHtmlUtil.addTd(tr, "").addClass("num").addClass("numFiltered");
+	};
+	
+	
+	this.setCollectionCounts = function(offset) {
 		var self = this;
 
 		$.ajax({
 			url: "/rest/filtered-collections",
 			data: {
 				limit  : self.COLL_LIMIT,
-				expand : "topCommunity",
-				offset : offset,
+				offset : offset
  			},
 			dataType: "json",
 			headers: self.myAuth.getHeaders(),
 			success: function(data){
 				$.each(data, function(index, coll){
-					var tr = self.myHtmlUtil.addTr($("#table tbody"));
-					tr.attr("cid", self.getId(coll)).attr("index",index + offset).addClass(index % 2 == 0 ? "odd data" : "even data");
-					self.myHtmlUtil.addTd(tr, index + offset + 1).addClass("num");
-					var parval = ""; 
-					
-					if ("topCommunity" in coll) {
-						var par = coll.topCommunity;
-						parval = par ? self.myHtmlUtil.getAnchor(par.name, "/handle/" + par.handle) : "";					
-					} else if ("parCommunityList" in coll) {
-						var par = coll.parentCommunityList[coll.parentCommunityList.length-1];
-						parval = par ? self.myHtmlUtil.getAnchor(par.name, "/handle/" + par.handle) : "";
-					}
-					self.myHtmlUtil.addTd(tr, parval).addClass("title comm");
-					self.myHtmlUtil.addTdAnchor(tr, coll.name, "/handle/" + coll.handle).addClass("title");
-					var td = self.myHtmlUtil.addTd(tr, coll.numberItems).addClass("num").addClass("link");
+					var id = self.getId(coll);
+					var tr = $("#table tbody").find("tr[cid="+id+"]");
+					var td = tr.find("td.numCount");
+					td.text(coll.numberItems);
 					td.on("click", function(){
 						self.drawItemTable(self.getId(coll),'',0);
 						$("#icollection").val(self.getId(coll));
@@ -115,15 +160,14 @@ var CollReport = function() {
 					});
 				});
 				
-				if (data.length == self.COLL_LIMIT) {
-					self.addCollectionRows(tbl, offset + self.COLL_LIMIT);
+				//cannot assume data returned is full amount in case some items are restricted
+				//if (data.length == self.COLL_LIMIT) {
+				if (data.length > 0) {
+					self.setCollectionCounts(offset + self.COLL_LIMIT);
 					return;
 				}  
 				self.myHtmlUtil.totalCol(3);
 				$("#table").addClass("sortable");
-				if (self.hasSorttable()) {
-					sorttable.makeSortable($("#table")[0]);					
-				}
 		  		
 		  		if (self.myFilters.getFilterList() != "") {
 		  			self.loadData();
@@ -133,7 +177,7 @@ var CollReport = function() {
 		  		}
 			},
 			error: function(xhr, status, errorThrown) {
-				alert("Error in /rest/filtered-collections "+ status+ " " + errorThrown);
+				alert("Error in /rest/collections "+ status+ " " + errorThrown);
 			},
 			complete: function(xhr, status) {
 				self.spinner.stop();
@@ -179,7 +223,6 @@ var CollReport = function() {
 					var trh = $("#table tr.header");
 					var filterName = itemFilter["filter-name"];
 					var filterTitle = itemFilter.title == null ? filterName : itemFilter.title;
-					var icount = itemFilter["item-count"];
 					if (!trh.find("th."+filterName).is("*")) {
 						var th = self.myHtmlUtil.addTh(trh, filterTitle);
 						th.addClass(filterName).addClass("datacol").addClass("sorttable_numeric");
@@ -195,47 +238,23 @@ var CollReport = function() {
 						});
 					}
 					
-                    var td = tr.find("td."+filterName);
-                    if (icount == null) {
-                    	icount = "0";
-                    }
-                    td.text(icount);
-					if (icount != "0") {
-						td.addClass("link");
-						td.on("click", function(){
-							self.drawItemTable(cid,filterName,0);
-							$("#icollection").val(cid);
-							$("#ifilter").val(filterName);
-						});
-						if (numItems != numItemsProcessed) {
-							td.addClass("partial");
-							td.attr("title", "Collection partially processed, item counts are incomplete");
-						}
-					}
-					
-					
+					self.setCellCount(tr, cid, 0, (numItems != numItemsProcessed), itemFilter);
+					self.setFilteredCount(tr, cid, 0, numItems, numItemsProcessed);
 				});
 				
 				tr.removeClass("processing");
 				if (!$("#table tr.processing").is("*")) {
-					if (self.hasSorttable()) {
-						$("#table").removeClass("sortable");
-						$("#table").addClass("sortable");
-						sorttable.makeSortable($("#table")[0]);						
-					}
-					var colcount = $("#table tr th").length;
-					for(var i=4; i<colcount; i++) {
-						self.myHtmlUtil.totalCol(i);
-					}
+					self.updateSortable();
+					self.totalFilters();
 					self.spinner.stop();
 	  	  		    $(".showCollections").attr("disabled", false);
 					return;
-				}
+                    }
 				if (row % threads == 0 || threads == 1) {
 					for(var i=1; i<=threads; i++) {
 						self.doRow(row+i, threads, curLoadId);
 					}					
-				}
+						}
 	 		},
 			error: function(xhr, status, errorThrown) {
 				alert("Error in /rest/filtered-collections "+ status+ " " + errorThrown);
@@ -243,9 +262,126 @@ var CollReport = function() {
 			complete: function(xhr, status) {
 				self.spinner.stop();
 		  		$(".showCollections").attr("disabled", false);
+					}
+					
+					
+				});
+	};			
+				
+	this.updateSortable = function() {
+					if (self.hasSorttable()) {
+						$("#table").removeClass("sortable");
+						$("#table").addClass("sortable");
+						sorttable.makeSortable($("#table")[0]);						
+					}
+	}
+	
+	this.totalFilters = function() {
+					var colcount = $("#table tr th").length;
+					for(var i=4; i<colcount; i++) {
+						self.myHtmlUtil.totalCol(i);
+					}
+				}
+
+	this.updateRow = function(cid, offset) {
+		var tr = $("tr[cid="+cid+"]");
+		$.ajax({
+			url: "/rest/filtered-collections/"+cid,
+			data: {
+				limit : self.COUNT_LIMIT,
+				offset : offset,
+				filters : self.myFilters.filterString,
+			},
+			dataType: "json",
+			headers: self.myAuth.getHeaders(),
+			success: function(data) {
+				var numItems = data.numberItems;
+				var numItemsProcessed = data.numberItemsProcessed;
+				$.each(data.itemFilters, function(index, itemFilter){
+					self.setCellCount(tr, cid, offset, (numItems != numItemsProcessed + offset),itemFilter);
+				});
+				self.setFilteredCount(tr, cid, offset, numItems, numItemsProcessed);				
+	 		},
+			error: function(xhr, status, errorThrown) {
+				alert("Error in /rest/filtered-collections/ " + cid+ status+ " " + errorThrown);
+			},
+			complete: function(xhr, status) {
+				self.spinner.stop();
+		  		$(".showCollections").attr("disabled", false);
 			}
 		});
+	};			
+
+	this.setFilteredCount = function(tr, cid, offset, numItems, numItemsProcessed) {
+        var td = tr.find("td.numFiltered");
+        var total = numItemsProcessed + offset; 
+        td.text(total);
+        td.removeClass("partial");
+        td.removeClass("toobig");
+        if (numItems != numItemsProcessed + offset) {
+        	if (offset == 0) {
+                td.addClass("button");
+				td.off();
+    			td.on("click", function(){
+    				if ($(this).hasClass("toobig")) {
+    					if (!confirm("A large number of items are present in this collection.\n\n" + 
+    							"If you choose to load this data, it will take some time to load and may impact server performance.")) {
+    						return;
+    					}
+    				}
+    				$(this).off();
+    				$(this).removeClass("button");
+    				self.updateRow(cid, offset + self.COUNT_LIMIT);
+    			});							        		
+        	} else {
+        		self.updateRow(cid, offset + self.COUNT_LIMIT);
+        	}
+            td.addClass("partial");
+            var title = "Collection partially processed, item counts are incomplete. ";
+            if (numItems >= self.TOOBIG) {
+                td.addClass("toobig");
+                title+= "\nIt will take significant time to apply this filter to the entire collection."
 	}			
+            td.attr("title", title);
+            return false;
+        } else {
+			self.totalFilters();
+        }
+        return true;
+    }
+	
+	this.setCellCount = function(tr, cid, offset, isPartial, itemFilter) {
+		var filterName = itemFilter["filter-name"];
+		var icount = itemFilter["item-count"];
+
+		var td = tr.find("td."+filterName);
+        if (icount == null) {
+        	icount = 0;
+        }
+        var cur = parseInt(td.text());
+        if (!isNaN(cur)) {
+            icount += cur;        	
+        }
+        
+        td.removeClass("partial");
+        td.removeClass("link");
+        td.removeAttr("title");
+        td.off();
+        td.text(icount);
+		if (icount != 0) {
+			td.addClass("link");
+			if (isPartial) {
+				td.addClass("partial");
+				td.attr("title", "Collection partially processed, item counts are incomplete");
+			}	
+			td.on("click", function(){
+				self.drawItemTable(cid,filterName,0);
+				$("#icollection").val(cid);
+				$("#ifilter").val(filterName);
+			});							
+		}		
+	}
+	
 				
 	this.drawItemTable = function(cid, filter, offset) {
 		self = this;
@@ -286,7 +422,7 @@ var CollReport = function() {
 					tr.addClass(index % 2 == 0 ? "odd data" : "even data");
 					self.myHtmlUtil.addTd(tr, offset+index+1).addClass("num");
 					self.myHtmlUtil.addTd(tr, self.getId(item));
-					self.myHtmlUtil.addTdAnchor(tr, item.handle, "/handle/" + item.handle);
+					self.myHtmlUtil.addTdAnchor(tr, item.handle, self.ROOTPATH + item.handle);
 					self.myHtmlUtil.addTd(tr, item.name).addClass("ititle");
 					if (fields != null) {
 						$.each(fields, function(index, field){

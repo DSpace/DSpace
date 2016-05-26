@@ -394,7 +394,7 @@ public class AccessSettingTag extends TagSupport
         }
 
         if (groups == null || groups.size() == 0){
-            groups = groupService.findAll(context, GroupService.NAME);
+            groups = groupService.findAll(context, null);
         }
 
         return groups;

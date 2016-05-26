@@ -11,6 +11,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
@@ -33,6 +34,7 @@ import java.util.*;
  * are required to have.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> class type
  */
 public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements DSpaceObjectService<T> {
 
@@ -50,6 +52,10 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Autowired(required = true)
     protected MetadataAuthorityService metadataAuthorityService;
 
+    public DSpaceObjectServiceImpl()
+    {
+
+    }
 
     @Override
     public String getName(T dso) {
@@ -271,7 +277,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so use a runtime exception
                 if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority().length() == 0))
                 {
-                    throw new IllegalArgumentException("The metadata field \"" + metadataField.toString() + "\" requires an authority key but none was provided. Vaue=\"" + values.get(i) + "\"");
+                    throw new IllegalArgumentException("The metadata field \"" + metadataField.toString() + "\" requires an authority key but none was provided. Value=\"" + values.get(i) + "\"");
                 }
             }
             if (values.get(i) != null)
@@ -355,6 +361,12 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     /**
      * Retrieve first metadata field value
+     * @param dso
+     * @param language
+     * @param element
+     * @param schema
+     * @param qualifier
+     * @return 
      */
     @Override
     public String getMetadataFirstValue(T dso, String schema, String element, String qualifier, String language){
@@ -367,6 +379,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     /**
      * Set first metadata field value
+     * @throws SQLException if database error
      */
     @Override
     public void setMetadataSingleValue(Context context, T dso, String schema, String element, String qualifier, String language, String value) throws SQLException {
@@ -382,6 +395,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
      * Protected method that deletes all metadata values from the database, should only be called when deleting the item.
      * @param context the dspaceObject
      * @param dso the dspaceObject who's metadata we are to delete
+     * @throws SQLException if database error
      */
     protected void deleteMetadata(Context context, T dso) throws SQLException {
 
@@ -485,10 +499,12 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     /**
      * Splits "schema.element.qualifier.language" into an array.
-     * <p/>
-     * The returned array will always have length >= 4
-     * <p/>
+     * <p>
+     * The returned array will always have length greater than or equal to 4
+     * <p>
      * Values in the returned array can be empty or null.
+     * @param fieldName field name
+     * @return array
      */
     protected String[] getElements(String fieldName) {
         String[] tokens = StringUtils.split(fieldName, ".");
@@ -503,10 +519,12 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     /**
      * Splits "schema.element.qualifier.language" into an array.
-     * <p/>
-     * The returned array will always have length >= 4
-     * <p/>
+     * <p>
+     * The returned array will always have length greater than or equal to 4
+     * <p>
      * When @param fill is true, elements that would be empty or null are replaced by Item.ANY
+     * @param fieldName field name
+     * @return array
      */
     protected String[] getElementsFilled(String fieldName) {
         String[] elements = getElements(fieldName);
@@ -533,6 +551,44 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         }else{
             return getMDValueByLegacyField(field);
         }
+    }
+
+    @Override
+    public void update(Context context, T dso) throws SQLException, AuthorizeException
+    {
+        if(dso.isMetadataModified())
+        {
+            /*
+            Update the order of the metadata values
+             */
+                // A map created to store the latest place for each metadata field
+                Map<MetadataField, Integer> fieldToLastPlace = new HashMap<>();
+                List<MetadataValue> metadataValues = dso.getMetadata();
+                for (MetadataValue metadataValue : metadataValues)
+                {
+                    //Retrieve & store the place for each metadata value
+                    int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
+                    metadataValue.setPlace(mvPlace);
+                }
+        }
+    }
+
+    /**
+     * Retrieve the place of the metadata value
+     * @param fieldToLastPlace the map containing the latest place of each metadata field
+     * @param metadataValue the metadata value that needs to get a place
+     * @return The new place for the metadata valu
+     */
+    protected int getMetadataValuePlace(Map<MetadataField, Integer> fieldToLastPlace, MetadataValue metadataValue) {
+        MetadataField metadataField = metadataValue.getMetadataField();
+        if(fieldToLastPlace.containsKey(metadataField))
+        {
+            fieldToLastPlace.put(metadataField, fieldToLastPlace.get(metadataField) + 1);
+        }else{
+            // The metadata value place starts at 0
+            fieldToLastPlace.put(metadataField, 0);
+        }
+        return fieldToLastPlace.get(metadataField);
     }
 
     protected String[] getMDValueByLegacyField(String field){

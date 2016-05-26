@@ -27,7 +27,13 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
+public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
+{
+    protected DOIDAOImpl()
+    {
+        super();
+    }
+
     @Override
     public DOI findByDoi(Context context, String doi) throws SQLException {
         Criteria criteria = createCriteria(context, DOI.class);
@@ -63,6 +69,28 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
         for (Integer status : statuses) {
             statusQuery.add(Restrictions.eq("status", status));
         }
+        criteria.add(statusQuery);
+        return list(criteria);
+    }
+    
+    @Override
+    public List<DOI> findSimilarNotInState(Context context, String doi, List<Integer> excludedStatuses, boolean dsoNotNull)
+            throws SQLException
+    {
+        // SELECT * FROM Doi WHERE doi LIKE ? AND resource_type_id = ? AND resource_id IS NOT NULL AND status != ? AND status != ?
+        Criteria criteria = createCriteria(context, DOI.class);
+        Conjunction conjunctionAnd = Restrictions.and();
+        Disjunction statusQuery = Restrictions.or();
+        for (Integer status : excludedStatuses) {
+            statusQuery.add(Restrictions.ne("status", status));
+        }
+        conjunctionAnd.add(Restrictions.like("doi", doi));
+        conjunctionAnd.add(statusQuery);
+        if (dsoNotNull)
+        {
+            conjunctionAnd.add(Restrictions.isNotNull("dSpaceObject"));
+        }
+        criteria.add(conjunctionAnd);
         return list(criteria);
     }
 

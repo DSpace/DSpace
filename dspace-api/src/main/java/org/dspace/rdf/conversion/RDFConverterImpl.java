@@ -12,14 +12,12 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.rdf.RDFConfiguration;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -27,56 +25,33 @@ import org.dspace.utils.DSpace;
  */
 public class RDFConverterImpl implements RDFConverter
 {
-    protected ConfigurationService configurationService;
-    protected List<ConverterPlugin> plugins;
     private static final Logger log = Logger.getLogger(RDFConverterImpl.class);
     
-    public RDFConverterImpl()
+    protected ConfigurationService configurationService;
+    protected List<ConverterPlugin> plugins;
+    
+    @Autowired(required=true)
+    public void setConfigurationService(ConfigurationService configurationService)
     {
-        this.configurationService = new DSpace().getConfigurationService();
-        this.plugins = new ArrayList<ConverterPlugin>();
-        
-        String pluginNames[] = RDFConfiguration.getConverterPlugins();
-        
-        if (pluginNames == null || pluginNames.length == 0)
+        this.configurationService = configurationService;
+    }
+    
+    @Autowired(required=true)
+    public void setPlugins(List<ConverterPlugin> plugins)
+    {
+        this.plugins = plugins;
+        if (log.isDebugEnabled())
         {
-            log.error("Cannot load RDF converter plugins!");
-            throw new RuntimeException("Cannot load rdf converter plugins!");
-        }
-        
-        for (String plugin : pluginNames)
-        {
-            try
+            StringBuilder pluginNames = new StringBuilder();
+            for (ConverterPlugin plugin : plugins)
             {
-                Class pluginClass = Class.forName(plugin);
-                ConverterPlugin pluginInstance =
-                        (ConverterPlugin) pluginClass.newInstance();
-                pluginInstance.setConfigurationService(this.configurationService);
-                this.plugins.add(pluginInstance);
+                if (pluginNames.length() > 0)
+                {
+                    pluginNames.append(", ");
+                }
+                pluginNames.append(plugin.getClass().getCanonicalName());
             }
-            catch (ClassNotFoundException ex)
-            {
-                log.warn("Cannot load plugin '" + plugin 
-                        + "': class not found!", ex);
-                // if we would ignore a plugin, we would generate incomplete RDF data.
-                throw new RuntimeException(ex.getMessage(), ex);
-            }
-            catch (IllegalAccessException ex)
-            {
-                log.warn("Cannot load plugin '" + plugin 
-                        + "': illegal access!", ex);
-                // if we would ignore a plugin, we would generate incomplete RDF data.
-                throw new RuntimeException(ex.getMessage(), ex);
-            }
-            catch (InstantiationException ex)
-            {
-                log.warn("Cannot load plugin '" + plugin 
-                        + "': cannot instantiate the module!", ex);
-                // if we would ignore a plugin, we would generate incomplete RDF data.
-                throw new RuntimeException(ex.getMessage(), ex);
-            }
-            log.debug("Successfully loaded RDFConverterPlugin " 
-                    + plugin + ".");
+            log.debug("Loaded the following plugins: " + pluginNames.toString());
         }
     }
     

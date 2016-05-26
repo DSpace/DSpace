@@ -18,7 +18,7 @@ import org.dspace.content.*;
 import org.dspace.core.Context;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
@@ -80,7 +80,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
     private boolean isAdvancedFormEnabled=false;
 
     public AccessStepUtil(Context c){
-        isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        isAdvancedFormEnabled=DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         context=c;
     }
 
@@ -122,14 +122,14 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
             java.util.List<Group> loadedGroups = null;
 
             // retrieve groups
-            String name = ConfigurationManager.getProperty("webui.submission.restrictstep.groups");
+            String name = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.submission.restrictstep.groups");
             if(name!=null){
                 Group uiGroup = groupService.findByName(context, name);
                 if(uiGroup!=null)
                     loadedGroups= uiGroup.getMemberGroups();
             }
             if(loadedGroups==null || loadedGroups.size() ==0){
-                loadedGroups = groupService.findAll(context, GroupService.NAME);
+                loadedGroups = groupService.findAll(context, null);
             }
 
             // if no group selected for default set anonymous

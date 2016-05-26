@@ -44,7 +44,7 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Servlet for generate a statistisc report
@@ -224,8 +224,7 @@ public class RequestItemServlet extends DSpaceServlet
 				Email email = Email.getEmail(I18nUtil.getEmailFilename(
 						context.getCurrentLocale(), "request_item.author"));
 				
-				RequestItemAuthor author = new DSpace()
-						.getServiceManager()
+				RequestItemAuthor author = DSpaceServicesFactory.getInstance().getServiceManager()
 						.getServiceByName(
 								RequestItemAuthorExtractor.class.getName(),
 								RequestItemAuthorExtractor.class)

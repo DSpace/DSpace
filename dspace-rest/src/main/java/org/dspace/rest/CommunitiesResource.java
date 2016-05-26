@@ -14,7 +14,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
-import org.dspace.eperson.EPerson;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Community;
 import org.dspace.rest.exceptions.ContextException;
@@ -82,13 +81,13 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.READ);
             writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
-            community = new Community(dspaceCommunity, expand, context);
+            community = new Community(dspaceCommunity, servletContext, expand, context);
             context.complete();
 
         }
@@ -148,7 +147,7 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             List<org.dspace.content.Community> dspaceCommunities = communityService.findAll(context);
             communities = new ArrayList<Community>();
@@ -164,7 +163,7 @@ public class CommunitiesResource extends Resource
             {
                 if (authorizeService.authorizeActionBoolean(context, dspaceCommunities.get(i), org.dspace.core.Constants.READ))
                 {
-                    Community community = new Community(dspaceCommunities.get(i), expand, context);
+                    Community community = new Community(dspaceCommunities.get(i), servletContext, expand, context);
                     writeStats(dspaceCommunities.get(i), UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                     communities.add(community);
@@ -230,7 +229,7 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             List<org.dspace.content.Community> dspaceCommunities = communityService.findAllTop(context);
             communities = new ArrayList<Community>();
@@ -246,7 +245,7 @@ public class CommunitiesResource extends Resource
             {
                 if (authorizeService.authorizeActionBoolean(context, dspaceCommunities.get(i), org.dspace.core.Constants.READ))
                 {
-                    Community community = new Community(dspaceCommunities.get(i), expand, context);
+                    Community community = new Community(dspaceCommunities.get(i), servletContext, expand, context);
                     writeStats(dspaceCommunities.get(i), UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                     communities.add(community);
@@ -312,7 +311,7 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.READ);
             writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
@@ -331,7 +330,7 @@ public class CommunitiesResource extends Resource
             {
                 if (authorizeService.authorizeActionBoolean(context, dspaceCollections.get(i), org.dspace.core.Constants.READ))
                 {
-                    collections.add(new Collection(dspaceCollections.get(i), expand, context, 20, 0));
+                    collections.add(new Collection(dspaceCollections.get(i), servletContext, expand, context, 20, 0));
                     writeStats(dspaceCollections.get(i), UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                 }
@@ -398,7 +397,7 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.READ);
             writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
@@ -417,7 +416,7 @@ public class CommunitiesResource extends Resource
             {
                 if (authorizeService.authorizeActionBoolean(context, dspaceCommunities.get(i), org.dspace.core.Constants.READ))
                 {
-                    communities.add(new Community(dspaceCommunities.get(i), expand, context));
+                    communities.add(new Community(dspaceCommunities.get(i), servletContext, expand, context));
                     writeStats(dspaceCommunities.get(i), UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                 }
@@ -473,8 +472,7 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            EPerson eperson = getUser(headers);
-            context = createContext(eperson);
+            context = createContext();
             if (!authorizeService.isAdmin(context))
             {
                 context.abort();
@@ -498,7 +496,7 @@ public class CommunitiesResource extends Resource
             communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
             communityService.update(context, dspaceCommunity);
 
-            retCommunity = new Community(dspaceCommunity, "", context);
+            retCommunity = new Community(dspaceCommunity, servletContext, "", context);
             context.complete();
         }
         catch (SQLException e)
@@ -557,7 +555,7 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.WRITE);
             writeStats(dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
@@ -572,7 +570,7 @@ public class CommunitiesResource extends Resource
             collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.SIDEBAR_TEXT, collection.getSidebarText());
             collectionService.update(context, dspaceCollection);
             communityService.update(context, dspaceCommunity);
-            retCollection = new Collection(dspaceCollection, "", context, 100, 0);
+            retCollection = new Collection(dspaceCollection, servletContext, "", context, 100, 0);
             context.complete();
 
         }
@@ -638,7 +636,7 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Community dspaceParentCommunity = findCommunity(context, communityId,
                     org.dspace.core.Constants.WRITE);
 
@@ -654,7 +652,7 @@ public class CommunitiesResource extends Resource
             communityService.update(context, dspaceCommunity);
             communityService.update(context, dspaceParentCommunity);
 
-            retCommunity = new Community(dspaceCommunity, "", context);
+            retCommunity = new Community(dspaceCommunity, servletContext, "", context);
             context.complete();
 
         }
@@ -717,7 +715,7 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.WRITE);
             writeStats(dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
@@ -780,7 +778,7 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Community community = findCommunity(context, communityId, org.dspace.core.Constants.DELETE);
             writeStats(community, UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor, headers,
@@ -851,7 +849,7 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Community community = findCommunity(context, communityId, org.dspace.core.Constants.WRITE);
             org.dspace.content.Collection collection = collectionService.findByIdOrLegacyId(context, collectionId);
@@ -951,7 +949,7 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Community parentCommunity = findCommunity(context, parentCommunityId,
                     org.dspace.core.Constants.WRITE);

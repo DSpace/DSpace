@@ -25,8 +25,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageWorkflowEvent;
-import org.dspace.utils.DSpace;
 import org.dspace.workflowbasic.service.BasicWorkflowItemService;
 import org.dspace.workflowbasic.service.BasicWorkflowService;
 import org.dspace.workflowbasic.service.TaskListItemService;
@@ -60,6 +60,11 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
     protected BasicWorkflowItemService workflowItemService;
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
+
+    protected BasicWorkflowServiceImpl()
+    {
+
+    }
 
     /** Symbolic names of workflow steps. */
     protected final String workflowText[] =
@@ -164,6 +169,20 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         if (step3group != null)
         {
             authorizeService.addPolicy(context, item, Constants.REMOVE, step3group, ResourcePolicy.TYPE_WORKFLOW);
+        }
+        if (step1group != null)
+        {
+            authorizeService.addPolicy(context, item, Constants.DELETE, step1group, ResourcePolicy.TYPE_WORKFLOW);
+        }
+
+        if (step2group != null)
+        {
+            authorizeService.addPolicy(context, item, Constants.DELETE, step2group, ResourcePolicy.TYPE_WORKFLOW);
+        }
+
+        if (step3group != null)
+        {
+            authorizeService.addPolicy(context, item, Constants.DELETE, step3group, ResourcePolicy.TYPE_WORKFLOW);
         }
     }
 
@@ -602,7 +621,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         if(newOwnerGroup != null){
             usageWorkflowEvent.setGroupOwners(newOwnerGroup);
         }
-        new DSpace().getEventService().fireEvent(usageWorkflowEvent);
+        DSpaceServicesFactory.getInstance().getEventService().fireEvent(usageWorkflowEvent);
     }
 
     @Override
@@ -1083,5 +1102,10 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
 
 		}
         return roleGroup;
+    }
+
+    @Override
+    public List<String> getFlywayMigrationLocations() {
+        return Collections.emptyList();
     }
 }

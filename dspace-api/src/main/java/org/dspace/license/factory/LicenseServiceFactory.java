@@ -8,7 +8,7 @@
 package org.dspace.license.factory;
 
 import org.dspace.license.service.CreativeCommonsService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the license package, use LicenseServiceFactory.getInstance() to retrieve an implementation
@@ -21,6 +21,6 @@ public abstract class LicenseServiceFactory {
 
     public static LicenseServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("licenseServiceFactory", LicenseServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("licenseServiceFactory", LicenseServiceFactory.class);
     }
 }

@@ -22,7 +22,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -108,8 +107,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
                 "published_before");
         boolean multipleFiles = Util.getBoolParameter(request,
                 "multiple_files");
-        boolean isThesis = ConfigurationManager
-                .getBooleanProperty("webui.submit.blocktheses")
+        boolean isThesis = configurationService.getBooleanProperty("webui.submit.blocktheses")
                 && Util.getBoolParameter(request, "is_thesis");
 
         if (subInfo.isInWorkflow())

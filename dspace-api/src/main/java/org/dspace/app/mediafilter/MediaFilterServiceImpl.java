@@ -10,18 +10,17 @@ package org.dspace.app.mediafilter;
 import java.io.InputStream;
 import java.util.*;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.service.*;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -52,6 +51,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     protected GroupService groupService;
     @Autowired(required = true)
     protected ItemService itemService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     protected int max2Process = Integer.MAX_VALUE;  // maximum number items to process
     
@@ -71,13 +72,17 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     protected boolean isQuiet = false;
     protected boolean isForce = false; // default to not forced
 
+    protected MediaFilterServiceImpl()
+    {
+
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        String publicPermissionFilters = ConfigurationManager.getProperty("filter.org.dspace.app.mediafilter.publicPermission");
+        String[] publicPermissionFilters = configurationService.getArrayProperty("filter.org.dspace.app.mediafilter.publicPermission");
+
         if(publicPermissionFilters != null) {
-            String[] publicPermisionFiltersArray = publicPermissionFilters.split(",");
-            for(String filter : publicPermisionFiltersArray) {
+            for(String filter : publicPermissionFilters) {
                 publicFiltersClasses.add(filter.trim());
             }
         }

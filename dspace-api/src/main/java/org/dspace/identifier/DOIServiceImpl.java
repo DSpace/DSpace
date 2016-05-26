@@ -31,6 +31,11 @@ public class DOIServiceImpl implements DOIService {
     @Autowired(required = true)
     protected DOIDAO doiDAO;
 
+    protected DOIServiceImpl()
+    {
+
+    }
+
     @Override
     public void update(Context context, DOI doi) throws SQLException {
         doiDAO.save(context, doi);
@@ -109,5 +114,12 @@ public class DOIServiceImpl implements DOIService {
     @Override
     public List<DOI> getDOIsByStatus(Context context, List<Integer> statuses) throws SQLException{
         return doiDAO.findByStatus(context, statuses);
+    }
+    
+    @Override
+    public List<DOI> getSimilarDOIsNotInState(Context context, String doiPattern, List<Integer> statuses, boolean dsoIsNotNull)
+            throws SQLException
+    {
+        return doiDAO.findSimilarNotInState(context, doiPattern, statuses, dsoIsNotNull);
     }
 }

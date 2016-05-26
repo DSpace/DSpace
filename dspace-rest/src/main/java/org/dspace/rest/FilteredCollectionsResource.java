@@ -13,11 +13,13 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.rest.common.FilteredCollection;
 import org.dspace.rest.exceptions.ContextException;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -37,6 +39,7 @@ import java.util.List;
 public class FilteredCollectionsResource extends Resource {
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private static Logger log = Logger.getLogger(FilteredCollectionsResource.class);
 
     /**
@@ -70,8 +73,8 @@ public class FilteredCollectionsResource extends Resource {
     public org.dspace.rest.common.FilteredCollection[] getCollections(@QueryParam("expand") String expand,
             @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("filters") @DefaultValue("is_item") String filters,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("filters") @DefaultValue("is_item") String filters, @QueryParam("xforwardedfor") String xforwardedfor,
+            @Context ServletContext servletContext, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -81,8 +84,8 @@ public class FilteredCollectionsResource extends Resource {
 
         try
         {
-            context = createContext(getUser(headers));
-            if (ConfigurationManager.getBooleanProperty("rest", "rest-reporting-authenticate", true) == false) {
+            context = createContext();
+            if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
                 context.turnOffAuthorisationSystem();            	
             }
 
@@ -98,7 +101,7 @@ public class FilteredCollectionsResource extends Resource {
             {
                 if (authorizeService.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
                 {
-                    FilteredCollection collection = new org.dspace.rest.common.FilteredCollection(dspaceCollection, filters, expand, context, limit,
+                    FilteredCollection collection = new org.dspace.rest.common.FilteredCollection(dspaceCollection, servletContext, filters, expand, context, limit,
                             offset);
                     collections.add(collection);
                     writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent,
@@ -127,7 +130,7 @@ public class FilteredCollectionsResource extends Resource {
      * Return instance of collection with passed id. You can add more properties
      * through expand parameter.
      * 
-     * @param collectionId
+     * @param collection_id
      *            Id of collection in DSpace.
      * @param expand
      *            String in which is what you want to add to returned instance
@@ -163,19 +166,19 @@ public class FilteredCollectionsResource extends Resource {
     		@QueryParam("limit") @DefaultValue("1000") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
     		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
     		@QueryParam("filters") @DefaultValue("is_item") String filters,
-    		@Context HttpHeaders headers, @Context HttpServletRequest request) {
+    		@Context HttpHeaders headers, @Context HttpServletRequest request, @Context ServletContext servletContext) {
         org.dspace.core.Context context = null;
         FilteredCollection retColl = new org.dspace.rest.common.FilteredCollection();
         try {
-            context = createContext(getUser(headers));
-            if (!ConfigurationManager.getBooleanProperty("rest", "rest-reporting-authenticate", false)) {
+            context = createContext();
+            if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
                 context.turnOffAuthorisationSystem();            	
             }
 
             org.dspace.content.Collection collection = collectionService.findByIdOrLegacyId(context, collection_id);
             if(authorizeService.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
 				writeStats(collection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
-                retColl = new org.dspace.rest.common.FilteredCollection(collection, filters, expand, context, limit, offset);
+                retColl = new org.dspace.rest.common.FilteredCollection(collection, servletContext, filters, expand, context, limit, offset);
             } else {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }

@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.Collections;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +107,7 @@ public class SpiderDetector {
         if (table == null) {
             table = new IPTable();
 
-            String filePath = ConfigurationManager.getProperty("dspace.dir");
+            String filePath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir");
 
             try {
                 File spidersDir = new File(filePath, "config/spiders");
@@ -156,7 +156,7 @@ public class SpiderDetector {
      */
     private static void loadPatterns(String directory, List<Pattern> patternList)
     {
-        String dspaceHome = ConfigurationManager.getProperty("dspace.dir");
+        String dspaceHome = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir");
         File spidersDir = new File(dspaceHome, "config/spiders");
         File patternsDir = new File(spidersDir, directory);
         if (patternsDir.exists() && patternsDir.isDirectory())
@@ -175,7 +175,7 @@ public class SpiderDetector {
                 }
                 for (String pattern : patterns)
                 {
-                    patternList.add(Pattern.compile(pattern));
+                    patternList.add(Pattern.compile(pattern,Pattern.CASE_INSENSITIVE));
                 }
                 log.info("Loaded pattern file:  {}", file.getPath());
             }
@@ -296,7 +296,7 @@ public class SpiderDetector {
 
     private static boolean isUseProxies() {
         if(useProxies == null) {
-            useProxies = "true".equals(ConfigurationManager.getProperty("useProxies"));
+            useProxies = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("useProxies");
         }
 
         return useProxies;

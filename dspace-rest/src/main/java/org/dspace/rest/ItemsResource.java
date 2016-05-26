@@ -99,12 +99,12 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
-            item = new Item(dspaceItem, expand, context);
+            item = new Item(dspaceItem, servletContext, expand, context);
             context.complete();
             log.trace("Item(id=" + itemId + ") was successfully read.");
 
@@ -159,7 +159,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             Iterator<org.dspace.content.Item> dspaceItems = itemService.findAllUnfiltered(context);
             items = new ArrayList<Item>();
@@ -178,7 +178,7 @@ public class ItemsResource extends Resource
                 {
                     if (itemService.isItemListedForUser(context, dspaceItem))
                     {
-                        items.add(new Item(dspaceItem, expand, context));
+                        items.add(new Item(dspaceItem, servletContext, expand, context));
                         writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                                 headers, request, context);
                     }
@@ -235,12 +235,12 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
-            metadata = new org.dspace.rest.common.Item(dspaceItem, "metadata", context).getMetadata();
+            metadata = new org.dspace.rest.common.Item(dspaceItem, servletContext, "metadata", context).getMetadata();
             context.complete();
         }
         catch (SQLException e)
@@ -294,12 +294,12 @@ public class ItemsResource extends Resource
         List<Bitstream> bitstreams = null;
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
-            List<Bitstream> itemBitstreams = new Item(dspaceItem, "bitstreams", context).getBitstreams();
+            List<Bitstream> itemBitstreams = new Item(dspaceItem, servletContext, "bitstreams", context).getBitstreams();
 
             if ((offset + limit) > (itemBitstreams.size() - offset))
             {
@@ -365,7 +365,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -440,7 +440,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -540,7 +540,7 @@ public class ItemsResource extends Resource
             }
 
             dspaceBitstream = bitstreamService.find(context, dspaceBitstream.getID());
-            bitstream = new Bitstream(dspaceBitstream, "", context);
+            bitstream = new Bitstream(dspaceBitstream, servletContext, "", context);
 
             context.complete();
 
@@ -567,7 +567,7 @@ public class ItemsResource extends Resource
             processFinally(context);
         }
 
-        log.info("Bitstream(id=" + bitstream.getId() + ") was successfully added into item(id=" + itemId + ").");
+        log.info("Bitstream(id=" + bitstream.getUUID() + ") was successfully added into item(id=" + itemId + ").");
         return bitstream;
     }
 
@@ -606,7 +606,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -687,14 +687,13 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.DELETE);
 
             writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting item.");
-            org.dspace.content.Collection collection = collectionService.find(context, dspaceItem.getCollections().get(0).getID());
-            collectionService.removeItem(context, collection, dspaceItem);
+            itemService.delete(context, dspaceItem);
             context.complete();
 
         }
@@ -755,7 +754,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -830,7 +829,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item item = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             org.dspace.content.Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context, bitstreamId);
@@ -843,7 +842,7 @@ public class ItemsResource extends Resource
             else if (!authorizeService.authorizeActionBoolean(context, bitstream, org.dspace.core.Constants.DELETE))
             {
                 context.abort();
-                log.error("User(" + getUser(headers).getEmail() + ") is not allowed to delete bitstream(id=" + bitstreamId + ").");
+                log.error("User(" + context.getCurrentUser().getEmail() + ") is not allowed to delete bitstream(id=" + bitstreamId + ").");
                 return Response.status(Status.UNAUTHORIZED).build();
             }
 
@@ -925,14 +924,14 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             Iterator<org.dspace.content.Item> itemIterator = itemService.findByMetadataField(context, metadataEntry.getSchema(), metadataEntry.getElement(), metadataEntry.getQualifier(), metadataEntry.getValue());
 
             while (itemIterator.hasNext())
             {
                 org.dspace.content.Item dspaceItem = itemIterator.next();
-                Item item = new Item(dspaceItem, "", context);
+                Item item = new Item(dspaceItem, servletContext, "", context);
                 writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                         request, context);
                 items.add(item);

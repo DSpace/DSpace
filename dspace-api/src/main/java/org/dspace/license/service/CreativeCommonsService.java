@@ -53,9 +53,9 @@ public interface CreativeCommonsService {
      * @param item
      * @param licenseStm
      * @param mimeType
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      *
      * * // PATCHED 12/01 FROM JIRA re: mimetypes for CCLicense and License RDF wjb
      */

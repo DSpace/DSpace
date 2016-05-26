@@ -32,16 +32,22 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> implements CommunityDAO {
+public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> implements CommunityDAO
+{
+    protected CommunityDAOImpl()
+    {
+        super();
+    }
 
     /**
      * Get a list of all communities in the system. These are alphabetically
      * sorted by community name.
      *
-     * @param context
-     *            DSpace context object
+     * @param context DSpace context object
+     * @param sortField sort field
      *
      * @return the communities in the system
+     * @throws SQLException if database error
      */
     @Override
     public List<Community> findAll(Context context, MetadataField sortField) throws SQLException
@@ -159,5 +165,10 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         Query hibernateQuery = createQuery(context, query.toString());
         hibernateQuery.setParameter("eperson_id", ePerson.getID());
         return list(hibernateQuery);
+    }
+
+    @Override
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Community"));
     }
 }

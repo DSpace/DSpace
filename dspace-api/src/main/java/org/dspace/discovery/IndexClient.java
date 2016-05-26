@@ -10,7 +10,7 @@ package org.dspace.discovery;
 import org.apache.log4j.Logger;
 import org.apache.commons.cli.*;
 import org.dspace.core.Context;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -33,7 +33,7 @@ public class IndexClient {
      *
      * @param args the command-line arguments, none used
      * @throws java.io.IOException
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      *
      */
     public static void main(String[] args) throws SQLException, IOException, SearchServiceException {
@@ -102,9 +102,7 @@ public class IndexClient {
          * new DSpace.getServiceManager().getServiceByName("org.dspace.discovery.SolrIndexer");
          */
 
-        DSpace dspace = new DSpace();
-
-        IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
+        IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
 
         if (line.hasOption("r")) {
             log.info("Removing " + line.getOptionValue("r") + " from Index");

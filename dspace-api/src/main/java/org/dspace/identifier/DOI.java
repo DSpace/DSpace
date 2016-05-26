@@ -40,6 +40,9 @@ public class DOI
     @JoinColumn(name = "dspace_object")
     private DSpaceObject dSpaceObject;
 
+    @Column(name = "resource_type_id")
+    private Integer resourceTypeId;
+
     @Column(name = "status")
     private Integer status;
 
@@ -67,11 +70,29 @@ public class DOI
     public DSpaceObject getDSpaceObject() {
         return dSpaceObject;
     }
-
+    
     public void setDSpaceObject(DSpaceObject dSpaceObject) {
         this.dSpaceObject = dSpaceObject;
+        
+        // set the Resource Type if the Object is not null
+        // don't set object type null, we want to know to which resource type
+        // the DOI was assigned to if the Object is deleted.
+        if (dSpaceObject != null)
+        {
+            this.resourceTypeId = dSpaceObject.getType();
+        }
     }
-
+    
+    /**
+     * returns the resource type of the DSpaceObject the DOI is or was assigned 
+     * to. The resource type is set automatically when a DOI is assigned to a 
+     * DSpaceObject, using {@link #setDSpaceObject(org.dspace.content.DSpaceObject) }.
+     * @return 
+     */
+    public Integer getResourceTypeId() {
+        return this.resourceTypeId;
+    }
+    
     public Integer getStatus() {
         return status;
     }

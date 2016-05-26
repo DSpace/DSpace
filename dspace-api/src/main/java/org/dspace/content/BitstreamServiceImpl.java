@@ -59,6 +59,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Autowired(required = true)
     protected BitstreamStorageService bitstreamStorageService;
 
+    protected BitstreamServiceImpl()
+    {
+        super();
+    }
 
     @Override
     public Bitstream find(Context context, UUID id) throws SQLException {
@@ -140,8 +144,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
      * @param assetstore corresponds to an assetstore in dspace.cfg
      * @param bitstreamPath the path and filename relative to the assetstore
      * @return  the newly registered bitstream
-     * @throws IOException
-     * @throws SQLException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public Bitstream register(Context context,
@@ -215,7 +220,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         log.info(LogManager.getHeader(context, "update_bitstream",
                 "bitstream_id=" + bitstream.getID()));
-
+        super.update(context, bitstream);
         if (bitstream.isModified())
         {
             context.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null, getIdentifiers(context, bitstream)));
@@ -234,7 +239,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public void delete(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
 
-        // changed to a check on remove
+        // changed to a check on delete
         // Check authorisation
         authorizeService.authorizeAction(context, bitstream, Constants.DELETE);
         log.info(LogManager.getHeader(context, "delete_bitstream",
@@ -245,15 +250,13 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         bitstream.getBundles().clear();
 
-
-        // Remove policies
-        authorizeService.removeAllPolicies(context, bitstream);
-
         deleteMetadata(context, bitstream);
 
         // Remove bitstream itself
         bitstream.setDeleted(true);
         update(context, bitstream);
+        // Remove policies from the file, we do this at the end since the methods above still require write rights.
+        authorizeService.removeAllPolicies(context, bitstream);
     }
 
     @Override
@@ -402,6 +405,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
+    public int countTotal(Context context) throws SQLException {
+        return bitstreamDAO.countRows(context);
+    }
+
+    @Override
     public Bitstream findByIdOrLegacyId(Context context, String id) throws SQLException {
         if(StringUtils.isNumeric(id))
         {
@@ -417,5 +425,20 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     public Bitstream findByLegacyId(Context context, int id) throws SQLException {
         return bitstreamDAO.findByLegacyId(context, id, Bitstream.class);
 
+    }
+
+    @Override
+    public int countDeletedBitstreams(Context context) throws SQLException {
+        return bitstreamDAO.countDeleted(context);
+    }
+
+    @Override
+    public int countBitstreamsWithoutPolicy(Context context) throws SQLException {
+        return bitstreamDAO.countWithNoPolicy(context);
+    }
+
+    @Override
+    public List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException {
+        return bitstreamDAO.getNotReferencedBitstreams(context);
     }
 }

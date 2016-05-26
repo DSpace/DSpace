@@ -59,7 +59,7 @@ public class RequiredMetadata extends AbstractCurationTask
      * Perform the curation task upon passed DSO
      *
      * @param dso the DSpace object
-     * @throws IOException
+     * @throws IOException if IO error
      */
     @Override
     public int perform(DSpaceObject dso) throws IOException

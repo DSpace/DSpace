@@ -31,7 +31,7 @@ import org.dspace.kernel.ServiceManager;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.KernelStartupCallbackService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,7 +160,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
             kernel = this;
             running = true;
 
-            List<KernelStartupCallbackService> callbackServices = new DSpace().getServiceManager().getServicesByType(KernelStartupCallbackService.class);
+            List<KernelStartupCallbackService> callbackServices = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(KernelStartupCallbackService.class);
             for (KernelStartupCallbackService callbackService : callbackServices) {
                 callbackService.executeCallback();
             }
@@ -260,13 +260,19 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
     // MBEAN methods
 
     private Date lastLoadDate;
-    /** Time that this kernel was started, as a java.util.Date. */
+    /** 
+     * Time that this kernel was started, as a java.util.Date. 
+     * @return date object
+     **/
     public Date getLastLoadDate() {
         return new Date(lastLoadDate.getTime());
     }
 
     private long loadTime;
-    /** Time that this kernel was started, as seconds since the epoch. */
+    /** 
+     * Time that this kernel was started, as seconds since the epoch. 
+     * @return seconds since epoch (as a long)
+     **/
     public long getLoadTime() {
         return loadTime;
     }

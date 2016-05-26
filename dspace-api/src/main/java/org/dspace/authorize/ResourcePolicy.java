@@ -12,6 +12,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.annotations.Type;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -70,7 +71,9 @@ public class ResourcePolicy{
     @Column(name="rptype", length = 30)
     private String rptype;
 
-    @Column(name="rpdescription", length = 100)
+    @Lob
+    @Type(type="org.hibernate.type.MaterializedClobType")
+    @Column(name="rpdescription")
     private String rpdescription;
 
     /**
@@ -200,6 +203,7 @@ public class ResourcePolicy{
 
     /**
      * assign an EPerson to this policy
+     * @param eperson Eperson
      */
     public void setEPerson(EPerson eperson)
     {
@@ -218,6 +222,7 @@ public class ResourcePolicy{
 
     /**
      * sets ID for Group referred to by this policy
+     * @param epersonGroup Group
      */
     public void setGroup(Group epersonGroup)
     {

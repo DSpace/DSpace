@@ -18,5 +18,10 @@ import org.dspace.core.AbstractHibernateDAO;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class WebAppDAOImpl extends AbstractHibernateDAO<WebApp> implements WebAppDAO{
+public class WebAppDAOImpl extends AbstractHibernateDAO<WebApp> implements WebAppDAO
+{
+    protected WebAppDAOImpl()
+    {
+        super();
+    }
 }

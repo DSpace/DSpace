@@ -22,6 +22,10 @@ public class SupervisedItemServiceImpl implements SupervisedItemService
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
 
+    protected SupervisedItemServiceImpl()
+    {
+
+    }
 
     @Override
     public List<WorkspaceItem> getAll(Context context)

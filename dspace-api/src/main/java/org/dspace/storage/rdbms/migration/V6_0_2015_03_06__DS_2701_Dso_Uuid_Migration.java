@@ -7,7 +7,6 @@
  */
 package org.dspace.storage.rdbms.migration;
 
-import org.dspace.storage.rdbms.MigrationUtils;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 

@@ -33,6 +33,7 @@ public class CheckerConsumer implements Consumer
     /**
      * Initialize - allocate any resources required to operate.
      * Called at the start of ANY sequence of event consume() calls.
+     * @throws Exception if error
      */
     @Override
     public void initialize() throws Exception
@@ -46,6 +47,7 @@ public class CheckerConsumer implements Consumer
      * @param ctx       the execution context object
      *
      * @param event the content event
+     * @throws Exception if error
      */
     @Override
     public void consume(Context ctx, Event event) throws Exception
@@ -63,6 +65,8 @@ public class CheckerConsumer implements Consumer
     /**
      * Signal that there are no more events queued in this
      * event stream.
+     * @param ctx Context
+     * @throws Exception if error
      */
     @Override
     public void end(Context ctx) throws Exception
@@ -73,6 +77,8 @@ public class CheckerConsumer implements Consumer
     /**
      * Finish - free any allocated resources.
      * Called when consumer is being released
+     * @param ctx Context
+     * @throws Exception if error
      */
     @Override
     public void finish(Context ctx) throws Exception

@@ -7,13 +7,11 @@
  */
 package org.dspace.eperson;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.dspace.content.*;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.DSpaceObjectLegacySupport;
+import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -21,6 +19,10 @@ import org.dspace.eperson.service.EPersonService;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Class representing an e-person.
@@ -299,7 +301,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public boolean canLogIn()
     {
-        return canLogIn;
+        return BooleanUtils.isTrue(canLogIn);
     }
 
     /**

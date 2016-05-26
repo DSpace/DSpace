@@ -29,32 +29,21 @@ import org.apache.cocoon.reading.AbstractReader;
 
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.MetadataExport;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.app.xmlui.aspect.discovery.AbstractSearch;
 import org.dspace.app.xmlui.aspect.discovery.SimpleSearch;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.core.Context;
-import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.content.*;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.discovery.*;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
-import org.dspace.discovery.configuration.DiscoverySortConfiguration;
-import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 
 
 /**
@@ -126,7 +115,7 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         	       	 
             Context context = ContextUtil.obtainContext(objectModel);
             
-            String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export");
+            String search_export_config = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.search.metadata_export");
             
             
             if(search_export_config.equals("admin")) {            	

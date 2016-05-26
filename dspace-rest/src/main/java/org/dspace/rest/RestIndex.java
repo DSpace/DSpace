@@ -7,9 +7,10 @@
  */
 package org.dspace.rest;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
@@ -17,18 +18,21 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.ShibAuthentication;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.rest.common.Status;
-import org.dspace.rest.common.User;
 import org.dspace.rest.exceptions.ContextException;
+import org.dspace.utils.DSpace;
 
 /**
  * Root of RESTful api. It provides login and logout. Also have method for
@@ -42,8 +46,6 @@ public class RestIndex {
     protected EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static Logger log = Logger.getLogger(RestIndex.class);
 
-    @javax.ws.rs.core.Context public static ServletContext servletContext;
-
     /**
      * Return html page with information about REST api. It contains methods all
      * methods provide by REST api.
@@ -52,7 +54,7 @@ public class RestIndex {
      */
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String sayHtmlHello() { 
+    public String sayHtmlHello(@Context ServletContext servletContext) {
     	// TODO Better graphics, add arguments to all methods. (limit, offset, item and so on)
         return "<html><title>DSpace REST - index</title>" +
                 "<body>"
@@ -161,26 +163,63 @@ public class RestIndex {
     /**
      * Method to login a user into REST API.
      * 
-     * @param user
-     *            User which will be logged in to REST API.
      * @return Returns response code OK and a token. Otherwise returns response
      *         code FORBIDDEN(403).
      */
     @POST
     @Path("/login")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response login(User user)
+    public Response login()
     {
-        String token = TokenHolder.login(user);
-        if (token == null)
-        {
-            log.info("REST Login Attempt failed for user: " + user.getEmail());
-            return Response.status(Response.Status.FORBIDDEN).build();
-        } else {
-            log.info("REST Login Success for user: " + user.getEmail());
-            return Response.ok(token, "text/plain").build();
-        }
+        //If you can get here, you are authenticated, the actual login is handled by spring security
+        return Response.ok().build();
     }
+
+	@GET
+	@Path("/shibboleth-login")
+	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+	public Response shibbolethLogin()
+	{
+		//If you can get here, you are authenticated, the actual login is handled by spring security
+		return Response.ok().build();
+	}
+
+	@GET
+	@Path("/login-shibboleth")
+	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+	public Response shibbolethLoginEndPoint()
+	{
+		org.dspace.core.Context context = null;
+		try {
+			context = Resource.createContext();
+			AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+			Iterator<AuthenticationMethod> authenticationMethodIterator = authenticationService.authenticationMethodIterator();
+			while(authenticationMethodIterator.hasNext())
+            {
+                AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
+				if(authenticationMethod instanceof ShibAuthentication)
+				{
+					//TODO: Perhaps look for a better way of handling this ?
+					org.dspace.services.model.Request currentRequest = new DSpace().getRequestService().getCurrentRequest();
+					String loginPageURL = authenticationMethod.loginPageURL(context, currentRequest.getHttpServletRequest(), currentRequest.getHttpServletResponse());
+					if(StringUtils.isNotBlank(loginPageURL))
+					{
+						currentRequest.getHttpServletResponse().sendRedirect(loginPageURL);
+					}
+				}
+            }
+			context.abort();
+		} catch (ContextException | SQLException | IOException e) {
+			Resource.processException("Shibboleth endpoint error:  " + e.getMessage(), context);
+		} finally {
+			if(context != null && context.isValid())
+			{
+				context.abort();
+			}
+
+		}
+		return Response.ok().build();
+	}
 
     /**
      * Method to logout a user from DSpace REST API. Removes the token and user from
@@ -197,24 +236,7 @@ public class RestIndex {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response logout(@Context HttpHeaders headers)
     {
-        List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
-        String token = null;
-        boolean logout = false;
-        EPerson ePerson = null;
-        if (list != null)
-        {
-            token = list.get(0);
-            ePerson = TokenHolder.getEPerson(token);
-            logout = TokenHolder.logout(token);
-        }
-        if ((token == null) || (!logout))
-        {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        if(ePerson != null) {
-            log.info("REST Logout: " + ePerson.getEmail());
-        }
+        //If you can get here, you are logged out, this actual logout is handled by spring security
         return Response.ok().build();
     }
 
@@ -235,14 +257,14 @@ public class RestIndex {
         org.dspace.core.Context context = null;
 
         try {
-            context = Resource.createContext(Resource.getUser(headers));
+            context = Resource.createContext();
             EPerson ePerson = context.getCurrentUser();
 
             if(ePerson != null) {
                 //DB EPerson needed since token won't have full info, need context
                 EPerson dbEPerson = epersonService.findByEmail(context, ePerson.getEmail());
-                String token = Resource.getToken(headers);
-                Status status = new Status(dbEPerson.getEmail(), dbEPerson.getFullName(), token);
+
+                Status status = new Status(dbEPerson.getEmail(), dbEPerson.getFullName());
                 return status;
             }
 

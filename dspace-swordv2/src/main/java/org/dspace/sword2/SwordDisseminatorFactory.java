@@ -7,13 +7,14 @@
  */
 package org.dspace.sword2;
 
-import org.dspace.core.PluginManager;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 import org.swordapp.server.UriRegistry;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
+import org.dspace.core.factory.CoreServiceFactory;
 
 public class SwordDisseminatorFactory
 {
@@ -36,9 +37,8 @@ public class SwordDisseminatorFactory
                                 "_"); // clean up the string for the plugin manager
                         format = format.replace("=",
                                 "_"); // clean up the string for the plugin manager
-                        disseminator = (SwordContentDisseminator) PluginManager
-                                .getNamedPlugin("swordv2-server",
-                                        SwordContentDisseminator.class, format);
+                        disseminator = (SwordContentDisseminator) CoreServiceFactory.getInstance().getPluginService()
+                                .getNamedPlugin(SwordContentDisseminator.class, format);
                         if (disseminator == null)
                         {
                             continue;
@@ -72,28 +72,35 @@ public class SwordDisseminatorFactory
                             "_"); // clean up the string for the plugin manager
                     acceptPackaging = acceptPackaging.replace("=",
                             "_"); // clean up the string for the plugin manager
-                    disseminator = (SwordContentDisseminator) PluginManager
-                            .getNamedPlugin("swordv2-server",
-                                    SwordContentDisseminator.class,
+                    disseminator = (SwordContentDisseminator) CoreServiceFactory.getInstance().getPluginService()
+                            .getNamedPlugin(SwordContentDisseminator.class,
                                     acceptPackaging);
                     if (disseminator != null)
                     {
                         if (accept != null)
                         {
+                            // Find first accept format that this disseminator works with
+                            String disseminateFormat = null;
                             for (Float q : accept.keySet())
                             {
                                 for (String format : accept.get(q))
                                 {
-                                    if (!disseminator
-                                            .disseminatesContentType(format))
+                                    if (disseminator.disseminatesContentType(format))
                                     {
-                                        disseminator = null;
-                                    }
-                                    else
-                                    {
-                                        disseminator.setContentType(format);
+                                        disseminateFormat = format;
+                                        break;
                                     }
                                 }
+                            }
+
+                            if(StringUtils.isNotEmpty(disseminateFormat))
+                            {
+                                disseminator.setContentType(disseminateFormat);
+                            }
+                            else
+                            {
+                                // No matching disseminator found
+                                disseminator = null;
                             }
                         }
                     }
@@ -132,9 +139,8 @@ public class SwordDisseminatorFactory
                             "_"); // clean up the string for the plugin manager
                     format = format.replace("=",
                             "_"); // clean up the string for the plugin manager
-                    disseminator = (SwordStatementDisseminator) PluginManager
-                            .getNamedPlugin("swordv2-server",
-                                    SwordStatementDisseminator.class, format);
+                    disseminator = (SwordStatementDisseminator) CoreServiceFactory.getInstance().getPluginService()
+                            .getNamedPlugin(SwordStatementDisseminator.class, format);
                     if (disseminator != null)
                     {
                         break;
@@ -155,9 +161,8 @@ public class SwordDisseminatorFactory
     public static SwordEntryDisseminator getEntryInstance()
             throws DSpaceSwordException, SwordError
     {
-        SwordEntryDisseminator disseminator = (SwordEntryDisseminator) PluginManager
-                .getSinglePlugin("swordv2-server",
-                        SwordEntryDisseminator.class);
+        SwordEntryDisseminator disseminator = (SwordEntryDisseminator) CoreServiceFactory.getInstance().getPluginService()
+                .getSinglePlugin(SwordEntryDisseminator.class);
         if (disseminator == null)
         {
             throw new SwordError(DSpaceUriRegistry.REPOSITORY_ERROR,

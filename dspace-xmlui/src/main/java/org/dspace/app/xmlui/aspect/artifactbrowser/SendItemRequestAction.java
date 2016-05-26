@@ -31,15 +31,13 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.utils.DSpace;
 
  /**
  * This action will send a mail to request a item to administrator when all mandatory data is present.
@@ -52,12 +50,13 @@ import org.dspace.utils.DSpace;
  */
 public class SendItemRequestAction extends AbstractAction
 {
-    private static Logger log = Logger.getLogger(SendItemRequestAction.class);
+    private static final Logger log = Logger.getLogger(SendItemRequestAction.class);
 
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected RequestItemService requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
@@ -83,7 +82,7 @@ public class SendItemRequestAction extends AbstractAction
         {
             // Either the user did not fill out the form or this is the
             // first time they are visiting the page.
-            Map<String,String> map = new HashMap<String,String>();
+            Map<String,String> map = new HashMap<>();
             map.put("bitstreamId",bitstreamId);
 
             if (StringUtils.isEmpty(requesterEmail))
@@ -109,8 +108,7 @@ public class SendItemRequestAction extends AbstractAction
         String title = "";
         Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamId));
 
-        RequestItemAuthor requestItemAuthor = new DSpace()
-                .getServiceManager()
+        RequestItemAuthor requestItemAuthor = DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServiceByName(
                         RequestItemAuthorExtractor.class.getName(),
                         RequestItemAuthorExtractor.class
@@ -132,8 +130,8 @@ public class SendItemRequestAction extends AbstractAction
         email.addArgument(getLinkTokenEmail(context,token));
         email.addArgument(requestItemAuthor.getFullName());    //   corresponding author name
         email.addArgument(requestItemAuthor.getEmail());    //   corresponding author email
-        email.addArgument(ConfigurationManager.getProperty("dspace.name"));
-        email.addArgument(ConfigurationManager.getProperty("mail.helpdesk"));
+        email.addArgument(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.name"));
+        email.addArgument(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("mail.helpdesk"));
 
         email.setReplyTo(requesterEmail);
          
@@ -144,19 +142,21 @@ public class SendItemRequestAction extends AbstractAction
 
     /**
      * Get the link to the author in RequestLink email.
-     * @param context
-     * @param requestItem
-     * @return
-     * @throws SQLException
+     * @param context DSpace session context.
+     * @param token token.
+     * @return the link.
+     * @throws SQLException passed through.
      */
     protected String getLinkTokenEmail(Context context, String token)
             throws SQLException
     {
-        String base = ConfigurationManager.getProperty("dspace.url");
+        String base = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url");
 
-        String specialLink = (new StringBuffer()).append(base).append(
-                base.endsWith("/") ? "" : "/").append(
-                "itemRequestResponse/").append(token)
+        String specialLink = new StringBuffer()
+                .append(base)
+                .append(base.endsWith("/") ? "" : "/")
+                .append("itemRequestResponse/")
+                .append(token)
                 .toString()+"/";
 
         return specialLink;

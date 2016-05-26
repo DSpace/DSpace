@@ -95,6 +95,11 @@ public class DSpaceAIPIngester
      * 3. If (1) or (2) succeeds, crosswalk it and ignore all other DMDs with
      *    same GROUPID<br>
      * 4. Crosswalk remaining DMDs not eliminated already.
+     * @throws PackageValidationException validation error
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void crosswalkObjectDmd(Context context, DSpaceObject dso,
@@ -193,6 +198,10 @@ public class DSpaceAIPIngester
      * license supplied by explicit argument next, else use collection's
      * default deposit license.
      * Normally the rightsMD crosswalks should provide a license.
+     * @throws PackageValidationException validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void addLicense(Context context, Item item, String license,
@@ -232,6 +241,11 @@ public class DSpaceAIPIngester
      * @param context DSpace Context
      * @param dso DSpace object
      * @param params Packager Parameters
+     * @throws org.dspace.content.packager.PackageValidationException
+     * @throws java.sql.SQLException
+     * @throws org.dspace.content.crosswalk.CrosswalkException
+     * @throws java.io.IOException
+     * @throws org.dspace.authorize.AuthorizeException
      */
     @Override
     public void finishObject(Context context, DSpaceObject dso, PackageParameters params)
@@ -256,6 +270,10 @@ public class DSpaceAIPIngester
 
     /**
      * Nothing extra to do to bitstream after ingestion.
+     * @throws MetadataValidationException if validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void finishBitstream(Context context,
@@ -271,6 +289,8 @@ public class DSpaceAIPIngester
     /**
      * Return the type of DSpaceObject in this package; it is
      * in the TYPE attribute of the mets:mets element.
+     * @return type
+     * @throws PackageValidationException if package validation error
      */
     @Override
     public int getObjectType(METSManifest manifest)
@@ -296,6 +316,7 @@ public class DSpaceAIPIngester
 
     /**
      * Name used to distinguish DSpace Configuration entries for this subclass.
+     * @return config name
      */
     @Override
     public String getConfigurationName()

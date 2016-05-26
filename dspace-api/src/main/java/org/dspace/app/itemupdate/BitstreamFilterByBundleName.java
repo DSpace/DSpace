@@ -29,8 +29,8 @@ public class BitstreamFilterByBundleName extends BitstreamFilter {
 	/**
 	 *    Filter bitstream based on bundle name found in properties file
 	 *    
-	 *    @param bitstream
-	 *    @throws BitstreamFilterException
+	 *    @param bitstream Bitstream
+	 *    @throws BitstreamFilterException if filter error
 	 *    @return whether bitstream is in bundle
 	 *    
 	 */

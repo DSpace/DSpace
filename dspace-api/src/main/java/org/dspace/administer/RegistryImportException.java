@@ -25,7 +25,7 @@ public class RegistryImportException extends Exception
     /**
      * create an exception with only a message
      * 
-     * @param message
+     * @param message error message
      */
     public RegistryImportException(String message)
     {
@@ -35,8 +35,8 @@ public class RegistryImportException extends Exception
     /**
      * create an exception with an inner exception and a message
      * 
-     * @param	message
-     * @param	e
+     * @param	message error message
+     * @param	e throwable
      */
     public RegistryImportException(String message, Throwable e)
     {
@@ -46,7 +46,7 @@ public class RegistryImportException extends Exception
     /**
      * create an exception with an inner exception
      * 
-     * @param	e
+     * @param	e throwable
      */
     public RegistryImportException(Throwable e)
     {

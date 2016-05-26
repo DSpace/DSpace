@@ -14,10 +14,15 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.*;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.SelfNamedPlugin;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 
 import java.util.*;
+import org.apache.commons.lang.ArrayUtils;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
@@ -38,7 +43,6 @@ public class MediaFilterCLITool {
 
     //suffix (in dspace.cfg) for input formats supported by each filter
     private static final String INPUT_FORMATS_SUFFIX = "inputFormats";
-
 
     public static void main(String[] argv) throws Exception
     {
@@ -161,8 +165,7 @@ public class MediaFilterCLITool {
         else
         {
             //retrieve list of all enabled media filter plugins!
-            String enabledPlugins = ConfigurationManager.getProperty(MEDIA_FILTER_PLUGINS_KEY);
-            filterNames = enabledPlugins.split(",\\s*");
+            filterNames = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty(MEDIA_FILTER_PLUGINS_KEY);
         }
 
         MediaFilterService mediaFilterService = MediaFilterServiceFactory.getInstance().getMediaFilterService();
@@ -178,7 +181,7 @@ public class MediaFilterCLITool {
         for(int i=0; i< filterNames.length; i++)
         {
             //get filter of this name & add to list of filters
-            FormatFilter filter = (FormatFilter) PluginManager.getNamedPlugin(FormatFilter.class, filterNames[i]);
+            FormatFilter filter = (FormatFilter) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(FormatFilter.class, filterNames[i]);
             if(filter==null)
             {
                 System.err.println("\nERROR: Unknown MediaFilter specified (either from command-line or in dspace.cfg): '" + filterNames[i] + "'");
@@ -209,13 +212,14 @@ public class MediaFilterCLITool {
                 //  filter.<class-name>.<plugin-name>.inputFormats
                 //For other MediaFilters, format of key is:
                 //  filter.<class-name>.inputFormats
-                String formats = ConfigurationManager.getProperty(
+                String[] formats = 
+                        DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty(
                         FILTER_PREFIX + "." + filterClassName +
-                                (pluginName!=null ? "." + pluginName : "") +
-                                "." + INPUT_FORMATS_SUFFIX);
+                        (pluginName!=null ? "." + pluginName : "") +
+                        "." + INPUT_FORMATS_SUFFIX);
 
                 //add to internal map of filters to supported formats
-                if (formats != null)
+                if (ArrayUtils.isNotEmpty(formats))
                 {
                     //For SelfNamedPlugins, map key is:
                     //  <class-name><separator><plugin-name>
@@ -223,7 +227,7 @@ public class MediaFilterCLITool {
                     //  <class-name>
                     filterFormats.put(filterClassName +
                                     (pluginName!=null ? MediaFilterService.FILTER_PLUGIN_SEPARATOR + pluginName : ""),
-                            Arrays.asList(formats.split(",[\\s]*")));
+                            Arrays.asList(formats));
                 }
             }//end if filter!=null
         }//end for

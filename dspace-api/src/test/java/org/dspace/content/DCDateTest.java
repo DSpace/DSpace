@@ -11,7 +11,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
 import java.util.*;
-import org.dspace.AbstractUnitTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +21,7 @@ import static org.hamcrest.CoreMatchers.*;
  *
  * @author pvillega
  */
-public class DCDateTest extends AbstractUnitTest
+public class DCDateTest
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(DCDateTest.class);
@@ -45,9 +44,7 @@ public class DCDateTest extends AbstractUnitTest
      * but no execution order is guaranteed
      */
     @Before
-    @Override
     public void init() {
-        super.init();
         TimeZone.setDefault(TimeZone.getTimeZone("GMT-8"));
     }
 
@@ -59,11 +56,9 @@ public class DCDateTest extends AbstractUnitTest
      * but no execution order is guaranteed
      */
     @After
-    @Override
     public void destroy()  {
         dc = null;
         c = null;
-        super.destroy();
     }
 
     /**

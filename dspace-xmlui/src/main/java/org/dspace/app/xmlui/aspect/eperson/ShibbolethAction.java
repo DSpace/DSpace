@@ -22,29 +22,33 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 /**
  * Attempt to authenticate the user based upon their presented shibboleth credentials. 
- * This action uses the http parameters as supplied by Shibboleth SP.
+ * This action uses the HTTP parameters as supplied by Shibboleth SP.
  * Read dspace.cfg for configuration detail.
- * 
- * If the authentication attempt is successful then an HTTP redirect will be
+ *
+ * <p>If the authentication attempt is successful then an HTTP redirect will be
  * sent to the browser redirecting them to their original location in the 
  * system before authenticated or if none is supplied back to the DSpace 
- * homepage. The action will also return true, thus contents of the action will
- * be excuted.
+ * home page. The action will also return true, thus contents of the action will
+ * be executed.
+ *
+ * <p>If the authentication attempt fails, the action returns false.
  * 
- * If the authentication attempt fails, the action returns false.
- * 
- * Example use:
- * 
+ * <p>Example use:
+ *
+ * <pre>
+ * {@code
  * <map:act name="Shibboleth">
  *   <map:serialize type="xml"/>
  * </map:act>
  * <map:transform type="try-to-login-again-transformer">
+ * }
+ * </pre>
  *
  * @author <a href="mailto:bliong@melcoe.mq.edu.au">Bruc Liong, MELCOE</a>
  */
@@ -53,10 +57,21 @@ public class ShibbolethAction extends AbstractAction
 {
 
     /**
-     * Attempt to authenticate the user. 
+     * Attempt to authenticate the user.
+     *
+     * @param redirector redirector.
+     * @param resolver source resolver.
+     * @param objectModel object model.
+     * @param source source.
+     * @param parameters sitemap parameters.
+     * @return result of the action.
+     * @throws org.apache.cocoon.sitemap.PatternException if authentication fails.
+     * @throws java.lang.Exception passed through.
      */
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
-            String source, Parameters parameters) throws Exception
+            String source, Parameters parameters)
+            throws PatternException, Exception
     {
         try
         {
@@ -84,7 +99,7 @@ public class ShibbolethAction extends AbstractAction
             	else
             	{
             		// Otherwise direct the user to the specified 'loginredirect' page (or homepage by default)
-            		String loginRedirect = ConfigurationManager.getProperty("xmlui.user.loginredirect");
+            		String loginRedirect = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.user.loginredirect");
             		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
             	}
             	

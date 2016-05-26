@@ -52,36 +52,10 @@ implements org.dspace.identifier.doi.DOIConnector
 
     @Override
     @Mock
-    public boolean isDOIReserved(Context context, DSpaceObject dso, String doi)
-            throws DOIIdentifierException
-    {
-        if (null == doi)
-        {
-            throw new NullPointerException();
-        }
-        UUID itemId = reserved.get(doi);
-        return (itemId != null && itemId.equals(dso.getID())) ? true : false;
-    }
-
-    @Override
-    @Mock
     public boolean isDOIRegistered(Context context, String doi)
             throws DOIIdentifierException
     {
         return registered.containsKey(doi);
-    }
-
-    @Override
-    @Mock
-    public boolean isDOIRegistered(Context context, DSpaceObject dso, String doi)
-            throws DOIIdentifierException
-    {
-        if (null == doi)
-        {
-            throw new NullPointerException();
-        }
-        UUID itemId = registered.get(doi);
-        return (itemId != null && itemId.equals(dso.getID())) ? true : false;
     }
 
     @Override

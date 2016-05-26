@@ -37,6 +37,11 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
     @Autowired(required = true)
     protected MetadataSchemaDAO metadataSchemaDAO;
 
+    protected MetadataSchemaServiceImpl()
+    {
+
+    }
+
     @Override
     public MetadataSchema create(Context context, String name, String namespace) throws SQLException, AuthorizeException, NonUniqueMetadataException {
                 // Check authorisation: Only admins may create metadata schemas
@@ -146,9 +151,10 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
      * number of times in the current schema.
      *
      * @param context DSpace context
+     * @param metadataSchemaId metadata schema id
      * @param namespace namespace URI to match
      * @return true of false
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean uniqueNamespace(Context context, int metadataSchemaId, String namespace)
             throws SQLException
@@ -160,9 +166,10 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
      * Return true if and only if the passed name is unique.
      *
      * @param context DSpace context
+     * @param metadataSchemaId metadata schema id
      * @param name  short name of schema
      * @return true of false
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean uniqueShortName(Context context, int metadataSchemaId, String name)
             throws SQLException

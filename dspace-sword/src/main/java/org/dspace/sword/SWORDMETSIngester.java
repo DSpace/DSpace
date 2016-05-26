@@ -21,7 +21,7 @@ import org.dspace.content.packager.PackageParameters;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
@@ -73,7 +73,7 @@ public class SWORDMETSIngester implements SWORDIngester
             }
             swordService.message("Using package manifest format: " + cfg);
 
-            PackageIngester pi = (PackageIngester) PluginManager
+            PackageIngester pi = (PackageIngester) CoreServiceFactory.getInstance().getPluginService()
                     .getNamedPlugin(PackageIngester.class, cfg);
             swordService.message(
                     "Loaded package ingester: " + pi.getClass().getName());

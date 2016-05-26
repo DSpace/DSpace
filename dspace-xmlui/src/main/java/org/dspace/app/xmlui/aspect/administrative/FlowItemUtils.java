@@ -26,7 +26,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
@@ -828,7 +828,7 @@ public class FlowItemUtils
                 String task = request.getParameter("curate_task");
                 Curator curator = FlowCurationUtils.getCurator(task);
                 String objId = String.valueOf(itemID);
-                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                String taskQueueName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.queuename");
                 boolean status = false;
                 Item item = itemService.find(context, itemID);
                 if (item != null)

@@ -28,6 +28,11 @@ public class HarvestedItemServiceImpl implements HarvestedItemService {
     @Autowired(required = true)
     protected HarvestedItemDAO harvestedItemDAO;
 
+    protected HarvestedItemServiceImpl()
+    {
+
+    }
+
     @Override
     public HarvestedItem find(Context context, Item item) throws SQLException {
         return harvestedItemDAO.findByItem(context, item);

@@ -505,7 +505,7 @@ public class EZIDIdentifierProvider
 
     /**
      * Get configured value of EZID username.
-     * @throws IdentifierException
+     * @throws IdentifierException if identifier error
      */
     private String loadUser()
             throws IdentifierException
@@ -523,7 +523,7 @@ public class EZIDIdentifierProvider
 
     /**
      * Get configured value of EZID password.
-     * @throws IdentifierException
+     * @throws IdentifierException if identifier error
      */
     private String loadPassword()
             throws IdentifierException
@@ -541,7 +541,7 @@ public class EZIDIdentifierProvider
 
     /**
      * Get configured value of EZID "shoulder".
-     * @throws IdentifierException
+     * @throws IdentifierException if identifier error
      */
     private String loadAuthority()
             throws IdentifierException

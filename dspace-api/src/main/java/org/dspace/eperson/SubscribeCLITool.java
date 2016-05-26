@@ -48,12 +48,12 @@ public class SubscribeCLITool {
      * Process subscriptions. This must be invoked only once a day. Messages are
      * only sent out when a collection has actually received new items, so that
      * people's mailboxes are not clogged with many "no new items" mails.
-     * <p/>
+     * <p>
      * Yesterday's newly available items are included. If this is run at for
      * example midday, any items that have been made available during the
      * current day will not be included, but will be included in the next day's
      * run.
-     * <p/>
+     * <p>
      * For example, if today's date is 2002-10-10 (in UTC) items made available
      * during 2002-10-09 (UTC) will be included.
      *

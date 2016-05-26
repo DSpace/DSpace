@@ -23,8 +23,7 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
-import org.dspace.handle.HandleServiceImpl;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.jdom.Element;
@@ -63,7 +62,7 @@ public class DSpaceOREGenerator extends AbstractGenerator
             
             // Instantiate and execute the ORE plugin
             SAXOutputter out = new SAXOutputter(contentHandler);
-            DisseminationCrosswalk xwalk = (DisseminationCrosswalk)PluginManager.getNamedPlugin(DisseminationCrosswalk.class,"ore");
+            DisseminationCrosswalk xwalk = (DisseminationCrosswalk)CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(DisseminationCrosswalk.class,"ore");
             
             Element ore = xwalk.disseminateElement(context, item);
             out.output(ore);

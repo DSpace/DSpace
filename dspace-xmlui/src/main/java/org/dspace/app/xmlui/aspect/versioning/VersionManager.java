@@ -11,7 +11,6 @@ import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
@@ -20,14 +19,11 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -159,14 +155,14 @@ public class VersionManager {
 
             Item item = itemService.find(context, itemId);
 
-            VersionHistory versionHistory = versioningService.findVersionHistory(context, item);
+            VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
 
             for (String id : versionIDs) {
                 versioningService.removeVersion(context, versioningService.getVersion(context, Integer.parseInt(id)));
             }
 
             //Retrieve the latest version of our history (IF any is even present)
-            Version latestVersion = versionHistoryService.getLatestVersion(versionHistory);
+            Version latestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
             if(latestVersion == null){
                 result.setParameter("itemID", null);
             }else{

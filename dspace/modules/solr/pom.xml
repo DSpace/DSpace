@@ -2,7 +2,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace.modules</groupId>
    <artifactId>solr</artifactId>
-   <version>6.0-SNAPSHOT</version>
+   <version>6.0-rc2-SNAPSHOT</version>
    <packaging>war</packaging>
    <name>DSpace SOLR :: Local Customizations</name>
    <description>
@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>6.0-SNAPSHOT</version>
+      <version>6.0-rc2-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -28,6 +28,8 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
              <configuration>
+               <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
+               <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                <!-- This 'dspace-solr' WAR overlays the Apache Solr Web Application
                     available in Maven Central -->
                <overlays>
@@ -39,7 +41,7 @@
                      need to take precedence over the solr-core, the solr-core will still be loaded in the solr-core.jar
                      -->
                      <excludes>
-                         <exclude>WEB-INF/lib/apache-solr-core-4.10.2.jar</exclude>
+                         <exclude>WEB-INF/lib/apache-solr-core-4.10.4.jar</exclude>
                          <!--Also ensure we use the DSpace solr web.xml file else our localhost filter will not work !-->
                          <exclude>WEB-INF/web.xml</exclude>
                      </excludes>
@@ -124,7 +126,10 @@
                    <artifactId>jetty-xml</artifactId>
                    <groupId>org.eclipse.jetty</groupId>
                </exclusion>
-
+               <exclusion>
+                   <groupId>org.apache.zookeeper</groupId>
+                   <artifactId>zookeeper</artifactId>
+               </exclusion>
            </exclusions>
        </dependency>
 

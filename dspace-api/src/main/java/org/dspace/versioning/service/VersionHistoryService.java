@@ -14,6 +14,7 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  *
@@ -21,31 +22,52 @@ import java.sql.SQLException;
  * @author Fabio Bolognesi (fabio at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
+ * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
  */
 public interface VersionHistoryService extends DSpaceCRUDService<VersionHistory> {
+    
+    public void add(Context context, VersionHistory versionHistory, Version version)
+            throws SQLException;
+    
+    public VersionHistory findByItem(Context context, Item item)
+            throws SQLException;
+    
+    public Version getFirstVersion(Context context, VersionHistory versionHistory)
+            throws SQLException;
+    
+    public Version getLatestVersion(Context context, VersionHistory versionHistory)
+            throws SQLException;
+    
+    public Version getNext(Context context, VersionHistory versionHistory, Version version)
+            throws SQLException;
+    
+    public Version getPrevious(Context context, VersionHistory versionHistory, Version version)
+            throws SQLException;
+    
+    public Version getVersion(Context context, VersionHistory versionHistory, Item item)
+            throws SQLException;
+    
+    public boolean hasNext(Context context, VersionHistory versionHistory, Item item)
+            throws SQLException;
 
-    public Version getLatestVersion(VersionHistory versionHistory);
+    public boolean hasNext(Context context, VersionHistory versionHistory, Version version)
+            throws SQLException;
+    
+    public boolean hasVersionHistory(Context context, Item item)
+            throws SQLException;
+    
+    public boolean isFirstVersion(Context context, Item item)
+            throws SQLException;
 
-    public Version getFirstVersion(VersionHistory versionHistory);
+    public boolean isFirstVersion(Context context, VersionHistory versionHistory, Version version)
+            throws SQLException;
 
-    public Version getPrevious(VersionHistory versionHistory, Version version);
+    public boolean isLastVersion(Context context, Item item)
+            throws SQLException;
 
-    public Version getNext(VersionHistory versionHistory, Version version);
-
-    public boolean hasNext(VersionHistory versionHistory, Version version);
-
-    public void add(VersionHistory versionHistory, Version version);
-
-    public Version getVersion(VersionHistory versionHistory, Item item);
-
-    public boolean hasNext(VersionHistory versionHistory, Item item);
-
-    public boolean isFirstVersion(VersionHistory versionHistory, Version version);
-
-    public boolean isLastVersion(VersionHistory versionHistory, Version version);
+    public boolean isLastVersion(Context context, VersionHistory versionHistory, Version version)
+            throws SQLException;
 
     public void remove(VersionHistory versionHistory, Version version);
-
-    public VersionHistory findByItem(Context context, Item item) throws SQLException;
 
 }
