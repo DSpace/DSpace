@@ -110,13 +110,12 @@
 	            <!-- Specify here any data loaders you want to include in the submission lookup process.
 	            	Dataloaders must either extend the "NetworkSubmissionLookupDataLoader" abstract class
 	            	or conform to "FileDataLoader" interface of BTE -->
-	            <entry key="scopus" value-ref="scopusOnlineDataLoader"/>	            	
 	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
 	            <!-- <entry key="pubmedEurope" value-ref="pubmedEuropeOnlineDataLoader"/> -->	            
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
 	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
 	            <entry key="cinii" value-ref="ciniiOnlineDataLoader"/>
-<!-- 	            depending on your apiKey you should use scopusOnlineDataLoader or SciValOnlineDataLoader
+<!-- 	            depending on your apiKey you should use scopusOnlineDataLoader or scivalOnlineDataLoader
 		    <entry key="scopus" value-ref="scopusOnlineDataLoader"/>
 	            <entry key="wos" value-ref="wosOnlineDataLoader"/> -->
 	            <entry key="pubmedXML" value-ref="pubmedFileDataLoader"/>
@@ -684,8 +683,8 @@
 		</constructor-arg>
 	</bean>
 
-	<!-- SCOPUS Data Loaders -->
-	<bean id="scopusOnlineDataLoader"
+	<!-- SCOPUS scival Data Loaders -->
+	<bean id="scivalOnlineDataLoader"
 		class="org.dspace.submit.lookup.SciValOnlineDataLoader"
 		scope="prototype">
 		<property name="searchProvider" value="false" />
@@ -693,14 +692,14 @@
 			returned by the Scopus free text (by author, title) search. Default value 
 			is 10 -->
 		<!-- <property name="maxResults" value="10" /> -->
-		<property name="fieldMap" ref="scopusInputMap" />
+		<property name="fieldMap" ref="scivalInputMap" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
 	</bean>
 
 	<alias name="scopusOnlineDataLoader"
 		alias="org.dspace.submit.lookup.SciValOnlineDataLoader" />
 
-	<bean name="scopusInputMap" class="java.util.HashMap" scope="prototype">
+	<bean name="scivalInputMap" class="java.util.HashMap" scope="prototype">
 		<constructor-arg>
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry key="eid" value="eid" />
@@ -848,7 +847,8 @@
 			</map>
 		</constructor-arg>
 	</bean>
-	
+
+	<!--  PUBMED EUROPE FEED -->	
 	<bean name="pubmedFeedPhase1TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
 	    <property name="dataLoader" ref="pubmedEuropeDataLoader"/>
     	<property name="workflow" ref="phase1LinearWorkflow"/>
@@ -870,4 +870,28 @@
 		<property name="outputMap" ref="outputMap"/>
 		<property name="sourceIdMetadata" value="dc.identifier.pmid" />		
 	</bean>
+
+	<!-- SCOPUS FEED -->
+	<bean name="scopusFeedPhase1TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="scopusDataLoader"/>
+    	<property name="workflow" ref="phase1LinearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+  	</bean>
+  	<bean name="scopusDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
+	    <property name="dataloadersMap">
+	        <map>
+	            <entry key="scopus" value-ref="scopusOnlineDataLoader"/>
+			</map>
+	    </property>
+	</bean>
+	<bean name="scopusFeedTransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="submissionItemDataLoader"/>
+    	<property name="workflow" ref="phase2linearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator"/>
+  	</bean>
+	<bean name="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
+		<property name="outputMap" ref="outputMap"/>
+		<property name="sourceIdMetadata" value="dc.identifier.eid" />		
+	</bean>
+	
 </beans>
