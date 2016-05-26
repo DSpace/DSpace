@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 @Disable
 @Path("/services")
@@ -78,7 +79,11 @@ public class MyHandleResource extends Resource {
                 String submitdate = new DCDate(new Date()).toString();
                 String subprefix = (isNotBlank(handle.subprefix)) ? handle.subprefix + "-" : "";
                 String magicURL = "";
-                for (String part : new String[]{handle.title, HandlePlugin.repositoryName, submitdate, handle.reportemail, handle.url}){
+                for (String part : new String[]{handle.title, HandlePlugin.repositoryName, submitdate, handle.reportemail, handle.datasetName, handle.datasetVersion, handle.query, handle.url}){
+                    if(isBlank(part)){
+                        //optional dataset etc...
+                        part = "";
+                    }
                     magicURL += HandlePlugin.magicBean + part;
                 }
                 String hdl = createHandle(subprefix, magicURL, context);

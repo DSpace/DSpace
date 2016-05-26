@@ -33,7 +33,10 @@ public abstract class AbstractPIDService {
 		TITLE,
 		REPOSITORY,
 		SUBMITDATE,
-		REPORTEMAIL
+		REPORTEMAIL,
+		DATASETNAME,
+		DATASETVERSION,
+		QUERY
 	}
 
 	public PIDServiceAuthenticator authenticator = null;
