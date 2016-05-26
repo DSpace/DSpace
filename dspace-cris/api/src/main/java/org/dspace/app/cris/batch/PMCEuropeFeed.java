@@ -220,7 +220,8 @@ public class PMCEuropeFeed
         else
         {
             TableRow row = DatabaseManager.querySingle(context,
-                    "SELECT max(impr.last_modified) as LAST_MODIFIED from IMP_RECORD_TO_ITEM imprti join IMP_RECORD impr on imprti.imp_record_id = impr.imp_record_id");
+                    "SELECT max(impr.last_modified) as LAST_MODIFIED from IMP_RECORD_TO_ITEM imprti join IMP_RECORD impr on "
+                    + "imprti.imp_record_id = impr.imp_record_id and imprti."+IMP_SOURCE_REF+" like 'pubmedEurope'");
             Date date = row.getDateColumn("LAST_MODIFIED");
             if (date == null)
             {
