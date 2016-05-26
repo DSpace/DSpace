@@ -5,6 +5,7 @@ import gr.ekt.bte.core.Record;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,5 +136,20 @@ public class WOSOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
     public void setIpAuthentication(Boolean ipAuthentication)
     {
         this.ipAuthentication = ipAuthentication;
+    }
+
+    public List<Record> searchByAffiliation(String userQuery,
+            String databaseID, String start, String end) throws HttpException, IOException
+    {
+        List<Record> results = new ArrayList<Record>();
+        if (databaseID != null) {
+            List<Record> search = wosService.searchByAffiliation(userQuery, databaseID, start, end, getWosUser(), getWosPassword(), getIpAuthentication());
+            if (search != null) {
+                for (Record scopus : search) {
+                    results.add(convertFields(scopus));
+                }
+            }
+        }
+        return results;
     }
 }

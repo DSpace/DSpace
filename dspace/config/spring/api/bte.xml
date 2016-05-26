@@ -897,4 +897,16 @@
 		<property name="sourceIdMetadata" value="dc.identifier.eid" />		
 	</bean>
 	
+	
+	<!-- WOS FEED -->
+	<bean name="wosFeedTransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="submissionItemDataLoader"/>
+    	<property name="workflow" ref="phase2linearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator"/>
+  	</bean>
+	<bean name="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
+		<property name="outputMap" ref="outputMap"/>
+		<property name="sourceIdMetadata" value="dc.identifier.isi" />		
+	</bean>
+	
 </beans>

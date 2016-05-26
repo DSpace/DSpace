@@ -1,11 +1,10 @@
 package org.dspace.submit.lookup;
 
-import gr.ekt.bte.core.Record;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -28,12 +27,16 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import gr.ekt.bte.core.Record;
+
 public class WOSService {
 	private static Logger log = Logger.getLogger(WOSService.class);
-
+	
+	private final String SEARCH_HEAD_BY_AFFILIATION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wok=\"http://woksearch.v3.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body><wok:search><queryParameters><databaseId>WOK</databaseId>";
 	private final String SEARCH_HEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wok=\"http://woksearch.v3.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body><wok:search><queryParameters><databaseId>WOK</databaseId>";
 	private final String RETRIEVEBYID_HEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wok=\"http://woksearch.v3.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body><wok:retrieveById><databaseId>WOK</databaseId>";
 
+	private final String SEARCH_END_BY_AFFILIATION = "<queryLanguage>en</queryLanguage></queryParameters><retrieveParameters><firstRecord>1</firstRecord><count>100</count></retrieveParameters></wok:search></soapenv:Body></soapenv:Envelope>";
 	private final String SEARCH_END = "<queryLanguage>en</queryLanguage></queryParameters><retrieveParameters><firstRecord>1</firstRecord><count>100</count></retrieveParameters></wok:search></soapenv:Body></soapenv:Envelope>";
 	private final String RETRIEVEBYID_END = "<queryLanguage>en</queryLanguage><retrieveParameters><firstRecord>1</firstRecord><count>100</count></retrieveParameters></wok:retrieveById></soapenv:Body></soapenv:Envelope>";
 
@@ -254,4 +257,23 @@ public class WOSService {
 		return results;
 	}
 
+	
+    public List<Record> searchByAffiliation(String userQuery, String databaseID, String start, String end,
+            String username, String password, boolean ipAuth)
+                    throws HttpException, IOException
+    {
+        StringBuffer query = new StringBuffer("<userQuery>");
+        query.append(userQuery);
+        query.append("</userQuery>");
+        query.append("<timeSpan>");
+        query.append("<begin>");
+        query.append(start);
+        query.append("</begin>");
+        query.append("<end>");
+        query.append(end);
+        query.append("</end>");
+        query.append("</timeSpan>");
+        String message = SEARCH_HEAD_BY_AFFILIATION + query.toString() + SEARCH_END_BY_AFFILIATION;
+        return internalSearch(message, username, password, ipAuth);
+    }
 }
