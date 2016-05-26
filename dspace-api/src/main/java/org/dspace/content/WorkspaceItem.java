@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.content.service.TemplateItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -26,6 +27,7 @@ import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.utils.DSpace;
 
 /**
  * Class representing an item in the process of being submitted by a user
@@ -237,16 +239,10 @@ public class WorkspaceItem implements InProgressSubmission
 
         // Copy template if appropriate
         Item templateItem = coll.getTemplateItem();
-
         if (template && (templateItem != null))
         {
-            Metadatum[] md = templateItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-
-            for (int n = 0; n < md.length; n++)
-            {
-                i.addMetadata(md[n].schema, md[n].element, md[n].qualifier, md[n].language,
-                        md[n].value, md[n].authority, md[n].confidence);
-            }
+        	TemplateItemService tis = new DSpace().getSingletonService(TemplateItemService.class);
+        	tis.applyTemplate(i, templateItem);
         }
 
         i.update();

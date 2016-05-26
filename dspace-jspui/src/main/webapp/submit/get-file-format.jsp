@@ -93,6 +93,8 @@
 
         <%-- <p align="center"><input type="submit" name="submit" value="Choose automatically-recognized type"></p> --%>
 		<p align="center"><input class="btn btn-default" type="submit" name="submit" value="<fmt:message key="jsp.submit.get-file-format.choose.button"/>" /></p>
+		
+		<input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>
     </form>
 
 <%-- Option list put in a separate form --%>
@@ -159,5 +161,7 @@
 
         <%-- <center><p><input type="submit" name="submit" value="Set File Format"></p></center> --%>
 		<input class="btn btn-primary col-md-2 col-md-offset-5" type="submit" name="submit" value="<fmt:message key="jsp.submit.general.submit"/>" />
+		
+		<input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>
     </form>
 </dspace:layout>

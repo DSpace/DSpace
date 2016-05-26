@@ -90,8 +90,8 @@
         }
 %>
         
-	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
-	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
+   	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.11.3.min.js"></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.11.4.min.js'></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/moment.js"></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>

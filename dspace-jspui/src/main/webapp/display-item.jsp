@@ -109,6 +109,8 @@
     
     VersionHistory history = (VersionHistory)request.getAttribute("versioning.history");
     List<Version> historyVersions = (List<Version>)request.getAttribute("versioning.historyversions");
+    
+    boolean dedupEnabled = ConfigurationManager.getBooleanProperty("deduplication", "deduplication.admin.feature", false);
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
@@ -121,8 +123,6 @@
 <script type="text/javascript"><!--
 var j = jQuery.noConflict();
 
-}
-
 j(document).ready(function() {
 
 	<% if(altMetricEnabled) { %>
@@ -130,6 +130,36 @@ j(document).ready(function() {
 	    j('div.altmetric-embed').on('altmetric:hide ', function () {
 	    	j('div.altmetric').hide();
 	    });
+	});
+	<% } %>
+	
+	<% if (dedupEnabled && admin_button) { %>
+	j.ajax({
+		url : "<%=request.getContextPath()%>/json/duplicate",
+		data : {																			
+			"itemid" : <%= item.getID()%>,
+			"typeid" : "2",
+			"admin": true
+		},
+		success : function(data) {
+			if(data.iTotalDisplayRecords==0) {
+				j('div.dedup').hide();
+			}
+			else {
+				j('#dedupCounter').html(data.iTotalDisplayRecords);
+				var queryString = "?";
+				var tmp_itemid_list = <%= item.getID()%> + ",";
+				j.each(data.aaData, function( index, value ) {
+					tmp_itemid_list += value.entityID;
+					tmp_itemid_list += ",";
+				});				
+				var itemid_list = tmp_itemid_list.substr(0, tmp_itemid_list.length-1);
+				queryString += 'scope=0&submitcheck=submitcheck&itemid_list='+itemid_list;
+				j('#dedupCounter').attr('href', '<%=request.getContextPath()%>/tools/duplicate' + queryString);
+			}			
+		},
+		error : function(data) {
+		}
 	});
 	<% } %>
 });
@@ -179,10 +209,16 @@ j(document).ready(function() {
             <div class="panel panel-warning">
             	<div class="panel-heading"><fmt:message key="jsp.admintools"/></div>
             	<div class="panel-body">
+				<form method="get" action="<%= request.getContextPath() %>/submit">
+                    <input type="hidden" name="edit_item" value="<%= item.getID() %>" />
+                    <input type="hidden" name="pageCallerID" value="0" />
+                    <%--<input type="submit" name="submit" value="Edit...">--%>
+                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.editsubmission.button"/>" />
+                </form>
                 <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
                     <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                     <%--<input type="submit" name="submit" value="Edit...">--%>
-                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
+                    <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.editnormal.button"/>" />
                 </form>
                 <form method="post" action="<%= request.getContextPath() %>/mydspace">
                     <input type="hidden" name="item_id" value="<%= item.getID() %>" />
@@ -216,12 +252,13 @@ j(document).ready(function() {
         </div>
 <%      } %>
 
+</div>
 <%
     }
 
     String displayStyle = (displayAll ? "full" : "");
 %>
-</div>
+
 <div class="row">
 <div id="wrapperDisplayItem" class="col-lg-9">
     <dspace:item-preview item="<%= item %>" />
@@ -251,7 +288,7 @@ j(document).ready(function() {
         if (workspace_id != null)
         {
 %>
-    <form class="col-md-2" method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
+    <form class="pull-left" method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
         <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>" />
         <input class="btn btn-default" type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text1"/>" />
     </form>
@@ -271,7 +308,7 @@ j(document).ready(function() {
         if (workspace_id != null)
         {
 %>
-    <form class="col-md-2" method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
+    <form class="pull-left" method="post" action="<%= request.getContextPath() %>/view-workspaceitem">
         <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>" />
         <input class="btn btn-default" type="submit" name="submit_full" value="<fmt:message key="jsp.display-item.text2"/>" />
     </form>
@@ -290,7 +327,7 @@ j(document).ready(function() {
     if (workspace_id != null)
     {
 %>
-   <form class="col-md-2" method="post" action="<%= request.getContextPath() %>/workspace">
+   <form class="pull-left" method="post" action="<%= request.getContextPath() %>/workspace">
         <input type="hidden" name="workspace_id" value="<%= workspace_id.intValue() %>"/>
         <input class="btn btn-primary" type="submit" name="submit_open" value="<fmt:message key="jsp.display-item.back_to_workspace"/>"/>
     </form>
@@ -306,9 +343,25 @@ j(document).ready(function() {
 <%
         }
 %>
+
 </div>
 <div class="col-lg-3">
 <div class="row">
+<%
+if (dedupEnabled && admin_button) { %>	
+<div class="col-lg-12 col-md-4 col-sm-6">
+<div class="media dedup">
+	<div class="media-left">
+		<fmt:message key="jsp.display-item.dedup.title"/>
+	</div>
+	<div id="dedupResult" class="media-body text-center">
+		<h4 class="media-heading"><fmt:message key="jsp.display-item.dedup.heading"/></h4>
+	    <span class="metric-counter"><a id="dedupCounter" data-toggle="tooltip" target="_blank" title="<fmt:message key="jsp.display-item.dedup.tooltip"/>" href=""><fmt:message key="jsp.display-item.dedup.check"/></a></span>
+	</div>
+</div>	
+</div>
+<br class="visible-lg" />
+<% } %>
 <c:forEach var="metricType" items="${metricTypes}">
 <c:set var="metricNameKey">
 	jsp.display-item.citation.${metricType}
@@ -414,13 +467,11 @@ j(document).ready(function() {
   </div>
 </div>
 <% }%>
-</div>
-
 <%
     }
 %>
 </div>
-
+</div>
 <div class="container">
     <%-- Versioning table --%>
 <%
@@ -487,5 +538,6 @@ j(document).ready(function() {
 <%
     } 
 %>
-	</div>    
+	</div>
+    
 </dspace:layout>

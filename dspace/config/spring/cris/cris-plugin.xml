@@ -11,23 +11,41 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                   http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                   http://www.springframework.org/schema/context
-                  http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+                  http://www.springframework.org/schema/context/spring-context-2.5.xsd
+                  http://www.springframework.org/schema/util
+    			  http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
 	<bean class="org.dspace.app.cris.integration.CrisRetrievePotentialMatchPlugin" id="org.dspace.app.cris.integration.IRetrievePotentialMatchPlugin"/>
 	<bean id="org.dspace.app.cris.util.IResearcherPageLabelDecorator" class="org.dspace.app.cris.util.BasicResearcherPageLabelDecorator"/>
 	
+	<util:constant id="CrisConsumer-SOURCE_INTERNAL"
+		static-field="org.dspace.app.cris.integration.authority.CrisConsumer.SOURCE_INTERNAL" />
+	
 	<bean id="org.dspace.app.cris.integration.authority.AuthoritiesFillerConfig" class="org.dspace.app.cris.integration.authority.AuthoritiesFillerConfig">
 		<property name="fillers">
 			<map>
 				<entry key="orcid">
-					<bean class="org.dspace.app.cris.integration.authority.ORCIDImportFiller" />
+					<bean class="org.dspace.app.cris.integration.authority.ORCIDImportFiller" parent="fullitemMetadataConfiguration" />
+				</entry>
+				<entry key-ref="CrisConsumer-SOURCE_INTERNAL">
+					<bean class="org.dspace.app.cris.integration.authority.ItemMetadataImportFiller" parent="fullitemMetadataConfiguration" />
 				</entry>
 			</map>
 		</property>
 	</bean>
+	
+	<bean class="org.dspace.app.cris.integration.authority.ItemMetadataImportFiller" id="fullitemMetadataConfiguration" abstract="true">
+		<property name="applicationService" ref="applicationService" />
+		<property name="allowsUpdateByDefault" value="true" />
+		<property name="configurations">
+			<bean class="java.util.HashMap" />
+		</property>
+	</bean>
+
 </beans>

@@ -36,6 +36,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.services.EmailService;
 import org.dspace.utils.DSpace;
@@ -103,6 +105,9 @@ import org.dspace.utils.DSpace;
  */
 public class Email
 {
+    
+    private static boolean skipEmailSend = false;
+    
     /** The content of the message */
     private String content;
 
@@ -113,8 +118,11 @@ public class Email
     private List<Object> arguments;
 
     /** The recipients */
-    private List<String> recipients;
+    private List<String> recipientsTO;
 
+    /** The recipients */
+    private List<String> recipientsCC;
+    
     /** Reply to field, if any */
     private String replyTo;
 
@@ -126,13 +134,19 @@ public class Email
 
     private static final Logger log = Logger.getLogger(Email.class);
 
+
+    public static void setSkipEmailSend(boolean skip) {
+        skipEmailSend = skip;
+    }
+    
     /**
      * Create a new email message.
      */
     public Email()
     {
         arguments = new ArrayList<Object>(50);
-        recipients = new ArrayList<String>(50);
+        recipientsTO = new ArrayList<String>(50);
+        recipientsCC = new ArrayList<String>(50);
         attachments = new ArrayList<FileAttachment>(10);
         moreAttachments = new ArrayList<InputStreamAttachment>(10);
         subject = "";
@@ -149,9 +163,26 @@ public class Email
      */
     public void addRecipient(String email)
     {
-        recipients.add(email);
+        addRecipientTO(email);
     }
 
+
+    /**
+     * Add a recipient
+     *
+     * @param email
+     *            the recipient's email address
+     */
+    public void addRecipientTO(String email)
+    {
+        recipientsTO.add(email);
+    }
+    
+    public void addRecipientCC(String email)
+    {
+        recipientsCC.add(email);
+    }
+    
     /**
      * Set the content of the message. Setting this "resets" the message
      * formatting -<code>addArgument</code> will start. Comments and any
@@ -220,7 +251,8 @@ public class Email
     public void reset()
     {
         arguments = new ArrayList<Object>(50);
-        recipients = new ArrayList<String>(50);
+        recipientsTO = new ArrayList<String>(50);
+        recipientsCC = new ArrayList<String>(50);
         attachments = new ArrayList<FileAttachment>(10);
         moreAttachments = new ArrayList<InputStreamAttachment>(10);
         replyTo = null;
@@ -236,9 +268,16 @@ public class Email
      */
     public void send() throws MessagingException, IOException
     {
+        
+        if (skipEmailSend) {
+            // exit immediatly
+            return;
+        }
+        
         // Get the mail configuration properties
         String from = ConfigurationManager.getProperty("mail.from.address");
         boolean disabled = ConfigurationManager.getBooleanProperty("mail.server.disabled", false);
+        String fixedRecipient = ConfigurationManager.getProperty("mail.server.fixedRecipient");
 
         // If no character set specified, attempt to retrieve a default
         if (charset == null)
@@ -254,17 +293,44 @@ public class Email
         MimeMessage message = new MimeMessage(session);
 
         // Set the recipients of the message
-        Iterator<String> i = recipients.iterator();
+        Iterator<String> i = recipientsTO.iterator();
+        Iterator<String> z = recipientsCC.iterator();
 
         while (i.hasNext())
         {
+            // ATTENTION: if you add more recipientType be sure to handle 
+            // them properly when the fixedRecipient is used
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(
                     i.next()));
+        }
+        while (z.hasNext())
+        {
+            // ATTENTION: if you add more recipientType be sure to handle 
+            // them properly when the fixedRecipient is used
+            message.addRecipient(Message.RecipientType.CC, new InternetAddress(
+                    z.next()));
         }
 
         // Format the mail message
         Object[] args = arguments.toArray();
         String fullMessage = MessageFormat.format(content, args);
+        
+        if(disabled) {
+            fullMessage += "\n===REAL RECIPIENT===\n";
+            for (String r : recipientsTO)
+            {
+                fullMessage += r + "\n";
+            }
+            if (recipientsCC.size() > 0)
+            {
+                fullMessage += "\n===REAL RECIPIENT (cc)===\n";
+                for (String r : recipientsCC)
+                {
+                    fullMessage += r + "\n";
+                }
+            }
+        }
+        
         Date date = new Date();
 
         message.setSentDate(date);
@@ -353,7 +419,18 @@ public class Email
 
             text.append('\n').append(fullMessage);
 
-            log.info(text);
+            if (StringUtils.isNotEmpty(fixedRecipient))
+            {
+                message.setRecipient(Message.RecipientType.TO,
+                        new InternetAddress(fixedRecipient));
+                message.setRecipients(Message.RecipientType.CC, 
+                        "");                        
+                Transport.send(message);
+            }
+            else
+            {
+                log.info(text);
+            }
         }
         else
             Transport.send(message);

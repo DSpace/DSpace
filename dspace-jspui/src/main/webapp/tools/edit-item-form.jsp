@@ -277,6 +277,12 @@
 		<div class="panel panel-default">
 			<div class="panel-heading"><fmt:message key="jsp.actiontools"/></div>
         	<div class="panel-body">
+        	<form method="get" action="<%= request.getContextPath() %>/submit">
+                 <input type="hidden" name="edit_item" value="<%= item.getID() %>" />
+                 <input type="hidden" name="pageCallerID" value="1" />
+                 <%--<input type="submit" name="submit" value="Edit...">--%>
+                 <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.editsubmission.button"/>" />
+            </form>
         	<%
     if (!item.isWithdrawn() && bWithdraw)
     {

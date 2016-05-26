@@ -68,6 +68,8 @@
 	    <div class="btn-group col-md-6 col-md-offset-3">
 	    	<input class="btn btn-warning col-md-6" type="submit" name="submit_reject" value="<fmt:message key="jsp.submit.show-license.notgrant.button"/>" />
 	    	<input class="btn btn-success col-md-6" type="submit" name="submit_grant" value="<fmt:message key="jsp.submit.show-license.grant.button"/>" />
-        </div>              
+        </div>
+        
+        <input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>              
     </form>
 </dspace:layout>

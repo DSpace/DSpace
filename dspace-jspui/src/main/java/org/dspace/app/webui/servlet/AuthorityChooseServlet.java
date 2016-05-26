@@ -67,6 +67,10 @@ public class AuthorityChooseServlet extends DSpaceServlet {
         ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
 
         String query = request.getParameter("query");
+        if (query == null) {
+        	// prevent user to hjack the server forcing the "select" return all behaviour
+        	query = "";
+        }
         String format = request.getParameter("format");
         int collection = UIUtil.getIntParameter(request, "collection");
         int start = UIUtil.getIntParameter(request, "start");

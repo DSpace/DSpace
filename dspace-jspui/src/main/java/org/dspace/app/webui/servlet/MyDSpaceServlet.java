@@ -35,6 +35,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.SupervisedItem;
@@ -45,7 +46,10 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.util.ItemUtils;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
@@ -300,11 +304,14 @@ public class MyDSpaceServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+        
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_cancel");
 
         // Get workspace item
-        WorkspaceItem workspaceItem;
-
+        WorkspaceItem workspaceItem = null;
+        // Get item
+        Item item = null;
+        
         try
         {
             int wsID = Integer.parseInt(request.getParameter("workspace_id"));
@@ -317,21 +324,66 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         if (workspaceItem == null)
         {
-            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-                    .getRequestLogInfo(request)));
-            JSPManager.showIntegrityError(request, response);
+            
+            try
+            {
+                int itemID = Integer.parseInt(request.getParameter("item_id"));
+                item = Item.find(context, itemID);
+            }
+            catch (NumberFormatException nfe)
+            {
+                item = null;
+            }
 
-            return;
+            if (item == null)
+            {
+                log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+                        .getRequestLogInfo(request)));
+                JSPManager.showIntegrityError(request, response);
+
+                return;
+            }
+            
         }
 
         // We have a workspace item
         if (buttonPressed.equals("submit_delete"))
         {
-            // User has clicked on "delete"
-            log.info(LogManager.getHeader(context, "remove_submission",
-                    "workspace_item_id=" + workspaceItem.getID() + ",item_id="
-                            + workspaceItem.getItem().getID()));
-            workspaceItem.deleteAll();
+            if (workspaceItem != null)
+            {
+                // User has clicked on "delete"
+                log.info(LogManager.getHeader(context, "remove_submission",
+                        "workspace_item_id=" + workspaceItem.getID()
+                                + ",item_id="
+                                + workspaceItem.getItem().getID()));
+                workspaceItem.deleteAll();
+            }
+            else
+            {
+                // User has clicked on "delete"
+                log.info(LogManager.getHeader(context, "remove_submission",
+                        "item_id=" + item.getID()));
+                context.turnOffAuthorisationSystem();
+                Integer status = ItemUtils.getItemStatus(context, item);
+                if(status == ItemUtils.ARCHIVE) {
+                    item.withdraw();
+                }
+                else {
+                    if(status == ItemUtils.WITHDRAWN) {
+                        item.getOwningCollection().removeItem(item);
+                        item.delete();
+                    }
+                    else {
+                        //Find item in workspace or workflow...
+                        InProgressSubmission inprogress = WorkspaceItem.findByItem(context, item);
+                        if (inprogress == null) {
+                            inprogress = WorkflowItem.findByItem(context, item);
+                        }
+                        inprogress.deleteWrapper();
+                        item.delete();
+                    }
+                }
+            }
             showMainPage(context, request, response);
             context.complete();
         }

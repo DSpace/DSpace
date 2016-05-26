@@ -38,4 +38,14 @@
             <bean class="org.dspace.versioning.VersionHistoryDAO"/>
         </property>
     </bean>
+    
+    <bean id="org.dspace.content.service.TemplateItemService" class="org.dspace.content.service.DSpaceTemplateItemService" scope="singleton">
+    	<property name="generators">
+    		<map>
+    			<entry key="submitter">
+    				<bean class="org.dspace.content.generator.SubmitterValueGenerator" />
+    			</entry>
+    		</map>
+    	</property>
+    </bean>
 </beans>

@@ -681,4 +681,50 @@ public class TableRow
             changed.put(column, Boolean.FALSE);
         }
     }
+    
+    public byte[] getBinaryData(String column)
+    {
+        if (!hasColumn(column))
+        {
+            throw new IllegalArgumentException("No such column " + column);
+        }
+
+        String name = canonicalizeAndCheck(column);
+
+        if (isColumnNull(name))
+        {
+            return null;
+        }
+
+        Object value = data.get(name);
+
+        if (value == null)
+        {
+            throw new IllegalArgumentException("Column " + column
+                    + " not present");
+        }
+
+        if (!(value instanceof byte[]))
+        {
+            throw new IllegalArgumentException("Value is not a bytea");
+        }
+
+        return (byte[]) value;
+    }
+    
+    public void setColumn(String column, byte[] bytea)
+    {
+        if (!hasColumn(column))
+        {
+            throw new IllegalArgumentException("No such column " + column);
+        }
+
+        String canonName = canonicalizeAndCheck(column);
+        Object value = (bytea == null) ? NULL_OBJECT : bytea;
+        if (!value.equals(data.get(canonName)))
+        {
+            data.put(canonName, value);
+            changed.put(canonName, Boolean.TRUE);
+        }
+    }
 }

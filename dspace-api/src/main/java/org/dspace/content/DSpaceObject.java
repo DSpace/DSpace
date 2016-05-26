@@ -8,10 +8,15 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -20,16 +25,15 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
+import org.dspace.handle.HandleManager;
+import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.handle.HandleManager;
-import org.dspace.identifier.IdentifierService;
 import org.dspace.utils.DSpace;
 
 /**
@@ -313,6 +317,15 @@ public abstract class DSpaceObject implements IGlobalSearchResult
     public abstract int getType();
 
     /**
+     * Provide the text name of the type of this DSpaceObject. It is most likely all uppercase.
+     * @return Object type as text
+     */
+    public String getTypeText()
+    {
+        return Constants.typeText[this.getType()];
+    }
+
+    /**
      * Get the internal ID (database primary key) of this object
      * 
      * @return internal ID of object
@@ -428,7 +441,7 @@ public abstract class DSpaceObject implements IGlobalSearchResult
      * <p>
      * Default behaviour is ADMIN right on the object grant right on all other
      * action on the object itself. Subclass should override this method as
-     * need.
+     * needed.
      * 
      * @param action
      *            ID of action being attempted, from
@@ -466,10 +479,6 @@ public abstract class DSpaceObject implements IGlobalSearchResult
     public DSpaceObject getParentObject() throws SQLException
     {
         return null;
-    }
-    
-    public String getTypeText() {
-        return Constants.typeText[getType()];
     }
     
     public abstract void update() throws SQLException, AuthorizeException;
@@ -651,9 +660,9 @@ public abstract class DSpaceObject implements IGlobalSearchResult
      * Retrieve first metadata field value
      */
     protected String getMetadataFirstValue(String schema, String element, String qualifier, String language){
-        Metadatum[] Metadatums = getMetadata(schema, element, qualifier, Item.ANY);
-        if(Metadatums.length>0){
-            return Metadatums[0].value;
+        Metadatum[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
+        if(dcvalues.length>0){
+            return dcvalues[0].value;
         }
         return null;
     }
@@ -711,17 +720,17 @@ public abstract class DSpaceObject implements IGlobalSearchResult
 
     public List<Metadatum> getMetadata(String schema, String element, String qualifier, String lang, String authority) {
         Metadatum[] metadata = getMetadata(schema, element, qualifier, lang);
-        List<Metadatum> Metadatums = Arrays.asList(metadata);
+        List<Metadatum> dcValues = Arrays.asList(metadata);
         if (!authority.equals(Item.ANY)) {
-            Iterator<Metadatum> iterator = Metadatums.iterator();
+            Iterator<Metadatum> iterator = dcValues.iterator();
             while (iterator.hasNext()) {
-                Metadatum Metadatum = iterator.next();
-                if (!authority.equals(Metadatum.authority)) {
+                Metadatum dcValue = iterator.next();
+                if (!authority.equals(dcValue.authority)) {
                     iterator.remove();
                 }
             }
         }
-        return Metadatums;
+        return dcValues;
     }
 
 
@@ -762,7 +771,7 @@ public abstract class DSpaceObject implements IGlobalSearchResult
 
     public void replaceMetadataValue(Metadatum oldValue, Metadatum newValue)
     {
-        // check both Metadatums are for the same field
+        // check both dcvalues are for the same field
         if (oldValue.hasSameFieldAs(newValue)) {
 
             String schema = oldValue.schema;
@@ -770,18 +779,17 @@ public abstract class DSpaceObject implements IGlobalSearchResult
             String qualifier = oldValue.qualifier;
 
             // Save all metadata for this field
-            Metadatum[] Metadatums = getMetadata(schema, element, qualifier, Item.ANY);
+            Metadatum[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
             clearMetadata(schema, element, qualifier, Item.ANY);
-            for (Metadatum Metadatum : Metadatums) {
-                if (Metadatum.equals(oldValue)) {
+            for (Metadatum dcvalue : dcvalues) {
+                if (dcvalue.equals(oldValue)) {
                     addMetadata(schema, element, qualifier, newValue.language, newValue.value, newValue.authority, newValue.confidence);
                 } else {
-                    addMetadata(schema, element, qualifier, Metadatum.language, Metadatum.value, Metadatum.authority, Metadatum.confidence);
+                    addMetadata(schema, element, qualifier, dcvalue.language, dcvalue.value, dcvalue.authority, dcvalue.confidence);
                 }
             }
         }
     }
-
 
 
     /**
@@ -945,25 +953,25 @@ public abstract class DSpaceObject implements IGlobalSearchResult
                 // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so use a runtime exception
                 if (authorityRequired && (dcv.authority == null || dcv.authority.length() == 0))
                 {
-                    throw new IllegalArgumentException("The metadata field \"" + fieldName + "\" requires an authority key but none was provided. Value=\"" + dcv.value + "\"");
+                    throw new IllegalArgumentException("The metadata field \"" + fieldName + "\" requires an authority key but none was provided. Vaue=\"" + dcv.value + "\"");
                 }
             }
             if (values[i] != null)
             {
                 // remove control unicode char
                 String temp = values[i].trim();
-                char[] Metadatum = temp.toCharArray();
-                for (int charPos = 0; charPos < Metadatum.length; charPos++)
+                char[] dcvalue = temp.toCharArray();
+                for (int charPos = 0; charPos < dcvalue.length; charPos++)
                 {
-                    if (Character.isISOControl(Metadatum[charPos]) &&
-                            !String.valueOf(Metadatum[charPos]).equals("\u0009") &&
-                            !String.valueOf(Metadatum[charPos]).equals("\n") &&
-                            !String.valueOf(Metadatum[charPos]).equals("\r"))
+                    if (Character.isISOControl(dcvalue[charPos]) &&
+                            !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\n") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\r"))
                     {
-                        Metadatum[charPos] = ' ';
+                        dcvalue[charPos] = ' ';
                     }
                 }
-                dcv.value = String.valueOf(Metadatum);
+                dcv.value = String.valueOf(dcvalue);
             }
             else
             {

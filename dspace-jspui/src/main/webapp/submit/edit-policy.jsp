@@ -62,6 +62,8 @@
 			<input class="btn btn-default col-md-6" type="submit" name="submit_edit_cancel" value="<fmt:message key="jsp.submit.general.cancel"/>" />
 			<input class="btn btn-primary col-md-6" type="submit" name="submit_save" value="<fmt:message key="jsp.submit.general.save"/>" />
 		</div>
+		
+		<input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>
     </form>
 
     <script type="text/javascript" src="<%= request.getContextPath() %>/submit/access-step.js"></script>

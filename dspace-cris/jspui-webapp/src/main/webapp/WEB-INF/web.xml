@@ -574,8 +574,30 @@
     	<servlet-class>org.dspace.app.webui.servlet.ReferencesServlet</servlet-class>
   	</servlet>  
 
+	<!-- Deduplication -->
+	<servlet>
+    	<servlet-name>deduplication</servlet-name>
+    	<servlet-class>org.dspace.app.webui.cris.servlet.DeduplicationServlet</servlet-class>
+  	</servlet>
+  	
+  	<!-- Duplicate checker admin servlet -->
+  	<servlet>
+   		<servlet-name>duplicatechecker</servlet-name>
+   		<servlet-class>org.dspace.app.webui.cris.servlet.DuplicateCheckerServlet</servlet-class>
+  	</servlet>
+  	
 	<!-- Servlet Mappings -->
 
+  	<servlet-mapping>	
+    	<servlet-name>deduplication</servlet-name>
+    	<url-pattern>/dedup/*</url-pattern>
+  	</servlet-mapping>
+  
+    <servlet-mapping>
+  	 	<servlet-name>duplicatechecker</servlet-name>
+   		<url-pattern>/tools/duplicate</url-pattern>
+  	</servlet-mapping>
+  
   	<servlet-mapping>
     	<servlet-name>references</servlet-name>
     	<url-pattern>/references</url-pattern>

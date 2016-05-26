@@ -55,6 +55,9 @@
          <excludes>
             <exclude>src</exclude>
             <exclude>config/dspace.cfg</exclude>
+            <exclude>config/hibernate.properties</exclude>
+            <exclude>config/crosswalks/oai/description.xml</exclude>
+            <exclude>solr/search/conf/database.properties</exclude>
             <exclude>config/log4j.properties</exclude>
             <exclude>config/modules/**</exclude>
          </excludes>

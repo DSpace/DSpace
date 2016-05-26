@@ -65,7 +65,7 @@
 <%-- HACK: <center> tag needed for broken Netscape 4.78 behaviour --%>
         
         <input class="btn btn-primary col-md-offset-5" type="submit" name="submit_retry" value="<fmt:message key="jsp.submit.upload-error.retry.button"/>" />
-        
+        <input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>
     </form>
 
 </dspace:layout>

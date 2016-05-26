@@ -106,7 +106,7 @@
        for (int z = 0; z < inputs.length; z++)
        {
           String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
-          if (!inputs[z].isVisible(scope) && !inputs[z].isReadOnly(scope))
+          if (!subInfo.isEditing() && !inputs[z].isVisible(scope) && !inputs[z].isReadOnly(scope))
           {
               continue;
           }

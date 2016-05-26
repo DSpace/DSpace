@@ -80,10 +80,16 @@
 <%
         }
 %>
-        
 	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.11.3.min.js"></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.11.4.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/tmpl.min.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/dataTables.bootstrap.min.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/dataTables.buttons.min.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/buttons.bootstrap.min.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/buttons.html5.min.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/dataTables.responsive.min.js"></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jdyna/jdyna.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
@@ -94,6 +100,14 @@
 		var JQ = j;
 		dspaceContextPath = "<%=request.getContextPath()%>";
 	</script>
+	
+	<script type='text/javascript'
+		src='<%= request.getContextPath() %>/js/dedup.js'></script>
+	<script type='text/javascript'
+		src='<%= request.getContextPath() %>/js/dedup-function.js'></script>
+	<script type='text/javascript'
+		src='<%= request.getContextPath() %>/js/dedup-behaviour.js'></script>
+			
     <%--Gooogle Analytics recording.--%>
     <%
     if (analyticsKey != null && analyticsKey.length() > 0)
