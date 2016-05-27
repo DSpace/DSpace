@@ -867,9 +867,9 @@
 	<bean name="pubmedFeedTransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
 	    <property name="dataLoader" ref="submissionItemDataLoader"/>
     	<property name="workflow" ref="phase2linearWorkflow"/>
-    	<property name="outputGenerator" ref="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator"/>
+    	<property name="outputGenerator" ref="pubmedOutputGenerator"/>
   	</bean>
-	<bean name="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
+	<bean name="pubmedOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
 		<property name="outputMap" ref="outputMap"/>
 		<property name="sourceIdMetadata" value="dc.identifier.pmid" />		
 	</bean>
@@ -890,9 +890,9 @@
 	<bean name="scopusFeedTransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
 	    <property name="dataLoader" ref="submissionItemDataLoader"/>
     	<property name="workflow" ref="phase2linearWorkflow"/>
-    	<property name="outputGenerator" ref="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator"/>
+    	<property name="outputGenerator" ref="scopusOutputGenerator"/>
   	</bean>
-	<bean name="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
+	<bean name="scopusOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
 		<property name="outputMap" ref="outputMap"/>
 		<property name="sourceIdMetadata" value="dc.identifier.eid" />		
 	</bean>
@@ -902,9 +902,9 @@
 	<bean name="wosFeedTransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
 	    <property name="dataLoader" ref="submissionItemDataLoader"/>
     	<property name="workflow" ref="phase2linearWorkflow"/>
-    	<property name="outputGenerator" ref="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator"/>
+    	<property name="outputGenerator" ref="wosOutputGenerator"/>
   	</bean>
-	<bean name="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
+	<bean name="wosOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
 		<property name="outputMap" ref="outputMap"/>
 		<property name="sourceIdMetadata" value="dc.identifier.isi" />		
 	</bean>
