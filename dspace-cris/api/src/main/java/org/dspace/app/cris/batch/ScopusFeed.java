@@ -396,7 +396,7 @@ public class ScopusFeed
 	                    Set<String> metadata = pmeItem.getMetadata()
 	                            .get(eidMetadata);
 	
-	                    dao.write(impRecord);
+	                    dao.write(impRecord, false);
 	                }
 	                context.commit();
 	                total += size;

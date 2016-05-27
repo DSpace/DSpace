@@ -413,7 +413,7 @@ public class PMCEuropeFeed
                                 metadata.iterator().next());
                     }
 
-                    dao.write(impRecord);
+                    dao.write(impRecord, false);
                 }
                 context.commit();
                 total += size;
