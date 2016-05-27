@@ -1520,5 +1520,7 @@ ol.ds-ordered-list ol.ds-ordered-list ol.ds-ordered-list {
 }
 
 .break-all{
-    word-break: break-all;
+    -ms-word-break:   break-all;
+    word-break:       break-word;
+    word-wrap:        break-word;
 }
