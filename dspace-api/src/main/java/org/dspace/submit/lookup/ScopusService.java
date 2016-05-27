@@ -52,8 +52,8 @@ import org.xml.sax.SAXException;
 public class ScopusService
 {
 
-    //private static final String ENDPOINT_SEARCH_SCOPUS = "http://api.elsevier.com/content/search/scopus";
-    private static final String ENDPOINT_SEARCH_SCOPUS = "http://localhost:9999/content/search/scopus";
+    private static final String ENDPOINT_SEARCH_SCOPUS = "http://api.elsevier.com/content/search/scopus";
+    //private static final String ENDPOINT_SEARCH_SCOPUS = "http://localhost:9999/content/search/scopus";
 
     private static final Logger log = Logger.getLogger(ScopusService.class);
 
