@@ -1521,6 +1521,6 @@ ol.ds-ordered-list ol.ds-ordered-list ol.ds-ordered-list {
 
 .break-all{
     -ms-word-break:   break-all;
-    word-break:       break-word;
+    word-break:       break-all;
     word-wrap:        break-word;
 }
