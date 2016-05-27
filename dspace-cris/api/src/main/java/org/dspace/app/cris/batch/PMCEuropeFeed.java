@@ -127,20 +127,20 @@ public class PMCEuropeFeed
         Context context = new Context();
         getPmid2item(context);
 
-        String endpoint = ConfigurationManager.getProperty("pmceurope",
+        String endpoint = ConfigurationManager.getProperty("pmceuropefeed",
                 "rest.endpoint");
         if (!StringUtils.isNotBlank(endpoint))
         {
             endpoint = PMCEUROPE_ENDPOINT_SEARCH;
         }
-        String queryFixedParam = ConfigurationManager.getProperty("pmceurope",
+        String queryFixedParam = ConfigurationManager.getProperty("pmceuropefeed",
                 "query.fixed-param");
         if (!StringUtils.isNotBlank(queryFixedParam))
         {
             queryFixedParam = QUERY_FIXED_PARAM;
         }
 
-        String queryParam = ConfigurationManager.getProperty("pmceurope",
+        String queryParam = ConfigurationManager.getProperty("pmceuropefeed",
                 "query.param.default");
         String usage = "org.dspace.app.cris.batch.PMCEuropeFeed -q queryPMC -p submitter -s start_date(YYYY-MM-DD) -e end_date(YYYY-MM-DD) -c collectionID";
 
@@ -152,7 +152,7 @@ public class PMCEuropeFeed
         options.addOption(
                 OptionBuilder.withArgName("query Parameters").hasArg(true)
                         .withDescription(
-                                "Query to retrieve data publications from PMC Europe, default query in pmceurope.cfg")
+                                "Query to retrieve data publications from PMC Europe, default query in pmceuropefeed.cfg")
                 .create("q"));
 
         options.addOption(
@@ -246,7 +246,7 @@ public class PMCEuropeFeed
 
         String query = queryParam + queryParamDate;
 
-        String pagesize = ConfigurationManager.getProperty("pmceurope",
+        String pagesize = ConfigurationManager.getProperty("pmceuropefeed",
                 "query.pagesize");
         if (!StringUtils.isNotBlank(pagesize))
         {
@@ -255,7 +255,7 @@ public class PMCEuropeFeed
 
         if (line.hasOption("z"))
         {
-            query = ConfigurationManager.getProperty("pmceurope",
+            query = ConfigurationManager.getProperty("pmceuropefeed",
                     "query.param.scratch");
         }
 

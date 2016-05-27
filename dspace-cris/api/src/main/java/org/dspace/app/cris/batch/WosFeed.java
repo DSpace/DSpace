@@ -78,10 +78,9 @@ public class WosFeed
         Options options = new Options();
         CommandLine line = null;
 
-        options.addOption(
-                OptionBuilder.withArgName("UserQuery").hasArg(true)
-                        .withDescription(
-                                "UserQuery, default query setup in the wosfeed.cfg")
+        options.addOption(OptionBuilder.withArgName("UserQuery").hasArg(true)
+                .withDescription(
+                        "UserQuery, default query setup in the wosfeed.cfg")
                 .create("q"));
 
         options.addOption(
@@ -96,9 +95,13 @@ public class WosFeed
                                 "Query End date to retrieve data publications from Wos, default is today")
                 .create("e"));
 
+        options.addOption(OptionBuilder.withArgName("forceCollectionID")
+                .hasArg(false).withDescription("force use the collectionID")
+                .create("f"));
+
         options.addOption(OptionBuilder.isRequired(true)
                 .withArgName("collectionID").hasArg(true)
-                .withDescription("Collection for item submision").create("c"));
+                .withDescription("Collection for item submission").create("c"));
 
         options.addOption(OptionBuilder.isRequired(true).withArgName("Eperson")
                 .hasArg(true).withDescription("Submitter of the records")
@@ -129,6 +132,7 @@ public class WosFeed
         context.setCurrentUser(eperson);
 
         int collection_id = Integer.parseInt(line.getOptionValue("c"));
+        boolean forceCollectionId = line.hasOption("f");
 
         String startDate = "";
         if (line.hasOption("s"))
@@ -147,8 +151,9 @@ public class WosFeed
         {
             endDate = line.getOptionValue("e");
         }
-        else {
-            Calendar cal = Calendar.getInstance();            
+        else
+        {
+            Calendar cal = Calendar.getInstance();
             endDate = df.format(cal.getTime());
         }
 
@@ -177,11 +182,23 @@ public class WosFeed
         {
             for (ImpRecordItem pmeItem : pmeItemList)
             {
-                total++;
+
+                int tmpCollectionID = collection_id;
+                if (!forceCollectionId)
+                {
+                    Set<String> t = pmeItem.getMetadata().get("dc.type");                 
+                    if (t != null && !t.isEmpty())
+                    {
+                        String stringTmpCollectionID = t.iterator().next();
+                        tmpCollectionID = ConfigurationManager.getIntProperty("wosfeed", "wos.type." + stringTmpCollectionID + ".collectionid", collection_id);
+                    }
+                }
+
+                total++;                
                 String action = "insert";
                 DTOImpRecord impRecord = writeImpRecord(context, dao,
-                        collection_id, pmeItem, action, eperson.getID());
-                
+                        tmpCollectionID, pmeItem, action, eperson.getID());
+
                 dao.write(impRecord, true);
 
             }
@@ -247,11 +264,13 @@ public class WosFeed
         List<ItemSubmissionLookupDTO> results = new ArrayList<ItemSubmissionLookupDTO>();
         if (wosResult != null && !wosResult.isEmpty())
         {
-            for(Record record : wosResult) {
+            for (Record record : wosResult)
+            {
                 List<Record> rr = new ArrayList<Record>();
                 rr.add(record);
-                ItemSubmissionLookupDTO result = new ItemSubmissionLookupDTO(rr);
-                results.add(result);                
+                ItemSubmissionLookupDTO result = new ItemSubmissionLookupDTO(
+                        rr);
+                results.add(result);
             }
 
             TransformationEngine transformationEngine2 = getFeedTransformationEngine();

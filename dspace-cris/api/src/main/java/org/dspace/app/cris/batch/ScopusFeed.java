@@ -67,19 +67,13 @@ import gr.ekt.bte.exceptions.MalformedSourceException;
 public class ScopusFeed
 {
 
-    private static final String LAST_MODIFIED = "last_modified";
-
     private static final String IMP_SOURCE_REF = "imp_sourceref";
 
     private static final String IMP_RECORD_ID = "imp_record_id";
 
-    private static final String IMP_ITEM_ID = "imp_item_id";
-
     private static final Logger log = Logger.getLogger(ScopusFeed.class);
 
     private static final String ENDPOINT_SEARCH = "http://api.elsevier.com/content/search/scopus";
-
-    private static final String QUERY_END_DATE = "2999-01-01";
 
     private static final String QUERY_PAGESIZE = "25";
 
@@ -91,11 +85,7 @@ public class ScopusFeed
 
     private static List<String> eidList = new ArrayList<String>();
     
-    private static HashMap<String,String> type2collection = new HashMap<String,String>();    
-
     private static String eidMetadata = "dc.identifier.eid";
-
-    private static String apiKey = ConfigurationManager.getProperty("submission.lookup.scopus.apikey");    
 
     // p = workspace, w = workflow step 1, y = workflow step 2, x =
     // workflow step 3, z = inarchive
@@ -115,6 +105,8 @@ public class ScopusFeed
             throws SQLException, BadTransformationSpec, MalformedSourceException
     {
 
+        String apiKey = ConfigurationManager.getProperty("submission.lookup.scopus.apikey");
+        
         String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
         String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
         
@@ -125,14 +117,14 @@ public class ScopusFeed
         geteidList(context);
 
 
-        String endpoint = ConfigurationManager.getProperty("scopus",
+        String endpoint = ConfigurationManager.getProperty("scopusfeed",
                 "rest.endpoint");
         if (!StringUtils.isNotBlank(endpoint))
         {
             endpoint = ENDPOINT_SEARCH;
         }
 
-        String queryParam = ConfigurationManager.getProperty("scopus",
+        String queryParam = ConfigurationManager.getProperty("scopusfeed",
                 "query.param.default");
         String usage = "org.dspace.app.cris.batch.ScopusFeed -q query -p submitter -s start_date(YYYY) -e end_date(YYYY) -c collectionID";
 
@@ -144,7 +136,7 @@ public class ScopusFeed
         options.addOption(
                 OptionBuilder.withArgName("query Parameters").hasArg(true)
                         .withDescription(
-                                "Query to retrieve data publications from Scopus, default query in scopus.cfg")
+                                "Query to retrieve data publications from Scopus, default query in scopusfeed.cfg")
                 .create("q"));
 
         options.addOption(
@@ -231,7 +223,7 @@ public class ScopusFeed
 
         if (line.hasOption("z"))
         {
-            query = ConfigurationManager.getProperty("scopus",
+            query = ConfigurationManager.getProperty("scopusfeed",
                     "query.param.scratch");
         }
 
@@ -362,7 +354,7 @@ public class ScopusFeed
             	List<List<String>> chunks = new ArrayList<List<String>>();
                 List<String> eidList = type2eid.get(t);
                 
-                String collID = ConfigurationManager.getProperty("scopus","scopus.type"+t+".collectionid");
+                String collID = ConfigurationManager.getProperty("scopusfeed","scopus.type"+t+".collectionid");
                 if(StringUtils.isNotBlank(collID)){
                 	collection_id = Integer.parseInt(collID);
                 }
