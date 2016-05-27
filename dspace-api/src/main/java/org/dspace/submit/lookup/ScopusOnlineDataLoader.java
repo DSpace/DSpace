@@ -45,7 +45,7 @@ public class ScopusOnlineDataLoader extends NetworkSubmissionLookupDataLoader
     @Override
     public List<String> getSupportedIdentifiers()
     {
-        return Arrays.asList(new String[] { PUBMED, DOI, SCOPUSEID, ORCID });
+        return Arrays.asList(new String[] { PUBMED, DOI, SCOPUSEID });
     }
 
     public void setSearchProvider(boolean searchProvider)
@@ -72,7 +72,7 @@ public class ScopusOnlineDataLoader extends NetworkSubmissionLookupDataLoader
 
         if (eids != null && eids.size() > 0 )
         {
-            String eidQuery = queryBuilder("PMID", eids);
+            String eidQuery = queryBuilder("EID", eids);
             query.append(eidQuery);
         	
         }
@@ -120,10 +120,10 @@ public class ScopusOnlineDataLoader extends NetworkSubmissionLookupDataLoader
     	int x=0;
     	for (String d : ids)
         {
+            if(x>0){
+                query+=" OR ";
+            }
     		query+=param+"("+d+")";
-    		if(x<ids.size()){
-    			query+=" OR ";
-    		}
     		x++;
         }
 		return query;
@@ -140,6 +140,20 @@ public class ScopusOnlineDataLoader extends NetworkSubmissionLookupDataLoader
             for (Record p : scopusResults)
             {
                 results.add(convertFields(p));
+            }
+        }
+        return results;
+    }
+    
+    public List<Record> search(String query) throws HttpException, IOException
+    {
+        List<Record> results = new ArrayList<Record>();
+        if (query != null) {
+            List<Record> search = scopusService.search(query);
+            if (search != null) {
+                for (Record scopus : search) {
+                    results.add(convertFields(scopus));
+                }
             }
         }
         return results;

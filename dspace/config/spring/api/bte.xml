@@ -877,18 +877,6 @@
 	</bean>
 
 	<!-- SCOPUS FEED -->
-	<bean name="scopusFeedPhase1TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
-	    <property name="dataLoader" ref="scopusDataLoader"/>
-    	<property name="workflow" ref="phase1LinearWorkflow"/>
-    	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
-  	</bean>
-  	<bean name="scopusDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
-	    <property name="dataloadersMap">
-	        <map>
-	            <entry key="scopus" value-ref="scopusOnlineDataLoader"/>
-			</map>
-	    </property>
-	</bean>
 	<bean name="scopusFeedTransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
 	    <property name="dataLoader" ref="submissionItemDataLoader"/>
     	<property name="workflow" ref="phase2linearWorkflow"/>

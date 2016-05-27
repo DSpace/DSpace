@@ -62,7 +62,7 @@ public class ScopusUtils
         }
         String subType = XMLUtils.getElementValue(article,
                 "subtype");
-        if (aggregationType != null){
+        if (subType != null){
             record.addValue("scopusType", new StringValue(subType));
         }
         String sourceTitle = XMLUtils.getElementValue(article,
@@ -82,7 +82,7 @@ public class ScopusUtils
         }        
         String eissn = XMLUtils.getElementValue(article,
                 "prism:eIssn");
-        if (issn != null){
+        if (eissn != null){
             record.addValue("eissn", new StringValue(eissn));
         }        
         String volume = XMLUtils.getElementValue(article,
@@ -116,7 +116,7 @@ public class ScopusUtils
         }
         String pmid = XMLUtils.getElementValue(article,
                 "pubmed-id");
-        if (volume != null){
+        if (pmid != null){
             record.addValue("pmid", new StringValue(volume));
         }
         String pubID = XMLUtils.getElementValue(article,

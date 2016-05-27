@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,13 +22,15 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.params.ConnRoutePNames;
@@ -48,6 +51,9 @@ import org.xml.sax.SAXException;
  */
 public class ScopusService
 {
+
+    //private static final String ENDPOINT_SEARCH_SCOPUS = "http://api.elsevier.com/content/search/scopus";
+    private static final String ENDPOINT_SEARCH_SCOPUS = "http://localhost:9999/content/search/scopus";
 
     private static final Logger log = Logger.getLogger(ScopusService.class);
 
@@ -90,10 +96,10 @@ public class ScopusService
         List<Record> results = new ArrayList<>();
         if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
         {
-            HttpGet method = null;
+            GetMethod method = null;
             try
             {
-                HttpClient client = new DefaultHttpClient();
+                HttpClient client = new HttpClient();
                 client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
                 if (StringUtils.isNotBlank(proxyHost)
                         && StringUtils.isNotBlank(proxyPort))
@@ -109,39 +115,31 @@ public class ScopusService
                 int start =0;
                 boolean lastPageReached= false;
                 while(!lastPageReached){
-                	
-		                URIBuilder uriBuilder = new URIBuilder(
-		                        "http://api.elsevier.com/content/search/scopus");
-		                uriBuilder.addParameter("apiKey", apiKey);
-		                uriBuilder.addParameter("view", "COMPLETE");
-		                uriBuilder.addParameter("start", Integer.toString(start) );
-		                uriBuilder.addParameter("query", query);
-		                method = new HttpGet(uriBuilder.build());
+                        // open session
+		                method = new GetMethod(ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey="+ apiKey +"&view=COMPLETE&start="+start+"&query="+query);
 		
 		                // Execute the method.
-		                HttpResponse response = client.execute(method);
-		                StatusLine statusLine = response.getStatusLine();
-		                int statusCode = statusLine.getStatusCode();
-		
+		                int statusCode = client.executeMethod(method);
+		                
 		                if (statusCode != HttpStatus.SC_OK)
 		                {
 		                    throw new RuntimeException("WS call failed: "
-		                            + statusLine);
+		                            + statusCode);
 		                }
 		
-		                DocumentBuilderFactory factory = DocumentBuilderFactory
-		                        .newInstance();
+		                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		                factory.setValidating(false);
 		                factory.setIgnoringComments(true);
 		                factory.setIgnoringElementContentWhitespace(true);
-		
+
 		                DocumentBuilder builder;
-		                try
-		                {
+		                try {
 		                    builder = factory.newDocumentBuilder();
-		
-		                    Document inDoc = builder.parse(response.getEntity().getContent());
-		
+
+		                    InputStream responseBodyAsStream = method.getResponseBodyAsStream();
+		                    
+		                    Document inDoc = builder.parse(responseBodyAsStream);
+
 		                    Element xmlRoot = inDoc.getDocumentElement();
 		                    
 		                    List<Element> pages = XMLUtils.getElementList(xmlRoot,

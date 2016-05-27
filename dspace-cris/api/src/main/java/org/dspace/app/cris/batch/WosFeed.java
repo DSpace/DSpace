@@ -43,8 +43,6 @@ public class WosFeed
 
     private static final Logger log = Logger.getLogger(WosFeed.class);
 
-    private static final String QUERY_END_DATE = "2999-01-01";
-
     private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
     // p = workspace, w = workflow step 1, y = workflow step 2, x =
