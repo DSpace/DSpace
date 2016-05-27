@@ -83,7 +83,7 @@ public class ScopusFeed
 
     private static final String QUERY_PAGESIZE = "25";
 
-    private static final String PMCEUROPE_TABLE = "IMP_RECORD_TO_ITEM";
+    private static final String IMP_RECORDTOITEM_TABLE = "IMP_RECORD_TO_ITEM";
 
     private static int timeout = 1000;
 
@@ -123,7 +123,7 @@ public class ScopusFeed
 
         Context context = new Context();
         geteidList(context);
-        getType2Collection();
+
 
         String endpoint = ConfigurationManager.getProperty("scopus",
                 "rest.endpoint");
@@ -131,12 +131,10 @@ public class ScopusFeed
         {
             endpoint = ENDPOINT_SEARCH;
         }
-        String queryFixedParam = ConfigurationManager.getProperty("pmceurope",
-                "query.fixed-param");
 
         String queryParam = ConfigurationManager.getProperty("scopus",
                 "query.param.default");
-        String usage = "org.dspace.app.cris.batch.PMCEuropeFeed -q query -p submitter -s start_date(YYYY-MM-DD) -e end_date(YYYY-MM-DD) -c collectionID";
+        String usage = "org.dspace.app.cris.batch.ScopusFeed -q query -p submitter -s start_date(YYYY) -e end_date(YYYY) -c collectionID";
 
         HelpFormatter formatter = new HelpFormatter();
 
@@ -146,7 +144,7 @@ public class ScopusFeed
         options.addOption(
                 OptionBuilder.withArgName("query Parameters").hasArg(true)
                         .withDescription(
-                                "Query to retrieve data publications from Scopus, default query in pmceurope.cfg")
+                                "Query to retrieve data publications from Scopus, default query in scopus.cfg")
                 .create("q"));
 
         options.addOption(
@@ -200,7 +198,7 @@ public class ScopusFeed
                 Integer.parseInt(line.getOptionValue("p")));
         context.setCurrentUser(eperson);
 
-        int collection_id = Integer.parseInt(line.getOptionValue("c"));
+        int coll_id = Integer.parseInt(line.getOptionValue("c"));
 
         String startDate = "";
         if (line.hasOption("s"))
@@ -220,10 +218,9 @@ public class ScopusFeed
         if (line.hasOption("q"))
         {
             queryParam = line.getOptionValue("q");
-            queryParamDate = "";
         }
 
-        String query = queryParam + queryParamDate;
+        String query = queryParam;
 
         String pagesize = ConfigurationManager.getProperty("scopuse",
                 "query.pagesize");
@@ -255,10 +252,10 @@ public class ScopusFeed
                 + "; end date:" + endDate + "; page size:" + pagesize);
         System.out.println("Starting query");
 
+        HashMap< String, List<String>> type2eid = new HashMap<String, List<String>>();
         try
         {
             int start = 0;
-            List<String> eidList = new ArrayList<String>();
 
             HttpClient client = new DefaultHttpClient();
             client.getParams().setIntParameter(
@@ -331,7 +328,18 @@ public class ScopusFeed
             			if(eidList.contains(eid)){
             			   continue;
             			}
-            				eidList.add(eid);
+            			String type = "default";
+            			String scopusType = XMLUtils.getElementValue(entry, "subtype");
+            			if(StringUtils.isNotBlank(scopusType)){
+            				type=scopusType;
+            			}
+            			
+            			List<String> eids = new ArrayList<String>();
+            			if(type2eid.containsKey(type)){
+            				eids = type2eid.get(type);
+            			}
+            			eids.add(eid);
+            			type2eid.put(type, eids);
             		}
                     
                 }
@@ -346,45 +354,56 @@ public class ScopusFeed
                 }
             }
 
-            System.out.println("Retrieved " + eidList.size() + " record");
-            List<List<String>> chunks = new ArrayList<List<String>>();
+            //System.out.println("Retrieved " + eidList.size() + " record");
 
-            for (int i = 0; i < eidList.size(); i += 50)
-            {
-                List<String> chunk = eidList.subList(i,
-                        Math.min(eidList.size(), i + 50));
-                chunks.add(chunk);
-            }
-
-            int total = 0;
-            int imported = 0;
-            List<ImpRecordItem> impItemList = new ArrayList<ImpRecordItem>();
-
-            ImpRecordDAO dao = ImpRecordDAOFactory.getInstance(context);
-            for (List<String> ch : chunks)
-            {
-                int size = ch.size();
-
-                for (String eID : ch)
-                {
-                    impItemList.addAll(convertToImpItem(eID));
+            Set<String> types = type2eid.keySet();
+            for(String t: types){
+            	int collection_id=coll_id;
+            	List<List<String>> chunks = new ArrayList<List<String>>();
+                List<String> eidList = type2eid.get(t);
+                
+                String collID = ConfigurationManager.getProperty("scopus","scopus.type"+t+".collectionid");
+                if(StringUtils.isNotBlank(collID)){
+                	collection_id = Integer.parseInt(collID);
                 }
-                for (ImpRecordItem pmeItem : impItemList)
-                {
-                    String sourceId = pmeItem.getSourceId();
-                    String action = "insert";
-                    DTOImpRecord impRecord = writeImpRecord(context, dao,
-                            collection_id, pmeItem, action, eperson.getID());
-                    Set<String> metadata = pmeItem.getMetadata()
-                            .get(eidMetadata);
-
-                    dao.write(impRecord);
-                }
-                context.commit();
-                total += size;
-                System.out.println("Imported " + total  + " record; ");
-                impItemList.clear();
-                context.clearCache();
+                
+            	for (int i = 0; i < eidList.size(); i += 50)
+            	{
+            		List<String> chunk = eidList.subList(i,
+            				Math.min(eidList.size(), i + 50));
+            		chunks.add(chunk);
+            	}
+	
+	            int total = 0;
+	            int imported = 0;
+	            List<ImpRecordItem> impItemList = new ArrayList<ImpRecordItem>();
+	
+	            ImpRecordDAO dao = ImpRecordDAOFactory.getInstance(context);
+	            for (List<String> ch : chunks)
+	            {
+	                int size = ch.size();
+	
+	                for (String eID : ch)
+	                {
+	                    impItemList.addAll(convertToImpItem(eID));
+	                }
+	                for (ImpRecordItem pmeItem : impItemList)
+	                {
+	                    String sourceId = pmeItem.getSourceId();
+	                    String action = "insert";
+	                    DTOImpRecord impRecord = writeImpRecord(context, dao,
+	                            collection_id, pmeItem, action, eperson.getID());
+	                    Set<String> metadata = pmeItem.getMetadata()
+	                            .get(eidMetadata);
+	
+	                    dao.write(impRecord);
+	                }
+	                context.commit();
+	                total += size;
+	                System.out.println("Imported " + total  + " record; ");
+	                impItemList.clear();
+	                context.clearCache();
+	            }
             }
 
             context.complete();
@@ -510,7 +529,7 @@ public class ScopusFeed
     {
 
         String query = "SELECT " + IMP_RECORD_ID + " FROM "
-                + PMCEUROPE_TABLE + " WHERE " + IMP_SOURCE_REF
+                + IMP_RECORDTOITEM_TABLE + " WHERE " + IMP_SOURCE_REF
                 + " = 'scopus'";
         TableRowIterator tri = null;
         try
@@ -531,17 +550,7 @@ public class ScopusFeed
             }
         }
     }
-    
-    private static void getType2Collection(){
-    	int x=1;
-    	boolean noType= false;
-    	while(!noType){
-    		String str = ConfigurationManager.getProperty("scopus", "scopus.type."+x+".collection.handle");
-    		String[] conf = StringUtils.split(str, "#");
-    		type2collection.put(conf[0], conf[1]);
-    		x++;
-    	}
-    }
+
 
     public static TransformationEngine getScopusFeedTransformationEngine()
     {
