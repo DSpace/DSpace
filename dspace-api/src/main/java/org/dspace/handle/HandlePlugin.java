@@ -30,6 +30,8 @@ import org.dspace.core.Context;
 
 import cz.cuni.mff.ufal.dspace.handle.PIDConfiguration;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 /**
  * Extension to the CNRI Handle Server that translates requests to resolve
  * handles into DSpace API calls. The implementation simply stubs out most of
@@ -288,10 +290,16 @@ public class HandlePlugin implements HandleStorage
 
             ResolvedHandle rh = null;
             if (url.startsWith(magicBean)) {
-                String[] splits = url.split(magicBean, 6);
+                String[] splits = url.split(magicBean);
                 url = splits[splits.length - 1];
-                // EMPTY, String title, String repository, String submitdate, String reportemail
-                rh = new ResolvedHandle(url, splits[1], splits[2], splits[3], splits[4]);
+                if(splits.length == 6){
+                    //old entry
+                    // EMPTY, String title, String repository, String submitdate, String reportemail
+                    rh = new ResolvedHandle(url, splits[1], splits[2], splits[3], splits[4]);
+                }else if(splits.length == 9){
+                    // EMPTY, String title, String repository, String submitdate, String reportemail, String dataset_name, String dataset_version, String query
+                    rh = new ResolvedHandle(url, splits[1], splits[2], splits[3], splits[4], splits[5], splits[6], splits[7]);
+                }
             }else {
                 rh = new ResolvedHandle(url, dso);
             }
@@ -471,6 +479,11 @@ class ResolvedHandle {
         init(url, title, repository, submitdate, reportemail);
     }
 
+    public ResolvedHandle(String url, String title, String repository, String submitdate, String reportemail, String datasetName, String datasetVersion, String query) {
+        init(url, title, repository, submitdate, reportemail, datasetName, datasetVersion, query);
+    }
+
+
     public ResolvedHandle(String url, DSpaceObject dso) {
         String title = null;
         String repository = null;
@@ -503,6 +516,10 @@ class ResolvedHandle {
     }
 
     private void init(String url, String title, String repository, String submitdate, String reportemail) {
+        init(url, title, repository, submitdate, reportemail, null, null, null);
+    }
+
+    private void init(String url, String title, String repository, String submitdate, String reportemail, String datasetName, String datasetVersion, String query) {
         idx = 11800;
         values = new LinkedList<>();
         //set timestamp, use submitdate for now
@@ -536,6 +553,18 @@ class ResolvedHandle {
         if (null != reportemail) {
             key = AbstractPIDService.HANDLE_FIELDS.REPORTEMAIL.toString();
             setValue(key, reportemail);
+        }
+        if (isNotBlank(datasetName)) {
+            key = AbstractPIDService.HANDLE_FIELDS.DATASETNAME.toString();
+            setValue(key, datasetName);
+        }
+        if (isNotBlank(datasetVersion)) {
+            key = AbstractPIDService.HANDLE_FIELDS.DATASETVERSION.toString();
+            setValue(key, datasetVersion);
+        }
+        if (isNotBlank(query)) {
+            key = AbstractPIDService.HANDLE_FIELDS.QUERY.toString();
+            setValue(key, query);
         }
     }
 
