@@ -53,14 +53,7 @@ public class ScopusService
 
     private int timeout = 1000;
 
-    String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-    String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
-    
     int itemPerPage = 25;
-    
-
-    
-    private String apiKey = ConfigurationManager.getProperty("submission.lookup.scopus.apikey");
 
     public List<Record> search(String title, String author, int year)
             throws HttpException, IOException
@@ -89,6 +82,11 @@ public class ScopusService
 
     public List<Record> search(String query) throws IOException, HttpException
     {
+
+        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
+        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+        String apiKey = ConfigurationManager.getProperty("submission.lookup.scopus.apikey");
+        
         List<Record> results = new ArrayList<>();
         if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
         {
