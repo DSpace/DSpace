@@ -3,6 +3,9 @@ package org.dspace.app.cris.batch.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.batch.dto.BitstreamInterface;
@@ -20,6 +23,8 @@ public abstract class ImpRecordDAO
     private final String GET_IMPRECORDIDTOITEMID_BY_IMP_RECORD_ID_QUERY = "SELECT * FROM imp_record_to_item WHERE imp_record_id = ?";
 
     protected Context context;
+    
+    private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss");
 
     protected ImpRecordDAO(Context ctx)
     {
@@ -61,10 +66,16 @@ public abstract class ImpRecordDAO
         return row.getIntColumn("imp_record_id") == -1 ? false : true;
     }
 
-    public void write(DTOImpRecord impRecord) throws SQLException
+    public void write(DTOImpRecord impRecord, boolean buildUniqueImpRecordId) throws SQLException
     {
+        String imp_record_id = impRecord.getImp_record_id();
+        if(buildUniqueImpRecordId) {
+            Calendar cal = Calendar.getInstance();
+            String timestamp = df.format(cal.getTime());
+            imp_record_id += ":" + timestamp;
+        }
         log.debug("INSERT INTO imp_record " + " VALUES ( "
-                + impRecord.getImp_id() + " , " + impRecord.getImp_record_id()
+                + impRecord.getImp_id() + " , " + imp_record_id
                 + " , " + impRecord.getImp_eperson_id() + " , "
                 + impRecord.getImp_collection_id() + " , "
                 + impRecord.getStatus() + " , " + impRecord.getOperation()
@@ -73,7 +84,7 @@ public abstract class ImpRecordDAO
         DatabaseManager.updateQuery(context,
                 "INSERT INTO imp_record(imp_id, imp_record_id, imp_eperson_id, imp_collection_id, status, operation, integra, last_modified, handle, imp_sourceref)"
                         + " VALUES (?, ?, ?, ?, ?, ?, null, null, null, ?)",
-                impRecord.getImp_id(), impRecord.getImp_record_id(),
+                impRecord.getImp_id(), imp_record_id,
                 impRecord.getImp_eperson_id(), impRecord.getImp_collection_id(),
                 impRecord.getStatus(), impRecord.getOperation(),
                 impRecord.getImp_sourceRef());

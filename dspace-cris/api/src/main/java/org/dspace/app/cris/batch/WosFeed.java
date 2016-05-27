@@ -93,7 +93,7 @@ public class WosFeed
         options.addOption(
                 OptionBuilder.withArgName("query End Date").hasArg(true)
                         .withDescription(
-                                "Query End date to retrieve data publications from Wos, default is 2999-12-31")
+                                "Query End date to retrieve data publications from Wos, default is today")
                 .create("e"));
 
         options.addOption(OptionBuilder.isRequired(true)
@@ -142,13 +142,17 @@ public class WosFeed
             startDate = df.format(cal.getTime());
         }
 
-        String endDate = QUERY_END_DATE;
+        String endDate = "";
         if (line.hasOption("e"))
         {
             endDate = line.getOptionValue("e");
         }
+        else {
+            Calendar cal = Calendar.getInstance();            
+            endDate = df.format(cal.getTime());
+        }
 
-        String userQuery = ConfigurationManager.getProperty("wos",
+        String userQuery = ConfigurationManager.getProperty("wosfeed",
                 "query.param.default");
         if (line.hasOption("q"))
         {
@@ -177,7 +181,8 @@ public class WosFeed
                 String action = "insert";
                 DTOImpRecord impRecord = writeImpRecord(context, dao,
                         collection_id, pmeItem, action, eperson.getID());
-                dao.write(impRecord);
+                
+                dao.write(impRecord, true);
 
             }
         }
@@ -240,22 +245,28 @@ public class WosFeed
         List<Record> wosResult = wosOnlineDataLoader
                 .searchByAffiliation(userQuery, databaseID, start, end);
         List<ItemSubmissionLookupDTO> results = new ArrayList<ItemSubmissionLookupDTO>();
-        ItemSubmissionLookupDTO result = new ItemSubmissionLookupDTO(wosResult);
-        results.add(result);
-
-        TransformationEngine transformationEngine2 = getFeedTransformationEngine();
-        if (transformationEngine2 != null)
+        if (wosResult != null && !wosResult.isEmpty())
         {
-            SubmissionItemDataLoader dataLoader = (SubmissionItemDataLoader) transformationEngine2
-                    .getDataLoader();
-            dataLoader.setDtoList(results);
+            for(Record record : wosResult) {
+                List<Record> rr = new ArrayList<Record>();
+                rr.add(record);
+                ItemSubmissionLookupDTO result = new ItemSubmissionLookupDTO(rr);
+                results.add(result);                
+            }
 
-            ImpRecordOutputGenerator outputGenerator = (ImpRecordOutputGenerator) transformationEngine2
-                    .getOutputGenerator();
-            transformationEngine2.transform(new TransformationSpec());
-            pmeResult = outputGenerator.getRecordIdItems();
+            TransformationEngine transformationEngine2 = getFeedTransformationEngine();
+            if (transformationEngine2 != null)
+            {
+                SubmissionItemDataLoader dataLoader = (SubmissionItemDataLoader) transformationEngine2
+                        .getDataLoader();
+                dataLoader.setDtoList(results);
+
+                ImpRecordOutputGenerator outputGenerator = (ImpRecordOutputGenerator) transformationEngine2
+                        .getOutputGenerator();
+                transformationEngine2.transform(new TransformationSpec());
+                pmeResult = outputGenerator.getRecordIdItems();
+            }
         }
-
         return pmeResult;
     }
 
