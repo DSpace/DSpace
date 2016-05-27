@@ -32,7 +32,7 @@ import gr.ekt.bte.core.Record;
 public class WOSService {
 	private static Logger log = Logger.getLogger(WOSService.class);
 	
-	private final String SEARCH_HEAD_BY_AFFILIATION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wok=\"http://woksearch.v3.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body><wok:search><queryParameters><databaseId>WOS</databaseId>";
+	private final String SEARCH_HEAD_BY_AFFILIATION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wok=\"http://woksearch.v3.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body><wok:search><queryParameters><databaseId>WOK</databaseId>";
 	private final String SEARCH_HEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wok=\"http://woksearch.v3.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body><wok:search><queryParameters><databaseId>WOK</databaseId>";
 	private final String RETRIEVEBYID_HEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wok=\"http://woksearch.v3.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body><wok:retrieveById><databaseId>WOK</databaseId>";
 
@@ -45,10 +45,10 @@ public class WOSService {
 	private final String CLOSE_MESSAGE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:auth=\"http://auth.cxf.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body>"
 			+ "<auth:closeSession/></soapenv:Body></soapenv:Envelope>";
 
-	//private final String endPointAuthService = "http://search.webofknowledge.com/esti/wokmws/ws/WOKMWSAuthenticate";
-	private final String endPointAuthService = "http://localhost:9998/esti/wokmws/ws/WOKMWSAuthenticate";
-	//private final String endPointSearchService = "http://search.webofknowledge.com/esti/wokmws/ws/WokSearch";
-	private final String endPointSearchService = "http://localhost:9998/esti/wokmws/ws/WokSearch";
+	private final String endPointAuthService = "http://search.webofknowledge.com/esti/wokmws/ws/WOKMWSAuthenticate";
+	//private final String endPointAuthService = "http://localhost:9998/esti/wokmws/ws/WOKMWSAuthenticate";
+	private final String endPointSearchService = "http://search.webofknowledge.com/esti/wokmws/ws/WokSearch";
+	//private final String endPointSearchService = "http://localhost:9998/esti/wokmws/ws/WokSearch";
 
 	public List<Record> search(String doi, String title, String author, int year, String username, String password, boolean ipAuth)
 			throws HttpException,
@@ -257,11 +257,11 @@ public class WOSService {
 		return results;
 	}
 
-	
+	//TODO databaseID not used
     public List<Record> searchByAffiliation(String userQuery, String databaseID, String start, String end,
             String username, String password, boolean ipAuth)
                     throws HttpException, IOException
-    {
+    {        
         StringBuffer query = new StringBuffer("<userQuery>");
         query.append(userQuery);
         query.append("</userQuery>");

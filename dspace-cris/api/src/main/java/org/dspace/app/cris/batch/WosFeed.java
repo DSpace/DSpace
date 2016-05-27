@@ -171,7 +171,7 @@ public class WosFeed
 
         ImpRecordDAO dao = ImpRecordDAOFactory.getInstance(context);
         pmeItemList.addAll(
-                convertToImpRecordItem(userQuery, "WOS", startDate, endDate));
+                convertToImpRecordItem(userQuery, "WOK", startDate, endDate));
 
         try
         {
