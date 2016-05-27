@@ -32,7 +32,7 @@ import gr.ekt.bte.core.Record;
 public class WOSService {
 	private static Logger log = Logger.getLogger(WOSService.class);
 	
-	private final String SEARCH_HEAD_BY_AFFILIATION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wok=\"http://woksearch.v3.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body><wok:search><queryParameters><databaseId>WOK</databaseId>";
+	private final String SEARCH_HEAD_BY_AFFILIATION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wok=\"http://woksearch.v3.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body><wok:search><queryParameters><databaseId>WOS</databaseId>";
 	private final String SEARCH_HEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wok=\"http://woksearch.v3.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body><wok:search><queryParameters><databaseId>WOK</databaseId>";
 	private final String RETRIEVEBYID_HEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wok=\"http://woksearch.v3.wokmws.thomsonreuters.com\"><soapenv:Header/><soapenv:Body><wok:retrieveById><databaseId>WOK</databaseId>";
 

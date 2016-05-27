@@ -626,6 +626,8 @@
 				<entry value="booktitle" key="dc.relation.ispartofbook" />
 				<entry value="meshheadings" key="dc.subject.mesh" />
 				<entry value="meshqualifiers" key="dc.subject.meshqualifier" />
+				<entry value="eid" key="dc.identifier.eid" />
+				<entry value="isiId" key="dc.identifier.isi" />
 				
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
 				<!-- 
@@ -906,7 +908,8 @@
   	</bean>
 	<bean name="wosOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
 		<property name="outputMap" ref="outputMap"/>
-		<property name="sourceIdMetadata" value="dc.identifier.isi" />		
+		<property name="sourceIdMetadata" value="dc.identifier.isi" />
+		<property name="providerName" value="wos" />		
 	</bean>
 	
 </beans>

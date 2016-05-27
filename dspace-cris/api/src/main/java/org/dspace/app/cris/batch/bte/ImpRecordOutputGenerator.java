@@ -87,7 +87,14 @@ public class ImpRecordOutputGenerator implements OutputGenerator {
             		break;
             	}
             	String pmid = values.get(0).getAsString();
-            	String providerName = itemLookup.getValues("provider_name_plugin").get(0).getAsString();
+            	
+            	String providerName = this.providerName;
+            	if(StringUtils.isNotBlank(providerName)) {
+            	    if(itemLookup.hasField("provider_name_field")) {
+            	        providerName = itemLookup.getValues("provider_name_field").get(0).getAsString();    
+            	    }            	        
+            	}
+            	
             	item.setSourceId(pmid);            	
                 item.setSourceRef(providerName);
             }
