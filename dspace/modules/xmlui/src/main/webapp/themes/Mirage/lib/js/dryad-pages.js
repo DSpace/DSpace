@@ -81,8 +81,7 @@ jQuery(document).ready(function() {
     // General support for simple tabs (styled as buttons)
     // NOTE: This logic supports multiple sets of tabs on a page.
     // NOTE: For now, we're only using this on the Home page!
-    if (jQuery('#aspect_discovery_RecentlyAdded_div_Home').length === 1 ||
-        jQuery('#aspect_journal_landing_JournalStats_div_journal-landing-banner-outer').length === 1)
+    if (jQuery('#aspect_discovery_RecentlyAdded_div_Home').length === 1)
     {
         var jQuerytabButtons = jQuery('.tab-buttons a');
         jQuerytabButtons.unbind('click').click(function() {
@@ -131,6 +130,53 @@ jQuery(document).ready(function() {
         }
 
     }
+
+    // enable landing-page deposit/download tab buttons
+    var tabClickFunction = function() {
+        jQuery(this).addClass('selected');
+        var jQuerypanel = jQuery(jQuery(this).attr('href'));
+        jQuerypanel.show();
+        jQuery(this).siblings().each(function() {
+            jQuery(this).removeClass('selected');
+            var jQuerypanel = jQuery(jQuery(this).attr('href'));
+            jQuerypanel.hide();
+        });
+        return false;
+    };
+    if (jQuery('#aspect_journal_landing_JournalStats_div_journal-landing-banner-outer').length === 1)
+    {
+        // enable only first tab, as the others are populated asynchronously
+        jQuery('.tab-buttons a').first().unbind('click').click(tabClickFunction);        
+    }
+    
+    // fill downloads tabs
+    jQuery('.download-query').each(function() 
+    {
+        var $elt = $(this);
+        var url = $elt.attr('data-download');
+        var $button = jQuery('a[href="#' + $elt.attr('id') + '"]');
+        $button.click(function(e) {
+            e.preventDefault();
+            return false;
+        });
+        var updateTabSuccess = function(data, status, xhr) {
+            var $newTable = $(data).find('table');
+            if ($newTable) {
+                $elt.find('table').replaceWith($newTable);
+                $button.click(tabClickFunction);
+                $button.removeClass('disabled');
+            }
+        };
+        var updateTabError = function(jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+        };
+        jQuery.ajax({
+            dataType: 'text',
+            url:      url,
+            success:  updateTabSuccess,
+            error:    updateTabError
+        });
+    });
 
 });
 

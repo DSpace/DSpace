@@ -7,6 +7,7 @@
  */
 package org.dspace.app.xmlui.aspect.journal.landing;
 
+import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
@@ -30,23 +31,16 @@ import java.util.regex.Pattern;
  * 
  * @author Nathan Day
  */
-public class ValidateRequest extends AbstractAction implements CacheableProcessingComponent {
-
+public class ValidateRequest extends AbstractAction
+{
     private static final Logger log = Logger.getLogger(ValidateRequest.class);
-    private static final Pattern issnPattern = Pattern.compile("\\d{4}-\\d{3}[\\dX]");
-
-    protected static final long pageValidityMs = ConfigurationManager.getLongProperty("landing-page.cache.validity");
-    protected  SourceValidity validity = new ExpiresValidity(System.currentTimeMillis() + pageValidityMs);
-
-    private String journalISSN;
 
     @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
-                    String source, Parameters parameters) throws Exception
+                    String source, Parameters parameters) throws ParameterException
     {
-        journalISSN = parameters.getParameter(Const.PARAM_JOURNAL_ISSN);
-        if (journalISSN == null || journalISSN.length() == 0 || !issnPattern.matcher(journalISSN).matches()) {
-            journalISSN = null;
+        String journalISSN = parameters.getParameter(Const.PARAM_JOURNAL_ISSN);
+        if (journalISSN == null || journalISSN.length() == 0 || !Const.issnPattern.matcher(journalISSN).matches()) {
             return null;
         }
         DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByISSN(journalISSN);
@@ -55,22 +49,12 @@ public class ValidateRequest extends AbstractAction implements CacheableProcessi
             map.put(Const.PARAM_JOURNAL_NAME, journalConcept.getFullName());
             map.put(Const.PARAM_JOURNAL_ISSN, journalISSN);
             map.put(Const.PARAM_JOURNAL_ABBR, journalConcept.getJournalID());
+            try {
+                map.put(Const.PARAM_DOWNLOAD_DURATION, parameters.getParameter(Const.PARAM_DOWNLOAD_DURATION));
+            } catch (Exception e) {}
             return map;
         }
         return null;
-    }
-
-
-    @Override
-    public Serializable getKey()
-    {
-        return journalISSN;
-    }
-
-    @Override
-    public SourceValidity getValidity()
-    {
-        return validity;
     }
 }
 

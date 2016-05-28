@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -71,10 +70,8 @@ public class JournalStats extends AbstractDSpaceTransformer
 
     private final static SimpleDateFormat fmt = new SimpleDateFormat(Const.fmtDateView);
 
-    private static final String solrStatsUrl = ConfigurationManager.getProperty("landing-page.stats.base");
     protected static final int displayCount = ConfigurationManager.getIntProperty("landing-page.stats.item-count");
 
-    protected static final String solrQueryFormat = ConfigurationManager.getProperty("landing-page.stats.query.format");
 
     protected class DivData {
         public String n;
@@ -86,6 +83,7 @@ public class JournalStats extends AbstractDSpaceTransformer
 
     protected class TabData {
         public String n;
+        public String rend;
         public Message buttonLabel;
         public Message refHead;
         public Message valHead;
@@ -137,7 +135,8 @@ public class JournalStats extends AbstractDSpaceTransformer
         tb1.valHead = T_date;
         tb1.queryType = QueryType.DEPOSITS;
 
-        tb2.n = JOURNAL_STATS_MONTH;
+        tb2.n = JOURNAL_STATS_DOWN;
+        tb2.rend = solrQueryMonth;
         tb2.buttonLabel = T_btn_month;
         tb2.dateFilter = solrDatePastMonth;
         tb2.refHead = T_empty;
@@ -145,7 +144,8 @@ public class JournalStats extends AbstractDSpaceTransformer
         tb2.queryType = QueryType.DOWNLOADS;
         tb2.facetQueryField = facetQueryField;
 
-        tb3.n = JOURNAL_STATS_YEAR;
+        tb3.n = JOURNAL_STATS_DOWN;
+        tb3.rend = solrQueryYear;
         tb3.buttonLabel = T_btn_year;
         tb3.dateFilter = solrDatePastYear;
         tb3.refHead = T_empty;
@@ -153,7 +153,8 @@ public class JournalStats extends AbstractDSpaceTransformer
         tb3.queryType = QueryType.DOWNLOADS;
         tb3.facetQueryField = facetQueryField;
 
-        tb4.n = JOURNAL_STATS_ALLTIME;
+        tb4.n = JOURNAL_STATS_DOWN;
+        tb4.rend = solrQueryAlltime;
         tb4.buttonLabel = T_btn_alltime;
         tb4.dateFilter = solrDateAllTime;
         tb4.refHead = T_empty;
@@ -184,7 +185,7 @@ public class JournalStats extends AbstractDSpaceTransformer
         if (memberName != null && memberName.length() > 0) {
             Para pMem = inner.addPara(BANNER_MEM, BANNER_MEM);
             pMem.addHighlight(null).addContent(T_Member);
-            pMem.addContent(": ");
+            pMem.addContent(BANNER_SEP);
             pMem.addContent(memberName);
         }
 
@@ -193,14 +194,14 @@ public class JournalStats extends AbstractDSpaceTransformer
         if (sponsorName != null && sponsorName.length() > 0) {
             Para pSpo = inner.addPara(BANNER_SPO, BANNER_SPO);
             pSpo.addHighlight(null).addContent(T_sponsorship);
-            pSpo.addContent(": ");
+            pSpo.addContent(BANNER_SEP);
             pSpo.addContent(sponsorName);
         }
 
         // Submission integration: ___
         Para pInt = inner.addPara(BANNER_INT, BANNER_INT);
         pInt.addHighlight(null).addContent(T_Integration);
-        pInt.addContent(": ");
+        pInt.addContent(BANNER_SEP);
         if (journalConcept.getIntegrated()) {
             pInt.addContent(T_yes);
         } else {
@@ -210,7 +211,7 @@ public class JournalStats extends AbstractDSpaceTransformer
         // When authors submit data: ___
         Para pAut = inner.addPara(BANNER_AUT, BANNER_AUT);
         pAut.addHighlight(null).addContent(T_Authors);
-        pAut.addContent(": ");
+        pAut.addContent(BANNER_SEP);
         if (journalConcept.getAllowReviewWorkflow()) {
             pAut.addContent(T_review);
         } else {
@@ -220,7 +221,7 @@ public class JournalStats extends AbstractDSpaceTransformer
         // Data embargo: ___
         Para pDat = inner.addPara(BANNER_DAT, BANNER_DAT);
         pDat.addHighlight(null).addContent(T_Embargo);
-        pDat.addContent(": ");
+        pDat.addContent(BANNER_SEP);
         if (journalConcept.getAllowEmbargo()) {
             pDat.addContent(T_allowed);
         } else {
@@ -230,7 +231,7 @@ public class JournalStats extends AbstractDSpaceTransformer
         // Metadata hidden until article publication: ___
         Para pMet = inner.addPara(BANNER_MET, BANNER_MET);
         pMet.addHighlight(null).addContent(T_Hidden);
-        pMet.addContent(": ");
+        pMet.addContent(BANNER_SEP);
         if (journalConcept.getPublicationBlackout()) {
             pMet.addContent(T_yes);
         } else {
@@ -241,7 +242,7 @@ public class JournalStats extends AbstractDSpaceTransformer
         Para pPac = inner.addPara(BANNER_PAC, BANNER_PAC);
         pPac.addHighlight(null).addContent(T_packages);
         long archivedPackageCount = DryadJournalStats.getArchivedPackagesCount(context, journalName);
-        pPac.addContent(": " + Long.toString(archivedPackageCount));
+        pPac.addContent(BANNER_SEP + Long.toString(archivedPackageCount));
 
         // SEARCH -----------------------------------------------------------------------------------------
         Division searchDiv = body.addDivision(SEARCH_DIV, SEARCH_DIV);
@@ -258,6 +259,8 @@ public class JournalStats extends AbstractDSpaceTransformer
                 LinkedHashMap<Item, String> depositData =
                         DryadJournalStats.getArchivedPackagesSortedRecent(context, journalName, fmt, displayCount);
                 addDepositTabData(statsOuter, t, depositData);
+            } else if (t.queryType == QueryType.DOWNLOADS) {
+                addDownloadsMarkup(statsOuter, t);
             }
         }
     }
@@ -303,35 +306,9 @@ public class JournalStats extends AbstractDSpaceTransformer
         pageMeta.addMetadata("request","journalName").addContent(journalName);
         pageMeta.addMetadata("request","journalAbbr").addContent(journalAbbr);
 
-        // STATS -------------------------------------------------------------------------
-        Metadata mSolrBaseUrl = pageMeta.addMetadata(Const.CINCLUDE_META, Const.CINCLUDE_SOLR_BASE);
-        mSolrBaseUrl.addContent(solrStatsUrl);
-        java.util.List<Integer> archivedDataFiles = DryadJournalStats.getArchivedDataFiles(context, journalName);
-        Collections.sort(archivedDataFiles);
-        String facetQueryVals = null;
-        String field = null;
-        for (TabData t : tabData) {
-            if (t.queryType == QueryType.DOWNLOADS) {
-                if (field == null || !field.equals(t.facetQueryField)) {
-                    facetQueryVals = DryadJournalStats.makeSolrDownloadFacetQuery(archivedDataFiles, t.facetQueryField);
-                    field = t.facetQueryField;
-                }
-                Metadata m = pageMeta.addMetadata(Const.CINCLUDE_META, t.n);
-                String queryString = String.format(solrQueryFormat, t.dateFilter, facetQueryVals, t.facetQueryField);
-                queryString = queryString.replace(Const.SPACE, Const.URL_SPACE);
-                m.addContent(queryString);
-            }
-        }
     }
 
-    /**
-     * Add Item/value to Wing division in a sub-division.
-     * @param outer
-     * @param t
-     * @param depositData
-     * @throws WingException
-     */
-    protected void addDepositTabData(Division outer, TabData t, LinkedHashMap<Item, String> depositData) throws WingException
+    private void addDepositTabData(Division outer, TabData t, LinkedHashMap<Item, String> depositData) throws WingException
     {
         if (depositData.entrySet().size() == 0)
             return;
@@ -353,6 +330,17 @@ public class JournalStats extends AbstractDSpaceTransformer
                 log.error(ex.getMessage());
             }
         }
+    }
+
+    private void addDownloadsMarkup(Division outer, TabData t) throws WingException
+    {
+        Division wrapper = outer.addDivision(t.n, t.rend);
+        Division items = wrapper.addDivision(ITEMS);
+        ReferenceSet itemsContainer = items.addReferenceSet(t.n, ReferenceSet.TYPE_SUMMARY_LIST);
+        itemsContainer.setHead(t.refHead);
+        Division vals = wrapper.addDivision(VALS);
+        List valsList = vals.addList(t.n, List.TYPE_SIMPLE, t.n);
+        valsList.setHead(t.valHead);
     }
 }
 
