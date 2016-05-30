@@ -327,7 +327,7 @@ public class FlowUtils {
 			WorkspaceItem workspace = findWorkspace(context,id);
 			workspace.deleteAll();
 	        context.commit();
-		}else if (ConfigurationManager.getBooleanProperty("lr","handle.register.on.save",false)){
+		}else if (ConfigurationManager.getBooleanProperty("lr","lr.handle.register.on.save",false)){
 			FlowUtils.reservePID(context, id);
 			context.commit();
 		}
