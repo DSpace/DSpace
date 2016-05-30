@@ -66,7 +66,7 @@
 	    }
 	}
 		
-	boolean globalShowFacet = false;
+	boolean globalShowFacets = false;
 	if (info!=null && info.getItems()!=null && info.getItems().length > 0) {
 %>
 	
