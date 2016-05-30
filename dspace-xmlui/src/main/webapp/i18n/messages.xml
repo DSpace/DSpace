@@ -823,7 +823,6 @@
 	<!-- org.dspace.app.xmlui.Submission.submit.ResumeStep -->
 	<message key="xmlui.Submission.submit.ResumeStep.submit_resume">Resume</message>
 	<message key="xmlui.Submission.submit.ResumeStep.submit_share">Share submission</message>
-	<message key="xmlui.Submission.submit.ResumeStep.submit_reserve_pid">Obtain a PID before submission</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SelectCollection -->
 	<message key="xmlui.Submission.submit.SelectCollection.head">Select a collection</message>

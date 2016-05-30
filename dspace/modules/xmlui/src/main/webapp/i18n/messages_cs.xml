@@ -835,7 +835,6 @@
 	<!-- org.dspace.app.xmlui.Submission.submit.ResumeStep -->
 	<message key="xmlui.Submission.submit.ResumeStep.submit_resume">Pokračovat</message>
 	<message key="xmlui.Submission.submit.ResumeStep.submit_share">Sdílet příspěvek</message>
-	<message key="xmlui.Submission.submit.ResumeStep.submit_reserve_pid">Získat PID před dokončením</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SelectCollection -->
 	<message key="xmlui.Submission.submit.SelectCollection.head">Vybrat kolekci</message>
