@@ -271,6 +271,26 @@ public class BrowseListTag extends TagSupport
                         .getProperty("webui.itemlist." + bix.getName()
                                 + ".widths");
             }
+            
+            if (bix != null && browseListLine == null)
+            {
+                browseListLine = ConfigurationManager
+                        .getProperty("webui.itemlist." + bix.getName()
+                                + ".columns");
+                browseWidthLine = ConfigurationManager
+                        .getProperty("webui.itemlist." + bix.getName()
+                                + ".widths");
+            }
+
+            if (bix != null && browseListLine == null)
+            {
+                browseListLine = ConfigurationManager
+                        .getProperty("webui.itemlist." + bix.getDisplayType()
+                                + ".columns");
+                browseWidthLine = ConfigurationManager
+                        .getProperty("webui.itemlist." + bix.getDisplayType()
+                                + ".widths");
+            }
         }
 
         if (browseListLine == null && config != null)
