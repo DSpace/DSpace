@@ -1,0 +1,2131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node id="cnpq" label="CNPQ">
+	<isComposedBy>
+		<node label="CIENCIAS EXATAS E DA TERRA" id="100000000003"> 
+		<isComposedBy>
+			<node label="MATEMATICA" id="100100000008">
+			<isComposedBy>
+				<node label="ALGEBRA" id="100100100004"> 
+				<isComposedBy>
+					<node label="CONJUNTOS" id="100100100102"> </node>
+					<node label="LOGICA MATEMATICA" id="100100100200"> </node>
+					<node label="TEORIA DOS NUMEROS" id="100100100309"> </node>
+					<node label="GRUPOS DE ALGEBRA NAO-COMUTAVIVA" id="100100100407"> </node>
+					<node label="ALGEBRA COMUTATIVA" id="100100100505"> </node>
+					<node label="GEOMETRIA ALGEBRICA" id="100100100603"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ANALISE" id="100100200000"> 
+				<isComposedBy>
+					<node label="ANALISE COMPLEXA" id="100100200109"> </node>
+					<node label="ANALISE FUNCIONAL" id="100100200207"> </node>
+					<node label="ANALISE FUNCIONAL NAO-LINEAR" id="100100200305"> </node>
+					<node label="EQUACOES DIFERENCIAIS ORDINARIAS" id="100100200403"> </node>
+					<node label="EQUACOES DIFERENCIAIS PARCIAIS" id="100100200501"> </node>
+					<node label="EQUACOES DIFERENCIAIS FUNCIONAIS" id="100100200600"> </node>
+				</isComposedBy>
+				</node>
+				<node label="GEOMETRIA E TOPOLOGIA" id="100100300007"> 
+				<isComposedBy>
+					<node label="GEOMETRIA DIFERENCIAL" id="100100300105"> </node>
+					<node label="TOPOLOGIA ALGEBRICA" id="100100300203"> </node>
+					<node label="TOPOLOGIA DAS VARIEDADES" id="100100300301"> </node>
+					<node label="SISTEMAS DINAMICOS" id="100100300400"> </node>
+					<node label="TEORIA DAS SINGULARIDADES E TEORIA DAS CATASTROFES" id="100100300508"> </node>
+					<node label="TEORIA DAS FOLHEACOES" id="100100300606"> </node>
+				</isComposedBy>
+				</node>
+				<node label="MATEMATICA APLICADA" id="100100400003"> 
+				<isComposedBy>
+					<node label="FISICA MATEMATICA" id="100100400101"> </node>
+					<node label="ANALISE NUMERICA" id="100100400200"> </node>
+					<node label="MATEMATICA DISCRETA E COMBINATORIA" id="100100400308"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="PROBABILIDADE E ESTATISTICA" id="100200000002"> 
+			<isComposedBy>
+				<node label="PROBABILIDADE" id="100200100009"> 
+				<isComposedBy>
+					<node label="TEORIA GERAL E FUNDAMENTOS DA PROBABILIDADE" id="100200100107"> </node>
+					<node label="TEORIA GERAL E PROCESSOS ESTOCASTICOS" id="100200100205"> </node>
+					<node label="TEOREMAS DE LIMITE" id="100200100303"> </node>
+					<node label="PROCESSOS MARKOVIANOS" id="100200100401"> </node>
+					<node label="ANALISE ESTOCASTICA" id="100200100500"> </node>
+					<node label="PROCESSOS ESTOCASTICOS ESPECIAIS" id="100200100608"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ESTATISTICA" id="100200200005"> 
+				<isComposedBy>
+					<node label="FUNDAMENTOS DA ESTATISTICA" id="100200200103"> </node>
+					<node label="INFERENCIA PARAMETRICA" id="100200200201"> </node>
+					<node label="INFERENCIA NAO-PARAMETRICA" id="100200200300"> </node>
+					<node label="INFERENCIA EM PROCESSOS ESTOCASTICOS" id="100200200408"> </node>
+					<node label="ANALISE MULTIVARIADA" id="100200200506"> </node>
+					<node label="REGRESSAO E CORRELACAO" id="100200200604"> </node>
+					<node label="PLANEJAMENTO DE EXPERIMENTOS" id="100200200702"> </node>
+					<node label="ANALISE DE DADOS" id="100200200800"> </node>
+				</isComposedBy>
+				</node>
+				<node label="PROBABILIDADE E ESTATISTICA APLICADAS" id="100200300001"> </node>
+			</isComposedBy>
+			</node>
+			<node label="CIENCIA DA COMPUTACAO" id="100300000007"> 
+			<isComposedBy>
+				<node label="TEORIA DA COMPUTACAO" id="100300100003"> 
+				<isComposedBy>
+					<node label="COMPUTABILIDADE E MODELOS DE COMPUTACAO" id="100300100101"> </node>
+					<node label="LINGUAGEM FORMAIS E AUTOMATOS" id="100300100200"> </node>
+					<node label="ANALISE DE ALGORITMOS E COMPLEXIDADE DE COMPUTACAO" id="100300100308"> </node>
+					<node label="LOGICAS E SEMANTICA DE PROGRAMAS" id="100300100406"> </node>
+				</isComposedBy>
+				</node>
+				<node label="MATEMATICA DA COMPUTACAO" id="100300200000"> 
+				<isComposedBy>
+					<node label="MATEMATICA SIMBOLICA" id="100300200108"> </node>
+					<node label="MODELOS ANALITICOS E DE SIMULACAO" id="100300200206"> </node>
+				</isComposedBy>
+				</node>
+				<node label="METODOLOGIA E TECNICAS DA COMPUTACAO" id="100300300006"> 
+				<isComposedBy>
+					<node label="LINGUAGENS DE PROGRAMACAO" id="100300300104"> </node>
+					<node label="ENGENHARIA DE SOFTWARE" id="100300300202"> </node>
+					<node label="BANCO DE DADOS" id="100300300300"> </node>
+					<node label="SISTEMAS DE INFORMACAO" id="100300300409"> </node>
+					<node label="PROCESSAMENTO GRAFICO (GRAPHICS)" id="100300300507"> </node>
+				</isComposedBy>
+				</node>
+				<node label="SISTEMAS DE COMPUTACAO" id="100300400002"> 
+				<isComposedBy>
+					<node label="HARDWARE" id="100300400100"> </node>
+					<node label="ARQUITETURA DE SISTEMAS DE COMPUTACAO" id="100300400209"> </node>
+					<node label="SOFTWARE BASICO" id="100300400307"> </node>
+					<node label="TELEINFORMATICA" id="100300400405"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ASTRONOMIA" id="100400000001"> 
+			<isComposedBy>
+				<node label="ASTRONOMIA DE POSICAO E MECANICA CELESTE" id="100400100008"> 
+				<isComposedBy>
+					<node label="ASTRONOMIA FUNDAMENTAL" id="100400100106"> </node>
+					<node label="ASTRONOMIA DINAMICA" id="100400100204"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ASTROFISICA ESTELAR" id="100400200004"> </node>
+				<node label="ASTROFISICA DO MEIO INTERESTELAR" id="100400300000"> 
+				<isComposedBy>
+					<node label="MEIO INTERESTELAR" id="100400300109"> </node>
+					<node label="NEBULOSA" id="100400300207"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ASTROFISICA EXTRAGALACTICA" id="100400400007"> 
+				<isComposedBy>
+					<node label="GALAXIAS" id="100400400105"> </node>
+					<node label="AGLOMERADOS DE GALAXIAS" id="100400400203"> </node>
+					<node label="QUASARES" id="100400400301"> </node>
+					<node label="COSMOLOGIA" id="100400400400"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ASTROFISICA DO SISTEMA SOLAR" id="100400500003"> 
+				<isComposedBy>
+					<node label="FISICA SOLAR" id="100400500101"> </node>
+					<node label="MOVIMENTO DA TERRA" id="100400500200"> </node>
+					<node label="SISTEMA PLANETARIO" id="100400500308"> </node>
+				</isComposedBy>
+				</node>
+				<node label="INSTRUMENTACAO ASTRONOMICA" id="100400600000"> 
+				<isComposedBy>
+					<node label="ASTRONOMIA OTICA" id="100400600108"> </node>
+					<node label="RADIOASTRONOMIA" id="100400600206"> </node>
+					<node label="ASTRONOMIA ESPACIAL" id="100400600304"> </node>
+					<node label="PROCESSAMENTO DE DADOS ASTRONOMICOS" id="100400600402"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="FISICA" id="100500000006">
+			<isComposedBy>
+				<node label="FISICA GERAL" id="100500100002"> 
+				<isComposedBy>
+					<node label="METODOS MATEMATICOS DA FISICA" id="100500100100"> </node>
+					<node label="FISICA CLASSICA E FISICA QUANTICA MECANICA E CAMPOS" id="100500100209"> </node>
+					<node label="RELATIVIDADE E GRAVITACAO" id="100500100307"> </node>
+					<node label="FISICA ESTATISTICA E TERMODINAMICA" id="100500100405"> </node>
+					<node label="METROLOGIA, TECNICAS GERAIS DE LABORATORIO, SISTEMA DE INSTRUMENTACAO" id="100500100503"> </node>
+					<node label="INSTRUMENTACAO ESPECIFICA DE USO GERAL EM FISICA" id="100500100601"> </node>
+				</isComposedBy>
+				</node>
+				<node label="AREAS CLASSICAS DE FENOMENOLOGIA E SUAS APLICACOES" id="100500200009"> 
+				<isComposedBy>
+					<node label="ELETRICIDADE E MAGNETISMO CAMPOS E PARTICULAS CARREGADAS" id="100500200107"> </node>
+					<node label="OTICA" id="100500200205"> </node>
+					<node label="ACUSTICA" id="100500200303"> </node>
+					<node label="TRANSFERENCIA DE CALOR PROCESSOS TERMICOS E TERMODINAMICOS" id="100500200401"> </node>
+					<node label="MECANICA, ELASTICIDADE E REOLOGIA" id="100500200500"> </node>
+					<node label="DINAMICA DOS FLUIDOS" id="100500200608"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FISICA DAS PARTICULAS ELEMENTARES E CAMPOS" id="100500300005"> 
+				<isComposedBy>
+					<node label="TEORIA GERAL DE PARTICULAS E CAMPOS" id="100500300103"> </node>
+					<node label="TEORIAS ESPECIFICAS E MODELOS DE INTERACAO SISTEMATICA DE PARTICULAS RAIOS COSMICOS" id="100500300201"> </node>
+					<node label="REACOES ESPECIFICAS E FENOMIOLOGIA DE PARTICULAS" id="100500300300"> </node>
+					<node label="PROPRIEDADES DE PARTICULAS ESPECIFICAS E RESSONANCIAS" id="100500300408"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FISICA NUCLEAR" id="100500400001"> 
+				<isComposedBy>
+					<node label="ESTRUTURA NUCLEAR" id="100500400100"> </node>
+					<node label="DESINTEGRACAO NUCLEAR E RADIOATIVIDADE" id="100500400208"> </node>
+					<node label="REACOES NUCLEARES E ESPALHAMENTO GERAL" id="100500400306"> </node>
+					<node label="REACOES NUCLEARES E ESPALHAMENTO (REACOES ESPECIFICAS)" id="100500400404"> </node>
+					<node label="PROPRIEDADES DE NUCLEOS ESPECIFICOS" id="100500400502"> </node>
+					<node label="METODOS EXPERIMENTAIS E INSTRUMENTACAO PARA PARTICULAS ELEMENTARES E FISICA NUCLEAR" id="100500400600"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FISICA ATOMICA E MOLECULAR" id="100500500008"> 
+				<isComposedBy>
+					<node label="ESTRUTURA ELETRONICA DE ATOMOS E MOLECULAS TEORIA" id="100500500106"> </node>
+					<node label="ESPECTROS ATOMICOS E INTEGRACAO DE FOTONS" id="100500500204"> </node>
+					<node label="ESPECTROS MOLECULARES E INTERACOES DE FOTONS COM MOLECULAS" id="100500500302"> </node>
+					<node label="PROCESSOS DE COLISAO E INTERACOES DE ATOMOS E MOLECULAS" id="100500500400"> </node>
+					<node label="INF.SOBRE ATOMOS E MOLECULAS OBTIDOS EXPERIMENTALMENTEINSTRUMENTACAO E TECNICAS" id="100500500509"> </node>
+					<node label="ESTUDOS DE ATOMOS E MOLECULAS ESPECIAIS" id="100500500607"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FISICA DOS FLUIDOS, FISICA DE PLASMAS E DESCARGAS ELETRICAS" id="100500600004"> 
+				<isComposedBy>
+					<node label="CINETICA E TEORIA DE TRANSPORTE DE FLUIDOS PROPRIEDADES FISICAS DE GASES" id="100500600102"> </node>
+					<node label="FISICA DE PLASMAS E DESCARGAS ELETRICAS" id="100500600200"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FISICA DA MATERIA CONDENSADA" id="100500700000"> 
+				<isComposedBy>
+					<node label="ESTRUTURA DE LIQUIDOS E SOLIDOS CRISTALOGRAFIA" id="100500700109"> </node>
+					<node label="PROPRIEDADES MECANICAS E ACUSTICAS DA MATERIA CONDENSADA" id="100500700207"> </node>
+					<node label="DINAMICA DA REDE E ESTATISTICA DE CRISTAIS" id="100500700305"> </node>
+					<node label="EQUACAO DE ESTADO, EQUILIBRIO DE FASES E TRANSICOES DE FASE" id="100500700403"> </node>
+					<node label="PROPRIEDADES TERMICAS DA MATERIA CONDENSADA" id="100500700501"> </node>
+					<node label="PROPRIEDADES DE TRANSPORTES DE MATERIA CONDENSADA (NAO ELETRONICAS)" id="100500700600"> </node>
+					<node label="CAMPOS QUANTICOS E SOLIDOS, HELIO, LIQUIDO, SOLIDO" id="100500700708"> </node>
+					<node label="SUPERFICIES E INTERFACES PELICULAS E FILAMENTOS" id="100500700806"> </node>
+					<node label="ESTADOS ELETRONICOS" id="100500700904"> </node>
+					<node label="TRANSP.ELETRONICOS E PROP. ELETRICAS DE SUPERFICIES INTERFACES E PELICULAS" id="100500701008"> </node>
+					<node label="ESTRUTURAS ELETRONICAS E PROPRIEDADES ELETRICAS DE SUPERFICIES INTERFACES E PELICULAS" id="100500701106"> </node>
+					<node label="SUPERCONDUTIVIDADE" id="100500701204"> </node>
+					<node label="MATERIAIS MAGNETICOS E PROPRIEDADES MAGNETICAS" id="100500701302"> </node>
+					<node label="RESSONANCIA MAG.E RELAX.NA MAT.CONDENSEFEITOS MOSBAUERCORR.ANG.PERTUBADA" id="100500701400"> </node>
+					<node label="MATERIAIS DIELETRICOS E PROPRIEDADES DIELETRICAS" id="100500701509"> </node>
+					<node label="PROP.OTICAS E ESPECTROSC.DA MAT.CONDENSOUTRAS INTER.DA MAT.COM RAD.E PART." id="100500701607"> </node>
+					<node label="EMISSAO ELETRONICA E IONICA POR LIQUIDOS E SOLIDOS FENOMENOS DE IMPACTO" id="100500701705"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="QUIMICA" id="100600000000"> 
+			<isComposedBy>
+				<node label="QUIMICA ORGANICA" id="100600100007"> 
+				<isComposedBy>
+					<node label="ESTRUTURA, CONFORMACAO E ESTEREOQUIMICA" id="100600100105"> </node>
+					<node label="SINTESE ORGANICA" id="100600100203"> </node>
+					<node label="FISICO-QUIMICA ORGANICA" id="100600100301"> </node>
+					<node label="FOTOQUIMICA ORGANICA" id="100600100400"> </node>
+					<node label="QUIMICA DOS PRODUTOS NATURAIS" id="100600100508"> </node>
+					<node label="EVOLUCAO, SISTEMATICA E ECOLOGIA QUIMICA" id="100600100606"> </node>
+					<node label="POLIMEROS E COLOIDES" id="100600100704"> </node>
+				</isComposedBy>
+				</node>
+				<node label="QUIMICA INORGANICA" id="100600200003"> 
+				<isComposedBy>
+					<node label="CAMPOS DE COORDENACAO" id="100600200101"> </node>
+					<node label="NAO-METAIS E SEUS COMPOSTOS" id="100600200200"> </node>
+					<node label="COMPOSTOS ORGANO-METALICOS" id="100600200308"> </node>
+					<node label="DETERMINACAO DE ESTRUTURA DE COMPOSTOS INORGANICOS" id="100600200406"> </node>
+					<node label="FOTO-QUIMICA INORGANICA" id="100600200504"> </node>
+					<node label="FISICO QUIMICA INORGANICA" id="100600200602"> </node>
+					<node label="QUIMICA BIO-INORGANICA" id="100600200700"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FISICO-QUIMICA" id="100600300000"> 
+				<isComposedBy>
+					<node label="CINETICA QUIMICA E CATALISE" id="100600300108"> </node>
+					<node label="ELETROQUIMICA" id="100600300206"> </node>
+					<node label="ESPECTROSCOPIA" id="100600300304"> </node>
+					<node label="QUIMICA DE INTERFACES" id="100600300402"> </node>
+					<node label="QUIMICA DO ESTADO CONDENSADO" id="100600300500"> </node>
+					<node label="QUIMICA NUCLEAR E RADIOQUIMICA" id="100600300609"> </node>
+					<node label="QUIMICA TEORICA" id="100600300707"> </node>
+					<node label="TERMODINAMICA QUIMICA" id="100600300805"> </node>
+				</isComposedBy>
+				</node>
+				<node label="QUIMICA ANALITICA" id="100600400006"> 
+				<isComposedBy>
+					<node label="SEPARACAO" id="100600400104"> </node>
+					<node label="METODOS OTICOS DE ANALISE" id="100600400202"> </node>
+					<node label="ELETROANALITICA" id="100600400300"> </node>
+					<node label="GRAVIMETRIA" id="100600400409"> </node>
+					<node label="TITIMETRIA" id="100600400507"> </node>
+					<node label="INSTRUMENTACAO ANALITICA" id="100600400605"> </node>
+					<node label="ANALISE DE TRACOS E QUIMICA AMBIENTAL" id="100600400703"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="GEOCIENCIAS" id="100700000005"> 
+			<isComposedBy>
+				<node label="GEOLOGIA" id="100700100001"> 
+				<isComposedBy>
+					<node label="MINERALOGIA" id="100700100100"> </node>
+					<node label="PETROLOGIA" id="100700100208"> </node>
+					<node label="GEOQUIMICA" id="100700100306"> </node>
+					<node label="GEOLOGIA REGIONAL" id="100700100404"> </node>
+					<node label="GEOTECTONICA" id="100700100502"> </node>
+					<node label="GEOCRONOLOGIA" id="100700100600"> </node>
+					<node label="CARTOGRAFIA GEOLOGICA" id="100700100709"> </node>
+					<node label="METALOGENIA" id="100700100807"> </node>
+					<node label="HIDROGEOLOGIA" id="100700100905"> </node>
+					<node label="PROSPECCAO MINERAL" id="100700101009"> </node>
+					<node label="SEDIMENTOLOGIA" id="100700101107"> </node>
+					<node label="PALEONTOLOGIA ESTRATIGRAFICA" id="100700101205"> </node>
+					<node label="ESTRATIGRAFIA" id="100700101303"> </node>
+					<node label="GEOLOGIA AMBIENTAL" id="100700101401"> </node>
+				</isComposedBy>
+				</node>
+				<node label="GEOFISICA" id="100700200008"> 
+				<isComposedBy>
+					<node label="GEOMAGNETISMO" id="100700200106"> </node>
+					<node label="SISMOLOGIA" id="100700200204"> </node>
+					<node label="GEOTERMIA E FLUXO TERMICO" id="100700200302"> </node>
+					<node label="PROPRIEDADES FISICAS DAS ROCHAS" id="100700200400"> </node>
+					<node label="GEOFISICA NUCLEAR" id="100700200509"> </node>
+					<node label="SENSORIAMENTO REMOTO" id="100700200607"> </node>
+					<node label="AERONOMIA" id="100700200705"> </node>
+					<node label="DESENVOLVIMENTO DE INSTRUMENTACAO GEOFISICA" id="100700200803"> </node>
+					<node label="GEOFISICA APLICADA" id="100700200901"> </node>
+					<node label="GRAVIMETRIA" id="100700201005"> </node>
+				</isComposedBy>
+				</node>
+				<node label="METEOROLOGIA" id="100700300004"> 
+				<isComposedBy>
+					<node label="METEOROLOGIA DINAMICA" id="100700300102"> </node>
+					<node label="METEOROLOGIA SINOTICA" id="100700300200"> </node>
+					<node label="METEOROLOGIA FISICA" id="100700300309"> </node>
+					<node label="QUIMICA DA ATMOSFERA" id="100700300407"> </node>
+					<node label="INSTRUMENTACAO METEOROLOGICA" id="100700300505"> </node>
+					<node label="CLIMATOLOGIA" id="100700300603"> </node>
+					<node label="MICROMETEOROLOGIA" id="100700300701"> </node>
+					<node label="SENSORIAMENTO REMOTO DA ATMOSFERA" id="100700300800"> </node>
+					<node label="METEOROLOGIA APLICADA" id="100700300908"> </node>
+				</isComposedBy>
+				</node>
+				<node label="GEODESIA" id="100700400000"> 
+				<isComposedBy>
+					<node label="GEODESIA FISICA" id="100700400109"> </node>
+					<node label="GEODESIA GEOMETRICA" id="100700400207"> </node>
+					<node label="GEODESIA CELESTE" id="100700400305"> </node>
+					<node label="FOTOGRAMETRIA" id="100700400403"> </node>
+					<node label="CARTOGRAFIA BASICA" id="100700400501"> </node>
+					<node label="GEOGRAFIA FISICA" id="100700500007"> </node>
+				</isComposedBy>
+				</node>
+				<node label="GEOMORFOLOGIA" id="100700500105"> 
+				<isComposedBy>
+					<node label="CLIMATOLOGIA GEOGRAFICA" id="100700500203"> </node>
+					<node label="PEDOLOGIA" id="100700500301"> </node>
+					<node label="HIDROGEOGRAFIA" id="100700500400"> </node>
+					<node label="GEOECOLOGIA" id="100700500508"> </node>
+					<node label="FOTOGEOGRAFIA (FISICO-ECOLOGICA)" id="100700500606"> </node>
+					<node label="GEOCARTOGRAFIA" id="100700500704"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="OCEANOGRAFIA" id="100800000000"> 
+			<isComposedBy>
+				<node label="OCEANOGRAFIA BIOLOGICA" id="100800100006"> 
+				<isComposedBy>
+					<node label="INTERACAO ENTRE OS ORGANISMOS MARINHOS E OS PARAMETROS AMBIENTAIS" id="100800100104"> </node>
+				</isComposedBy>
+				</node>
+				<node label="OCEANOGRAFIA FISICA" id="100800200002"> 
+				<isComposedBy>
+					<node label="VARIAVEIS FISICAS DA AGUA DO MAR" id="100800200100"> </node>
+					<node label="MOVIMENTO DA AGUA DO MAR" id="100800200209"> </node>
+					<node label="ORIGEM DAS MASSAS DE AGUA" id="100800200307"> </node>
+					<node label="INTERACAO DO OCEANO COM O LEITO DO MAR" id="100800200405"> </node>
+					<node label="INTERACAO DO OCEANO COM A ATMOSFERA" id="100800200503"> </node>
+				</isComposedBy>
+				</node>
+				<node label="OCEANOGRAFIA QUIMICA" id="100800300009"> 
+				<isComposedBy>
+					<node label="PROPRIEDADES QUIMICAS DA AGUA DO MAR" id="100800300107"> </node>
+					<node label="INTERACOES QUIMICO-BIOLOGICAS/GEOLOGICAS DAS SUBSTANCIAS QUIMICAS DA AGUA DO MAR" id="100800300205"> </node>
+				</isComposedBy>
+				</node>
+				<node label="OCEANOGRAFIA GEOLOGICA" id="100800400005"> 
+				<isComposedBy>
+					<node label="GEOMORFOLOGIA SUBMARINA" id="100800400103"> </node>
+					<node label="SEDIMENTOLOGIA MARINHA" id="100800400201"> </node>
+					<node label="GEOFISICA MARINHA" id="100800400300"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+		</isComposedBy>
+		</node>
+		<node label="CIENCIAS BIOLOGICAS" id="200000000006"> 
+		<isComposedBy>
+			<node label="BIOLOGIA GERAL" id="200100000000"> </node>
+			<node label="GENETICA" id="200200000005"> 
+			<isComposedBy>
+				<node label="GENETICA QUANTITATIVA" id="200200100001"> </node>
+				<node label="GENETICA MOLECULAR E DE MICROORGANISMOS" id="200200200008"> </node>
+				<node label="GENETICA VEGETAL" id="200200300004"> </node>
+				<node label="GENETICA ANIMAL" id="200200400000"> </node>
+				<node label="GENETICA HUMANA E MEDICA" id="200200500007"> </node>
+				<node label="MUTAGENESE" id="200200600003"> </node>
+			</isComposedBy>
+			</node>
+			<node label="BOTANICA" id="200300000000"> 
+			<isComposedBy>
+				<node label="PALEOBOTANICA" id="200300100006"> </node>
+				<node label="MORFOLOGIA VEGETAL" id="200300200002"> 
+				<isComposedBy>
+					<node label="MORFOLOGIA EXTERNA" id="200300200100"> </node>
+					<node label="CITOLOGIA VEGETAL" id="200300200209"> </node>
+					<node label="ANATOMIA VEGETAL" id="200300200307"> </node>
+					<node label="PALINOLOGIA" id="200300200405"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FISIOLOGIA VEGETAL" id="200300300009"> 
+				<isComposedBy>
+					<node label="NUTRICAO E CRESCIMENTO VEGETAL" id="200300300107"> </node>
+					<node label="REPRODUCAO VEGETAL" id="200300300205"> </node>
+					<node label="ECOFISIOLOGIA VEGETAL" id="200300300303"> </node>
+				</isComposedBy>
+				</node>
+				<node label="TAXONOMIA VEGETAL" id="200300400005"> 
+				<isComposedBy>
+					<node label="TAXONOMIA DE CRIPTOGAMOS" id="200300400103"> </node>
+					<node label="TAXONOMIA DE FANEROGAMOS" id="200300400201"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FITOGEOGRAFIA" id="200300500001"> </node>
+				<node label="BOTANICA APLICADA" id="200300600008"> </node>
+			</isComposedBy>
+			</node>
+			<node label="ZOOLOGIA" id="200400000004"> 
+			<isComposedBy>
+				<node label="PALEOZOOLOGIA" id="200400100000"> </node>
+				<node label="MORFOLOGIA DOS GRUPOS RECENTES" id="200400200007"> </node>
+				<node label="FISIOLOGIA DOS GRUPOS RECENTES" id="200400300003"> </node>
+				<node label="COMPORTAMENTO ANIMAL" id="200400400000"> </node>
+				<node label="TAXONOMIA DOS GRUPOS RECENTES" id="200400500006"> </node>
+				<node label="ZOOLOGIA APLICADA" id="200400600002"> 
+				<isComposedBy>
+					<node label="CONSERVACAO DAS ESPECIES ANIMAIS" id="200400600100"> </node>
+					<node label="UTILIZACAO DOS ANIMAIS" id="200400600209"> </node>
+					<node label="CONTROLE POPULACIONAL DE ANIMAIS" id="200400600307"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ECOLOGIA" id="200500000009"> 
+			<isComposedBy>
+				<node label="ECOLOGIA TEORICA" id="200500100005"> </node>
+				<node label="ECOLOGIA DE ECOSSISTEMAS" id="200500200001"> </node>
+				<node label="ECOLOGIA APLICADA" id="200500300008"> </node>
+			</isComposedBy>
+			</node>
+			<node label="MORFOLOGIA" id="200600000003"> 
+			<isComposedBy>
+				<node label="CITOLOGIA E BIOLOGIA CELULAR" id="200600100000"> </node>
+				<node label="EMBRIOLOGIA" id="200600200006"> </node>
+				<node label="HISTOLOGIA" id="200600300002"> </node>
+				<node label="ANATOMIA" id="200600400009"> 
+				<isComposedBy>
+					<node label="ANATOMIA HUMANA" id="200600400107"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="FISIOLOGIA" id="200700000008"> 
+			<isComposedBy>
+				<node label="FISIOLOGIA GERAL" id="200700100004"> 
+				<node label="FISIOLOGIA DE ORGAOS E SISTEMAS" id="200700200000"> </node>
+				<isComposedBy>
+					<node label="NEUROFISIOLOGIA" id="200700200109"> </node>
+					<node label="FISIOLOGIA CARDIOVASCULAR" id="200700200207"> </node>
+					<node label="FISIOLOGIA DA RESPIRACAO" id="200700200305"> </node>
+					<node label="FISIOLOGIA RENAL" id="200700200403"> </node>
+					<node label="FISIOLOGIA ENDOCRINA" id="200700200501"> </node>
+					<node label="FISIOLOGIA DA DIGESTAO" id="200700200600"> </node>
+					<node label="CINESIOLOGIA" id="200700200708"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FISIOLOGIA DO ESFORCO" id="200700300007"> </node>
+				<node label="FISIOLOGIA COMPARADA" id="200700400003"> </node>
+			</isComposedBy>
+			</node>
+			<node label="BIOQUIMICA" id="200800000002"> 
+			<isComposedBy>
+				<node label="QUIMICA DE MACROMOLECULAS" id="200800100009"> 
+				<isComposedBy>
+					<node label="PROTEINAS" id="200800100107"> </node>
+					<node label="LIPIDEOS" id="200800100205"> </node>
+					<node label="GLICIDEOS" id="200800100303"> </node>
+				</isComposedBy>
+				</node>
+				<node label="BIOQUIMICA DOS MICROORGANISMOS" id="200800200005"> </node>
+				<node label="METABOLISMO E BIOENERGETICA" id="200800300001"> </node>
+				<node label="BIOLOGIA MOLECULAR" id="200800400008"> </node>
+				<node label="ENZIMOLOGIA" id="200800500004"> </node>
+			</isComposedBy>
+			</node>
+			<node label="BIOFISICA" id="200900000007"> 
+			<isComposedBy>
+				<node label="BIOFISICA MOLECULAR" id="200900100003"> </node>
+				<node label="BIOFISICA CELULAR" id="200900200000"> </node>
+				<node label="BIOFISICA DE PROCESSOS E SISTEMAS" id="200900300006"> </node>
+				<node label="RADIOLOGIA E FOTOBIOLOGIA" id="200900400002"> </node>
+			</isComposedBy>
+			</node>
+			<node label="FARMACOLOGIA" id="201000000000"> 
+			<isComposedBy>
+				<node label="FARMACOLOGIA GERAL" id="201000100006">
+				<isComposedBy>
+					<node label="FARMACOCINETICA" id="201000100104"> </node>
+					<node label="BIODISPONIBILIDADE" id="201000100202"> </node>
+				</isComposedBy>	
+				</node>
+				<node label="FARMACOLOGIA AUTONOMICA" id="201000200002"> </node>
+				<node label="NEUROPSICOFARMACOLOGIA" id="201000300009"> </node>
+				<node label="FARMACOLOGIA CARDIORENAL" id="201000400005"> </node>
+				<node label="FARMACOLOGIA BIOQUIMICA E MOLECULAR" id="201000500001"> </node>
+				<node label="ETNOFARMACOLOGIA" id="201000600008"> </node>
+				<node label="TOXICOLOGIA" id="201000700004"> </node>
+				<node label="FARMACOLOGIA CLINICA" id="201000800000"> </node>
+			</isComposedBy>
+			</node>
+			<node label="IMUNOLOGIA" id="201100000004"> 
+			<isComposedBy>
+				<node label="IMUNOQUIMICA" id="201100100000"> </node>
+				<node label="IMUNOLOGIA CELULAR" id="201100200007"> </node>
+				<node label="IMUNOGENETICA" id="201100300003"> </node>
+				<node label="IMUNOLOGIA APLICADA" id="201100400000"> </node>
+			</isComposedBy>
+			</node>
+			<node label="MICROBIOLOGIA" id="201200000009"> 
+			<isComposedBy>
+				<node label="BIOLOGIA E FISIOLOGIA DOS MICROORGANISMOS" id="201200100005"> 
+				<isComposedBy>
+					<node label="VIROLOGIA" id="201200100103"> </node>
+					<node label="BACTEROLOGIA" id="201200100201"> </node>
+					<node label="MICOLOGIA" id="201200100300"> </node>
+				</isComposedBy>
+				</node>
+				<node label="MICROBIOLOGIA APLICADA" id="201200200001"> </node>
+				<node label="MICROBIOLOGIA MEDICA" id="201200200100"> </node>
+				<node label="MICROBIOLOGIA INDUSTRIAL E DE FERMENTACAO" id="201200200208"> </node>
+			</isComposedBy>
+			</node>
+			<node label="PARASITOLOGIA" id="201300000003"> 
+			<isComposedBy>
+				<node label="PROTOZOOLOGIA DE PARASITOS" id="201300100000">
+				<isComposedBy>				
+					<node label="PROTOZOOLOGIA PARASITARIA HUMANA" id="201300100108"> </node>
+					<node label="PROTOZOOLOGIA PARASITARIA ANIMAL" id="201300100206"> </node>
+				</isComposedBy>
+				</node>
+				<node label="HELMINTOLOGIA DE PARASITOS" id="201300200006"> 
+				<isComposedBy>
+					<node label="HELMINTOLOGIA HUMANA" id="201300200104"> </node>
+					<node label="HELMINTOLOGIA ANIMAL" id="201300200202"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ENTOMOLOGIA E MALACOLOGIA DE PARASITOS E VETORES" id="201300300002"> </node>
+			</isComposedBy>
+			</node>
+		</isComposedBy>
+		</node>
+		<node label="ENGENHARIAS" id="300000000009"> 
+		<isComposedBy>
+			<node label="ENGENHARIA CIVIL" id="300100000003"> 
+			<isComposedBy>
+				<node label="CONSTRUCAO CIVIL" id="300100100000"> 
+				<isComposedBy>
+					<node label="MATERIAIS E COMPONENTES DE CONSTRUCAO" id="300100100108"> </node>
+					<node label="PROCESSOS CONSTRUTIVOS" id="300100100206"> </node>
+					<node label="INSTALACOES PREDIAIS" id="300100100304"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ESTRUTURAS" id="300100200006"> 
+				<isComposedBy>
+					<node label="ESTRUTURAS DE CONCRETO" id="300100200104"> </node>
+					<node label="ESTRUTURAS DE MADEIRAS" id="300100200202"> </node>
+					<node label="ESTRUTURAS METALICAS" id="300100200300"> </node>
+					<node label="MECANICA DAS ESTRUTURAS" id="300100200409"> </node>
+				</isComposedBy>
+				</node>
+				<node label="GEOTECNICA" id="300100300002"> 
+				<isComposedBy>
+					<node label="FUNDACOES E ESCAVACOES" id="300100300100"> </node>
+					<node label="MECANICAS DAS ROCHAS" id="300100300209"> </node>
+					<node label="MECANICAS DOS SOLOS" id="300100300307"> </node>
+					<node label="OBRAS DE TERRA E ENROCAMENTO" id="300100300405"> </node>
+					<node label="PAVIMENTOS" id="300100300503"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ENGENHARIA HIDRAULICA" id="300100400009"> 
+				<isComposedBy>
+					<node label="HIDRAULICA" id="300100400107"> </node>
+					<node label="HIDROLOGIA" id="300100400205"> </node>
+				</isComposedBy>
+				</node>
+				<node label="INFRA-ESTRUTURA DE TRANSPORTES" id="300100500005"> 
+				<isComposedBy>
+					<node label="AEROPORTOS PROJETO E CONSTRUCAO" id="300100500103"> </node>
+					<node label="FERROVIAS PROJETOS E CONSTRUCAO" id="300100500201"> </node>
+					<node label="PORTOS E VIAS NEVEGAVEIS PROJETO E CONSTRUCAO" id="300100500300"> </node>
+					<node label="RODOVIAS PROJETO E CONSTRUCAO" id="300100500408"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA DE MINAS" id="300200000008"> 
+			<isComposedBy>
+				<node label="PESQUISA MINERAL" id="300200100004"> 
+				<isComposedBy>
+					<node label="CARACTERIZACAO DO MINERIO" id="300200100102"> </node>
+					<node label="DIMENSIONAMENTO DE JAZIDAS" id="300200100200"> </node>
+				</isComposedBy>
+				</node>
+				<node label="LAVRA" id="300200200000"> 
+				<isComposedBy>
+					<node label="LAVRA A CEU ABERTO" id="300200200109"> </node>
+					<node label="LAVRA DE MINA SUBTERRANEA" id="300200200207"> </node>
+					<node label="EQUIPAMENTOS DE LAVRA" id="300200200305"> </node>
+				</isComposedBy>
+				</node>
+				<node label="TRATAMENTO DE MINERIOS" id="300200300007"> 
+				<isComposedBy>
+					<node label="METODOS DE CONCENTRACAO E ENRIQUECIMENTO DE MINERIOS" id="300200300105"> </node>
+					<node label="EQUIPAMENTOS DE BENEFICIAMENTO DE MINERIOS" id="300200300203"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA DE MATERIAIS E METALURGICA" id="300300000002"> 
+			<isComposedBy>
+				<node label="INSTALACOES E EQUIPAMENTOS METALURGICOS" id="300300100009"> 
+				<isComposedBy>
+					<node label="INSTALACOES METALURGICAS" id="300300100107"> </node>
+					<node label="EQUIPAMENTOS METALURGICOS" id="300300100205"> </node>
+				</isComposedBy>
+				</node>
+				<node label="METALURGIA EXTRATIVA" id="300300200005"> 
+				<isComposedBy>
+					<node label="AGLOMERACAO" id="300300200103"> </node>
+					<node label="ELETROMETALURGIA" id="300300200201"> </node>
+					<node label="HIDROMETALURGIA" id="300300200300"> </node>
+					<node label="PIROMETALURGIA" id="300300200408"> </node>
+					<node label="TRATAMENTO DE MINERIOS" id="300300200506"> </node>
+				</isComposedBy>
+				</node>
+				<node label="METALURGIA DE TRANSFORMACAO" id="300300300001"> 
+				<isComposedBy>
+					<node label="CONFORMACAO MECANICA" id="300300300100"> </node>
+					<node label="FUNDICAO" id="300300300208"> </node>
+					<node label="METALURGIA DE PO" id="300300300306"> </node>
+					<node label="RECOBRIMENTOS" id="300300300404"> </node>
+					<node label="SOLDAGEM" id="300300300502"> </node>
+					<node label="TRATAMENTO TERMICOS, MECANICOS E QUIMICOS" id="300300300600"> </node>
+					<node label="USINAGEM" id="300300300709"> </node>
+				</isComposedBy>
+				</node>
+				<node label="METALURGIA FISICA" id="300300400008"> 
+				<isComposedBy>
+					<node label="ESTRUTURA DOS METAIS E LIGAS" id="300300400106"> </node>
+					<node label="PROPRIEDADES FISICAS DOS METAIS E LIGAS" id="300300400204"> </node>
+					<node label="PROPRIEDADES MECANICAS DOS METAIS E LIGAS" id="300300400302"> </node>
+					<node label="TRANSFORMACAO DE FASES" id="300300400400"> </node>
+					<node label="CORROSAO" id="300300400509"> </node>
+				</isComposedBy>
+				</node>
+				<node label="MATERIAIS NAO METALICOS" id="300300500004"> 
+				<isComposedBy>
+					<node label="EXTRACAO E TRANSFORMACAO DE MATERIAIS" id="300300500102"> </node>
+					<node label="CERAMICOS" id="300300500200"> </node>
+					<node label="MATERIAIS CONJUGADOS NAO METALICOS" id="300300500309"> </node>
+					<node label="POLIMEROS, APLICACOES" id="300300500407"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA ELETRICA" id="300400000007"> 
+			<isComposedBy>
+				<node label="MATERIAIS ELETRICOS" id="300400100003"> 
+				<isComposedBy>
+					<node label="MATERIAIS CONDUTORES" id="300400100101"> </node>
+					<node label="MATERIAIS E COMPONENTES SEMICONDUTORES" id="300400100200"> </node>
+					<node label="MATERIAIS E DISPOSITIVOS SUPERCONDUTORES" id="300400100308"> </node>
+					<node label="MATERIAIS DIELETRICOS, PIESOELETRICOS E FERROELETRICOS" id="300400100406"> </node>
+					<node label="MATERIAIS E COMPONENTES ELETROOTICOS E MAGNETOOTICOS, MATERIAIS FOTOELETRICOS" id="300400100504"> </node>
+					<node label="MATERIAIS E DISPOSITIVOS MAGNETICOS" id="300400100602"> </node>
+				</isComposedBy>
+				</node>
+				<node label="MEDIDAS ELETRICAS, MAGNETICAS E ELETRONICAS INSTRUMENTACAO" id="300400200000"> 
+				<isComposedBy>
+					<node label="MEDIDAS ELETRICAS" id="300400200108"> </node>
+					<node label="MEDIDAS MAGNETICAS" id="300400200206"> </node>
+					<node label="INSTRUMENTACAO ELETROMECANICA" id="300400200304"> </node>
+					<node label="INSTRUMENTACAO ELETRONICA" id="300400200402"> </node>
+					<node label="SISTEMAS ELETRONICOS DE MEDIDA E DE CONTROLE" id="300400200500"> </node>
+				</isComposedBy>
+				</node>
+				<node label="CIRCUITOS ELETRICOS, MAGNETICOS E ELETRONICOS" id="300400300006"> 
+				<isComposedBy>
+					<node label="TEORIA GERAL DOS CIRCUITOS ELETRICOS" id="300400300104"> </node>
+					<node label="CIRCUITOS LINEARES E NAO-LINEARES" id="300400300202"> </node>
+					<node label="CIRCUITOS ELETRONICOS" id="300400300300"> </node>
+					<node label="CIRCUITOS MAGNETICOS, MAGNETISMOS, ELETROMAGNETISMO" id="300400300409"> </node>
+				</isComposedBy>
+				</node>
+				<node label="SISTEMAS ELETRICOS DE POTENCIA" id="300400400002">
+				<isComposedBy>
+					<node label="GERACAO DA ENERGIA ELETRICA" id="300400400100"> </node>
+					<node label="TRANSMISSAO DA ENERGIA ELETRICA, DISTRIBUICAO DA ENERGIA ELETRICA" id="300400400209"> </node>
+					<node label="CONVERSAO E RETIFICACAO DA ENERGIA ELETRICA" id="300400400307"> </node>
+					<node label="MEDICAO, CONTROLE, CORRECAO E PROTECAO DE SISTEMAS ELETRICOS DE POTENCIA" id="300400400405"> </node>
+					<node label="MAQUINAS ELETRICAS E DISPOSITIVOS DE POTENCIA" id="300400400503"> </node>
+					<node label="INSTALACOES ELETRICAS PREDIAIS E INDUSTRIAIS" id="300400400601"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ELETRONICA INDUSTRIAL, SISTEMAS E CONTROLES ELETRONICOS" id="300400500009"> 
+				<isComposedBy>
+					<node label="ELETRONICA INDUSTRIAL" id="300400500107"> </node>
+					<node label="AUTOMACAO ELETRONICA DE PROCESSOS ELETRICOS E INDUSTRIAIS" id="300400500205"> </node>
+					<node label="CONTROLE DE PROCESSOS ELETRONICOS, RETROALIMENTACAO" id="300400500303"> </node>
+				</isComposedBy>
+				</node>
+				<node label="TELECOMUNICACOES" id="300400600005"> 
+				<isComposedBy>
+					<node label="TEORIA ELETROMAGNETICA, MICROONDAS, PROPAGACAO DE ONDAS, ANTENAS" id="300400600103"> </node>
+					<node label="RADIONAVEGACAO E RADIOASTRONOMIA" id="300400600201"> </node>
+					<node label="SISTEMAS DE TELECOMUNICACOES" id="300400600300"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA MECANICA" id="300500000001"> 
+			<isComposedBy>
+				<node label="FENOMENOS DE TRANSPORTE" id="300500100008"> 
+				<isComposedBy>
+					<node label="TRANSFERENCIA DE CALOR" id="300500100106"> </node>
+					<node label="MECANICA DOS FLUIDOS" id="300500100204"> </node>
+					<node label="DINAMICA DOS GASES" id="300500100302"> </node>
+					<node label="PRINCIPIOS VARIACIONAIS E METODOS NUMERICOS" id="300500100400"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ENGENHARIA TERMICA" id="300500200004"> 
+				<isComposedBy>
+					<node label="TERMODINAMICA" id="300500200102"> </node>
+					<node label="CONTROLE AMBIENTAL" id="300500200200"> </node>
+					<node label="APROVEITAMENTO DA ENERGIA" id="300500200309"> </node>
+				</isComposedBy>
+				</node>
+				<node label="MECANICA DOS SOLIDOS" id="300500300000"> 
+				<isComposedBy>
+					<node label="MECANICA DOS CORPOS SOLIDOS, ELASTICOS E PLASTICOS" id="300500300109"> </node>
+					<node label="DINAMICA DOS CORPOS RIGIDOS, ELASTICOS E PLASTICOS" id="300500300207"> </node>
+					<node label="ANALISE DE TENSOES" id="300500300305"> </node>
+					<node label="TERMOELASTICIDADE" id="300500300403"> </node>
+				</isComposedBy>
+				</node>
+				<node label="PROJETOS DE MAQUINAS" id="300500400007"> 
+				<isComposedBy>
+					<node label="TEORIA DOS MECANISMOS" id="300500400105"> </node>
+					<node label="ESTATICA E DINAMICA APLICADA" id="300500400203"> </node>
+					<node label="ELEMENTOS DE MAQUINAS" id="300500400301"> </node>
+					<node label="FUNDAMENTOS GERAIS DE PROJETOS DAS MAQUINAS" id="300500400400"> </node>
+					<node label="MAQUINAS, MOTORES E EQUIPAMENTOS" id="300500400508"> </node>
+					<node label="METODOS DE SINTESE E OTIMIZACAO APLICADOS AO PROJETO MECANICO" id="300500400606"> </node>
+					<node label="CONTROLE DE SISTEMAS MECANICOS" id="300500400704"> </node>
+					<node label="APROVEITAMENTO DE ENERGIA" id="300500400802"> </node>
+				</isComposedBy>
+				</node>
+				<node label="PROCESSOS DE FABRICACAO" id="300500500003"> 
+				<isComposedBy>
+					<node label="MATRIZES E FERRAMENTAS" id="300500500101"> </node>
+					<node label="MAQUINAS DE USINAGEM E CONFORMACAO" id="300500500200"> </node>
+					<node label="CONTROLE NUMERICO" id="300500500308"> </node>
+					<node label="ROBOTIZACAO" id="300500500406"> </node>
+					<node label="PROCESSOS DE FABRICACAO, SELECAO ECONOMICA" id="300500500504"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA QUIMICA" id="300600000006"> 
+			<isComposedBy>
+				<node label="PROCESSOS INDUSTRIAIS DE ENGENHARIA QUIMICA" id="300600100002"> 
+				<isComposedBy>
+					<node label="PROCESSOS BIOQUIMICOS" id="300600100100"> </node>
+					<node label="PROCESSOS ORGANICOS" id="300600100209"> </node>
+					<node label="PROCESSOS INORGANICOS" id="300600100307"> </node>
+				</isComposedBy>
+				</node>
+				<node label="OPERACOES INDUSTRIAIS E EQUIPAMENTOS PARA ENGENHARIA QUIMICA" id="300600200009"> 
+				<isComposedBy>
+					<node label="REATORES QUIMICOS" id="300600200107"> </node>
+					<node label="OPERACOES CARACTERISTICAS DE PROCESSOS BIOQUIMICOS" id="300600200205"> </node>
+					<node label="OPERACOES DE SEPARACAO E MISTURA" id="300600200303"> </node>
+				</isComposedBy>
+				</node>
+				<node label="TECNOLOGIA QUIMICA" id="300600300005"> 
+				<isComposedBy>
+					<node label="BALANCOS GLOBAIS DE MATERIA E ENERGIA" id="300600300103"> </node>
+					<node label="AGUA" id="300600300201"> </node>
+					<node label="ALCOOL" id="300600300300"> </node>
+					<node label="ALIMENTOS" id="300600300408"> </node>
+					<node label="BORRACHAS" id="300600300506"> </node>
+					<node label="CARVAO" id="300600300604"> </node>
+					<node label="CERAMICA" id="300600300702"> </node>
+					<node label="CIMENTO" id="300600300800"> </node>
+					<node label="COURO" id="300600300909"> </node>
+					<node label="DETERGENTES" id="300600301002"> </node>
+					<node label="FERTILIZANTES" id="300600301100"> </node>
+					<node label="MEDICAMENTOS" id="300600301209"> </node>
+					<node label="METAIS NAO-FERROSOS" id="300600301307"> </node>
+					<node label="OLEOS" id="300600301405"> </node>
+					<node label="PAPEL E CELULOSE" id="300600301503"> </node>
+					<node label="PETROLEO E PETROQUIMICA" id="300600301601"> </node>
+					<node label="POLIMEROS" id="300600301700"> </node>
+					<node label="PRODUTOS NATURAIS" id="300600301808"> </node>
+					<node label="TEXTEIS" id="300600301906"> </node>
+					<node label="TRATAMENTOS E APROVEITAMENTO DE REJEITOS" id="300600302000"> </node>
+					<node label="XISTO" id="300600302108"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA SANITARIA" id="300700000000"> 
+			<isComposedBy>
+				<node label="RECURSOS HIDRICOS" id="300700100007"> 
+				<isComposedBy>
+					<node label="PLANEJAMENTO INTEGRADO DOS RECURSOS HIDRICOS" id="300700100105"> </node>
+					<node label="TECNOLOGIA E PROBLEMAS SANITARIOS DE IRRIGACAO" id="300700100203"> </node>
+					<node label="AGUAS SUBTERRANEAS E POCOS PROFUNDOS" id="300700100301"> </node>
+					<node label="CONTROLE DE ENCHENTES E DE BARRAGENS" id="300700100400"> </node>
+					<node label="SEDIMENTOLOGIA" id="300700100508"> </node>
+				</isComposedBy>
+				</node>
+				<node label="TRATAMENTO DE AGUAS DE ABASTECIMENTO E RESIDUARIAS" id="300700200003"> 
+				<isComposedBy>
+					<node label="QUIMICA SANITARIA" id="300700200101"> </node>
+					<node label="PROCESSOS SIMPLIFICADOS DE TRATAMENTO DE AGUAS" id="300700200200"> </node>
+					<node label="TECNICAS CONVENCIONAIS DE TRATAMENTO DE AGUAS" id="300700200308"> </node>
+					<node label="TECNICAS AVANCADAS DE TRATAMENTO DE AGUAS" id="300700200406"> </node>
+					<node label="ESTUDOS E CARACTERIZACAO DE EFLUENTES INDUSTRIAIS" id="300700200504"> </node>
+					<node label="LAY OUT DE PROCESSOS INDUSTRIAIS" id="300700200602"> </node>
+					<node label="RESIDUOS RADIOATIVOS" id="300700200700"> </node>
+				</isComposedBy>
+				</node>
+				<node label="SANEAMENTO BASICO" id="300700300000"> 
+				<isComposedBy>
+					<node label="TECNICAS DE ABASTECIMENTO DA AGUA" id="300700300108"> </node>
+					<node label="DRENAGEM DE AGUAS RESIDUARIAS" id="300700300206"> </node>
+					<node label="DRENAGEM URBANA DE AGUAS PLUVIAIS" id="300700300304"> </node>
+					<node label="RESIDUOS SOLIDOS, DOMESTICOS E INDUSTRIAIS" id="300700300402"> </node>
+					<node label="LIMPEZA PUBLICA" id="300700300500"> </node>
+					<node label="INSTALACOES HIDRAULICO-SANITARIAS" id="300700300609"> </node>
+				</isComposedBy>
+				</node>
+				<node label="SANEAMENTO AMBIENTAL" id="300700400006"> 
+				<isComposedBy>
+					<node label="ECOLOGIA APLICADA A ENGENHARIA SANITARIA" id="300700400104"> </node>
+					<node label="MICROBIOLOGIA APLICADA E ENGENHARIA SANITARIA" id="300700400202"> </node>
+					<node label="PARASITOLOGIA APLICADA A ENGENHARIA SANITARIA" id="300700400300"> </node>
+					<node label="QUALIDADE DO AR, DAS AGUAS E DO SOLO" id="300700400409"> </node>
+					<node label="CONTROLE DA POLUICAO" id="300700400507"> </node>
+					<node label="LEGISLACAO AMBIENTAL" id="300700400605"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA DE PRODUCAO" id="300800000005"> 
+			<isComposedBy>
+				<node label="GERENCIA DE PRODUCAO" id="300800100001"> 
+				<isComposedBy>
+					<node label="PLANEJAMENTO DE INSTALACOES INDUSTRIAIS" id="300800100100"> </node>
+					<node label="PLANEJAMENTO, PROJETO E CONTROLE DE SISTEMAS DE PRODUCAO" id="300800100208"> </node>
+					<node label="HIGIENE E SEGURANCA DO TRABALHO" id="300800100306"> </node>
+					<node label="SUPRIMENTOS" id="300800100404"> </node>
+					<node label="GARANTIA DE CONTROLE DE QUALIDADE" id="300800100502"> </node>
+				</isComposedBy>
+				</node>
+				<node label="PESQUISA OPERACIONAL" id="300800200008"> 
+				<isComposedBy>
+					<node label="PROCESSOS ESTOCASTICOS E TEORIAS DA FILAS" id="300800200106"> </node>
+					<node label="PROGRAMACAO LINEAR, NAO-LINEAR, MISTA E DINAMICA" id="300800200204"> </node>
+					<node label="SERIES TEMPORAIS" id="300800200302"> </node>
+					<node label="TEORIA DOS GRAFOS" id="300800200400"> </node>
+					<node label="TEORIA DOS JOGOS" id="300800200509"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ENGENHARIA DO PRODUTO" id="300800300004"> 
+				<isComposedBy>
+					<node label="ERGONOMIA" id="300800300102"> </node>
+					<node label="METODOLOGIA DE PROJETO DO PRODUTO" id="300800300200"> </node>
+					<node label="PROCESSOS DE TRABALHO" id="300800300309"> </node>
+					<node label="GERENCIA DO PROJETO E DO PRODUTO" id="300800300407"> </node>
+					<node label="DESENVOLVIMENTO DE PRODUTO" id="300800300505"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ENGENHARIA ECONOMICA" id="300800400000"> 
+				<isComposedBy>
+					<node label="ESTUDO DE MERCADO" id="300800400109"> </node>
+					<node label="LOCALIZACAO INDUSTRIAL" id="300800400207"> </node>
+					<node label="ANALISE DE CUSTOS" id="300800400305"> </node>
+					<node label="ECONOMIA DE TECNOLOGIA" id="300800400403"> </node>
+					<node label="VIDA ECONOMICA DOS EQUIPAMENTOS" id="300800400501"> </node>
+					<node label="AVALIACAO DE PROJETOS" id="300800400600"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA NUCLEAR" id="300900000000"> 
+			<isComposedBy>
+				<node label="APLICACOES DE RADIOISOTOPOS" id="300900100006"> 
+				<isComposedBy>
+					<node label="PRODUCAO DE RADIOISOTOPOS" id="300900100104"> </node>
+					<node label="APLICACOES INDUSTRIAIS DE RADIOISOTOPOS" id="300900100202"> </node>
+					<node label="INSTRUMENTACAO PARA MEDIDA E CONTROLE DE RADIACAO" id="300900100300"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FUSAO CONTROLADA" id="300900200002">
+				<isComposedBy>				
+					<node label="PROCESSOS INDUSTRIAIS DA FUSAO CONTROLADA" id="300900200100"> </node>
+					<node label="PROBLEMAS TECNOLOGICOS DA FUSAO CONTROLADA" id="300900200209"> </node>
+				</isComposedBy>
+				</node>
+				<node label="COMBUSTIVEL NUCLEAR" id="300900300009"> 
+				<isComposedBy>
+					<node label="EXTRACAO DE COMBUSTIVEL NUCLEAR" id="300900300107"> </node>
+					<node label="CONVERSAO, ENRIQUECIMENTO E FABRICACAO DE COMBUSTIVEL NUCLEAR" id="300900300205"> </node>
+					<node label="REPROCESSAMENTO DE COMBUSTIVEL NUCLEAR" id="300900300303"> </node>
+					<node label="REJEITOS DE COMBUSTIVEL NUCLEAR" id="300900300401"> </node>
+				</isComposedBy>
+				</node>
+				<node label="TECNOLOGIA DOS REATORES" id="300900400005"> 
+				<isComposedBy>
+					<node label="NUCLEO DO REATOR" id="300900400103"> </node>
+					<node label="MATERIAIS NUCLEARES E BLINDAGEM DE REATORES" id="300900400201"> </node>
+					<node label="TRANSFERENCIA DE CALOR EM REATORES" id="300900400300"> </node>
+					<node label="GERACAO E INTEGRACAO COM SISTEMAS ELETRICOS EM REATORES" id="300900400408"> </node>
+					<node label="INSTRUMENTACAO PARA OPERACAO E CONTROLE DE REATORES" id="300900400506"> </node>
+					<node label="SEGURANCA, LOCALIZACAO E LICENCIAMENTO DE REATORES" id="300900400604"> </node>
+					<node label="ASPECTOS ECONOMICOS DE REATORES" id="300900400702"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA DE TRANSPORTES" id="301000000002"> 
+			<isComposedBy>
+				<node label="PLANEJAMENTO DE TRANSPORTES" id="301000100009"> 
+				<isComposedBy>
+					<node label="PLANEJAMENTO E ORGANIZACAO DO SISTEMA DE TRANSPORTE" id="301000100107"> </node>
+					<node label="ECONOMIA DOS TRANSPORTES" id="301000100205"> </node>
+				</isComposedBy>
+				</node>
+				<node label="VEICULOS E EQUIPAMENTOS DE CONTROLE" id="301000200005"> 
+				<isComposedBy>
+					<node label="VIAS DE TRANSPORTE" id="301000200103"> </node>
+					<node label="VEICULOS DE TRANSPORTES" id="301000200201"> </node>
+					<node label="ESTACAO DE TRANSPORTE" id="301000200300"> </node>
+					<node label="EQUIPAMENTOS AUXILIARES E CONTROLES" id="301000200408"> </node>
+				</isComposedBy>
+				</node>
+				<node label="OPERACOES DE TRANSPORTES" id="301000300001"> 
+				<isComposedBy>
+					<node label="ENGENHARIA DE TRAFEGO" id="301000300100"> </node>
+					<node label="CAPACIDADE DE VIAS DE TRANSPORTE" id="301000300208"> </node>
+				</isComposedBy>
+				</node>
+				<node label="OPERACAO DE SISTEMAS DE TRANSPORTE" id="301000300306"> </node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA NAVAL E OCEANICA" id="301100000007"> 
+			<isComposedBy>
+				<node label="HIDRODINAMICA DE NAVIOS E SISTEMAS OCEANICOS" id="301100100003"> 
+				<isComposedBy>
+					<node label="RESISTENCIA HIDRODINAMICA" id="301100100101"> </node>
+					<node label="PROPULSAO DE NAVIOS" id="301100100200"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ESTRUTURAS NAVAIS E OCEANICAS" id="301100200000"> 
+				<isComposedBy>
+					<node label="ANALISE TEORICA E EXPERIMENTAL DE ESTRUTURA" id="301100200108"> </node>
+					<node label="DINAMICA ESTRUTURAL NAVAL E OCEANICA" id="301100200206"> </node>
+					<node label="SINTESE ESTRUTURAL NAVAL E OCEANICA" id="301100200304"> </node>
+				</isComposedBy>
+				</node>
+				<node label="MAQUINAS MARITIMAS" id="301100300006"> 
+				<isComposedBy>
+					<node label="ANALISE DE SISTEMAS PROPULSORES" id="301100300104"> </node>
+					<node label="CONTROLE E AUTOMACAO DE SISTEMAS PROPULSORES" id="301100300202"> </node>
+					<node label="EQUIPAMENTOS AUXILIARES DO SISTEMA PROPULSIVO" id="301100300300"> </node>
+					<node label="MOTOR DE PROPULSAO" id="301100300409"> </node>
+				</isComposedBy>
+				</node>
+				<node label="PROJETO DE NAVIOS E DE SISTEMAS OCEANICOS" id="301100400002"> 
+				<isComposedBy>
+					<node label="PROJETOS DE NAVIOS" id="301100400100"> </node>
+					<node label="PROJETOS DE SISTEMAS OCEANICOS FIXOS E SEMI-FIXOS" id="301100400209"> </node>
+					<node label="PROJETOS DE EMBARCACOES NAO-CONVENCIONAIS" id="301100400307"> </node>
+				</isComposedBy>
+				</node>
+				<node label="TECNOLOGIA DE CONSTRUCAO NAVAL E DE SISTEMAS OCEANICAS" id="301100500009"> 
+				<isComposedBy>
+					<node label="METODOS DE FABRICACAO DE NAVIOS E SISTEMAS OCEANICOS" id="301100500107"> </node>
+					<node label="SOLDAGEM DE ESTRUTURAS NAVAIS E OCEANICOS" id="301100500205"> </node>
+					<node label="CUSTOS DE CONSTRUCAO NAVAL" id="301100500303"> </node>
+					<node label="NORMATIZACAO E CERTIFICACAO DE QUALIDADE DE NAVIOS" id="301100500401"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA AEROESPACIAL" id="301200000001"> 
+			<isComposedBy>
+				<node label="AERODINAMICA" id="301200100008"> 
+				<isComposedBy>
+					<node label="AERODINAMICA DE AERONAVES ESPACIAIS" id="301200100106"> </node>
+					<node label="AERODINAMICA DOS PROCESSOS GEOFISICOS E INTERPLANETARIOS" id="301200100204"> </node>
+				</isComposedBy>
+				</node>
+				<node label="DINAMICA DE VOO" id="301200200004"> 
+				<isComposedBy>
+					<node label="TRAJETORIAS E ORBITAS" id="301200200102"> </node>
+					<node label="ESTABILIDADE E CONTROLE" id="301200200200"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ESTRUTURAS AEROESPACIAIS" id="301200300000"> 
+				<isComposedBy>
+					<node label="AEROELASTICIDADE" id="301200300109"> </node>
+					<node label="FADIGA" id="301200300207"> </node>
+					<node label="PROJETO DE ESTRUTURAS AEROESPACIAIS" id="301200300305"> </node>
+				</isComposedBy>
+				</node>
+				<node label="MATERIAIS E PROCESSOS PARA ENGENHARIA AERONAUTICA E AEROESPACIAL" id="301200400007"> </node>
+				<node label="PROPULSAO AEROESPACIAL" id="301200500003"> 
+				<isComposedBy>
+					<node label="COMBUSTAO E ESCOAMENTO COM REACOES QUIMICAS" id="301200500101"> </node>
+					<node label="PROPULSAO DE FOGUETES" id="301200500200"> </node>
+					<node label="MAQUINAS DE FLUXO" id="301200500308"> </node>
+					<node label="MOTORES ALTERNATIVOS" id="301200500406"> </node>
+				</isComposedBy>
+				</node>
+				<node label="SISTEMAS AEROESPACIAIS" id="301200600000"> 
+				<isComposedBy>
+					<node label="AVIOES" id="301200600108"> </node>
+					<node label="FOGUETES" id="301200600206"> </node>
+					<node label="HELICOPTEROS" id="301200600304"> </node>
+					<node label="HOVERCRAFT" id="301200600402"> </node>
+					<node label="SATELITES E OUTROS DISPOSITIVOS AEROESPACIAIS" id="301200600500"> </node>
+					<node label="NORMATIZACAO E CERTIFICACAO DE QUALIDADE DE AERONAVES E COMPONENTES" id="301200600609"> </node>
+					<node label="MANUTENCAO DE SISTEMAS AEROESPACIAIS" id="301200600707"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA BIOMEDICA" id="301300000006"> 
+			<isComposedBy>
+				<node label="BIOENGENHARIA" id="301300100002"> 
+				<isComposedBy>
+					<node label="PROCESSAMENTO DE SINAIS BIOLOGICOS" id="301300100100"> </node>
+					<node label="MODELAGEM DE FENOMENOS BIOLOGICOS" id="301300100209"> </node>
+					<node label="MODELAGEM DE SISTEMAS BIOLOGICOS" id="301300100307"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ENGENHARIA MEDICA" id="301300200009"> 
+				<isComposedBy>
+					<node label="BIOMATERIAIS E MATERIAIS BIOCOMPATIVEIS" id="301300200107"> </node>
+					<node label="TRANSDUTORES PARA APLICACOES BIOMEDICAS" id="301300200205"> </node>
+					<node label="INSTRUMENTACAO ODONTOLOGICA E MEDICO-HOSPITALAR" id="301300200303"> </node>
+					<node label="TECNOLOGIA DE PROTESES" id="301300200401"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+		</isComposedBy>
+		</node>
+		<node label="CIENCIAS DA SAUDE" id="400000000001"> 
+		<isComposedBy>
+			<node label="MEDICINA" id="400100000006"> 
+			<isComposedBy>
+				<node label="CLINICA MEDICA" id="400100100002">
+				<isComposedBy>
+					<node label="ANGIOLOGIA" id="400100100100"> </node>
+					<node label="DERMATOLOGIA" id="400100100209"> </node>
+					<node label="ALERGOLOGIA E IMUNOLOGIA CLINICA" id="400100100307"> </node>
+					<node label="CANCEROLOGIA" id="400100100405"> </node>
+					<node label="HEMATOLOGIA" id="400100100503"> </node>
+					<node label="ENDOCRINOLOGIA" id="400100100601"> </node>
+					<node label="NEUROLOGIA" id="400100100700"> </node>
+					<node label="PEDIATRIA" id="400100100808"> </node>
+					<node label="DOENCAS INFECCIOSAS E PARASITARIAS" id="400100100906"> </node>
+					<node label="CARDIOLOGIA" id="400100101000"> </node>
+					<node label="GASTROENTEROLOGIA" id="400100101108"> </node>
+					<node label="PNEUMOLOGIA" id="400100101206"> </node>
+					<node label="NEFROLOGIA" id="400100101304"> </node>
+					<node label="REUMATOLOGIA" id="400100101402"> </node>
+					<node label="GINECOLOGIA E OBSTETRICIA" id="400100101500"> </node>
+					<node label="FISIATRIA" id="400100101609"> </node>
+					<node label="OFTALMOLOGIA" id="400100101707"> </node>
+					<node label="ORTOPEDIA" id="400100101806"> </node>
+				</isComposedBy>
+				</node>
+				<node label="CIRURGIA" id="400100200009">
+				<isComposedBy>
+					<node label="CIRURGIA PLASTICA E RESTAURADORA" id="400100200107"> </node>
+					<node label="CIRURGIA OTORRINOLARINGOLOGICA" id="400100200205"> </node>
+					<node label="CIRURGIA OFTALMOLOGICA" id="400100200303"> </node>
+					<node label="CIRURGIA CARDIOVASCULAR" id="400100200401"> </node>
+					<node label="CIRURGIA TORAXICA" id="400100200500"> </node>
+					<node label="CIRURGIA GASTROENTEROLOGIA" id="400100200608"> </node>
+					<node label="CIRURGIA PEDIATRICA" id="400100200706"> </node>
+					<node label="NEUROCIRURGIA" id="400100200804"> </node>
+					<node label="CIRURGIA UROLOGICA" id="400100200902"> </node>
+					<node label="CIRURGIA PROCTOLOGICA" id="400100201006"> </node>
+					<node label="CIRURGIA ORTOPEDICA" id="400100201104"> </node>
+					<node label="CIRURGIA TRAUMATOLOGICA" id="400100201202"> </node>
+					<node label="ANESTESIOLOGIA" id="400100201300"> </node>
+					<node label="CIRURGIA EXPERIMENTAL" id="400100201409"> </node>
+				</isComposedBy>
+				</node>
+				<node label="SAUDE MATERNO-INFANTIL" id="400100300005"> </node>
+				<node label="PSIQUIATRIA" id="400100400001"> </node>
+				<node label="ANATOMIA PATOLOGICA E PATOLOGIA CLINICA" id="400100500008"> </node>
+				<node label="RADIOLOGIA MEDICA" id="400100600004"> </node>
+				<node label="MEDICINA LEGAL E DEONTOLOGIA" id="400100700000"> </node>
+			</isComposedBy>
+			</node>
+			<node label="ODONTOLOGIA" id="400200000000"> 
+			<isComposedBy>
+				<node label="CLINICA ODONTOLOGICA" id="400200100007"> </node>
+				<node label="CIRURGIA BUCO-MAXILO-FACIAL" id="400200200003"> </node>
+				<node label="ORTODONTIA" id="400200300000"> </node>
+				<node label="ODONTOPEDIATRIA" id="400200400006"> </node>
+				<node label="PERIODONTIA" id="400200500002"> </node>
+				<node label="ENDODONTIA" id="400200600009"> </node>
+				<node label="RADIOLOGIA ODONTOLOGICA" id="400200700005"> </node>
+				<node label="ODONTOLOGIA SOCIAL E PREVENTIVA" id="400200800001"> </node>
+				<node label="MATERIAIS ODONTOLOGICOS" id="400200900008"> </node>
+			</isComposedBy>
+			</node>
+			<node label="FARMACIA" id="400300000005">
+			<isComposedBy>
+				<node label="FARMACOTECNIA" id="400300100001"> </node>
+				<node label="FARMACOGNOSIA" id="400300200008"> </node>
+				<node label="ANALISE TOXICOLOGICA" id="400300300004"> </node>
+				<node label="ANALISE E CONTROLE E MEDICAMENTOS" id="400300400000"> </node>
+				<node label="BROMATOLOGIA" id="400300500007"> </node>
+			</isComposedBy>
+			</node>
+			<node label="ENFERMAGEM" id="400400000000">
+			<isComposedBy>
+				<node label="ENFERMAGEM MEDICO-CIRURGICA" id="400400100006"> </node>
+				<node label="ENFERMAGEM OBSTETRICA" id="400400200002"> </node>
+				<node label="ENFERMAGEM PEDIATRICA" id="400400300009"> </node>
+				<node label="ENFERMAGEM PSIQUIATRICA" id="400400400005"> </node>
+				<node label="ENFERMAGEM DE DOENCAS CONTAGIOSAS" id="400400500001"> </node>
+				<node label="ENFERMAGEM DE SAUDE PUBLICA" id="400400600008"> </node>
+			</isComposedBy>
+			</node>
+			<node label="NUTRICAO" id="400500000004">
+			<isComposedBy>
+				<node label="BIOQUIMICA DA NUTRICAO" id="400500100000"> </node>
+				<node label="DIETETICA" id="400500200007"> </node>
+				<node label="ANALISE NUTRICIONAL DE POPULACAO" id="400500300003"> </node>
+				<node label="DESNUTRICAO E DESENVOLVIMENTO FISIOLOGICO" id="400500400000"> </node>
+			</isComposedBy>
+			</node>
+			<node label="SAUDE COLETIVA" id="400600000009">
+			<isComposedBy>
+				<node label="EPIDEMIOLOGIA" id="400600100005"> </node>
+				<node label="SAUDE PUBLICA" id="400600200001"> </node>
+				<node label="MEDICINA PREVENTIVA" id="400600300008"> </node>
+			</isComposedBy>
+			</node>
+			<node label="FONOAUDIOLOGIA" id="400700000003"> </node>
+			<node label="FISIOTERAPIA E TERAPIA OCUPACIONAL" id="400800000008"> </node>
+			<node label="EDUCACAO FISICA" id="400900000002"> </node>
+		</isComposedBy>
+		</node>
+		<node label="CIENCIAS AGRARIAS" id="500000000004"> 
+		<isComposedBy>
+			<node label="AGRONOMIA" id="500100000009"> 
+			<isComposedBy>
+				<node label="CIENCIA DO SOLO" id="500100100005"> 
+				<isComposedBy>
+					<node label="GENESE, MORFOLOGIA E CLASSIFICACAO DOS SOLOS" id="500100100103"> </node>
+					<node label="FISICA DO SOLO" id="500100100201"> </node>
+					<node label="QUIMICA DO SOLO" id="500100100300"> </node>
+					<node label="MICROBIOLOGIA E BIOQUIMICA DO SOLO" id="500100100408"> </node>
+					<node label="FERTILIDADE DO SOLO E ADUBACAO" id="500100100506"> </node>
+					<node label="MANEJO E CONSERVACAO DO SOLO" id="500100100604"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FITOSSANIDADE" id="500100200001"> 
+				<isComposedBy>
+					<node label="FITOPATOLOGIA" id="500100200100"> </node>
+					<node label="ENTOMOLOGIA AGRICOLA" id="500100200208"> </node>
+					<node label="PARASITOLOGIA AGRICOLA" id="500100200306"> </node>
+					<node label="MICROBIOLOGIA AGRICOLA" id="500100200404"> </node>
+					<node label="DEFESA FITOSSANITARIA" id="500100200502"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FITOTECNIA" id="500100300008">
+				<isComposedBy>				
+					<node label="MANEJO E TRATOS CULTURAIS" id="500100300106"> </node>
+					<node label="MECANIZACAO AGRICOLA" id="500100300204"> </node>
+					<node label="PRODUCAO E BENEFICIAMENTO DE SEMENTES" id="500100300302"> </node>
+					<node label="PRODUCAO DE MUDAS" id="500100300400"> </node>
+					<node label="MELHORAMENTO VEGETAL" id="500100300509"> </node>
+					<node label="FISIOLOGIA DE PLANTAS CULTIVADAS" id="500100300607"> </node>
+					<node label="MATOLOGIA" id="500100300705"> </node>
+				</isComposedBy>
+				</node>
+				<node label="FLORICULTURA, PARQUES E JARDINS" id="500100400004"> 
+				<isComposedBy>
+					<node label="FLORICULTURA" id="500100400102"> </node>
+					<node label="PARQUES E JARDINS" id="500100400200"> </node>
+					<node label="ARBORIZACAO DE VIAS PUBLICAS" id="500100400309"> </node>
+				</isComposedBy>
+				</node>
+				<node label="AGROMETEOROLOGIA" id="500100500000"> </node>
+				<node label="EXTENSAO RURAL" id="500100600007"> </node>
+			</isComposedBy>
+			</node>
+			<node label="RECURSOS FLORESTAIS E ENGENHARIA FLORESTAL" id="500200000003">
+			<isComposedBy>
+				<node label="SILVICULTURA" id="500200100000"> 
+				<isComposedBy>
+					<node label="DENDROLOGIA" id="500200100108"> </node>
+					<node label="FLORESTAMENTO E REFLORESTAMENTO" id="500200100206"> </node>
+					<node label="GENETICA E MELHORAMENTO FLORESTAL" id="500200100304"> </node>
+					<node label="SEMENTES FLORESTAIS" id="500200100402"> </node>
+					<node label="NUTRICAO FLORESTAL" id="500200100500"> </node>
+					<node label="FISIOLOGIA FLORESTAL" id="500200100609"> </node>
+					<node label="SOLOS FLORESTAIS" id="500200100707"> </node>
+					<node label="PROTECAO FLORESTAL" id="500200100805"> </node>
+				</isComposedBy>
+				</node>
+				<node label="MANEJO FLORESTAL" id="500200200006"> 
+				<isComposedBy>
+					<node label="ECONOMIA FLORESTAL" id="500200200104"> </node>
+					<node label="POLITICA E LEGISLACAO FLORESTAL" id="500200200202"> </node>
+					<node label="ADMINISTRACAO FLORESTAL" id="500200200300"> </node>
+					<node label="DENDROMETRIA E INVENTARIO FLORESTAL" id="500200200409"> </node>
+					<node label="FOTOINTERPRETACAO FLORESTAL" id="500200200507"> </node>
+					<node label="ORDENAMENTO FLORESTAL" id="500200200605"> </node>
+				</isComposedBy>
+				</node>
+				<node label="TECNICAS E OPERACOES FLORESTAIS" id="500200300002"> 
+				<isComposedBy>
+					<node label="EXPLORACAO FLORESTAL" id="500200300100"> </node>
+					<node label="MECANIZACAO FLORESTAL" id="500200300209"> </node>
+				</isComposedBy>
+				</node>
+				<node label="TECNOLOGIA E UTILIZACAO DE PRODUTOS FLORESTAIS" id="500200400009"> 
+				<isComposedBy>
+					<node label="ANATOMIA E IDENTIFICACAO DE PRODUTOS FLORESTAIS" id="500200400107"> </node>
+					<node label="PROPRIEDADES FISICO-MECANICAS DA MADEIRA" id="500200400205"> </node>
+					<node label="RELACOES AGUA-MADEIRA E SECAGEM" id="500200400303"> </node>
+					<node label="TRATAMENTO DA MADEIRA" id="500200400401"> </node>
+					<node label="PROCESSAMENTO MECANICO DA MADEIRA" id="500200400500"> </node>
+					<node label="QUIMICA DA MADEIRA" id="500200400608"> </node>
+					<node label="RESINAS DE MADEIRAS" id="500200400706"> </node>
+					<node label="TECNOLOGIA DE CELULOSE E PAPEL" id="500200400804"> </node>
+					<node label="TECNOLOGIA DE CHAPAS" id="500200400902"> </node>
+				</isComposedBy>
+				</node>
+				<node label="CONSERVACAO DA NATUREZA" id="500200500005"> 
+				<isComposedBy>
+					<node label="HIDROLOGIA FLORESTAL" id="500200500103"> </node>
+					<node label="CONSERVACAO DE AREAS SILVESTRES" id="500200500201"> </node>
+					<node label="CONSERVACAO DE BACIAS HIDROGRAFICAS" id="500200500300"> </node>
+					<node label="RECUPERACAO DE AREAS DEGRADADAS" id="500200500408"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ENERGIA DE BIOMASSA FLORESTAL" id="500200600001"> </node>
+			</isComposedBy>
+			</node>
+			<node label="ENGENHARIA AGRICOLA" id="500300000008"> 
+			<isComposedBy>
+				<node label="MAQUINAS E IMPLEMENTOS AGRICOLAS" id="500300100004"> </node>
+				<node label="ENGENHARIA DE AGUA E SOLO" id="500300200000"> 
+				<isComposedBy>
+					<node label="IRRIGACAO E DRENAGEM" id="500300200109"> </node>
+					<node label="CONSERVACAO DE SOLO E AGUA" id="500300200207"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ENGENHARIA DE PROCESSAMENTO DE PRODUTOS AGRICOLAS" id="500300300007"> 
+				<isComposedBy>
+					<node label="PRE-PROCESSAMENTO DE PRODUTOS AGRICOLAS" id="500300300105"> </node>
+					<node label="ARMAZENAMENTO DE PRODUTOS AGRICOLAS" id="500300300203"> </node>
+					<node label="TRANSFERENCIA DE PRODUTOS AGRICOLAS" id="500300300301"> </node>
+				</isComposedBy>
+				</node>
+				<node label="CONSTRUCOES RURAIS E AMBIENCIA" id="500300400003"> 
+				<isComposedBy>
+					<node label="ASSENTAMENTO RURAL" id="500300400101"> </node>
+					<node label="ENGENHARIA DE CONSTRUCOES RURAIS" id="500300400200"> </node>
+					<node label="SANEAMENTO RURAL" id="500300400308"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ENERGIZACAO RURAL" id="500300500000"> </node>
+			</isComposedBy>
+			</node>
+			<node label="ZOOTECNIA" id="500400000002"> 
+			<isComposedBy>
+				<node label="ECOLOGIA DOS ANIMAIS DOMESTICOS E ETOLOGIA" id="500400100009"> </node>
+				<node label="GENETICA E MELHORAMENTO DOS ANIMAIS DOMESTICOS" id="500400200005"> </node>
+				<node label="NUTRICAO E ALIMENTACAO ANIMAL" id="500400300001"> 
+				<isComposedBy>
+					<node label="EXIGENCIAS NUTRICIONAIS DOS ANIMAIS" id="500400300100"> </node>
+					<node label="AVALIACAO DE ALIMENTOS PARA ANIMAIS" id="500400300208"> </node>
+					<node label="CONSERVACAO DE ALIMENTOS PARA ANIMAIS" id="500400300306"> </node>
+				</isComposedBy>
+				</node>
+				<node label="PASTAGEM E FORRAGICULTURA" id="500400400008"> 
+				<isComposedBy>
+					<node label="AVALIACAO, PRODUCAO E CONSERVACAO DE FORRAGENS" id="500400400106"> </node>
+					<node label="MANEJO E CONSERVACAO DE PASTAGENS" id="500400400204"> </node>
+					<node label="FISIOLOGIA DE PLANTAS FORRAGEIRAS" id="500400400302"> </node>
+					<node label="MELHORAMENTO DE PLANTAS FORRAGEIRAS E PRODUCAO DE SEMENTES" id="500400400400"> </node>
+					<node label="TOXICOLOGIA E PLANTAS TOXICAS" id="500400400509"> </node>
+				</isComposedBy>
+				</node>
+				<node label="PRODUCAO ANIMAL" id="500400500004"> 
+				<isComposedBy>
+					<node label="CRIACAO DE ANIMAIS" id="500400500102"> </node>
+					<node label="MANEJO DE ANIMAIS" id="500400500200"> </node>
+					<node label="INSTALACOES PARA PRODUCAO ANIMAL" id="500400500309"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+			<node label="MEDICINA VETERINARIA" id="500500000007"> 
+			<isComposedBy>
+				<node label="CLINICA E CIRURGIA ANIMAL" id="500500100003"> 
+				<isComposedBy>
+					<node label="ANESTESIOLOGIA ANIMAL" id="500500100101"> </node>
+					<node label="TECNICA CIRURGICA ANIMAL" id="500500100200"> </node>
+					<node label="RADIOLOGIA DE ANIMAIS" id="500500100308"> </node>
+					<node label="FARMACOLOGIA E TERAPEUTICA ANIMAL" id="500500100406"> </node>
+					<node label="OBSTETRICIA ANIMAL" id="500500100504"> </node>
+					<node label="CLINICA VETERINARIA" id="500500100602"> </node>
+					<node label="CLINICA CIRURGICA ANIMAL" id="500500100700"> </node>
+					<node label="TOXICOLOGIA ANIMAL" id="500500100809"> </node>
+				</isComposedBy>
+				</node>
+				<node label="MEDICINA VETERINARIA PREVENTIVA" id="500500200000"> 
+				<isComposedBy>
+					<node label="EPIDEMIOLOGIA ANIMAL" id="500500200108"> </node>
+					<node label="SANEAMENTO APLICADO A SAUDE DO HOMEM" id="500500200206"> </node>
+					<node label="DOENCAS INFECCIOSAS DE ANIMAIS" id="500500200304"> </node>
+					<node label="DOENCAS PARASITARIAS DE ANIMAIS" id="500500200402"> </node>
+					<node label="SAUDE ANIMAL (PROGRAMAS SANITARIOS)" id="500500200500"> </node>
+				</isComposedBy>
+				</node>
+				<node label="PATOLOGIA ANIMAL" id="500500300006"> 
+				<isComposedBy>
+					<node label="PATOLOGIA AVIARIA" id="500500300104"> </node>
+					<node label="ANATOMIA PATOLOGIA ANIMAL" id="500500300202"> </node>
+					<node label="PATOLOGIA CLINICA ANIMAL" id="500500300300"> </node>
+				</isComposedBy>
+				</node>
+				<node label="REPRODUCAO ANIMAL" id="500500400002"> 
+				<isComposedBy>
+					<node label="GINECOLOGIA E ANDROLOGIA ANIMAL" id="500500400100"> </node>
+					<node label="INSEMINACAO ARTIFICIAL ANIMAL" id="500500400209"> </node>
+					<node label="FISIOPATOLOGIA DA REPRODUCAO ANIMAL" id="500500400307"> </node>
+				</isComposedBy>
+				</node>
+				<node label="INSPECAO DE PRODUTOS DE ORIGEM ANIMAL" id="500500500009"> </node>
+			</isComposedBy>
+			</node>
+			<node label="RECURSOS PESQUEIROS E ENGENHARIA DE PESCA" id="500600000001"> 
+			<isComposedBy>
+				<node label="RECURSOS PESQUEIROS MARINHOS" id="500600100008"> 
+				<isComposedBy>
+					<node label="FATORES ABIOTICOS DO MAR" id="500600100106"> </node>
+					<node label="AVALIACAO DE ESTOQUES PESQUEIROS MARINHOS" id="500600100204"> </node>
+					<node label="EXPLORACAO PESQUEIRA MARINHA" id="500600100302"> </node>
+					<node label="MANEJO E CONSERVACAO DE RECURSOS PESQUEIROS MARINHOS" id="500600100400"> </node>
+				</isComposedBy>
+				</node>
+				<node label="RECURSOS PESQUEIROS DE AGUAS INTERIORES" id="500600200004"> 
+				<isComposedBy>
+					<node label="FATORES ABIOTICOS DE AGUAS INTERIORES" id="500600200102"> </node>
+					<node label="AVALIACAO DE ESTOQUES PESQUEIROS DE AGUAS INTERIORES" id="500600200200"> </node>
+					<node label="EXPLOTACAO PESQUEIRA DE AGUAS INTERIORES" id="500600200309"> </node>
+					<node label="MANEJO E CONSERVACAO DE RECURSOS PESQUEIROS DE AGUAS INTERIORES" id="500600200407"> </node>
+				</isComposedBy>
+				</node>
+				<node label="AQUICULTURA" id="500600300000"> 
+				<isComposedBy>
+					<node label="MARICULTURA" id="500600300109"> </node>
+					<node label="CARCINOCULTURA" id="500600300207"> </node>
+					<node label="OSTREICULTURA" id="500600300305"> </node>
+					<node label="PISCICULTURA" id="500600300403"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ENGENHARIA DE PESCA" id="500600400007"> </node>
+			</isComposedBy>
+			</node>
+			<node label="CIENCIA E TECNOLOGIA DE ALIMENTOS" id="500700000006"> 
+			<isComposedBy>
+				<node label="CIENCIA DE ALIMENTOS" id="500700100002"> 
+				<isComposedBy>
+					<node label="VALOR NUTRITIVO DE ALIMENTOS" id="500700100100"> </node>
+					<node label="QUIMICA, FISICA, FISICO-QUIMICA E BIOQUIMICA DOS ALIM. E DAS MAT.-PRIMAS ALIMENTARES" id="500700100209"> </node>
+					<node label="MICROBIOLOGIA DE ALIMENTOS" id="500700100307"> </node>
+					<node label="FISIOLOGIA POS-COLHEITA" id="500700100405"> </node>
+					<node label="TOXICIDADE E RESIDUOS DE PESTICIDAS EM ALIMENTOS" id="500700100503"> </node>
+					<node label="AVALIACAO E CONTROLE DE QUALIDADE DE ALIMENTOS" id="500700100601"> </node>
+					<node label="PADROES, LEGISLACAO E FISCALIZACAO DE ALIMENTOS" id="500700100700"> </node>
+				</isComposedBy>
+				</node>
+				<node label="TECNOLOGIA DE ALIMENTOS" id="500700200009"> 
+				<isComposedBy>
+					<node label="TECNOLOGIA DE PRODUTOS DE ORIGEM ANIMAL" id="500700200107"> </node>
+					<node label="TECNOLOGIA DE PRODUTOS DE ORIGEM VEGETAL" id="500700200205"> </node>
+					<node label="TECNOLOGIA DAS BEBIDAS" id="500700200303"> </node>
+					<node label="TECNOLOGIA DE ALIMENTOS DIETETICOS E NUTRICIONAIS" id="500700200401"> </node>
+					<node label="APROVEITAMENTO DE SUBPRODUTOS" id="500700200500"> </node>
+					<node label="EMBALAGENS DE PRODUTOS ALIMENTARES" id="500700200608"> </node>
+				</isComposedBy>
+				</node>
+				<node label="ENGENHARIA DE ALIMENTOS" id="500700300005"> 
+				<isComposedBy>
+					<node label="INSTALACOES INDUSTRIAIS DE PRODUCAO DE ALIMENTOS" id="500700300103"> </node>
+					<node label="ARMAZENAMENTO DE ALIMENTOS" id="500700300201"> </node>
+				</isComposedBy>
+				</node>
+			</isComposedBy>
+			</node>
+		</isComposedBy>
+		</node>
+		<node label="CIENCIAS SOCIAIS APLICADAS" id="600000000007"> 
+		<isComposedBy>
+			<node label="DIREITO" id="600100000001"> 
+				<isComposedBy>
+				<node label="TEORIA DO DIREITO" id="600100100008"> 
+					<isComposedBy>
+					<node label="TEORIA GERAL DO DIREITO" id="600100100106"> </node>
+					<node label="TEORIA GERAL DO PROCESSO" id="600100100204"> </node>
+					<node label="TEORIA DO ESTADO" id="600100100302"> </node>
+					<node label="HISTORIA DO DIREITO" id="600100100400"> </node>
+					<node label="FILOSOFIA DO DIREITO" id="600100100509"> </node>
+					<node label="LOGICA JURIDICA" id="600100100607"> </node>
+					<node label="SOCIOLOGIA JURIDICA" id="600100100705"> </node>
+					<node label="ANTROPOLOGIA JURIDICA" id="600100100803"> </node>
+					</isComposedBy>
+				</node>
+				<node label="DIREITO PUBLICO" id="600100200004"> 
+					<isComposedBy>
+					<node label="DIREITO TRIBUTARIO" id="600100200102"> </node>
+					<node label="DIREITO PENAL" id="600100200200"> </node>
+					<node label="DIREITO PROCESSUAL PENAL" id="600100200309"> </node>
+					<node label="DIREITO PROCESSUAL CIVIL" id="600100200407"> </node>
+					<node label="DIREITO CONSTITUCIONAL" id="600100200505"> </node>
+					<node label="DIREITO ADMINISTRATIVO" id="600100200603"> </node>
+					<node label="DIREITO INTERNACIONAL PUBLICO" id="600100200701"> </node>
+					</isComposedBy>
+				</node>
+				<node label="DIREITO PRIVADO" id="600100300000"> 
+					<isComposedBy>
+					<node label="DIREITO CIVIL" id="600100300109"> </node>
+					<node label="DIREITO COMERCIAL" id="600100300207"> </node>
+					<node label="DIREITO DO TRABALHO" id="600100300305"> </node>
+					<node label="DIREITO INTERNACIONAL PRIVADO" id="600100300403"> </node>
+					</isComposedBy>
+				</node>
+				<node label="DIREITOS ESPECIAIS" id="600100400007"> </node>
+				</isComposedBy>
+			</node>
+			<node label="ADMINISTRACAO" id="600200000006"> 
+				<isComposedBy>
+				<node label="ADMINISTRACAO DE EMPRESAS" id="600200100002"> 
+					<isComposedBy>
+					<node label="ADMINISTRACAO DA PRODUCAO" id="600200100100"> </node>
+					<node label="ADMINISTRACAO FINANCEIRA" id="600200100209"> </node>
+					<node label="MERCADOLOGIA" id="600200100307"> </node>
+					<node label="NEGOCIOS INTERNACIONAIS" id="600200100405"> </node>
+					<node label="ADMINISTRACAO DE RECURSOS HUMANOS" id="600200100503"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ADMINISTRACAO PUBLICA" id="600200200009"> 
+					<isComposedBy>
+					<node label="CONTABILIDADE E FINANCAS PUBLICAS" id="600200200107"> </node>
+					<node label="ORGANIZACOES PUBLICAS" id="600200200205"> </node>
+					<node label="POLITICA E PLANEJAMENTO GOVERNAMENTAIS" id="600200200303"> </node>
+					<node label="ADMINISTRACAO DE PESSOAL" id="600200200401"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ADMINISTRACAO DE SETORES ESPECIFICOS" id="600200300005"> </node>
+				<node label="CIENCIAS CONTABEIS" id="600200400001"> </node>
+				</isComposedBy>
+			</node>
+			<node label="ECONOMIA" id="600300000000"> 
+				<isComposedBy>
+				<node label="TEORIA ECONOMICA" id="600300100007"> 
+					<isComposedBy>
+					<node label="ECONOMIA GERAL" id="600300100105"> </node>
+					<node label="TEORIA GERAL DA ECONOMIA" id="600300100203"> </node>
+					<node label="HISTORIA DO PENSAMENTO ECONOMICO" id="600300100301"> </node>
+					<node label="HISTORIA ECONOMICA" id="600300100400"> </node>
+					<node label="SISTEMAS ECONOMICOS" id="600300100508"> </node>
+					</isComposedBy>
+				</node>
+				<node label="METODOS QUANTITATIVOS EM ECONOMIA" id="600300200003"> 
+					<isComposedBy>
+					<node label="METODOS E MODELOS MATEMATICOS, ECONOMETRICOS E ESTATISTICOS" id="600300200101"> </node>
+					<node label="ESTATISTICA SOCIO-ECONOMICA" id="600300200200"> </node>
+					<node label="CONTABILIDADE NACIONAL" id="600300200308"> </node>
+					<node label="ECONOMIA MATEMATICA" id="600300200406"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ECONOMIA MONETARIA E FISCAL" id="600300300000"> 
+					<isComposedBy>
+					<node label="TEORIA MONETARIA E FINANCEIRA" id="600300300108"> </node>
+					<node label="INSTITUICOES MONETARIAS E FINANCEIRAS DO BRASIL" id="600300300206"> </node>
+					<node label="FINANCAS PUBLICAS INTERNAS" id="600300300304"> </node>
+					<node label="POLITICA FISCAL DO BRASIL" id="600300300402"> </node>
+					</isComposedBy>
+				</node>
+				<node label="CRESCIMENTO, FLUTUACOES E PLANEJAMENTO ECONOMICO" id="600300400006"> 
+					<isComposedBy>
+					<node label="CRESCIMENTO E DESENVOLVIMENTO ECONOMICO" id="600300400104"> </node>
+					<node label="TEORIA E POLITICA DE PLANEJAMENTO ECONOMICO" id="600300400202"> </node>
+					<node label="FLUTUACOES CICLICAS E PROJECOES ECONOMICAS" id="600300400300"> </node>
+					<node label="INFLACAO" id="600300400409"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ECONOMIA INTERNACIONAL" id="600300500002"> 
+					<isComposedBy>
+					<node label="TEORIA DO COMERCIO INTERNACIONAL" id="600300500100"> </node>
+					<node label="RELACOES DO COMERCIO POLITICA COMERCIAL INTEGRACAO ECONOMICA" id="600300500209"> </node>
+					<node label="BALANCO DE PAGAMENTOS FINANCAS INTERNACIONAIS" id="600300500307"> </node>
+					<node label="INVESTIMENTOS INTERNACIONAIS E AJUDA EXTERNA" id="600300500405"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ECONOMIA DOS RECURSOS HUMANOS" id="600300600009"> 
+					<isComposedBy>
+					<node label="TREINAMENTO E ALOCACAO DE MAO-DE-OBRA OFERTA DE MAO-DE-OBRA E FORCA DE TRABALHO" id="600300600107"> </node>
+					<node label="MERCADO DE TRABALHO POLITICA DO GOVERNO" id="600300600205"> </node>
+					<node label="SINDICATOS, DISSIDIOS COLETIVOS, RELACOES DE EMPREGO (EMPREGADOR/EMPREGADO)" id="600300600303"> </node>
+					<node label="CAPITAL HUMANO" id="600300600401"> </node>
+					<node label="DEMOGRAFIA ECONOMICA" id="600300600500"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ECONOMIA INDUSTRIAL" id="600300700005"> 
+					<isComposedBy>
+					<node label="ORGANIZACAO INDUSTRIAL E ESTUDOS INDUSTRIAIS" id="600300700103"> </node>
+					<node label="MUDANCA TECNOLOGICA" id="600300700201"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ECONOMIA DO BEM-ESTAR SOCIAL" id="600300800001"> 
+					<isComposedBy>
+					<node label="ECONOMIA DOS PROGRAMAS DE BEM-ESTAR SOCIAL" id="600300800100"> </node>
+					<node label="ECONOMIA DO CONSUMIDOR" id="600300800208"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ECONOMIA REGIONAL E URBANA" id="600300900008"> 
+					<isComposedBy>
+					<node label="ECONOMIA REGIONAL" id="600300900106"> </node>
+					<node label="ECONOMIA URBANA" id="600300900204"> </node>
+					<node label="RENDA E TRIBUTACAO" id="600300900302"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ECONOMIAS AGRARIA E DOS RECURSOS NATURAIS" id="600301000006"> 
+					<isComposedBy>
+					<node label="ECONOMIA AGRARIA" id="600301000104"> </node>
+					<node label="ECONOMIA DOS RECURSOS NATURAIS" id="600301000202"> </node>
+					</isComposedBy>
+				</node>
+				</isComposedBy>
+			</node>
+			<node label="ARQUITETURA E URBANISMO" id="600400000005"> 
+				<isComposedBy>
+				<node label="FUNDAMENTOS DE ARQUITETURA E URBANISMO" id="600400100001"> 
+					<isComposedBy>
+					<node label="HISTORIA DA ARQUITETURA E URBANISMO" id="600400100100"> </node>
+					<node label="TEORIA DA ARQUITETURA" id="600400100208"> </node>
+					<node label="HISTORIA DO URBANISMO" id="600400100306"> </node>
+					<node label="TEORIA DO URBANISMO" id="600400100404"> </node>
+					</isComposedBy>
+				</node>
+				<node label="PROJETO DE ARQUITETUTA E URBANISMO" id="600400200008"> 
+					<isComposedBy>
+					<node label="PLANEJAMENTO E PROJETOS DA EDIFICACAO" id="600400200106"> </node>
+					<node label="PLANEJAMENTO E PROJETO DO ESPACO URBANO" id="600400200204"> </node>
+					<node label="PLANEJAMENTO E PROJETO DO EQUIPAMENTO" id="600400200302"> </node>
+					</isComposedBy>
+				</node>
+				<node label="TECNOLOGIA DE ARQUITETURA E URBANISMO" id="600400300004"> 
+					<isComposedBy>
+					<node label="ADEQUACAO AMBIENTAL" id="600400300102"> </node>
+					</isComposedBy>
+				</node>
+				<node label="PAISAGISMO" id="600400400000"> 
+					<isComposedBy>
+					<node label="DESENVOLVIMENTO HISTORICO DO PAISAGISMO" id="600400400109"> </node>
+					<node label="CONCEITUACAO DE PAISAGISMO E METODOLOGIA DO PAISAGISMO" id="600400400207"> </node>
+					<node label="ESTUDOS DE ORGANIZACAO DO ESPACO EXTERIOR" id="600400400305"> </node>
+					<node label="PROJETOS DE ESPACOS LIVRES URBANOS" id="600400400403"> </node>
+					</isComposedBy>
+				</node>
+				</isComposedBy>
+			</node>
+			<node label="PLANEJAMENTO URBANO E REGIONAL" id="600500000000"> 
+				<isComposedBy>
+				<node label="FUNDAMENTOS DO PLANEJAMENTO URBANO E REGIONAL" id="600500100006"> 
+					<isComposedBy>
+					<node label="TEORIA DO PLANEJAMENTO URBANO E REGIONAL" id="600500100104"> </node>
+					<node label="TEORIA DA URBANIZACAO" id="600500100202"> </node>
+					<node label="POLITICA URBANA" id="600500100300"> </node>
+					<node label="HISTORIA URBANA" id="600500100409"> </node>
+					</isComposedBy>
+				</node>
+				<node label="METODOS E TECNICAS DO PLANEJAMENTO URBANO E REGIONAL" id="600500200002"> 
+					<isComposedBy>
+					<node label="INFORMACAO, CADASTRO E MAPEAMENTO" id="600500200100"> </node>
+					<node label="TECNICA DE PREVISAO URBANA E REGIONAL" id="600500200209"> </node>
+					<node label="TECNICAS DE ANALISE E AVALIACAO URBANA E REGIONAL" id="600500200307"> </node>
+					<node label="TECNICAS DE PLANEJAMENTO E PROJETO URBANOS E REGIONAIS" id="600500200405"> </node>
+					</isComposedBy>
+				</node>
+				<node label="SERVICOS URBANOS E REGIONAIS" id="600500300009"> 
+					<isComposedBy>
+					<node label="ADMINISTRACAO MUNICIPAL E URBANA" id="600500300107"> </node>
+					<node label="ESTUDOS DA HABITACAO" id="600500300205"> </node>
+					<node label="ASPECTOS SOCIAIS DO PLANEJAMENTO URBANO E REGIONAL" id="600500300303"> </node>
+					<node label="ASPECTOS ECONOMICOS DO PLANEJAMENTO URBANO E REGIONAL" id="600500300401"> </node>
+					<node label="ASPECTOS FISICO-AMBIENTAIS DO PLANEJAMENTO URBANO E REGIONAL" id="600500300500"> </node>
+					<node label="SERVICOS COMUNITARIOS" id="600500300608"> </node>
+					<node label="INFRA-ESTRUTURAS URBANAS E REGIONAIS" id="600500300706"> </node>
+					<node label="TRANSPORTE E TRAFEGO URBANO E REGIONAL" id="600500300804"> </node>
+					<node label="LEGISLACAO URBANA E REGIONAL" id="600500300902"> </node>
+					</isComposedBy>
+				</node>
+				</isComposedBy>
+			</node>
+			<node label="DEMOGRAFIA" id="600600000004"> 
+				<isComposedBy>
+				<node label="DISTRIBUICAO ESPACIAL" id="600600100000"> 
+					<isComposedBy>
+					<node label="DISTRIBUICAO ESPACIAL GERAL" id="600600100109"> </node>
+					<node label="DISTRIBUICAO ESPACIAL URBANA" id="600600100207"> </node>
+					<node label="DISTRIBUICAO ESPACIAL RURAL" id="600600100305"> </node>
+					</isComposedBy>
+				</node>
+				<node label="TENDENCIA POPULACIONAL" id="600600200007"> 
+					<isComposedBy>
+					<node label="TENDENCIAS PASSADAS" id="600600200105"> </node>
+					<node label="TAXAS E ESTIMATIVAS CORRENTES" id="600600200203"> </node>
+					<node label="PROJECOES" id="600600200301"> </node>
+					</isComposedBy>
+				</node>
+				<node label="COMPONENTES DA DINAMICA DEMOGRAFICA" id="600600300003"> 
+					<isComposedBy>
+					<node label="FECUNDIDADE" id="600600300101"> </node>
+					<node label="MORTALIDADE" id="600600300200"> </node>
+					<node label="MIGRACAO" id="600600300308"> </node>
+					</isComposedBy>
+				</node>
+				<node label="NUPCIALIDADE E FAMILIA" id="600600400000"> 
+					<isComposedBy>
+					<node label="CASAMENTO E DIVORCIO" id="600600400108"> </node>
+					<node label="FAMILIA E REPRODUCAO" id="600600400206"> </node>
+					</isComposedBy>
+				</node>
+				<node label="DEMOGRAFIA HISTORICA" id="600600500006"> 
+					<isComposedBy>
+					<node label="DISTRIBUICAO ESPACIAL" id="600600500104"> </node>
+					<node label="NATALIDADE, MORTALIDADE, MIGRACAO" id="600600500202"> </node>
+					<node label="NUPCIALIDADE E FAMILIA" id="600600500300"> </node>
+					<node label="METODOS E TECNICAS DE DEMOGRAFIA HISTORICA" id="600600500409"> </node>
+					</isComposedBy>
+				</node>
+				<node label="POLITICA PUBLICA E POPULACAO" id="600600600002"> 
+					<isComposedBy>
+					<node label="POLITICA POPULACIONAL" id="600600600100"> </node>
+					<node label="POLITICAS DE REDISTRIBUICAO DE POPULACAO" id="600600600209"> </node>
+					<node label="POLITICAS DE PLANEJAMENTO FAMILIAR" id="600600600307"> </node>
+					</isComposedBy>
+				</node>
+				<node label="FONTES DE DADOS DEMOGRAFICOS" id="600600700009"> </node>
+				</isComposedBy>
+			</node>
+			<node label="CIENCIA DA INFORMACAO" id="600700000009"> 
+				<isComposedBy>
+				<node label="TEORIA DA INFORMACAO" id="600700100005"> 
+					<isComposedBy>
+					<node label="TEORIA GERAL DA INFORMACAO" id="600700100103"> </node>
+					<node label="PROCESSOS DA COMUNICACAO" id="600700100201"> </node>
+					<node label="REPRESENTACAO DA INFORMACAO" id="600700100300"> </node>
+					</isComposedBy>
+				</node>
+				<node label="BIBLIOTECONOMIA" id="600700200001"> 
+					<isComposedBy>
+					<node label="TEORIA DA CLASSIFICACAO" id="600700200100"> </node>
+					<node label="METODOS QUANTITATIVOS. BIBLIOMETRIA" id="600700200208"> </node>
+					<node label="TECNICAS DE RECUPERACAO DE INFORMACAO" id="600700200306"> </node>
+					<node label="PROCESSOS DE DISSEMINACAO DA INFORMACAO" id="600700200404"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ARQUIVOLOGIA" id="600700300008"> 
+					<isComposedBy>
+					<node label="ORGANIZACAO DE ARQUIVOS" id="600700300106"> </node>
+					</isComposedBy>
+				</node>
+				</isComposedBy>
+			</node>
+			<node label="MUSEOLOGIA" id="600800000003"> </node>
+			<node label="COMUNICACAO" id="600900000008"> 
+				<isComposedBy>
+				<node label="TEORIA DA COMUNICACAO" id="600900100004"> </node>
+				<node label="JORNALISMO E EDITORACAO" id="600900200000"> 
+					<isComposedBy>
+					<node label="TEORIA E ETICA DO JORNALISMO" id="600900200109"> </node>
+					<node label="ORGANIZACAO EDITORIAL DE JORNAIS" id="600900200207"> </node>
+					<node label="ORGANIZACAO COMERCIAL DE JORNAIS" id="600900200305"> </node>
+					<node label="JORNALISMO ESPECIALIZADO (COMUNITARIO, RURAL, EMPRESARIAL, CIENTIFICO)" id="600900200403"> </node>
+					</isComposedBy>
+				</node>
+				<node label="RADIO E TELEVISAO" id="600900300007"> 
+					<isComposedBy>
+					<node label="RADIODIFUSAO" id="600900300105"> </node>
+					<node label="VIDEODIFUSAO" id="600900300203"> </node>
+					</isComposedBy>
+				</node>
+				<node label="RELACOES PUBLICAS E PROPAGANDA" id="600900400003"> </node>
+				<node label="COMUNICACAO VISUAL" id="600900500000"> </node>
+				</isComposedBy>
+			</node>
+			<node label="SERVICO SOCIAL" id="601000000000"> 
+				<isComposedBy>
+				<node label="FUNDAMENTOS DO SERVICO SOCIAL" id="601000100007"> </node>
+				<node label="SERVICO SOCIAL APLICADO" id="601000200003"> 
+					<isComposedBy>
+					<node label="SERVICO SOCIAL DO TRABALHO" id="601000200101"> </node>
+					<node label="SERVICO SOCIAL DA EDUCACAO" id="601000200200"> </node>
+					<node label="SERVICO SOCIAL DO MENOR" id="601000200308"> </node>
+					<node label="SERVICO SOCIAL DA SAUDE" id="601000200406"> </node>
+					<node label="SERVICO SOCIAL DA HABITACAO" id="601000200504"> </node>
+					</isComposedBy>
+				</node>
+				</isComposedBy>
+			</node>
+			<node label="ECONOMIA DOMESTICA" id="601100000005"> </node>
+			<node label="DESENHO INDUSTRIAL" id="601200000000"> 
+				<isComposedBy>
+				<node label="PROGRAMACAO VISUAL" id="601200100006"> </node>
+				<node label="DESENHO DE PRODUTO" id="601200200002"> </node>
+				</isComposedBy>
+			</node>
+			<node label="TURISMO" id="601300000004"> </node>
+		</isComposedBy>
+		</node>
+		<node label="CIENCIAS HUMANAS" id="700000000000"> 
+			<isComposedBy>
+			<node label="FILOSOFIA" id="700100000004"> 
+				<isComposedBy>
+				<node label="HISTORIA DA FILOSOFIA" id="700100100000"> </node>
+				<node label="METAFISICA" id="700100200007"> </node>
+				<node label="LOGICA" id="700100300003"> </node>
+				<node label="ETICA" id="700100400000"> </node>
+				<node label="EPISTEMOLOGIA" id="700100500006"> </node>
+				<node label="FILOSOFIA BRASILEIRA" id="700100600002"> </node>
+				</isComposedBy>
+			</node>
+			<node label="SOCIOLOGIA" id="700200000009"> 
+				<isComposedBy>
+				<node label="FUNDAMENTOS DA SOCIOLOGIA" id="700200100005"> 
+					<isComposedBy>
+					<node label="TEORIA SOCIOLOGICA" id="700200100103"> </node>
+					<node label="HISTORIA DA SOCIOLOGIA" id="700200100201"> </node>
+					</isComposedBy>
+				</node>
+				<node label="SOCIOLOGIA DO CONHECIMENTO" id="700200200001"> </node>
+				<node label="SOCIOLOGIA DO DESENVOLVIMENTO" id="700200300008"> </node>
+				<node label="SOCIOLOGIA URBANA" id="700200400004"> </node>
+				<node label="SOCIOLOGIA RURAL" id="700200500000"> </node>
+				<node label="SOCIOLOGIA DA SAUDE" id="700200600007"> </node>
+				<node label="OUTRAS SOCIOLOGIAS ESPECIFICAS" id="700200700003"> </node>
+				</isComposedBy>
+			</node>
+			<node label="ANTROPOLOGIA" id="700300000003"> 
+				<isComposedBy>
+				<node label="TEORIA ANTROPOLOGICA" id="700300100000"> </node>
+				<node label="ETNOLOGIA INDIGENA" id="700300200006"> </node>
+				<node label="ANTROPOLOGIA URBANA" id="700300300002"> </node>
+				<node label="ANTROPOLOGIA RURAL" id="700300400009"> </node>
+				<node label="ANTROPOLOGIA DAS POPULACOES AFRO-BRASILEIRAS" id="700300500005"> </node>
+				</isComposedBy>
+			</node>
+			<node label="ARQUEOLOGIA" id="700400000008"> 
+				<isComposedBy>
+				<node label="TEORIA E METODO EM ARQUEOLOGIA" id="700400100004"> </node>
+				<node label="ARQUEOLOGIA PRE-HISTORICA" id="700400200000"> </node>
+				<node label="ARQUEOLOGIA HISTORICA" id="700400300007"> </node>
+				</isComposedBy>
+			</node>
+			<node label="HISTORIA" id="700500000002"> 
+				<isComposedBy>
+				<node label="TEORIA E FILOSOFIA DA HISTORIA" id="700500100009"> </node>
+				<node label="HISTORIA ANTIGA E MEDIEVAL" id="700500200005"> </node>
+				<node label="HISTORIA MODERNA E CONTEMPORANEA" id="700500300001"> </node>
+				<node label="HISTORIA DA AMERICA" id="700500400008"> 
+					<isComposedBy>
+					<node label="HISTORIA DOS ESTADOS UNIDOS" id="700500400106"> </node>
+					<node label="HISTORIA LATINO-AMERICANA" id="700500400204"> </node>
+					</isComposedBy>
+				</node>
+				<node label="HISTORIA DO BRASIL" id="700500500004"> 
+					<isComposedBy>
+					<node label="HISTORIA DO BRASIL COLONIA" id="700500500102"> </node>
+					<node label="HISTORIA DO BRASIL IMPERIO" id="700500500200"> </node>
+					<node label="HISTORIA DO BRASIL REPUBLICA" id="700500500309"> </node>
+					<node label="HISTORIA REGIONAL DO BRASIL" id="700500500407"> </node>
+					</isComposedBy>
+				</node>
+				<node label="HISTORIA DAS CIENCIAS" id="700500600000"> </node>
+				</isComposedBy>
+			</node>
+			<node label="GEOGRAFIA" id="700600000007"> 
+				<isComposedBy>
+				<node label="GEOGRAFIA HUMANA" id="700600100003"> 
+					<isComposedBy>
+					<node label="GEOGRAFIA DA POPULACAO" id="700600100101"> </node>
+					<node label="GEOGRAFIA AGRARIA" id="700600100200"> </node>
+					<node label="GEOGRAFIA URBANA" id="700600100308"> </node>
+					<node label="GEOGRAFIA ECONOMICA" id="700600100406"> </node>
+					<node label="GEOGRAFIA POLITICA" id="700600100504"> </node>
+					</isComposedBy>
+				</node>
+				<node label="GEOGRAFIA REGIONAL" id="700600200000"> 
+					<isComposedBy>
+					<node label="TEORIA DO DESENVOLVIMENTO REGIONAL" id="700600200108"> </node>
+					<node label="REGIONALIZACAO" id="700600200206"> </node>
+					<node label="ANALISE REGIONAL" id="700600200304"> </node>
+					</isComposedBy>
+				</node>
+				</isComposedBy>
+			</node>
+			<node label="PSICOLOGIA" id="700700000001"> 
+				<isComposedBy>
+				<node label="FUNDAMENTOS E MEDIDAS DA PSICOLOGIA" id="700700100008"> 
+					<isComposedBy>
+					<node label="HISTORIA, TEORIAS E SISTEMAS EM PSICOLOGIA" id="700700100106"> </node>
+					<node label="METODOLOGIA, INSTRUMENTACAO E EQUIPAMENTO EM PSICOLOGIA" id="700700100204"> </node>
+					<node label="CONSTRUCAO E VALIDADE DE TESTES, ESCALAS E OUTRAS MEDIDAS PSICOLOGICAS" id="700700100302"> </node>
+					<node label="TECNICAS DE PROCESSAMENTO ESTATISTICO, MATEMATICO E COMPUTACIONAL EM PSICOLOGIA" id="700700100400"> </node>
+					</isComposedBy>
+				</node>
+				<node label="PSICOLOGIA EXPERIMENTAL" id="700700200004"> 
+					<isComposedBy>
+					<node label="PROCESSOS PERCEPTUAIS E MOTORES" id="700700200102"> </node>
+					<node label="PROCESSOS DE APRENDIZAGEM, MEMORIA E MOTIVACAO" id="700700200200"> </node>
+					<node label="PROCESSOS COGNITIVOS E ATENCIONAIS" id="700700200309"> </node>
+					<node label="ESTADOS SUBJETIVOS E EMOCAO" id="700700200407"> </node>
+					</isComposedBy>
+				</node>
+				<node label="PSICOLOGIA FISIOLOGICA" id="700700300000"> 
+					<isComposedBy>
+					<node label="NEUROLOGIA, ELETROFISIOLOGIA E COMPORTAMENTO" id="700700300109"> </node>
+					<node label="PROCESSOS PSICO-FISIOLOGICOS" id="700700300207"> </node>
+					<node label="ESTIMULACAO ELETRICA E COM DROGAS COMPORTAMENTO" id="700700300305"> </node>
+					<node label="PSICOBIOLOGIA" id="700700300403"> </node>
+					</isComposedBy>
+				</node>
+				<node label="PSICOLOGIA COMPARATIVA" id="700700400007"> 
+					<isComposedBy>
+					<node label="ESTUDOS NATURALISTICOS DO COMPORTAMENTO ANIMAL" id="700700400105"> </node>
+					<node label="MECANISMOS INSTINTIVOS E PROCESSOS SOCIAIS EM ANIMAIS" id="700700400203"> </node>
+					</isComposedBy>
+				</node>
+				<node label="PSICOLOGIA SOCIAL" id="700700500003"> 
+					<isComposedBy>
+					<node label="RELACOES INTERPESSOAIS" id="700700500101"> </node>
+					<node label="PROCESSOS GRUPAIS E DE COMUNICACAO" id="700700500200"> </node>
+					<node label="PAPEIS E ESTRUTURAS SOCIAIS INDIVIDUO" id="700700500308"> </node>
+					</isComposedBy>
+				</node>
+				<node label="PSICOLOGIA COGNITIVA" id="700700600000"> </node>
+				<node label="PSICOLOGIA DO DESENVOLVIMENTO HUMANO" id="700700700006"> 
+					<isComposedBy>
+					<node label="PROCESSOS PERCEPTUAIS E COGNITIVOS DESENVOLVIMENTO" id="700700700104"> </node>
+					<node label="DESENVOLVIMENTO SOCIAL E DA PERSONALIDADE" id="700700700202"> </node>
+					</isComposedBy>
+				</node>
+				<node label="PSICOLOGIA DO ENSINO E DA APRENDIZAGEM" id="700700800002"> 
+					<isComposedBy>
+					<node label="PLANEJAMENTO INSTITUCIONAL" id="700700800100"> </node>
+					<node label="PROGRAMACAO DE CONDICOES DE ENSINO" id="700700800209"> </node>
+					<node label="TREINAMENTO DE PESSOAL" id="700700800307"> </node>
+					<node label="APRENDIZAGEM E DESEMPENHO ACADEMICOS" id="700700800405"> </node>
+					<node label="ENSINO E APRENDIZAGEM NA SALA DE AULA" id="700700800503"> </node>
+					</isComposedBy>
+				</node>
+				<node label="PSICOLOGIA DO TRABALHO E ORGANIZACIONAL" id="700700900009"> 
+					<isComposedBy>
+					<node label="ANALISE INSTITUCIONAL" id="700700900107"> </node>
+					<node label="RECRUTAMENTO E SELECAO DE PESSOAL" id="700700900205"> </node>
+					<node label="TREINAMENTO E AVALIACAO" id="700700900303"> </node>
+					<node label="FATORES HUMANOS NO TRABALHO" id="700700900401"> </node>
+					<node label="PLANEJAMENTO AMBIENTAL E COMPORTAMENTO HUMANO" id="700700900500"> </node>
+					</isComposedBy>
+				</node>
+				<node label="TRATAMENTO E PREVENCAO PSICOLOGICA" id="700701000007"> 
+					<isComposedBy>
+					<node label="INTERVENCAO TERAPEUTICA" id="700701000105"> </node>
+					<node label="PROGRAMAS DE ATENDIMENTO COMUNITARIO" id="700701000203"> </node>
+					<node label="TREINAMENTO E REABILITACAO" id="700701000301"> </node>
+					<node label="DESVIOS DA CONDUTA" id="700701000400"> </node>
+					<node label="DISTURBIOS DA LINGUAGEM" id="700701000508"> </node>
+					<node label="DISTURBIOS PSICOSSOMATICOS" id="700701000606"> </node>
+					</isComposedBy>
+				</node>
+				</isComposedBy>
+			</node>
+			<node label="EDUCACAO" id="700800000006"> 
+				<isComposedBy>
+				<node label="FUNDAMENTOS DA EDUCACAO" id="700800100002"> 
+					<isComposedBy>
+					<node label="FILOSOFIA DA EDUCACAO" id="700800100100"> </node>
+					<node label="HISTORIA DA EDUCACAO" id="700800100209"> </node>
+					<node label="SOCIOLOGIA DA EDUCACAO" id="700800100307"> </node>
+					<node label="ANTROPOLOGIA EDUCACIONAL" id="700800100405"> </node>
+					<node label="ECONOMIA DA EDUCACAO" id="700800100503"> </node>
+					<node label="PSICOLOGIA EDUCACIONAL" id="700800100601"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ADMINISTRACAO EDUCACIONAL" id="700800200009"> 
+					<isComposedBy>
+					<node label="ADMINISTRACAO DE SISTEMAS EDUCACIONAIS" id="700800200107"> </node>
+					<node label="ADMINISTRACAO DE UNIDADES EDUCATIVAS" id="700800200205"> </node>
+					</isComposedBy>
+				</node>
+				<node label="PLANEJAMENTO E AVALIACAO EDUCACIONAL" id="700800300005"> 
+					<isComposedBy>
+					<node label="POLITICA EDUCACIONAL" id="700800300103"> </node>
+					<node label="PLANEJAMENTO EDUCACIONAL" id="700800300201"> </node>
+					<node label="AVALIACAO DE SISTEMAS, INSTITUICOES, PLANOS E PROGRAMAS EDUCACIONAIS" id="700800300300"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ENSINO-APRENDIZAGEM" id="700800400001"> 
+					<isComposedBy>
+					<node label="TEORIAS DA INSTRUCAO" id="700800400100"> </node>
+					<node label="METODOS E TECNICAS DE ENSINO" id="700800400208"> </node>
+					<node label="TECNOLOGIA EDUCACIONAL" id="700800400306"> </node>
+					<node label="AVALIACAO DA APRENDIZAGEM" id="700800400404"> </node>
+					</isComposedBy>
+				</node>
+				<node label="CURRICULO" id="700800500008"> 
+					<isComposedBy>
+					<node label="TEORIA GERAL DE PLANEJAMENTO E DESENVOLVIMENTO CURRICULAR" id="700800500106"> </node>
+					<node label="CURRICULOS ESPECIFICOS PARA NIVEIS E TIPOS DE EDUCACAO" id="700800500204"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ORIENTACAO E ACONSELHAMENTO" id="700800600004"> 
+					<isComposedBy>
+					<node label="ORIENTACAO EDUCACIONAL" id="700800600102"> </node>
+					<node label="ORIENTACAO VOCACIONAL" id="700800600200"> </node>
+					</isComposedBy>
+				</node>
+				<node label="TOPICOS ESPECIFICOS DE EDUCACAO" id="700800700000"> 
+					<isComposedBy>
+					<node label="EDUCACAO DE ADULTOS" id="700800700109"> </node>
+					<node label="EDUCACAO PERMANENTE" id="700800700207"> </node>
+					<node label="EDUCACAO RURAL" id="700800700305"> </node>
+					<node label="EDUCACAO EM PERIFERIAS URBANAS" id="700800700403"> </node>
+					<node label="EDUCACAO ESPECIAL" id="700800700501"> </node>
+					<node label="EDUCACAO PRE-ESCOLAR" id="700800700600"> </node>
+					<node label="ENSINO PROFISSIONALIZANTE" id="700800700708"> </node>
+					</isComposedBy>
+				</node>
+				</isComposedBy>
+			</node>
+			<node label="CIENCIA POLITICA" id="700900000000"> 
+				<isComposedBy>
+				<node label="TEORIA POLITICA" id="700900100007"> 
+					<isComposedBy>
+					<node label="TEORIA POLITICA CLASSICA" id="700900100105"> </node>
+					<node label="TEORIA POLITICA MEDIEVAL" id="700900100203"> </node>
+					<node label="TEORIA POLITICA MODERNA" id="700900100301"> </node>
+					<node label="TEORIA POLITICA CONTEMPORANEA" id="700900100400"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ESTADO E GOVERNO" id="700900200003"> 
+					<isComposedBy>
+					<node label="ESTRUTURA E TRANSFORMACAO DO ESTADO" id="700900200101"> </node>
+					<node label="SISTEMAS GOVERNAMENTAIS COMPARADOS" id="700900200200"> </node>
+					<node label="RELACOES INTERGOVERNAMENTAIS" id="700900200308"> </node>
+					<node label="ESTUDOS DO PODER LOCAL" id="700900200406"> </node>
+					<node label="INSTITUICOES GOVERNAMENTAIS ESPECIFICAS" id="700900200504"> </node>
+					</isComposedBy>
+				</node>
+				<node label="COMPORTAMENTO POLITICO" id="700900300000"> 
+					<isComposedBy>
+					<node label="ESTUDOS ELEITORAIS E PARTIDOS POLITICOS" id="700900300108"> </node>
+					<node label="ATITUDE E IDEOLOGIAS POLITICAS" id="700900300206"> </node>
+					<node label="CONFLITOS E COALIZOES POLITICAS" id="700900300304"> </node>
+					<node label="COMPORTAMENTO LEGISLATIVO" id="700900300402"> </node>
+					<node label="CLASSES SOCIAIS E GRUPOS DE INTERESSE" id="700900300500"> </node>
+					</isComposedBy>
+				</node>
+				<node label="POLITICAS PUBLICAS" id="700900400006"> 
+					<isComposedBy>
+					<node label="ANALISE DO PROCESSO DECISORIO" id="700900400104"> </node>
+					<node label="ANALISE INSTITUCIONAL" id="700900400202"> </node>
+					<node label="TECNICAS DE ANTECIPACAO" id="700900400300"> </node>
+					</isComposedBy>
+				</node>
+				<node label="POLITICA INTERNACIONAL" id="700900500002"> 
+					<isComposedBy>
+					<node label="POLITICA EXTERNA DO BRASIL" id="700900500100"> </node>
+					<node label="ORGANIZACOES INTERNACIONAIS" id="700900500209"> </node>
+					<node label="INTEGRACAO INTERNACIONAL, CONFLITO, GUERRA E PAZ" id="700900500307"> </node>
+					<node label="RELACOES INTERNACIONAIS, BILATERAIS E MULTILATERAIS" id="700900500405"> </node>
+					</isComposedBy>
+				</node>
+				</isComposedBy>
+			</node>
+			<node label="TEOLOGIA" id="701000000003"> 
+				<isComposedBy>
+				<node label="HISTORIA DA TEOLOGIA" id="701000100000"> </node>
+				<node label="TEOLOGIA MORAL" id="701000200006"> </node>
+				<node label="TEOLOGIA SISTEMATICA" id="701000300002"> </node>
+				<node label="TEOLOGIA PASTORAL" id="701000400009"> </node>
+				</isComposedBy>
+			</node>
+			</isComposedBy>
+		</node>
+		<node label="LINGUISTICA, LETRAS E ARTES" id="800000000002"> 
+			<isComposedBy>
+			<node label="LINGUISTICA" id="800100000007"> 
+				<isComposedBy>
+				<node label="TEORIA E ANALISE LINGUISTICA" id="800100100003"> </node>
+				<node label="FISIOLOGIA DA LINGUAGEM" id="800100200000"> </node>
+				<node label="LINGUISTICA HISTORICA" id="800100300006"> </node>
+				<node label="SOCIOLINGUISTICA E DIALETOLOGIA" id="800100400002"> </node>
+				<node label="PSICOLINGUISTICA" id="800100500009"> </node>
+				<node label="LINGUISTICA APLICADA" id="800100600005"> </node>
+				</isComposedBy>
+			</node>
+			<node label="LETRAS" id="800200000001"> 
+				<isComposedBy>
+				<node label="LINGUA PORTUGUESA" id="800200100008"> </node>
+				<node label="LINGUAS ESTRANGEIRAS MODERNAS" id="800200200004"> </node>
+				<node label="LINGUAS CLASSICAS" id="800200300000"> </node>
+				<node label="LINGUAS INDIGENAS" id="800200400007"> </node>
+				<node label="TEORIA LITERARIA" id="800200500003"> </node>
+				<node label="LITERATURA BRASILEIRA" id="800200600000"> </node>
+				<node label="OUTRAS LITERATURAS VERNACULAS" id="800200700006"> </node>
+				<node label="LITERATURAS ESTRANGEIRAS MODERNAS" id="800200800002"> </node>
+				<node label="LITERATURAS CLASSICAS" id="800200900009"> </node>
+				<node label="LITERATURA COMPARADA" id="800201000007"> </node>
+				</isComposedBy>
+			</node>
+			<node label="ARTES" id="800300000006"> 
+				<isComposedBy>
+				<node label="FUNDAMENTOS E CRITICA DAS ARTES" id="800300100002"> 
+					<isComposedBy>
+					<node label="TEORIA DA ARTE" id="800300100100"> </node>
+					<node label="HISTORIA DA ARTE" id="800300100209"> </node>
+					<node label="CRITICA DA ARTE" id="800300100307"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ARTES PLASTICAS" id="800300200009"> 
+					<isComposedBy>
+					<node label="PINTURA" id="800300200107"> </node>
+					<node label="DESENHO" id="800300200205"> </node>
+					<node label="GRAVURA" id="800300200303"> </node>
+					<node label="ESCULTURA" id="800300200401"> </node>
+					<node label="CERAMICA" id="800300200500"> </node>
+					<node label="TECELAGEM" id="800300200608"> </node>
+					</isComposedBy>
+				</node>
+				<node label="MUSICA" id="800300300005"> 
+					<isComposedBy>
+					<node label="REGENCIA" id="800300300103"> </node>
+					<node label="INSTRUMENTACAO MUSICAL" id="800300300201"> </node>
+					<node label="COMPOSICAO MUSICAL" id="800300300300"> </node>
+					<node label="CANTO" id="800300300408"> </node>
+					</isComposedBy>
+				</node>
+				<node label="DANCA" id="800300400001"> 
+					<isComposedBy>
+					<node label="EXECUCAO DA DANCA" id="800300400100"> </node>
+					<node label="COREOGRAFIA" id="800300400208"> </node>
+					</isComposedBy>
+				</node>
+				<node label="TEATRO" id="800300500008"> 
+					<isComposedBy>
+					<node label="DRAMATURGIA" id="800300500106"> </node>
+					<node label="DIRECAO TEATRAL" id="800300500204"> </node>
+					<node label="CENOGRAFIA" id="800300500302"> </node>
+					<node label="INTERPRETACAO TEATRAL" id="800300500400"> </node>
+					</isComposedBy>
+				</node>
+				<node label="OPERA" id="800300600004"> </node>
+				<node label="FOTOGRAFIA" id="800300700000"> </node>
+				<node label="CINEMA" id="800300800007"> 
+					<isComposedBy>
+					<node label="ADMINISTRACAO E PRODUCAO DE FILMES" id="800300800105"> </node>
+					<node label="ROTEIRO E DIRECAO CINEMATOGRAFICOS" id="800300800203"> </node>
+					<node label="TECNICAS DE REGISTRO E PROCESSAMENTO DE FILMES" id="800300800301"> </node>
+					<node label="INTERPRETACAO CINEMATOGRAFICA" id="800300800400"> </node>
+					</isComposedBy>
+				</node>
+				<node label="ARTES DO VIDEO" id="800300900003"> </node>
+				<node label="EDUCACAO ARTISTICA" id="800301000001"> </node>
+				</isComposedBy>
+			</node>
+			</isComposedBy>
+		</node>
+		<node label="OUTROS" id="900000000005"> 
+			<isComposedBy>
+			<node label="ADMINISTRACAO HOSPITALAR" id="900100000000"> </node>
+			<node label="ADMINISTRACAO RURAL" id="900200000004"> </node>
+			<node label="CARREIRA MILITAR" id="900300000009"> </node>
+			<node label="CARREIRA RELIGIOSA" id="900400000003"> </node>
+			<node label="CIENCIAS" id="900500000008"> </node>
+			<node label="BIOMEDICINA" id="900600000002"> </node>
+			<node label="CIENCIAS ATUARIAIS" id="900700000007"> </node>
+			<node label="CIENCIAS SOCIAIS" id="900800000001"> </node>
+			<node label="DECORACAO" id="900900000006"> </node>
+			<node label="DESENHO DE MODA" id="901000000009"> </node>
+			<node label="DESENHO DE PROJETOS" id="901100000003"> </node>
+			<node label="DIPLOMACIA" id="901200000008"> </node>
+			<node label="ENGENHARIA DE AGRIMENSURA" id="901300000002"> </node>
+			<node label="ENGENHARIA CARTOGRAFICA" id="901400000007"> </node>
+			<node label="ENGENHARIA DE ARMAMENTOS" id="901500000001"> </node>
+			<node label="ENGENHARIA MECATRONICA" id="901600000006"> </node>
+			<node label="ENGENHARIA TEXTIL" id="901700000000"> </node>
+			<node label="ESTUDOS SOCIAIS" id="901800000005"> </node>
+			<node label="HISTORIA NATURAL" id="901900000000"> </node>
+			<node label="QUIMICA INDUSTRIAL" id="902000000002"> </node>
+			<node label="RELACOES INTERNACIONAIS" id="902100000007"> </node>
+			<node label="RELACOES PUBLICAS" id="902200000001"> </node>
+			<node label="SECRETARIADO EXECUTIVO" id="902300000006"> </node>
+			</isComposedBy>
+		</node>
+	</isComposedBy>
+</node>
