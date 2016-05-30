@@ -30,6 +30,12 @@ public class ItemMetadataImportFillerConfiguration {
 		
 		private Integer visibility;
 		
+		private boolean formatAsDate;
+		
+		public void setFormatAsDate(boolean isDate) {
+			this.formatAsDate = isDate;
+		}
+
 		public String getShortName() {
 			return shortName;
 		}
@@ -47,6 +53,9 @@ public class ItemMetadataImportFillerConfiguration {
 		}
 		public void setVisibility(Integer visibility){
 			this.visibility = visibility;
+		}
+		public boolean formatAsDate() {
+			return formatAsDate;
 		}
 	}
 

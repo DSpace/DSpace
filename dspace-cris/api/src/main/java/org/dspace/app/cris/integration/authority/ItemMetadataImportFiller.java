@@ -7,6 +7,9 @@
  */
 package org.dspace.app.cris.integration.authority;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -83,32 +86,18 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller {
 					Metadatum[] inputs = item.getMetadataByMetadataString(mdInput);
 					if (details.isUseAll()) {
 						for (Metadatum value : inputs) {
-							if (value.authority != null) {
-								ACrisObject entityByCrisId = applicationService.getEntityByCrisId(value.authority);
-								if (!containsValue(props, entityByCrisId)) {
-									ResearcherPageUtils.buildGenericValue(crisObject, entityByCrisId, prefix + details.getShortName(), details.getVisibility());
-								}
-							}
-							else {
-								if (!containsValue(props, value.value)) {
-									ResearcherPageUtils.buildTextValue(crisObject, value.value, prefix + details.getShortName(), details.getVisibility());
-								}
+							Object dcvalue = buildGenericValue(context, item, value, details);
+							if (!containsValue(props, dcvalue)) {
+								ResearcherPageUtils.buildGenericValue(crisObject, dcvalue, prefix + details.getShortName(), details.getVisibility());
 							}
 						}
 					}
 					else {
 						try {
 							Metadatum value = inputs[idx];
-							if (value.authority != null) {
-								ACrisObject entityByCrisId = applicationService.getEntityByCrisId(value.authority);
-								if (!containsValue(props, entityByCrisId)) {
-									ResearcherPageUtils.buildGenericValue(crisObject, entityByCrisId, prefix + details.getShortName(), details.getVisibility());
-								}
-							}
-							else {
-								if (!containsValue(props, value.value)) {
-									ResearcherPageUtils.buildTextValue(crisObject, value.value, prefix + details.getShortName(), details.getVisibility());
-								}
+							Object dcvalue = buildGenericValue(context, item, value, details);
+							if (!containsValue(props, dcvalue)) {
+								ResearcherPageUtils.buildGenericValue(crisObject, dcvalue, prefix + details.getShortName(), details.getVisibility());
 							}
 						}
 						catch (ArrayIndexOutOfBoundsException ex) {
@@ -121,9 +110,36 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller {
 		}
 	}
 	
+	private Object buildGenericValue(Context context, Item item, Metadatum value, MappingDetails details) {
+		Object dcvalue = value.value;
+		if (details.formatAsDate()) {
+			SimpleDateFormat sdf;
+			if (value.value.length() == 4) {
+				sdf = new SimpleDateFormat("yyyy");
+			}
+			else if (value.value.length() == 7) {
+				sdf = new SimpleDateFormat("yyyy-MM");
+			} 
+			else {
+				sdf = new SimpleDateFormat("yyyy-MM-dd");
+			}
+			try {
+				dcvalue = sdf.parse(value.value);
+			} catch (ParseException e) {
+				log.warn(LogManager.getHeader(context, "fillRecord",
+						"Mangled date value " + value.value + " item_id=" + item.getID()), e);
+				dcvalue = null;
+			}
+		}
+		else if (value.authority != null) {
+			dcvalue = applicationService.getEntityByCrisId(value.authority);
+		}
+		return dcvalue;
+	}
+
 	private boolean containsValue(List<? extends Property> props, Object val) {
 		for (Property p : props) {
-			if (p.getValue().getReal().equals(val)) {
+			if (p.getValue().getObject().equals(val)) {
 				return true;
 			}
 		}

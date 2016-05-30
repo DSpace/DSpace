@@ -624,7 +624,9 @@ return decorator.generateDisplayValue(alternativeName, rp);
 	}
 
 	public static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void buildGenericValue(ACrisObject<P, TP, NP, NTP, ACNO, ATNO> ro, Object valueToSet, String pdefKey, Integer visibility) {
-
+		if (valueToSet == null) {
+			return;
+		}
 		TP pdef = applicationService.findPropertiesDefinitionByShortName(ro.getClassPropertiesDefinition(), pdefKey);
         if (pdef == null) {
         	log.warn("Property "+pdefKey+ " not found");
