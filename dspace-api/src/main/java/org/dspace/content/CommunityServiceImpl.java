@@ -398,15 +398,16 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // Check authorisation
         authorizeService.authorizeAction(context, community, Constants.REMOVE);
 
-        community.removeCollection(collection);
         ArrayList<String> removedIdentifiers = collectionService.getIdentifiers(context, collection);
         String removedHandle = collection.getHandle();
         UUID removedId = collection.getID();
 
-
-        collection.removeCommunity(community);
-        if(CollectionUtils.isEmpty(collection.getCommunities())){
+        if(collection.getCommunities().size() == 1)
+        {
             collectionService.delete(context, collection);
+        }else{
+            community.removeCollection(collection);
+            collection.removeCommunity(community);
         }
 
         log.info(LogManager.getHeader(context, "remove_collection",
