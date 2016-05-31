@@ -1524,8 +1524,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     public String locationToName(Context context, String field, String value) throws SQLException {
         if("location.comm".equals(field) || "location.coll".equals(field))
         {
-            int type = field.equals("location.comm") ? Constants.COMMUNITY : Constants.COLLECTION;
-            DSpaceObject commColl = contentServiceFactory.getDSpaceObjectService(type).find(context, UUID.fromString(value));
+            int type = ("location.comm").equals(field) ? Constants.COMMUNITY : Constants.COLLECTION;
+            DSpaceObject commColl = null;
+            if (StringUtils.isNotBlank(value))
+            {
+                commColl = contentServiceFactory.getDSpaceObjectService(type).find(context, UUID.fromString(value));
+            }
             if(commColl != null)
             {
                 return commColl.getName();
@@ -2017,7 +2021,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         DiscoverFilterQuery result = new DiscoverFilterQuery();
 
         StringBuilder filterQuery = new StringBuilder();
-        if(StringUtils.isNotBlank(field))
+        if(StringUtils.isNotBlank(field) && StringUtils.isNotBlank(value))
         {
             filterQuery.append(field);
             if("equals".equals(operator))
@@ -2069,10 +2073,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
 
-
+            result.setDisplayedValue(transformDisplayedValue(context, field, value));
         }
 
-        result.setDisplayedValue(transformDisplayedValue(context, field, value));
         result.setFilterQuery(filterQuery.toString());
         return result;
     }

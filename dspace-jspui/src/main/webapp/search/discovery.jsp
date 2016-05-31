@@ -67,7 +67,7 @@
 <%
     // Get the attributes
     DSpaceObject scope = (DSpaceObject) request.getAttribute("scope" );
-    String searchScope = scope!=null?scope.getHandle():"";
+    String searchScope = scope!=null ? scope.getHandle() : "";
     List<DSpaceObject> scopes = (List<DSpaceObject>) request.getAttribute("scopes");
     List<String> sortOptions = (List<String>) request.getAttribute("sortOptions");
 
@@ -77,7 +77,7 @@
 	    query = "";
 	}
     Boolean error_b = (Boolean)request.getAttribute("search.error");
-    boolean error = (error_b == null ? false : error_b.booleanValue());
+    boolean error = error_b==null ? false : error_b.booleanValue();
     
     DiscoverQuery qArgs = (DiscoverQuery) request.getAttribute("queryArgs");
     String sortedBy = qArgs.getSortField();
@@ -94,6 +94,13 @@
 	    int idx = 1;
 	    for (String[] filter : appliedFilters)
 	    {
+                if (filter == null
+                        || filter[0] == null || filter[0].trim().equals("")
+                        || filter[2] == null || filter[2].trim().equals(""))
+                {
+                    idx++;
+                    continue;
+                }
 	        httpFilters += "&amp;filter_field_"+idx+"="+URLEncoder.encode(filter[0],"UTF-8");
 	        httpFilters += "&amp;filter_type_"+idx+"="+URLEncoder.encode(filter[1],"UTF-8");
 	        httpFilters += "&amp;filter_value_"+idx+"="+URLEncoder.encode(filter[2],"UTF-8");
@@ -217,7 +224,7 @@
 					{
 					    String fkey = "jsp.search.filter." + Escape.uriParam(searchFilter.getIndexFieldName());
 					    %><option value="<%= Utils.addEntities(searchFilter.getIndexFieldName()) %>"<% 
-					            if (filter[0].equals(searchFilter.getIndexFieldName()))
+					            if (searchFilter.getIndexFieldName().equals(filter[0]))
 					            {
 					                %> selected="selected"<%
 					                found = true;
