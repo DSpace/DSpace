@@ -91,7 +91,7 @@ public class ChecksumHistoryDAOImplTest
         bss.update(context, bs);
         context.restoreAuthSystemState();
 
-        cal.roll(Calendar.DATE, -1);
+        cal.add(Calendar.DATE, -1);
         Date matchDate = cal.getTime();
         checkId++;
         qry.setInteger("id", checkId);
@@ -101,7 +101,7 @@ public class ChecksumHistoryDAOImplTest
         qry.executeUpdate();
 
         // Row with nonmatching result code
-        cal.roll(Calendar.DATE, -1);
+        cal.add(Calendar.DATE, -1);
         Date noMatchDate = cal.getTime();
         checkId++;
         qry.setInteger("id", checkId);
@@ -111,7 +111,7 @@ public class ChecksumHistoryDAOImplTest
         qry.executeUpdate();
 
         // Create one newer row
-        cal.roll(Calendar.DATE, +3);
+        cal.add(Calendar.DATE, +3);
         Date futureDate = cal.getTime();
         checkId++;
         qry.setInteger("id", checkId);
