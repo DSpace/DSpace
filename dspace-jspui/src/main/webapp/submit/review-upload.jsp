@@ -68,7 +68,7 @@
 <div class="col-md-10">
                                     <div class="row">
                                         <span class="metadataFieldLabel col-md-4"><%= (subInfo.getSubmissionItem().hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload2")) %></span>
-                                        <span class="metadataFieldValue col-md-8">
+                                        <span class="metadataFieldValue col-md-8 break-all">
 <%
     List<Bitstream> bitstreams = ContentServiceFactory.getInstance().getItemService().getNonInternalBitstreams(context, item);
 
