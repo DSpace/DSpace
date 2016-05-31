@@ -308,7 +308,7 @@ public class UploadStep extends AbstractSubmissionStep
                     row.addCell();
                 }
 
-                row.addCell().addXref(url,name);
+                row.addCell(null,null,"break-all").addXref(url, name);
                 row.addCellContent(bytes + " bytes");
                 if (desc == null || desc.length() == 0)
                 {
@@ -316,7 +316,7 @@ public class UploadStep extends AbstractSubmissionStep
                 }
                 else
                 {
-                    row.addCellContent(desc);
+                    row.addCell(null,null,"break-all").addContent(desc);
                 }
 
                 BitstreamFormat format = bitstream.getFormat(context);
@@ -492,7 +492,7 @@ public class UploadStep extends AbstractSubmissionStep
                 support = T_supported;
             }
 
-            org.dspace.app.xmlui.wing.element.Item file = uploadSection.addItem();
+            org.dspace.app.xmlui.wing.element.Item file = uploadSection.addItem(null,"break-all");
             file.addXref(url,name);
             file.addContent(" - "+ format + " ");
             file.addContent(support);

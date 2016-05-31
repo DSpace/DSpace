@@ -127,7 +127,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		// LIST: edit form
 		List edit = div.addList("edit-bitstream-list", List.TYPE_FORM);
         edit.addLabel(T_file_label);
-        edit.addItem().addXref(fileUrl, fileName);
+        edit.addItem(null,"break-all").addXref(fileUrl, fileName);
 
         Text bitstreamName = edit.addItem().addText("bitstreamName");
         bitstreamName.setLabel(T_filename_label);
