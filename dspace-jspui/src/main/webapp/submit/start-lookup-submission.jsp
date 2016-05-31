@@ -23,8 +23,7 @@
 
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="java.lang.Boolean" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
+<%@ page import="java.util.*" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
     prefix="c" %>
@@ -42,8 +41,18 @@
         (List<Collection>) request.getAttribute("collections");
 
     //get collection id from the collection home
-    String collection_id = (String) request.getAttribute("collection_id");
-    
+	Object collection_id_object = request.getAttribute("collection_id");
+
+	String collection_id;
+
+	if(collection_id_object instanceof UUID){
+		UUID uuid = (UUID) collection_id_object;
+		collection_id = uuid.toString();
+	}
+	else {
+		collection_id = (String) collection_id_object;
+	}
+
     //check if we need to display the "no collection selected" error
     Boolean noCollection = (Boolean) request.getAttribute("no.collection");
     Boolean nosuuid = (Boolean) request.getAttribute("nouuid");
