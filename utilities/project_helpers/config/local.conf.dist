@@ -371,5 +371,12 @@ lr.link.checker.user.agent = "DSpace Link Validator"
 lr.link.checker.connect.timeout = 2000
 lr.link.checker.read.timeout = 3000
 
+#####
+#
+#  shortener
+#
+####
+lr.shortener.enabled = false
+lr.shortener.handle.prefix = 1234
 
 lr.compile.time=
