@@ -361,8 +361,6 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             ePerson.getGroups().remove(group);
         }
 
-        deleteMetadata(context, group);
-
         // empty out group2groupcache table (if we do it after we delete our object we get an issue with references)
         group2GroupCacheDAO.deleteAll(context);
         // Remove ourself
@@ -467,7 +465,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     protected boolean epersonInGroup(Context context, String groupName, EPerson ePerson)
             throws SQLException
     {
-        return groupDAO.findByNameAndEPerson(context, groupName, ePerson) != null;
+        return groupDAO.findByNameAndMembership(context, groupName, ePerson) != null;
     }
 
 

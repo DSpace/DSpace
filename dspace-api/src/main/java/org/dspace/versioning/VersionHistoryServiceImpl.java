@@ -7,17 +7,19 @@
  */
 package org.dspace.versioning;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.versioning.dao.VersionHistoryDAO;
 import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import org.dspace.versioning.service.VersioningService;
 
 /**
  *
@@ -52,7 +54,16 @@ public class VersionHistoryServiceImpl implements VersionHistoryService
 
     @Override
     public void update(Context context, VersionHistory versionHistory) throws SQLException, AuthorizeException {
-        versionHistoryDAO.save(context, versionHistory);
+        update(context, Collections.singletonList(versionHistory));
+    }
+
+    @Override
+    public void update(Context context, List<VersionHistory> versionHistories) throws SQLException, AuthorizeException {
+        if(CollectionUtils.isNotEmpty(versionHistories)) {
+            for (VersionHistory versionHistory : versionHistories) {
+                versionHistoryDAO.save(context, versionHistory);
+            }
+        }
     }
 
     @Override

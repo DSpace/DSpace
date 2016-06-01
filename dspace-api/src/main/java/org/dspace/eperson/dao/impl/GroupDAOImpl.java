@@ -47,7 +47,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         addMetadataValueWhereQuery(queryBuilder, Collections.singletonList(metadataField), "=", null);
 
         Query query = createQuery(context, queryBuilder.toString());
-        query.setParameter(metadataField.toString(), metadataField.getFieldID());
+        query.setParameter(metadataField.toString(), metadataField.getID());
         query.setParameter("queryParam", searchValue);
 
         return list(query);
@@ -65,7 +65,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
 
         Query query = createQuery(context, queryBuilder.toString());
         for (MetadataField sortField : sortMetadataFields) {
-            query.setParameter(sortField.toString(), sortField.getFieldID());
+            query.setParameter(sortField.toString(), sortField.getID());
         }
         return list(query);
     }
@@ -97,11 +97,11 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         query.setParameter("name", name);
         query.setCacheable(true);
 
-        return uniqueResult(query);
+        return singleResult(query);
     }
 
     @Override
-    public Group findByNameAndEPerson(Context context, String groupName, EPerson ePerson) throws SQLException {
+    public Group findByNameAndMembership(Context context, String groupName, EPerson ePerson) throws SQLException {
         if(groupName == null || ePerson == null) {
             return null;
         } else {
@@ -123,7 +123,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
             query.setParameter("eperson_id", ePerson.getID());
             query.setCacheable(true);
 
-            return uniqueResult(query);
+            return singleResult(query);
         }
     }
 

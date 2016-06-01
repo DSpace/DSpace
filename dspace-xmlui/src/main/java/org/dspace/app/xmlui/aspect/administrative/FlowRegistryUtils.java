@@ -7,13 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.utils.RequestUtils;
 import org.dspace.app.xmlui.utils.UIException;
@@ -29,6 +22,13 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -112,7 +112,7 @@ public class FlowRegistryUtils
 		    result.setContinue(true);
 		    result.setOutcome(true);
 		    result.setMessage(T_add_metadata_schema_success_notice);   
-		    result.setParameter("schemaID", schema.getSchemaID());
+		    result.setParameter("schemaID", schema.getID());
 		}
 		
 		return result;
@@ -213,7 +213,7 @@ public class FlowRegistryUtils
 				result.setContinue(true);
 				result.setOutcome(true);
 				result.setMessage(T_add_metadata_field_success_notice);
-				result.setParameter("fieldID", field.getFieldID());
+				result.setParameter("fieldID", field.getID());
 			} 
 			catch (NonUniqueMetadataException nume)
 			{
@@ -269,7 +269,7 @@ public class FlowRegistryUtils
 		
 		// Check to make sure the field is unique, sometimes the NonUniqueMetadataException is not thrown.
 		MetadataField possibleDuplicate = metadataFieldService.findByElement(context, metadataSchemaService.find(context, schemaID), element, qualifier);
-		if (possibleDuplicate != null && possibleDuplicate.getFieldID() != fieldID)
+		if (possibleDuplicate != null && possibleDuplicate.getID() != fieldID)
         {
             result.addError("duplicate_field");
         }

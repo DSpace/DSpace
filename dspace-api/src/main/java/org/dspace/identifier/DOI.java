@@ -10,6 +10,7 @@ package org.dspace.identifier;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 
 import javax.persistence.*;
 
@@ -21,7 +22,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "Doi" )
 public class DOI
-        implements Identifier
+        implements Identifier, ReloadableEntity<Integer>
 {
     public static final String SCHEME = "doi:";
 
@@ -55,7 +56,7 @@ public class DOI
     {
     }
 
-    public Integer getId() {
+    public Integer getID() {
         return id;
     }
 

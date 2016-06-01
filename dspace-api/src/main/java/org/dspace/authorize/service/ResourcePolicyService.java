@@ -45,8 +45,6 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     public void removeAllPolicies(Context c, DSpaceObject o) throws SQLException, AuthorizeException;
 
-    public void removeAllPolicies(Context c, DSpaceObject o, boolean updateLastModified) throws SQLException, AuthorizeException;
-
     public void removePolicies(Context c, DSpaceObject o, int actionId) throws SQLException, AuthorizeException;
 
     public void removePolicies(Context c, DSpaceObject o, String type) throws SQLException, AuthorizeException;

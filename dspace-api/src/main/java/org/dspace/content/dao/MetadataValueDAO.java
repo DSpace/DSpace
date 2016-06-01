@@ -34,4 +34,5 @@ public interface MetadataValueDAO extends GenericDAO<MetadataValue> {
             throws SQLException;
 
     int countRows(Context context) throws SQLException;
+
 }

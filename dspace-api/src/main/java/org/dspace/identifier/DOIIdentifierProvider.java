@@ -841,7 +841,7 @@ public class DOIIdentifierProvider
             // We need to generate a new DOI.
             doi = doiService.create(context);
             doiIdentifier = this.getPrefix() + "/" + this.getNamespaceSeparator() + 
-                    doi.getId();
+                    doi.getID();
         }
 
         // prepare new doiRow

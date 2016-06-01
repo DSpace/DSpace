@@ -7,15 +7,15 @@
  */
 package org.dspace.workflowbasic;
 
-import java.sql.SQLException;
-
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 
 import javax.persistence.*;
+import java.sql.SQLException;
 
 /**
  * Class representing an item going through the workflow process in DSpace
@@ -25,14 +25,14 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "workflowitem")
-public class BasicWorkflowItem implements WorkflowItem
+public class BasicWorkflowItem implements WorkflowItem, ReloadableEntity<Integer>
 {
 
     @Id
     @Column(name = "workflow_id", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="workflowitem_seq")
     @SequenceGenerator(name="workflowitem_seq", sequenceName="workflowitem_seq", allocationSize = 1)
-    private int workflowitemId;
+    private Integer workflowitemId;
 
 
     /** The item this workflow object pertains to */
@@ -78,7 +78,7 @@ public class BasicWorkflowItem implements WorkflowItem
      * @return the internal identifier
      */
     @Override
-    public int getID()
+    public Integer getID()
     {
         return workflowitemId;
     }

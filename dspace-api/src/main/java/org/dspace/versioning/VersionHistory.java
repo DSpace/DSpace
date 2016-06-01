@@ -8,6 +8,7 @@
 package org.dspace.versioning;
 
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -25,7 +26,7 @@ import org.apache.log4j.Logger;
  */
 @Entity
 @Table(name="versionhistory")
-public class VersionHistory {
+public class VersionHistory implements ReloadableEntity<Integer> {
     
     private static final Logger log = Logger.getLogger(VersionHistory.class);
 
@@ -33,7 +34,7 @@ public class VersionHistory {
     @Column(name="versionhistory_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="versionhistory_seq")
     @SequenceGenerator(name="versionhistory_seq", sequenceName="versionhistory_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
 
     //We use fetchtype eager for versions since we always require our versions when loading the history
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "versionHistory")
@@ -50,7 +51,7 @@ public class VersionHistory {
 
     }
 
-    public int getId() {
+    public Integer getID() {
         return id;
     }
 
@@ -92,7 +93,7 @@ public class VersionHistory {
         }
 
         final VersionHistory that = (VersionHistory)o;
-        if (this.getId() != that.getId())
+        if (this.getID() != that.getID())
         {
             return false;
         }
@@ -104,7 +105,7 @@ public class VersionHistory {
     public int hashCode()
     {
         int hash=7;
-        hash=79*hash+ this.getId();
+        hash=79*hash+ this.getID();
         return hash;
     }
 

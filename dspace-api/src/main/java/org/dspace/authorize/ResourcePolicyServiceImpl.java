@@ -7,13 +7,9 @@
  */
 package org.dspace.authorize;
 
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
@@ -23,6 +19,9 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Service implementation for the ResourcePolicy object.
@@ -204,17 +203,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
 
     @Override
     public void removeAllPolicies(Context c, DSpaceObject o) throws SQLException, AuthorizeException {
-        // FIXME: authorization check?
-        removeAllPolicies(c, o, true);
-    }
-
-    @Override
-    public void removeAllPolicies(Context c, DSpaceObject o, boolean updateLastModified) throws SQLException, AuthorizeException {
-        // FIXME: authorization check?
-        if(updateLastModified)
-        {
-            contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
-        }
+        contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
         resourcePolicyDAO.deleteByDso(c, o);
     }
 
@@ -269,12 +258,31 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
      */
     @Override
     public void update(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException {
-        if(resourcePolicy.getdSpaceObject() != null){
-            //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
-            contentServiceFactory.getDSpaceObjectService(resourcePolicy.getdSpaceObject()).updateLastModified(context, resourcePolicy.getdSpaceObject());
-        }
+        update(context, Collections.singletonList(resourcePolicy));
+    }
 
-        // FIXME: Check authorisation
-        resourcePolicyDAO.save(context, resourcePolicy);
+    /**
+     * Update the ResourcePolicies
+     */
+    @Override
+    public void update(Context context, List<ResourcePolicy> resourcePolicies) throws SQLException, AuthorizeException {
+        if(CollectionUtils.isNotEmpty(resourcePolicies)) {
+            Set<DSpaceObject> relatedDSpaceObjects = new HashSet<>();
+
+            for (ResourcePolicy resourcePolicy : resourcePolicies) {
+                if (resourcePolicy.getdSpaceObject() != null) {
+                    relatedDSpaceObjects.add(resourcePolicy.getdSpaceObject());
+                }
+
+                // FIXME: Check authorisation
+                resourcePolicyDAO.save(context, resourcePolicy);
+            }
+
+            //Update the last modified timestamp of all related DSpace Objects
+            for (DSpaceObject dSpaceObject : relatedDSpaceObjects) {
+                //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
+                contentServiceFactory.getDSpaceObjectService(dSpaceObject).updateLastModified(context, dSpaceObject);
+            }
+        }
     }
 }

@@ -532,9 +532,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // Remove any Handle
         handleService.unbindHandle(context, community);
 
-        deleteMetadata(context, community);
-
-
         Group g = community.getAdministrators();
 
         // Delete community row

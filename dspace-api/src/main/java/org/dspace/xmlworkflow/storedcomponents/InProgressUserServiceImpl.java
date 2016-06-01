@@ -7,6 +7,7 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -15,6 +16,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -71,7 +73,16 @@ public class InProgressUserServiceImpl implements InProgressUserService {
 
     @Override
     public void update(Context context, InProgressUser inProgressUser) throws SQLException, AuthorizeException {
-        inProgressUserDAO.save(context, inProgressUser);
+        update(context, Collections.singletonList(inProgressUser));
+    }
+
+    @Override
+    public void update(Context context, List<InProgressUser> inProgressUsers) throws SQLException, AuthorizeException {
+        if(CollectionUtils.isNotEmpty(inProgressUsers)) {
+            for (InProgressUser inProgressUser : inProgressUsers) {
+                inProgressUserDAO.save(context, inProgressUser);
+            }
+        }
     }
 
     @Override

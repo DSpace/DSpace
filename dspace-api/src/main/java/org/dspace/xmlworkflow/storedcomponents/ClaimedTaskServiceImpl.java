@@ -7,6 +7,7 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -15,6 +16,8 @@ import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -48,7 +51,16 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService
 
     @Override
     public void update(Context context, ClaimedTask claimedTask) throws SQLException, AuthorizeException {
-        claimedTaskDAO.save(context, claimedTask);
+        update(context, Collections.singletonList(claimedTask));
+    }
+
+    @Override
+    public void update(Context context, List<ClaimedTask> claimedTasks) throws SQLException, AuthorizeException {
+        if(CollectionUtils.isNotEmpty(claimedTasks)) {
+            for (ClaimedTask claimedTask : claimedTasks) {
+                claimedTaskDAO.save(context, claimedTask);
+            }
+        }
     }
 
     @Override

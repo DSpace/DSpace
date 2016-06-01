@@ -7,22 +7,17 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.registries;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataSchemaService;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Prompt the user to determin if they really want to delete the displayed schemas.
@@ -100,7 +95,7 @@ public class DeleteMetadataSchemaConfirm extends AbstractDSpaceTransformer
     	for (MetadataSchema schema : schemas) 
     	{
     		Row row = table.addRow();
-    		row.addCell().addContent(schema.getSchemaID());
+    		row.addCell().addContent(schema.getID());
         	row.addCell().addContent(schema.getNamespace());
         	row.addCell().addContent(schema.getName());
 	    }

@@ -7,26 +7,28 @@
  */
 package org.dspace.content;
 
-import mockit.*;
-
+import mockit.NonStrictExpectations;
+import org.apache.log4j.Logger;
+import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-import java.io.FileInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.AbstractUnitTest;
-import org.apache.log4j.Logger;
-import org.junit.*;
-import static org.junit.Assert.* ;
-import static org.hamcrest.CoreMatchers.*;
-import org.junit.rules.ExpectedException;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.*;
 
 
 /**

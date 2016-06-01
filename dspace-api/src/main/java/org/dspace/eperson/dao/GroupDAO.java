@@ -126,6 +126,6 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * @return The group with the specified name
      * @throws SQLException if database error
      */
-    Group findByNameAndEPerson(Context context, String groupName, EPerson ePerson) throws SQLException;
+    Group findByNameAndMembership(Context context, String groupName, EPerson ePerson) throws SQLException;
 
 }
