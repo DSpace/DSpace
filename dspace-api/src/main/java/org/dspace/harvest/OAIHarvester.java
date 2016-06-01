@@ -115,6 +115,9 @@ public class OAIHarvester {
 		workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
         pluginService = CoreServiceFactory.getInstance().getPluginService();
 
+		configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+
 		if (dso.getType() != Constants.COLLECTION)
         {
             throw new HarvestingException("OAIHarvester can only harvest collections");
@@ -283,7 +286,6 @@ public class OAIHarvester {
 			intermediateCommit();
 
 			// expiration timer starts
-			configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 			int expirationInterval = configurationService.getIntProperty("oai.harvester.threadTimeout");
 	    	if (expirationInterval == 0)
             {
