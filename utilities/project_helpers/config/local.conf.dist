@@ -19,6 +19,10 @@ lr.pid.community.configurations = community=*,prefix=99999,type=local,canonical_
 # if true, PID metadata will be filled with object metadata like title
 lr.pid.resolvemetadata = true
 
+handle.canonical.prefix = http://hdl.handle.net/
+handle.prefix = 123456789
+handle.dir=${dspace.dir}/handle-server
+
 
 # UFAL mounted assetstore for restricted item harvesting. Please mind the trailing slash
 lr.harvestable.assetstore =
@@ -62,6 +66,13 @@ db.driver = org.postgresql.Driver
 db.username = dspace
 db.password =
 
+db.maxidle = -1
+db.schema =
+db.maxwait = 5000
+db.maxconnections = 30
+db.statementpool = true
+db.poolname = dspacepool
+
 # UFAL Utilities database name.
 lr.utilities.database = XXX-UTILS-DATABASE
 
@@ -87,6 +98,14 @@ dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied L
 # Used in email templates
 lr.dspace.name.short = LINDAT/CLARIN
 
+supported.locales = en, cs
+
+default.language = en_US
+http.proxy.host =
+http.proxy.port =
+loglevel.other=INFO
+loglevel.dspace=INFO
+
 
 ############################################
 
@@ -97,6 +116,10 @@ mail.server = 127.0.0.1
 
 # Mail server disabled?
 mail.server.disabled = true
+
+mail.server.username =
+mail.server.password =
+mail.server.port = 25
 
 # UFAL: Contact information
 lr.help.mail = dspace-help@ufal.mff.cuni.cz
@@ -109,6 +132,9 @@ mail.registration.notify = ${mail.admin}
 
 # General site administration (Webmaster) e-mail
 mail.admin = ${mail.feedback.recipient}
+
+# Email where errors will be sent (from specific classes)
+lr.errors.email=
 
 # solr server address that your instance is using.
 solr.server = http://ufal-point-dev.ms.mff.cuni.cz:8080/repository/solr
@@ -170,9 +196,6 @@ lr.replication.jargon.MAX_SZ_FOR_SINGLE_BUF=
 lr.replication.jargon.BUFFER_SIZE=
 # log progress after count of iterations (depends on buffer_size)
 lr.replication.jargon.PUT_LOG_AFTER=
-
-# Email where errors will be sent (from specific classes)
-lr.errors.email=
 
 
 # Selenium Testing #########################
@@ -261,6 +284,8 @@ harvesterInfo.url = http://catalog.clarin.eu/oai-harvester/
 # whether to show language field in user profile
 lr.xmlui.user.showlanguage = false
 
+###############################################
+# oai
 #mind the documentation for oai/cite and the respective apache rewrite
 lr.repository.identifier = lindat.mff.cuni.cz 
 lr.repository.sampleIdentifier = oai:lindat.mff.cuni.cz:11858/00-097C-0000-0001-487A-4
@@ -345,26 +370,6 @@ lr.curation.metadata.checkrequired.ignore = metashare.*
 lr.link.checker.user.agent = "DSpace Link Validator"
 lr.link.checker.connect.timeout = 2000
 lr.link.checker.read.timeout = 3000
-###
-supported.locales = en, cs
-###
 
-mail.server.username = 
-mail.server.password = 
-mail.server.port = 25
-default.language = en_US
-db.maxidle = -1
-db.schema = 
-db.maxwait = 5000
-db.maxconnections = 30
-db.statementpool = true
-db.poolname = dspacepool
-http.proxy.host =
-http.proxy.port =
-handle.canonical.prefix = http://hdl.handle.net/
-handle.prefix = 123456789
-loglevel.other=INFO
-loglevel.dspace=INFO
-handle.dir=${dspace.dir}/handle-server
 
 lr.compile.time=
