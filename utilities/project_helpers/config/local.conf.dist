@@ -45,10 +45,6 @@ xmlui.google.analytics.key =
 
 # Database settings ########################
 
-# This is not the name of the database you are using. Instead the name of the RDBMS used e.g. postgres or oracle.
-# This is required for database creation scripts.
-db.name = postgres
-
 # The name of the database that you will use for your dspace instance.
 # If the database is not created yet, this name will be used to create the new database.
 # Be careful with the trailing spaces in the name!
@@ -255,10 +251,6 @@ lr.shibboleth.discofeed.url = https://ufal-point-dev.ms.mff.cuni.cz/Shibboleth.s
 # don't change this on ufal-point-dev!
 lr.aai.url = https://lindat.mff.cuni.cz/aai
 
-# oai path including /request
-# if you want the URL to be extracted from HttpRequest then remove OAIHandler.baseURL=${oai.baseURL} from oaicat.properties
-lr.oai.baseUrl = ${dspace.baseUrl}/oai/request
-
 # For reports
 harvesterInfo.url = http://catalog.clarin.eu/oai-harvester/
 
@@ -371,7 +363,6 @@ http.proxy.host =
 http.proxy.port =
 handle.canonical.prefix = http://hdl.handle.net/
 handle.prefix = 123456789
-handle.resolvemetadata = true
 loglevel.other=INFO
 loglevel.dspace=INFO
 handle.dir=${dspace.dir}/handle-server
