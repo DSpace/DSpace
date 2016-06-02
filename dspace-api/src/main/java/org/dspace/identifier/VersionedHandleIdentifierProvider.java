@@ -16,6 +16,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.*;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
@@ -70,32 +71,30 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     @Override
     public boolean supports(String identifier)
     {
-        String prefix = handleService.getPrefix();
-        String handleResolver = ConfigurationManager.getProperty("handle.canonical.prefix");
+    	String prefix = handleService.getPrefix();
+        String canonicalPrefix = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("handle.canonical.prefix");
         if (identifier == null)
         {
             return false;
         }
+        // return true if handle has valid starting pattern
         if (identifier.startsWith(prefix)
-                || identifier.startsWith(handleResolver)
-                || identifier.startsWith("http://hdl.handle.net/")
+                || identifier.startsWith(canonicalPrefix)
                 || identifier.startsWith("hdl:")
-                || identifier.startsWith("info:hdl"))
+                || identifier.startsWith("info:hdl")
+                || identifier.matches("^https?://hdl.handle.net/")
+                || identifier.matches("^https?://.+/handle/"))
         {
             return true;
         }
-        
-        try {
-            String outOfUrl = retrieveHandleOutOfUrl(identifier);
-            if(outOfUrl != null)
-                {
-                    return true;
-                }
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-        }
-        
-        return false;
+        // return false if identifier starts with DOI prefix
+        if(identifier.startsWith("10.") || identifier.matches("^https?://dx.doi.org") || identifier.startsWith("doi:"))
+        	return false;
+        // return false if identifier does not contain a '/' or is a URL that does not match above patterns 
+        if(! identifier.contains("/") || identifier.matches("^https?://.+"))
+        	return false;
+        // otherwise, assumed a valid handle
+        return true;
     }
 
     @Override
