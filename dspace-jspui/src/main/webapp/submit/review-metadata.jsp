@@ -59,6 +59,17 @@
     
     // determine collection
     Collection c = subInfo.getSubmissionItem().getCollection();
+    
+    // Fetch the document type (dc.type)
+    String documentType = "";
+    if( (ContentServiceFactory.getInstance().getItemService()
+            .getMetadataByMetadataString(item, "dc.type") != null)
+            && (ContentServiceFactory.getInstance().getItemService()
+                    .getMetadataByMetadataString(item, "dc.type").size() >0) )
+    {
+        documentType = ContentServiceFactory.getInstance().getItemService()
+                .getMetadataByMetadataString(item, "dc.type").get(0).getValue();
+    }
 
     DCInputSet inputSet = null;
 
@@ -81,6 +92,7 @@
                        DCInputSet inputSet,
                        SubmissionInfo subInfo,
                        Item item,
+                       String documentType,
                        int pageNum,
                        PageContext pageContext)
         throws ServletException, IOException
@@ -98,6 +110,11 @@
 
        for (int z = 0; z < inputs.length; z++)
        {
+          // Omit fields not allowed for this document type
+          if(!inputs[z].isAllowedFor(documentType))
+          {
+              continue;
+          }
           String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
           if (!inputs[z].isVisible(scope) && !inputs[z].isReadOnly(scope))
           {
@@ -216,7 +233,7 @@
 <div class="col-md-10">
 
 <%
-            layoutSection(request, out, inputSet, subInfo, item, pageNum, pageContext);
+            layoutSection(request, out, inputSet, subInfo, item, documentType, pageNum, pageContext);
 %>
 </div>
 <div class="col-md-2">
