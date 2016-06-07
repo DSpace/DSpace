@@ -51,69 +51,11 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.avalon.framework</groupId>
-                    <artifactId>avalon-framework-api</artifactId>
-                    <version>4.3.1</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.cocoon</groupId>
-                    <artifactId>cocoon-sitemap-api</artifactId>
-                    <version>1.0.0</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.cocoon</groupId>
-                    <artifactId>cocoon-sitemap-impl</artifactId>
-                    <version>1.0.0</version>
-                </dependency>
-                <dependency>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                    <version>1.2.14</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.dspace.discovery</groupId>
-                    <artifactId>discovery-solr-provider</artifactId>
-                    <version>0.9.4-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.dspace.discovery</groupId>
-                    <artifactId>discovery-xmlui-webapp</artifactId>
-                    <version>0.9.2</version>
-                    <type>war</type>
-                </dependency>
-                <dependency>
-                    <groupId>org.dspace.dependencies.solr</groupId>
-                    <artifactId>dspace-solr-solrj</artifactId>
-                    <version>1.4.0.1</version>
-                </dependency>
-            </dependencies>
-        </profile>
-
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>org.dspace.modules</groupId>
-            <artifactId>api-stats</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace.modules</groupId>
             <artifactId>api</artifactId>
             <version>${pom.version}</version>
-        </dependency>
-        <dependency>
-            <!-- This is required to get the base classes for tests -->
-            <groupId>org.dspace.modules</groupId>
-            <artifactId>api</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -146,10 +88,42 @@
             <type>war</type>
             <version>${pom.version}</version>
         </dependency>
+
+        <!-- TESTS -->
         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-stats</artifactId>
-            <version>${pom.version}</version>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom2</artifactId>
+            <version>2.0.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.4</version>
         </dependency>
     </dependencies>
 

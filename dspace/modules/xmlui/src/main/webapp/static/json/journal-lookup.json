@@ -1,0 +1,922 @@
+{
+  "data" : [
+     {
+        "issn" : "0002-9122",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "Y",
+        "title" : "American Journal of Botany",
+        "sponsor" : "The Botanical Society of America"
+     },
+     {
+        "title" : "American Naturalist, The",
+        "sponsor" : "American Society of Naturalists",
+        "integrated" : "Y",
+        "issn" : "",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N"
+     },
+     {
+        "integrated" : "N",
+        "embargo" : "Y",
+        "issn" : "2168-0450",
+        "submission" : "A",
+        "hidden" : "Y",
+        "title" : "Applications in Plant Sciences",
+        "sponsor" : "The Botanical Society of America"
+     },
+     {
+        "title" : "Behavioral Ecology",
+        "sponsor" : "Behavioral Ecology",
+        "integrated" : "Y",
+        "submission" : "R",
+        "issn" : "1045-2249",
+        "embargo" : "N",
+        "hidden" : "N"
+     },
+     {
+        "integrated" : "Y",
+        "embargo" : "Y",
+        "issn" : "1314-2828",
+        "submission" : "A",
+        "hidden" : "Y",
+        "title" : "Biodiversity Data Journal",
+        "sponsor" : "Pensoft"
+     },
+     {
+        "embargo" : "Y",
+        "issn" : "0024-4066",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Biological Journal of the Linnean Society",
+        "sponsor" : "$120"
+     },
+     {
+        "title" : "Biology Letters",
+        "sponsor" : "The Royal Society",
+        "integrated" : "Y",
+        "embargo" : "Y",
+        "issn" : "1744-9561",
+        "submission" : "A",
+        "hidden" : "N"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "Biology Open",
+        "integrated" : "Y",
+        "hidden" : "N",
+        "issn" : "",
+        "embargo" : "N",
+        "submission" : "R"
+     },
+     {
+        "integrated" : "Y",
+        "issn" : "",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "title" : "BioRisk",
+        "sponsor" : "Pensoft"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "Bioscience",
+        "hidden" : "N",
+        "issn" : "",
+        "embargo" : "Y",
+        "submission" : "R",
+        "integrated" : "Y"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "embargo" : "Y",
+        "issn" : "0006-3606",
+        "submission" : "A",
+        "sponsor" : "Biotropica",
+        "title" : "Biotropica"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "BMC Ecology",
+        "hidden" : "N",
+        "embargo" : "N",
+        "issn" : "1472-6785",
+        "submission" : "R",
+        "integrated" : "Y"
+     },
+     {
+        "title" : "BMC Evolutionary Biology",
+        "sponsor" : "$120",
+        "submission" : "R",
+        "issn" : "1471-2148",
+        "embargo" : "N",
+        "hidden" : "N",
+        "integrated" : "Y"
+     },
+     {
+        "hidden" : "N",
+        "issn" : "2044-6055",
+        "embargo" : "N",
+        "submission" : "R",
+        "integrated" : "Y",
+        "sponsor" : "$120",
+        "title" : "BMJ Open"
+     },
+     {
+        "issn" : "",
+        "submission" : "A",
+        "embargo" : "Y",
+        "hidden" : "Y",
+        "integrated" : "Y",
+        "title" : "The Bone &amp; Joint Journal",
+        "sponsor" : "British Editorial Society of Bone &amp; Joint Surgery"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "submission" : "A",
+        "issn" : "",
+        "embargo" : "Y",
+        "sponsor" : "British Editorial Society of Bone &amp; Joint Surgery",
+        "title" : "Bone &amp; Joint Research"
+     },
+     {
+        "hidden" : "Y",
+        "issn" : "",
+        "embargo" : "Y",
+        "submission" : "A",
+        "integrated" : "Y",
+        "sponsor" : "British Editorial Society of Bone &amp; Joint Surgery",
+        "title" : "Bone &amp; Joint360"
+     },
+     {
+        "sponsor" : "Pensoft",
+        "title" : "Comparative Cytogenetics",
+        "integrated" : "Y",
+        "hidden" : "N",
+        "embargo" : "Y",
+        "issn" : "1993-0771",
+        "submission" : "A"
+     },
+     {
+        "title" : "Deutsche Entomologische Zeitschrift",
+        "sponsor" : "Pensoft",
+        "submission" : "A",
+        "issn" : "0012-0073",
+        "embargo" : "N",
+        "hidden" : "Y",
+        "integrated" : "Y"
+     },
+     {
+        "embargo" : "N",
+        "issn" : "0950-1991",
+        "submission" : "R",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Development",
+        "sponsor" : "$120"
+     },
+     {
+        "integrated" : "Y",
+        "issn" : "",
+        "submission" : "R",
+        "embargo" : "N",
+        "hidden" : "N",
+        "title" : "Disease Models &amp; Mechanisms",
+        "sponsor" : "$120"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "issn" : "0906-7590",
+        "submission" : "A",
+        "embargo" : "Y",
+        "sponsor" : "Nordic Society Oikos",
+        "title" : "Ecography"
+     },
+     {
+        "embargo" : "Y",
+        "issn" : "1051-0761",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Ecological Applications",
+        "sponsor" : "$120"
+     },
+     {
+        "sponsor" : "Ecological Society of America",
+        "title" : "Ecological Monographs",
+        "hidden" : "N",
+        "issn" : "0012-9615",
+        "submission" : "A",
+        "embargo" : "Y",
+        "integrated" : "Y"
+     },
+     {
+        "title" : "Ecology",
+        "sponsor" : "$120",
+        "integrated" : "Y",
+        "issn" : "0012-9658",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N"
+     },
+     {
+        "sponsor" : "Ecology and Evolution",
+        "title" : "Ecology and Evolution",
+        "hidden" : "Y",
+        "embargo" : "Y",
+        "issn" : "2045-7758",
+        "submission" : "A",
+        "integrated" : "Y"
+     },
+     {
+        "title" : "Ecology Letters",
+        "sponsor" : "$120",
+        "integrated" : "Y",
+        "submission" : "A",
+        "issn" : "1461-023X",
+        "embargo" : "Y",
+        "hidden" : "Y"
+     },
+     {
+        "integrated" : "Y",
+        "submission" : "A",
+        "issn" : "2325-1026",
+        "embargo" : "Y",
+        "hidden" : "Y",
+        "title" : "Elementa: Science of the Anthropocene",
+        "sponsor" : "BioOne"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "submission" : "R",
+        "issn" : "2050-084X",
+        "embargo" : "N",
+        "sponsor" : "eLife",
+        "title" : "eLife"
+     },
+     {
+        "title" : "Environmental Epigenetics",
+        "sponsor" : "$120",
+        "issn" : "",
+        "submission" : "R",
+        "embargo" : "N",
+        "hidden" : "N",
+        "integrated" : "Y"
+     },
+     {
+        "sponsor" : "Evidence-based Preclinical Medicine",
+        "title" : "Evidence-based Preclinical Medicine",
+        "hidden" : "N",
+        "issn" : "2054-703X",
+        "embargo" : "N",
+        "submission" : "R",
+        "integrated" : "Y"
+     },
+     {
+        "sponsor" : "Society for the Study of Evolution",
+        "title" : "Evolution",
+        "integrated" : "Y",
+        "hidden" : "N",
+        "issn" : "1936-6426",
+        "submission" : "A",
+        "embargo" : "Y"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "issn" : "1752-4571",
+        "embargo" : "Y",
+        "submission" : "A",
+        "sponsor" : "Evolutionary Applications",
+        "title" : "Evolutionary Applications"
+     },
+     {
+        "sponsor" : "British Ecological Society",
+        "title" : "Functional Ecology",
+        "hidden" : "Y",
+        "issn" : "0269-8463",
+        "embargo" : "Y",
+        "submission" : "A",
+        "integrated" : "Y"
+     },
+     {
+        "sponsor" : "German National Library of Medicine",
+        "title" : "GMS German Medical Science",
+        "hidden" : "N",
+        "embargo" : "Y",
+        "issn" : "1612-3174",
+        "submission" : "R",
+        "integrated" : "Y"
+     },
+     {
+        "integrated" : "Y",
+        "submission" : "R",
+        "issn" : "",
+        "embargo" : "Y",
+        "hidden" : "N",
+        "title" : "GMS German Plastic, Reconstructive and Aesthetic Surgery",
+        "sponsor" : "German National Library of Medicine"
+     },
+     {
+        "title" : "GMS Health Technology Assessment",
+        "sponsor" : "German National Library of Medicine",
+        "embargo" : "Y",
+        "issn" : "",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "N"
+     },
+     {
+        "hidden" : "Y",
+        "embargo" : "Y",
+        "issn" : "",
+        "submission" : "A",
+        "integrated" : "N",
+        "sponsor" : "German National Library of Medicine",
+        "title" : "GMS Hygiene and Infection Control"
+     },
+     {
+        "hidden" : "N",
+        "embargo" : "Y",
+        "issn" : "",
+        "submission" : "R",
+        "integrated" : "Y",
+        "sponsor" : "German National Library of Medicine",
+        "title" : "GMS Infectious Diseases"
+     },
+     {
+        "title" : "GMS Interdisciplinary Plastic and Reconstructive Surgery DGPW",
+        "sponsor" : "German National Library of Medicine",
+        "integrated" : "Y",
+        "issn" : "",
+        "embargo" : "Y",
+        "submission" : "R",
+        "hidden" : "N"
+     },
+     {
+        "issn" : "",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "N",
+        "title" : "GMS Medizin - Bibliothek - Information",
+        "sponsor" : "German National Library of Medicine"
+     },
+     {
+        "issn" : "",
+        "embargo" : "Y",
+        "submission" : "R",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "GMS Medizinische, Informatik, Biometrie und Epidemiologie",
+        "sponsor" : "German National Library of Medicine"
+     },
+     {
+        "sponsor" : "German National Library of Medicine",
+        "title" : "GMS Onkologische Rehabilitation und Sozialmedizin",
+        "hidden" : "N",
+        "embargo" : "Y",
+        "issn" : "",
+        "submission" : "R",
+        "integrated" : "Y"
+     },
+     {
+        "embargo" : "Y",
+        "issn" : "",
+        "submission" : "R",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "GMS Zeitschrift für Medizinische Ausbildung",
+        "sponsor" : "German National Library of Medicine"
+     },
+     {
+        "hidden" : "N",
+        "submission" : "R",
+        "issn" : "",
+        "embargo" : "Y",
+        "integrated" : "Y",
+        "sponsor" : "German National Library of Medicine",
+        "title" : "GMS Zeitschrift zur Förderung der Qualitätssicherung in medizinischen Laboratorien"
+     },
+     {
+        "sponsor" : "The Genetics Society",
+        "title" : "Heredity",
+        "hidden" : "N",
+        "issn" : "0018-067X",
+        "embargo" : "Y",
+        "submission" : "A",
+        "integrated" : "Y"
+     },
+     {
+        "title" : "Interface Focus",
+        "sponsor" : "The Royal Society",
+        "integrated" : "N",
+        "issn" : "2042-8898",
+        "submission" : "A",
+        "embargo" : "Y",
+        "hidden" : "Y"
+     },
+     {
+        "hidden" : "Y",
+        "submission" : "A",
+        "issn" : "1058-5893",
+        "embargo" : "N",
+        "integrated" : "Y",
+        "sponsor" : "University of Chicago Press",
+        "title" : "International Journal of Plant Sciences"
+     },
+     {
+        "title" : "Journal of Animal Ecology",
+        "sponsor" : "British Ecological Society",
+        "issn" : "0021-8790",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "Y"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "embargo" : "Y",
+        "issn" : "0021-8901",
+        "submission" : "A",
+        "sponsor" : "British Ecological Society",
+        "title" : "Journal of Applied Ecology"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "submission" : "A",
+        "issn" : "0908-8857",
+        "embargo" : "Y",
+        "sponsor" : "Nordic Society Oikos",
+        "title" : "Journal of Avian Biology"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "embargo" : "N",
+        "issn" : "",
+        "submission" : "R",
+        "sponsor" : "$120",
+        "title" : "Journal of Cell Science"
+     },
+     {
+        "sponsor" : "Journal of Consumer Research",
+        "title" : "Journal of Consumer Research",
+        "hidden" : "Y",
+        "issn" : "0093-5301",
+        "submission" : "A",
+        "embargo" : "Y",
+        "integrated" : "N"
+     },
+     {
+        "sponsor" : "British Ecological Society",
+        "title" : "Journal of Ecology",
+        "hidden" : "Y",
+        "issn" : "0022-0477",
+        "submission" : "A",
+        "embargo" : "Y",
+        "integrated" : "Y"
+     },
+     {
+        "title" : "Journal of Evolutionary Biology",
+        "sponsor" : "European Society for Evolutionary Biology",
+        "integrated" : "Y",
+        "embargo" : "Y",
+        "issn" : "1010-061X",
+        "submission" : "A",
+        "hidden" : "N"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "The Journal of Experimental Biology",
+        "hidden" : "N",
+        "issn" : "",
+        "submission" : "R",
+        "embargo" : "N",
+        "integrated" : "Y"
+     },
+     {
+        "sponsor" : "U.S. Fish and Wildlife Service",
+        "title" : "Journal of Fish and Wildlife Management",
+        "hidden" : "N",
+        "issn" : "1944-687X",
+        "embargo" : "N",
+        "submission" : "A",
+        "integrated" : "Y"
+     },
+     {
+        "sponsor" : "American Genetic Association",
+        "title" : "Journal of Heredity",
+        "integrated" : "Y",
+        "hidden" : "N",
+        "embargo" : "Y",
+        "issn" : "0022-1503",
+        "submission" : "A"
+     },
+     {
+        "hidden" : "Y",
+        "submission" : "A",
+        "issn" : "1070-9428",
+        "embargo" : "Y",
+        "integrated" : "Y",
+        "sponsor" : "Pensoft",
+        "title" : "Journal of Hymenoptera Research"
+     },
+     {
+        "title" : "Journal of Paleontology",
+        "sponsor" : "The Paleontological Society",
+        "submission" : "R",
+        "issn" : "0022-3360",
+        "embargo" : "Y",
+        "hidden" : "N",
+        "integrated" : "Y"
+     },
+     {
+        "hidden" : "Y",
+        "submission" : "A",
+        "issn" : "1742-5662",
+        "embargo" : "Y",
+        "integrated" : "N",
+        "sponsor" : "The Royal Society",
+        "title" : "Journal of the Royal Society Interface"
+     },
+     {
+        "integrated" : "Y",
+        "issn" : "",
+        "submission" : "R",
+        "embargo" : "N",
+        "hidden" : "N",
+        "title" : "Journal of Urban Ecology",
+        "sponsor" : "$120"
+     },
+     {
+        "sponsor" : "British Ecological Society",
+        "title" : "Methods in Ecology and Evolution",
+        "hidden" : "Y",
+        "issn" : "2041-210X",
+        "embargo" : "Y",
+        "submission" : "A",
+        "integrated" : "Y"
+     },
+     {
+        "sponsor" : "Molecular Ecology",
+        "title" : "Molecular Ecology",
+        "integrated" : "Y",
+        "hidden" : "N",
+        "issn" : "0962-1083",
+        "submission" : "R",
+        "embargo" : "N"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "issn" : "1755-098X",
+        "embargo" : "N",
+        "submission" : "R",
+        "sponsor" : "Molecular Ecology Resources",
+        "title" : "Molecular Ecology Resources"
+     },
+     {
+        "title" : "MycoKeys",
+        "sponsor" : "Pensoft",
+        "issn" : "1314-4049",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "Y"
+     },
+     {
+        "sponsor" : "Pensoft",
+        "title" : "Nature Conservation",
+        "integrated" : "Y",
+        "hidden" : "N",
+        "embargo" : "Y",
+        "issn" : "",
+        "submission" : "A"
+     },
+     {
+        "sponsor" : "Pensoft",
+        "title" : "NeoBiota",
+        "integrated" : "Y",
+        "hidden" : "N",
+        "submission" : "A",
+        "issn" : "1314-2488",
+        "embargo" : "Y"
+     },
+     {
+        "title" : "Nordic Journal of Botany",
+        "sponsor" : "Nordic Society Oikos",
+        "embargo" : "Y",
+        "issn" : "0107-055X",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y"
+     },
+     {
+        "sponsor" : "Pensoft",
+        "title" : "Nota Lepidopterologica",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "embargo" : "N",
+        "issn" : "",
+        "submission" : "A"
+     },
+     {
+        "title" : "Oikos",
+        "sponsor" : "Nordic Society Oikos",
+        "integrated" : "Y",
+        "embargo" : "Y",
+        "issn" : "0030-1299",
+        "submission" : "A",
+        "hidden" : "N"
+     },
+     {
+        "title" : "Open Biology",
+        "sponsor" : "The Royal Society",
+        "integrated" : "N",
+        "issn" : "2046-2441",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y"
+     },
+     {
+        "issn" : "",
+        "embargo" : "Y",
+        "submission" : "R",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Open Health Data",
+        "sponsor" : "$120"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "issn" : "1475-4983",
+        "embargo" : "Y",
+        "submission" : "R",
+        "sponsor" : "The Palaeontological Association",
+        "title" : "Palaeontology"
+     },
+     {
+        "sponsor" : "The Paleontological Society",
+        "title" : "Paleobiology",
+        "integrated" : "Y",
+        "hidden" : "N",
+        "embargo" : "Y",
+        "issn" : "0094-8373",
+        "submission" : "A"
+     },
+     {
+        "title" : "Papers in Palaeontology",
+        "sponsor" : "The Palaeontological Association",
+        "embargo" : "N",
+        "issn" : "2056-2802",
+        "submission" : "R",
+        "hidden" : "Y",
+        "integrated" : "Y"
+     },
+     {
+        "integrated" : "N",
+        "hidden" : "Y",
+        "submission" : "A",
+        "issn" : "1364-503X",
+        "embargo" : "Y",
+        "sponsor" : "The Royal Society",
+        "title" : "Philosophical Transactions of the Royal Society A"
+     },
+     {
+        "integrated" : "N",
+        "issn" : "0962-8436",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "title" : "Philosophical Transactions of the Royal Society B",
+        "sponsor" : "The Royal Society"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "issn" : "",
+        "submission" : "R",
+        "embargo" : "N",
+        "sponsor" : "University of Chicago Press",
+        "title" : "Physiological and Biochemical Zoology"
+     },
+     {
+        "title" : "PhytoKeys",
+        "sponsor" : "Pensoft",
+        "integrated" : "Y",
+        "submission" : "A",
+        "issn" : "1314-2003",
+        "embargo" : "Y",
+        "hidden" : "Y"
+     },
+     {
+        "issn" : "1040-4651",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "N",
+        "title" : "The Plant Cell",
+        "sponsor" : "American Society of Plant Biologists"
+     },
+     {
+        "integrated" : "N",
+        "embargo" : "Y",
+        "issn" : "",
+        "submission" : "A",
+        "hidden" : "Y",
+        "title" : "Plant Physiology",
+        "sponsor" : "American Society of Plant Biologists"
+     },
+     {
+        "hidden" : "Y",
+        "submission" : "A",
+        "issn" : "",
+        "embargo" : "Y",
+        "integrated" : "N",
+        "sponsor" : "The Botanical Society of America",
+        "title" : "Plant Science Bulletin"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "PLOS Biology",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "embargo" : "N",
+        "issn" : "1544-9173",
+        "submission" : "D"
+     },
+     {
+        "title" : "PLOS Computational Biology",
+        "sponsor" : "$120",
+        "integrated" : "Y",
+        "issn" : "1553-734X",
+        "submission" : "D",
+        "embargo" : "N",
+        "hidden" : "Y"
+     },
+     {
+        "title" : "PLOS Genetics",
+        "sponsor" : "$120",
+        "integrated" : "Y",
+        "issn" : "1553-7390",
+        "submission" : "D",
+        "embargo" : "N",
+        "hidden" : "Y"
+     },
+     {
+        "integrated" : "Y",
+        "embargo" : "N",
+        "issn" : "1549-1277",
+        "submission" : "D",
+        "hidden" : "Y",
+        "title" : "PLOS Medicine",
+        "sponsor" : "$120"
+     },
+     {
+        "integrated" : "Y",
+        "issn" : "1935-2727",
+        "submission" : "D",
+        "embargo" : "N",
+        "hidden" : "Y",
+        "title" : "PLOS Neglected Tropical Diseases",
+        "sponsor" : "$120"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "PLOS ONE",
+        "hidden" : "Y",
+        "issn" : "1932-6203",
+        "embargo" : "N",
+        "submission" : "D",
+        "integrated" : "Y"
+     },
+     {
+        "hidden" : "Y",
+        "embargo" : "N",
+        "issn" : "1553-7366",
+        "submission" : "D",
+        "integrated" : "Y",
+        "sponsor" : "$120",
+        "title" : "PLOS Pathogens"
+     },
+     {
+        "integrated" : "N",
+        "submission" : "A",
+        "issn" : "0950-1207",
+        "embargo" : "Y",
+        "hidden" : "Y",
+        "title" : "Proceedings of the Royal Society A",
+        "sponsor" : "The Royal Society"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "submission" : "R",
+        "issn" : "0962-8452",
+        "embargo" : "Y",
+        "sponsor" : "The Royal Society",
+        "title" : "Proceedings of the Royal Society B"
+     },
+     {
+        "integrated" : "Y",
+        "submission" : "R",
+        "issn" : "2054-5703",
+        "embargo" : "N",
+        "hidden" : "Y",
+        "title" : "Royal Society Open Science",
+        "sponsor" : "The Royal Society"
+     },
+     {
+        "integrated" : "Y",
+        "issn" : "2052-4463",
+        "submission" : "D",
+        "embargo" : "Y",
+        "hidden" : "Y",
+        "title" : "Scientific Data",
+        "sponsor" : "Nature Publishing Group"
+     },
+     {
+        "integrated" : "Y",
+        "issn" : "1768-1448",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "title" : "Subterranean Biology",
+        "sponsor" : "Pensoft"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "issn" : "1063-5157",
+        "submission" : "R",
+        "embargo" : "N",
+        "sponsor" : "Society of Systematic Biologists",
+        "title" : "Systematic Biology"
+     },
+     {
+        "issn" : "0363-6445",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "N",
+        "title" : "Systematic Botany",
+        "sponsor" : "American Society of Plant Taxonomists"
+     },
+     {
+        "sponsor" : "Toxicological Sciences",
+        "title" : "Toxicological Sciences",
+        "integrated" : "Y",
+        "hidden" : "N",
+        "issn" : "",
+        "embargo" : "Y",
+        "submission" : "R"
+     },
+     {
+        "integrated" : "Y",
+        "embargo" : "N",
+        "issn" : "",
+        "submission" : "R",
+        "hidden" : "N",
+        "title" : "Virus Evolution",
+        "sponsor" : "$120"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "submission" : "R",
+        "issn" : "",
+        "embargo" : "N",
+        "sponsor" : "$120",
+        "title" : "Work, Aging and Retirement"
+     },
+     {
+        "title" : "ZooKeys",
+        "sponsor" : "Pensoft",
+        "integrated" : "Y",
+        "embargo" : "Y",
+        "issn" : "1313-2970",
+        "submission" : "A",
+        "hidden" : "Y"
+     },
+     {
+        "integrated" : "Y",
+        "embargo" : "N",
+        "issn" : "",
+        "submission" : "A",
+        "hidden" : "Y",
+        "title" : "Zoological Systematics and Evolution",
+        "sponsor" : "Pensoft"
+     }
+  ]
+}

@@ -273,7 +273,7 @@ h1.ds-option-set-head {
 }
 .ds-div-head {
     font-size: 20px;
-    height: 25px;
+    min-height: 25px;
     overflow: visible;
 }
 /* remove some style for nested boxes */
@@ -1578,7 +1578,15 @@ h1 + div.tab-buttons {
     background-color: #707070;
     color: #fff;
     border: 1px solid #555;
+    cursor: default;
 }
+.tab-buttons a.disabled:hover {
+    cursor: default;
+}
+.tab-buttons a.disabled {
+    background-color: #e2e2e2;
+}
+
 .browse-data-panel h1.ds-div-head {
     font-size: 120%;
 }
@@ -2667,5 +2675,10 @@ h2.pricing-plan {
 
 .orcid-error{
     color:red;
+}
+
+
+#journal-logo {
+    float: right;
 }
 

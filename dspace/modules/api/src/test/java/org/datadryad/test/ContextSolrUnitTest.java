@@ -1,14 +1,21 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.datadryad.test;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.impl.XMLResponseParser;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
 import org.junit.After;
 import org.junit.Before;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.impl.XMLResponseParser;
 
 import java.io.File;
 import java.io.FileInputStream;

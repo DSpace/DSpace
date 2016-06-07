@@ -179,7 +179,6 @@
         range or prefix queries that expand to big boolean
         queries.  An exception is thrown if exceeded.  -->
     <maxBooleanClauses>1024</maxBooleanClauses>
-
     
     <!-- Cache used by SolrIndexSearcher for filters (DocSets),
          unordered sets of *all* documents that match a query.
