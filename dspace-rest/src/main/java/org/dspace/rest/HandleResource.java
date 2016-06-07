@@ -218,12 +218,12 @@ public class HandleResource extends Resource {
     }
 
     public static AbstractFormat getCitation(String prefix, String suffix, String format) throws OAIException, JAXBException, IOException {
-        String urlProp = ConfigurationManager.getProperty("dspace.baseUrl");
+        String urlProp = ConfigurationManager.getProperty("oai", "dspace.oai.url");
         String identifier = String.format("oai:%s:%s/%s", ConfigurationManager.getProperty("oai","identifier.prefix"), prefix, suffix);
         return getAbstractFormat(format, urlProp, identifier);
     }
     public static AbstractFormat getAbstractFormat(String format, String baseUrl, String identifier) throws JAXBException, IOException, OAIException {
-        URL url = new URL(String.format("%s/oai/request", baseUrl));
+        URL url = new URL(String.format("%s/request", baseUrl));
         OaiPmhServer server = new OaiPmhServer(url);
         Record record = server.getRecord(identifier, format);
         String metadataString = record.getMetadataAsString();
