@@ -45,4 +45,6 @@
     <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year">Popular (year)</message>
     <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime">Popular (all-time)</message>
 
+    <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.noDataAvailable">No data available</message>
+
 </catalogue>
