@@ -157,8 +157,12 @@ public class UploadStep extends AbstractSubmissionStep
 
     /**
      * Check if user has requested to edit information about an
-     * uploaded file
+     * uploaded file.
+     * @throws org.apache.cocoon.ProcessingException passed through.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws java.io.IOException passed through.
      */
+    @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters)
             throws ProcessingException, SAXException, IOException
     {
@@ -177,6 +181,7 @@ public class UploadStep extends AbstractSubmissionStep
         }
     }
 
+    @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
@@ -303,7 +308,7 @@ public class UploadStep extends AbstractSubmissionStep
                     row.addCell();
                 }
 
-                row.addCell().addXref(url,name);
+                row.addCell(null,null,"break-all").addXref(url, name);
                 row.addCellContent(bytes + " bytes");
                 if (desc == null || desc.length() == 0)
                 {
@@ -311,7 +316,7 @@ public class UploadStep extends AbstractSubmissionStep
                 }
                 else
                 {
-                    row.addCellContent(desc);
+                    row.addCell(null,null,"break-all").addContent(desc);
                 }
 
                 BitstreamFormat format = bitstream.getFormat(context);
@@ -369,11 +374,14 @@ public class UploadStep extends AbstractSubmissionStep
 
 
     /**
-     * Sherpa romeo submission support
+     * Sherpa RoMEO submission support.
+     * @param item the item in question.
+     * @param divIn add to this division.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
 
-    public void make_sherpaRomeo_submission(Item item, Division divIn) throws WingException {
-
+    public void make_sherpaRomeo_submission(Item item, Division divIn)
+            throws WingException {
 
         if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.sherparomeo-policy-enabled", true)){
 
@@ -443,7 +451,13 @@ public class UploadStep extends AbstractSubmissionStep
      *      The new sub-List object created by this step, which contains
      *      all the reviewable information.  If this step has nothing to
      *      review, then return null!   
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
+    @Override
     public List addReviewSection(List reviewList) throws SAXException,
             WingException, UIException, SQLException, IOException,
             AuthorizeException
@@ -478,7 +492,7 @@ public class UploadStep extends AbstractSubmissionStep
                 support = T_supported;
             }
 
-            org.dspace.app.xmlui.wing.element.Item file = uploadSection.addItem();
+            org.dspace.app.xmlui.wing.element.Item file = uploadSection.addItem(null,"break-all");
             file.addXref(url,name);
             file.addContent(" - "+ format + " ");
             file.addContent(support);

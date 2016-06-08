@@ -276,6 +276,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value) throws SQLException;
 
+    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, List<String> values) throws SQLException;
 
     /**
      * Add a single metadata field. This is appended to existing

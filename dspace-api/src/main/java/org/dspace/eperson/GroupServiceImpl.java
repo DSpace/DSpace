@@ -171,22 +171,19 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             EPerson currentUser = context.getCurrentUser();
 
             //First check the special groups
-            boolean found = false;
             List<Group> specialGroups = context.getSpecialGroups();
             if(CollectionUtils.isNotEmpty(specialGroups)) {
-                Iterator<Group> it = specialGroups.iterator();
-                while (it.hasNext() && !found) {
-                    Group next = it.next();
-                    found = StringUtils.equals(next.getName(), groupName);
+                for (Group specialGroup : specialGroups)
+                {
+                    //Check if the current special group is the one we are looking for OR retrieve all groups & make a check here.
+                    if(StringUtils.equals(specialGroup.getName(), groupName) || allMemberGroups(context, currentUser).contains(findByName(context, groupName)))
+                    {
+                        return true;
+                    }
                 }
             }
-
-            if(found) {
-                return true;
-            } else {
-                //lookup eperson in normal groups and subgroups
-                return epersonInGroup(context, groupName, currentUser);
-            }
+            //lookup eperson in normal groups and subgroups
+            return epersonInGroup(context, groupName, currentUser);
         } else {
             return false;
         }
@@ -364,8 +361,6 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             ePerson.getGroups().remove(group);
         }
 
-        deleteMetadata(context, group);
-
         // empty out group2groupcache table (if we do it after we delete our object we get an issue with references)
         group2GroupCacheDAO.deleteAll(context);
         // Remove ourself
@@ -470,7 +465,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     protected boolean epersonInGroup(Context context, String groupName, EPerson ePerson)
             throws SQLException
     {
-        return groupDAO.findByNameAndEPerson(context, groupName, ePerson) != null;
+        return groupDAO.findByNameAndMembership(context, groupName, ePerson) != null;
     }
 
 

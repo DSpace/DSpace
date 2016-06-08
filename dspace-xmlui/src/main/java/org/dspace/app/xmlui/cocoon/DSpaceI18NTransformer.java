@@ -18,35 +18,43 @@ import org.dspace.app.xmlui.configuration.Aspect;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 
 /**
- * This is a simple extension to the stardand Cocoon I18N transformer
+ * This is a simple extension to the standard Cocoon I18N transformer
  * that specializes the configuration based upon currently installed
  * aspects.
- * 
+ *
+ * <p>
  * This transformer modified the base configuration by adding two 
- * <location/> parameters for each aspect into the default catalogue.
+ * {@code <location/>} parameters for each aspect into the default catalogue.
  * The first location parameter is contained within the catalogue's
  * base location + the aspect path. The second location parameter is
  * located inside the aspect's path + "/i18n/"
- * 
+ *
+ * <p>
  * This allows aspect developers to place their default messages files
  * inside the aspect, and place translations into various languages inside 
  * the base i18n/ directory.
- * 
+ *
+ * <p>
  * EXAMPLE:
- * 
- * For instance let's say that the i18n transformer's configuration 
+ *
+ * <p>
+ * For instance, let's say that the i18n transformer's configuration
  * were as follows:
+ * <pre>{@code
  * <catalogues default="default">
  *   <catalogue id="default" name="messages" aspects="true">
  *     <location>context://i18n</location>
  *   </catalogue>
  * </catalogues>
+ * }</pre>
  * 
  * And there were two aspects installed:
- * <aspect name="Browse Artifacts" path="resource://aspects/BrowseArtifacts/" />
- * <aspect name="Administration" path="resource://aspects/Administrative/" />
- * 
+ * <br>{@code <aspect name="Browse Artifacts" path="resource://aspects/BrowseArtifacts/" />}
+ * <br>{@code <aspect name="Administration" path="resource://aspects/Administrative/" />}
+ *
+ * <p>
  * The effective configuration would be:
+ * <pre>{@code
  * <catalogues default="default">
  *   <catalogue id="default" name="messages" aspects="true">
  *     <location>context://i18n/</location>
@@ -56,8 +64,8 @@ import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
  *     <location>resource://aspects/Administrative/i18n/</location>
  *   </catalogue>
  * </catalogues>
- * 
- * 
+ * }</pre>
+ *
  * @author Scott Phillips
  */
 
@@ -71,10 +79,15 @@ public class DSpaceI18NTransformer extends I18nTransformer {
 	
 
     /**
-     * Intercept the configuration parameters comming from the cocoon sitemap before
-     * they are read by the cocoon i18n transformer. We want to add in <location> parameters
-     * for each 
+     * Intercept the configuration parameters coming from the Cocoon sitemap before
+     * they are read by the cocoon i18n transformer.  We want to add in
+     * {@code <location>} parameters for each.
+     *
+     * @param originalConf the intercepted configuration.
+     * @throws org.apache.avalon.framework.configuration.ConfigurationException
+     *      passed through.
      */
+    @Override
     public void configure(Configuration originalConf) throws ConfigurationException 
     {
     	MutableConfiguration modifiedConf = new DefaultConfiguration(originalConf,true);
@@ -145,6 +158,5 @@ public class DSpaceI18NTransformer extends I18nTransformer {
         // Pass off to cocoon's i18n transformer our modified configuration with new aspect locations.
         super.configure(modifiedConf);
     }
-	
 
 }

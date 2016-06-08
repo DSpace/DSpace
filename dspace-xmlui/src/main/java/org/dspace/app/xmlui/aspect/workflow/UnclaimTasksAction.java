@@ -40,12 +40,22 @@ public class UnclaimTasksAction extends AbstractAction
 	protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
 
     /**
+     * Unclaim-tasks action.
+     *
      * @param redirector
      *            un-used.
      * @param resolver
+     *            unused.
      * @param objectModel
      *            Cocoon's object model
+     * @param source
+     *            unused.
+     * @param parameters
+     *            unused.
+     * @return null.
+     * @throws java.lang.Exception passed through.
      */
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {

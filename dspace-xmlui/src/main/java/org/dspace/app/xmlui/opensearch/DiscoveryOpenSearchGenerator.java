@@ -7,30 +7,22 @@
  */
 package org.dspace.app.xmlui.opensearch;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Map;
-
-import org.apache.avalon.excalibur.pool.Recyclable;
-import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.caching.CacheableProcessingComponent;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.SourceResolver;
-import org.apache.cocoon.xml.dom.DOMStreamer;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.utils.FeedUtils;
-import org.dspace.content.DSpaceObject;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+import org.apache.avalon.excalibur.pool.*;
+import org.apache.avalon.framework.parameters.*;
+import org.apache.cocoon.*;
+import org.apache.cocoon.caching.*;
+import org.apache.cocoon.environment.*;
+import org.apache.cocoon.xml.dom.*;
+import org.dspace.app.xmlui.utils.*;
+import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.DiscoverQuery;
-import org.dspace.discovery.DiscoverResult;
-import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchServiceException;
-import org.dspace.discovery.SearchUtils;
-import org.dspace.sort.SortOption;
-import org.xml.sax.SAXException;
+import org.dspace.discovery.*;
+import org.dspace.sort.*;
+import org.xml.sax.*;
 
 
 /**
@@ -115,8 +107,7 @@ public class DiscoveryOpenSearchGenerator extends AbstractOpenSearchGenerator
                     queryResults = SearchUtils.getSearchService().search(context, scope, queryArgs);
 
 	            // creates the results array and generates the OpenSearch result
-	            DSpaceObject[] results = new DSpaceObject[queryResults.getDspaceObjects().size()];
-	            queryResults.getDspaceObjects().toArray(results);
+	            List<DSpaceObject> results = queryResults.getDspaceObjects();
 	            
 	            resultsDoc = openSearchService.getResultsDoc(context, format, query, (int) queryResults.getTotalSearchResults(), start, rpp, scope, results, FeedUtils.i18nLabels);
                 FeedUtils.unmangleI18N(resultsDoc);

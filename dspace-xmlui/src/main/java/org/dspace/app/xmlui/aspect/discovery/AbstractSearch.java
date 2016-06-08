@@ -459,7 +459,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * @param dspaceObjectsList a list of DSpace objects
      * @param item the DSpace item to be rendered
      * @param highlightedResults the highlighted results
-     * @throws WingException
+     * @throws WingException passed through.
      * @throws SQLException Database failure in services this calls
      */
     protected void renderItem(org.dspace.app.xmlui.wing.element.List dspaceObjectsList, Item item, DiscoverResult.DSpaceObjectHighlightResult highlightedResults) throws WingException, SQLException {
@@ -636,7 +636,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * @param metadataKey the metadata key {schema}.{element}.{qualifier}
      * @param metadataFieldList the wing list we need to add the metadata value to
      * @param value the metadata value
-     * @throws WingException
+     * @throws WingException passed through.
      */
     protected void addMetadataField(
             DiscoverResult.DSpaceObjectHighlightResult highlightedResults,

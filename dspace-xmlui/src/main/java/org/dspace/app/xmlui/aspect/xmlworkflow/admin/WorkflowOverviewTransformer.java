@@ -94,9 +94,7 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
     protected XmlWorkflowFactory workflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
     protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
 
-    /**
-     * Add Page metadata.
-     */
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException
     {
         pageMeta.addMetadata("title").addContent(T_title);
@@ -105,7 +103,7 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
         pageMeta.addTrail().addContent(T_trail);
     }
 
-
+    @Override
     public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
         Context context = ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel));
         if(!authorizeService.isAdmin(context)){
@@ -116,12 +114,15 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
         this.buildSearchResultsDivision(div);
     }
 
-
     /**
      * Attach a division to the given search division named "search-results"
      * which contains results for this search query.
      *
      * @param div The division to contain the results division.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     protected void buildSearchResultsDivision(Division div)
             throws IOException, SQLException, WingException, AuthorizeException {
@@ -203,9 +204,6 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
                     itemRow.addCell().addXref(handleService.resolveToURL(context, wfi.getCollection().getHandle()), wfi.getCollection().getName());
                     //Column 4 submitter
                     itemRow.addCell().addXref("mailto:" + wfi.getSubmitter().getEmail(), wfi.getSubmitter().getFullName());
-
-
-
                 }
 
                 Para buttonsPara = resultsDiv.addPara();
@@ -253,9 +251,11 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
         return s != null ? s : "DESC";
     }
 
-
     /**
-     * Generate a url to the simple search url.
+     * Generate a URL to the simple search url.
+     * @param parameters search parameters.
+     * @return the URL.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
      */
     protected String generateURL(Map<String, String> parameters)
             throws UIException {

@@ -86,18 +86,20 @@ public class DescribeStep extends AbstractSubmissionStep
     protected static final Message T_report_no=
         message("xmlui.Submission.submit.DescribeStep.report_no");
         
-        /**
+    /**
      * A shared resource of the inputs reader. The 'inputs' are the
      * questions we ask the user to describe an item during the
      * submission process. The reader is a utility class to read
      * that configuration file.
      */
     private static DCInputsReader INPUTS_READER = null;
+
     private static final Message T_vocabulary_link = message("xmlui.Submission.submit.DescribeStep.controlledvocabulary.link");
 
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
     protected MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+
     /**
      * Ensure that the inputs reader has been initialized, this method may be
      * called multiple times with no ill-effect.
@@ -120,11 +122,11 @@ public class DescribeStep extends AbstractSubmissionStep
     {
         return INPUTS_READER;
     }
-    
 
-        /**
-         * Establish our required parameters, abstractStep will enforce these.
-         */
+    /**
+     * Establish our required parameters.  AbstractStep will enforce these.
+     * @throws javax.servlet.ServletException if the reader could not initialize.
+     */
         public DescribeStep() throws ServletException
         {
                 this.requireSubmission = true;
@@ -141,6 +143,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
         }
         
+    @Override
         public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
         {
@@ -160,6 +163,7 @@ public class DescribeStep extends AbstractSubmissionStep
             }
         }
 
+    @Override
         public void addBody(Body body) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
         {
@@ -310,7 +314,14 @@ public class DescribeStep extends AbstractSubmissionStep
      *      The new sub-List object created by this step, which contains
      *      all the reviewable information.  If this step has nothing to
      *      review, then return null!
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException on reader error.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
+    @Override
     public List addReviewSection(List reviewList) throws SAXException,
         WingException, UIException, SQLException, IOException,
         AuthorizeException
@@ -425,7 +436,8 @@ public class DescribeStep extends AbstractSubmissionStep
          * @param dcValues
          *                      The field's pre-existing values.
          */
-        private void renderNameField(List form, String fieldName, DCInput dcInput, java.util.List<MetadataValue> dcValues, boolean readonly) throws WingException
+        private void renderNameField(List form, String fieldName, DCInput dcInput, java.util.List<MetadataValue> dcValues, boolean readonly)
+                throws WingException
         {
                 // The name field is a composite field containing two text fields, one
                 // for first name the other for last name.

@@ -8,18 +8,18 @@
 package org.dspace.versioning.dao.impl;
 
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.dao.VersionDAO;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
 import java.util.List;
-import org.dspace.versioning.VersionHistory;
-import org.hibernate.Query;
-import org.hibernate.criterion.Order;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Version object.
@@ -51,7 +51,7 @@ public class VersionDAOImpl extends AbstractHibernateDAO<Version> implements Ver
         Query q = this.createQuery(c, 
                 "SELECT (COALESCE(MAX(versionNumber), 0) + 1) "
                         + "FROM Version WHERE versionHistory.id = :historyId");
-        q.setParameter("historyId", vh.getId());
+        q.setParameter("historyId", vh.getID());
 
         int next = (Integer) q.uniqueResult();
         return next;

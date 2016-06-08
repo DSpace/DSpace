@@ -25,7 +25,7 @@ import org.w3c.dom.NodeList;
  * is shared with the JSPUI, and that UI employs a completely different i18n
  * mechanism, the SyndicationFeed abstraction takes its own map of message
  * keys to localized values.  For the XMLUI, the "localized value" is actually
- * a string with a special sentinal prefix (defined here as I18N_PREFIX). This
+ * a string with a special sentinel prefix (defined here as I18N_PREFIX). This
  * is really just a marker; the DOM has to be post-processed later and the
  * prefixed text is replaced by a Cocoon i18n element (whose key attribute
  * is the text following the prefix).
@@ -40,7 +40,7 @@ public class FeedUtils
 {
     public static final Map<String, String> i18nLabels = makeI18NLabels();
 
-    /** The prefix used to differentate i18n keys */
+    /** The prefix used to differentiate i18n keys */
     private static final String I18N_PREFIX = "I18N:";
 
     /** Cocoon's i18n namespace */
@@ -48,7 +48,7 @@ public class FeedUtils
 
     /**
      * Returns a map of localizable labels whose values are themselves keys that are
-     * unmangled into a true i18n element for later localization.
+     * de-mangled into a true i18n element for later localization.
      *
      * @return A map of mangled labels.
      */
@@ -67,7 +67,7 @@ public class FeedUtils
      * with the i18n prefix with an actual i18n element that
      * can be processed by the i18n transformer.
      *
-     * @param dom
+     * @param dom the document.
      */
     public static void unmangleI18N(Document dom)
     {
@@ -93,4 +93,3 @@ public class FeedUtils
         }
     }
 }
-

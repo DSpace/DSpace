@@ -9,6 +9,7 @@ package org.dspace.xmlworkflow.storedcomponents;
 
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.Group;
 
 import javax.persistence.*;
@@ -28,13 +29,13 @@ import java.sql.SQLException;
  */
 @Entity
 @Table(name="cwf_collectionrole")
-public class CollectionRole {
+public class CollectionRole implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name="collectionrole_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="cwf_collectionrole_seq")
     @SequenceGenerator(name="cwf_collectionrole_seq", sequenceName="cwf_collectionrole_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
 
 //    @Column(name = "role_id")
 //    @Lob
@@ -83,4 +84,7 @@ public class CollectionRole {
         return group;
     }
 
+    public Integer getID() {
+        return id;
+    }
 }

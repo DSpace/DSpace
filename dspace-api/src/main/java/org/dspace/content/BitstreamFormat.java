@@ -15,12 +15,16 @@ import java.util.List;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CollectionId;
 import org.hibernate.annotations.Type;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Class representing a particular bitstream format.
@@ -33,14 +37,14 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="bitstreamformatregistry")
-public class BitstreamFormat implements Serializable
+public class BitstreamFormat implements Serializable, ReloadableEntity<Integer>
 {
 
     @Id
     @Column(name="bitstream_format_id", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="bitstreamformatregistry_seq")
     @SequenceGenerator(name="bitstreamformatregistry_seq", sequenceName="bitstreamformatregistry_seq", allocationSize = 1, initialValue = 1)
-    private int id;
+    private Integer id;
 
     @Column(name="short_description", length = 128, unique = true)
     private String shortDescription;
@@ -111,7 +115,7 @@ public class BitstreamFormat implements Serializable
      * 
      * @return the internal identifier
      */
-    public final int getID()
+    public final Integer getID()
     {
         return id;
     }

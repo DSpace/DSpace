@@ -172,7 +172,7 @@ public class SyndicationFeed
      * @param labels label map
      */
     public void populate(HttpServletRequest request, Context context, DSpaceObject dso,
-                         DSpaceObject items[], Map<String, String> labels)
+                         List<?extends DSpaceObject> items, Map<String, String> labels)
     {
         String logoURL = null;
         String objectURL = null;

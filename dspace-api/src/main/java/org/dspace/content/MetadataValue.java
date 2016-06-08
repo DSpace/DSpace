@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -26,17 +27,17 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="metadatavalue")
-public class MetadataValue
+public class MetadataValue implements ReloadableEntity<Integer>
 {
     /** The reference to the metadata field */
     @Id
     @Column(name="metadata_value_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="metadatavalue_seq")
     @SequenceGenerator(name="metadatavalue_seq", sequenceName="metadatavalue_seq", allocationSize = 1)
-    private int valueId;
+    private Integer id;
 
     /** The primary key for the metadata value */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "metadata_field_id")
     private MetadataField metadataField = null;
 
@@ -62,7 +63,7 @@ public class MetadataValue
     @Column(name = "confidence")
     private int confidence = -1;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade={CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY, cascade={CascadeType.PERSIST})
     @JoinColumn(name="dspace_object_id")
     protected DSpaceObject dSpaceObject;
 
@@ -73,7 +74,7 @@ public class MetadataValue
      */
     protected MetadataValue()
     {
-
+        id = 0;
     }
 
     /**
@@ -81,9 +82,9 @@ public class MetadataValue
      *
      * @return metadata value ID
      */
-    public int getValueId()
+    public Integer getID()
     {
-        return valueId;
+        return id;
     }
 
     /**
@@ -238,11 +239,11 @@ public class MetadataValue
             return false;
         }
         final MetadataValue other = (MetadataValue) obj;
-        if (this.valueId != other.valueId)
+        if (this.id != other.id)
         {
             return false;
         }
-        if (this.getValueId() != other.getValueId())
+        if (this.getID() != other.getID())
         {
             return false;
         }
@@ -257,8 +258,8 @@ public class MetadataValue
     public int hashCode()
     {
         int hash = 7;
-        hash = 47 * hash + this.valueId;
-        hash = 47 * hash + this.getValueId();
+        hash = 47 * hash + this.id;
+        hash = 47 * hash + this.getID();
         hash = 47 * hash + this.getDSpaceObject().getID().hashCode();
         return hash;
     }

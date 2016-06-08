@@ -84,6 +84,7 @@ public class FlowItemUtils
 	 * @param context The current DSpace context.
 	 * @param identifier An Internal ID or a handle
 	 * @return A flow result
+     * @throws java.sql.SQLException passed through.
 	 */
 	public static FlowResult resolveItemIdentifier(Context context, String identifier) throws SQLException
 	{
@@ -131,10 +132,10 @@ public class FlowItemUtils
 	 * 
 	 * Each metadata entry will have three fields "name_X", "value_X", and "language_X" where X is an
 	 * integer that relates all three of the fields together. The name parameter stores the metadata name 
-	 * that is used by the entry (i.e schema_element_qualifier). The value and language paramaters are user
+	 * that is used by the entry (i.e schema_element_qualifier). The value and language parameters are user
 	 * inputed fields. If the optional parameter "remove_X" is given then the metadata value is removed.
 	 * 
-	 * To support AJAX operations on this page an aditional parameter is considered, the "scope". The scope
+	 * To support AJAX operations on this page an additional parameter is considered, the "scope". The scope
 	 * is the set of metadata entries that are being updated during this request. It the metadata name, 
 	 * schema_element_qualifier, only fields that have this name are considered! If all fields are to be
 	 * considered then scope should be set to "*". 
@@ -146,8 +147,13 @@ public class FlowItemUtils
 	 * @param itemID  internal item id
 	 * @param request the Cocoon request
 	 * @return A flow result
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static FlowResult processEditItem(Context context, UUID itemID, Request request) throws SQLException, AuthorizeException, UIException, IOException
+	public static FlowResult processEditItem(Context context, UUID itemID, Request request)
+            throws SQLException, AuthorizeException, UIException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
@@ -240,14 +246,19 @@ public class FlowItemUtils
 	}
 	
 	/**
-	 * Process the request paramaters to add a new metadata entry for the item.
+	 * Process the request parameters to add a new metadata entry for the item.
 	 * 
 	 * @param context The current DSpace context
 	 * @param itemID  internal item id
 	 * @param request the Cocoon request
 	 * @return A flow result
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static FlowResult processAddMetadata(Context context, UUID itemID, Request request) throws SQLException, AuthorizeException, UIException, IOException
+	public static FlowResult processAddMetadata(Context context, UUID itemID, Request request)
+            throws SQLException, AuthorizeException, UIException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
@@ -280,6 +291,9 @@ public class FlowItemUtils
 	 * @param context The DSpace context
 	 * @param itemID The id of the to-be-withdrawn item.
 	 * @return A result object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
 	public static FlowResult processWithdrawItem(Context context, UUID itemID) throws SQLException, AuthorizeException, IOException
 	{
@@ -296,13 +310,15 @@ public class FlowItemUtils
 		return result;
 	}
 	
-	
 	/**
 	 * Reinstate the specified item, this method assumes that the action has been confirmed.
 	 * 
 	 * @param context The DSpace context
 	 * @param itemID The id of the to-be-reinstated item.
 	 * @return A result object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
 	public static FlowResult processReinstateItem(Context context, UUID itemID) throws SQLException, AuthorizeException, IOException
 	{
@@ -319,13 +335,15 @@ public class FlowItemUtils
 		return result;
 	}
 
-
     /**
      * Make the specified item Private, this method assumes that the action has been confirmed.
      *
      * @param context The DSpace context
      * @param itemID The id of the to-be-withdrawn item.
      * @return A result object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
      */
     public static FlowResult processPrivateItem(Context context, UUID itemID) throws SQLException, AuthorizeException, IOException
     {
@@ -349,6 +367,9 @@ public class FlowItemUtils
      * @param context The DSpace context
      * @param itemID The id of the to-be-withdrawn item.
      * @return A result object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
      */
     public static FlowResult processPublicItem(Context context, UUID itemID) throws SQLException, AuthorizeException, IOException
     {
@@ -366,7 +387,6 @@ public class FlowItemUtils
         return result;
     }
 
-
     /**
      * Move the specified item to another collection.
      *
@@ -375,8 +395,12 @@ public class FlowItemUtils
      * @param collectionID The id of the destination collection.
      * @param inherit Whether to inherit the policies of the destination collection
      * @return A result object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
      */
-    public static FlowResult processMoveItem(Context context, UUID itemID, UUID collectionID, boolean inherit) throws SQLException, AuthorizeException, IOException
+    public static FlowResult processMoveItem(Context context, UUID itemID, UUID collectionID, boolean inherit)
+            throws SQLException, AuthorizeException, IOException
     {
         FlowResult result = new FlowResult();
         result.setContinue(false);
@@ -456,7 +480,6 @@ public class FlowItemUtils
         return result;
     }
 
-
 	/**
 	 * Permanently delete the specified item, this method assumes that
 	 * the action has been confirmed.
@@ -464,6 +487,9 @@ public class FlowItemUtils
 	 * @param context The DSpace context
 	 * @param itemID The id of the to-be-deleted item.
 	 * @return A result object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
 	public static FlowResult processDeleteItem(Context context, UUID itemID) throws SQLException, AuthorizeException, IOException
 	{
@@ -477,8 +503,7 @@ public class FlowItemUtils
         
 		return result;
 	}
-	
-	
+
 	/**
 	 * Add a new bitstream to the item. The bundle, bitstream (aka file), and description 
 	 * will be used to create a new bitstream. If the format needs to be adjusted then they 
@@ -488,6 +513,9 @@ public class FlowItemUtils
 	 * @param itemID The item to add a new bitstream too
 	 * @param request The request.
 	 * @return A flow result
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
 	public static FlowResult processAddBitstream(Context context, UUID itemID, Request request) throws SQLException, AuthorizeException, IOException 
 	{
@@ -596,13 +624,19 @@ public class FlowItemUtils
 	 * @param context The DSpace content
 	 * @param itemID The item to which the bitstream belongs
 	 * @param bitstreamID The bitstream being updated.
+     * @param bitstreamName the bitstream's name.
+     * @param primary "yes" or "no":  is bitstream primary?
 	 * @param description The new description of the bitstream
 	 * @param formatID The new format ID of the bitstream
 	 * @param userFormat Any user supplied formats.
+     * @param request user request.
 	 * @return A flow result object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
 	public static FlowResult processEditBitstream(Context context, UUID itemID, UUID bitstreamID, String bitstreamName,
-                                                  String primary, String description, int formatID, String userFormat, Request request) throws SQLException, AuthorizeException
+            String primary, String description, int formatID, String userFormat, Request request)
+            throws SQLException, AuthorizeException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
@@ -649,8 +683,7 @@ public class FlowItemUtils
 				}
 			}
 		}
-		
-		
+
 		//Step 2:
 		// Update the bitstream's format
 		if (formatID > 0)
@@ -678,12 +711,10 @@ public class FlowItemUtils
 
         processAccessFields(context, request, ((Item)bitstreamService.getParentObject(context,bitstream)).getOwningCollection(), bitstream);
 
-
         result.setContinue(true);
-	     result.setOutcome(true);
-	     result.setMessage(T_bitstream_updated);
-	        
-		
+        result.setOutcome(true);
+        result.setMessage(T_bitstream_updated);
+
 		return result;
 	}
 	
@@ -695,8 +726,13 @@ public class FlowItemUtils
 	 * @param itemID The item id from which to remove bitstreams
 	 * @param bitstreamIDs A bundleID slash bitstreamID pair of bitstreams to be removed.
 	 * @return A flow result
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException if bitstreamIDs cannot be parsed.
 	 */
-	public static FlowResult processDeleteBitstreams(Context context, UUID itemID, String[] bitstreamIDs) throws SQLException, AuthorizeException, IOException, UIException
+	public static FlowResult processDeleteBitstreams(Context context, UUID itemID, String[] bitstreamIDs)
+            throws SQLException, AuthorizeException, IOException, UIException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
@@ -708,9 +744,9 @@ public class FlowItemUtils
 			String[] parts = id.split("/");
 			
 			if (parts.length != 2)
-                        {
+            {
 				throw new UIException("Unable to parse id into bundle and bitstream id: "+id);
-                        }
+            }
 			
 			UUID bundleID = UUID.fromString(parts[0]);
 			UUID bitstreamID = UUID.fromString(parts[1]);
@@ -786,19 +822,21 @@ public class FlowItemUtils
         return result;
     }
 
-        /**
-         * processCurateDSO
-         *
-         * Utility method to process curation tasks
-         * submitted via the DSpace GUI
-         *
-         * @param context
-         * @param itemID
-         * @param request
-         *
-         */
-        public static FlowResult processCurateItem(Context context, UUID itemID, Request request)
-                                                                throws AuthorizeException, IOException, SQLException, Exception
+    /**
+     * processCurateDSO
+     *
+     * Utility method to process curation tasks submitted via the DSpace GUI.
+     *
+     * @param context session context.
+     * @param itemID the Item to be curated.
+     * @param request user request.
+     * @return flow result.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
+     */
+    public static FlowResult processCurateItem(Context context, UUID itemID, Request request)
+            throws AuthorizeException, IOException, SQLException, Exception
 	{
                 String task = request.getParameter("curate_task");
 		Curator curator = FlowCurationUtils.getCurator(task);
@@ -819,11 +857,19 @@ public class FlowItemUtils
 		}
 	}
 
-      /**
-       * queues curation tasks
-       */
-        public static FlowResult processQueueItem(Context context, UUID itemID, Request request)
-                                                                throws AuthorizeException, IOException, SQLException, Exception
+    /**
+     * queues curation tasks.
+     *
+     * @param context session context.
+     * @param itemID the Item to be curated.
+     * @param request user request.
+     * @return flow result.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
+     */
+    public static FlowResult processQueueItem(Context context, UUID itemID, Request request)
+            throws AuthorizeException, IOException, SQLException, Exception
 	{
                 String task = request.getParameter("curate_task");
                 Curator curator = FlowCurationUtils.getCurator(task);
@@ -847,7 +893,6 @@ public class FlowItemUtils
                 return FlowCurationUtils.getQueueFlowResult(task, status, objId, taskQueueName);
 	}
 
-	
 	/**
 	 * Parse the given name into three parts, divided by an _. Each part should represent the 
 	 * schema, element, and qualifier. You are guaranteed that if no qualifier was supplied the 

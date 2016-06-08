@@ -84,7 +84,7 @@ public interface OpenSearchService {
      * @throws IOException if IO error
      */
     public String getResultsString(Context context, String format, String query, int totalResults, int start, int pageSize,
-                                          DSpaceObject scope, DSpaceObject[] results,
+                                          DSpaceObject scope, List<DSpaceObject> results,
                                           Map<String, String> labels) throws IOException;
     /**
      * Returns a formatted set of search results as a document
@@ -102,7 +102,7 @@ public interface OpenSearchService {
      * @throws IOException if IO error
      */
     public Document getResultsDoc(Context context, String format, String query, int totalResults, int start, int pageSize,
-                                         DSpaceObject scope, DSpaceObject[] results, Map<String, String> labels)
+                                         DSpaceObject scope, List<DSpaceObject> results, Map<String, String> labels)
             throws IOException;
 
     public DSpaceObject resolveScope(Context context, String scope) throws SQLException;

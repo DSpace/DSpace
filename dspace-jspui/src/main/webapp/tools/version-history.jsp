@@ -113,14 +113,14 @@ var j = jQuery.noConflict();
 
 		%>	
 		<tr>
-			<td headers="t0"><input type="checkbox" class="remove" name="remove" value="<%=versRow.getId()%>"/></td>
+			<td headers="t0"><input type="checkbox" class="remove" name="remove" value="<%=versRow.getID()%>"/></td>
 			<td headers="t1" class="oddRowEvenCol"><%= versRow.getVersionNumber() %></td>
 			<td headers="t2" class="oddRowOddCol"><a href="<%= url %>"><%= identifier %></a><%= item.getID()==versRow.getItem().getID()?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
                         <% if (show_submitter) { %>
 			<td headers="t3" class="oddRowEvenCol"><a href="mailto:<%= versRowPerson.getEmail() %>"><%=versRowPerson.getFullName() %></a></td>
                         <% } %>
 			<td headers="t4" class="oddRowOddCol"><%= versRow.getVersionDate() %></td>
-			<td headers="t5" class="oddRowEvenCol"><%= versRow.getSummary() %><a class="btn btn-default pull-right" href="<%= request.getContextPath() %>/tools/version?itemID=<%= versRow.getItem().getID()%>&versionID=<%= versRow.getId() %>&submit_update_version"><span class="glyphicon glyphicon-pencil"></span>&nbsp;<fmt:message key="jsp.version.history.update"/></a></td>
+			<td headers="t5" class="oddRowEvenCol"><%= versRow.getSummary() %><a class="btn btn-default pull-right" href="<%= request.getContextPath() %>/tools/version?itemID=<%= versRow.getItem().getID()%>&versionID=<%= versRow.getID() %>&submit_update_version"><span class="glyphicon glyphicon-pencil"></span>&nbsp;<fmt:message key="jsp.version.history.update"/></a></td>
 		</tr>
 		<% } %>
 	</table>

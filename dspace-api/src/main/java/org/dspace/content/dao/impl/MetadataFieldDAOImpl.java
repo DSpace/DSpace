@@ -10,11 +10,12 @@ package org.dspace.content.dao.impl;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.dao.MetadataFieldDAO;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.Query;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -36,85 +37,110 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     @Override
     public MetadataField find(Context context, int metadataFieldId, MetadataSchema metadataSchema, String element,
                            String qualifier) throws SQLException{
-        Criteria criteria = createCriteria(context, MetadataField.class);
-        criteria.add(
-                Restrictions.and(
-                        Restrictions.not(Restrictions.eq("id", metadataFieldId)),
-                        Restrictions.eq("metadataSchema.id", metadataSchema.getSchemaID()),
-                        Restrictions.eq("element", element),
-                        Restrictions.eqOrIsNull("qualifier", qualifier)
-                )
-        );
-        criteria.setCacheable(true);
+        Query query;
 
-        return singleResult(criteria);
+        if(qualifier != null) {
+            query = createQuery(context, "SELECT mf " +
+                    "FROM MetadataField mf " +
+                    "JOIN FETCH mf.metadataSchema ms " +
+                    "WHERE mf.id != :id " +
+                    "AND ms.name = :name AND mf.element = :element " +
+                    "AND qualifier = :qualifier");
+        } else {
+            query = createQuery(context, "SELECT mf " +
+                    "FROM MetadataField mf " +
+                    "JOIN FETCH mf.metadataSchema ms " +
+                    "WHERE mf.id != :id " +
+                    "AND ms.name = :name AND mf.element = :element " +
+                    "AND mf.qualifier IS NULL");
+        }
+
+        query.setParameter("id", metadataFieldId);
+        query.setParameter("name", metadataSchema.getName());
+        query.setParameter("element", element);
+
+        if(qualifier != null) {
+            query.setParameter("qualifier", qualifier);
+        }
+
+        query.setCacheable(true);
+        return singleResult(query);
     }
 
     @Override
     public MetadataField findByElement(Context context, MetadataSchema metadataSchema, String element, String qualifier) throws SQLException
     {
-        Criteria criteria = createCriteria(context, MetadataField.class);
-        criteria.add(
-                Restrictions.and(
-                        Restrictions.eq("metadataSchema.id", metadataSchema.getSchemaID()),
-                        Restrictions.eq("element", element),
-                        Restrictions.eqOrIsNull("qualifier", qualifier)
-                )
-        );
-        criteria.setCacheable(true);
+        return findByElement(context, metadataSchema.getName(), element, qualifier);
+    }
 
-        return singleResult(criteria);
+    @Override
+    public MetadataField findByElement(Context context, String metadataSchema, String element, String qualifier) throws SQLException
+    {
+        Query query;
+
+        if(qualifier != null) {
+            query = createQuery(context, "SELECT mf " +
+                    "FROM MetadataField mf " +
+                    "JOIN FETCH mf.metadataSchema ms " +
+                    "WHERE ms.name = :name AND mf.element = :element " +
+                    "AND qualifier = :qualifier");
+        } else {
+            query = createQuery(context, "SELECT mf " +
+                    "FROM MetadataField mf " +
+                    "JOIN FETCH mf.metadataSchema ms " +
+                    "WHERE ms.name = :name AND mf.element = :element " +
+                    "AND mf.qualifier IS NULL");
+        }
+
+        query.setParameter("name", metadataSchema);
+        query.setParameter("element", element);
+
+        if(qualifier != null) {
+            query.setParameter("qualifier", qualifier);
+        }
+
+        query.setCacheable(true);
+        return singleResult(query);
     }
 
     @Override
     public List<MetadataField> findAll(Context context, Class<MetadataField> clazz) throws SQLException {
         Criteria criteria = createCriteria(context, MetadataField.class);
         criteria.createAlias("metadataSchema", "s").addOrder(Order.asc("s.name")).addOrder(Order.asc("element")).addOrder(Order.asc("qualifier"));
+        criteria.setFetchMode("metadataSchema", FetchMode.JOIN);
         criteria.setCacheable(true);
         return list(criteria);
-    }
-
-    @Override
-    public MetadataField findByElement(Context context, String metadataSchema, String element, String qualifier) throws SQLException
-    {
-        Criteria criteria = createCriteria(context, MetadataField.class);
-        criteria.createAlias("metadataSchema", "s").add(
-                Restrictions.and(
-                        Restrictions.eq("s.name", metadataSchema),
-                        Restrictions.eq("element", element),
-                        Restrictions.eqOrIsNull("qualifier", qualifier)
-                )
-        );
-        criteria.setCacheable(true);
-
-        return singleResult(criteria);
     }
 
     @Override
     public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchema, String element) throws SQLException
     {
-        Criteria criteria = createCriteria(context, MetadataField.class);
-        criteria.createAlias("metadataSchema", "s").add(
-                Restrictions.and(
-                        Restrictions.eq("s.name", metadataSchema),
-                        Restrictions.eq("element", element)
-                )
-        );
-        criteria.setCacheable(true);
+        Query query = createQuery(context, "SELECT mf " +
+                    "FROM MetadataField mf " +
+                    "JOIN FETCH mf.metadataSchema ms " +
+                    "WHERE ms.name = :name AND mf.element = :element ");
 
-        return list(criteria);
+
+        query.setParameter("name", metadataSchema);
+        query.setParameter("element", element);
+
+        query.setCacheable(true);
+        return list(query);
     }
 
     
     @Override
     public List<MetadataField> findAllInSchema(Context context, MetadataSchema metadataSchema) throws SQLException {
-        // Get all the metadatafieldregistry rows
-        Criteria criteria = createCriteria(context, MetadataField.class);
-        criteria.createAlias("metadataSchema", "s");
-        criteria.add(Restrictions.eq("s.id", metadataSchema.getSchemaID()));
-        criteria.addOrder(Order.asc("s.name")).addOrder(Order.asc("element")).addOrder(Order.asc("qualifier"));
 
-        criteria.setCacheable(true);
-        return list(criteria);
+        Query query = createQuery(context, "SELECT mf " +
+                "FROM MetadataField mf " +
+                "JOIN FETCH mf.metadataSchema ms " +
+                "WHERE ms.name = :name " +
+                "ORDER BY mf.element ASC, mf.qualifier ASC ");
+
+        query.setParameter("name", metadataSchema.getName());
+
+        query.setCacheable(true);
+        return list(query);
     }
 }

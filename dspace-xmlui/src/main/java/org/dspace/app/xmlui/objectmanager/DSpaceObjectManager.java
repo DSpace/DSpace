@@ -40,6 +40,7 @@ public class DSpaceObjectManager implements ObjectManager
      *            The object to be managed.
      * @return The object identifiers
      */
+    @Override
     public boolean manageObject(Object object)
     {
     	// Check that the object is of a type we can manage.
@@ -51,8 +52,8 @@ public class DSpaceObjectManager implements ObjectManager
     /**
      * Return the metadata URL of the supplied object, assuming 
      * it's a DSpace item, community or collection.
-     * 
      */
+    @Override
 	public String getObjectURL(Object object) throws WingException 
 	{
 		if (object instanceof DSpaceObject)
@@ -90,6 +91,7 @@ public class DSpaceObjectManager implements ObjectManager
 	 * Return a pretty specific string giving a hint to the theme as to what
 	 * type of DSpace object is being referenced.
 	 */
+    @Override
 	public String getObjectType(Object object)
 	{
 		if (object instanceof Item)
@@ -112,6 +114,7 @@ public class DSpaceObjectManager implements ObjectManager
      * Return a globally unique identifier for the repository. For dspace, we
      * use the handle prefix.
      */
+    @Override
 	public String getRepositoryIdentifier(Object object) throws WingException
 	{
 		return handleService.getPrefix();
@@ -119,6 +122,9 @@ public class DSpaceObjectManager implements ObjectManager
 	
 	/**
 	 * Return the metadata URL for this repository.
+     * @param object unused.
+     * @return path to the metadata document.
+     * @throws org.dspace.app.xmlui.wing.WingException never.
 	 */
 	public String getRepositoryURL(Object object) throws WingException
 	{
@@ -130,6 +136,7 @@ public class DSpaceObjectManager implements ObjectManager
 	 * For the DSpace implementation we just return a hash of one entry which contains
 	 * a reference to this repository's metadata.
 	 */
+    @Override
 	public Map<String,String> getAllManagedRepositories() throws WingException
 	{
 		String handlePrefix = handleService.getPrefix();

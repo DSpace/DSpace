@@ -176,7 +176,7 @@
 			   <%   }
 			      } %> />
 		</td>
-                <td headers="t2" class="<%= row %>RowOddCol">
+                <td headers="t2" class="<%= row %>RowOddCol break-all">
                 	<a href="<%= request.getContextPath() %>/retrieve/<%= bitstreams.get(i).getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams.get(i).getName()) %>" target="_blank"><%= bitstreams.get(i).getName() %></a>
             <%      // Don't display "remove" button in workflow mode
 			        if (allowFileEditing)
@@ -189,7 +189,7 @@
 			        } %>	
                 </td>
                 <td headers="t3" class="<%= row %>RowEvenCol"><%= bitstreams.get(i).getSize() %> bytes</td>
-                <td headers="t4" class="<%= row %>RowOddCol">
+                <td headers="t4" class="<%= row %>RowOddCol break-all">
                     <%= (bitstreams.get(i).getDescription() == null || bitstreams.get(i).getDescription().equals("")
                         ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.upload-file-list.empty1")
                         : bitstreams.get(i).getDescription()) %>

@@ -62,6 +62,7 @@ public class CurateCommunityForm extends AbstractDSpaceTransformer   {
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 
+    @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
     		          Parameters parameters) throws ProcessingException, SAXException, IOException
     {
@@ -69,30 +70,18 @@ public class CurateCommunityForm extends AbstractDSpaceTransformer   {
     	FlowCurationUtils.setupCurationTasks();
     }
 
-        /**
-         * common package method for initializing form gui elements
-         * Could be refactored.
-         * 
-         * @param pageMeta
-         * @throws WingException
-         */
-        public void addPageMeta(PageMeta pageMeta) throws WingException
+    @Override
+    public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         pageMeta.addTrail().addContent(T_community_trail);
         pageMeta.addTrail().addContent(T_trail);
     }
-        /** addBody
-     *
-     * @param body
-     * @throws WingException
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-        public void addBody(Body body)
-                                    throws WingException, SQLException,
-                                                        AuthorizeException, UnsupportedEncodingException
+
+    @Override
+    public void addBody(Body body)
+            throws WingException, SQLException, AuthorizeException, UnsupportedEncodingException
 	{
 		UUID communityID = UUID.fromString(parameters.getParameter("communityID", null));
 		Community thisCommunity = communityService.find(context, communityID);
