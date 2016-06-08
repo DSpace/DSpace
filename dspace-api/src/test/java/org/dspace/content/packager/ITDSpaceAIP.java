@@ -75,12 +75,14 @@ public class ITDSpaceAIP extends AbstractUnitTest
     private static String testCollectionHandle = null;
     private static String testItemHandle = null;
     private static String testMappedItemHandle = null;
+
     private static String submitterEmail = "aip-test@dspace.org";
+
     private Context context;
     
     /** Create a temporary folder which will be cleaned up automatically by JUnit.
         NOTE: As a ClassRule, this temp folder is shared by ALL tests below.
-        Its AIP contents are initialized in init() below. **/
+        Its AIP contents are initialized in {@link #init()} below. */
     @ClassRule
     public static final TemporaryFolder testFolder = new TemporaryFolder();
     
