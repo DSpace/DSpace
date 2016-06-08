@@ -82,9 +82,15 @@ public class XSLUtils {
             // so the whole thing is prefix...suffix
             String[] parts = name.split("\\.");
             if (parts.length > 1) {
-                // there is a file extension.
+                // there is a period
                 suffix = parts[parts.length - 1];
-                suffix = name.substring(name.length() - suffix.length() - 3, name.length() - suffix.length() - 1) + "." + suffix;
+
+		// if the period is near the beginning of the string, it's an abbreviation, not a file extension, so ignore it
+		if (name.length() - suffix.length() < 4) {
+		    suffix = null;
+		} else {
+		    suffix = name.substring(name.length() - suffix.length() - 3, name.length() - suffix.length() - 1) + "." + suffix;
+		}
             }
 
             if ((suffix == null) || (suffix.length() > 6)){
