@@ -621,12 +621,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         item.getCollections().clear();
         item.setOwningCollection(null);
 
-        // remove all of our authorization policies
-        authorizeService.removeAllPolicies(context, item);
-
         // Remove any Handle
         handleService.unbindHandle(context, item);
 
+        // remove all of our authorization policies
+        authorizeService.removeAllPolicies(context, item);
 
         // Finally remove item row
         itemDAO.delete(context, item);
