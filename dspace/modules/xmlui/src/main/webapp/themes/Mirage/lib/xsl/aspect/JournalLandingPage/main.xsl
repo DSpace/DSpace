@@ -14,39 +14,67 @@
 
     <xsl:variable name="upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
     <xsl:variable name="lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
-    <xsl:variable name="landing-placeholder" select="'&#x2013;'"/>
+    <xsl:variable name="space"      select="' '"/>
+    <xsl:variable name="space-esc"  select="'\ '"/>
+    <xsl:variable name="field-sep"  select="':'"/>
+    <xsl:variable name="field-join" select="'|||'"/>
+    <xsl:variable name="field"      select="'prism.publicationName_filter'"/>
+    <xsl:variable name="default-image" select="'/themes/Dryad/images/invisible.gif'"/>
+    <xsl:variable name="downloads-class"    select="'download-query'"/>
+    <xsl:variable name="downloads-url-base" select="concat('/', string(//dri:metadata[@element='request'][@qualifier='URI']), '/downloads/')"/>
+    <xsl:variable name="data-download"      select="'data-download'"/>
 
-    <!-- 
+    <!--
         Journal info and image
     -->
+    <!-- suppress this element in document order -->
+    <xsl:template match="dri:p[@id='aspect.journal.landing.JournalStats.p.hidden-fields']"/>
     <xsl:template match="//dri:document/dri:body/dri:div[@n='journal-landing-banner-outer']">
         <xsl:variable name="journal-name" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalName'])"/>
         <xsl:variable name="journal-abbr" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalAbbr'])"/>
         <xsl:variable name="alt" select="concat($journal-name, ' cover')"/>
         <xsl:variable name="cover" select="concat('/themes/Dryad/images/coverimages/', $journal-abbr, '.png')"/>
-        <xsl:variable name="default" select="'/themes/Dryad/images/invisible.gif'"/>
+
         <div id="{translate(string(@id), '.', '_')}" class="ds-static-div primary clearfix">
-            <p style="position: relative; float: right; max-width:100%; max-height:100%">
-                <img alt="{$alt}" 
-                    src="{$cover}" 
-                    id="journal-logo"
-                    class="pub-cover"
-                    onerror="this.src='{$default}'"></img>
-            </p>
-            <xsl:apply-templates/>
+            <table width="100%">
+                <tr>
+                    <td>
+                        <h1 class="ds-div-head">
+                            <xsl:value-of select=".//dri:p[@id='aspect.journal.landing.JournalStats.p.hidden-fields']/dri:field/@n"/>
+                        </h1>
+                        <xsl:apply-templates/>
+                    </td>
+                    <td>
+                        <img alt="{$alt}"
+                            src="{$cover}"
+                            id="journal-logo"
+                            class="pub-cover"
+                            onerror="this.src='{$default-image}'"></img>
+                    </td>
+                </tr>
+            </table>
         </div>
     </xsl:template>
 
-    <!-- 
-        Search data in Dryad associated with ... 
+    <!--
+        Search data in Dryad associated with ...
     -->
     <xsl:template match="//dri:document/dri:body/dri:div[@n='journal-landing-search']">
         <xsl:variable name="label" select="'Enter keyword, author, title, DOI.'"/>
         <xsl:variable name="placeholder" select="concat($label, ' ', 'Example: herbivory')"/>
-        <xsl:variable name="journal-name" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalName']"/>
-        <xsl:variable name="fq" select="concat('prism.publicationName_filter:',
-                                                translate($journal-name, $upper, $lower), 
-                                                '|||', $journal-name)"/>
+
+        <!-- journal name filter parameters for solr query -->
+        <xsl:variable name="journal-name" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalName'])"/>
+        <xsl:variable name="journal-name-esc">
+            <xsl:call-template name="escape-name">
+                <xsl:with-param name="str" select="$journal-name"/>
+                <xsl:with-param name="find" select="$space"/>
+                <xsl:with-param name="replace" select="$space-esc"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="journal-name-lower" select="translate($journal-name-esc, $upper, $lower)"/>
+        <xsl:variable name="fq"                 select="concat($field, $field-sep, $journal-name-lower, $field-join, $journal-name-esc)"/>
+
         <xsl:apply-templates select="dri:head"/>
         <form id="{translate(string(@id), '.', '_')}" class="ds-interactive-div primary"
               action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
@@ -64,10 +92,84 @@
         </form>
     </xsl:template>
 
-    <!-- 
+    <!--
         Browse for data
     -->
-    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.journal.landing.JournalStats.div.journal-landing-stats']">        
+    <xsl:template name="handle-tab-data">
+        <xsl:param name="id"/>
+        <div id="{$id}" class="ds-static-div primary">
+            <xsl:for-each select="dri:div">
+                <xsl:variable name="id2" select="concat($id, '-', string(position()))"/>
+                
+                <div id="{$id2}" class="browse-data-panel">
+                    <xsl:attribute name="style">
+                        <xsl:choose>
+                            <xsl:when test="position() = 1">overflow: auto;</xsl:when>
+                            <xsl:otherwise>overflow: auto; display: none;</xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <!-- add on-load handler for downloads data query 
+                        <metadata element="request" qualifier="URI">journal/0002-9122</metadata>
+                    -->
+                    <xsl:if test="@n='downloads'">
+                        <xsl:attribute name="class"><xsl:value-of select="$downloads-class"/></xsl:attribute>
+                        <xsl:attribute name="{$data-download}"><xsl:value-of select="concat($downloads-url-base, @rend)"/></xsl:attribute>
+                    </xsl:if>
+                    
+                    <table>
+                        <xsl:choose>
+                            <xsl:when test="dri:div[@n='vals']/dri:list/dri:item">
+                                <thead>
+                                    <tr style="width:100%">
+                                        <th style="float:left">
+                                            <h2 class="ds-head">
+                                                <i18n:text><xsl:value-of select="dri:div[@n='items']/dri:referenceSet/dri:head"/></i18n:text>
+                                            </h2>
+                                        </th>
+                                        <th style="width:20%">
+                                            <h2 class="ds-head">
+                                                <i18n:text><xsl:value-of select="dri:div[@n='vals']/dri:list/dri:head"/></i18n:text>
+                                            </h2>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <xsl:for-each select="dri:div[@n='vals']/dri:list/dri:item">
+                                        <xsl:variable name="position" select="position()"/>
+                                        <tr>
+                                            <td>
+                                                <xsl:apply-templates select="ancestor::dri:div[@n='vals']/preceding-sibling::dri:div[@n='items']/dri:referenceSet/dri:reference[$position]" mode="journalLanding"/>
+                                            </td>
+                                            <td align="center">
+                                                <xsl:apply-templates select="."/>
+                                            </td>
+                                        </tr>
+                                    </xsl:for-each>
+                                </tbody>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2">
+                                            <i18n:text>xmlui.JournalLandingPage.JournalLandingTabbedTransformer.noDataAvailable</i18n:text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </table>
+                </div>
+            </xsl:for-each>
+        </div>
+    </xsl:template>
+    
+    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.journal.landing.JournalDownloads.div.journal-landing-stats']">
+        <xsl:call-template name="handle-tab-data">
+            <xsl:with-param name="id" select="translate(string(@id), '.', '_')"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.journal.landing.JournalStats.div.journal-landing-stats']">
         <xsl:variable name="id" select="translate(string(@id), '.', '_')"/>
         <xsl:apply-templates select="dri:head"/>
 
@@ -77,58 +179,18 @@
                     <xsl:if test="position()=1">
                         <xsl:attribute name="class">selected</xsl:attribute>
                     </xsl:if>
-                    <!-- TODO: debug why the i18n:text is necesary -->
+                    <xsl:if test="position() != 1">
+                        <xsl:attribute name="class">disabled</xsl:attribute>
+                    </xsl:if>
                     <span>
                         <i18n:text><xsl:value-of select="."/></i18n:text>
                     </span>
                 </a>
             </xsl:for-each>
         </div>
-
-        <div id="{$id}" class="ds-static-div primary">
-            <xsl:for-each select="dri:div">
-                <xsl:variable name="id2" select="concat($id, '-', string(position()))"/>
-                <div id="{$id2}" class="browse-data-panel" style="">
-                    <xsl:attribute name="style">
-                        <xsl:choose>
-                            <xsl:when test="position() = 1">overflow: auto;</xsl:when>
-                            <xsl:otherwise>overflow: auto; display: none;</xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
-                    <table>
-                        <xsl:if test="dri:div[@n='items']/dri:referenceSet/dri:head or 
-                                      dri:div[@n='vals']/dri:list/dri:head"
-                        >
-                            <tr style="width:100%">
-                                <th style="float:left"><xsl:apply-templates select="dri:div[@n='items']/dri:referenceSet/dri:head"/></th>
-                                <th style="width:20%"><xsl:apply-templates select="dri:div[@n='vals']/dri:list/dri:head"/></th>
-                            </tr>
-                        </xsl:if>
-                        <xsl:choose>
-                            <xsl:when test="dri:div[@n='vals']/dri:list/dri:item">
-                                <xsl:for-each select="dri:div[@n='vals']/dri:list/dri:item">
-                                    <xsl:variable name="position" select="position()"/>
-                                    <tr>
-                                        <td>
-                                            <xsl:apply-templates select="ancestor::dri:div[@n='vals']/preceding-sibling::dri:div[@n='items']/dri:referenceSet/dri:reference[$position]" mode="journalLanding"/>
-                                        </td>
-                                        <td align="center">
-                                            <xsl:apply-templates select="."/>
-                                        </td>
-                                    </tr>
-                                </xsl:for-each>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <tr>
-                                    <td><xsl:value-of select="$landing-placeholder"/></td>
-                                    <td align="center"><xsl:value-of select="$landing-placeholder"/></td>
-                                </tr>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </table>
-                </div>
-            </xsl:for-each>
-        </div>
+        <xsl:call-template name="handle-tab-data">
+            <xsl:with-param name="id" select="$id"/>
+        </xsl:call-template>
     </xsl:template>
 
     <xsl:template match="dri:reference" mode="journalLanding">
@@ -150,6 +212,31 @@
 
     <xsl:template match="//dri:div[@n='journal-landing-banner-inner']/dri:p/dri:hi" priority="2">
         <strong><i18n:text><xsl:value-of select="."/></i18n:text></strong>
+    </xsl:template>
+
+    <!--
+        Utility template to replace all $find in $str with $replace.
+    -->
+    <xsl:template name="escape-name">
+        <xsl:param name="str"/>
+        <xsl:param name="find"/>
+        <xsl:param name="replace"/>
+        <xsl:choose>
+            <xsl:when test="string-length($str) &gt; 0 and contains($str, $find)">
+                <xsl:variable name="str-before" select="substring-before($str,$find)"/>
+                <xsl:variable name="str-after">
+                    <xsl:call-template name="escape-name">
+                        <xsl:with-param name="find" select="$find"/>
+                        <xsl:with-param name="replace" select="$replace"/>
+                        <xsl:with-param name="str" select="substring-after($str, $find)"/>
+                    </xsl:call-template>
+                </xsl:variable>
+                <xsl:value-of select="concat($str-before,$replace,$str-after)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$str"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
 </xsl:stylesheet>

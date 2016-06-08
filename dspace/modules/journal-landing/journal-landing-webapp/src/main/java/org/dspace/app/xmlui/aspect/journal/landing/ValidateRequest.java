@@ -7,22 +7,23 @@
  */
 package org.dspace.app.xmlui.aspect.journal.landing;
 
-import java.util.Map;
-import java.util.HashMap;
-
+import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
+import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.SourceResolver;
-
+import org.apache.excalibur.source.SourceValidity;
+import org.apache.excalibur.source.impl.validity.ExpiresValidity;
 import org.apache.log4j.Logger;
-import org.dspace.JournalUtils;
-
-import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.content.authority.Concept;
-import org.dspace.core.Context;
 import org.datadryad.api.DryadJournalConcept;
+import org.dspace.JournalUtils;
+import org.dspace.core.ConfigurationManager;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Cocoon Action to confirm that the requested journal landing page is for 
@@ -30,29 +31,30 @@ import org.datadryad.api.DryadJournalConcept;
  * 
  * @author Nathan Day
  */
-public class ValidateRequest extends AbstractAction {
-
+public class ValidateRequest extends AbstractAction
+{
     private static final Logger log = Logger.getLogger(ValidateRequest.class);
 
     @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
-                    String source, Parameters parameters) throws Exception
+                    String source, Parameters parameters) throws ParameterException
     {
-        String journalAbbr = parameters.getParameter(PARAM_JOURNAL_NAME);
-        if (journalAbbr == null || journalAbbr.length() == 0) return null;
-
-        // verify we have an accurate journal
-        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(journalAbbr);
-        if (journalConcept == null) {
+        String journalISSN = parameters.getParameter(Const.PARAM_JOURNAL_ISSN);
+        if (journalISSN == null || journalISSN.length() == 0 || !Const.issnPattern.matcher(journalISSN).matches()) {
             return null;
         }
-        String journalName = journalConcept.getFullName();
-        if (journalName != null && journalName.length() != 0) {
+        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByISSN(journalISSN);
+        if (journalConcept != null && journalConcept.getIntegrated()) {
             Map map = new HashMap();
-            map.put(PARAM_JOURNAL_NAME, journalName);
-            map.put(PARAM_JOURNAL_ABBR, journalAbbr);
+            map.put(Const.PARAM_JOURNAL_NAME, journalConcept.getFullName());
+            map.put(Const.PARAM_JOURNAL_ISSN, journalISSN);
+            map.put(Const.PARAM_JOURNAL_ABBR, journalConcept.getJournalID());
+            try {
+                map.put(Const.PARAM_DOWNLOAD_DURATION, parameters.getParameter(Const.PARAM_DOWNLOAD_DURATION));
+            } catch (Exception e) {}
             return map;
         }
         return null;
     }
 }
+

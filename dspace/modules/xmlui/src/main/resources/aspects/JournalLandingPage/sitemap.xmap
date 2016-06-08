@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+    <map:components>
+        <map:actions>
+            <map:action name="ValidateRequest"       src="org.dspace.app.xmlui.aspect.journal.landing.ValidateRequest"/>
+        </map:actions>
+        <map:transformers>
+            <map:transformer name="JournalStats"     src="org.dspace.app.xmlui.aspect.journal.landing.JournalStats"/>
+            <map:transformer name="JournalDownloads" src="org.dspace.app.xmlui.aspect.journal.landing.JournalDownloads"/>
+        </map:transformers>
+        <map:matchers default="wildcard"/>
+    </map:components>
+
+    <map:pipelines>
+
+        <map:pipeline type="noncaching">
+            <map:generate/>
+
+            <!--
+                Return journal download stats for requests: /journal/*/downloads/*
+
+                Where the final segment maps to a solr time subquery from dspace.cfg:
+                    month   => time:[NOW-1MONTH TO NOW]
+                    year    => time:[NOW-1YEAR TO NOW]
+                    alltime => time:[* TO NOW]
+            -->
+            <map:match type="wildcard" pattern="journal/*/downloads/*">
+                <map:act type="ValidateRequest">
+                    <map:parameter name="journalISSN" value="{1}"/>
+                    <map:parameter name="downloadDuration" value="{2}"/>
+                    <map:transform type="JournalDownloads">
+                        <map:parameter name="journalISSN" value="{journalISSN}"/>
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                        <map:parameter name="downloadDuration" value="{downloadDuration}"/>
+                    </map:transform>
+                </map:act>
+            </map:match>
+
+            <!--
+                Return a journal landing page for requests: /journal/nnnn-nnnn
+            -->
+            <map:match type="wildcard" pattern="journal/*">
+                <map:act type="ValidateRequest">
+                    <map:parameter name="journalISSN" value="{1}"/>
+                    <map:transform type="JournalStats">
+                        <map:parameter name="journalISSN" value="{journalISSN}"/>
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
+                </map:act>
+            </map:match>
+
+            <map:serialize/>
+
+        </map:pipeline>
+
+    </map:pipelines>
+
+</map:sitemap>
+
