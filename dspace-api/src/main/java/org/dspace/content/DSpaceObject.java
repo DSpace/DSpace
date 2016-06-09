@@ -1402,7 +1402,6 @@ public abstract class DSpaceObject
         else
         {
             Collection collection = null;            
-
             if (type == Constants.COLLECTION)
             {
                 collection = (Collection) this;
@@ -1410,6 +1409,12 @@ public abstract class DSpaceObject
             else if (type == Constants.ITEM)
             {
                 collection = ((Item) this).getOwningCollection();
+                if(collection == null){
+                    WorkspaceItem wi = WorkspaceItem.findByItem(ourContext, (Item)this);
+                    if(wi != null){
+                        collection = wi.getCollection();
+                    }
+                }
             }
 
             if (collection != null)                
