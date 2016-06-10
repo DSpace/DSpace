@@ -282,12 +282,31 @@ public class GroupEditServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        List<Group> groups = groupService.findAll(c, null);
-
-        // if( groups == null ) { System.out.println("groups are null"); }
-        // else System.out.println("# of groups: " + groups.length);
-        request.setAttribute("groups", groups);
-
+        List<Group> groups = new ArrayList<Group>();
+        boolean isAdmin = authorizeService.isAdmin(c);
+        boolean isCommunityAdmin = authorizeService.isCommunityAdmin(c);
+        boolean isCollectionAdmin = authorizeService.isCollectionAdmin(c);
+        
+        // In case the user is a community or collection admin, only the groups
+        // the user is allowed to change should listed
+        if(!isAdmin && (isCommunityAdmin || isCollectionAdmin))
+        {
+            for(Group group: groups)
+            {
+                if(authorizeService.authorizeActionBoolean(c, group, Constants.WRITE) ||
+                   authorizeService.authorizeActionBoolean(c, group, Constants.ADD))
+                {
+                    groups.add(group);
+                }
+            }
+            request.setAttribute("groups", groups);
+        }
+        // All groups are shown to the System admin
+        else
+        {
+            groups = groupService.findAll(c, GroupService.NAME);
+            request.setAttribute("groups", groups);
+        }
         JSPManager.showJSP(request, response, "/tools/group-list.jsp");
         c.complete();
     }

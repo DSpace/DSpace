@@ -179,6 +179,10 @@ public interface AuthorizeService {
      * @throws SQLException if database error
      */
     public boolean isAdmin(Context c) throws SQLException;
+    
+    public boolean isCommunityAdmin(Context c) throws SQLException;
+    
+    public boolean isCollectionAdmin(Context c) throws SQLException; 
 
     ///////////////////////////////////////////////
     // policy manipulation methods
