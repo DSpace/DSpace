@@ -390,13 +390,22 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     public void update(Context context, T dso) throws SQLException, AuthorizeException;
 
+    /**
+     * Remove the object from storage.
+     *
+     * @param context Session context.
+     * @param dso The object to be deleted.
+     * @throws SQLException whenever.
+     * @throws AuthorizeException whenever.
+     * @throws IOException whenever.
+     */
     public void delete(Context context, T dso) throws SQLException, AuthorizeException, IOException;
 
-
     /**
-     * Returns the Constants which this service supports
+     * Returns the DSpaceObject type which this service supports.
+     * @see org.dspace.core.Constants
      *
-     * @return a org.dspace.core.Constants that represents a DSpaceObjct type
+     * @return a constant that represents a DSpaceObjct type.
      */
     public int getSupportsTypeConstant();
 

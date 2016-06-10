@@ -23,10 +23,9 @@ public interface DSpaceObjectLegacySupportService<T extends DSpaceObject> {
 
     public T findByIdOrLegacyId(Context context, String id) throws SQLException;
 
-
     /**
      * Generic find for when the precise type of a DSO is not known, just the
-     * a pair of type number and database ID.
+     * database ID.
      *
      * @param context - the context
      * @param id - the legacy id within table of type'd objects
@@ -36,9 +35,10 @@ public interface DSpaceObjectLegacySupportService<T extends DSpaceObject> {
     public T findByLegacyId(Context context, int id) throws SQLException;
 
     /**
-     * Returns the Constants which this service supports
+     * Returns the DSpaceObject type which this service supports.
+     * @see org.dspace.core.Constants
      *
-     * @return a org.dspace.core.Constants that represents a DSpaceObjct type
+     * @return a constant that represents a DSpaceObjct type.
      */
     public int getSupportsTypeConstant();
 }
