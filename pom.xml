@@ -1429,6 +1429,28 @@
         </mailingList>
     </mailingLists>
 
+    <developers>
+        <developer>
+           <name>DSpace Committers</name>
+           <email>dspace-devel@googlegroups.com</email>
+           <url>https://wiki.duraspace.org/display/DSPACE/DSpace+Committers</url>
+           <roles>
+             <role>committer</role>
+           </roles>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+           <name>DSpace Contributors</name>
+           <email>dspace-tech@googlegroups.com</email>
+           <url>https://wiki.duraspace.org/display/DSPACE/DSpaceContributors</url>
+           <roles>
+             <role>developer</role>
+           </roles>
+        </contributor>
+    </contributors>
+
     <!--
       The SCM repository location is used by Continuum to update against
       when changes have occurred.  This spawns a new build cycle and releases
