@@ -139,11 +139,11 @@ public class WOSOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
     }
 
     public List<Record> searchByAffiliation(String userQuery,
-            String databaseID, String start, String end) throws HttpException, IOException
+            String databaseID, String symbolicTimeSpan, String start, String end) throws HttpException, IOException
     {
         List<Record> results = new ArrayList<Record>();
         if (databaseID != null) {
-            List<Record> search = wosService.searchByAffiliation(userQuery, databaseID, start, end, getWosUser(), getWosPassword(), getIpAuthentication());
+            List<Record> search = wosService.searchByAffiliation(userQuery, databaseID, symbolicTimeSpan, start, end, getWosUser(), getWosPassword(), getIpAuthentication());
             if (search != null) {
                 for (Record scopus : search) {
                     results.add(convertFields(scopus));

@@ -258,21 +258,28 @@ public class WOSService {
 	}
 
 	//TODO databaseID not used
-    public List<Record> searchByAffiliation(String userQuery, String databaseID, String start, String end,
+    public List<Record> searchByAffiliation(String userQuery, String databaseID, String symbolicTimeSpan, String start, String end,
             String username, String password, boolean ipAuth)
                     throws HttpException, IOException
     {        
         StringBuffer query = new StringBuffer("<userQuery>");
         query.append(userQuery);
         query.append("</userQuery>");
-        query.append("<timeSpan>");
-        query.append("<begin>");
-        query.append(start);
-        query.append("</begin>");
-        query.append("<end>");
-        query.append(end);
-        query.append("</end>");
-        query.append("</timeSpan>");
+        if(StringUtils.isNotBlank(symbolicTimeSpan)) {
+            query.append("<symbolicTimeSpan>");
+            query.append(symbolicTimeSpan);
+            query.append("</symbolicTimeSpan>");
+        }
+        else {
+            query.append("<timeSpan>");
+            query.append("<begin>");
+            query.append(start);
+            query.append("</begin>");
+            query.append("<end>");
+            query.append(end);
+            query.append("</end>");
+            query.append("</timeSpan>");
+        }
         String message = SEARCH_HEAD_BY_AFFILIATION + query.toString() + SEARCH_END_BY_AFFILIATION;
         return internalSearch(message, username, password, ipAuth);
     }

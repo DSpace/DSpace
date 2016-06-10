@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -28,8 +30,10 @@ import org.dspace.app.cris.batch.dto.DTOImpRecord;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
 import org.dspace.submit.lookup.ScopusOnlineDataLoader;
 import org.dspace.submit.lookup.SubmissionItemDataLoader;
+import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.utils.DSpace;
 
@@ -50,11 +54,16 @@ public class ScopusFeed
     // workflow step 3, z = inarchive
     private static String status = "y";
 
-    private static TransformationEngine feedTransformationEngine = new DSpace()
+    private static TransformationEngine feedTransformationEnginePhaseOne = new DSpace()
             .getServiceManager()
-            .getServiceByName("scopusFeedTransformationEngine",
+            .getServiceByName("scopusFeedTransformationEnginePhaseOne",
                     TransformationEngine.class);
-
+    
+    private static TransformationEngine feedTransformationEnginePhaseTwo = new DSpace()
+            .getServiceManager()
+            .getServiceByName("scopusFeedTransformationEnginePhaseTwo",
+                    TransformationEngine.class);
+    
     private static ScopusOnlineDataLoader scopusOnlineDataLoader = new DSpace()
             .getServiceManager().getServiceByName("scopusOnlineDataLoader",
                     ScopusOnlineDataLoader.class);
@@ -186,10 +195,15 @@ public class ScopusFeed
                 int tmpCollectionID = collection_id;
                 if (!forceCollectionId)
                 {
-                    Set<String> t = pmeItem.getMetadata().get("dc.type");
+                    Set<String> t = pmeItem.getMetadata().get("dc.source.type");
                     if (t != null && !t.isEmpty())
                     {
-                        String stringTmpCollectionID = t.iterator().next();
+                        String stringTmpCollectionID = "";
+                        Iterator<String> iterator = t.iterator();
+                        while(iterator.hasNext()) {
+                            String stringTrimTmpCollectionID = iterator.next();
+                            stringTmpCollectionID += stringTrimTmpCollectionID.trim();                                
+                        }
                         tmpCollectionID = ConfigurationManager
                                 .getIntProperty("scopusfeed",
                                         "scopus.type." + stringTmpCollectionID
@@ -278,17 +292,34 @@ public class ScopusFeed
         List<ItemSubmissionLookupDTO> results = new ArrayList<ItemSubmissionLookupDTO>();
         if (wosResult != null && !wosResult.isEmpty())
         {
-            for (Record record : wosResult)
+
+            TransformationEngine transformationEngine1 = getFeedTransformationEnginePhaseOne();
+            if (transformationEngine1 != null)
             {
-                List<Record> rr = new ArrayList<Record>();
-                rr.add(record);
-                ItemSubmissionLookupDTO result = new ItemSubmissionLookupDTO(
-                        rr);
-                results.add(result);
+                for (Record record : wosResult)
+                {
+                    HashMap<String, Set<String>> map = new HashMap<String, Set<String>>();
+                    HashSet<String> set = new HashSet<String>();
+                    set.add(record.getValues("eid").get(0).getAsString());
+                    map.put("scopuseid", set);
+
+                    MultipleSubmissionLookupDataLoader mdataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine1
+                            .getDataLoader();
+                    mdataLoader.setIdentifiers(map);
+                    SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine1
+                            .getOutputGenerator();
+                    outputGenerator
+                            .setDtoList(new ArrayList<ItemSubmissionLookupDTO>());
+
+                    transformationEngine1.transform(new TransformationSpec());
+                    log.debug("BTE transformation finished!");
+                    results.addAll(outputGenerator.getDtoList());
+                }                
+                
             }
 
-            TransformationEngine transformationEngine2 = getFeedTransformationEngine();
-            if (transformationEngine2 != null)
+            TransformationEngine transformationEngine2 = getFeedTransformationEnginePhaseTwo();
+            if (transformationEngine2 != null && results!=null)
             {
                 SubmissionItemDataLoader dataLoader = (SubmissionItemDataLoader) transformationEngine2
                         .getDataLoader();
@@ -303,9 +334,14 @@ public class ScopusFeed
         return pmeResult;
     }
 
-    public static TransformationEngine getFeedTransformationEngine()
+    public static TransformationEngine getFeedTransformationEnginePhaseOne()
     {
-        return feedTransformationEngine;
+        return feedTransformationEnginePhaseOne;
+    }
+    
+    public static TransformationEngine getFeedTransformationEnginePhaseTwo()
+    {
+        return feedTransformationEnginePhaseTwo;
     }
 
 }

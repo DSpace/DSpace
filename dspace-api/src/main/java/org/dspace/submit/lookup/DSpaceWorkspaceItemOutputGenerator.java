@@ -7,12 +7,6 @@
  */
 package org.dspace.submit.lookup;
 
-import gr.ekt.bte.core.DataOutputSpec;
-import gr.ekt.bte.core.OutputGenerator;
-import gr.ekt.bte.core.Record;
-import gr.ekt.bte.core.RecordSet;
-import gr.ekt.bte.core.Value;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,6 +24,7 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.AdditionalMetadataUpdateProcessPlugin;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -37,6 +32,13 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
+import org.dspace.utils.DSpace;
+
+import gr.ekt.bte.core.DataOutputSpec;
+import gr.ekt.bte.core.OutputGenerator;
+import gr.ekt.bte.core.Record;
+import gr.ekt.bte.core.RecordSet;
+import gr.ekt.bte.core.Value;
 
 /**
  * @author Andrea Bollini
@@ -52,6 +54,8 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
 
     private Context context;
 
+    private DSpace dspace = new DSpace();
+    
     private String formName;
 
     private List<WorkspaceItem> witems;
@@ -225,9 +229,20 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
 
         try
         {
+            String providerName = "";
+            List<Value> providerNames = itemLookup.getValues("provider_name_field");
+            if(providerNames!=null && providerNames.size()>0) {
+                providerName = providerNames.get(0).getAsString();
+            }
+            List<AdditionalMetadataUpdateProcessPlugin> additionalMetadataUpdateProcessPlugins = (List<AdditionalMetadataUpdateProcessPlugin>)dspace
+                    .getServiceManager().getServicesByType(AdditionalMetadataUpdateProcessPlugin.class);
+            for(AdditionalMetadataUpdateProcessPlugin additionalMetadataUpdateProcessPlugin : additionalMetadataUpdateProcessPlugins) {
+                additionalMetadataUpdateProcessPlugin.process(this.context, item, providerName);
+            }
+            
             item.update();
         }
-        catch (SQLException e)
+        catch (SQLException | NullPointerException e)
         {
             log.error(e.getMessage(), e);
         }

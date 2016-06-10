@@ -142,6 +142,7 @@
 			    <ref bean="mapConverter_pubstatusPubmed"/>
 				<ref bean="mapConverter_classificationASJC" />
 			    <ref bean="mapConverter_scopusType"/>
+			    <ref bean="mapConverter_wosType"/>			    			    
 			    <ref bean="splitValue"/>							    
 			    <ref bean="removeLastDot"/>
 			</list>
@@ -169,12 +170,24 @@
 	    <property name="fieldKeys">
 	        <list>
 	            <!-- Specify the internal BTE keys that this modifier needs to be applied for -->
-	        	<value>scopusType</value>
+	        	<value>subtype</value>
 	        </list>
 	    </property>
 	</bean>
 	
 	
+	<bean name="mapConverter_wosType" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
+	    <constructor-arg value="mapConverter_wosType Modifier"/>
+	    <property name="converterNameFile" value="mapConverter-wosType.properties"/>
+	    <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+	    <property name="fieldKeys">
+	        <list>
+	            <!-- Specify the internal BTE keys that this modifier needs to be applied for -->
+	        	<value>subtype</value>
+	        </list>
+	    </property>
+	</bean>
+
 	<!-- Converts an input value to an output one -->
 	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
 	    <constructor-arg value="mapConverter_pubstatusPubmed Modifier"/>
@@ -242,8 +255,9 @@
 			<list>
 			    <ref bean="fieldMergeModifier"/>
 			    <ref bean="valueConcatenationModifier"/>
-			    <ref bean="languageCodeModifier"/>
-
+			    <ref bean="languageCodeModifier"/>			    
+			    <ref bean="journalsModifier"/>
+			    <ref bean="authorsModifier"/>			    
 			</list>
 		</property>
 	</bean>
@@ -269,14 +283,63 @@
 	        </map>
 	    </property>
 	</bean>
-	
+		
 	<bean name="valueConcatenationModifier" class="org.dspace.submit.lookup.ValueConcatenationModifier">
 	    <property name="field" value="allkeywords"/>
 	    <property name="separator" value=";" />
 	    <property name="whitespaceAfter" value="true" />
 	</bean>
 
-        <bean name="languageCodeModifier" class="org.dspace.submit.lookup.LanguageCodeModifier"/>
+    <bean name="languageCodeModifier" class="org.dspace.submit.lookup.LanguageCodeModifier"/>
+    
+    <bean name="journalsModifier"
+		class="org.dspace.submit.lookup.AuthorityLookupModifier">
+		<property name="searchService" ref="org.dspace.discovery.SearchService" />
+		<property name="resourceTypeID" value="1001" />
+		<property name="metadataInputConfiguration">
+			<map>
+				<entry key="jissn" value="crisjournal.journalissn" />
+				<entry key="jeissn" value="crisjournal.journaleissn" />
+			</map>
+		</property>
+		<property name="mappingOutputConfiguration">
+			<map>
+				<entry key="journalname" value="journal" />
+				<entry key="journalissn" value="jissn" />
+				<entry key="journaleissn" value="jeissn" />
+				<entry key="journalpublisher" value="publisher" />
+			</map>
+		</property>
+		<property name="mappingAuthorityConfiguration">
+			<map>
+				<entry key="journalname" value="journal" />
+			</map>
+		</property>
+		<property name="clazzCrisObject" value="org.dspace.app.cris.model.ResearchObject" />
+	</bean>
+	
+	<bean name="authorsModifier"
+		class="org.dspace.submit.lookup.AuthorityLookupModifier">
+		<property name="searchService" ref="org.dspace.discovery.SearchService" />
+		<property name="resourceTypeID" value="9" />
+		<property name="metadataInputConfiguration">
+			<map>
+				<entry key="authors" value="crisauthoritylookup" />
+			</map>
+		</property>
+		<property name="mappingOutputConfiguration">
+			<map>
+				<entry key="fullName" value="authors" />
+			</map>
+		</property>
+		<property name="mappingAuthorityConfiguration">
+			<map>
+				<entry key="fullName" value="authors" />
+			</map>
+		</property>
+		<property name="clazzCrisObject" value="org.dspace.app.cris.model.ResearcherPage" />
+	</bean>
+	
 
 	<bean name="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" class="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" scope="prototype">
 	    <property name="outputMap" ref="outputMap"/>
@@ -290,7 +353,7 @@
 				<value>dc.description.scopuscitationcount</value>
 				<value>dc.description.scopuscitationurl</value>-->
 			</list>
-		</property> 
+		</property>		 
 	</bean>
 	
 	<!-- **************************************************************************************************** -->
@@ -523,7 +586,7 @@
 				<entry key="editors" value="editors" />
 				<entry key="translators" value="translators" />
 				<entry key="chairs" value="chairs" />
-				<entry key="doyType" value="subtype" />
+				<entry key="doiType" value="subtype" />
 				<!-- Not used -->
 				<!-- 
 					<entry key="publicationType" value="" />
@@ -593,11 +656,10 @@
 				<entry value="pisbn" key="dc.identifier.isbn" />
 				<entry value="sissn" key="dc.identifier.issn" />
 				<entry value="jeissn" key="dc.identifier.eissn" />
-				<entry value="journal" key="dc.relation.ispartof" />				
 				<entry value="lastpage" key="dc.relation.lastpage" />
 				<entry value="eisbn" key="" />
-				<entry value="sourceTitle" key="dc.relation.ispartof" />
-				<entry value="bookChapter.sourceTitle" key="dc.relation.ispartofbook" />
+				<entry value="journal" key="dc.relation.ispartof" />				
+				<entry value="proceedingsPaper.journal" key="dc.relation.ispartofbook" />				
 				<entry value="title" key="dc.title" />
 				<entry value="issued" key="dc.date.issued" />
 				<entry value="language" key="dc.language.iso" />
@@ -613,21 +675,23 @@
 				<entry value="arxivCategory" key="dc.subject" />
 				<entry value="doi" key="dc.identifier.doi" />
 				<entry value="publisher" key="dc.publisher" />
+				<entry value="publisherPlace" key="dc.publisher.place" />
 				<entry value="pubmedID" key="dc.identifier.pmid" />
 				<entry value="pubmedcentralID" key="dc.identifier.pmcid" />
 				<entry value="uri" key="dc.identifier.uri" />
 				<entry value="url" key="dc.identifier.url" />
-				<entry value="issue" key="dc.relation.issue" />
-				<entry value="volume" key="dc.relation.volume" />
-				<entry value="firstpage" key="dc.description.startpage" />
-				<entry value="lastpage" key="dc.description.endpage" />
+				<entry value="issue" key="dc.identifier.issue" />
+				<entry value="volume" key="dc.identifier.volume" />
+				<entry value="firstpage" key="dc.identifier.spage" />
+				<entry value="lastpage" key="dc.identifier.epage" />
 				<entry value="editionnumber" key="dc.relation.edition" />
 				<entry value="seriestitle" key="dc.relation.ispartofjournal" />
-				<entry value="booktitle" key="dc.relation.ispartofbook" />
+				<entry value="booktitle" key="dc.relation.ispartofbook" />				
 				<entry value="meshheadings" key="dc.subject.mesh" />
 				<entry value="meshqualifiers" key="dc.subject.meshqualifier" />
-				<entry value="eid" key="dc.identifier.eid" />
+				<entry value="eid" key="dc.identifier.scopus" />
 				<entry value="isiId" key="dc.identifier.isi" />
+				<entry value="providerType" key="dc.source.type" />				
 				
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
 				<!-- 
@@ -667,8 +731,9 @@
                     <entry key="doi" value="doi" />
                     <entry key="pmid" value="pubmedID" />
                     <entry key="title" value="title" />
-                    <entry key="scopusType" value="subtype" />
-                    <entry key="sourceTitle" value="sourceTitle" />
+                    <entry key="itemType" value="subtype" />
+                    <entry key="scopusType" value="providerType" />
+                    <entry key="sourceTitle" value="journal" />
                     <entry key="isbn" value="pisbn" />
                     <entry key="issn" value="jissn" />
                     <entry key="eissn" value="eissn" />
@@ -805,6 +870,7 @@
 				<entry key="publisherPlace" value="publisherPlace" />
 				<entry key="publisherCountry" value="publisherCountry" />
 				<entry key="itemType" value="subtype" />
+				<entry key="wosType" value="providerType" />
 			</map>
 		</constructor-arg>
 	</bean>
@@ -877,7 +943,20 @@
 	</bean>
 
 	<!-- SCOPUS FEED -->
-	<bean name="scopusFeedTransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	<bean name="scopusFeedTransformationEnginePhaseOne" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="scopusFeedDataLoader"/>
+    	<property name="workflow" ref="phase1LinearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+  	</bean>
+  	<bean name="scopusFeedDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
+	    <property name="dataloadersMap">
+	        <map>
+	            <entry key="scopus" value-ref="scopusOnlineDataLoader"/>
+			</map>
+	    </property>
+	</bean>
+	
+	<bean name="scopusFeedTransformationEnginePhaseTwo" class="gr.ekt.bte.core.TransformationEngine">
 	    <property name="dataLoader" ref="submissionItemDataLoader"/>
     	<property name="workflow" ref="phase2linearWorkflow"/>
     	<property name="outputGenerator" ref="scopusOutputGenerator"/>
@@ -889,7 +968,20 @@
 	
 	
 	<!-- WOS FEED -->
-	<bean name="wosFeedTransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	<bean name="wosFeedTransformationEnginePhaseOne" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="wosFeedDataLoader"/>
+    	<property name="workflow" ref="phase1LinearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+  	</bean>
+  	<bean name="wosFeedDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
+	    <property name="dataloadersMap">
+	        <map>
+	            <entry key="wos" value-ref="wosOnlineDataLoader"/>
+			</map>
+	    </property>
+	</bean>
+	
+	<bean name="wosFeedTransformationEnginePhaseTwo" class="gr.ekt.bte.core.TransformationEngine">
 	    <property name="dataLoader" ref="submissionItemDataLoader"/>
     	<property name="workflow" ref="phase2linearWorkflow"/>
     	<property name="outputGenerator" ref="wosOutputGenerator"/>

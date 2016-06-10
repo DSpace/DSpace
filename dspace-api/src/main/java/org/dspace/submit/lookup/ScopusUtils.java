@@ -63,6 +63,7 @@ public class ScopusUtils
         String subType = XMLUtils.getElementValue(article,
                 "subtype");
         if (subType != null){
+            record.addValue("itemType", new StringValue(subType));
             record.addValue("scopusType", new StringValue(subType));
         }
         String sourceTitle = XMLUtils.getElementValue(article,

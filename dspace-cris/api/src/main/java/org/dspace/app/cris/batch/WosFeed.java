@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +29,9 @@ import org.dspace.app.cris.batch.dto.DTOImpRecord;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
 import org.dspace.submit.lookup.SubmissionItemDataLoader;
+import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
 import org.dspace.submit.lookup.WOSOnlineDataLoader;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.utils.DSpace;
@@ -49,8 +53,14 @@ public class WosFeed
     // workflow step 3, z = inarchive
     private static String status = "y";
 
-    private static TransformationEngine feedTransformationEngine = new DSpace()
-            .getServiceManager().getServiceByName("wosFeedTransformationEngine",
+    private static TransformationEngine feedTransformationEnginePhaseOne = new DSpace()
+            .getServiceManager()
+            .getServiceByName("wosFeedTransformationEnginePhaseOne",
+                    TransformationEngine.class);
+    
+    private static TransformationEngine feedTransformationEnginePhaseTwo = new DSpace()
+            .getServiceManager()
+            .getServiceByName("wosFeedTransformationEnginePhaseTwo",
                     TransformationEngine.class);
 
     private static WOSOnlineDataLoader wosOnlineDataLoader = new DSpace()
@@ -82,15 +92,23 @@ public class WosFeed
                 .create("q"));
 
         options.addOption(
-                OptionBuilder.withArgName("query Start Date").hasArg(true)
+                OptionBuilder.withArgName("query SymbolicTimeSpan").hasArg(true)
                         .withDescription(
-                                "Query start date to retrieve data publications from Wos, default start date is yesterday")
+                                "This element defines a range of load dates. The load date is the date when a record was added to a database. If symbolicTimeSpan is specified,"
+                                + " the timeSpan parameter must be omitted. If timeSpan and symbolicTimeSpan are both omitted, then the maximum publication date time span will"
+                                + " be inferred from the editions data. Values 1week, 2week or 3week")
+                .create("t"));
+        
+        options.addOption(
+                OptionBuilder.withArgName("beginTimeSpan").hasArg(true)
+                        .withDescription(
+                                "Query start date to retrieve data publications from Wos, default start date is yesterday (begin timeSpan)")
                 .create("s"));
 
         options.addOption(
-                OptionBuilder.withArgName("query End Date").hasArg(true)
+                OptionBuilder.withArgName("endTimeSpan").hasArg(true)
                         .withDescription(
-                                "Query End date to retrieve data publications from Wos, default is today")
+                                "Query End date to retrieve data publications from Wos, default is today (end timeSpan)")
                 .create("e"));
 
         options.addOption(OptionBuilder.withArgName("forceCollectionID")
@@ -132,29 +150,42 @@ public class WosFeed
         int collection_id = Integer.parseInt(line.getOptionValue("c"));
         boolean forceCollectionId = line.hasOption("f");
 
-        String startDate = "";
-        if (line.hasOption("s"))
+        String symbolicTimeSpan = null;
+        String startDate = null;
+        String endDate = null;
+        
+        if (line.hasOption("t"))
         {
-            startDate = line.getOptionValue("s");
+            symbolicTimeSpan = line.getOptionValue("t");
         }
-        else
+        
+        if (!line.hasOption("s") && !line.hasOption("e"))
         {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -1);
-            startDate = df.format(cal.getTime());
+            symbolicTimeSpan = "1week";
         }
-
-        String endDate = "";
-        if (line.hasOption("e"))
-        {
-            endDate = line.getOptionValue("e");
+        else {
+            if (line.hasOption("s"))
+            {
+                startDate = line.getOptionValue("s");
+            }
+            else
+            {
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DATE, -1);
+                startDate = df.format(cal.getTime());
+            }
+            
+            if (line.hasOption("e"))
+            {
+                endDate = line.getOptionValue("e");
+            }
+            else
+            {
+                Calendar cal = Calendar.getInstance();
+                endDate = df.format(cal.getTime());
+            }
         }
-        else
-        {
-            Calendar cal = Calendar.getInstance();
-            endDate = df.format(cal.getTime());
-        }
-
+        
         String userQuery = ConfigurationManager.getProperty("wosfeed",
                 "query.param.default");
         if (line.hasOption("q"))
@@ -174,7 +205,7 @@ public class WosFeed
 
         ImpRecordDAO dao = ImpRecordDAOFactory.getInstance(context);
         pmeItemList.addAll(
-                convertToImpRecordItem(userQuery, "WOK", startDate, endDate));
+                convertToImpRecordItem(userQuery, "WOK", symbolicTimeSpan, startDate, endDate));
 
         try
         {
@@ -184,10 +215,15 @@ public class WosFeed
                 int tmpCollectionID = collection_id;
                 if (!forceCollectionId)
                 {
-                    Set<String> t = pmeItem.getMetadata().get("dc.type");                 
+                    Set<String> t = pmeItem.getMetadata().get("dc.source.type");                 
                     if (t != null && !t.isEmpty())
                     {
-                        String stringTmpCollectionID = t.iterator().next();
+                        String stringTmpCollectionID = "";
+                        Iterator<String> iterator = t.iterator();
+                        while(iterator.hasNext()) {
+                            String stringTrimTmpCollectionID = iterator.next();
+                            stringTmpCollectionID += stringTrimTmpCollectionID.trim();                                
+                        }
                         tmpCollectionID = ConfigurationManager.getIntProperty("wosfeed", "wos.type." + stringTmpCollectionID + ".collectionid", collection_id);
                     }
                 }
@@ -252,27 +288,44 @@ public class WosFeed
     }
 
     private static List<ImpRecordItem> convertToImpRecordItem(String userQuery,
-            String databaseID, String start, String end)
+            String databaseID, String symbolicTimeSpan, String start, String end)
                     throws BadTransformationSpec, MalformedSourceException,
                     HttpException, IOException
     {
         List<ImpRecordItem> pmeResult = new ArrayList<ImpRecordItem>();
         List<Record> wosResult = wosOnlineDataLoader
-                .searchByAffiliation(userQuery, databaseID, start, end);
+                .searchByAffiliation(userQuery, databaseID, symbolicTimeSpan, start, end);
         List<ItemSubmissionLookupDTO> results = new ArrayList<ItemSubmissionLookupDTO>();
         if (wosResult != null && !wosResult.isEmpty())
         {
-            for (Record record : wosResult)
+
+            TransformationEngine transformationEngine1 = getFeedTransformationEnginePhaseOne();
+            if (transformationEngine1 != null)
             {
-                List<Record> rr = new ArrayList<Record>();
-                rr.add(record);
-                ItemSubmissionLookupDTO result = new ItemSubmissionLookupDTO(
-                        rr);
-                results.add(result);
+                for (Record record : wosResult)
+                {
+                    HashMap<String, Set<String>> map = new HashMap<String, Set<String>>();
+                    HashSet<String> set = new HashSet<String>();
+                    set.add(record.getValues("isiId").get(0).getAsString());
+                    map.put("isiid", set);
+
+                    MultipleSubmissionLookupDataLoader mdataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine1
+                            .getDataLoader();
+                    mdataLoader.setIdentifiers(map);
+                    SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine1
+                            .getOutputGenerator();
+                    outputGenerator
+                            .setDtoList(new ArrayList<ItemSubmissionLookupDTO>());
+
+                    transformationEngine1.transform(new TransformationSpec());
+                    log.debug("BTE transformation finished!");
+                    results.addAll(outputGenerator.getDtoList());
+                }                
+                
             }
 
-            TransformationEngine transformationEngine2 = getFeedTransformationEngine();
-            if (transformationEngine2 != null)
+            TransformationEngine transformationEngine2 = getFeedTransformationEnginePhaseTwo();
+            if (transformationEngine2 != null && results!=null)
             {
                 SubmissionItemDataLoader dataLoader = (SubmissionItemDataLoader) transformationEngine2
                         .getDataLoader();
@@ -287,9 +340,14 @@ public class WosFeed
         return pmeResult;
     }
 
-    public static TransformationEngine getFeedTransformationEngine()
+    public static TransformationEngine getFeedTransformationEnginePhaseOne()
     {
-        return feedTransformationEngine;
+        return feedTransformationEnginePhaseOne;
+    }
+    
+    public static TransformationEngine getFeedTransformationEnginePhaseTwo()
+    {
+        return feedTransformationEnginePhaseTwo;
     }
 
 }

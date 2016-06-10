@@ -50,6 +50,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.xml.transform.TransformerException;
@@ -64,6 +65,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.content.AdditionalMetadataUpdateProcessPlugin;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -109,6 +111,8 @@ import org.dspace.workflow.WorkflowManager;
  */
 public class ItemImportOA
 {
+
+    private DSpace dspace = new DSpace();
 
     /** logger */
     private static Logger log = Logger.getLogger(ItemImportOA.class);
@@ -543,6 +547,13 @@ public class ItemImportOA
         loadDublinCore(c, item, imp_id);
         // and the bitstreams
         processImportBitstream(c, item, imp_id, clearOldBitstream);
+        
+        List<AdditionalMetadataUpdateProcessPlugin> additionalMetadataUpdateProcessPlugins = (List<AdditionalMetadataUpdateProcessPlugin>) dspace
+                .getServiceManager().getServicesByType(AdditionalMetadataUpdateProcessPlugin.class);
+        for(AdditionalMetadataUpdateProcessPlugin additionalMetadataUpdateProcessPlugin : additionalMetadataUpdateProcessPlugins) {
+            additionalMetadataUpdateProcessPlugin.process(c, item, getSourceRef());
+        }
+        
         item.update();
 
         if (goToWithdrawn)
@@ -807,7 +818,7 @@ public class ItemImportOA
         if (StringUtils.isNotEmpty(handle))
         {
             // se ti arriva allora chiami il service che ti registra l'handle
-            IdentifierService identifierService = new DSpace()
+            IdentifierService identifierService = dspace
                     .getSingletonService(IdentifierService.class);
             identifierService.register(c, myitem, handle);
         }
@@ -816,6 +827,13 @@ public class ItemImportOA
         loadDublinCore(c, myitem, imp_id);
         // and the bitstreams
         processImportBitstream(c, myitem, imp_id, clearOldBitstream);
+        
+        List<AdditionalMetadataUpdateProcessPlugin> additionalMetadataUpdateProcessPlugins = (List<AdditionalMetadataUpdateProcessPlugin>) dspace
+                .getServiceManager().getServicesByType(AdditionalMetadataUpdateProcessPlugin.class);
+        for(AdditionalMetadataUpdateProcessPlugin additionalMetadataUpdateProcessPlugin : additionalMetadataUpdateProcessPlugins) {
+            additionalMetadataUpdateProcessPlugin.process(c, myitem, getSourceRef());
+        }
+        
         wi.setMultipleFiles(true);
         wi.setMultipleTitles(true);
         wi.setPublishedBefore(true);

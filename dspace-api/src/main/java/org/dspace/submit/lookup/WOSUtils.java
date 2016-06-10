@@ -5,6 +5,7 @@ import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.core.Value;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -91,7 +92,7 @@ public class WOSUtils {
 
 		Element names = XMLUtils.getSingleElement(summary, "names");
 		List<Element> namesList = XMLUtils.getElementList(names, "name");
-		List<Value> authors = new LinkedList<Value>();
+		List<Value> authors = new ArrayList<Value>();
 		for (Element current : namesList) {
 			if ("author".equals(current.getAttribute("role"))) {
 				Element authorName = XMLUtils.getSingleElement(current, "wos_standard");
@@ -142,6 +143,7 @@ public class WOSUtils {
 			String type = current.getTextContent();
 			if (StringUtils.isNotBlank(type)) {
 				record.addValue("itemType", new StringValue(type));
+				record.addValue("wosType", new StringValue(type));
 			}
 			break;
 			// }
