@@ -1,0 +1,25 @@
+<conference>
+
+	<event_metadata>
+		<conference_name>@dc.identifier.citation@</conference_name>
+	</event_metadata>
+	
+	<proceedings_metadata>
+		<proceedings_title>@dc.relation.ispartof@</proceedings_title>		
+		<publisher>
+			<publisher_name>@dc.publisher@</publisher_name>
+			<publisher_place>@dc.publisher.place@</publisher_place>
+		</publisher>  		
+		<publication_date>@virtual.crossrefissued@</publication_date>
+		@virtual.crossrefisbn@
+	</proceedings_metadata>
+	
+	<conference_paper>
+		<titles><title>@dc.title@</title></titles>
+		<doi_data>
+			<doi>@virtual.doi@</doi>
+			<resource>@dc.identifier.uri@</resource>
+		</doi_data>
+	</conference_paper>
+		
+</conference>

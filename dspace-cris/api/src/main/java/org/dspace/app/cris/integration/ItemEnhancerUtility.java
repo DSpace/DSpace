@@ -7,9 +7,6 @@
  */
 package org.dspace.app.cris.integration;
 
-import it.cineca.surplus.ir.defaultvalues.DefaultValuesBean;
-import it.cineca.surplus.ir.defaultvalues.EnhancedValuesGenerator;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -20,6 +17,8 @@ import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemEnhancer;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.integration.defaultvalues.DefaultValuesBean;
+import org.dspace.content.integration.defaultvalues.EnhancedValuesGenerator;
 import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 

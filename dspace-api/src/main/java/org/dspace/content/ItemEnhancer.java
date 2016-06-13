@@ -7,9 +7,9 @@
  */
 package org.dspace.content;
 
-import it.cineca.surplus.ir.defaultvalues.EnhancedValuesGenerator;
-
 import java.util.List;
+
+import org.dspace.content.integration.defaultvalues.EnhancedValuesGenerator;
 
 public class ItemEnhancer extends AItemEnhancer
 {

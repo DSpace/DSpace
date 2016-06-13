@@ -8,7 +8,6 @@
 package org.dspace.app.cris.metrics.pmc.services;
 
 import it.cilea.osd.common.utils.XMLUtils;
-import it.cineca.surplus.ir.util.CustomClasspathEntityResolver;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.metrics.pmc.model.PMCRecord;
+import org.dspace.content.integration.util.CustomClasspathEntityResolver;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

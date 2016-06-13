@@ -31,12 +31,11 @@ import org.dspace.app.cris.metrics.wos.dto.WosResponse;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+import org.dspace.content.integration.crosswalks.StreamGenericDisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
-
-import it.cineca.surplus.ir.crosswalks.StreamGenericDisseminationCrosswalk;
 
 public class WosService {
 

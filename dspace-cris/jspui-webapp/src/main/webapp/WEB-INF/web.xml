@@ -586,7 +586,58 @@
    		<servlet-class>org.dspace.app.webui.cris.servlet.DuplicateCheckerServlet</servlet-class>
   	</servlet>
   	
+  	  <!-- Doi plugin -->
+    <servlet>
+    	<servlet-name>doichecker</servlet-name>
+    	<servlet-class>org.dspace.app.webui.servlet.DoiCheckerServlet</servlet-class>
+  	</servlet>
+
+  	<servlet>
+    	<servlet-name>doifactory</servlet-name>
+    	<servlet-class>org.dspace.app.webui.servlet.DoiFactoryServlet</servlet-class>
+  	</servlet>
+
+  	<servlet>
+    	<servlet-name>doifixutility</servlet-name>
+    	<servlet-class>org.dspace.app.webui.servlet.DoiFixUtilityCheckerServlet</servlet-class>
+  	</servlet>
+  	
+  	<servlet>
+    	<servlet-name>doipendings</servlet-name>
+    	<servlet-class>org.dspace.app.webui.servlet.DoiPendingServlet</servlet-class>
+  	</servlet>
+  	
+  	<servlet>
+    	<servlet-name>doiqueued</servlet-name>
+    	<servlet-class>org.dspace.app.webui.servlet.DoiQueuedServlet</servlet-class>
+  	</servlet>
+  	
 	<!-- Servlet Mappings -->
+
+  	<servlet-mapping>
+    	<servlet-name>doichecker</servlet-name>
+    	<url-pattern>/dspace-admin/doi</url-pattern>
+  	</servlet-mapping>
+
+  	<servlet-mapping>
+    	<servlet-name>doifactory</servlet-name>
+    	<url-pattern>/dspace-admin/doifactory/*</url-pattern>
+  	</servlet-mapping>
+
+  	<servlet-mapping>
+    	<servlet-name>doifixutility</servlet-name>
+    	<url-pattern>/dspace-admin/doifix/*</url-pattern>
+  	</servlet-mapping>
+  	
+  	<servlet-mapping>
+    	<servlet-name>doipendings</servlet-name>
+    	<url-pattern>/dspace-admin/doipendings</url-pattern>
+  	</servlet-mapping>
+
+  	<servlet-mapping>
+    	<servlet-name>doiqueued</servlet-name>
+    	<url-pattern>/dspace-admin/doiqueued</url-pattern>
+  	</servlet-mapping>
 
   	<servlet-mapping>	
     	<servlet-name>deduplication</servlet-name>

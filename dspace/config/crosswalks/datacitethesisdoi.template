@@ -1,0 +1,15 @@
+	
+	<identifier identifierType="DOI">@virtual.doi@</identifier>
+	<creators>
+		<creator><creatorName><![CDATA[@dc.authority.people@]]></creatorName></creator>
+	</creators>
+	<titles>
+		<title><![CDATA[ @dc.title@ ]]></title>
+	</titles>
+	<publisher><![CDATA[ @dc.publisher.name@]]></publisher>
+	<publicationYear>@virtual.date.year@</publicationYear>
+
+	<dates>
+		<date dateType="Issued">@dc.date.issued@</date>
+	</dates>
+	<language>@dc.language.iso@</language>

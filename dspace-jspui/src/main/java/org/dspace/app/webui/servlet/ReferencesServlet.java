@@ -44,6 +44,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+import org.dspace.content.integration.crosswalks.FileNameDisseminator;
+import org.dspace.content.integration.crosswalks.StreamGenericDisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -54,9 +56,6 @@ import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
-
-import it.cineca.surplus.ir.crosswalks.FileNameDisseminator;
-import it.cineca.surplus.ir.crosswalks.StreamGenericDisseminationCrosswalk;
 
 /**
  * Servlet for export in references format

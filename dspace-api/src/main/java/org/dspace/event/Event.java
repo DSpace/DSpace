@@ -67,6 +67,8 @@ public class Event implements Serializable
     public static final int DELETE = 1 << 5; // destroy object
     
     public static final int INSTALL = 1 << 6; // object exits workspace/flow
+    
+    public static final int UPDATE_FORCE = 1 << 7; // object force reindex
 
     /** Index of filter parts in their array: */
     public static final int SUBJECT_MASK = 0; // mask of subject types
@@ -75,7 +77,7 @@ public class Event implements Serializable
 
     // XXX NOTE: keep this up to date with any changes to event (action) types.
     private static final String eventTypeText[] = { "CREATE", "MODIFY",
-            "MODIFY_METADATA", "ADD", "REMOVE", "DELETE", "INSTALL" };
+            "MODIFY_METADATA", "ADD", "REMOVE", "DELETE", "INSTALL", "UPDATE_FORCE" };
 
     /** XXX NOTE: These constants must be kept synchronized * */
     /** XXX NOTE: with ALL_OBJECTS_MASK *AND* objTypeToMask hash * */

@@ -1,0 +1,17 @@
+<dissertation>
+
+	<person_name contributor_role="author" sequence="first">@virtual.crossrefauthor@</person_name>
+	<titles>
+		<title>@dc.title@</title>
+	</titles>
+	<approval_date><year>@dc.date.issued@</year></approval_date>
+	<institution><institution_name>@dc.publisher@</institution_name></institution>
+	<degree>@dc.degree.level@</degree>
+	<isbn>@dc.identifier.isbn@</isbn>
+	<publisher_item><identifier>@dc.identifier@</identifier></publisher_item>
+	<doi_data>
+		<doi>@virtual.doi@</doi>
+		<resource>@dc.identifier.uri@</resource>
+	</doi_data>
+	
+</dissertation>

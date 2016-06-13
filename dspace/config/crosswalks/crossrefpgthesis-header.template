@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_batch xmlns="{0}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="{0} {1}" version="{2}">
+	<head>
+		<doi_batch_id>{3}</doi_batch_id>
+		<timestamp>{4}</timestamp>
+		<depositor>
+			<name>{5}</name>
+			<email_address>{6}</email_address>
+		</depositor>
+		<registrant>{7}</registrant>
+	</head>
+	<body>
