@@ -82,6 +82,7 @@ public class PiwikStatisticsReader extends AbstractReader {
 		"lr", "lr.statistics.api.site_id");
 	private static final String PIWIK_DOWNLOAD_SITE_ID = ConfigurationManager.getProperty(
 		"lr", "lr.tracker.bitstream.site_id");
+	
 	private static final int PIWIK_SHOW_LAST_N_DAYS = ConfigurationManager.getIntProperty(
 		"lr", "lr.statistics.show_last_n", 7);
 
@@ -161,27 +162,40 @@ public class PiwikStatisticsReader extends AbstractReader {
 				startDate = df.parse(dt[1]);
 				endDate = df.parse(dt[0]);
 			}
+			
+			String period = request.getParameter("period");
 
 			String urlParams =
 				  "&date=" + df.format(endDate) + "," + df.format(startDate)
+				+ "&period=" + period
 				+ "&idSite=" + PIWIK_SITE_ID
 				+ "&token_auth=" + PIWIK_AUTH_TOKEN
 				+ "&segment=pageUrl=@" + item.getHandle()
 				+ "&columns=nb_pageviews,nb_uniq_pageviews,nb_uniq_visitors,nb_visits";
 			String downloadUrlParams =
 				  "&date=" + df.format(endDate) + "," + df.format(startDate)
+				+ "&period=" + period
 				+ "&idSite=" + PIWIK_DOWNLOAD_SITE_ID
 				+ "&token_auth=" + PIWIK_AUTH_TOKEN
 				+ "&segment=pageUrl=@" + item.getHandle()
 				+ "&columns=nb_pageviews,nb_uniq_pageviews";
+			String bitstreamWiseDownloadCount = "method=Actions.getPageUrls"
+				+ "&date=" + df.format(endDate) + "," + df.format(startDate)
+				+ "&period=range"
+				+ "&idSite=" + PIWIK_DOWNLOAD_SITE_ID
+				+ "&include_aggregate_rows=0"
+				+ "&flat=1"
+				+ "&token_auth=" + PIWIK_AUTH_TOKEN
+				+ "&showColumns=url,nb_hits"
+				+ "&segment=pageUrl=@" + item.getHandle();
 
-			final boolean two_requests = false;
+
+			final boolean multi_requests = false;
 			String mergedResult = "";
-			queryString += "&token_auth=" + PIWIK_AUTH_TOKEN +
-				"&module=API";
+			queryString += "&token_auth=" + PIWIK_AUTH_TOKEN + "&module=API";
 			String piwikApiGetQuery = "method=API.get";
 
-			if ( two_requests ) {
+			if ( multi_requests ) {
 
 				String report = PiwikHelper.readFromURL(
 					PIWIK_API_URL + rest + "?" + queryString + "&" + piwikApiGetQuery + urlParams
@@ -196,16 +210,18 @@ public class PiwikStatisticsReader extends AbstractReader {
 					mergedResult = PiwikHelper.mergeJSON(report, downloadReport);
 				}
 			}else {
-				String piwikBulkApiGetQuery = "&method=API.getBulkRequest";
-				queryString += "&format=JSON";
+				String piwikBulkApiGetQuery = "module=API&method=API.getBulkRequest&format=JSON"
+						+ "&token_auth=" + PIWIK_AUTH_TOKEN;
 
 				String url0 = URLEncoder.encode(piwikApiGetQuery + urlParams, "UTF-8");
 				String url1 = URLEncoder.encode(piwikApiGetQuery + downloadUrlParams, "UTF-8");
+				String url2 = URLEncoder.encode(bitstreamWiseDownloadCount, "UTF-8");
 				String report = PiwikHelper.readFromURL(
 					PIWIK_API_URL + rest + "?"
-						+ queryString + piwikBulkApiGetQuery
+						+ piwikBulkApiGetQuery
 						+ "&urls[0]=" + url0
 						+ "&urls[1]=" + url1
+						+ "&urls[2]=" + url2
 				);
 				//mergedResult = PiwikHelper.mergeJSONResults(report);
 				mergedResult = report;
