@@ -25,6 +25,8 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
+import org.dspace.harvest.HarvestedItem;
+import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.versioning.service.VersioningService;
@@ -74,6 +76,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected VersioningService versioningService;
+    @Autowired(required=true)
+    protected HarvestedItemService harvestedItemService;
 
     protected ItemServiceImpl()
     {
@@ -578,9 +582,18 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public void delete(Context context, Item item) throws SQLException, AuthorizeException, IOException {
         authorizeService.authorizeAction(context, item, Constants.DELETE);
+
+        // Also delete the item if it appears in a harvested collection.
+        HarvestedItem hi = harvestedItemService.find(context, item);
+
+        if(hi!=null)
+        {
+            harvestedItemService.delete(context, hi);
+        }
+        
         item.getCollections().clear();
         item.setOwningCollection(null);
-        rawDelete(context,  item);
+        rawDelete(context,item);
     }
 
     @Override
@@ -598,18 +611,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogManager.getHeader(context, "delete_item", "item_id="
                 + item.getID()));
 
-        deleteMetadata(context, item);
-
         // Remove bundles
         removeAllBundles(context, item);
-
-        // remove all of our authorization policies
-        authorizeService.removeAllPolicies(context, item, false);
 
         // Remove any Handle
         handleService.unbindHandle(context, item);
 
-                // remove version attached to the item
+        // remove version attached to the item
         removeVersion(context, item);
 
         // Finally remove item row

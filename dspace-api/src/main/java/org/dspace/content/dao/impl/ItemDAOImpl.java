@@ -107,7 +107,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         addMetadataSortQuery(query, Collections.singletonList(metadataField), null);
 
         Query hibernateQuery = createQuery(context, query.toString());
-        hibernateQuery.setParameter(metadataField.toString(), metadataField.getFieldID());
+        hibernateQuery.setParameter(metadataField.toString(), metadataField.getID());
         hibernateQuery.setParameter("in_archive", true);
         hibernateQuery.setParameter("submitter", eperson);
         hibernateQuery.setMaxResults(limit);

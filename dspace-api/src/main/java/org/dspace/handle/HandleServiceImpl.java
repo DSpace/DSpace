@@ -7,10 +7,6 @@
  */
 package org.dspace.handle;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
@@ -21,6 +17,10 @@ import org.dspace.core.Context;
 import org.dspace.handle.dao.HandleDAO;
 import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
@@ -133,7 +133,7 @@ public class HandleServiceImpl implements HandleService
             throws SQLException
     {
         Handle handle = handleDAO.create(context, new Handle());
-        String handleId = createId(handle.getId());
+        String handleId = createId(handle.getID());
 
         handle.setHandle(handleId);
         handle.setDSpaceObject(dso);

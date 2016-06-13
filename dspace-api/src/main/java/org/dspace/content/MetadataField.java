@@ -8,9 +8,13 @@
 package org.dspace.content;
 
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
+
 
 /**
  * DSpace object that represents a metadata field, which is
@@ -23,16 +27,18 @@ import javax.persistence.*;
  * @see org.dspace.content.MetadataSchema
  */
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Table(name="metadatafieldregistry")
-public class MetadataField {
+public class MetadataField implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name="metadata_field_id", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="metadatafieldregistry_seq")
     @SequenceGenerator(name="metadatafieldregistry_seq", sequenceName="metadatafieldregistry_seq", allocationSize = 1, initialValue = 1)
-    private int id;
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "metadata_schema_id",nullable = false)
     private MetadataSchema metadataSchema;
 
@@ -62,7 +68,7 @@ public class MetadataField {
      *
      * @return metadata field id
      */
-    public int getFieldID()
+    public Integer getID()
     {
         return id;
     }
@@ -170,7 +176,7 @@ public class MetadataField {
             return false;
         }
         final MetadataField other = (MetadataField) obj;
-        if (this.getFieldID() != other.getFieldID())
+        if (this.getID() != other.getID())
         {
             return false;
         }
@@ -185,8 +191,8 @@ public class MetadataField {
     public int hashCode()
     {
         int hash = 7;
-        hash = 47 * hash + getFieldID();
-        hash = 47 * hash + getMetadataSchema().getSchemaID();
+        hash = 47 * hash + getID();
+        hash = 47 * hash + getMetadataSchema().getID();
         return hash;
     }
 

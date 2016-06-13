@@ -92,7 +92,7 @@ if (error!=null) {
       <tr>
          <td>
              <form class="form-inline" method="post" action="">
-                 <span class="col-md-1"><%= types.get(i).getFieldID() %></span>
+                 <span class="col-md-1"><%= types.get(i).getID() %></span>
 
                     <div class="form-group">
                     	<label class="sr-only" for="element"><fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/></label>
@@ -109,7 +109,7 @@ if (error!=null) {
                          
 					<div class="btn-group pull-right">                             
                          
-                            <input type="hidden" name="dc_type_id" value="<%= types.get(i).getFieldID() %>"/>
+                            <input type="hidden" name="dc_type_id" value="<%= types.get(i).getID() %>"/>
                             <input class="btn btn-primary" type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>"/>             
                          
                             <input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>"/>
@@ -125,7 +125,7 @@ if (error!=null) {
  </table>
 
       <form method="post" action="">
-        <input type="hidden" name="dc_schema_id" value="<%= schema.getSchemaID() %>"/>
+        <input type="hidden" name="dc_schema_id" value="<%= schema.getID() %>"/>
         	 <h2><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfield"/></h2>
               <p class="alert alert-info"><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfieldnote"/></p>
                       
@@ -157,7 +157,7 @@ if (error!=null) {
     for (int i = 0; i < types.size(); i++)
     {
       String qualifier = (types.get(i).getQualifier() == null ? "" : "."+types.get(i).getQualifier());
-%>     <option value="<%= types.get(i).getFieldID() %>"><%= types.get(i).getElement()+qualifier %></option>
+%>     <option value="<%= types.get(i).getID() %>"><%= types.get(i).getElement()+qualifier %></option>
 <%  }
 %>
       </select>
@@ -166,9 +166,9 @@ if (error!=null) {
 <%
     for (int i = 0; i < schemas.size(); i++)
     {
-              if (schemas.get(i).getSchemaID() != schema.getSchemaID())
+              if (schemas.get(i).getID() != schema.getID())
               {
-%>      <option value="<%= schemas.get(i).getSchemaID() %>"><%= schemas.get(i).getNamespace() %></option>
+%>      <option value="<%= schemas.get(i).getID() %>"><%= schemas.get(i).getNamespace() %></option>
 <%            }
     }
 %>

@@ -7,15 +7,6 @@
  */
 package org.dspace.app.webui.servlet;
 
-import com.hp.hpl.jena.sparql.vocabulary.DOAP;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.UUID;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -32,6 +23,13 @@ import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.UUID;
 
 /**
  * Servlet for handling the operations in the version history page
@@ -98,7 +96,7 @@ public class VersionHistoryServlet extends DSpaceServlet
             Version version = versionHistoryService.getVersion(context, history, item);
             if (version != null)
             {
-                versionID = String.valueOf(version.getId());
+                versionID = String.valueOf(version.getID());
             }
         }
         String submit = UIUtil.getSubmitButton(request, "submit");

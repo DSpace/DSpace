@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>6.0-rc2-SNAPSHOT</version>
+    <version>6.0-rc3-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -70,7 +70,7 @@
                             </goals>
                             <configuration>
                                 <rules>
-                                    <DependencyConvergence/>
+                                    <DependencyConvergence />
                                 </rules>
                             </configuration>
                         </execution>
@@ -782,114 +782,114 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-jspui</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-jspui</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-xmlui</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-xmlui</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rest</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rest</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-solr</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-solr</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>6.0-rc3-SNAPSHOT</version>
                 <type>war</type>
                 <classifier>skinny</classifier>
             </dependency>
@@ -1428,6 +1428,28 @@
             </archive>
         </mailingList>
     </mailingLists>
+
+    <developers>
+        <developer>
+           <name>DSpace Committers</name>
+           <email>dspace-devel@googlegroups.com</email>
+           <url>https://wiki.duraspace.org/display/DSPACE/DSpace+Committers</url>
+           <roles>
+             <role>committer</role>
+           </roles>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+           <name>DSpace Contributors</name>
+           <email>dspace-tech@googlegroups.com</email>
+           <url>https://wiki.duraspace.org/display/DSPACE/DSpaceContributors</url>
+           <roles>
+             <role>developer</role>
+           </roles>
+        </contributor>
+    </contributors>
 
     <!--
       The SCM repository location is used by Continuum to update against

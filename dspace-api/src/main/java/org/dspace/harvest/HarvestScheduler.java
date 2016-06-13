@@ -146,6 +146,8 @@ public class HarvestScheduler implements Runnable
         {
             try
             {
+                mainContext = new Context();
+
                 synchronized (HarvestScheduler.class) {
                     switch (interrupt) {
                         case HARVESTER_INTERRUPT_NONE:
@@ -179,7 +181,6 @@ public class HarvestScheduler implements Runnable
                 status = HARVESTER_STATUS_RUNNING;
 
                 // Stage #1: if something is ready for harvest, push it onto the ready stack, mark it as "queued"
-                mainContext = new Context();
                 List<HarvestedCollection> cids = harvestedCollectionService.findReady(mainContext);
                 log.info("Collections ready for immediate harvest: " + cids.toString());
 

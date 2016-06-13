@@ -7,9 +7,6 @@
  */
 package org.dspace.identifier;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -26,6 +23,10 @@ import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -269,7 +270,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
             
             // as we reuse the DOI ID, we do not have to check whether the DOI exists already.
             String identifier = this.getPrefix() + "/" + this.getNamespaceSeparator() +
-                    doi.getId().toString();
+                    doi.getID().toString();
 
             if (version.getVersionNumber() > 1)
             {

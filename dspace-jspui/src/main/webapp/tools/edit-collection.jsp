@@ -411,7 +411,7 @@
                 	<select class="form-control" name="metadata_format" >
 	                	<%
 		                // Add an entry for each instance of ingestion crosswalks configured for harvesting 
-			            String metaString = "harvester.oai.metadataformats.";
+			            String metaString = "harvester.metadataformats.";
 			            Enumeration pe = ConfigurationManager.propertyNames("oai");
 			            while (pe.hasMoreElements())
 			            {

@@ -205,31 +205,16 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     @Override
     public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, List<String> values) throws SQLException {
-        String fieldKey = metadataAuthorityService.makeFieldKey(schema, element, qualifier);
-        if (metadataAuthorityService.isAuthorityControlled(fieldKey))
-        {
-            List<String> authorities = new ArrayList<String>();
-            List<Integer> confidences = new ArrayList<Integer>();
-            for (int i = 0; i < values.size(); ++i)
-            {
-                if(dso instanceof Item)
-                {
-                    getAuthoritiesAndConfidences(fieldKey, ((Item) dso).getOwningCollection(), values, authorities, confidences, i);
-                }else{
-                    getAuthoritiesAndConfidences(fieldKey, null, values, authorities, confidences, i);
-                }
-            }
-            addMetadata(context, dso, schema, element, qualifier, lang, values, authorities, confidences);
+        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        if (metadataField == null) {
+            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier);
         }
-        else
-        {
-            addMetadata(context, dso, schema, element, qualifier, lang, values, null, null);
-        }
+
+        addMetadata(context, dso, metadataField, lang, values);
     }
 
     @Override
     public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException {
-
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
@@ -316,8 +301,28 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     @Override
     public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value) throws SQLException {
-        addMetadata(context, dso, metadataField, language, Arrays.asList(value), null, null);
+        addMetadata(context, dso, metadataField, language, Arrays.asList(value));
+    }
 
+    @Override
+    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, List<String> values) throws SQLException {
+        if(metadataField != null) {
+            String fieldKey = metadataAuthorityService.makeFieldKey(metadataField.getMetadataSchema().getName(), metadataField.getElement(), metadataField.getQualifier());
+            if (metadataAuthorityService.isAuthorityControlled(fieldKey)) {
+                List<String> authorities = new ArrayList<String>();
+                List<Integer> confidences = new ArrayList<Integer>();
+                for (int i = 0; i < values.size(); ++i) {
+                    if (dso instanceof Item) {
+                        getAuthoritiesAndConfidences(fieldKey, ((Item) dso).getOwningCollection(), values, authorities, confidences, i);
+                    } else {
+                        getAuthoritiesAndConfidences(fieldKey, null, values, authorities, confidences, i);
+                    }
+                }
+                addMetadata(context, dso, metadataField, language, values, authorities, confidences);
+            } else {
+                addMetadata(context, dso, metadataField, language, values, null, null);
+            }
+        }
     }
 
     @Override
@@ -385,22 +390,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             clearMetadata(context, dso, schema, element, qualifier, language);
             addMetadata(context, dso, schema, element, qualifier, language, value);
             dso.setMetadataModified();
-        }
-    }
-
-    /**
-     * Protected method that deletes all metadata values from the database, should only be called when deleting the item.
-     * @param context the dspaceObject
-     * @param dso the dspaceObject who's metadata we are to delete
-     * @throws SQLException if database error
-     */
-    protected void deleteMetadata(Context context, T dso) throws SQLException {
-
-        Iterator<MetadataValue> metadataValueIterator = dso.getMetadata().iterator();
-        while (metadataValueIterator.hasNext()) {
-            MetadataValue metadataValue = metadataValueIterator.next();
-            metadataValueIterator.remove();
-            metadataValueService.delete(context, metadataValue);
         }
     }
 

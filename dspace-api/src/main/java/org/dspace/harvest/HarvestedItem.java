@@ -11,6 +11,7 @@ import java.util.Date;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 
 import javax.persistence.*;
 
@@ -19,13 +20,13 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="harvested_item")
-public class HarvestedItem
+public class HarvestedItem implements ReloadableEntity<Integer>
 {
     @Id
     @Column(name="id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="harvested_item_seq")
     @SequenceGenerator(name="harvested_item_seq", sequenceName="harvested_item_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="item_id", unique = true)
@@ -48,7 +49,7 @@ public class HarvestedItem
     {
     }
 
-    public int getId() {
+    public Integer getID() {
         return id;
     }
 

@@ -23,6 +23,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
+import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -63,6 +65,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     protected SubscribeService subscribeService;
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
+    @Autowired(required=true)
+    protected HarvestedCollectionService harvestedCollectionService;
 
 
     protected CollectionServiceImpl()
@@ -634,6 +638,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         log.info(LogManager.getHeader(context, "delete_collection",
                 "collection_id=" + collection.getID()));
 
+        // remove harvested collections.
+        HarvestedCollection hc = harvestedCollectionService.find(context,collection);
+        if(hc!=null)
+        {
+            harvestedCollectionService.delete(context, hc);
+        }
+
         context.addEvent(new Event(Event.DELETE, Constants.COLLECTION,
                 collection.getID(), collection.getHandle(), getIdentifiers(context, collection)));
 
@@ -727,8 +738,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             groupService.delete(context, g);
         }
 
-
-        deleteMetadata(context, collection);
         Iterator<Community> owningCommunities = collection.getCommunities().iterator();
         while (owningCommunities.hasNext())
         {

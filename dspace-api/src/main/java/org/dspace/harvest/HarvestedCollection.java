@@ -9,6 +9,7 @@ package org.dspace.harvest;
 
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,7 +20,7 @@ import java.util.Date;
 
 @Entity
 @Table(name="harvested_collection")
-public class HarvestedCollection
+public class HarvestedCollection implements ReloadableEntity<Integer>
 {
     @Id
     @Column(name="id")
@@ -84,6 +85,10 @@ public class HarvestedCollection
      */
 	protected HarvestedCollection()
     {
+    }
+
+    public Integer getID() {
+        return id;
     }
 
     /** 

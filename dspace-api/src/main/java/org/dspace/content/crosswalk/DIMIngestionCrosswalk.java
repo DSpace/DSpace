@@ -7,19 +7,20 @@
  */
 package org.dspace.content.crosswalk;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.jdom.Element;
 import org.jdom.Namespace;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * DIM ingestion crosswalk
@@ -33,7 +34,7 @@ public class DIMIngestionCrosswalk implements IngestionCrosswalk
 {
     private static final Namespace DIM_NS = Namespace.getNamespace("http://www.dspace.org/xmlns/dspace/dim");
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-
+    private CrosswalkMetadataValidator metadataValidator = new CrosswalkMetadataValidator();
 
 	@Override
     public void ingest(Context context, DSpaceObject dso, List<Element> metadata, boolean createMissingMetadataFields) throws CrosswalkException, IOException, SQLException, AuthorizeException {
@@ -69,8 +70,8 @@ public class DIMIngestionCrosswalk implements IngestionCrosswalk
             String schema = field.getAttributeValue("mdschema");
             String element = field.getAttributeValue("element");
             String qualifier = field.getAttributeValue("qualifier");
-            CrosswalkUtils.checkMetadata(context, schema, element, qualifier, createMissingMetadataFields);
-            itemService.addMetadata(context, item, schema, element, qualifier,
+            MetadataField metadataField = metadataValidator.checkMetadata(context, schema, element, qualifier, createMissingMetadataFields);
+            itemService.addMetadata(context, item, metadataField,
         			field.getAttributeValue("lang"), field.getText());
         }
         

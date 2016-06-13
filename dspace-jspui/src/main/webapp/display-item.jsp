@@ -188,7 +188,7 @@
                 	<% if(hasVersionHistory) { %>			                
                 	<form method="get" action="<%= request.getContextPath() %>/tools/history">
                     	<input type="hidden" name="itemID" value="<%= item.getID() %>" />
-                    	<input type="hidden" name="versionID" value="<%= versionHistoryService.getVersion(context, history, item)!=null?versionHistoryService.getVersion(context, history, item).getId():null %>" />
+                    	<input type="hidden" name="versionID" value="<%= versionHistoryService.getVersion(context, history, item)!=null?versionHistoryService.getVersion(context, history, item).getID():null %>" />
                     	<input class="btn btn-info col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.history.button"/>" />
                 	</form>         	         	
 					<% } %>

@@ -7,10 +7,6 @@
  */
 package org.dspace.authorize.service;
 
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Collection;
@@ -18,6 +14,10 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
 
 /**
  * AuthorizeManager handles all authorization checks for DSpace. For better
@@ -308,8 +308,6 @@ public interface AuthorizeService {
      * @throws AuthorizeException if authorization error
      */
     public void removeAllPolicies(Context c, DSpaceObject o) throws SQLException, AuthorizeException;
-
-    public void removeAllPolicies(Context c, DSpaceObject o, boolean updateLastModified) throws SQLException, AuthorizeException;
 
     /**
      * removes ALL policies for an object that are not of the input type.

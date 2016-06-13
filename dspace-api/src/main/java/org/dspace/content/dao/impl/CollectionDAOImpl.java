@@ -72,7 +72,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         if(limit != null){
             hibernateQuery.setMaxResults(limit);
         }
-        hibernateQuery.setParameter(order.toString(), order.getFieldID());
+        hibernateQuery.setParameter(order.toString(), order.getID());
         return list(hibernateQuery);
     }
 

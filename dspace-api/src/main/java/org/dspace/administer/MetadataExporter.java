@@ -7,19 +7,7 @@
  */
 package org.dspace.administer;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
@@ -30,6 +18,14 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -314,16 +310,16 @@ public class MetadataExporter
     private static String getSchemaName(Context context, MetadataField mdField) throws SQLException, RegistryExportException
     {
         // Get name from cache
-        String name = schemaMap.get(mdField.getMetadataSchema().getSchemaID());
+        String name = schemaMap.get(mdField.getMetadataSchema().getID());
 
         if (name == null)
         {
             // Name not retrieved before, so get the schema now
-            MetadataSchema mdSchema = metadataSchemaService.find(context, mdField.getMetadataSchema().getSchemaID());
+            MetadataSchema mdSchema = metadataSchemaService.find(context, mdField.getMetadataSchema().getID());
             if (mdSchema != null)
             {
                 name = mdSchema.getName();
-                schemaMap.put(mdSchema.getSchemaID(), name);
+                schemaMap.put(mdSchema.getID(), name);
             }
             else
             {

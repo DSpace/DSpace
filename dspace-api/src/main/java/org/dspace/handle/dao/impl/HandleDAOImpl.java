@@ -17,6 +17,7 @@ import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,18 +36,34 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
 
     @Override
     public List<Handle> getHandlesByDSpaceObject(Context context, DSpaceObject dso) throws SQLException {
-        Criteria criteria = createCriteria(context, Handle.class);
-        criteria.add(Restrictions.and(
-                Restrictions.eq("dso", dso)
-        ));
-        return list(criteria);
+        if(dso == null) {
+            return Collections.emptyList();
+        } else {
+            Query query = createQuery(context,
+                    "SELECT h " +
+                    "FROM Handle h " +
+                    "LEFT JOIN FETCH h.dso " +
+                    "WHERE h.dso.id = :id ");
+
+            query.setParameter("id", dso.getID());
+
+            query.setCacheable(true);
+            return list(query);
+        }
     }
 
     @Override
     public Handle findByHandle(Context context, String handle) throws SQLException {
-        Criteria criteria = createCriteria(context, Handle.class);
-        criteria.add(Restrictions.eq("handle", handle));
-        return uniqueResult(criteria);
+        Query query = createQuery(context,
+                "SELECT h " +
+                "FROM Handle h " +
+                "LEFT JOIN FETCH h.dso " +
+                "WHERE h.handle = :handle ");
+
+        query.setParameter("handle", handle);
+
+        query.setCacheable(true);
+        return uniqueResult(query);
     }
 
     @Override
