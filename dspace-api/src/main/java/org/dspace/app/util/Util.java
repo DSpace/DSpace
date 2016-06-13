@@ -20,10 +20,11 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 
@@ -482,5 +483,15 @@ public class Util {
 		}
 		result[i - 1] = idsList.subList(offset, idsList.size());
 		return result;
-	}    
+	}
+	
+    public static String normalizeISSN(String issn) {
+        if (issn != null) {
+            issn = issn.replaceAll("\\s", "");
+        }
+        if (issn != null && issn.trim().length() == 8) {
+            return StringUtils.upperCase(issn.trim().substring(0, 4) + "-" + issn.trim().substring(4));
+        }
+        return issn;
+    }
 }
