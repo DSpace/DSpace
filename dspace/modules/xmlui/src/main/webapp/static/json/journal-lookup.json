@@ -649,6 +649,15 @@
         "hidden" : "Y"
      },
      {
+        "issn" : "2054-7102",
+        "embargo" : "Y",
+        "submission" : "R",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Open Health Data",
+        "sponsor" : "$120"
+     },
+     {
         "integrated" : "Y",
         "hidden" : "Y",
         "issn" : "1475-4983",
