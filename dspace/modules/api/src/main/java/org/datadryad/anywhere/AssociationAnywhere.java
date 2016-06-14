@@ -17,6 +17,7 @@ import org.dspace.content.Item;
 import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.identifier.DOIIdentifierProvider;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -186,6 +187,11 @@ public class AssociationAnywhere {
      * @throws AssociationAnywhereException
      */
     public static String tallyCredit(Context context, String customerId, String dataPackageDOI) throws AssociationAnywhereException {
+        // Don't tally if this is a versioned DOI, as the credit was tallied at the archiving of the original package.
+        if (DOIIdentifierProvider.isVersionedDOI(dataPackageDOI)) {
+            return "VERSIONED_DOI";
+        }
+
         log.debug("tallying one credit for customerId " + customerId);
         
         if("test".equals(customerId))
