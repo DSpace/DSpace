@@ -1313,10 +1313,14 @@ public class SubmissionController extends DSpaceServlet
             //get previous step
             currentStepConfig = si.getSubmissionConfig().getStep(currentStepNum);
         
-            if(currentStepConfig.isVisible())
+            if (currentStepConfig != null
+                    && !si.getSubmissionConfig().isWorkflow())
             {
-                nextStep = currentStepConfig;
-                break;
+                if (currentStepConfig.isVisible())
+                {
+                    nextStep = currentStepConfig;
+                    break;
+                }
             }
         }
         return nextStep;
