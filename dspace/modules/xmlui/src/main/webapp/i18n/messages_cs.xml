@@ -732,7 +732,7 @@
 	<message key="xmlui.Submission.general.go_mydspace">Přejít na mou domovskou stránku</message>
 	<message key="xmlui.Submission.general.submission.title">Zaslání záznamu</message>
 	<message key="xmlui.Submission.general.submission.trail">Zaslání záznamu</message>
-	<message key="xmlui.Submission.general.submission.head">Zaslání záznamu</message>	
+	<message key="xmlui.Submission.general.submission.head">Zaslání záznamu {0}</message>
 	<message key="xmlui.Submission.general.submission.previous">&lt; Předchozí</message>
 	<message key="xmlui.Submission.general.submission.save">Uložit a ukončit</message>
 	<message key="xmlui.Submission.general.submission.next">Další &gt;</message>

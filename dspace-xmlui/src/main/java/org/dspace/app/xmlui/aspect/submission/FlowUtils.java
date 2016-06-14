@@ -320,16 +320,14 @@ public class FlowUtils {
 	 * @param id The unique ID of the current workspace/workflow
 	 * @param request The cocoon request object.
 	 */
-	public static void processSaveOrRemove(Context context, String id, Request request) throws SQLException, AuthorizeException, IOException, IdentifierException {
+	public static void processSaveOrRemove(Context context, String id, Request request) throws SQLException, AuthorizeException, IOException
+	{
 		if (request.getParameter("submit_remove") != null)
 		{
 			// If they selected to remove the item then delete everything.
 			WorkspaceItem workspace = findWorkspace(context,id);
 			workspace.deleteAll();
 	        context.commit();
-		}else if (ConfigurationManager.getBooleanProperty("lr","lr.handle.register.on.save",false)){
-			FlowUtils.reservePID(context, id);
-			context.commit();
 		}
 	}
 	
@@ -455,16 +453,19 @@ public class FlowUtils {
     }
 
 	public static String reservePID(Context context, String workspaceID) throws IdentifierException, SQLException, AuthorizeException {
-		if(workspaceID.startsWith("S")){
-			workspaceID = workspaceID.substring(1);
+		if(ConfigurationManager.getBooleanProperty("lr", "reserve.pid.on.start", false)) {
+			if (workspaceID.startsWith("S")) {
+				workspaceID = workspaceID.substring(1);
+			}
+			WorkspaceItem wi = WorkspaceItem.find(context, Integer.parseInt(workspaceID));
+			Item item = wi.getItem();
+			IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+			context.turnOffAuthorisationSystem();
+			identifierService.reserve(context, item);
+			item.update();
+			context.restoreAuthSystemState();
+			return item.getHandle();
 		}
-		WorkspaceItem wi = WorkspaceItem.find(context, Integer.parseInt(workspaceID));
-		Item item = wi.getItem();
-		IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
-		context.turnOffAuthorisationSystem();
-		identifierService.reserve(context, item);
-		item.update();
-		context.restoreAuthSystemState();
-		return item.getHandle();
+		return null;
 	}
 }

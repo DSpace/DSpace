@@ -23,7 +23,7 @@ handle.canonical.prefix = http://hdl.handle.net/
 handle.prefix = 123456789
 handle.dir=${dspace.dir}/handle-server
 
-lr.handle.register.on.save = false
+lr.reserve.pid.on.start = false
 
 
 # UFAL mounted assetstore for restricted item harvesting. Please mind the trailing slash

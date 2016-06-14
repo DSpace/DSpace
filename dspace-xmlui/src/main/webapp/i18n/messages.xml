@@ -722,7 +722,7 @@
     <message key="xmlui.Submission.general.go_mydspace">Go to My Home</message>
 	<message key="xmlui.Submission.general.submission.title">Item submission</message>
 	<message key="xmlui.Submission.general.submission.trail">Item submission</message>
-	<message key="xmlui.Submission.general.submission.head">Item submission</message>
+	<message key="xmlui.Submission.general.submission.head">Item submission {0}</message>
 	<message key="xmlui.Submission.general.submission.previous">&lt; Previous</message>
 	<message key="xmlui.Submission.general.submission.save">Save &amp; Exit</message>
 	<message key="xmlui.Submission.general.submission.next">Next &gt;</message>

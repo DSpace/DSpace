@@ -185,6 +185,8 @@ function doSubmission()
                        workspaceID = workspace.getID();
                        
                        collectionSelected = true;
+
+					   FlowUtils.reservePID(getDSContext(), workspaceID);
                         
                        break; // We don't need to ask them for a collection again.   
                    }
@@ -442,7 +444,6 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
                 {
                     FlowUtils.setBackPageReached(getDSContext(),workspaceID, step, page);
                 }
-				FlowUtils.processSaveOrRemove(getDSContext(), workspaceID, cocoon.request);
                 //share and exit
                 shareSubmission(workspaceID);
             }
