@@ -153,6 +153,7 @@ public class ScopusFeed
             startDate = Long.toString(cal.getTimeInMillis());
         }
 
+        startDate = startDate.substring(0, 10);
         String endDate = "";
         if (line.hasOption("e"))
         {
@@ -165,7 +166,7 @@ public class ScopusFeed
             Calendar cal = Calendar.getInstance();
             endDate = Long.toString(cal.getTimeInMillis());
         }
-
+        endDate = endDate.substring(0, 10);
         String userQuery = ConfigurationManager.getProperty("scopusfeed",
                 "query.param.default");
         if (line.hasOption("q"))
