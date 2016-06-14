@@ -347,6 +347,7 @@ public class PaypalImpl implements PaypalService{
             {
                 showSkipPaymentButton(maindiv,"Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please continue, and we will contact you regarding payment. Error code: Secure-null");
                 shoppingCart.setNote("Paypal returned null secure token");
+                shoppingCart.update();
             }
             else
             {
@@ -507,6 +508,7 @@ public class PaypalImpl implements PaypalService{
             paypalService.showSkipPaymentButton(mainDiv,"errors in generate the payment form:"+e.getMessage());
             if (shoppingCart != null) {
                 shoppingCart.setNote("Payment error: " + e.getMessage());
+                shoppingCart.update();
             }
             log.error("Exception when entering the checkout step:", e);
         }
