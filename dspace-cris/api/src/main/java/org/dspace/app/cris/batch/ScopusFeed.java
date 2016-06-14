@@ -188,11 +188,11 @@ public class ScopusFeed
         pmeItemList
                 .addAll(convertToImpRecordItem(userQuery, startDate, endDate));
 
-        try
+     
+        for (ImpRecordItem pmeItem : pmeItemList)
         {
-            for (ImpRecordItem pmeItem : pmeItemList)
+            try
             {
-
                 int tmpCollectionID = collection_id;
                 if (!forceCollectionId)
                 {
@@ -201,9 +201,11 @@ public class ScopusFeed
                     {
                         String stringTmpCollectionID = "";
                         Iterator<String> iterator = t.iterator();
-                        while(iterator.hasNext()) {
+                        while (iterator.hasNext())
+                        {
                             String stringTrimTmpCollectionID = iterator.next();
-                            stringTmpCollectionID += stringTrimTmpCollectionID.trim();                                
+                            stringTmpCollectionID += stringTrimTmpCollectionID
+                                    .trim();
                         }
                         tmpCollectionID = ConfigurationManager
                                 .getIntProperty("scopusfeed",
@@ -219,13 +221,13 @@ public class ScopusFeed
                         tmpCollectionID, pmeItem, action, eperson.getID());
 
                 dao.write(impRecord, true);
-
+            }
+            catch (Exception ex)
+            {
+                deleted++;
             }
         }
-        catch (Exception ex)
-        {
-            deleted++;
-        }
+
         System.out.println("Imported " + (total - deleted) + " record; "
                 + deleted + " marked as removed");
         pmeItemList.clear();

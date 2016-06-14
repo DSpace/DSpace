@@ -207,40 +207,45 @@ public class WosFeed
         pmeItemList.addAll(
                 convertToImpRecordItem(userQuery, "WOK", symbolicTimeSpan, startDate, endDate));
 
-        try
+        for (ImpRecordItem pmeItem : pmeItemList)
         {
-            for (ImpRecordItem pmeItem : pmeItemList)
+            try
             {
-
                 int tmpCollectionID = collection_id;
                 if (!forceCollectionId)
                 {
-                    Set<String> t = pmeItem.getMetadata().get("dc.source.type");                 
+                    Set<String> t = pmeItem.getMetadata().get("dc.source.type");
                     if (t != null && !t.isEmpty())
                     {
                         String stringTmpCollectionID = "";
                         Iterator<String> iterator = t.iterator();
-                        while(iterator.hasNext()) {
+                        while (iterator.hasNext())
+                        {
                             String stringTrimTmpCollectionID = iterator.next();
-                            stringTmpCollectionID += stringTrimTmpCollectionID.trim();                                
+                            stringTmpCollectionID += stringTrimTmpCollectionID
+                                    .trim();
                         }
-                        tmpCollectionID = ConfigurationManager.getIntProperty("wosfeed", "wos.type." + stringTmpCollectionID + ".collectionid", collection_id);
+                        tmpCollectionID = ConfigurationManager
+                                .getIntProperty("wosfeed",
+                                        "wos.type." + stringTmpCollectionID
+                                                + ".collectionid",
+                                        collection_id);
                     }
                 }
 
-                total++;                
+                total++;
                 String action = "insert";
                 DTOImpRecord impRecord = writeImpRecord(context, dao,
                         tmpCollectionID, pmeItem, action, eperson.getID());
 
                 dao.write(impRecord, true);
-
+            }
+            catch (Exception ex)
+            {
+                deleted++;
             }
         }
-        catch (Exception ex)
-        {
-            deleted++;
-        }
+      
         System.out.println("Imported " + (total - deleted) + " record; "
                 + deleted + " marked as removed");
         pmeItemList.clear();
