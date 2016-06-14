@@ -32,7 +32,7 @@ public class CitationMetadataUpdateProcessPlugin
     {
         final StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) PluginManager
                 .getNamedPlugin(StreamDisseminationCrosswalk.class,
-                        provider + ".citation");
+                        provider.trim() + ".citation");
 
         String type = item.getMetadata("dc.type");
 
@@ -41,7 +41,7 @@ public class CitationMetadataUpdateProcessPlugin
         {
             streamCrosswalk = (StreamDisseminationCrosswalk) PluginManager
                     .getNamedPlugin(StreamDisseminationCrosswalk.class,
-                            provider + "-"
+                            provider.trim() + "-"
                                     + StringUtils.deleteWhitespace(
                                             type.toLowerCase()).trim()
                             + ".citation");
@@ -60,8 +60,7 @@ public class CitationMetadataUpdateProcessPlugin
             item.addMetadata(schemaOutputMetadata, elementOutputMetadata,
                     qualifierOutputMetadata, null, out.toString());
         }
-        catch (IOException | SQLException | AuthorizeException
-                | CrosswalkException e)
+        catch (Exception e)
         {
             log.error(LogManager.getHeader(context,
                     "citationMetadataUpdateProcessPlugin",

@@ -189,7 +189,7 @@ public class ReferencesServlet extends DSpaceServlet
             // Set the response MIME type
             if (mimeType != null)
             {
-                String ext = ConfigurationManager.getProperty("rosswalk.refer."+format+".file.ext");
+                String ext = ConfigurationManager.getProperty("crosswalk.refer."+format+".file.ext");
                 response.setContentType(mimeType);
                 if(streamCrosswalkDefault instanceof FileNameDisseminator) {
                     response.setHeader("Content-Disposition",
