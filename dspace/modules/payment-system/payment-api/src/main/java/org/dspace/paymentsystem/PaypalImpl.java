@@ -346,7 +346,7 @@ public class PaypalImpl implements PaypalService{
             if(workspaceItem!=null||AuthorizeManager.isAdmin(context,ePerson))
             {
                 showSkipPaymentButton(maindiv,"Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please continue, and we will contact you regarding payment. Error code: Secure-null");
-
+                shoppingCart.setNote("Paypal returned null secure token");
             }
             else
             {
@@ -435,11 +435,12 @@ public class PaypalImpl implements PaypalService{
         PaypalService paypalService = new DSpace().getSingletonService(PaypalService.class);
         //mainDiv.setHead("Checkout");
         String errorMessage = request.getParameter("encountError");
+        ShoppingCart shoppingCart = null;
         try{
             //create new transaction or update transaction id with item
             String previous_email = request.getParameter("login_email");
             EPerson eperson = EPerson.findByEmail(context,previous_email);
-            ShoppingCart shoppingCart = payementSystemService.getShoppingCartByItemId(context,item.getID());
+            shoppingCart = payementSystemService.getShoppingCartByItemId(context,item.getID());
             if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
             {
                   //shopping cart already paid, not need to generate a form
@@ -504,6 +505,9 @@ public class PaypalImpl implements PaypalService{
         {
             //TODO: handle the exceptions
             paypalService.showSkipPaymentButton(mainDiv,"errors in generate the payment form:"+e.getMessage());
+            if (shoppingCart != null) {
+                shoppingCart.setNote("Payment error: " + e.getMessage());
+            }
             log.error("Exception when entering the checkout step:", e);
         }
 
