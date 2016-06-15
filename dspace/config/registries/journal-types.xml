@@ -100,4 +100,14 @@
         <schema>journal</schema>
         <element>issn</element>
     </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>website</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>coverImage</element>
+    </dc-type>
 </dspace-dc-types>
