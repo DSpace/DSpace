@@ -60,14 +60,12 @@ public class ImpRecordOutputGenerator implements OutputGenerator {
         return new ArrayList<String>();
 	}
 	
-
 	@Override
 	public List<String> generateOutput(RecordSet recs, DataOutputSpec spec) {
 		return generateOutput(recs);
 	}
-	
 
-	public ImpRecordItem  merge( ImpRecordItem item, Record record)
+	public ImpRecordItem  merge(ImpRecordItem item, Record record)
     {
         Record itemLookup = record;
 
@@ -99,23 +97,54 @@ public class ImpRecordOutputGenerator implements OutputGenerator {
                 item.setSourceRef(providerName);
             }
             
-            Set<String> val = new HashSet<String>();
+            Set<ImpRecordMetadata> val = new HashSet<ImpRecordMetadata>();
             if (values != null && values.size() > 0)
             {
                 for (Value value : values)
                 {
-                	String strVal= value.getAsString();
-                	if(!StringUtils.isNotBlank(strVal)){
+                    ImpRecordMetadata strVal= splitValue(value.getAsString());
+                	if(!StringUtils.isNotBlank(strVal.getValue())){
                 		continue;
                 	}
                 	val.add(strVal);
                 }
-               item.addMetadata(metadata,val);
+                if(!val.isEmpty()) {
+                    item.addMetadata(metadata,val);
+                }
             }
         }
         return item;
     }
 
+    private ImpRecordMetadata splitValue(String value)
+    {
+        String[] splitted = value
+                .split(SubmissionLookupService.SEPARATOR_VALUE_REGEX);
+        ImpRecordMetadata result = new ImpRecordMetadata();
+        result.setValue(splitted[0]);
+        if (splitted.length > 1)
+        {
+            if (StringUtils.isNotBlank(splitted[1]))
+            {
+                result.setAuthority(splitted[1]);
+            }
+            if (splitted.length > 2)
+            {
+                result.setConfidence(Integer.parseInt(splitted[2]));
+                if (splitted.length > 3)
+                {
+                    result.setMetadataOrder(Integer.parseInt(splitted[3]));
+                    if (splitted.length > 4)
+                    {
+                        result.setShare(Integer
+                                .parseInt(splitted[4]));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    
     private String getMetadata(String formName,Record itemLookup, String name)
     {
         String type = SubmissionLookupService.getType(itemLookup);
@@ -146,7 +175,7 @@ public class ImpRecordOutputGenerator implements OutputGenerator {
         }
         return md;
     }
-
+    
 	public Collection getCollection() {
 		return collection;
 	}
@@ -210,4 +239,3 @@ public class ImpRecordOutputGenerator implements OutputGenerator {
     }
 
 }
-

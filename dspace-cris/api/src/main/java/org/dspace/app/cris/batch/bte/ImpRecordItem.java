@@ -1,32 +1,36 @@
 package org.dspace.app.cris.batch.bte;
 
-
 import java.util.HashMap;
 import java.util.Set;
 
-public class ImpRecordItem {
+public class ImpRecordItem
+{
 
-	public ImpRecordItem(){
-		metadata = new HashMap<String,Set<String>>();
-	}
-	
-	private String sourceId;
-	
-	private String sourceRef;
-	
-	private HashMap<String,Set<String>> metadata;
-	
-	public HashMap<String, Set<String>> getMetadata() {
-		return metadata;
-	}
+    public ImpRecordItem()
+    {
+        metadata = new HashMap<String, Set<ImpRecordMetadata>>();
+    }
 
-	public void setMetadata(HashMap<String, Set<String>> metadata) {
-		this.metadata = metadata;
-	}
-	
-	public void addMetadata(String metadataName,Set<String> values){
-		this.metadata.put(metadataName, values);
-	}
+    private String sourceId;
+
+    private String sourceRef;
+
+    private HashMap<String, Set<ImpRecordMetadata>> metadata;
+
+    public HashMap<String, Set<ImpRecordMetadata>> getMetadata()
+    {
+        return metadata;
+    }
+
+    public void setMetadata(HashMap<String, Set<ImpRecordMetadata>> metadata)
+    {
+        this.metadata = metadata;
+    }
+
+    public void addMetadata(String metadataName, Set<ImpRecordMetadata> values)
+    {
+        this.metadata.put(metadataName, values);
+    }
 
     public String getSourceId()
     {

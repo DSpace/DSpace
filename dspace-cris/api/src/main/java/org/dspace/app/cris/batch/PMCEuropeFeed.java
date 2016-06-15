@@ -38,6 +38,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.batch.bte.ImpRecordItem;
+import org.dspace.app.cris.batch.bte.ImpRecordMetadata;
 import org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator;
 import org.dspace.app.cris.batch.dao.ImpRecordDAO;
 import org.dspace.app.cris.batch.dao.ImpRecordDAOFactory;
@@ -405,12 +406,12 @@ public class PMCEuropeFeed
                     }
                     DTOImpRecord impRecord = writeImpRecord(context, dao,
                             collection_id, pmeItem, action, eperson.getID());
-                    Set<String> metadata = pmeItem.getMetadata()
+                    Set<ImpRecordMetadata> metadata = pmeItem.getMetadata()
                             .get(pmcidMetadata);
                     if (metadata != null && !metadata.isEmpty())
                     {
                         retrieveAndUploadPdf(context, impRecord,
-                                metadata.iterator().next());
+                                metadata.iterator().next().getValue());
                     }
 
                     dao.write(impRecord, false);
@@ -454,24 +455,24 @@ public class PMCEuropeFeed
     {
         DTOImpRecord dto = new DTOImpRecord(dao);
 
-        HashMap<String, Set<String>> meta = pmeItem.getMetadata();
+        HashMap<String, Set<ImpRecordMetadata>> meta = pmeItem.getMetadata();
         for (String md : meta.keySet())
         {
-            Set<String> values = meta.get(md);
+            Set<ImpRecordMetadata> values = meta.get(md);
             String[] splitMd = StringUtils.split(md, "\\.");
             int metadata_order = 0;
-            for (String value : values)
+            for (ImpRecordMetadata value : values)
             {
                 metadata_order++;
                 if (splitMd.length > 2)
                 {
-                    dto.addMetadata(splitMd[0], splitMd[1], splitMd[2], value,
-                            null, -1, metadata_order, -1);
+                    dto.addMetadata(splitMd[0], splitMd[1], splitMd[2], value.getValue(),
+                            value.getAuthority(), value.getConfidence(), metadata_order, -1);
                 }
                 else
                 {
-                    dto.addMetadata(splitMd[0], splitMd[1], null, value, null,
-                            -1, metadata_order, -1);
+                    dto.addMetadata(splitMd[0], splitMd[1], null, value.getValue(), value.getAuthority(),
+                            value.getConfidence(), metadata_order, value.getShare());
                 }
             }
         }
