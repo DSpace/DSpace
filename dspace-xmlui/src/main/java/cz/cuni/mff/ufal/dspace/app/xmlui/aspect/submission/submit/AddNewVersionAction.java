@@ -122,8 +122,10 @@ public class AddNewVersionAction extends AbstractAction
         
         // clear dc.identifier.uri - will be created upon installation to the repository
         item.clearMetadata("dc", "identifier", "uri", Item.ANY);
-        
-        // add note about the base item         
+
+        //clear previous notes as note is non repeatable
+        item.clearMetadata("local", "submission", "note", Item.ANY);
+        // add note about the base item
         String note = String.format("This item was created as a new version of '%s' (%s)", baseItem.getName(), baseItem.getHandle());        
         item.addMetadata("local", "submission", "note", Item.ANY, note);
         
