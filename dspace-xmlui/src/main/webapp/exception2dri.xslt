@@ -37,7 +37,20 @@ Created by Tim Donohue
         <div id="exception" rend="exception">
           <head><xsl:value-of select="$pageTitle"/></head>
           <p>
-            <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/</xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></xref>
+            <xref>
+              <xsl:attribute name="target">
+                <xsl:choose>
+                  <xsl:when test="starts-with($contextPath,'/')">
+                    <xsl:value-of select="$contextPath"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="concat('/',$contextPath)"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+
+              </xsl:attribute>
+              <i18n:text>xmlui.general.go_home</i18n:text>
+            </xref>
           </p>
           <p>
             <i18n:text>xmlui.error.contact_msg</i18n:text>
@@ -61,7 +74,16 @@ Created by Tim Donohue
           <metadata element="contextPath"><xsl:value-of select="$contextPath"/></metadata>
           <metadata element="title"><xsl:value-of select="$pageTitle"/></metadata>
           <trail>
-            <xsl:attribute name="target"><xsl:value-of select="$contextPath"/></xsl:attribute>
+            <xsl:attribute name="target">
+              <xsl:choose>
+                <xsl:when test="starts-with($contextPath,'/')">
+                  <xsl:value-of select="$contextPath"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="concat('/',$contextPath)"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
             <i18n:text>xmlui.general.dspace_home</i18n:text>
           </trail>
         </pageMeta>

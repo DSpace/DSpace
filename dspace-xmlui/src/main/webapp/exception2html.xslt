@@ -85,7 +85,18 @@ Scott Phillips adapted it for Manakin's need.
 
         <h1><xsl:value-of select="$pageTitle"/></h1>
         <p class="home">
-          <a><xsl:attribute name="href"><xsl:value-of select="$contextPath"/></xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></a>
+          <a>
+              <xsl:attribute name="href">
+              <xsl:choose>
+                  <xsl:when test="starts-with($contextPath,'/')">
+                      <xsl:value-of select="$contextPath"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                      <xsl:value-of select="concat('/',$contextPath)"/>
+                  </xsl:otherwise>
+              </xsl:choose>
+              </xsl:attribute>
+          </a>
         </p>
         <p class="message">
           <xsl:value-of select="@class"/>:
