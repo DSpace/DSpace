@@ -178,5 +178,5 @@
 		</property>
 	</bean>
 	
-	<bean name="enhancerFulltext" class="it.cineca.surplus.ir.defaultvalues.FulltextInfoGenerator"/>
+	<bean name="enhancerFulltext" class="org.dspace.content.integration.defaultvalues.FulltextInfoGenerator"/>
 </beans>
