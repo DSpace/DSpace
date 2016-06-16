@@ -100,4 +100,9 @@
         <schema>journal</schema>
         <element>issn</element>
     </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>hasJournalPage</element>
+    </dc-type>
 </dspace-dc-types>
