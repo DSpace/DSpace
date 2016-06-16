@@ -50,6 +50,8 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     public static final String CUSTOMER_ID = "customerID";
     public static final String DESCRIPTION = "description";
     public static final String MEMBERNAME = "memberName";
+    public static final String WEBSITE = "website";
+    public static final String COVER_IMAGE = "coverImage";
 
     public static final String SUBSCRIPTION_PLAN = "SUBSCRIPTION";
     public static final String PREPAID_PLAN = "PREPAID";
@@ -82,6 +84,8 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
         journalMetadata.setProperty(CUSTOMER_ID, "journal.customerID");
         journalMetadata.setProperty(DESCRIPTION, "journal.description");
         journalMetadata.setProperty(MEMBERNAME, "journal.memberName");
+        journalMetadata.setProperty(WEBSITE, "journal.website");
+        journalMetadata.setProperty(COVER_IMAGE, "journal.coverImage");
 
         defaultMetadataValues = new Properties();
         defaultMetadataValues.setProperty(journalMetadata.getProperty(JOURNAL_ID), "");
@@ -102,6 +106,8 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
         defaultMetadataValues.setProperty(journalMetadata.getProperty(CUSTOMER_ID), "");
         defaultMetadataValues.setProperty(journalMetadata.getProperty(DESCRIPTION), "");
         defaultMetadataValues.setProperty(journalMetadata.getProperty(MEMBERNAME), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(WEBSITE), "");
+        defaultMetadataValues.setProperty(journalMetadata.getProperty(COVER_IMAGE), "");
     }
 
     // these are mandatory elements
@@ -335,6 +341,24 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     public void setDescription(String value) {
         setConceptMetadataValue(journalMetadata.getProperty(DESCRIPTION), value);
+    }
+
+    public String getWebsite() {
+        return getConceptMetadataValue(journalMetadata.getProperty(WEBSITE));
+    }
+
+    public void setWebsite(String value) {
+        setConceptMetadataValue(journalMetadata.getProperty(WEBSITE), value);
+        JournalUtils.updateDryadJournalConcept(this);
+    }
+
+    public String getCoverImage() {
+        return getConceptMetadataValue(journalMetadata.getProperty(COVER_IMAGE));
+    }
+
+    public void setCoverImage(String value) {
+        setConceptMetadataValue(journalMetadata.getProperty(COVER_IMAGE), value);
+        JournalUtils.updateDryadJournalConcept(this);
     }
 
     public String getMemberName() {
