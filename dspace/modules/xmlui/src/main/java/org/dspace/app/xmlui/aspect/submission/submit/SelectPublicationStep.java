@@ -81,7 +81,15 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     protected static final Message T_Country_help= message("xmlui.submit.select.country.help");
     protected static final Message T_Country_error= message("xmlui.submit.select.country.error");
 
+    private static final Message T_funding_head = message("xmlui.submit.select.funding.head");
+    private static final Message T_funding_help = message("xmlui.submit.select.funding.help");
+    private static final Message T_funding_desc1 = message("xmlui.submit.select.funding.desc1");
+    private static final Message T_funding_desc2 = message("xmlui.submit.select.funding.desc2");
+    private static final Message T_funding_status_yes = message("xmlui_submit_funding_status_yes");
+    private static final Message T_funding_status_no = message("xmlui_submit_funding_status_no");
 
+    private static final Message T_select_yes = message("xmlui.Submission.submit.ReviewStep.yes");
+    private static final Message T_select_no = message("xmlui.Submission.submit.ReviewStep.no");
 
     private static final Message T_article_status = message("xmlui.submit.publication.article_status");
     private static final Message T_article_status_help = message("xmlui.submit.publication.article_status_help");
@@ -126,6 +134,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         List form = div.addList("submit-create-publication", List.TYPE_FORM);
 
         generateCountryList(form,request);
+        generateFundingInfo(form,request);
 
         boolean submitExisting = ConfigurationManager.getBooleanProperty("submit.dataset.existing-datasets", true);
 
@@ -477,5 +486,23 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         }
         }catch (Exception e)
         {}
+    }
+
+    private void generateFundingInfo(List form, Request request) throws WingException {
+        try{
+            Item fundingInfo = form.addItem("jquery_radios","");
+            fundingInfo.addContent(T_funding_head);
+            fundingInfo.addContent(T_funding_help);
+
+            Radio fundingStatus = fundingInfo.addRadio("funding_status");
+            fundingStatus.addOption("1", T_funding_status_yes);
+            fundingStatus.addOption("0", T_funding_status_no);
+            Item grantInfo = form.addItem("grant-info","grant-info");
+            Text grantInfoText = grantInfo.addText("grant-info");
+            grantInfoText.setHelp(T_funding_desc1);
+
+        }catch (Exception e)
+        {}
+
     }
 }
