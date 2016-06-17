@@ -32,5 +32,9 @@
         <schema>dryad</schema>
         <element>citationInProgress</element>
     </dc-type>
+    <dc-type>
+        <schema>dryad</schema>
+        <element>fundingEntity</element>
+    </dc-type>
 
 </dspace-dc-types>
