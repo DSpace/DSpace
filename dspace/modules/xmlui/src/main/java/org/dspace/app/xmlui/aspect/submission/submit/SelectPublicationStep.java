@@ -15,7 +15,6 @@ import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.*;
 import org.dspace.core.ConfigurationManager;
@@ -223,7 +222,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     private void addArticleStatusRadios(Request request, List form, Manuscript manuscript) throws WingException {
         // add "article status" radios
-        Item articleStatus = form.addItem("article_status", "");
+        Item articleStatus = form.addItem("jquery_radios", "");
         articleStatus.addContent(T_article_status);
         Radio accessRadios = articleStatus.addRadio("article_status");
         accessRadios.setHelp(T_article_status_help);
