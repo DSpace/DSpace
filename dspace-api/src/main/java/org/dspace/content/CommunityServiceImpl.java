@@ -427,13 +427,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         String removedHandle = childCommunity.getHandle();
         UUID removedId = childCommunity.getID();
 
+        rawDelete(context, childCommunity);
 
-        parentCommunity.removeSubCommunity(childCommunity);
         childCommunity.getParentCommunities().remove(parentCommunity);
-        if(CollectionUtils.isEmpty(childCommunity.getParentCommunities()))
-        {
-            rawDelete(context, childCommunity);
-        }
+        parentCommunity.removeSubCommunity(childCommunity);
+
         log.info(LogManager.getHeader(context, "remove_subcommunity",
                 "parent_comm_id=" + parentCommunity.getID() + ",child_comm_id=" + childCommunity.getID()));
 
