@@ -37,9 +37,9 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
     // If this returns null, not found
     @Override
     public T findByPath(StoragePath path) throws StorageException {
-        // can search by organization code id
+        // can search by journal code
         checkObjectPath(path);
-        // find parameters are valid, must be organization code
+        // find parameters are valid, must be journal code
         return readObject(path);
     }
 

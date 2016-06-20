@@ -51,7 +51,7 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
             journalConcept.setJournalID(TEST_JOURNAL_CODE);
             Context context = new Context();
             JournalUtils.addDryadJournalConcept(context, journalConcept);
-            journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, TEST_JOURNAL_CODE);
+            journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, TEST_JOURNAL_CODE);
             context.complete();
         } catch (Exception ex) {
             fail("Exception setting up test journal: " + ex);
@@ -78,7 +78,7 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
         try {
             DatabaseManager.deleteByValue(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, ManuscriptDatabaseStorageImpl.COLUMN_MSID, TEST_MANUSCRIPT_ID_1);
             DatabaseManager.deleteByValue(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, ManuscriptDatabaseStorageImpl.COLUMN_MSID, TEST_MANUSCRIPT_ID_2);
-            DatabaseManager.deleteByValue(context, JournalDatabaseStorageImpl.ORGANIZATION_TABLE, JournalDatabaseStorageImpl.COLUMN_CODE, TEST_JOURNAL_CODE);
+            DatabaseManager.deleteByValue(context, JournalDatabaseStorageImpl.JOURNAL_TABLE, JournalDatabaseStorageImpl.COLUMN_CODE, TEST_JOURNAL_CODE);
         } catch (SQLException ex) {
             fail("Exception clearing test journal and manuscript: " + ex);
         }

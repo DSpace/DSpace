@@ -124,7 +124,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             }
             try {
                 Context context = getContext();
-                Journal journal = JournalDatabaseStorageImpl.getOrganizationByConceptID(context, organizationID);
+                Journal journal = JournalDatabaseStorageImpl.getJournalByConceptID(context, organizationID);
                 manuscript.setJournal(journal);
                 manuscript.setJournalConcept(JournalUtils.getJournalConceptByISSN(journal.issn));
                 completeContext(context);
@@ -173,7 +173,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     }
 
     private static TableRow getTableRowByManuscriptId(Context context, String msid, String organizationCode) throws SQLException, IOException {
-        Journal journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
+        Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, organizationCode);
         if (journal == null) {
             return null;
         } else {
@@ -237,7 +237,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     private static List<Manuscript> getManuscripts(Context context, String organizationCode, int limit) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        Journal journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
+        Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, organizationCode);
         if (journal == null) {
             return manuscripts;
         } else {
@@ -255,7 +255,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     private static List<Manuscript> getManuscriptsMatchingQuery(Context context, String organizationCode, String searchParam, int limit) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        Journal journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
+        Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, organizationCode);
         if (journal == null) {
             return manuscripts;
         } else {
@@ -278,7 +278,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         String manuscriptID = path.getManuscriptId();
         try {
             Context context = getContext();
-            Journal journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, path.getJournalCode());
+            Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, path.getJournalCode());
             if (journal != null) {
                 Integer organizationId = journal.conceptID;
                 TableRowIterator rows = null;
@@ -318,7 +318,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     }
 
     private static void insertManuscript(Context context, Manuscript manuscript, String organizationCode) throws SQLException, IOException {
-        Journal journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
+        Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, organizationCode);
         if (journal != null) {
             Integer organizationId = journal.conceptID;
             TableRow row = tableRowFromManuscript(manuscript, organizationId);
@@ -343,7 +343,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if(manuscript.getManuscriptId() == null) {
             throw new SQLException("NULL ID");
         }
-        Journal journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
+        Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, organizationCode);
         if (journal != null) {
             Integer organizationId = journal.conceptID;
             Integer manuscriptId = getManuscriptInternalId(context, manuscript.getManuscriptId(), organizationId);
