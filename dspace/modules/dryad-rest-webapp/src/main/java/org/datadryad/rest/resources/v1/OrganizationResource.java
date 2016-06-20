@@ -23,7 +23,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.datadryad.rest.responses.ErrorsResponse;
 import org.datadryad.rest.models.Journal;
-import org.datadryad.rest.storage.AbstractOrganizationStorage;
+import org.datadryad.rest.storage.AbstractJournalStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.responses.ResponseFactory;
@@ -37,7 +37,8 @@ import org.dspace.JournalUtils;
 
 @Path("organizations")
 public class OrganizationResource {
-    @Context AbstractOrganizationStorage organizationStorage;
+    @Context
+    AbstractJournalStorage organizationStorage;
     @Context UriInfo uriInfo;
     @Context HttpServletRequest request;
 

@@ -26,7 +26,7 @@ import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.responses.ErrorsResponse;
 import org.datadryad.rest.responses.ResponseFactory;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
-import org.datadryad.rest.storage.AbstractOrganizationStorage;
+import org.datadryad.rest.storage.AbstractJournalStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 
@@ -39,7 +39,8 @@ import org.datadryad.rest.storage.StoragePath;
 public class ManuscriptResource {
     private static final Logger log = Logger.getLogger(ManuscriptResource.class);
     @Context AbstractManuscriptStorage manuscriptStorage;
-    @Context AbstractOrganizationStorage organizationStorage;
+    @Context
+    AbstractJournalStorage organizationStorage;
     @Context UriInfo uriInfo;
     @Context SecurityContext securityContext;
     @Context ManuscriptHandlerGroup handlers;

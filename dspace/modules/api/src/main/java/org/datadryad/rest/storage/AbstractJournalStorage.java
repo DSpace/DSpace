@@ -11,7 +11,7 @@ import org.datadryad.api.DryadJournalConcept;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public abstract class AbstractOrganizationStorage extends AbstractStorage<DryadJournalConcept> {
+public abstract class AbstractJournalStorage extends AbstractStorage<DryadJournalConcept> {
     @Override
     public final void checkCollectionPath(StoragePath path) throws StorageException {
         final List<String> expectedKeyPath = Arrays.asList(); // Collection is root

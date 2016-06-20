@@ -12,7 +12,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Journal;
-import org.datadryad.rest.storage.AbstractOrganizationStorage;
+import org.datadryad.rest.storage.AbstractJournalStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.dspace.core.ConfigurationManager;
@@ -25,8 +25,8 @@ import org.dspace.JournalUtils;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage {
-    private static Logger log = Logger.getLogger(OrganizationDatabaseStorageImpl.class);
+public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
+    private static Logger log = Logger.getLogger(JournalDatabaseStorageImpl.class);
 
     // Database objects
     static final String ORGANIZATION_TABLE = "organization";
@@ -42,11 +42,11 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
             COLUMN_ISSN
     );
 
-    public OrganizationDatabaseStorageImpl(String configFileName) {
+    public JournalDatabaseStorageImpl(String configFileName) {
         setConfigFile(configFileName);
     }
 
-    public OrganizationDatabaseStorageImpl() {
+    public JournalDatabaseStorageImpl() {
         // For use when ConfigurationManager is already configured
     }
 
