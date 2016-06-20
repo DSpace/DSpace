@@ -13,8 +13,8 @@ import org.datadryad.rest.storage.rdbms.JournalDatabaseStorageImpl;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 @Provider
-public class OrganizationStorageProvider extends SingletonTypeInjectableProvider<Context, AbstractJournalStorage> {
-    public OrganizationStorageProvider() {
+public class JournalStorageProvider extends SingletonTypeInjectableProvider<Context, AbstractJournalStorage> {
+    public JournalStorageProvider() {
         super(AbstractJournalStorage.class, new JournalDatabaseStorageImpl());
     }
 }
