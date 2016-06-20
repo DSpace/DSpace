@@ -126,7 +126,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                 Context context = getContext();
                 Journal journal = JournalDatabaseStorageImpl.getOrganizationByConceptID(context, organizationID);
                 manuscript.setJournal(journal);
-                manuscript.setJournalConcept(JournalUtils.getJournalConceptByISSN(journal.organizationISSN));
+                manuscript.setJournalConcept(JournalUtils.getJournalConceptByISSN(journal.issn));
                 completeContext(context);
             } catch (SQLException e) {
                 log.error("couldn't find organization " + organizationID);

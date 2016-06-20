@@ -79,7 +79,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
 //        assertNull("Object must not exist before creating", organization);
 //        organization = new Organization();
 //        organization.journalCode = TEST_ORGANIZATION_CODE_2;
-//        organization.organizationName = TEST_ORGANIZATION_NAME_2;
+//        organization.fullName = TEST_ORGANIZATION_NAME_2;
 //        path = new StoragePath();
 //        instance.createObject(path, organization);
 //        Boolean exists = instance.objectExists(path, organization);
@@ -93,10 +93,10 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
 //        StoragePath path = StoragePath.createOrganizationPath(TEST_ORGANIZATION_CODE_1);
 //        Organization organization = instance.readObject(path);
 //        assertNotNull("Object must exist before updating", organization);
-//        organization.organizationName = TEST_ORGANIZATION_NAME_2;
+//        organization.fullName = TEST_ORGANIZATION_NAME_2;
 //        instance.updateObject(path, organization);
 //        organization = instance.readObject(path);
-//        assertEquals("Updated object should have updated name", TEST_ORGANIZATION_NAME_2, organization.organizationName);
+//        assertEquals("Updated object should have updated name", TEST_ORGANIZATION_NAME_2, organization.fullName);
 //        assertEquals("Updated object should have original code", TEST_ORGANIZATION_CODE_1, organization.journalCode);
     }
 
@@ -111,7 +111,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
 //        OrganizationDatabaseStorageImpl instance = new OrganizationDatabaseStorageImpl();
 //        String expectedName = TEST_ORGANIZATION_NAME_1;
 //        Organization result = instance.readObject(path);
-//        String resultName = result.organizationName;
+//        String resultName = result.fullName;
 //        assertEquals("Read object should have same name as original", expectedName, resultName);
     }
 

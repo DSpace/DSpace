@@ -20,8 +20,8 @@ public class Journal {
     public static final String JOURNAL_CODE = "journalCode";
     public Integer conceptID;
     public String journalCode = "";
-    public String organizationName = "";
-    public String organizationISSN = "";
+    public String fullName = "";
+    public String issn = "";
 
     public Journal() {
     }
@@ -29,8 +29,8 @@ public class Journal {
     public Journal(DryadJournalConcept dryadJournalConcept) {
         conceptID = new Integer(dryadJournalConcept.getConceptID());
         journalCode = dryadJournalConcept.getJournalID();
-        organizationName = dryadJournalConcept.getFullName();
-        organizationISSN = dryadJournalConcept.getISSN();
+        fullName = dryadJournalConcept.getFullName();
+        issn = dryadJournalConcept.getISSN();
     }
 
     public Boolean isValid() {
@@ -40,8 +40,8 @@ public class Journal {
     @Override
     public boolean equals(Object o) {
         if (o.getClass().equals(this.getClass())) {
-            Journal org = (Journal) o;
-            if (this.journalCode.equals(org.journalCode) && this.organizationName.equals(org.organizationName) && this.organizationISSN.equals(org.organizationISSN)) {
+            Journal journal = (Journal) o;
+            if (this.journalCode.equals(journal.journalCode) && this.fullName.equals(journal.fullName) && this.issn.equals(journal.issn)) {
                 return true;
             }
         }

@@ -91,10 +91,10 @@ public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
             Journal journal = new Journal();
             journal.conceptID = row.getIntColumn(COLUMN_ID);
             journal.journalCode = row.getStringColumn(COLUMN_CODE);
-            journal.organizationName = row.getStringColumn(COLUMN_NAME);
-            journal.organizationISSN = row.getStringColumn(COLUMN_ISSN);
-            if (journal.organizationISSN == null) {
-                journal.organizationISSN = "";
+            journal.fullName = row.getStringColumn(COLUMN_NAME);
+            journal.issn = row.getStringColumn(COLUMN_ISSN);
+            if (journal.issn == null) {
+                journal.issn = "";
             }
             return journal;
         } else {
@@ -191,7 +191,7 @@ public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
         try {
             context = getContext();
             Journal journal = getOrganizationByCodeOrISSN(context, organizationCode);
-            if (organizationCode.equals(journal.organizationISSN)) {
+            if (organizationCode.equals(journal.issn)) {
                 // this is an ISSN, replace journalCode with the organization's code.
                 organizationCode = journal.journalCode;
             }
