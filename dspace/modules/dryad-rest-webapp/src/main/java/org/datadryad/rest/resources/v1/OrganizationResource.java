@@ -67,7 +67,7 @@ public class OrganizationResource {
         }
     }
 
-    @Path("/{organizationCode}")
+    @Path("/{journalCode}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrganization(@PathParam(Journal.JOURNAL_CODE) String organizationCode) {
@@ -164,7 +164,7 @@ public class OrganizationResource {
         }
     }
 
-    @Path("/{organizationCode}")
+    @Path("/{journalCode}")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

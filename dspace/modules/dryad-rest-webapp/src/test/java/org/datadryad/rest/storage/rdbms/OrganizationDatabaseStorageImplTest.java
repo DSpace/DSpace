@@ -78,7 +78,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
 //        Organization organization = instance.readObject(path);
 //        assertNull("Object must not exist before creating", organization);
 //        organization = new Organization();
-//        organization.organizationCode = TEST_ORGANIZATION_CODE_2;
+//        organization.journalCode = TEST_ORGANIZATION_CODE_2;
 //        organization.organizationName = TEST_ORGANIZATION_NAME_2;
 //        path = new StoragePath();
 //        instance.createObject(path, organization);
@@ -97,7 +97,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
 //        instance.updateObject(path, organization);
 //        organization = instance.readObject(path);
 //        assertEquals("Updated object should have updated name", TEST_ORGANIZATION_NAME_2, organization.organizationName);
-//        assertEquals("Updated object should have original code", TEST_ORGANIZATION_CODE_1, organization.organizationCode);
+//        assertEquals("Updated object should have original code", TEST_ORGANIZATION_CODE_1, organization.journalCode);
     }
 
     /**
@@ -126,7 +126,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
 //        OrganizationDatabaseStorageImpl instance = new OrganizationDatabaseStorageImpl();
 //        instance.deleteObject(path);
 //        Organization dummyOrganization = new Organization();
-//        dummyOrganization.organizationCode = TEST_ORGANIZATION_CODE_1;
+//        dummyOrganization.journalCode = TEST_ORGANIZATION_CODE_1;
 //        Boolean exists = instance.objectExists(path, dummyOrganization);
 //        assertFalse("Deleted object should not exist", exists);
     }

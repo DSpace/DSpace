@@ -34,7 +34,7 @@ public class LegacyManuscript {
     public LegacyManuscript() {}
     public LegacyManuscript(Manuscript manuscript) {
         this.Journal = manuscript.getJournal().organizationName;
-        this.Journal_Code = manuscript.getJournal().organizationCode;
+        this.Journal_Code = manuscript.getJournal().journalCode;
         this.Submission_Metadata.Manuscript = manuscript.getManuscriptId();
         this.Submission_Metadata.Article_Title = manuscript.getTitle();
         this.Article_Status = manuscript.getLiteralStatus();

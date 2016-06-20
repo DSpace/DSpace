@@ -167,7 +167,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         TableRow row = getTableRowByManuscriptId(context, msid, organizationCode);
         if (row != null) {
             manuscript = manuscriptFromTableRow(row);
-            manuscript.getJournal().organizationCode = organizationCode;
+            manuscript.getJournal().journalCode = organizationCode;
         }
         return manuscript;
     }
@@ -193,7 +193,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         TableRow existingRow = null;
         Integer organizationId = journal.conceptID;
         if (manuscript.getManuscriptId() != null) {
-            existingRow = getTableRowByManuscriptId(context, manuscript.getManuscriptId(), journal.organizationCode);
+            existingRow = getTableRowByManuscriptId(context, manuscript.getManuscriptId(), journal.journalCode);
         }
         if (existingRow == null) {
             // try looking it up by pub doi

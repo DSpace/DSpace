@@ -270,7 +270,7 @@ public class WorkflowItem implements InProgressSubmission {
     }
 
     public static List<WorkflowItem> findAllByManuscript(Context context, Manuscript manuscript) throws ApproveRejectReviewItemException {
-        String journalCode = manuscript.getJournal().organizationCode;
+        String journalCode = manuscript.getJournal().journalCode;
         WorkflowItem[] workflowItems = null;
         ArrayList<WorkflowItem> matchingItems = new ArrayList<WorkflowItem>();
 

@@ -611,7 +611,7 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     public Journal getOrganizationFromJournalConcept() {
         Journal journal = new Journal();
         journal.conceptID = getUnderlyingConcept().getID();
-        journal.organizationCode = getJournalID();
+        journal.journalCode = getJournalID();
         journal.organizationName = getFullName();
         journal.organizationISSN = getISSN();
         return journal;

@@ -34,7 +34,7 @@ import org.datadryad.rest.storage.StoragePath;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-@Path("organizations/{organizationCode}/manuscripts")
+@Path("organizations/{journalCode}/manuscripts")
 
 public class ManuscriptResource {
     private static final Logger log = Logger.getLogger(ManuscriptResource.class);
