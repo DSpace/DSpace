@@ -89,7 +89,7 @@ public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
     static Journal organizationFromTableRow(TableRow row) {
         if(row != null) {
             Journal journal = new Journal();
-            journal.organizationId = row.getIntColumn(COLUMN_ID);
+            journal.conceptID = row.getIntColumn(COLUMN_ID);
             journal.organizationCode = row.getStringColumn(COLUMN_CODE);
             journal.organizationName = row.getStringColumn(COLUMN_NAME);
             journal.organizationISSN = row.getStringColumn(COLUMN_ISSN);

@@ -46,22 +46,22 @@ public class StoragePath extends ArrayList<StoragePathElement> {
 
     public static StoragePath createOrganizationPath(String organizationCode) {
         StoragePath path = new StoragePath();
-        path.addPathElement(Journal.ORGANIZATION_CODE, organizationCode);
+        path.addPathElement(Journal.JOURNAL_CODE, organizationCode);
         return path;
     }
 
     public static StoragePath createManuscriptPath(String organizationCode, String manuscriptId) {
         StoragePath path = new StoragePath();
-        path.addPathElement(Journal.ORGANIZATION_CODE, organizationCode);
+        path.addPathElement(Journal.JOURNAL_CODE, organizationCode);
         path.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
         return path;
     }
 
     public void setOrganizationCode(String organizationCode) {
         if (getOrganizationCode() == null) {   // can't add ManuscriptId to a path that doesn't have an organization
-            this.addPathElement(Journal.ORGANIZATION_CODE, organizationCode);
+            this.addPathElement(Journal.JOURNAL_CODE, organizationCode);
         } else {
-            this.set(0, new StoragePathElement(Journal.ORGANIZATION_CODE, organizationCode));
+            this.set(0, new StoragePathElement(Journal.JOURNAL_CODE, organizationCode));
         }
     }
 

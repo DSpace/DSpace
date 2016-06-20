@@ -177,7 +177,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if (journal == null) {
             return null;
         } else {
-            Integer organizationId = journal.organizationId;
+            Integer organizationId = journal.conceptID;
             String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
             TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
             return row;
@@ -191,7 +191,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             return null;
         }
         TableRow existingRow = null;
-        Integer organizationId = journal.organizationId;
+        Integer organizationId = journal.conceptID;
         if (manuscript.getManuscriptId() != null) {
             existingRow = getTableRowByManuscriptId(context, manuscript.getManuscriptId(), journal.organizationCode);
         }
@@ -241,7 +241,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if (journal == null) {
             return manuscripts;
         } else {
-            Integer organizationId = journal.organizationId;
+            Integer organizationId = journal.conceptID;
             String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ? ORDER BY manuscript_id DESC LIMIT ? ";
             TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, limit);
             while(rows.hasNext()) {
@@ -259,7 +259,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if (journal == null) {
             return manuscripts;
         } else {
-            Integer organizationId = journal.organizationId;
+            Integer organizationId = journal.conceptID;
             String searchWords[] = searchParam.split("\\s", 2);
             String queryParam = "%" + searchWords[0] + "%";
             String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ? AND json_data like ? ORDER BY manuscript_id DESC LIMIT ? ";
@@ -280,7 +280,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             Context context = getContext();
             Journal journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, path.getOrganizationCode());
             if (journal != null) {
-                Integer organizationId = journal.organizationId;
+                Integer organizationId = journal.conceptID;
                 TableRowIterator rows = null;
                 if (manuscriptID != null) {
                     String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ? AND msid like ? ORDER BY manuscript_id DESC LIMIT ? ";
@@ -320,7 +320,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     private static void insertManuscript(Context context, Manuscript manuscript, String organizationCode) throws SQLException, IOException {
         Journal journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (journal != null) {
-            Integer organizationId = journal.organizationId;
+            Integer organizationId = journal.conceptID;
             TableRow row = tableRowFromManuscript(manuscript, organizationId);
             if (row != null) {
                 row.setColumn(COLUMN_VERSION, 1);
@@ -345,7 +345,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
         Journal journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, organizationCode);
         if (journal != null) {
-            Integer organizationId = journal.organizationId;
+            Integer organizationId = journal.conceptID;
             Integer manuscriptId = getManuscriptInternalId(context, manuscript.getManuscriptId(), organizationId);
             log.error("deleting ms " + manuscript.getManuscriptId() + " with internal ID " + manuscriptId);
             TableRow row = tableRowFromManuscript(manuscript, organizationId);

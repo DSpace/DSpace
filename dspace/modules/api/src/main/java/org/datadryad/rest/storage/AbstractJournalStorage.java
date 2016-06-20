@@ -21,7 +21,7 @@ public abstract class AbstractJournalStorage extends AbstractStorage<DryadJourna
 
     @Override
     public final void checkObjectPath(StoragePath path) throws StorageException {
-        final List<String> expectedKeyPath = Arrays.asList(Journal.ORGANIZATION_CODE);
+        final List<String> expectedKeyPath = Arrays.asList(Journal.JOURNAL_CODE);
         checkPath(path, expectedKeyPath);
     }
 }

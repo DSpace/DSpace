@@ -70,7 +70,7 @@ public class OrganizationResource {
     @Path("/{organizationCode}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrganization(@PathParam(Journal.ORGANIZATION_CODE) String organizationCode) {
+    public Response getOrganization(@PathParam(Journal.JOURNAL_CODE) String organizationCode) {
         StoragePath path = StoragePath.createOrganizationPath(organizationCode);
         try {
             DryadJournalConcept journalConcept = organizationStorage.findByPath(path);
@@ -168,7 +168,7 @@ public class OrganizationResource {
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteOrganization(@PathParam(Journal.ORGANIZATION_CODE) String organizationCode) {
+    public Response deleteOrganization(@PathParam(Journal.JOURNAL_CODE) String organizationCode) {
         StoragePath path = StoragePath.createOrganizationPath(organizationCode);
         try {
             organizationStorage.deleteByPath(path);

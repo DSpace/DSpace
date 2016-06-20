@@ -17,8 +17,8 @@ import java.lang.Override;
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Journal {
-    public static final String ORGANIZATION_CODE = "organizationCode";
-    public Integer organizationId;
+    public static final String JOURNAL_CODE = "organizationCode";
+    public Integer conceptID;
     public String organizationCode = "";
     public String organizationName = "";
     public String organizationISSN = "";
@@ -27,7 +27,7 @@ public class Journal {
     }
 
     public Journal(DryadJournalConcept dryadJournalConcept) {
-        organizationId = new Integer(dryadJournalConcept.getConceptID());
+        conceptID = new Integer(dryadJournalConcept.getConceptID());
         organizationCode = dryadJournalConcept.getJournalID();
         organizationName = dryadJournalConcept.getFullName();
         organizationISSN = dryadJournalConcept.getISSN();
