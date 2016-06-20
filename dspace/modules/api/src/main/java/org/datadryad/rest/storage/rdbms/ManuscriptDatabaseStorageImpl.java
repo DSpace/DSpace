@@ -116,7 +116,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     private static Manuscript manuscriptFromTableRow(TableRow row) throws IOException {
         if(row != null) {
             String json_data = row.getStringColumn(COLUMN_JSON_DATA);
-            int organizationID = row.getIntColumn(COLUMN_JOURNAL_ID);
+            int journalConceptID = row.getIntColumn(COLUMN_JOURNAL_ID);
             Manuscript manuscript = reader.readValue(json_data);
             manuscript.setStatus(row.getStringColumn(COLUMN_STATUS));
             if (manuscript.optionalProperties == null) {
@@ -124,12 +124,12 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             }
             try {
                 Context context = getContext();
-                Journal journal = JournalDatabaseStorageImpl.getJournalByConceptID(context, organizationID);
+                Journal journal = JournalDatabaseStorageImpl.getJournalByConceptID(context, journalConceptID);
                 manuscript.setJournal(journal);
                 manuscript.setJournalConcept(JournalUtils.getJournalConceptByISSN(journal.issn));
                 completeContext(context);
             } catch (SQLException e) {
-                log.error("couldn't find organization " + organizationID);
+                log.error("couldn't find journal concept " + journalConceptID);
             }
             return manuscript;
         } else {
@@ -137,9 +137,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
-    private static Integer getManuscriptInternalId(Context context, String msid, Integer organizationId) throws SQLException {
+    private static Integer getManuscriptInternalId(Context context, String msid, Integer journalConceptID) throws SQLException {
         String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_MSID + " like ? and " + COLUMN_JOURNAL_ID + " = ? and" + COLUMN_ACTIVE + "= ?";
-        TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
+        TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, journalConceptID, ACTIVE_TRUE);
         if(row != null) {
             return row.getIntColumn(COLUMN_ID);
         } else {
@@ -148,10 +148,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     }
 
 
-    static TableRow tableRowFromManuscript(Manuscript manuscript, Integer organizationId) throws IOException {
+    static TableRow tableRowFromManuscript(Manuscript manuscript, Integer journalConceptID) throws IOException {
         if(manuscript != null) {
             TableRow row = new TableRow(MANUSCRIPT_TABLE, MANUSCRIPT_COLUMNS);
-            row.setColumn(COLUMN_JOURNAL_ID, organizationId);
+            row.setColumn(COLUMN_JOURNAL_ID, journalConceptID);
             row.setColumn(COLUMN_MSID, manuscript.getManuscriptId());
             row.setColumn(COLUMN_JSON_DATA, manuscript.toString());
             row.setColumn(COLUMN_DATE_ADDED, new Date());
@@ -177,9 +177,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if (journal == null) {
             return null;
         } else {
-            Integer organizationId = journal.conceptID;
+            Integer journalConceptID = journal.conceptID;
             String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_MSID + " = ? and " + COLUMN_JOURNAL_ID + " = ? and" + COLUMN_ACTIVE + "= ?";
-            TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
+            TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, journalConceptID, ACTIVE_TRUE);
             return row;
         }
     }
@@ -191,7 +191,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             return null;
         }
         TableRow existingRow = null;
-        Integer organizationId = journal.conceptID;
+        Integer journalConceptID = journal.conceptID;
         if (manuscript.getManuscriptId() != null) {
             existingRow = getTableRowByManuscriptId(context, manuscript.getManuscriptId(), journal.journalCode);
         }
@@ -199,9 +199,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             // try looking it up by pub doi
             String pubDOI = manuscript.getPublicationDOI();
             if (!"".equals(pubDOI)) {
-                log.debug("Looking for a manuscript with publication DOI like " + pubDOI + " and " + COLUMN_JOURNAL_ID + " like " + organizationId);
+                log.debug("Looking for a manuscript with publication DOI like " + pubDOI + " and " + COLUMN_JOURNAL_ID + " like " + journalConceptID);
                 String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and" + COLUMN_ACTIVE + "= ? and" + COLUMN_JSON_DATA + "like '%\"publicationDOI\" : \"" + pubDOI + "\"%'";
-                existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE);
+                existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE);
             }
         }
         if (existingRow != null) {
@@ -217,7 +217,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             }
             if (!"".equals(authorString.toString())) {
                 String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and" + COLUMN_ACTIVE + "= ? " + authorString.toString();
-                TableRowIterator tableRowIterator = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE);
+                TableRowIterator tableRowIterator = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE);
                 if (tableRowIterator != null) {
                     List<TableRow> rows = tableRowIterator.toList();
                     for (TableRow row : rows) {
@@ -241,9 +241,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if (journal == null) {
             return manuscripts;
         } else {
-            Integer organizationId = journal.conceptID;
+            Integer journalConceptID = journal.conceptID;
             String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? AND" + COLUMN_ACTIVE + "= ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
-            TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, limit);
+            TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, limit);
             while(rows.hasNext()) {
                 TableRow row = rows.next();
                 Manuscript manuscript = manuscriptFromTableRow(row);
@@ -259,11 +259,11 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if (journal == null) {
             return manuscripts;
         } else {
-            Integer organizationId = journal.conceptID;
+            Integer journalConceptID = journal.conceptID;
             String searchWords[] = searchParam.split("\\s", 2);
             String queryParam = "%" + searchWords[0] + "%";
             String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? AND" + COLUMN_ACTIVE + "= ? AND" + COLUMN_JSON_DATA + "like ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
-            TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, queryParam, limit);
+            TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, queryParam, limit);
             while(rows.hasNext()) {
                 TableRow row = rows.next();
                 Manuscript manuscript = manuscriptFromTableRow(row);
@@ -280,14 +280,14 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             Context context = getContext();
             Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, path.getJournalCode());
             if (journal != null) {
-                Integer organizationId = journal.conceptID;
+                Integer journalConceptID = journal.conceptID;
                 TableRowIterator rows = null;
                 if (manuscriptID != null) {
                     String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? AND" + COLUMN_ACTIVE + "= ? AND " + COLUMN_MSID + " like ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
-                    rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, manuscriptID, limit);
+                    rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, manuscriptID, limit);
                 } else {
                     String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? AND" + COLUMN_ACTIVE + "= ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
-                    rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, limit);
+                    rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, limit);
                 }
                 while (rows.hasNext()) {
                     TableRow row = rows.next();
@@ -320,8 +320,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     private static void insertManuscript(Context context, Manuscript manuscript, String journalCode) throws SQLException, IOException {
         Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, journalCode);
         if (journal != null) {
-            Integer organizationId = journal.conceptID;
-            TableRow row = tableRowFromManuscript(manuscript, organizationId);
+            Integer journalConceptID = journal.conceptID;
+            TableRow row = tableRowFromManuscript(manuscript, journalConceptID);
             if (row != null) {
                 row.setColumn(COLUMN_VERSION, 1);
                 row.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
@@ -345,10 +345,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
         Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, journalCode);
         if (journal != null) {
-            Integer organizationId = journal.conceptID;
-            Integer manuscriptId = getManuscriptInternalId(context, manuscript.getManuscriptId(), organizationId);
+            Integer journalConceptID = journal.conceptID;
+            Integer manuscriptId = getManuscriptInternalId(context, manuscript.getManuscriptId(), journalConceptID);
             log.error("deleting ms " + manuscript.getManuscriptId() + " with internal ID " + manuscriptId);
-            TableRow row = tableRowFromManuscript(manuscript, organizationId);
+            TableRow row = tableRowFromManuscript(manuscript, journalConceptID);
             row.setColumn(COLUMN_ID, manuscriptId);
             row.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
             DatabaseManager.delete(context, row);
