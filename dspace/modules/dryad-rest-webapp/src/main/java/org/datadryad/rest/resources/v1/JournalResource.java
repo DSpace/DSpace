@@ -36,7 +36,7 @@ import org.dspace.JournalUtils;
  */
 
 @Path("organizations")
-public class OrganizationResource {
+public class JournalResource {
     @Context
     AbstractJournalStorage organizationStorage;
     @Context UriInfo uriInfo;
