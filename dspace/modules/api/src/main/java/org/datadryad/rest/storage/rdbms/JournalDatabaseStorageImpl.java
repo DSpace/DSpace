@@ -186,7 +186,7 @@ public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
 
     @Override
     protected DryadJournalConcept readObject(StoragePath path) throws StorageException {
-        String organizationCode = path.getOrganizationCode();
+        String organizationCode = path.getJournalCode();
         Context context = null;
         try {
             context = getContext();

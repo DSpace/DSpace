@@ -39,18 +39,17 @@ import org.datadryad.rest.storage.StoragePath;
 public class ManuscriptResource {
     private static final Logger log = Logger.getLogger(ManuscriptResource.class);
     @Context AbstractManuscriptStorage manuscriptStorage;
-    @Context
-    AbstractJournalStorage organizationStorage;
+    @Context AbstractJournalStorage journalStorage;
     @Context UriInfo uriInfo;
     @Context SecurityContext securityContext;
     @Context ManuscriptHandlerGroup handlers;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManuscripts(@PathParam(Journal.JOURNAL_CODE) String organizationCode, @QueryParam("search") String searchParam, @QueryParam("count") Integer resultParam) {
+    public Response getManuscripts(@PathParam(Journal.JOURNAL_CODE) String journalCode, @QueryParam("search") String searchParam, @QueryParam("count") Integer resultParam) {
         try {
             // Returning a list requires POJO turned on
-            StoragePath path = StoragePath.createOrganizationPath(organizationCode);
+            StoragePath path = StoragePath.createJournalPath(journalCode);
             return Response.ok(manuscriptStorage.getResults(path, searchParam, resultParam)).build();
         } catch (StorageException ex) {
             log.error("Exception getting manuscripts", ex);
@@ -62,9 +61,9 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManuscript(@PathParam(Journal.JOURNAL_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId) {
+    public Response getManuscript(@PathParam(Journal.JOURNAL_CODE) String journalCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId) {
         try {
-            StoragePath manuscriptPath = StoragePath.createManuscriptPath(organizationCode, manuscriptId);
+            StoragePath manuscriptPath = StoragePath.createManuscriptPath(journalCode, manuscriptId);
             Manuscript manuscript = manuscriptStorage.findByPath(manuscriptPath);
             if(manuscript == null) {
                 ErrorsResponse error = ResponseFactory.makeError("Manuscript with ID " + manuscriptId + " does not exist", "Manuscript not found", uriInfo, Status.NOT_FOUND.getStatusCode());
@@ -82,20 +81,20 @@ public class ManuscriptResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createManuscript(@PathParam(Journal.JOURNAL_CODE) String organizationCode, Manuscript manuscript) {
-        StoragePath organizationPath = StoragePath.createOrganizationPath(organizationCode);
+    public Response createManuscript(@PathParam(Journal.JOURNAL_CODE) String journalCode, Manuscript manuscript) {
+        StoragePath journalPath = StoragePath.createJournalPath(journalCode);
         if(manuscript.isValid()) {
             try {
-                // Find the organization in database first.
-                manuscript.setJournal(organizationStorage.findByPath(organizationPath).getOrganizationFromJournalConcept());
-                manuscriptStorage.create(organizationPath, manuscript);
+                // Find the journal in database first.
+                manuscript.setJournal(journalStorage.findByPath(journalPath).getOrganizationFromJournalConcept());
+                manuscriptStorage.create(journalPath, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception creating manuscript", ex);
                 ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to create manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
                 return error.toResponse().build();
             }
-            // call handlers - must set organization first
-            handlers.handleObjectCreated(organizationPath, manuscript);
+            // call handlers - must set journal first
+            handlers.handleObjectCreated(journalPath, manuscript);
             UriBuilder ub = uriInfo.getAbsolutePathBuilder();
             URI uri = ub.path(manuscript.getManuscriptId()).build();
             return Response.created(uri).entity(manuscript).build();
@@ -109,19 +108,19 @@ public class ManuscriptResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateManuscript(@PathParam(Journal.JOURNAL_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId, Manuscript manuscript) {
-        StoragePath path = StoragePath.createManuscriptPath(organizationCode, manuscriptId);
+    public Response updateManuscript(@PathParam(Journal.JOURNAL_CODE) String journalCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId, Manuscript manuscript) {
+        StoragePath path = StoragePath.createManuscriptPath(journalCode, manuscriptId);
         if(manuscript.isValid()) {
             try {
-                StoragePath organizationPath = StoragePath.createOrganizationPath(organizationCode);
-                manuscript.setJournal(organizationStorage.findByPath(organizationPath).getOrganizationFromJournalConcept());
+                StoragePath journalPath = StoragePath.createJournalPath(journalCode);
+                manuscript.setJournal(journalStorage.findByPath(journalPath).getOrganizationFromJournalConcept());
                 manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception updating manuscript", ex);
                 ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to update manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
                 return error.toResponse().build();
             }
-            // call handlers - must set organization first.
+            // call handlers - must set journal first.
             handlers.handleObjectUpdated(path, manuscript);
             return Response.ok(manuscript).build();
         } else {
@@ -133,20 +132,20 @@ public class ManuscriptResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateManuscript(@PathParam(Journal.JOURNAL_CODE) String organizationCode, Manuscript manuscript) {
+    public Response updateManuscript(@PathParam(Journal.JOURNAL_CODE) String journalCode, Manuscript manuscript) {
         String manuscriptId = manuscript.getManuscriptId();
-        StoragePath path = StoragePath.createManuscriptPath(organizationCode, manuscriptId);
+        StoragePath path = StoragePath.createManuscriptPath(journalCode, manuscriptId);
         if(manuscript.isValid()) {
             try {
-                StoragePath organizationPath = StoragePath.createOrganizationPath(organizationCode);
-                manuscript.setJournal(organizationStorage.findByPath(organizationPath).getOrganizationFromJournalConcept());
+                StoragePath journalPath = StoragePath.createJournalPath(journalCode);
+                manuscript.setJournal(journalStorage.findByPath(journalPath).getOrganizationFromJournalConcept());
                 manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception updating manuscript", ex);
                 ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to update manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
                 return error.toResponse().build();
             }
-            // call handlers - must set organization first.
+            // call handlers - must set journal first.
             handlers.handleObjectUpdated(path, manuscript);
             return Response.ok(manuscript).build();
         } else {
@@ -159,8 +158,8 @@ public class ManuscriptResource {
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteManuscript(@PathParam(Journal.JOURNAL_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId) {
-        StoragePath path = StoragePath.createManuscriptPath(organizationCode, manuscriptId);
+    public Response deleteManuscript(@PathParam(Journal.JOURNAL_CODE) String journalCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId) {
+        StoragePath path = StoragePath.createManuscriptPath(journalCode, manuscriptId);
         try {
             manuscriptStorage.deleteByPath(path);
         } catch (StorageException ex) {

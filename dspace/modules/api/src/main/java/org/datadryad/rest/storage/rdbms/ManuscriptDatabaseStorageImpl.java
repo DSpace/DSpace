@@ -278,7 +278,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         String manuscriptID = path.getManuscriptId();
         try {
             Context context = getContext();
-            Journal journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, path.getOrganizationCode());
+            Journal journal = JournalDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, path.getJournalCode());
             if (journal != null) {
                 Integer organizationId = journal.conceptID;
                 TableRowIterator rows = null;
@@ -376,7 +376,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     // This call is always limited to the default limit of entries, so as not to tie up the connection pool.
     @Override
     protected void addResults(StoragePath path, List<Manuscript> manuscripts, String searchParam, Integer limit) throws StorageException {
-        String organizationCode = path.getOrganizationCode();
+        String organizationCode = path.getJournalCode();
         String manuscriptId = path.getManuscriptId();
         int limitInt = DEFAULT_LIMIT;
         if (limit != null) {
@@ -408,7 +408,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             log.error("object exists");
             throw new StorageException("Unable to create, manuscript already exists");
         }
-        String organizationCode = path.getOrganizationCode();
+        String organizationCode = path.getJournalCode();
         try {
             Context context = getContext();
             insertManuscript(context, manuscript, organizationCode);
@@ -422,7 +422,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     @Override
     protected Manuscript readObject(StoragePath path) throws StorageException {
-        String organizationCode = path.getOrganizationCode();
+        String organizationCode = path.getJournalCode();
         String manuscriptId = path.getManuscriptId();
         try {
             Context context = getContext();
@@ -438,7 +438,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     @Override
     protected void deleteObject(StoragePath path) throws StorageException {
-        String organizationCode = path.getOrganizationCode();
+        String organizationCode = path.getJournalCode();
         String manuscriptId = path.getManuscriptId();
         try {
             Context context = getContext();
