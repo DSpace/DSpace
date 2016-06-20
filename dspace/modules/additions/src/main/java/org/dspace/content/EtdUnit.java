@@ -576,15 +576,21 @@ public class EtdUnit extends DSpaceObject
      */
     public Collection[] getCollections() throws SQLException
     {
+        final int titleFieldID = MetadataField.findByElement(
+                myContext,
+                MetadataSchema.find(myContext, MetadataSchema.DC_SCHEMA)
+                        .getSchemaID(), "title", null).getFieldID();
         // Get the collection table rows
         TableRowIterator tri = DatabaseManager
                 .queryTable(
                         myContext,
                         "collection",
-                        "SELECT collection.* FROM collection, collection2etdunit WHERE "
-                                + "collection.collection_id=collection2etdunit.collection_id AND "
-                                + "collection2etdunit.etdunit_id= ? ORDER BY name",
-                                myRow.getIntColumn("etdunit_id"));
+                        "SELECT c.* FROM collection c, collection2etdunit c2e, metadatavalue m WHERE "
+                                + "c.collection_id=c2e.collection_id AND c2e.etdunit_id=? AND "
+                                + "m.resource_id=c.collection_id AND m.metadata_field_id=? AND "
+                                + "m.resource_type_id=? ORDER BY m.text_value",
+                        myRow.getIntColumn("etdunit_id"), titleFieldID,
+                        Constants.COLLECTION);
 
         // Build a list of Collection objects
         List<Collection> collections = new ArrayList<Collection>();
