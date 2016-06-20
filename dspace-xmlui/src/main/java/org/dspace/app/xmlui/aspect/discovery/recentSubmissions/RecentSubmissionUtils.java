@@ -29,7 +29,10 @@ public class RecentSubmissionUtils {
     /**
      * Retrieves the recent submitted items of the given scope
      *
+     * @param context session context.
      * @param dso the DSpace object can either be null (indicating home page), a collection or a community
+     * @param offset start here in the list.
+     * @return result.
      */
     public static DiscoverResult getRecentlySubmittedItems(Context context, DSpaceObject dso, int offset) {
         try {

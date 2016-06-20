@@ -23,11 +23,11 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * to a fixed number of days. Table constructed from a dspace.cfg property
  * with syntax:
  *
- * embargo.terms.days = 90 days:90,1 year:365,2 years:730
+ * {@code embargo.terms.days = 90 days:90,1 year:365,2 years:730}
  *
- * That is, an arbitrary, comma separated, list of <terms>:<days> where <terms>
- * can be any string and <days> must be a positive integer.
- * All the <terms> fields should be defined in a 'value-pairs' element,
+ * That is, an arbitrary, comma separated, list of {@code <terms>:<days>} where {@code <terms>}
+ * can be any string and {@code <days>} must be a positive integer.
+ * All the {@code <terms>} fields should be defined in a 'value-pairs' element,
  * and the field configured as the embargo terms should employ a drop-down using
  * that element in input_forms.xml, if user submission is desired.
  * 

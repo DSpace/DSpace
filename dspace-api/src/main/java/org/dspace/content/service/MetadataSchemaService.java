@@ -24,12 +24,15 @@ import java.util.List;
 public interface MetadataSchemaService {
 
     /**
-     * Creates a new metadata schema in the database, using the name & namspace.
+     * Creates a new metadata schema in the database, using the name and namespace.
      *
      * @param context
      *            DSpace context object
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param name name
+     * @param namespace namespace
+     * @return new MetadataSchema
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      * @throws NonUniqueMetadataException
      */
     public MetadataSchema create(Context context, String name, String namespace) throws SQLException, AuthorizeException, NonUniqueMetadataException;
@@ -40,7 +43,7 @@ public interface MetadataSchemaService {
      * @param context DSpace context
      * @param namespace namespace URI to match
      * @return metadata schema object or null if none found.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public MetadataSchema findByNamespace(Context context, String namespace) throws SQLException;
 
@@ -48,8 +51,9 @@ public interface MetadataSchemaService {
      * Update the metadata schema in the database.
      *
      * @param context DSpace context
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param metadataSchema metadata schema
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      * @throws NonUniqueMetadataException
      */
     public void update(Context context, MetadataSchema metadataSchema) throws SQLException, AuthorizeException, NonUniqueMetadataException;
@@ -58,8 +62,9 @@ public interface MetadataSchemaService {
      * Delete the metadata schema.
      *
      * @param context DSpace context
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @param metadataSchema metadata schema
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void delete(Context context, MetadataSchema metadataSchema) throws SQLException, AuthorizeException;
 
@@ -68,7 +73,7 @@ public interface MetadataSchemaService {
      *
      * @param context DSpace context
      * @return array of metadata schemas
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<MetadataSchema> findAll(Context context) throws SQLException;
 
@@ -81,7 +86,7 @@ public interface MetadataSchemaService {
      * @param id
      *            the schema ID
      * @return the metadata schema object
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public MetadataSchema find(Context context, int id) throws SQLException;
 
@@ -93,7 +98,7 @@ public interface MetadataSchemaService {
      * @param shortName
      *            the short name for the schema
      * @return the metadata schema object
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public MetadataSchema find(Context context, String shortName) throws SQLException;
 }

@@ -143,7 +143,7 @@ public class Constants
 
     /**
      * generating constants for the relevance array dynamically is simple: just
-     * 1 << TYPE
+     * {@code 1 << TYPE}
      */
     public static final int RBITSTREAM = 1 << BITSTREAM;
 

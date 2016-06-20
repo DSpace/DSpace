@@ -33,7 +33,7 @@ import org.purl.sword.base.ServiceDocumentRequest;
 public class ServiceDocumentServlet extends HttpServlet {
 
 	/** The repository */
-	private final transient SWORDServer myRepository;
+	private transient SWORDServer myRepository;
 
 	/** Authentication type. */
 	private String authN;
@@ -44,10 +44,15 @@ public class ServiceDocumentServlet extends HttpServlet {
 	/** Logger */
 	private static final Logger log = Logger.getLogger(ServiceDocumentServlet.class);
 
-    public ServiceDocumentServlet()
-            throws ServletException
-    {
-		// Instantiate the correct SWORD Server class
+    /**
+	 * Initialise the servlet.
+	 *
+	 * @throws ServletException if the server class cannot be instantiated.
+	 */
+    @Override
+	public void init() throws ServletException {
+
+        // Instantiate the correct SWORD Server class
 		String className = getServletContext().getInitParameter("sword-server-class");
 		if (className == null) {
 			log.fatal("Unable to read value of 'sword-server-class' from Servlet context");
@@ -65,15 +70,6 @@ public class ServiceDocumentServlet extends HttpServlet {
 								+ className, e);
 			}
 		}
-    }
-
-    /**
-	 * Initialise the servlet.
-	 * 
-	 * @throws ServletException
-	 */
-    @Override
-	public void init() throws ServletException {
 
 		// Set the authentication method
 		authN = getServletContext().getInitParameter("authentication-method");
@@ -100,7 +96,11 @@ public class ServiceDocumentServlet extends HttpServlet {
 	}
 
 	/**
-	 * Process the get request.
+	 * Process the GET request.
+     * @param request the request.
+     * @param response the response.
+     * @throws javax.servlet.ServletException passed through.
+     * @throws java.io.IOException passed through.
 	 */
     @Override
 	protected void doGet(HttpServletRequest request,
@@ -154,7 +154,7 @@ public class ServiceDocumentServlet extends HttpServlet {
 			// Return the relevant HTTP status code
 			response.sendError(see.getStatus(), see.getDescription());
 		} catch (SWORDException se) {
-			se.printStackTrace();
+            log.error("Internal error", se);
 			// Throw a HTTP 500
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, se.getMessage());
 		}
@@ -162,6 +162,10 @@ public class ServiceDocumentServlet extends HttpServlet {
 
 	/**
 	 * Process the post request. This will return an unimplemented response.
+     * @param request the request.
+     * @param response the response.
+     * @throws javax.servlet.ServletException passed through.
+     * @throws java.io.IOException passed through.
 	 */
     @Override
 	protected void doPost(HttpServletRequest request,

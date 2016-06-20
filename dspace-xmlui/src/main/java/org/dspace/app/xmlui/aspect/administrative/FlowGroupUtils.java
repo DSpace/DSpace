@@ -54,6 +54,7 @@ public class FlowGroupUtils {
 	 * @param context The current DSpace context.
 	 * @param groupID The group id.
 	 * @return The group's name.
+     * @throws java.sql.SQLException passed through.
 	 */
 	public static String getName(Context context, UUID groupID) throws SQLException
 	{
@@ -78,6 +79,7 @@ public class FlowGroupUtils {
 	 * @param context The current DSpace context
 	 * @param groupID The group's id.
 	 * @return An array of ids.
+     * @throws java.sql.SQLException passed through.
 	 */
 	public static String[] getEPeopleMembers(Context context, UUID groupID) throws SQLException
 	{
@@ -111,6 +113,7 @@ public class FlowGroupUtils {
 	 * @param context The current DSpace context
 	 * @param groupID The group's id.
 	 * @return An array of ids.
+     * @throws java.sql.SQLException passed through.
 	 */
 	public static String[] getGroupMembers(Context context, UUID groupID) throws SQLException
 	{
@@ -136,8 +139,7 @@ public class FlowGroupUtils {
 		
 		return groupIDs;
 	}
-	
-	
+
 	/**
 	 * Add the given id to the list and return a new list.
 	 * 
@@ -180,8 +182,12 @@ public class FlowGroupUtils {
 	 * @param newEPeopleIDsArray All epeople members
 	 * @param newGroupIDsArray All group members.
 	 * @return A result
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException on bad encoding.
 	 */
-	public static FlowResult processSaveGroup(Context context, UUID groupID, String newName, String[] newEPeopleIDsArray, String[] newGroupIDsArray) throws SQLException, AuthorizeException, UIException
+	public static FlowResult processSaveGroup(Context context, UUID groupID, String newName, String[] newEPeopleIDsArray, String[] newGroupIDsArray)
+            throws SQLException, AuthorizeException, UIException
 	{
 		FlowResult result = new FlowResult();
 		
@@ -343,6 +349,9 @@ public class FlowGroupUtils {
 	 * @param context The current DSpace context
 	 * @param groupIDs A list of groups to be removed.
 	 * @return A results object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
 	public static FlowResult processDeleteGroups(Context context, String[] groupIDs) throws SQLException, AuthorizeException, IOException
 	{
@@ -417,11 +426,11 @@ public class FlowGroupUtils {
 	 * Note: the order of these suffixes are important, see getCollectionRole()
 	 */
 	private static final String[] COLLECTION_SUFFIXES = {"_SUBMIT","_ADMIN","_WFSTEP_1","_WORKFLOW_STEP_1","_WFSTEP_2","_WORKFLOW_STEP_2","_WFSTEP_3","_WORKFLOW_STEP_3","_DEFAULT_ITEM_READ"};
-	
-	
+
 	/**
-	 * Extracts the collection id that may be immbedded in the given group name.
-	 * 
+	 * Extracts the collection id that may be embedded in the given group name.
+	 *
+     * @param context session context.
 	 * @param groupName - the name of a group (ie group.getName())
 	 * @return the integer collection id or -1 if the group is not that of a collection
 	 */
@@ -510,9 +519,7 @@ public class FlowGroupUtils {
 		
 		return Role.none;
 	}
-	
-	
-	
+
     /**
      * The community prefix: all groups which are specific to
      * a community start with this.
@@ -532,7 +539,8 @@ public class FlowGroupUtils {
     /**
      * Extracts the community id that may be embedded in the given group name.
      * 
-     * @param groupName - the name of a group (ie group.getName())
+     * @param context session context.
+     * @param groupName the name of a group (ie group.getName())
      * @return the integer community id or -1 if the group is not that of a community
      */
     public static UUID getCommunityId(Context context, String groupName)
@@ -618,6 +626,5 @@ public class FlowGroupUtils {
         
         return Role.none;
     }
-    
-	
+
 }

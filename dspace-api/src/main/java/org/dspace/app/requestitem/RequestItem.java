@@ -10,6 +10,7 @@ package org.dspace.app.requestitem;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,7 +20,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name="requestitem")
-public class RequestItem {
+public class RequestItem implements ReloadableEntity<Integer> {
 
 
     @Id
@@ -76,7 +77,7 @@ public class RequestItem {
     {
     }
 
-    public int getID() {
+    public Integer getID() {
         return requestitem_id;
     }
 

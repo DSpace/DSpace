@@ -7,17 +7,6 @@
  */
 package org.dspace.app.xmlui.wing.element;
 
-/**
- * A class representing a table cell.
- * 
- * The cell element contained in a row of a table carries content for that
- * table. It is a character container, just like p, item, and hi, and its
- * primary purpose is to display textual data, possibly enhanced with
- * hyperlinks, emphasized blocks of text, images and form fields.
- * 
- * @author Scott Phillips
- */
-
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingContext;
 import org.dspace.app.xmlui.wing.WingException;
@@ -26,6 +15,16 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 
+/**
+ * A class representing a table cell.
+ * 
+ * <p>The cell element contained in a row of a table carries content for that
+ * table. It is a character container, just like p, item, and hi, and its
+ * primary purpose is to display textual data, possibly enhanced with
+ * hyperlinks, emphasized blocks of text, images and form fields.
+ * 
+ * @author Scott Phillips
+ */
 public class Cell extends RichTextContainer implements StructuralElement
 {
     /** The name of the cell element */
@@ -41,19 +40,19 @@ public class Cell extends RichTextContainer implements StructuralElement
     public static final String A_COLS = "cols";
 
     /** The name of this cell */
-    private String name;
+    private final String name;
 
     /** The role of this cell, see ROLES below */
-    private String role;
+    private final String role;
 
     /** How many rows does this table span */
-    private int rows;
+    private final int rows;
 
     /** How many cols does this table span */
-    private int cols;
+    private final int cols;
 
     /** Special rendering instructions */
-    private String rend;
+    private final String rend;
 
     /** The possible cell role types */
     public static final String ROLE_DATA = "data";
@@ -84,6 +83,7 @@ public class Cell extends RichTextContainer implements StructuralElement
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Cell(WingContext context, String name, String role, int rows,
             int cols, String rend) throws WingException
@@ -116,7 +116,9 @@ public class Cell extends RichTextContainer implements StructuralElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler,
             NamespaceSupport namespaces) throws SAXException
     {
@@ -151,9 +153,7 @@ public class Cell extends RichTextContainer implements StructuralElement
         endElement(contentHandler, namespaces, E_CELL);
     }
 
-    /**
-     * dispose
-     */
+    @Override
     public void dispose()
     {
         if (contents != null)

@@ -9,10 +9,10 @@ package org.dspace.checker;
 
 import org.dspace.core.Context;
 import org.dspace.content.Bitstream;
+import org.dspace.core.ReloadableEntity;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * <p>
@@ -26,7 +26,7 @@ import java.util.UUID;
  */
 @Entity
 @Table(name="checksum_history")
-public class ChecksumHistory
+public class ChecksumHistory implements ReloadableEntity<Long>
 {
 
 
@@ -34,7 +34,7 @@ public class ChecksumHistory
     @Column(name="check_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="checksum_history_check_id_seq")
     @SequenceGenerator(name="checksum_history_check_id_seq", sequenceName="checksum_history_check_id_seq", allocationSize = 1)
-    private long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bitstream_id")
@@ -67,7 +67,7 @@ public class ChecksumHistory
     {
     }
 
-    public long getId() {
+    public Long getID() {
         return id;
     }
 
@@ -169,6 +169,7 @@ public class ChecksumHistory
 
     /**
      * Return the processing result.
+     * @return result
      */
     public ChecksumResult getResult()
     {

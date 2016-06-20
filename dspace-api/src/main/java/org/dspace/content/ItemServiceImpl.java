@@ -25,6 +25,8 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
+import org.dspace.harvest.HarvestedItem;
+import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.versioning.service.VersioningService;
@@ -74,6 +76,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected VersioningService versioningService;
+    @Autowired(required=true)
+    protected HarvestedItemService harvestedItemService;
 
     protected ItemServiceImpl()
     {
@@ -596,13 +600,19 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogManager.getHeader(context, "delete_item", "item_id="
                 + item.getID()));
 
-        deleteMetadata(context, item);
-
         // Remove bundles
         removeAllBundles(context, item);
 
         // remove version attached to the item
         removeVersion(context, item);
+
+        // Also delete the item if it appears in a harvested collection.
+        HarvestedItem hi = harvestedItemService.find(context, item);
+
+        if(hi!=null)
+        {
+            harvestedItemService.delete(context, hi);
+        }
 
         //Only clear collections after we have removed everything else from the item
         item.getCollections().clear();
@@ -917,7 +927,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      * @param qualifier metadata field qualifier
      * @param value field value or Item.ANY to match any value
      * @return an iterator over the items matching that authority value
-     * @throws SQLException, AuthorizeException, IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      *
      */
     @Override

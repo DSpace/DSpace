@@ -15,8 +15,8 @@ import java.util.Iterator;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.rdf.RDFConfiguration;
+import org.dspace.rdf.RDFUtil;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  *
@@ -244,7 +244,8 @@ public class Negotiator {
         if (StringUtils.isEmpty(handle))
         {
             log.warn("Handle is empty, set it to Site Handle.");
-            handle = ConfigurationManager.getProperty("handle.prefix") + "/0";
+            handle = DSpaceServicesFactory.getInstance().getConfigurationService()
+                    .getProperty("handle.prefix") + "/0";
         }
         
         // don't redirect if HTML is requested and content negotiation is done
@@ -262,8 +263,10 @@ public class Negotiator {
         // if html is requested we have to forward to the repositories webui.
         if ("html".equals(lang))
         {
-            urlBuilder.append(ConfigurationManager.getProperty("dspace.url"));
-            if (!handle.equals(ConfigurationManager.getProperty("handle.prefix") + "/0"))
+            urlBuilder.append(DSpaceServicesFactory.getInstance()
+                    .getConfigurationService().getProperty("dspace.url"));
+            if (!handle.equals(DSpaceServicesFactory.getInstance()
+                    .getConfigurationService().getProperty("handle.prefix") + "/0"))
             {
                 urlBuilder.append("/handle/");
                 urlBuilder.append(handle).append("/").append(extraPathInfo);
@@ -287,7 +290,9 @@ public class Negotiator {
         }
         
         // load the URI of the dspace-rdf module.
-        urlBuilder.append(RDFConfiguration.getDSpaceRDFModuleURI());
+        urlBuilder.append(DSpaceServicesFactory.getInstance()
+                .getConfigurationService()
+                .getProperty(RDFUtil.CONTEXT_PATH_KEY));
         if (urlBuilder.length() == 0)
         {
             log.error("Cannot load URL of dspace-rdf module. "

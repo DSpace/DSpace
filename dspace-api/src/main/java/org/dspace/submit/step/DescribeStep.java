@@ -821,7 +821,7 @@ public class DescribeStep extends AbstractProcessingStep
      *            the metadata element
      * @param qualifier
      *            the metadata qualifier, or null if unqualified
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected void readDate(Context context, HttpServletRequest request, Item item, String schema,
             String element, String qualifier) throws SQLException

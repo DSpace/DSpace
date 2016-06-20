@@ -61,10 +61,8 @@ public class DailyReportEmailer
      * @param numberOfBitstreams
      *            the number of bitstreams reported
      * 
-     * @throws IOException
-     *             if IO exception occurs
-     * @throws javax.mail.MessagingException
-     *             if message cannot be sent.
+     * @throws IOException if IO exception occurs
+     * @throws MessagingException if message cannot be sent.
      */
     public void sendReport(File attachment, int numberOfBitstreams) 
             throws IOException, javax.mail.MessagingException 
@@ -192,7 +190,7 @@ public class DailyReportEmailer
             int numBitstreams = 0;
 
             // create a temporary file in the log directory
-            String dirLocation = ConfigurationManager.getProperty("log.dir");
+            String dirLocation = ConfigurationManager.getProperty("log.report.dir");
             File directory = new File(dirLocation);
 
             if (directory.exists() && directory.isDirectory())

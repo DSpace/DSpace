@@ -7,6 +7,7 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -15,6 +16,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,7 +74,16 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
 
     @Override
     public void update(Context context, WorkflowItemRole workflowItemRole) throws SQLException, AuthorizeException {
-        workflowItemRoleDAO.save(context, workflowItemRole);
+        update(context, Collections.singletonList(workflowItemRole));
+    }
+
+    @Override
+    public void update(Context context, List<WorkflowItemRole> workflowItemRoles) throws SQLException, AuthorizeException {
+        if(CollectionUtils.isNotEmpty(workflowItemRoles)) {
+            for (WorkflowItemRole workflowItemRole : workflowItemRoles) {
+                workflowItemRoleDAO.save(context, workflowItemRole);
+            }
+        }
     }
 
     @Override

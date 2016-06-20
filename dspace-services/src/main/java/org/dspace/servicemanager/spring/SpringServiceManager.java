@@ -64,7 +64,10 @@ public final class SpringServiceManager implements ServiceManagerSystem {
      * For TESTING:
      * Allows adding extra spring config paths.
      *
+     * @param parent parent ServiceManagerSystem
+     * @param configurationService current DSpace configuration service
      * @param testMode if true then do not load the core beans
+     * @param developmentMode if true then services loaded on demand only
      * @param configPaths additional spring config paths within this classloader
      */
     public SpringServiceManager(ServiceManagerSystem parent, DSpaceConfigurationService configurationService, boolean testMode, boolean developmentMode, String... configPaths) {
@@ -86,6 +89,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     public static final String addonResourcePath = "classpath*:spring/spring-dspace-addon-*-services.xml";
 
     @SuppressWarnings("unchecked")
+    @Override
     public <T> T getServiceByName(String name, Class<T> type) {
         T bean = null;
         // handle special case to return the core AC
@@ -136,6 +140,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public <T> List<T> getServicesByType(Class<T> type) {
         ArrayList<T> l = new ArrayList<T>();
         Map<String, T> beans;
@@ -148,6 +153,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         return l;
     }
 
+    @Override
     public void shutdown() {
         if (applicationContext != null) {
             try {
@@ -167,6 +173,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         }
     }
 
+    @Override
     public void startup() {
         long startTime = System.currentTimeMillis();
         // get all spring config paths
@@ -224,6 +231,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public <T> T registerServiceClass(String name, Class<T> type) {
         if (name == null || type == null) {
             throw new IllegalArgumentException("name and type must not be null for service registration");
@@ -238,6 +246,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         return service;
     }
 
+    @Override
     public void registerService(String name, Object service) {
         if (name == null || service == null) {
             throw new IllegalArgumentException("name and service must not be null for service registration");
@@ -250,6 +259,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         registerBean(name, service);
     }
 
+    @Override
     public void registerServiceNoAutowire(String name, Object service) {
         if (name == null || service == null) {
             throw new IllegalArgumentException("name and service must not be null for service registration");
@@ -261,8 +271,8 @@ public final class SpringServiceManager implements ServiceManagerSystem {
      * This handles the common part of the 2 types of service 
      * registrations.
      *
-     * @param name
-     * @param service
+     * @param name name of bean
+     * @param service service object
      */
     private void registerBean(String name, Object service) {
         try {
@@ -273,6 +283,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         }
     }
 
+    @Override
     public void unregisterService(String name) {
         if (applicationContext.containsBean(name)) {
             try {
@@ -289,6 +300,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         }
     }
 
+    @Override
     public List<String> getServicesNames() {
         ArrayList<String> beanNames = new ArrayList<String>();
         String[] singletons = applicationContext.getBeanFactory().getSingletonNames();
@@ -302,10 +314,12 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         return beanNames;
     }
 
+    @Override
     public boolean isServiceExists(String name) {
         return applicationContext.containsBean(name);
     }
 
+    @Override
     public Map<String, Object> getServices() {
         Map<String, Object> services = new HashMap<String, Object>();
         String[] singletons = applicationContext.getBeanFactory().getSingletonNames();
@@ -323,6 +337,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         return services;
     }
 
+    @Override
     public void pushConfig(Map<String, Object> settings) {
         throw new UnsupportedOperationException("Not implemented for individual service manager systems");
     }

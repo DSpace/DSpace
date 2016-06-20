@@ -11,9 +11,8 @@ Sitemap: ${dspace.url}/htmlmap
 User-agent: *
 # Disable access to Discovery search and filters
 Disallow: /discover
-Disallow: /handle/${handle.prefix}/*/discover
 Disallow: /search-filter
-Disallow: /handle/${handle.prefix}/*/search-filter
+
 #
 # Optionally uncomment the following line ONLY if sitemaps are working
 # and you have verified that your site is being indexed correctly.

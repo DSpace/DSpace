@@ -7,15 +7,15 @@
  */
 package org.dspace.xoai.services.impl;
 
+import org.dspace.content.MetadataField;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.services.api.FieldResolver;
 
 import java.sql.SQLException;
 import java.util.regex.Pattern;
-import org.dspace.content.MetadataField;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.MetadataFieldService;
 
 public class DSpaceFieldResolver implements FieldResolver {
     private MetadataFieldCache metadataFieldCache = null;
@@ -41,7 +41,7 @@ public class DSpaceFieldResolver implements FieldResolver {
                 MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
                 if (null != metadataField)
                 {
-                    metadataFieldCache.add(field, metadataField.getFieldID());
+                    metadataFieldCache.add(field, metadataField.getID());
                 }
                 else
                     throw new InvalidMetadataFieldException();

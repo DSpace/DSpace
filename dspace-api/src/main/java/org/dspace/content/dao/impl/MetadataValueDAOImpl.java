@@ -10,9 +10,10 @@ package org.dspace.content.dao.impl;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.MetadataValueDAO;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 
@@ -39,8 +40,10 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
     {
         Criteria criteria = createCriteria(context, MetadataValue.class);
         criteria.add(
-                Restrictions.eq("metadataField", metadataField)
+                Restrictions.eq("metadataField.id", metadataField.getID())
         );
+        criteria.setFetchMode("metadataField", FetchMode.JOIN);
+
         return list(criteria);
     }
 
@@ -50,6 +53,8 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
         criteria.add(
                 Restrictions.like("value", "%" + value + "%")
         );
+        criteria.setFetchMode("metadataField", FetchMode.JOIN);
+
         return list(criteria);
     }
 
@@ -65,7 +70,7 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
     public MetadataValue getMinimum(Context context, int metadataFieldId)
             throws SQLException
     {
-        String queryString = "SELECT m FROM MetadataValue m WHERE metadata_field_id = :metadata_field_id ORDER BY text_value";
+        String queryString = "SELECT m FROM MetadataValue m JOIN FETCH m.metadataField WHERE m.metadataField.id = :metadata_field_id ORDER BY text_value";
         Query query = createQuery(context, queryString);
         query.setParameter("metadata_field_id", metadataFieldId);
         query.setMaxResults(1);
@@ -76,4 +81,5 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) FROM MetadataValue"));
     }
+
 }

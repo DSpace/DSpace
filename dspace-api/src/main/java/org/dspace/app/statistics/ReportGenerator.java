@@ -152,6 +152,9 @@ public class ReportGenerator
     /**
      * main method to be run from command line.  See usage information for
      * details as to how to use the command line flags
+     * @param argv
+     * @throws java.lang.Exception
+     * @throws java.sql.SQLException
      */
     public static void main(String [] argv)
         throws Exception, SQLException
@@ -206,10 +209,13 @@ public class ReportGenerator
      * this method is retained for backwards compatibility, but delegates the actual
      * wprk to a new method
      *
-     * @param   context     the DSpace context in which this action is performed
-     * @param   myFormat    the desired output format (currently on HTML supported)
-     * @param   myInput     the aggregation file to be turned into a report
-     * @param   myOutput    the file into which to write the report
+     * @param context     the DSpace context in which this action is performed
+     * @param myFormat    the desired output format (currently on HTML supported)
+     * @param myInput     the aggregation file to be turned into a report
+     * @param myOutput    the file into which to write the report
+     * @param myMap       the map
+     * @throws Exception if error
+     * @throws SQLException if database error
      */
     public static void processReport(Context context, String myFormat, 
                                      String myInput, String myOutput,
@@ -242,6 +248,11 @@ public class ReportGenerator
      * using the pre-configuration information passed here, read in the
      * aggregation data and output a file containing the report in the
      * requested format
+     * @param context context
+     * @param report report
+     * @param myInput input
+     * @throws Exception if error
+     * @throws SQLException if database error
      */
     public static void processReport(Context context, Report report,
                                      String myInput)
@@ -527,6 +538,7 @@ public class ReportGenerator
      * actions which are more understandable to humans
      *
      * @param   map     the map file
+     * @throws IOException if IO error
      */
     public static void readMap(String map)
         throws IOException
@@ -612,6 +624,8 @@ public class ReportGenerator
      * The values that come from this file form the basis of the analysis report
      *
      * @param   input   the aggregator file
+     * @throws IOException if IO error
+     * @throws ParseException if parse error
      */
     public static void readInput(String input)
         throws IOException, ParseException
@@ -783,6 +797,7 @@ public class ReportGenerator
      *
      * @return      a string containing a reference (almost citation) to the
      *              article
+     * @throws SQLException if database error
      */
     public static String getItemInfo(Context context, String handle)
         throws SQLException

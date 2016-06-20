@@ -58,7 +58,7 @@ public interface MetadataExposureService {
      * @param qualifier metadata field qualifier
      *
      * @return true (hidden) or false (exposed)
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     public boolean isHidden(Context context, String schema, String element, String qualifier)
             throws SQLException;

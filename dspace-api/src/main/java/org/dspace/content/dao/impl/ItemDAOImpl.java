@@ -107,7 +107,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         addMetadataSortQuery(query, Collections.singletonList(metadataField), null);
 
         Query hibernateQuery = createQuery(context, query.toString());
-        hibernateQuery.setParameter(metadataField.toString(), metadataField.getFieldID());
+        hibernateQuery.setParameter(metadataField.toString(), metadataField.getID());
         hibernateQuery.setParameter("in_archive", true);
         hibernateQuery.setParameter("submitter", eperson);
         hibernateQuery.setMaxResults(limit);
@@ -244,6 +244,9 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     
     @Override
     public int countItems(Context context, List<Collection> collections, boolean includeArchived, boolean includeWithdrawn) throws SQLException {
+        if (collections.size() == 0) {
+            return 0;
+        }
         Query query = createQuery(context, "select count(distinct i) from Item i " +
                                             "join i.collections collection " +
                                             "WHERE collection IN (:collections) AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn");

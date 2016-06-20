@@ -139,8 +139,8 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 	    // The big complex way of getting to our metadata
 	    settings.addLabel(T_label_metadata_format);
     
-	    String key = "harvester.oai.metadataformats." + metadataFormatValue;
-	    String metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("oai." + key);
+	    String key = "oai.harvester.metadataformats." + metadataFormatValue;
+	    String metadataString = (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key));
 
 	    String displayName;
     	if (metadataString.indexOf(',') != -1)
@@ -157,8 +157,8 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
     	settings.addLabel(T_label_harvest_level);
     	Item harvestLevel = settings.addItem();
     	switch (harvestLevelValue) {
-    		case 1: harvestLevel.addContent(T_option_md_only); break;
-    		case 2: harvestLevel.addContent(T_option_md_and_ref); break;
+			case HarvestedCollection.TYPE_DMD: harvestLevel.addContent(T_option_md_only); break;
+			case HarvestedCollection.TYPE_DMDREF: harvestLevel.addContent(T_option_md_and_ref); break;
     		default: harvestLevel.addContent(T_option_md_and_bs); break;
     	}
 	        	    	

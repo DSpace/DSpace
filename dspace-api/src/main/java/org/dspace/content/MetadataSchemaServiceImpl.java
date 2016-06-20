@@ -73,7 +73,7 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
         metadataSchemaDAO.save(context, metadataSchema);
         log.info(LogManager.getHeader(context, "create_metadata_schema",
                 "metadata_schema_id="
-                        + metadataSchema.getSchemaID()));
+                        + metadataSchema.getID()));
         return metadataSchema;
     }
 
@@ -92,21 +92,21 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
         }
 
         // Ensure the schema name is unique
-        if (!uniqueShortName(context, metadataSchema.getSchemaID(), metadataSchema.getName()))
+        if (!uniqueShortName(context, metadataSchema.getID(), metadataSchema.getName()))
         {
             throw new NonUniqueMetadataException("Please make the name " + metadataSchema.getName()
                     + " unique");
         }
 
         // Ensure the schema namespace is unique
-        if (!uniqueNamespace(context, metadataSchema.getSchemaID(), metadataSchema.getNamespace()))
+        if (!uniqueNamespace(context, metadataSchema.getID(), metadataSchema.getNamespace()))
         {
             throw new NonUniqueMetadataException("Please make the namespace " + metadataSchema.getNamespace()
                     + " unique");
         }
         metadataSchemaDAO.save(context, metadataSchema);
         log.info(LogManager.getHeader(context, "update_metadata_schema",
-                "metadata_schema_id=" + metadataSchema.getSchemaID() + "namespace="
+                "metadata_schema_id=" + metadataSchema.getID() + "namespace="
                         + metadataSchema.getNamespace() + "name=" + metadataSchema.getName()));
     }
 
@@ -120,7 +120,7 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
         }
 
         log.info(LogManager.getHeader(context, "delete_metadata_schema",
-                "metadata_schema_id=" + metadataSchema.getSchemaID()));
+                "metadata_schema_id=" + metadataSchema.getID()));
 
         metadataSchemaDAO.delete(context, metadataSchema);
     }
@@ -151,9 +151,10 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
      * number of times in the current schema.
      *
      * @param context DSpace context
+     * @param metadataSchemaId metadata schema id
      * @param namespace namespace URI to match
      * @return true of false
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean uniqueNamespace(Context context, int metadataSchemaId, String namespace)
             throws SQLException
@@ -165,9 +166,10 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
      * Return true if and only if the passed name is unique.
      *
      * @param context DSpace context
+     * @param metadataSchemaId metadata schema id
      * @param name  short name of schema
      * @return true of false
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean uniqueShortName(Context context, int metadataSchemaId, String name)
             throws SQLException

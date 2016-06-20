@@ -28,6 +28,7 @@ public interface SupervisedItemService
      * @param context the context this object exists in
      *
      * @return array of SupervisedItems
+     * @throws SQLException if database error
      */
     public List<WorkspaceItem> getAll(Context context) throws SQLException;
 
@@ -39,6 +40,7 @@ public interface SupervisedItemService
      * @param   context     the dspace context
      *
      * @return the items eperson is supervising in an array
+     * @throws SQLException if database error
      */
     public List<WorkspaceItem> findbyEPerson(Context context, EPerson ep)
         throws SQLException;

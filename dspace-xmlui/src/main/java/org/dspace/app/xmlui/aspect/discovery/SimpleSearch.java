@@ -33,12 +33,12 @@ import org.xml.sax.SAXException;
 
 /**
  * Perform a simple search of the repository. The user provides a simple one
- * field query (the url parameter is named query) and the results are processed.
+ * field query (the URL parameter is named query) and the results are processed.
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
- * @author Adán Román Ruiz <aroman@arvo.es> (Bugfix)
+ * @author Ad&aacute;n Rom&aacute;n Ruiz &lt;aroman@arvo.es&gt; (Bugfix)
  */
 public class SimpleSearch extends AbstractSearch implements CacheableProcessingComponent {
     /**
@@ -88,7 +88,10 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
     /**
      * Add Page metadata.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws java.sql.SQLException passed through.
      */
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
@@ -105,7 +108,13 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
      * build the DRI page representing the body of the search query. This
      * provides a widget to generate a new query and list of search results if
      * present.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
+    @Override
     public void addBody(Body body) throws SAXException, WingException,
             SQLException, IOException, AuthorizeException {
 
@@ -267,6 +276,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         return request.getContextPath() + (dso == null ? "" : "/handle/" + dso.getHandle()) + "/discover";
     }
 
+    @Override
     protected Map<String, String[]> getParameterFilterQueries(){
         return DiscoveryUIUtils.getParameterFilterQueries(ObjectModelHelper.getRequest(objectModel));
 
@@ -276,6 +286,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
      *  This method returns more expanded filter queries then the getParameterFilterQueries
      * @return an array containing the filter queries
      */
+    @Override
     protected String[] getFilterQueries() {
         return DiscoveryUIUtils.getFilterQueries(ObjectModelHelper.getRequest(objectModel), context);
     }
@@ -284,7 +295,10 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     /**
      * Get the search query from the URL parameter, if none is found the empty
      * string is returned.
+     * @return decoded query.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
      */
+    @Override
     protected String getQuery() throws UIException {
         Request request = ObjectModelHelper.getRequest(objectModel);
         String query = decodeFromURL(request.getParameter("query"));
@@ -296,8 +310,11 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     }
 
     /**
-     * Generate a url to the simple search url.
+     * Generate a URL to the simple search.
+     * @return the URL.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
      */
+    @Override
     protected String generateURL(Map<String, String> parameters)
             throws UIException {
         String query = getQuery();

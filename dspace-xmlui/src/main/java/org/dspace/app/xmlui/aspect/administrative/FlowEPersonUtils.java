@@ -68,6 +68,8 @@ public class FlowEPersonUtils {
 	 * @param request The HTTP request parameters
 	 * @param objectModel Cocoon's object model
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
 	public static FlowResult processAddEPerson(Context context, Request request, Map objectModel) throws SQLException, AuthorizeException 
 	{
@@ -139,6 +141,8 @@ public class FlowEPersonUtils {
 	 * @param ObjectModel Cocoon's object model
 	 * @param epersonID The unique id of the eperson being edited.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
 	public static FlowResult processEditEPerson(Context context,
             Request request, Map ObjectModel, UUID epersonID)
@@ -230,8 +234,13 @@ public class FlowEPersonUtils {
 	 * @param context The current DSpace context
 	 * @param epersonID The unique id of the eperson being edited.
 	 * @return A process result's object.
+     * @throws java.io.IOException passed through.
+     * @throws javax.mail.MessagingException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
-	public static FlowResult processResetPassword(Context context, UUID epersonID) throws IOException, MessagingException, SQLException, AuthorizeException
+	public static FlowResult processResetPassword(Context context, UUID epersonID)
+            throws IOException, MessagingException, SQLException, AuthorizeException
 	{	
 		EPerson eperson = ePersonService.find(context, epersonID);
 		
@@ -255,6 +264,7 @@ public class FlowEPersonUtils {
 	 * @param objectModel Object model to obtain the HTTP request from.
 	 * @param epersonID The epersonID of the person to login as.
 	 * @return The flow result.
+     * @throws java.sql.SQLException passed through.
 	 */
 	public static FlowResult processLoginAs(Context context, Map objectModel, UUID epersonID) throws SQLException
 	{
@@ -286,8 +296,13 @@ public class FlowEPersonUtils {
 	 * @param context The current DSpace context
 	 * @param epeopleIDs The unique id of the eperson being edited.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.eperson.EPersonDeletionException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static FlowResult processDeleteEPeople(Context context, String[] epeopleIDs) throws NumberFormatException, SQLException, AuthorizeException, EPersonDeletionException, IOException {
+	public static FlowResult processDeleteEPeople(Context context, String[] epeopleIDs)
+            throws NumberFormatException, SQLException, AuthorizeException, EPersonDeletionException, IOException {
 		FlowResult result = new FlowResult();
 		
 		List<String> unableList = new ArrayList<String>();
@@ -322,8 +337,7 @@ public class FlowEPersonUtils {
     		result.setOutcome(true);
     		result.setMessage(t_delete_eperson_success_notice);
     	}
- 
-    	
+
     	return result;
 	}
 }

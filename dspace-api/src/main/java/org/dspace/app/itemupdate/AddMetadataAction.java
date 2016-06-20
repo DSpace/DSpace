@@ -31,14 +31,14 @@ public class AddMetadataAction extends UpdateMetadataAction {
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
 	/**
-	 * 	Adds metadata specified in the source archive
+	 *  Adds metadata specified in the source archive
 	 * 
-	 *  @param context
-	 *  @param itarch
-	 *  @param isTest
-	 *  @param suppressUndo
-	 *  @throws AuthorizeException
-	 *  @throws SQLException
+	 *  @param context DSpace Context
+	 *  @param itarch item archive
+	 *  @param isTest test flag
+	 *  @param suppressUndo undo flag
+	 *  @throws AuthorizeException if authorization error
+	 *  @throws SQLException if database error
 	 */
 	@Override
     public void execute(Context context, ItemArchive itarch, boolean isTest,

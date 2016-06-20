@@ -80,10 +80,10 @@ public class OREDisseminationCrosswalk
      * Disseminate an Atom-encoded ORE ReM mapped from a DSpace Item
      * @param item 
      * @return
-     * @throws CrosswalkException
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     private Element disseminateItem(Context context, Item item) throws CrosswalkException, IOException, SQLException, AuthorizeException
     {

@@ -7,9 +7,6 @@
  */
 package org.dspace.core;
 
-import java.sql.SQLException;
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -21,6 +18,9 @@ import org.dspace.event.service.EventService;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.utils.DSpace;
 import org.springframework.util.CollectionUtils;
+
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Class representing the context of a particular DSpace operation. This stores
@@ -89,10 +89,11 @@ public class Context
         init();
     }
 
+
     /**
      * Construct a new context object with default options. A database connection is opened.
      * No user is authenticated.
-     * 
+     *
      * @exception SQLException
      *                if there was an error obtaining a database connection
      */
@@ -106,8 +107,6 @@ public class Context
      * No user is authenticated.
      * 
      * @param options   context operation flags
-     * @exception SQLException
-     *                if there was an error obtaining a database connection
      */
     public Context(short options)
     {
@@ -158,7 +157,6 @@ public class Context
     {
         return dbConnection;
     }
-
 
     public DatabaseConfigVO getDBConfig() throws SQLException
     {
@@ -351,8 +349,41 @@ public class Context
         if(!isValid())
             log.info("complete() was called on a closed Context object. No changes to commit.");
 
-        // FIXME: Might be good not to do a commit() if nothing has actually
-        // been written using this connection
+        try
+        {
+            // As long as we have a valid, writeable database connection,
+            // commit any changes made as part of the transaction
+            commit();
+        }
+        finally
+        {
+            if(dbConnection != null)
+            {
+                // Free the DB connection
+                dbConnection.closeDBConnection();
+                dbConnection = null;
+            }
+        }
+    }
+
+    /**
+     * Commit the current transaction with the database, persisting any pending changes.
+     * The database connection is not closed and can be reused afterwards.
+     *
+     * <b>WARNING: After calling this method all previously fetched entities are "detached" (pending
+     * changes are not tracked anymore). You have to reload all entities you still want to work with
+     * manually after this method call (see {@link Context#reloadEntity(ReloadableEntity)}).</b>
+     *
+     * @throws SQLException When committing the transaction in the database fails.
+     */
+    public void commit() throws SQLException
+    {
+        // If Context is no longer open/valid, just note that it has already been closed
+        if(!isValid()) {
+            log.info("commit() was called on a closed Context object. No changes to commit.");
+        }
+
+        // Our DB Connection (Hibernate) will decide if an actual commit is required or not
         try
         {
             // As long as we have a valid, writeable database connection,
@@ -361,16 +392,17 @@ public class Context
             {
                 dispatchEvents();
             }
-        }
-        finally
-        {
+
+        } finally {
+            if(log.isDebugEnabled()) {
+                log.debug("Cache size on commit is " + getCacheSize());
+            }
+
             if(dbConnection != null)
             {
                 //Commit our changes
                 dbConnection.commit();
-                // Free the DB connection
-                dbConnection.closeDBConnection();
-                dbConnection = null;
+                reloadContextBoundEntities();
             }
         }
     }
@@ -402,6 +434,7 @@ public class Context
     /**
      * Select an event dispatcher, <code>null</code> selects the default
      * 
+     * @param dispatcher dispatcher
      */
     public void setDispatcher(String dispatcher)
     {
@@ -453,7 +486,7 @@ public class Context
     }
 
     /**
-     * Retrieves the first element in the events list & removes it from the list of events once retrieved
+     * Retrieves the first element in the events list and removes it from the list of events once retrieved
      * @return The first event of the list or <code>null</code> if the list is empty
      */
     public Event pollEvent()
@@ -564,7 +597,8 @@ public class Context
     /**
      * Get an array of all of the special groups that current user is a member
      * of.
-     * @throws SQLException
+     * @return list of groups
+     * @throws SQLException if database error
      */
     public List<Group> getSpecialGroups() throws SQLException
     {
@@ -584,7 +618,7 @@ public class Context
          * If a context is garbage-collected, we roll back and free up the
          * database connection if there is one.
          */
-        if (dbConnection.isTransActionAlive())
+        if (dbConnection != null && dbConnection.isTransActionAlive())
         {
             abort();
         }
@@ -596,7 +630,82 @@ public class Context
         dbConnection.shutdown();
     }
 
+    /**
+     * Clear the cache of all object that have been read from the database so far. This will also free up
+     * (heap space) memory. You should use this method when processing a large number of records.
+     *
+     * <b>WARNING: After calling this method all previously fetched entities are "detached" (pending
+     * changes are not tracked anymore). You have to reload all entities you still want to work with
+     * manually after this method call (see {@link Context#reloadEntity(ReloadableEntity)}).</b>
+     *
+     * This method will take care of reloading the current user.
+     *
+     * @throws SQLException When clearing the entity cache fails
+     */
 	public void clearCache() throws SQLException {
+        if(log.isDebugEnabled()) {
+            log.debug("Cache size before clear cache is " + getCacheSize());
+        }
+
 		this.getDBConnection().clearCache();
-	}
+
+        reloadContextBoundEntities();
+    }
+
+    /**
+     * Returns the size of the cache of all object that have been read from the database so far. A larger number
+     * means that more memory is consumed by the cache. This also has a negative impact on the query performance. In
+     * that case you should consider clearing the cache (see {@link Context#clearCache() clearCache}).
+     *
+     * @throws SQLException When connecting to the active cache fails.
+     */
+    public long getCacheSize() throws SQLException {
+        return this.getDBConnection().getCacheSize();
+    }
+
+    /**
+     * Enable or disable "batch processing mode" for this context.
+     *
+     * Enabling batch processing mode means that the database connection is configured so that it is optimized to
+     * process a large number of records.
+     *
+     * Disabling batch processing mode restores the normal behaviour that is optimal for querying and updating a
+     * small number of records.
+     *
+     * @param batchModeEnabled When true, batch processing mode will be enabled. If false, it will be disabled.
+     * @throws SQLException When configuring the database connection fails.
+     */
+    public void enableBatchMode(boolean batchModeEnabled) throws SQLException {
+        dbConnection.setOptimizedForBatchProcessing(batchModeEnabled);
+    }
+
+    /**
+     * Check if "batch processing mode" is enabled for this context.
+     * @return True if batch processing mode is enabled, false otherwise.
+     */
+    public boolean isBatchModeEnabled() {
+        return dbConnection.isOptimizedForBatchProcessing();
+    }
+
+    /**
+     * Reload an entity from the database into the cache. This method will return a reference to the "attached"
+     * entity. This means changes to the entity will be tracked and persisted to the database.
+     *
+     * @param entity The entity to reload
+     * @param <E> The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @return A (possibly) <b>NEW</b> reference to the entity that should be used for further processing.
+     * @throws SQLException When reloading the entity from the database fails.
+     */
+    @SuppressWarnings("unchecked")
+    public <E extends ReloadableEntity> E reloadEntity(E entity) throws SQLException {
+        return (E) dbConnection.reloadEntity(entity);
+    }
+
+    /**
+     * Reload all entities related to this context.
+     * @throws SQLException When reloading one of the entities fails.
+     */
+    private void reloadContextBoundEntities() throws SQLException {
+        currentUser = reloadEntity(currentUser);
+    }
 }

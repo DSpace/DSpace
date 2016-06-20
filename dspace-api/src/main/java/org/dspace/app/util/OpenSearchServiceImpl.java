@@ -127,7 +127,7 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
 
     @Override
     public String getResultsString(Context context, String format, String query, int totalResults, int start, int pageSize,
-    		                          	  DSpaceObject scope, DSpaceObject[] results,
+    		                          	  DSpaceObject scope, List<DSpaceObject> results,
     		                          	  Map<String, String> labels) throws IOException
     {
         try
@@ -143,7 +143,7 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
 
     @Override
     public Document getResultsDoc(Context context, String format, String query, int totalResults, int start, int pageSize,
-    		                          DSpaceObject scope, DSpaceObject[] results, Map<String, String> labels)
+    		                          DSpaceObject scope, List<DSpaceObject> results, Map<String, String> labels)
                                       throws IOException
     {
         try
@@ -158,7 +158,7 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
     }
 
     protected SyndicationFeed getResults(Context context, String format, String query, int totalResults, int start, int pageSize,
-                                          DSpaceObject scope, DSpaceObject[] results, Map<String, String> labels)
+                                          DSpaceObject scope, List<DSpaceObject> results, Map<String, String> labels)
     {
         // Encode results in requested format
         if ("rss".equals(format))
@@ -283,7 +283,7 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
      * Converts a JDOM document to a W3C one
      * @param jdomDoc
      * @return W3C Document object
-     * @throws IOException
+     * @throws IOException if IO error
      */
     protected Document jDomToW3(org.jdom.Document jdomDoc) throws IOException
     {

@@ -224,6 +224,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * return type found in Constants
+     * @return Community type
      */
     @Override
     public int getType()

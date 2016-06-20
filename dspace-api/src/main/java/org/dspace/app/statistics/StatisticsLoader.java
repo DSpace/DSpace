@@ -66,6 +66,7 @@ public class StatisticsLoader
 
     /**
      * Get an array of the dates of the report files.
+     * @return array of dates
      */
     public static Date[] getMonthlyReportDates()
     {
@@ -74,6 +75,7 @@ public class StatisticsLoader
 
     /**
      * Get an array of the dates of the analysis files.
+     * @return array of dates
      */
     public static Date[] getMonthlyAnalysisDates()
     {
@@ -82,7 +84,8 @@ public class StatisticsLoader
 
     /**
      * Convert the formatted dates that are the keys of the map into a date array.
-     * @param monthlyMap
+     * @param monthlyMap map 
+     * @return array of dates
      */
     protected static Date[] getDatesFromMap(Map<String, StatsFile> monthlyMap)
     {
@@ -107,7 +110,7 @@ public class StatisticsLoader
 
     /**
      * Sort the date array in descending (reverse chronological) order.
-     * @param dates
+     * @param dates array of dates
      * @return sorted dates.
      */
     protected static Date[] sortDatesDescending(Date[] dates)
@@ -145,7 +148,8 @@ public class StatisticsLoader
 
     /**
      * Get the analysis file for a given date.
-     * @param date
+     * @param date date
+     * @return File
      */
     public static File getAnalysisFor(String date)
     {
@@ -156,7 +160,8 @@ public class StatisticsLoader
 
     /**
      * Get the report file for a given date.
-     * @param date
+     * @param date date
+     * @return File
      */
     public static File getReportFor(String date)
     {
@@ -167,6 +172,7 @@ public class StatisticsLoader
 
     /**
      * Get the current general analysis file.
+     * @return File
      */
     public static File getGeneralAnalysis()
     {
@@ -176,6 +182,7 @@ public class StatisticsLoader
 
     /**
      * Get the current general report file.
+     * @return File
      */
     public static File getGeneralReport()
     {
@@ -213,7 +220,7 @@ public class StatisticsLoader
 
     /**
      * Generate the cached file list from the array of files
-     * @param fileList
+     * @param fileList array of files
      */
     private static synchronized void loadFileList(File[] fileList)
     {
@@ -305,9 +312,10 @@ public class StatisticsLoader
      * formatters are used to identify the file as a particular type,
      * and extract the relevant information.  If the file is not identified
      * by the formatter provided, then we return null.
-     * @param thisFile
-     * @param thisPattern
-     * @param sdf
+     * @param thisFile file
+     * @param thisPattern patter
+     * @param sdf date format
+     * @return StatsFile
      */
     private static StatsFile makeStatsFile(File thisFile, Pattern thisPattern, DateFormat sdf)
     {
@@ -336,10 +344,11 @@ public class StatisticsLoader
 
     /**
      * Get an array of all the analysis and report files.
+     * @return array of files
      */
     private static File[] getAnalysisAndReportFileList()
     {
-        File reportDir = new File(ConfigurationManager.getProperty("log.dir"));
+        File reportDir = new File(ConfigurationManager.getProperty("log.report.dir"));
         if (reportDir != null)
         {
             return reportDir.listFiles(new AnalysisAndReportFilter());

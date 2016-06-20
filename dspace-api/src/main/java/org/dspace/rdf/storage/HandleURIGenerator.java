@@ -23,6 +23,7 @@ import org.dspace.handle.service.HandleService;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -31,8 +32,10 @@ import java.util.UUID;
 public class HandleURIGenerator implements URIGenerator {
     private static final Logger log = Logger.getLogger(HandleURIGenerator.class);
 
-    protected final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
-    protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    @Autowired(required=true)
+    protected SiteService siteService;
+    @Autowired(required=true)
+    protected HandleService handleService;
 
 
     @Override

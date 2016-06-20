@@ -10,6 +10,7 @@ package org.dspace.xmlworkflow.storedcomponents;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 
@@ -26,13 +27,13 @@ import java.sql.SQLException;
  */
 @Entity
 @Table(name="cwf_workflowitem")
-public class XmlWorkflowItem implements WorkflowItem {
+public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> {
 
     @Id
     @Column(name="workflowitem_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="cwf_workflowitem_seq")
     @SequenceGenerator(name="cwf_workflowitem_seq", sequenceName="cwf_workflowitem_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id")
@@ -67,7 +68,7 @@ public class XmlWorkflowItem implements WorkflowItem {
      * @return the internal identifier
      */
     @Override
-    public int getID()
+    public Integer getID()
     {
         return id;
     }

@@ -67,12 +67,14 @@ public abstract class AbstractStatisticsDataTransformer extends AbstractDSpaceTr
      * @param mainDiv
      *            the div to add the table to
      * @param display the statistics table containing our data
-     * @throws org.xml.sax.SAXException
-     * @throws org.dspace.app.xmlui.wing.WingException
-     * @throws java.text.ParseException
-     * @throws java.io.IOException
-     * @throws org.apache.solr.client.solrj.SolrServerException
-     * @throws java.sql.SQLException
+     * @param addRowTitles switch.
+     * @param valueMessagePrefixes for each column.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws java.text.ParseException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.apache.solr.client.solrj.SolrServerException passed through.
+     * @throws java.sql.SQLException passed through.
      */
     protected void addDisplayTable(Division mainDiv, StatisticsTable display, boolean addRowTitles, String []valueMessagePrefixes)
             throws SAXException, WingException, SQLException,

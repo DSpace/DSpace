@@ -32,7 +32,6 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.xml.sax.SAXException;
@@ -91,9 +90,12 @@ public class DSpaceMETSGenerator extends AbstractGenerator
 
 	/**
 	 * Generate the METS Document.
+     * @throws java.io.IOException passed through.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.apache.cocoon.ProcessingException on error.
 	 */
-	public void generate() throws IOException, SAXException,
-			ProcessingException {
+    @Override
+	public void generate() throws IOException, SAXException, ProcessingException {
 		try {
 			// Open a new context.
 			Context context = ContextUtil.obtainContext(objectModel);
@@ -215,6 +217,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
 	
 	/**
 	 * Configure the adapter according to the supplied parameters.
+     * @param adapter the adapter.
 	 */
 	public void configureAdapter(AbstractAdapter adapter)
 	{

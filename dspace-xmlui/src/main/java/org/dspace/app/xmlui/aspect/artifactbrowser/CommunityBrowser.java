@@ -52,13 +52,17 @@ import org.xml.sax.SAXException;
  * This item may be configured so that it will only display up to a specific depth,
  * and may include or exclude collections from the tree.
  * 
- * The configuration option available: <depth exclude-collections="true">999</depth>
- * 
+ * <p>The configuration option available:
+ *
+ * <pre>
+ * {@code <depth exclude-collections="true">999</depth>}
+ * </pre>
+ *
  * @author Scott Phillips
  */
 public class CommunityBrowser extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    private static Logger log = Logger.getLogger(CommunityBrowser.class);
+    private static final Logger log = Logger.getLogger(CommunityBrowser.class);
 
     /** Language Strings */
     public static final Message T_dspace_home =
@@ -96,10 +100,19 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     /**
      * Set the component up, pulling any configuration values from the sitemap
      * parameters.
+     *
+     * @param resolver source resolver.
+     * @param objectModel object model.
+     * @param src source.
+     * @param parameters sitemap parameters.
+     * @throws org.apache.cocoon.ProcessingException passed through.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws java.io.IOException passed through.
      */
+    @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
-            Parameters parameters) throws ProcessingException, SAXException,
-            IOException
+            Parameters parameters)
+            throws ProcessingException, SAXException, IOException
     {
         super.setup(resolver, objectModel, src, parameters);
 
@@ -111,7 +124,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     /**
      * Generate the unique caching key.
      * This key must be unique within the space of this component.
+     * @return the key.
      */
+    @Override
     public Serializable getKey()
     {
     	boolean full = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.community-list.render.full", true);
@@ -123,24 +138,26 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
      * 
      * The validity object will include a list of all communities 
      * and collections being browsed along with their logo bitstreams.
+     * @return validity.
      */
+    @Override
     public SourceValidity getValidity()
     {
     	if (validity == null)
     	{
 	        try {
-	            DSpaceValidity validity = new DSpaceValidity();
+	            DSpaceValidity theValidity = new DSpaceValidity();
 	            
-	            TreeNode root = buildTree(communityService.findAllTop(context));
+	            TreeNode treeRoot = buildTree(communityService.findAllTop(context));
 	            
-	            Stack<TreeNode> stack = new Stack<TreeNode>();
-	            stack.push(root);
+	            Stack<TreeNode> stack = new Stack<>();
+	            stack.push(treeRoot);
 	            
 	            while (!stack.empty())
 	            {
 	                TreeNode node = stack.pop();
 	                
-	                validity.add(context, node.getDSO());
+	                theValidity.add(context, node.getDSO());
 	                
 	                // If we are configured to use collection strengths (i.e. item counts) then include that number in the validity.
 	                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
@@ -150,7 +167,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	                    {	//try to determine Collection size (i.e. # of items)
 	                    	
 	                    	int size = new ItemCounter(context).getCount(node.getDSO());
-	                    	validity.add("size:"+size);
+	                    	theValidity.add("size:"+size);
 	                    }
 	                    catch(ItemCountException e) { /* ignore */ }
 	        		}
@@ -166,10 +183,10 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	            String assumeCacheValidity = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.community-list.cache");
 	            if (assumeCacheValidity != null)
                 {
-                    validity.setAssumedValidityDelay(assumeCacheValidity);
+                    theValidity.setAssumedValidityDelay(assumeCacheValidity);
                 }
 	            
-	            this.validity = validity.complete();
+	            this.validity = theValidity.complete();
 	        } 
 	        catch (SQLException sqle) 
 	        {
@@ -182,7 +199,14 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 
     /**
      * Add a page title and trail links.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
             AuthorizeException
@@ -197,7 +221,14 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     /**
      * Add a community-browser division that includes references to community and
      * collection metadata.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
+    @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
@@ -205,16 +236,16 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         division.setHead(T_head);
         division.addPara(T_select);
 
-        TreeNode root = buildTree(communityService.findAllTop(context));
-        
+        TreeNode treeRoot = buildTree(communityService.findAllTop(context));
+
         boolean full = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.community-list.render.full", true);
-        
+
         if (full)
         {
 	        ReferenceSet referenceSet = division.addReferenceSet("community-browser",
 	                ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
 	        
-	        java.util.List<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
+	        java.util.List<TreeNode> rootNodes = treeRoot.getChildrenOfType(Constants.COMMUNITY);
 	        
 	        for (TreeNode node : rootNodes)
 	        {
@@ -225,7 +256,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         {
         	List list = division.addList("comunity-browser");
         	
-        	java.util.List<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
+        	java.util.List<TreeNode> rootNodes = treeRoot.getChildrenOfType(Constants.COMMUNITY);
  	        
  	        for (TreeNode node : rootNodes)
  	        {
@@ -241,6 +272,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
      * 
      * @param referenceSet The include set
      * @param node The current node of the hierarchy.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void buildReferenceSet(ReferenceSet referenceSet, TreeNode node) throws WingException
     {
@@ -279,6 +311,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
      * 
      * @param list The parent list
      * @param node The current node of the hierarchy.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void buildList(List list, TreeNode node) throws WingException
     {
@@ -294,8 +327,8 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
             name = ((Collection) dso).getName();
         }
         
-        String url = contextPath + "/handle/"+dso.getHandle();
-        list.addItem().addHighlight("bold").addXref(url, name);
+        String aURL = contextPath + "/handle/"+dso.getHandle();
+        list.addItem().addHighlight("bold").addXref(aURL, name);
         
         List subList = null;
         
@@ -312,8 +345,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
                 subList.addItemXref(collectionUrl, collectionName);
             }
         }
-        
-        
+
         // Add all the sub-communities
         java.util.List<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
         if (communityNodes != null && communityNodes.size() > 0)
@@ -330,9 +362,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         }
     }
     
-    /**
-     * recycle
-     */
+    @Override
     public void recycle() 
     {
         this.root = null;
@@ -357,7 +387,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         TreeNode newRoot = new TreeNode();
 
         // Setup for breadth-first traversal
-        Stack<TreeNode> stack = new Stack<TreeNode>();
+        Stack<TreeNode> stack = new Stack<>();
 
         for (Community community : communities)
         {
@@ -397,7 +427,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * Private class to represent the tree structure of communities & collections. 
+     * Private class to represent the tree structure of communities and collections.
      */
     protected static class TreeNode
     {
@@ -408,7 +438,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         private int level;
 
         /** All children of this node */
-        private java.util.List<TreeNode> children = new ArrayList<TreeNode>();
+        private final java.util.List<TreeNode> children = new ArrayList<>();
 
         /** 
          * Construct a new root level node 
@@ -459,11 +489,12 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
+         * @param type interesting type.
          * @return All children of the given @type.
          */
         public java.util.List<TreeNode> getChildrenOfType(int type)
         {
-            java.util.List<TreeNode> results = new ArrayList<TreeNode>();
+            java.util.List<TreeNode> results = new ArrayList<>();
             for (TreeNode node : children)
             {
                 if (node.dso.getType() == type)

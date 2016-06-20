@@ -162,6 +162,15 @@ public class DSpaceSwordClient
 
     /**
      * Create the package and write it to disk.
+     * @param context session context.
+     * @param handle object to be packaged.
+     * @param file write the package here.
+     * @throws org.dspace.sword.client.exceptions.InvalidHandleException
+     *              if handle cannot be resolved.
+     * @throws org.dspace.sword.client.exceptions.PackagerException
+     *              on error.
+     * @throws org.dspace.sword.client.exceptions.PackageFormatException
+     *              on unknown package type.
      */
     public void createPackage(Context context, String handle, File file) throws InvalidHandleException, PackagerException, PackageFormatException
     {
@@ -209,8 +218,9 @@ public class DSpaceSwordClient
      * Reads the file, probably a zipped package, and sends it to the Sword server.
      *
      * @return A unique ID returned by a successful deposit
-     * @throws org.purl.sword.client.SWORDClientException
-     *
+     * @throws org.purl.sword.client.SWORDClientException passed through.
+     * @throws org.dspace.sword.client.exceptions.HttpException
+     *              on error.
      */
     public String sendMessage() throws SWORDClientException, HttpException
     {

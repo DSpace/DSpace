@@ -698,7 +698,7 @@ public class DOIIdentifierProvider
      * @param identifier The DOI in a format that is accepted by
      *                   {@link formatIdentifier(String)}.
      * @return Null if the DOI couldn't be found or the associated DSpaceObject.
-     * @throws SQLException
+     * @throws SQLException if database error
      * @throws IdentifierException If {@code identifier} is null or an empty string.
      * @throws IllegalArgumentException If the identifier couldn't be recognized as DOI.
      */
@@ -731,7 +731,7 @@ public class DOIIdentifierProvider
      * @param dso DSpaceObject to find doi for. DOIs with status TO_BE_DELETED will be
      * ignored.
      * @return The DOI as String or null if DOI was not found.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public String getDOIByObject(Context context, DSpaceObject dso)
             throws SQLException
@@ -841,7 +841,7 @@ public class DOIIdentifierProvider
             // We need to generate a new DOI.
             doi = doiService.create(context);
             doiIdentifier = this.getPrefix() + "/" + this.getNamespaceSeparator() + 
-                    doi.getId();
+                    doi.getID();
         }
 
         // prepare new doiRow
@@ -888,8 +888,8 @@ public class DOIIdentifierProvider
      * @param context
      * @param dso DSpaceObject the DOI should be added to.
      * @param doi The DOI that should be added as metadata.
-     * @throws SQLException
-     * @throws AuthorizeException 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     protected void saveDOIToObject(Context context, DSpaceObject dso, String doi)
             throws SQLException, AuthorizeException, IdentifierException
@@ -919,8 +919,8 @@ public class DOIIdentifierProvider
      * @param context
      * @param dso The DSpaceObject the DOI should be removed from.
      * @param doi The DOI to remove out of the metadata.
-     * @throws AuthorizeException
-     * @throws SQLException 
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
      */
     protected void removeDOIFromObject(Context context, DSpaceObject dso, String doi)
             throws AuthorizeException, SQLException, IdentifierException

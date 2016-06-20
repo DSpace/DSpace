@@ -220,6 +220,8 @@ public class RequestItemServlet extends DSpaceServlet
             	String token = requestItemService.createRequest(context, bitstream_id != null?
             			bitstreamService.find(context, bitstream_id):null, item, allfiles, requesterEmail, reqname, coment);
             	
+                String linkedToken = getLinkTokenEmail(context, token);
+                
                 // All data is there, send the email
 				Email email = Email.getEmail(I18nUtil.getEmailFilename(
 						context.getCurrentLocale(), "request_item.author"));
@@ -243,7 +245,7 @@ public class RequestItemServlet extends DSpaceServlet
                         .getHandle()));
 				email.addArgument(title); // request item title
 				email.addArgument(coment); // message
-				email.addArgument(token);
+				email.addArgument(linkedToken);
 				
 				email.addArgument(authorName); // corresponding author name
 				email.addArgument(authorEmail); // corresponding author email
@@ -532,14 +534,17 @@ public class RequestItemServlet extends DSpaceServlet
 		}
    }
 	
-	/**
+    /**
      * Get the link to the author in RequestLink email.
      * 
-     * @param email
-     *            The email address to mail to
-     *
-     * @exception SQLExeption
-     *
+     * @param context
+     *            the context object
+     * @param token
+     *            the token
+     * 
+     * @return link based on the token
+     * 
+     * @throws java.sql.SQLException 
      */
     public static String getLinkTokenEmail(Context context, String token)
             throws SQLException

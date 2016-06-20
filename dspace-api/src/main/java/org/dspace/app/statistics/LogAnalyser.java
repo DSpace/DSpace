@@ -9,7 +9,6 @@ package org.dspace.app.statistics;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverQuery;
@@ -185,8 +184,8 @@ public class LogAnalyser
    ////////////////////////
    
    /** the log directory to be analysed */
-   private static String logDir = ConfigurationManager.getProperty("log.dir");  
-        
+   private static String logDir = ConfigurationManager.getProperty("log.report.dir");
+
    /** the regex to describe the file name format */
    private static String fileTemplate = "dspace\\.log.*";
         
@@ -196,7 +195,7 @@ public class LogAnalyser
                             "dstat.cfg";
    
    /** the output file to which to write aggregation data */
-   private static String outFile = ConfigurationManager.getProperty("log.dir") + File.separator + "dstat.dat";
+   private static String outFile = ConfigurationManager.getProperty("log.report.dir") + File.separator + "dstat.dat";
    
    /** the starting date of the report */
    private static Date startDate = null;
@@ -213,6 +212,9 @@ public class LogAnalyser
     /**
      * main method to be run from command line.  See usage information for
      * details as to how to use the command line flags (-help)
+     * @param argv arguments
+     * @throws Exception if error
+     * @throws SQLException if database error
      */
     public static void main(String [] argv)
         throws Exception, SQLException
@@ -294,6 +296,10 @@ public class LogAnalyser
      * @param   myStartDate     the desired start of the analysis.  Starts from the beginning otherwise
      * @param   myEndDate       the desired end of the analysis.  Goes to the end otherwise
      * @param   myLookUp        force a lookup of the database
+     * @return aggregate output
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws SearchServiceException if search error
      */
     public static String processLogs(Context context, String myLogDir, 
                                     String myFileTemplate, String myConfigFile, 
@@ -555,7 +561,7 @@ public class LogAnalyser
         {
             logDir = myLogDir;
         }
-        
+
         if (myFileTemplate != null)
         {
             fileTemplate = myFileTemplate;
@@ -587,6 +593,7 @@ public class LogAnalyser
     
     /**
      * generate the analyser's output to the specified out file
+     * @return output
      */
     public static String createOutput()
     {
@@ -866,6 +873,7 @@ public class LogAnalyser
 
     /**
      * Read in the current config file and populate the class globals.
+     * @throws IOException if IO error
      */
     public static void readConfig() throws IOException
     {
@@ -876,6 +884,7 @@ public class LogAnalyser
      * Read in the given config file and populate the class globals.
      *
      * @param   configFile  the config file to read in
+     * @throws IOException if IO error
      */
     public static void readConfig(String configFile) throws IOException
     {
@@ -1166,6 +1175,8 @@ public class LogAnalyser
      * @param   type        value for DC field 'type' (unqualified)
      *
      * @return              an integer containing the relevant count
+     * @throws SQLException if database error
+     * @throws SearchServiceException if search error
      */
     public static Integer getNumItems(Context context, String type)
             throws SQLException, SearchServiceException {
@@ -1216,6 +1227,8 @@ public class LogAnalyser
      *
      * @return              an Integer containing the number of items in the
      *                      archive
+     * @throws SQLException if database error
+     * @throws SearchServiceException if search error
      */
     public static Integer getNumItems(Context context)
             throws SQLException, SearchServiceException {

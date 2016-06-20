@@ -232,7 +232,7 @@ public class Email
      *
      * @throws MessagingException
      *             if there was a problem sending the mail.
-     * @throws IOException 
+     * @throws IOException if IO error
      */
     public void send() throws MessagingException, IOException
     {
@@ -370,7 +370,7 @@ public class Email
      * @return the email object, with the content and subject filled out from
      *         the template
      *
-     * @throws IOException
+     * @throws IOException if IO error
      *             if the template couldn't be found, or there was some other
      *             error reading the template
      */

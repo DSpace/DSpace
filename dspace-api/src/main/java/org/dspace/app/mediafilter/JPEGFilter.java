@@ -27,7 +27,7 @@ import org.dspace.core.ConfigurationManager;
  * thumbnail.maxwidth, thumbnail.maxheight, the size we want our thumbnail to be
  * no bigger than. Creates only JPEGs.
  *
- * @author Jason Sherman <jsherman@usao.edu>
+ * @author Jason Sherman jsherman@usao.edu
  */
 public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
 {
@@ -66,10 +66,12 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
     }
 
     /**
-     * @param source
-     *            source input stream
+     * @param currentItem item
+     * @param source source input stream
+     * @param verbose verbose mode
      * 
      * @return InputStream the resulting input stream
+     * @throws Exception if error
      */
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
@@ -239,6 +241,8 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
      * Convenience method that returns a blurred instance of the
      * provided {@code BufferedImage}.
      *
+     * @param buf buffered image
+     * @return updated BufferedImage
      */
     public BufferedImage getBlurredInstance(BufferedImage buf)
     {

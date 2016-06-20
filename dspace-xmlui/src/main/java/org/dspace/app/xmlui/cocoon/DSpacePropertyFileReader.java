@@ -17,22 +17,39 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Class will read the DSpace configuration file via the DSpaceServicesFactory.getInstance().getConfigurationService()
- * 
+ * Class will read the DSpace configuration file via
+ * {@link DSpaceServicesFactory#getConfigurationService()}.
  * It accepts the name of the property to read and the name of the variable to
- * use in the sitemap scope.  
+ * use in the sitemap scope.
+ *
+ * <p>
  * For example:
+ * <pre>{@code
  * 		<map:act type="DSpacePropertyFileReader">
  *			<map:parameter name="dspace.dir" value="dspace_dir" />
  *			<map:transform type="Include" src="{dspace_dir}/config/news.xml" /> 
  *		</map:act>
- * Will place the value of the "dspace.dir" property in the "dspace_dir" variable to be
- * used in the sitemap.
+ * }</pre>
+ * Will place the value of the {@code dspace.dir} property in the
+ * {@code dspace_dir} variable to be used in the sitemap.
  * 
  * @author Jay Paz
  * 
  */
 public class DSpacePropertyFileReader extends AbstractAction {
+
+    /**
+     * Reading action.
+     *
+     * @param redirector unused.
+     * @param resolver unused.
+     * @param objectModel unused.
+     * @param source unused.
+     * @param parameters Reader parameters.
+     * @return a map of parameter names to DSpace configuration values.
+     * @throws Exception passed through.
+     */
+    @Override
 	public Map act(Redirector redirector, SourceResolver resolver,
 			Map objectModel, String source, Parameters parameters)
 			throws Exception {

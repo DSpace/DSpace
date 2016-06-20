@@ -8,6 +8,7 @@
 package org.dspace.app.util;
 
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,7 +20,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name="webapp")
-public class WebApp {
+public class WebApp implements ReloadableEntity<Integer> {
 
 
     @Id
@@ -50,7 +51,7 @@ public class WebApp {
 
     }
 
-    public Integer getId() {
+    public Integer getID() {
         return id;
     }
 

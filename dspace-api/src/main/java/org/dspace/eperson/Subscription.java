@@ -9,6 +9,7 @@ package org.dspace.eperson;
 
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 
 import javax.persistence.*;
 
@@ -19,13 +20,13 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "subscription")
-public class Subscription {
+public class Subscription implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name = "subscription_id", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="subscription_seq")
     @SequenceGenerator(name="subscription_seq", sequenceName="subscription_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id")
@@ -45,7 +46,7 @@ public class Subscription {
 
     }
 
-    public int getId() {
+    public Integer getID() {
         return id;
     }
 

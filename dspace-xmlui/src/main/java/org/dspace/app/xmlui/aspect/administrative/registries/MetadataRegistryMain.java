@@ -7,25 +7,18 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.registries;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.CheckBox;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataSchemaService;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * This is the main entry point for managing the metadata registry. This transformer 
@@ -134,7 +127,7 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
 
         for (MetadataSchema schema : schemas)
         {
-            int schemaID = schema.getSchemaID();
+            int schemaID = schema.getID();
             String namespace = schema.getNamespace();
             String name = schema.getName();
             String url = contextPath

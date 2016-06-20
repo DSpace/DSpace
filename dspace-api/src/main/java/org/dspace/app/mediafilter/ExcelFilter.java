@@ -73,11 +73,14 @@ public class ExcelFilter extends MediaFilter
     }
 
     /**
-     * @param source
-     *            source input stream
+     * @param item item
+     * @param source source input stream
+     * @param verbose verbose mode
      * 
      * @return InputStream the resulting input stream
+     * @throws Exception if error
      */
+    @Override
     public InputStream getDestinationStream(Item item, InputStream source, boolean verbose)
             throws Exception
     {

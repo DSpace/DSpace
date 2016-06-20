@@ -63,8 +63,15 @@ public class FlowUtils {
 	 *
 	 * @param context The current DSpace content
 	 * @param id The unique ID of the current workflow
+     * @return whether the workflow is completed.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws javax.servlet.ServletException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static boolean processApproveTask(Context context, String id) throws SQLException, UIException, ServletException, AuthorizeException, IOException
+	public static boolean processApproveTask(Context context, String id)
+            throws SQLException, UIException, ServletException, AuthorizeException, IOException
 	{
 		BasicWorkflowItem workflowItem = findWorkflow(context, id);
 		Item item = workflowItem.getItem();
@@ -91,13 +98,19 @@ public class FlowUtils {
 
 
 	/**
-	 * Return the given task back to the pool of unclaimed tasks for another user
+	 * Return the given task to the pool of unclaimed tasks for another user
 	 * to select and perform.
 	 *
 	 * @param context The current DSpace content
 	 * @param id The unique ID of the current workflow
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws javax.servlet.ServletException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static void processUnclaimTask(Context context, String id) throws SQLException, UIException, ServletException, AuthorizeException, IOException
+	public static void processUnclaimTask(Context context, String id)
+            throws SQLException, UIException, ServletException, AuthorizeException, IOException
 	{
 		BasicWorkflowItem workflowItem = findWorkflow(context, id);
 
@@ -118,8 +131,14 @@ public class FlowUtils {
 	 *
 	 * @param context The current DSpace content
 	 * @param id The unique ID of the current workflow
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws javax.servlet.ServletException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static void processClaimTask(Context context, String id) throws SQLException, UIException, ServletException, AuthorizeException, IOException
+	public static void processClaimTask(Context context, String id)
+            throws SQLException, UIException, ServletException, AuthorizeException, IOException
 	{
 		BasicWorkflowItem workflowItem = findWorkflow(context, id);
         if(workflowItem.getState() != BasicWorkflowService.WFSTATE_STEP1POOL &&
@@ -181,8 +200,15 @@ public class FlowUtils {
 	 * @param context The current DSpace content
 	 * @param id The unique ID of the current workflow
      * @param request The current request object
+     * @return error if any.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws javax.servlet.ServletException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static String processRejectTask(Context context, String id,Request request) throws SQLException, UIException, ServletException, AuthorizeException, IOException
+	public static String processRejectTask(Context context, String id,Request request)
+            throws SQLException, UIException, ServletException, AuthorizeException, IOException
 	{
 		BasicWorkflowItem workflowItem = findWorkflow(context, id);
 
@@ -226,11 +252,15 @@ public class FlowUtils {
      * prepended with the character S to signify that it is a workflow
      * instead of a workspace.
      *
-     * @param context
-     * @param inProgressSubmissionID
-     * @return The found workflowitem or null if none found.
+     * @param context session context.
+     * @param inProgressSubmissionID internal identifier of the submission.
+     * @return The found workflow item or null if none found.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
      */
-    public static BasicWorkflowItem findWorkflow(Context context, String inProgressSubmissionID) throws SQLException, AuthorizeException, IOException {
+    public static BasicWorkflowItem findWorkflow(Context context, String inProgressSubmissionID)
+            throws SQLException, AuthorizeException, IOException {
         int id = Integer.valueOf(inProgressSubmissionID.substring(1));
         return basicWorkflowItemService.find(context, id);
     }

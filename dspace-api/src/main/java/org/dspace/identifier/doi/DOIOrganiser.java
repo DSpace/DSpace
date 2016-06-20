@@ -723,7 +723,7 @@ public class DOIOrganiser {
      * contains digits only we treat it as ItemID, if not we try to find a
      * matching doi or a handle (in this order).
      * @return The TableRow or null if the Object does not have a DOI.
-     * @throws SQLException
+     * @throws SQLException if database error
      * @throws IllegalArgumentException If the identifier is null, an empty
      * String or specifies an DSpaceObject that is not an item. We currently
      * support DOIs for items only, but this may change once...

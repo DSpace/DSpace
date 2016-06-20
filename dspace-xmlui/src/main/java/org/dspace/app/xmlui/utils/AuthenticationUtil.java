@@ -18,12 +18,10 @@ import javax.servlet.http.HttpSession;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.aspect.administrative.SystemwideAlerts;
-import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -97,6 +95,7 @@ public class AuthenticationUtil
      * @return Return a current context with either the eperson attached if the
      *         authentication was successful or or no eperson attached if the
      *         attempt failed.
+     * @throws java.sql.SQLException passed through.
      */
     public static Context authenticate(Map objectModel, String email, String password, String realm)
     throws SQLException
@@ -150,6 +149,7 @@ public class AuthenticationUtil
      * @param objectModel
      *            Cocoon's object model.
      * @return This requests DSpace context.
+     * @throws java.sql.SQLException passed through.
      */
     public static Context authenticateImplicit(Map objectModel)
             throws SQLException
@@ -229,7 +229,7 @@ public class AuthenticationUtil
      * 			  The cocoon object model.
      * @param eperson
      *            the eperson logged in
-     * 
+     * @throws java.sql.SQLException passed through.
      */
     public static void logIn(Map objectModel, EPerson eperson) throws SQLException
     {
@@ -238,8 +238,7 @@ public class AuthenticationUtil
         
         logIn(context,request,eperson);
     }
-    
-    
+
     /**
      * Check to see if there are any session attributes indicating a currently authenticated 
      * user. If there is then log this user in.
@@ -248,6 +247,7 @@ public class AuthenticationUtil
      *            DSpace context
      * @param request
      *            HTTP Request
+     * @throws java.sql.SQLException passed through.
      */
     public static void resumeLogin(Context context, HttpServletRequest request)
             throws SQLException
@@ -313,7 +313,7 @@ public class AuthenticationUtil
      * 		The real HTTP request.
      * @param loginAs
      * 		Whom to login as.
-     * @throws SQLException
+     * @throws SQLException passed through.
      * @throws AuthorizeException using an I18nTransformer key as the message
      */
     public static void loginAs(Context context, HttpServletRequest request, EPerson loginAs ) 
@@ -373,6 +373,7 @@ public class AuthenticationUtil
      *            DSpace context
      * @param request
      *            HTTP request
+     * @throws java.sql.SQLException passed through.
      */
     public static void logOut(Context context, HttpServletRequest request) throws SQLException
     {
@@ -402,8 +403,7 @@ public class AuthenticationUtil
         session.removeAttribute(AUTHENTICATED_USER_ID);
         session.removeAttribute(CURRENT_IP_ADDRESS);
     }
-    
-    
+
     /**
      * Determine if the email can register itself or needs to be
      * created by a site administrator first.
@@ -413,6 +413,7 @@ public class AuthenticationUtil
      * @param email
      *          The email of the person to be registered.
      * @return true if the email can register, otherwise false.
+     * @throws java.sql.SQLException passed through.
      */
     public static boolean canSelfRegister(Map objectModel, String email) throws SQLException 
     {
@@ -439,6 +440,7 @@ public class AuthenticationUtil
      * @param email
      *              The email address of the EPerson.
      * @return true if allowed.
+     * @throws java.sql.SQLException passed through.
      */
     public static boolean allowSetPassword(Map objectModel, String email)
 	throws SQLException
@@ -458,6 +460,8 @@ public class AuthenticationUtil
      * @param email
      *              The email address of the new eperson.
      * @return A newly created EPerson object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     public static EPerson createNewEperson(Map objectModel, String email) throws 
         SQLException, AuthorizeException
@@ -481,15 +485,12 @@ public class AuthenticationUtil
         
         return eperson;   
     }
-    
-    
-    
-    
-    
+
     /**
      * Is there a currently interrupted request?
      * 
      * @param objectModel The Cocoon object Model
+     * @return true if there is an interrupted or un-resumed request.
      */
     public static boolean isInterupptedRequest(Map objectModel) 
     {
@@ -508,9 +509,7 @@ public class AuthenticationUtil
     	// There are not interrupted requests.
     	return false;
     }
-    
-    
-    
+
     /**
      * Interrupt the current request and store if for later resumption. This
      * request will send an HTTP redirect telling the client to authenticate
@@ -630,7 +629,7 @@ public class AuthenticationUtil
 
     /**
      * Has this user authenticated?
-     * @param request
+     * @param request the user's Request.
      * @return true if request is in a session having a user ID.
      */
     public static boolean isLoggedIn(HttpServletRequest request)

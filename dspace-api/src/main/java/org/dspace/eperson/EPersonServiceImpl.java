@@ -209,9 +209,6 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             throw new AuthorizeException(new EPersonDeletionException(constraintList));
         }
 
-        // Delete the Dublin Core
-        deleteMetadata(context, ePerson);
-
         context.addEvent(new Event(Event.DELETE, Constants.EPERSON, ePerson.getID(), ePerson.getEmail(), getIdentifiers(context, ePerson)));
 
         // XXX FIXME: This sidesteps the object model code so it won't

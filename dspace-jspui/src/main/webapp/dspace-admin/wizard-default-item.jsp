@@ -83,7 +83,7 @@
 <%
 		for (int dc = 0; dc < dcTypes.size(); dc++)
 		{ %>
-					<option value="<%= dcTypes.get(dc).getFieldID() %>"><%= dcTypes.get(dc).getQualifier() == null ?
+					<option value="<%= dcTypes.get(dc).getID() %>"><%= dcTypes.get(dc).getQualifier() == null ?
 					    dcTypes.get(dc).getMetadataSchema().getName() + "." + dcTypes.get(dc).getElement() : dcTypes.get(dc).getMetadataSchema().getName() + "." + dcTypes.get(dc).getElement() + "." + dcTypes.get(dc).getQualifier() %></option>
 <%      } %>
 				</select></td>

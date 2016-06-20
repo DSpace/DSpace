@@ -7,13 +7,9 @@
  */
 package org.dspace.authorize;
 
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
@@ -23,6 +19,9 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Service implementation for the ResourcePolicy object.
@@ -55,6 +54,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
      *            ID of the ResourcePolicy
      *
      * @return the ResourcePolicy format, or null if the ID is invalid.
+     * @throws SQLException if database error
      */
     @Override
     public ResourcePolicy find(Context context, int id) throws SQLException
@@ -67,6 +67,8 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
      *
      * @param context
      *            DSpace context object
+     * @return ResourcePolicy
+     * @throws SQLException if database error
      */
     @Override
     public ResourcePolicy create(Context context) throws SQLException
@@ -109,6 +111,10 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
     /**
      * Delete an ResourcePolicy
      *
+     * @param context context
+     * @param resourcePolicy resource policy
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void delete(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException {
@@ -125,6 +131,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
 
 
     /**
+     * @param resourcePolicy resource policy
      * @return action text or 'null' if action row empty
      */
     @Override
@@ -144,6 +151,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
     /**
      * figures out if the date is valid for the policy
      *
+     * @param resourcePolicy resource policy
      * @return true if policy has begun and hasn't expired yet (or no dates are
      *         set)
      */
@@ -195,17 +203,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
 
     @Override
     public void removeAllPolicies(Context c, DSpaceObject o) throws SQLException, AuthorizeException {
-        // FIXME: authorization check?
-        removeAllPolicies(c, o, true);
-    }
-
-    @Override
-    public void removeAllPolicies(Context c, DSpaceObject o, boolean updateLastModified) throws SQLException, AuthorizeException {
-        // FIXME: authorization check?
-        if(updateLastModified)
-        {
-            contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
-        }
+        contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
         resourcePolicyDAO.deleteByDso(c, o);
     }
 
@@ -253,15 +251,38 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
 
     /**
      * Update the ResourcePolicy
+     * @param context context
+     * @param resourcePolicy resource policy
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void update(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException {
-        if(resourcePolicy.getdSpaceObject() != null){
-            //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
-            contentServiceFactory.getDSpaceObjectService(resourcePolicy.getdSpaceObject()).updateLastModified(context, resourcePolicy.getdSpaceObject());
-        }
+        update(context, Collections.singletonList(resourcePolicy));
+    }
 
-        // FIXME: Check authorisation
-        resourcePolicyDAO.save(context, resourcePolicy);
+    /**
+     * Update the ResourcePolicies
+     */
+    @Override
+    public void update(Context context, List<ResourcePolicy> resourcePolicies) throws SQLException, AuthorizeException {
+        if(CollectionUtils.isNotEmpty(resourcePolicies)) {
+            Set<DSpaceObject> relatedDSpaceObjects = new HashSet<>();
+
+            for (ResourcePolicy resourcePolicy : resourcePolicies) {
+                if (resourcePolicy.getdSpaceObject() != null) {
+                    relatedDSpaceObjects.add(resourcePolicy.getdSpaceObject());
+                }
+
+                // FIXME: Check authorisation
+                resourcePolicyDAO.save(context, resourcePolicy);
+            }
+
+            //Update the last modified timestamp of all related DSpace Objects
+            for (DSpaceObject dSpaceObject : relatedDSpaceObjects) {
+                //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
+                contentServiceFactory.getDSpaceObjectService(dSpaceObject).updateLastModified(context, dSpaceObject);
+            }
+        }
     }
 }

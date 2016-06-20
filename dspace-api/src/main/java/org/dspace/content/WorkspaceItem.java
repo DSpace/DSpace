@@ -7,19 +7,19 @@
  */
 package org.dspace.content;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.workflow.WorkflowItem;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class representing an item in the process of being submitted by a user
@@ -29,14 +29,14 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "workspaceitem")
-public class WorkspaceItem implements InProgressSubmission, Serializable
+public class WorkspaceItem implements InProgressSubmission, Serializable, ReloadableEntity<Integer>
 {
 
     @Id
     @Column(name = "workspace_item_id", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="workspaceitem_seq")
     @SequenceGenerator(name="workspaceitem_seq", sequenceName="workspaceitem_seq", allocationSize = 1)
-    private int workspaceItemId;
+    private Integer workspaceItemId;
 
     /** The item this workspace object pertains to */
     @OneToOne(fetch = FetchType.LAZY)
@@ -90,7 +90,7 @@ public class WorkspaceItem implements InProgressSubmission, Serializable
      * @return the internal identifier
      */
     @Override
-    public int getID()
+    public Integer getID()
     {
         return workspaceItemId;
     }

@@ -32,6 +32,7 @@ public class DiscoveryUIUtils {
 
     /**
      * Returns a list of the filter queries for use in rendering pages, creating page more urls, ....
+     * @param request user's request.
      * @return an array containing the filter queries
      */
     public static Map<String, String[]> getParameterFilterQueries(Request request) {
@@ -55,6 +56,8 @@ public class DiscoveryUIUtils {
 
     /**
      * Returns all the filter queries for use by discovery
+     * @param request user's request.
+     * @param context session context.
      * @return an array containing the filter queries
      */
     public static String[] getFilterQueries(Request request, Context context) {

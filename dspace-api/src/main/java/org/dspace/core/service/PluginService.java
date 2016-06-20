@@ -9,7 +9,7 @@ package org.dspace.core.service;
 
 /**
  * A service to manage "plugins". At this point, it's based off of the structure
- * of the legacy PluginManager (<=5.x), until a better plugin definition is created.
+ * of the legacy PluginManager (5.x or below), until a better plugin definition is created.
  * <p>
  * In DSpace, a "plugin" corresponds simply to a Java interface. Plugin implementations
  * are simply classes which implement that interface (and often they are given unique

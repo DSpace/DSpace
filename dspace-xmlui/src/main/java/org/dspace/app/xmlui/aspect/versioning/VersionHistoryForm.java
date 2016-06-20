@@ -25,14 +25,14 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 import java.sql.SQLException;
-import java.util.*;
-import org.dspace.versioning.service.VersionHistoryService;
+import java.util.UUID;
 
 /**
  *
@@ -180,7 +180,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
                 {
                     CheckBox remove = row.addCell().addCheckBox("remove");
 				    remove.setLabel("remove");
-				    remove.addOption(version.getId());
+				    remove.addOption(version.getID());
                 }
 
                 row.addCell().addContent(version.getVersionNumber());
@@ -197,7 +197,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
                 if(!isItemView)
                 {
-                    row.addCell().addXref(contextPath + "/item/versionhistory?versioning-continue=" + knot.getId() + "&versionID=" + version.getId() + "&itemID=" + version.getItem().getID() + "&submit_update", T_submit_update);
+                    row.addCell().addXref(contextPath + "/item/versionhistory?versioning-continue=" + knot.getId() + "&versionID=" + version.getID() + "&itemID=" + version.getItem().getID() + "&submit_update", T_submit_update);
                 }
             }
         }

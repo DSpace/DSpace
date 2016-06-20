@@ -48,7 +48,7 @@ public class MetadataSchema {
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
-        this.setSchemaID(schema.getSchemaID());
+        this.setSchemaID(schema.getID());
         this.setPrefix(schema.getName());
         this.setNamespace(schema.getNamespace());
         if (expandFields.contains("fields") || expandFields.contains("all")) {

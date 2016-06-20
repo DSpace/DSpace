@@ -7,13 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.utils.RequestUtils;
 import org.dspace.app.xmlui.utils.UIException;
@@ -29,6 +22,13 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -68,8 +68,13 @@ public class FlowRegistryUtils
 	 * @param namespace The new schema's namespace
 	 * @param name The new schema's name.
 	 * @return A flow result
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.content.NonUniqueMetadataException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException on unsupported encoding.
 	 */
-	public static FlowResult processAddMetadataSchema(Context context, String namespace, String name) throws SQLException, AuthorizeException, NonUniqueMetadataException, UIException
+	public static FlowResult processAddMetadataSchema(Context context, String namespace, String name)
+            throws SQLException, AuthorizeException, NonUniqueMetadataException, UIException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
@@ -107,7 +112,7 @@ public class FlowRegistryUtils
 		    result.setContinue(true);
 		    result.setOutcome(true);
 		    result.setMessage(T_add_metadata_schema_success_notice);   
-		    result.setParameter("schemaID", schema.getSchemaID());
+		    result.setParameter("schemaID", schema.getID());
 		}
 		
 		return result;
@@ -119,8 +124,12 @@ public class FlowRegistryUtils
 	 * @param context The DSpace context
 	 * @param schemaIDs A list of schema IDs to be deleted.
 	 * @return A flow result
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.content.NonUniqueMetadataException passed through.
 	 */
-	public static FlowResult processDeleteMetadataSchemas(Context context, String[] schemaIDs) throws SQLException, AuthorizeException, NonUniqueMetadataException
+	public static FlowResult processDeleteMetadataSchemas(Context context, String[] schemaIDs)
+            throws SQLException, AuthorizeException, NonUniqueMetadataException
 	{
 		FlowResult result = new FlowResult();
 		
@@ -161,8 +170,13 @@ public class FlowRegistryUtils
 	 * @param qualifier The field's qualifier.
 	 * @param note A scope not about the field.
 	 * @return A results object
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException on unsupported encoding.
 	 */
-	public static FlowResult processAddMetadataField(Context context, int schemaID, String element, String qualifier, String note) throws IOException, AuthorizeException, SQLException, UIException
+	public static FlowResult processAddMetadataField(Context context, int schemaID, String element, String qualifier, String note)
+            throws IOException, AuthorizeException, SQLException, UIException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
@@ -199,7 +213,7 @@ public class FlowRegistryUtils
 				result.setContinue(true);
 				result.setOutcome(true);
 				result.setMessage(T_add_metadata_field_success_notice);
-				result.setParameter("fieldID", field.getFieldID());
+				result.setParameter("fieldID", field.getID());
 			} 
 			catch (NonUniqueMetadataException nume)
 			{
@@ -221,8 +235,13 @@ public class FlowRegistryUtils
 	 * @param qualifier A new qualifier value
 	 * @param note A new note value.
 	 * @return A results object.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException on unsupported encoding.
 	 */
-	public static FlowResult processEditMetadataField(Context context, int schemaID, int fieldID, String element, String qualifier, String note) throws IOException, AuthorizeException, SQLException, UIException
+	public static FlowResult processEditMetadataField(Context context, int schemaID, int fieldID, String element, String qualifier, String note)
+            throws IOException, AuthorizeException, SQLException, UIException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
@@ -250,7 +269,7 @@ public class FlowRegistryUtils
 		
 		// Check to make sure the field is unique, sometimes the NonUniqueMetadataException is not thrown.
 		MetadataField possibleDuplicate = metadataFieldService.findByElement(context, metadataSchemaService.find(context, schemaID), element, qualifier);
-		if (possibleDuplicate != null && possibleDuplicate.getFieldID() != fieldID)
+		if (possibleDuplicate != null && possibleDuplicate.getID() != fieldID)
         {
             result.addError("duplicate_field");
         }
@@ -346,8 +365,13 @@ public class FlowRegistryUtils
 	 * @param schemaID The target schema ID
 	 * @param fieldIDs The fields to be moved.
 	 * @return A results object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.content.NonUniqueMetadataException passed through.
+     * @throws java.io.IOException passed through.
 	 */	
-	public static FlowResult processMoveMetadataField(Context context, int schemaID, String[] fieldIDs) throws NumberFormatException, SQLException, AuthorizeException, NonUniqueMetadataException, IOException
+	public static FlowResult processMoveMetadataField(Context context, int schemaID, String[] fieldIDs)
+            throws NumberFormatException, SQLException, AuthorizeException, NonUniqueMetadataException, IOException
 	{
 		FlowResult result = new FlowResult();
 
@@ -377,8 +401,11 @@ public class FlowRegistryUtils
 	 * @param context The DSpace context
 	 * @param fieldIDs The fields to be deleted.
 	 * @return A results object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
-	public static FlowResult processDeleteMetadataField(Context context, String[] fieldIDs) throws NumberFormatException, SQLException, AuthorizeException
+	public static FlowResult processDeleteMetadataField(Context context, String[] fieldIDs)
+            throws NumberFormatException, SQLException, AuthorizeException
 	{
         FlowResult result = new FlowResult();
 		
@@ -412,6 +439,8 @@ public class FlowRegistryUtils
 	 * @param formatID The id of the format being updated.
 	 * @param request The request object, for all the field entries.
 	 * @return A results object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
 	public static FlowResult processEditBitstreamFormat(Context context, int formatID, Request request) throws SQLException, AuthorizeException
 	{
@@ -491,8 +520,11 @@ public class FlowRegistryUtils
 	 * @param context The DSpace context
 	 * @param formatIDs The formats-to-be-deleted.
 	 * @return A results object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
-	public static FlowResult processDeleteBitstreamFormats(Context context, String[] formatIDs) throws NumberFormatException, SQLException, AuthorizeException
+	public static FlowResult processDeleteBitstreamFormats(Context context, String[] formatIDs)
+            throws NumberFormatException, SQLException, AuthorizeException
 	{
         FlowResult result = new FlowResult();
 		

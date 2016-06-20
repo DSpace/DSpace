@@ -310,6 +310,11 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
     /**
      * Returns object's metadata in MODS format, as List of XML structure nodes.
+     * @param context context
+     * @throws org.dspace.content.crosswalk.CrosswalkException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso)
@@ -321,6 +326,11 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
     /**
      * Disseminate an Item, Collection, or Community to MODS.
+     * @param context context
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public Element disseminateElement(Context context, DSpaceObject dso)
@@ -439,6 +449,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      *
      * @param site
      *            The site to derive metadata from
+     * @return list of metadata
      */
     protected List<MockMetadataValue> site2Metadata(Site site)
     {
@@ -473,6 +484,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      *
      * @param community
      *            The community to derive metadata from
+     * @return list of metadata
      */
     protected List<MockMetadataValue> community2Metadata(Community community)
     {
@@ -522,6 +534,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      *
      * @param collection
      *            The collection to derive metadata from
+     * @return list of metadata
      */
     protected List<MockMetadataValue> collection2Metadata(Collection collection)
     {
@@ -585,6 +598,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      *
      * @param item
      *            The item to derive metadata from
+     * @return list of metadata
      */
     protected List<MockMetadataValue> item2Metadata(Item item)
     {

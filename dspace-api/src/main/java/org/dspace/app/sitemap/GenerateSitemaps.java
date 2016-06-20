@@ -152,9 +152,9 @@ public class GenerateSitemaps
      *            if {@code true}, generate an HTML sitemap.
      * @param makeSitemapOrg
      *            if {@code true}, generate an sitemap.org sitemap.
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a database error occurs.
-     * @throws IOException
+     * @throws IOException if IO error
      *             if IO error occurs.
      */
     public static void generateSitemaps(boolean makeHTMLMap,

@@ -48,7 +48,7 @@
     <p class="alert alert-warning"><fmt:message key="jsp.dspace-admin.confirm-delete-mdschema.warning"/></p>
 
     <form method="post">
-        <input type="hidden" name="dc_schema_id" value="<%= schema.getSchemaID() %>">
+        <input type="hidden" name="dc_schema_id" value="<%= schema.getID() %>">
         <div class="btn-group">
         	<%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
         	<input class="btn btn-danger" type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>">

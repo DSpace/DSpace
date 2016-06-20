@@ -38,7 +38,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.jdom.Element;
 
 /**
- * Base class for package ingester of METS (Metadata Encoding & Transmission
+ * Base class for package ingester of METS (Metadata Encoding and Transmission
  * Standard) Packages.<br>
  * See <a href="http://www.loc.gov/standards/mets/">
  * http://www.loc.gov/standards/mets/</a>.
@@ -136,6 +136,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
          * @param mdref
          *            the METS mdRef element to locate the input for.
          * @return the input stream of its content.
+         * @throws MetadataValidationException if validation error
+         * @throws IOException if IO error
          * @see METSManifest
          */
         @Override
@@ -178,13 +180,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      *            may be null, which takes default license.
      * @return DSpaceObject created by ingest.
      * 
-     * @throws PackageValidationException
+     * @throws PackageValidationException if package validation error
      *             if package is unacceptable or there is a fatal error turning
      *             it into a DSpaceObject.
-     * @throws CrosswalkException
-     * @throws AuthorizeException
-     * @throws SQLException
-     * @throws IOException
+     * @throws CrosswalkException if crosswalk error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws WorkflowException if workflow error
      */
     @Override
     public DSpaceObject ingest(Context context, DSpaceObject parent,
@@ -301,10 +304,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @param params
      *            Ingestion parameters
      * @return parsed out METSManifest
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws MetadataValidationException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws MetadataValidationException if metadata validation error
      */
     protected METSManifest parsePackage(Context context, File pkgFile,
             PackageParameters params) throws IOException, SQLException,
@@ -366,12 +369,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @param license
      *            DSpace license agreement
      * @return completed result as a DSpace object
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws CrosswalkException
-     * @throws MetadataValidationException
-     * @throws PackageValidationException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
+     * @throws MetadataValidationException if metadata validation error
+     * @throws WorkflowException if workflow error
+     * @throws PackageValidationException if package validation error
      */
     protected DSpaceObject ingestObject(Context context, DSpaceObject parent,
             METSManifest manifest, File pkgFile, PackageParameters params,
@@ -581,12 +585,12 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @param license
      *            DSpace license agreement
      * @return completed result as a DSpace object
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws CrosswalkException
-     * @throws MetadataValidationException
-     * @throws PackageValidationException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
+     * @throws MetadataValidationException if metadata validation error
+     * @throws PackageValidationException if package validation error
      */
     protected DSpaceObject replaceObject(Context context, DSpaceObject dso,
             METSManifest manifest, File pkgFile, PackageParameters params,
@@ -627,7 +631,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         // clear out all metadata values associated with this object
         PackageUtils.clearAllMetadata(context, dso);
 
-        // @TODO -- We are currently NOT clearing out the following during a
+        // TODO -- We are currently NOT clearing out the following during a
         // replace.  So, even after a replace, the following information may be
         // retained in the system:
         // o  Rights/Permissions in system or on objects
@@ -737,12 +741,12 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      *            Ingestion Parameters
      * @param mdRefCallback
      *            MdrefManager storing info about mdRefs in manifest
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
-     * @throws MetadataValidationException
-     * @throws CrosswalkException
-     * @throws PackageValidationException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
+     * @throws MetadataValidationException if metadata validation error
+     * @throws CrosswalkException if crosswalk error
+     * @throws PackageValidationException if package validation error
      */
     protected void addBitstreams(Context context, Item item,
             METSManifest manifest, File pkgFile, PackageParameters params,
@@ -910,9 +914,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      *            DSpace Item
      * @param manifest
      *            The METS Manifest
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws PackageValidationException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws PackageValidationException if package validation error
      */
     protected void addManifestBitstream(Context context, Item item,
             METSManifest manifest) throws IOException, SQLException,
@@ -958,11 +963,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      *            zip)
      * @param params
      *            Ingestion Parameters
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
-     * @throws MetadataValidationException
-     * @throws PackageValidationException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
+     * @throws MetadataValidationException if metadata validation error
+     * @throws PackageValidationException if package validation error
      */
     protected void addContainerLogo(Context context, DSpaceObject dso,
             METSManifest manifest, File pkgFile, PackageParameters params)
@@ -1026,11 +1031,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @param callback
      *            the MdrefManager (manages all external metadata files
      *            referenced by METS <code>mdref</code> elements)
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
-     * @throws MetadataValidationException
-     * @throws PackageValidationException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
+     * @throws MetadataValidationException if metadata validation error
+     * @throws PackageValidationException if package validation error
      */
     protected void addTemplateItem(Context context, DSpaceObject dso,
             METSManifest manifest, File pkgFile, PackageParameters params,
@@ -1110,13 +1115,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @param params
      *            Parameters passed from the packager script
      * @return DSpaceObject created by ingest.
-     * @throws PackageValidationException
+     * @throws PackageValidationException if package validation error
      *             if package is unacceptable or there is a fatal error turning
      *             it into a DSpace Object.
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws CrosswalkException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
+     * @throws WorkflowException if workflow error
      */
     @Override
     public DSpaceObject replace(Context context, DSpaceObject dsoToReplace,
@@ -1297,8 +1303,12 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
     /**
      * Remove an existing DSpace Object (called during a replace)
      * 
+     * @param context context
      * @param dso
      *            DSpace Object
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     protected void removeObject(Context context, DSpaceObject dso)
             throws AuthorizeException, SQLException, IOException
@@ -1343,10 +1353,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @param manifest
      *            METS manifest
      * @return a DSpace Object which is the parent (or null, if not found)
-     * @throws PackageValidationException
+     * @throws PackageValidationException if package validation error
      *             if parent reference cannot be found in manifest
-     * @throws MetadataValidationException
-     * @throws SQLException
+     * @throws MetadataValidationException if metadata validation error
+     * @throws SQLException if database error
      */
     public DSpaceObject getParentObject(Context context, METSManifest manifest)
             throws PackageValidationException, MetadataValidationException,
@@ -1394,8 +1404,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @param manifest
      *            METS manifest
      * @return handle as a string (or null, if not found)
-     * @throws PackageValidationException
+     * @throws PackageValidationException if package validation error
      *             if handle cannot be found in manifest
+     * @throws MetadataValidationException if validation error
+     * @throws SQLException if database error 
      */
     public String getObjectHandle(METSManifest manifest)
             throws PackageValidationException, MetadataValidationException,
@@ -1429,6 +1441,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @param path
      *            the File path (either path in Zip package or a URL)
      * @return the InputStream for the file
+     * @throws MetadataValidationException if validation error
+     * @throws IOException if IO error
      */
     protected static InputStream getFileInputStream(File pkgFile,
             PackageParameters params, String path)
@@ -1510,7 +1524,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * access the METS document through the <code>manifest</code> variable, an
      * instance of <code>METSManifest</code>.
      * 
-     * @throws MetadataValidationException
+     * @throws MetadataValidationException if metadata validation error
      *             if there is a fatal problem with the METS document's
      *             conformance to the expected profile.
      */
@@ -1531,10 +1545,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * Note that <code>item</code> and <code>manifest</code> are available as
      * protected fields from the superclass.
      * 
-     * @param context
-     *            the DSpace context
-     * @param manifest
- *            the METSManifest
+     * @param context the DSpace context
+     * @param dso DSpace Object
+     * @param manifest the METSManifest
      * @param callback
 *            the MdrefManager (manages all external metadata files
 *            referenced by METS <code>mdref</code> elements)
@@ -1542,6 +1555,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 *            array of Elements, each a METS <code>dmdSec</code> that
 *            applies to the Item as a whole.
      * @param params
+     * @throws CrosswalkException if crosswalk error
+     * @throws PackageValidationException if package validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public abstract void crosswalkObjectDmd(Context context, DSpaceObject dso,
             METSManifest manifest, MdrefManager callback, Element dmds[],
@@ -1566,10 +1584,16 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * 
      * @param context
      *            the DSpace context
+     * @param item Item
      * @param collection
      *            DSpace Collection to which the item is being submitted.
      * @param license
      *            optional user-supplied Deposit License text (may be null)
+     * @param params
+     * @throws PackageValidationException if package validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public abstract void addLicense(Context context, Item item, String license,
             Collection collection, PackageParameters params)
@@ -1588,6 +1612,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      *            the DSpace Object
      * @param params
      *            the Packager Parameters
+     * @throws CrosswalkException if crosswalk error
+     * @throws PackageValidationException if package validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public abstract void finishObject(Context context, DSpaceObject dso,
             PackageParameters params) throws PackageValidationException,
@@ -1596,7 +1625,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
     /**
      * Determines what type of DSpace object is represented in this METS doc.
      * 
+     * @param manifest METS manifest
      * @return one of the object types in Constants.
+     * @throws PackageValidationException if package validation error
      */
     public abstract int getObjectType(METSManifest manifest)
             throws PackageValidationException;
@@ -1604,6 +1635,15 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
     /**
      * Subclass-dependent final processing on a Bitstream; could include fixing
      * up the name, bundle, other attributes.
+     * @param context context
+     * @param manifest METS manifest
+     * @param bs bitstream
+     * @param mfile element
+     * @param params package params
+     * @throws MetadataValidationException if validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public abstract void finishBitstream(Context context, Bitstream bs,
             Element mfile, METSManifest manifest, PackageParameters params)
@@ -1614,6 +1654,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * Returns keyword that makes the configuration keys of this subclass
      * unique, e.g. if it returns NAME, the key would be:
      * "mets.NAME.ingest.preserveManifest = true"
+     * @return name
      */
     public abstract String getConfigurationName();
 

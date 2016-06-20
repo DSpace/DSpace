@@ -18,12 +18,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.PackageUtils;
@@ -40,6 +35,12 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Configurable XSLT-driven ingestion Crosswalk
@@ -100,7 +101,8 @@ public class XSLTIngestionCrosswalk
         String authority = field.getAttributeValue("authority");
         String sconf = field.getAttributeValue("confidence");
 
-        CrosswalkUtils.checkMetadata(context, schema, element, qualifier, createMissingMetadataFields);
+        CrosswalkMetadataValidator metadataValidator = new CrosswalkMetadataValidator();
+        MetadataField metadataField = metadataValidator.checkMetadata(context, schema, element, qualifier, createMissingMetadataFields);
         // sanity check: some XSL puts an empty string in qualifier,
         // change it to null so we match the unqualified DC field:
         if (qualifier != null && qualifier.equals(""))
@@ -113,11 +115,11 @@ public class XSLTIngestionCrosswalk
         {
             int confidence = (sconf != null && sconf.length() > 0) ?
                     Choices.getConfidenceValue(sconf) : Choices.CF_UNSET;
-            itemService.addMetadata(context, item, schema, element, qualifier, lang, field.getText(), authority, confidence);
+            itemService.addMetadata(context, item, metadataField, lang, field.getText(), authority, confidence);
         }
         else
         {
-            itemService.addMetadata(context, item, schema, element, qualifier, lang, field.getText());
+            itemService.addMetadata(context, item, metadataField, lang, field.getText());
         }
     }
 
@@ -126,6 +128,11 @@ public class XSLTIngestionCrosswalk
      * Translation produces a list of DIM "field" elements;
      * these correspond directly to Item.addMetadata() calls so
      * they are simply executed.
+     * @param createMissingMetadataFields whether to create missing fields
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, List<Element> metadata,
@@ -155,6 +162,11 @@ public class XSLTIngestionCrosswalk
      * Ingest a whole document.  Build Document object around root element,
      * and feed that to the transformation, since it may get handled
      * differently than a List of metadata elements.
+     * @param createMissingMetadataFields whether to create missing fields
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
@@ -207,6 +219,11 @@ public class XSLTIngestionCrosswalk
      * @param context the context
      * @param dso object into which to ingest metadata
      * @param  dim root of a DIM expression
+     * @param createMissingMetadataFields whether to create missing fields
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
 
     public static void ingestDIM(Context context, DSpaceObject dso, Element dim, boolean createMissingMetadataFields)
@@ -275,7 +292,9 @@ public class XSLTIngestionCrosswalk
 
     /**
      * Simple command-line rig for testing the DIM output of a stylesheet.
-     * Usage:  java XSLTIngestionCrosswalk  <crosswalk-name> <input-file>
+     * Usage: {@code java XSLTIngestionCrosswalk  <crosswalk-name> <input-file>}
+     * @param argv arguments
+     * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception
     {

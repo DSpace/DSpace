@@ -7,8 +7,11 @@
  */
 package org.dspace.handle;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 
 import javax.persistence.*;
 
@@ -19,7 +22,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="handle")
-public class Handle {
+public class Handle implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name="handle_id")
@@ -51,7 +54,7 @@ public class Handle {
 
     }
 
-    public Integer getId() {
+    public Integer getID() {
         return id;
     }
 
@@ -77,5 +80,27 @@ public class Handle {
 
     public Integer getResourceTypeId() {
         return resourceTypeId;
+    }
+
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Handle handle1 = (Handle) o;
+
+        return new EqualsBuilder()
+                .append(id, handle1.id)
+                .append(handle, handle1.handle)
+                .append(resourceTypeId, handle1.resourceTypeId)
+                .isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(handle)
+                .append(resourceTypeId)
+                .toHashCode();
     }
 }

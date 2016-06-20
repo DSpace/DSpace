@@ -22,7 +22,7 @@ import java.util.UUID;
 /**
  * Database Access Object interface class for the Group object.
  * The implementation of this class is responsible for all database calls for the Group object and is autowired by spring
- * This class should only be accessed from a single service & should never be exposed outside of the API
+ * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -34,7 +34,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * @param searchValue The value to match
      * @param metadataField The metadata field to search in
      * @return The groups that have a matching value for specified metadata field
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException;
 
@@ -43,7 +43,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * @param context The DSpace context
      * @param sortMetadataFields The metadata fields to sort on
      * @return A list of all groups, ordered by metadata fields
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     List<Group> findAll(Context context, List<MetadataField> sortMetadataFields) throws SQLException;
 
@@ -51,7 +51,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * Find all groups ordered by name ascending
      * @param context The DSpace context
      * @return A list of all groups, ordered by name
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     List<Group> findAll(Context context) throws SQLException;
 
@@ -60,7 +60,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * @param context The DSpace context
      * @param ePerson The EPerson to match
      * @return A list of all groups to which the given EPerson belongs
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     List<Group> findByEPerson(Context context, EPerson ePerson) throws SQLException;
 
@@ -69,7 +69,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * @param context The DSpace context
      * @param flushQueries Flush all pending queries
      * @return A list of pairs indicating parent - child
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     List<Pair<UUID, UUID>> getGroup2GroupResults(Context context, boolean flushQueries) throws SQLException;
 
@@ -77,7 +77,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * Return all empty groups
      * @param context The DSpace context
      * @return All empty groups
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     List<Group> getEmptyGroups(Context context) throws SQLException;
 
@@ -85,7 +85,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * Count the number of groups in DSpace
      * @param context The DSpace context
      * @return The number of groups
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     int countRows(Context context) throws SQLException;
 
@@ -94,7 +94,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * @param context The DSpace context
      * @param name The name of the group to look for
      * @return The group with the specified name
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     Group findByName(Context context, String name) throws SQLException;
 
@@ -105,7 +105,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * @param offset Offset to use for pagination (-1 to disable)
      * @param limit The maximum number of results to return (-1 to disable)
      * @return Groups matching the query
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     List<Group> findByNameLike(Context context, String groupName, int offset, int limit) throws SQLException;
 
@@ -114,7 +114,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * @param context The DSpace context
      * @param groupName Part of the group's name to search for
      * @return The number of matching groups
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     int countByNameLike(Context context, String groupName) throws SQLException;
 
@@ -124,8 +124,8 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * @param groupName The name of the group to look for
      * @param ePerson The EPerson which has to be a member
      * @return The group with the specified name
-     * @throws SQLException
+     * @throws SQLException if database error
      */
-    Group findByNameAndEPerson(Context context, String groupName, EPerson ePerson) throws SQLException;
+    Group findByNameAndMembership(Context context, String groupName, EPerson ePerson) throws SQLException;
 
 }

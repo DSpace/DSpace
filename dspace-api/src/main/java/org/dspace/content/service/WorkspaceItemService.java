@@ -38,6 +38,7 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      *            ID of the workspace item
      *
      * @return the workspace item, or null if the ID is invalid.
+     * @throws SQLException if database error
      */
     public WorkspaceItem find(Context context, int id) throws SQLException;
 
@@ -55,6 +56,8 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      *            of the collection's template item
      *
      * @return the newly created workspace item
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public WorkspaceItem create(Context context, Collection collection,  boolean template)
             throws AuthorizeException, SQLException;
@@ -73,6 +76,7 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      *            the eperson
      *
      * @return the corresponding workspace items
+     * @throws SQLException if database error
      */
     public List<WorkspaceItem> findByEPerson(Context context, EPerson ep)
             throws SQLException;
@@ -86,6 +90,7 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      *            the collection
      *
      * @return the corresponding workspace items
+     * @throws SQLException if database error
      */
     public List<WorkspaceItem> findByCollection(Context context, Collection collection)
             throws SQLException;
@@ -101,6 +106,7 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      *            the item
      *
      * @return workflow item corresponding to the item, or null
+     * @throws SQLException if database error
      */
     public WorkspaceItem findByItem(Context context, Item item)
             throws SQLException;
@@ -115,6 +121,7 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * @param   context     the context object
      *
      * @return      all workspace items
+     * @throws SQLException if database error
      */
     public List<WorkspaceItem> findAll(Context context)
         throws SQLException;
@@ -123,6 +130,11 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * Delete the workspace item. The entry in workspaceitem, the unarchived
      * item and its contents are all removed (multiple inclusion
      * notwithstanding.)
+     * @param context context
+     * @param workspaceItem workspace item
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void deleteAll(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException, IOException;
 
@@ -132,7 +144,7 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * The map entry returned contains stage reached as the key and count of items in that stage as a value
      * @param context
      * @return
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException;
 }

@@ -100,6 +100,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
+     * @return the key.
      */
     @Override
     public Serializable getKey() {
@@ -124,7 +125,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
      * Generate the cache validity object.
      *
      * The validity object will include the item being viewed,
-     * along with all bundles & bitstreams.
+     * along with all bundles and bitstreams.
+     * @return validity.
      */
     @Override
     public SourceValidity getValidity()
@@ -136,9 +138,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 	        try {
 	            dso = HandleUtil.obtainHandle(objectModel);
 
-	            DSpaceValidity validity = new DSpaceValidity();
-	            validity.add(context, dso);
-	            this.validity =  validity.complete();
+	            DSpaceValidity newValidity = new DSpaceValidity();
+	            newValidity.add(context, dso);
+	            this.validity =  newValidity.complete();
 	        }
 	        catch (Exception e)
 	        {
@@ -159,6 +161,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     /**
      * Add the item's title and trail links to the page's metadata.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException if a crosswalk fails.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
@@ -322,6 +330,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     /**
      * Display a single item
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     @Override
     public void addBody(Body body) throws SAXException, WingException,
@@ -413,23 +427,17 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     /**
      * Determine if the full item should be referenced or just a summary.
+     * @param objectModel to get the request.
+     * @return true if the full item should be shown.
      */
     public static boolean showFullItem(Map objectModel)
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
         String show = request.getParameter("show");
 
-        if (show != null && show.length() > 0)
-        {
-            return true;
-        }
-
-        return false;
+        return show != null && show.length() > 0;
     }
 
-    /**
-     * Recycle
-     */
     @Override
     public void recycle() {
     	this.validity = null;

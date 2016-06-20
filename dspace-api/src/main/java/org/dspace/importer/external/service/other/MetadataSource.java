@@ -179,7 +179,7 @@ public abstract class MetadataSource {
     /**
      * Attempts to init a session
      *
-     * @throws Exception
+     * @throws Exception if error
      */
     public abstract void init() throws Exception;
 

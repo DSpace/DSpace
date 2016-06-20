@@ -47,9 +47,9 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
      *
      * @param context
      *            DSpace context object
-     *
+     * @param order order by MetadataField
      * @return the collections in the system
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     @Override
     public List<Collection> findAll(Context context, MetadataField order) throws SQLException
@@ -72,7 +72,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         if(limit != null){
             hibernateQuery.setMaxResults(limit);
         }
-        hibernateQuery.setParameter(order.toString(), order.getFieldID());
+        hibernateQuery.setParameter(order.toString(), order.getID());
         return list(hibernateQuery);
     }
 

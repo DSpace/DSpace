@@ -252,7 +252,7 @@ public class CCLookup {
 	 * 			containing the user-supplied answer.
 	 * @param lang The language to request localized elements in.
 	 *
-	 * @throws IOException
+	 * @throws IOException if IO error
 	 *
 	 * @see CCLicense
 	 * @see Map
@@ -321,7 +321,7 @@ public class CCLookup {
 	 *
 	 * Note: does not support localization in 1.5 -- not yet
 	 *
-	 * @throws IOException
+	 * @throws IOException if IO error
 	 *
 	 * @see CCLicense
 	 * @see Map

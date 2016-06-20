@@ -24,7 +24,7 @@ public class BrowseDAOFactory
 	 * 
 	 * @param context	the DSpace context
 	 * @return			the relevant DAO
-	 * @throws BrowseException
+	 * @throws BrowseException if browse error
 	 */
 	public static BrowseDAO getInstance(Context context)
 		throws BrowseException

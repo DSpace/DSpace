@@ -59,8 +59,8 @@ public class ItemCountDAOSolr implements ItemCountDAO
     /**
      * Set the dspace context to use
      * 
-     * @param context
-     * @throws ItemCountException
+     * @param context DSpace Context
+     * @throws ItemCountException if count error
      */
     @Override
     public void setContext(Context context) throws ItemCountException
@@ -71,8 +71,9 @@ public class ItemCountDAOSolr implements ItemCountDAO
     /**
      * Get the count of the items in the given container.
      * 
-     * @param dso
-     * @throws ItemCountException
+     * @param dso Dspace Context
+     * @return count
+     * @throws ItemCountException if count error
      */
     @Override
     public int getCount(DSpaceObject dso) throws ItemCountException
@@ -106,7 +107,7 @@ public class ItemCountDAOSolr implements ItemCountDAO
      * make sure that the counts are actually fetched from Solr (if haven't been
      * cached in a Map yet)
      * 
-     * @throws ItemCountException
+     * @throws ItemCountException if count error
      */
     private void loadCount() throws ItemCountException
     {

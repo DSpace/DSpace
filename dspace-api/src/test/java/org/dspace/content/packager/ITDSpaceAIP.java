@@ -900,7 +900,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
      * In HashMap, Key is the object handle, and Value is "[type-text]::[title]".
      * @param dso DSpaceObject
      * @param infoMap HashMap
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     private void saveObjectInfo(DSpaceObject dso, HashMap<String,String> infoMap)
             throws SQLException
@@ -957,7 +957,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
      * <P>
      * In HashMap, Key is the object handle, and Value is "[type-text]::[title]".
      * @param infoMap HashMap of objects to check for
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     private void assertObjectsExist(HashMap<String,String> infoMap)
             throws SQLException
@@ -988,7 +988,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
     /**
      * Assert the objects listed in a HashMap do NOT exist in DSpace.
      * @param infoMap HashMap of objects to check for
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     public void assertObjectsNotExist(HashMap<String,String> infoMap)
             throws SQLException

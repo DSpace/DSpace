@@ -77,6 +77,11 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
      * Returns object's metadata as XML elements.
      * Simple-minded copying of elements: convert contributor.author to
      * "creator" but otherwise just grab element name without qualifier.
+     * @param context context
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso)

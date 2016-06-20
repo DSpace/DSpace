@@ -44,12 +44,20 @@ public interface CitationDocumentService {
      *  This object is citation-able (presently, just PDF)
      *
      *  The module must be enabled, before the permission level checks happen.
-     * @param bitstream
-     * @return
+     * @param bitstream DSpace bitstream
+     * @param context DSpace context
+     * @throws SQLException if error
+     * @return true or false
      */
     public Boolean isCitationEnabledForBitstream(Bitstream bitstream, Context context) throws SQLException;
 
-
+    /**
+     * 
+     * @param context DSpace Context
+     * @param bitstream DSpace Bitstream
+     * @return true or false
+     * @throws SQLException if error
+     */
     public boolean canGenerateCitationVersion(Context context, Bitstream bitstream) throws SQLException;
 
     /**
@@ -64,33 +72,67 @@ public interface CitationDocumentService {
      *  <li> Create cover page and add content to it.</li>
      *  <li> Concatenate the coverpage and the source
      *     document.</li>
-     * </p>
+     * </ol>
      *
+     * @param context DSpace context
      * @param bitstream The source bitstream being cited. This must be a PDF.
      * @return The temporary File that is the finished, cited document.
-     * @throws java.io.FileNotFoundException
-     * @throws SQLException
-     * @throws org.dspace.authorize.AuthorizeException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public File makeCitedDocument(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException;
 
+    /**
+     * 
+     * @param page page
+     * @param contentStream content stream
+     * @param text text to draw
+     * @param startX x-coordinate of word
+     * @param startY y-coordinate of word
+     * @param pdfFont font
+     * @param fontSize size of font
+     * @return integer
+     * @throws IOException if IO error
+     */
     public int drawStringWordWrap(PDPage page, PDPageContentStream contentStream, String text,
                                     int startX, int startY, PDFont pdfFont, float fontSize) throws IOException;
 
+    /**
+     * Get name of owning community
+     * @param context DSpace context
+     * @param item DSpace Item
+     * @return name
+     */
     public String getOwningCommunity(Context context, Item item);
 
+    /**
+     * Get name of owning collection
+     * @param item DSpace Item
+     * @return owning collection name
+     */
     public String getOwningCollection(Item item);
 
+    /**
+     * Get metadata separated by value separator (semicolon)
+     * @param item DSpace Item
+     * @param metadataKey metadata string
+     * @see org.dspace.content.service.DSpaceObjectService#getMetadataByMetadataString(org.dspace.content.DSpaceObject, java.lang.String) 
+     * @return string
+     */
     public String getAllMetadataSeparated(Item item, String metadataKey);
 
     /**
-     * @param page
-     * @param contentStream
+     * @param page page
+     * @param contentStream content stream
      * @param y the y-coordinate of the first row
      * @param margin the padding on left and right of table
      * @param content a 2d array containing the table data
-     * @throws IOException
+     * @param font PDFont
+     * @param fontSize size of font (int)
+     * @param cellBorders whether to include cellBorders
+     * @throws IOException if error
      */
     public void drawTable(PDPage page, PDPageContentStream contentStream,
                                  float y, float margin,

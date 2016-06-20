@@ -17,7 +17,7 @@ package org.dspace.kernel;
  * <p>
  * If you want the system to execute your class then you must list it in 
  * the DSpace configuration with the fully qualified classpath
- * (NOTE that the xxx can be anything as long as it is unique): <br/>
+ * (NOTE that the xxx can be anything as long as it is unique): <br>
  * {@code activator.xxx = org.dspace.MyClass}
  * </p>
  * <p>
@@ -25,15 +25,15 @@ package org.dspace.kernel;
  * Developers should create their providers/plugins/etc. in this method and
  * use the registration methods in the {@link ServiceManager} to register them. 
  * {@link #stop(ServiceManager)} will be called when the kernel shuts down. Perform any cleanup/shutdown actions
- * you like during this phase (unregistering your services here is a good idea). <br/>
+ * you like during this phase (unregistering your services here is a good idea). <br>
  * </p>
  * <p>This is modeled after the OSGi {@code BundleActivator}.</p>
  * <p>
  * There is another type of activator used in DSpace but it is 
  * configured via the configuration service only.  The class activator
  * is configured by creating a config property like this
- * (NOTE that the xxx can be anything as long as it is unique): <br/>
- * {@code activator.class.xxx = org.dspace.MyClass;org.dspace.MyServiceName;constructor}<br/>
+ * (NOTE that the xxx can be anything as long as it is unique): <br>
+ * {@code activator.class.xxx = org.dspace.MyClass;org.dspace.MyServiceName;constructor}<br>
  * Unlike the normal activators, these are started up when the kernel 
  * core services start and thus can actually be accessed from the 
  * service manager and referenced in providers and plugins.

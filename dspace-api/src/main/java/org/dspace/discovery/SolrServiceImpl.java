@@ -69,7 +69,7 @@ import java.util.*;
  * collections, communities, etc. It is meant to either be invoked from the
  * command line (see dspace/bin/index-all) or via the indexContent() methods
  * within DSpace.
- * <p/>
+ * <p>
  * The Administrator can choose to run SolrIndexer in a cron that repeats
  * regularly, a failed attempt to index from the UI will be "caught" up on in
  * that cron.
@@ -173,8 +173,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      *
      * @param context Users Context
      * @param dso     DSpace Object (Item, Collection or Community
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if error
      */
     @Override
     public void indexContent(Context context, DSpaceObject dso)
@@ -190,8 +189,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @param context Users Context
      * @param dso     DSpace Object (Item, Collection or Community
      * @param force   Force update even if not stale.
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if error
      */
     @Override
     public void indexContent(Context context, DSpaceObject dso,
@@ -256,8 +254,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      *
      * @param context
      * @param dso     DSpace Object, can be Community, Item, or Collection
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     @Override
     public void unIndexContent(Context context, DSpaceObject dso)
@@ -271,8 +269,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @param context
      * @param dso     DSpace Object, can be Community, Item, or Collection
      * @param commit if <code>true</code> force an immediate commit on SOLR
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     @Override
     public void unIndexContent(Context context, DSpaceObject dso, boolean commit)
@@ -298,8 +296,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Unindex a Document in the Lucene index.
      * @param context the dspace context
      * @param handle the handle of the object to be deleted
-     * @throws IOException
-     * @throws SQLException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
      */
     @Override
     public void unIndexContent(Context context, String handle) throws IOException, SQLException {
@@ -310,8 +308,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Unindex a Document in the Lucene Index.
      * @param context the dspace context
      * @param handle the handle of the object to be deleted
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     @Override
     public void unIndexContent(Context context, String handle, boolean commit)
@@ -380,7 +378,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Iterates over all Items, Collections and Communities. And updates them in
      * the index. Uses decaching to control memory footprint. Uses indexContent
      * and isStale to check state of item in index.
-     * <p/>
+     * <p>
      * At first it may appear counterintuitive to have an IndexWriter/Reader
      * opened and closed on each DSO. But this allows the UI processes to step
      * in and attain a lock and write to the index even if other processes/jvms
@@ -648,8 +646,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
 
     /**
+     * @param context DSpace context
      * @param myitem the item for which our locations are to be retrieved
-     * @return a list containing the identifiers of the communities & collections
+     * @return a list containing the identifiers of the communities and collections
      * @throws SQLException sql exception
      */
     protected List<String> getItemLocations(Context context, Item myitem)
@@ -746,8 +745,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Build a solr document for a DSpace Community.
      *
      * @param community Community to be indexed
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     protected void buildDocument(Context context, Community community)
     throws SQLException, IOException {
@@ -874,8 +873,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      *
      * @param context Users Context
      * @param item    The DSpace Item to be indexed
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     protected void buildDocument(Context context, Item item)
             throws SQLException, IOException {

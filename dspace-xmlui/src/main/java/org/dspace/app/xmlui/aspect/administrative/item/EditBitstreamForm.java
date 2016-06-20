@@ -36,8 +36,9 @@ import org.xml.sax.SAXException;
 
 /**
  * 
- * Show a form allowing the user to edit a bitstream's metadata, the description & format.
- * 
+ * Show a form allowing the user to edit a bitstream's metadata, the description
+ * and format.
+ *
  * @author Scott Phillips
  */
 public class EditBitstreamForm extends AbstractDSpaceTransformer
@@ -73,6 +74,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
+    @Override
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
 		pageMeta.addMetadata("title").addContent(T_title);
@@ -83,6 +85,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
         pageMeta.addMetadata("javascript", "static").addContent("static/js/editItemUtil.js");
 	}
 
+    @Override
 	public void addBody(Body body) throws SAXException, WingException,
 	UIException, SQLException, IOException, AuthorizeException
 	{
@@ -124,7 +127,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		// LIST: edit form
 		List edit = div.addList("edit-bitstream-list", List.TYPE_FORM);
         edit.addLabel(T_file_label);
-        edit.addItem().addXref(fileUrl, fileName);
+        edit.addItem(null,"break-all").addXref(fileUrl, fileName);
 
         Text bitstreamName = edit.addItem().addText("bitstreamName");
         bitstreamName.setLabel(T_filename_label);

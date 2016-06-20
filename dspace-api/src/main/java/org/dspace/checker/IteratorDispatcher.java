@@ -36,7 +36,7 @@ public class IteratorDispatcher implements BitstreamDispatcher
     /**
      * Main constructor.
      * 
-     * @param bitstreamIds
+     * @param bitstreams bitstream iterator
      */
     public IteratorDispatcher(Iterator<Bitstream> bitstreams)
     {

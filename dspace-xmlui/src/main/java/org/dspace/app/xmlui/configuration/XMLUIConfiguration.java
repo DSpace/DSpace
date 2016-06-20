@@ -30,13 +30,13 @@ public class XMLUIConfiguration
 {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(XMLUIConfiguration.class);
+    private static final Logger log = Logger.getLogger(XMLUIConfiguration.class);
     
     /** The configured Aspects */
-    private static List<Aspect> aspects = new ArrayList<Aspect>();
+    private static final List<Aspect> aspects = new ArrayList<>();
 
     /** The configured Theme rules */
-    private static List<Theme> themes = new ArrayList<Theme>(); 
+    private static final List<Theme> themes = new ArrayList<>();
 
     /**
      * Initialize the XMLUI Configuration.
@@ -46,10 +46,12 @@ public class XMLUIConfiguration
      * supplied but only the first valid file (exists and readable) will
      * be used.
      * 
-     * @param configPaths Multiple paths configuration paths may be specified
+     * @param configPaths Multiple configuration paths may be specified.
+     * @throws java.io.IOException if file access fails.
+     * @throws org.jdom.JDOMException if file cannot be parsed.
      */
-    public static void loadConfig(String ... configPaths) throws IOException,
-            JDOMException
+    public static void loadConfig(String ... configPaths)
+            throws IOException, JDOMException
     {
         if (configPaths == null || configPaths.length == 0)
         {
