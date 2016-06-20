@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
-import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.storage.AbstractOrganizationStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
@@ -86,29 +86,29 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         }
     }
 
-    static Organization organizationFromTableRow(TableRow row) {
+    static Journal organizationFromTableRow(TableRow row) {
         if(row != null) {
-            Organization organization = new Organization();
-            organization.organizationId = row.getIntColumn(COLUMN_ID);
-            organization.organizationCode = row.getStringColumn(COLUMN_CODE);
-            organization.organizationName = row.getStringColumn(COLUMN_NAME);
-            organization.organizationISSN = row.getStringColumn(COLUMN_ISSN);
-            if (organization.organizationISSN == null) {
-                organization.organizationISSN = "";
+            Journal journal = new Journal();
+            journal.organizationId = row.getIntColumn(COLUMN_ID);
+            journal.organizationCode = row.getStringColumn(COLUMN_CODE);
+            journal.organizationName = row.getStringColumn(COLUMN_NAME);
+            journal.organizationISSN = row.getStringColumn(COLUMN_ISSN);
+            if (journal.organizationISSN == null) {
+                journal.organizationISSN = "";
             }
-            return organization;
+            return journal;
         } else {
             return null;
         }
     }
 
-    public static Organization getOrganizationByCodeOrISSN(Context context, String codeOrISSN) throws SQLException {
+    public static Journal getOrganizationByCodeOrISSN(Context context, String codeOrISSN) throws SQLException {
         String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE UPPER(code) = UPPER(?) OR UPPER(issn) = UPPER(?)";
         TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, codeOrISSN, codeOrISSN);
         return organizationFromTableRow(row);
     }
 
-    public static Organization getOrganizationByConceptID(Context context, int conceptID) throws SQLException {
+    public static Journal getOrganizationByConceptID(Context context, int conceptID) throws SQLException {
         String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE organization_id = ?";
         TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, conceptID);
         return organizationFromTableRow(row);
@@ -190,10 +190,10 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         Context context = null;
         try {
             context = getContext();
-            Organization organization = getOrganizationByCodeOrISSN(context, organizationCode);
-            if (organizationCode.equals(organization.organizationISSN)) {
+            Journal journal = getOrganizationByCodeOrISSN(context, organizationCode);
+            if (organizationCode.equals(journal.organizationISSN)) {
                 // this is an ISSN, replace organizationCode with the organization's code.
-                organizationCode = organization.organizationCode;
+                organizationCode = journal.organizationCode;
             }
             completeContext(context);
         } catch (Exception e) {

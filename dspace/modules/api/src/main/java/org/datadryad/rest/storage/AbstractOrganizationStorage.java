@@ -4,7 +4,7 @@ package org.datadryad.rest.storage;
 
 import java.util.Arrays;
 import java.util.List;
-import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.models.Journal;
 import org.datadryad.api.DryadJournalConcept;
 
 /**
@@ -21,7 +21,7 @@ public abstract class AbstractOrganizationStorage extends AbstractStorage<DryadJ
 
     @Override
     public final void checkObjectPath(StoragePath path) throws StorageException {
-        final List<String> expectedKeyPath = Arrays.asList(Organization.ORGANIZATION_CODE);
+        final List<String> expectedKeyPath = Arrays.asList(Journal.ORGANIZATION_CODE);
         checkPath(path, expectedKeyPath);
     }
 }

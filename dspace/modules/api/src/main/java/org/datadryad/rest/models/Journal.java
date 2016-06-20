@@ -16,17 +16,17 @@ import java.lang.Override;
  */
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Organization {
+public class Journal {
     public static final String ORGANIZATION_CODE = "organizationCode";
     public Integer organizationId;
     public String organizationCode = "";
     public String organizationName = "";
     public String organizationISSN = "";
 
-    public Organization() {
+    public Journal() {
     }
 
-    public Organization(DryadJournalConcept dryadJournalConcept) {
+    public Journal(DryadJournalConcept dryadJournalConcept) {
         organizationId = new Integer(dryadJournalConcept.getConceptID());
         organizationCode = dryadJournalConcept.getJournalID();
         organizationName = dryadJournalConcept.getFullName();
@@ -40,7 +40,7 @@ public class Organization {
     @Override
     public boolean equals(Object o) {
         if (o.getClass().equals(this.getClass())) {
-            Organization org = (Organization) o;
+            Journal org = (Journal) o;
             if (this.organizationCode.equals(org.organizationCode) && this.organizationName.equals(org.organizationName) && this.organizationISSN.equals(org.organizationISSN)) {
                 return true;
             }

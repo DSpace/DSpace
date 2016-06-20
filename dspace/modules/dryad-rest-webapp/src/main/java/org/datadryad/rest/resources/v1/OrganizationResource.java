@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.datadryad.rest.responses.ErrorsResponse;
-import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.storage.AbstractOrganizationStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
@@ -69,7 +69,7 @@ public class OrganizationResource {
     @Path("/{organizationCode}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrganization(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode) {
+    public Response getOrganization(@PathParam(Journal.ORGANIZATION_CODE) String organizationCode) {
         StoragePath path = StoragePath.createOrganizationPath(organizationCode);
         try {
             DryadJournalConcept journalConcept = organizationStorage.findByPath(path);
@@ -167,7 +167,7 @@ public class OrganizationResource {
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteOrganization(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode) {
+    public Response deleteOrganization(@PathParam(Journal.ORGANIZATION_CODE) String organizationCode) {
         StoragePath path = StoragePath.createOrganizationPath(organizationCode);
         try {
             organizationStorage.deleteByPath(path);

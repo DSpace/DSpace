@@ -160,9 +160,9 @@ public class EmailParser {
         manuscript.setStatus(dataForXML.remove(Manuscript.ARTICLE_STATUS).toLowerCase());
         manuscript.setTitle((String) dataForXML.remove(Manuscript.ARTICLE_TITLE));
 
-        manuscript.getOrganization().organizationCode = dataForXML.remove(Manuscript.JOURNAL_CODE);
-        manuscript.getOrganization().organizationName = dataForXML.remove(Manuscript.JOURNAL);
-        manuscript.setJournalConcept(JournalUtils.getJournalConceptByJournalName(manuscript.getOrganization().organizationName));
+        manuscript.getJournal().organizationCode = dataForXML.remove(Manuscript.JOURNAL_CODE);
+        manuscript.getJournal().organizationName = dataForXML.remove(Manuscript.JOURNAL);
+        manuscript.setJournalConcept(JournalUtils.getJournalConceptByJournalName(manuscript.getJournal().organizationName));
 
         CorrespondingAuthor correspondingAuthor = manuscript.getCorrespondingAuthor();
         correspondingAuthor.author = new Author((String) dataForXML.remove(Manuscript.CORRESPONDING_AUTHOR));

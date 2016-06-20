@@ -2,15 +2,8 @@
  */
 package org.datadryad.rest.storage.rdbms;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.ArrayList;
 import org.apache.log4j.Logger;
-import org.datadryad.rest.models.Organization;
-import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.test.ContextUnitTest;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

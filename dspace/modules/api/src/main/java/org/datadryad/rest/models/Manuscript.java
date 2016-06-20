@@ -160,7 +160,7 @@ public class Manuscript {
     private static final Logger log = Logger.getLogger(Manuscript.class);
 
     @JsonIgnore
-    private Organization organization = new Organization();
+    private Journal journal = new Journal();
 
     static {
         journalMetadata = new Properties();
@@ -189,13 +189,13 @@ public class Manuscript {
 
     public Manuscript(DryadJournalConcept journalConcept) {
         this.journalConcept = journalConcept;
-        this.setOrganization(new Organization(journalConcept));
+        this.setJournal(new Journal(journalConcept));
     }
 
     public Manuscript(LegacyManuscript legacyManuscript) {
         DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(legacyManuscript.Journal_Code);
         this.setJournalConcept(journalConcept);
-        this.setOrganization(new Organization(journalConcept));
+        this.setJournal(new Journal(journalConcept));
         // Required fields are: manuscriptID, status, authors (though author identifiers are optional), and title. All other fields are optional.
         this.manuscriptId = legacyManuscript.Submission_Metadata.Manuscript;
         this.title = legacyManuscript.Submission_Metadata.Article_Title;
@@ -253,12 +253,12 @@ public class Manuscript {
         this.manuscriptId = manuscriptId;
     }
 
-    public Organization getOrganization() {
-        return organization;
+    public Journal getJournal() {
+        return journal;
     }
 
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
+    public void setJournal(Journal journal) {
+        this.journal = journal;
     }
 
     public String getAbstract() {

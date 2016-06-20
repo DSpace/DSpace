@@ -8,7 +8,7 @@ import org.dspace.content.authority.Term;
 import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.storage.StorageException;
 import org.dspace.JournalUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -608,13 +608,13 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     }
 
     @JsonIgnore
-    public Organization getOrganizationFromJournalConcept() {
-        Organization organization = new Organization();
-        organization.organizationId = getUnderlyingConcept().getID();
-        organization.organizationCode = getJournalID();
-        organization.organizationName = getFullName();
-        organization.organizationISSN = getISSN();
-        return organization;
+    public Journal getOrganizationFromJournalConcept() {
+        Journal journal = new Journal();
+        journal.organizationId = getUnderlyingConcept().getID();
+        journal.organizationCode = getJournalID();
+        journal.organizationName = getFullName();
+        journal.organizationISSN = getISSN();
+        return journal;
     }
 
     @Override

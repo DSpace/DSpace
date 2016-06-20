@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -44,14 +44,14 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
     public void setUp() {
         super.setUp();
         // Create an organization
-        Organization organization = null;
+        Journal journal = null;
         try {
             DryadJournalConcept journalConcept = new DryadJournalConcept();
             journalConcept.setFullName(TEST_ORGANIZATION_NAME);
             journalConcept.setJournalID(TEST_ORGANIZATION_CODE);
             Context context = new Context();
             JournalUtils.addDryadJournalConcept(context, journalConcept);
-            organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, TEST_ORGANIZATION_CODE);
+            journal = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, TEST_ORGANIZATION_CODE);
             context.complete();
         } catch (Exception ex) {
             fail("Exception setting up test organization: " + ex);
@@ -63,7 +63,7 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
         manuscript.setManuscriptId(TEST_MANUSCRIPT_ID_1);
         try {
             DatabaseManager.deleteByValue(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, ManuscriptDatabaseStorageImpl.COLUMN_MSID, TEST_MANUSCRIPT_ID_1);
-            TableRow manuscriptRow = ManuscriptDatabaseStorageImpl.tableRowFromManuscript(manuscript, organization.organizationId);
+            TableRow manuscriptRow = ManuscriptDatabaseStorageImpl.tableRowFromManuscript(manuscript, journal.organizationId);
             manuscriptRow.setColumn(ManuscriptDatabaseStorageImpl.COLUMN_VERSION, 1);
             manuscriptRow.setColumn(ManuscriptDatabaseStorageImpl.COLUMN_ACTIVE, ManuscriptDatabaseStorageImpl.ACTIVE_TRUE);
             DatabaseManager.insert(context, manuscriptRow);
