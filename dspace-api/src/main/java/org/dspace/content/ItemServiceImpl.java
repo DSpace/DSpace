@@ -619,7 +619,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         item.setOwningCollection(null);
 
         // remove all of our authorization policies
-        authorizeService.removeAllPolicies(context, item, false);
+        authorizeService.removeAllPolicies(context, item);
 
         // Remove any Handle
         handleService.unbindHandle(context, item);
