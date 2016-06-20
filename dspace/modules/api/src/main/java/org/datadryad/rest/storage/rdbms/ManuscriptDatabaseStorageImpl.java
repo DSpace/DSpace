@@ -138,7 +138,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     }
 
     private static Integer getManuscriptInternalId(Context context, String msid, Integer journalConceptID) throws SQLException {
-        String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_MSID + " like ? and " + COLUMN_JOURNAL_ID + " = ? and" + COLUMN_ACTIVE + "= ?";
+        String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_MSID + " like ? and " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ?";
         TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, journalConceptID, ACTIVE_TRUE);
         if(row != null) {
             return row.getIntColumn(COLUMN_ID);
@@ -178,7 +178,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             return null;
         } else {
             Integer journalConceptID = journal.conceptID;
-            String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_MSID + " = ? and " + COLUMN_JOURNAL_ID + " = ? and" + COLUMN_ACTIVE + "= ?";
+            String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_MSID + " = ? and " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ?";
             TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, journalConceptID, ACTIVE_TRUE);
             return row;
         }
@@ -200,7 +200,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             String pubDOI = manuscript.getPublicationDOI();
             if (!"".equals(pubDOI)) {
                 log.debug("Looking for a manuscript with publication DOI like " + pubDOI + " and " + COLUMN_JOURNAL_ID + " like " + journalConceptID);
-                String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and" + COLUMN_ACTIVE + "= ? and" + COLUMN_JSON_DATA + "like '%\"publicationDOI\" : \"" + pubDOI + "\"%'";
+                String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? and " + COLUMN_JSON_DATA + " like '%\"publicationDOI\" : \"" + pubDOI + "\"%'";
                 existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE);
             }
         }
@@ -213,10 +213,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             List<Author> authorList = manuscript.getAuthorList();
             StringBuilder authorString = new StringBuilder();
             for (Author author : authorList) {
-                authorString.append(" and" + COLUMN_JSON_DATA + "like '%\"familyName\" : \"" + StringEscapeUtils.escapeSql(author.familyName) + "\"%' ");
+                authorString.append(" and " + COLUMN_JSON_DATA + " like '%\"familyName\" : \"" + StringEscapeUtils.escapeSql(author.familyName) + "\"%' ");
             }
             if (!"".equals(authorString.toString())) {
-                String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and" + COLUMN_ACTIVE + "= ? " + authorString.toString();
+                String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? " + authorString.toString();
                 TableRowIterator tableRowIterator = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE);
                 if (tableRowIterator != null) {
                     List<TableRow> rows = tableRowIterator.toList();
@@ -242,7 +242,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             return manuscripts;
         } else {
             Integer journalConceptID = journal.conceptID;
-            String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? AND" + COLUMN_ACTIVE + "= ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
+            String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
             TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, limit);
             while(rows.hasNext()) {
                 TableRow row = rows.next();
@@ -262,7 +262,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             Integer journalConceptID = journal.conceptID;
             String searchWords[] = searchParam.split("\\s", 2);
             String queryParam = "%" + searchWords[0] + "%";
-            String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? AND" + COLUMN_ACTIVE + "= ? AND" + COLUMN_JSON_DATA + "like ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
+            String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? and " + COLUMN_JSON_DATA + " like ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
             TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, queryParam, limit);
             while(rows.hasNext()) {
                 TableRow row = rows.next();
@@ -283,10 +283,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                 Integer journalConceptID = journal.conceptID;
                 TableRowIterator rows = null;
                 if (manuscriptID != null) {
-                    String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? AND" + COLUMN_ACTIVE + "= ? AND " + COLUMN_MSID + " like ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
+                    String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? AND " + COLUMN_MSID + " like ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
                     rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, manuscriptID, limit);
                 } else {
-                    String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? AND" + COLUMN_ACTIVE + "= ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
+                    String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
                     rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, limit);
                 }
                 while (rows.hasNext()) {
