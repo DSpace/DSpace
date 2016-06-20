@@ -86,7 +86,7 @@ public class ManuscriptResource {
         if(manuscript.isValid()) {
             try {
                 // Find the journal in database first.
-                manuscript.setJournal(journalStorage.findByPath(journalPath).getOrganizationFromJournalConcept());
+                manuscript.setJournal(journalStorage.findByPath(journalPath).getJournalFromJournalConcept());
                 manuscriptStorage.create(journalPath, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception creating manuscript", ex);
@@ -113,7 +113,7 @@ public class ManuscriptResource {
         if(manuscript.isValid()) {
             try {
                 StoragePath journalPath = StoragePath.createJournalPath(journalCode);
-                manuscript.setJournal(journalStorage.findByPath(journalPath).getOrganizationFromJournalConcept());
+                manuscript.setJournal(journalStorage.findByPath(journalPath).getJournalFromJournalConcept());
                 manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception updating manuscript", ex);
@@ -138,7 +138,7 @@ public class ManuscriptResource {
         if(manuscript.isValid()) {
             try {
                 StoragePath journalPath = StoragePath.createJournalPath(journalCode);
-                manuscript.setJournal(journalStorage.findByPath(journalPath).getOrganizationFromJournalConcept());
+                manuscript.setJournal(journalStorage.findByPath(journalPath).getJournalFromJournalConcept());
                 manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception updating manuscript", ex);

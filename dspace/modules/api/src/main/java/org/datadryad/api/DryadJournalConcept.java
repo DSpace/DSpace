@@ -608,7 +608,7 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     }
 
     @JsonIgnore
-    public Journal getOrganizationFromJournalConcept() {
+    public Journal getJournalFromJournalConcept() {
         Journal journal = new Journal();
         journal.conceptID = getUnderlyingConcept().getID();
         journal.journalCode = getJournalID();
