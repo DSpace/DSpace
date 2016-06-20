@@ -412,10 +412,6 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             item.removeBundle(bundle);
         }
 
-
-        // remove our authorization policies
-        authorizeService.removeAllPolicies(context, bundle);
-
         // Remove ourself
         bundleDAO.delete(context, bundle);
     }

@@ -744,9 +744,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             owningCommunity.getCollections().remove(collection);
         }
 
-        // Remove all authorization policies
-        authorizeService.removeAllPolicies(context, collection);
-
         collectionDAO.delete(context, collection);
     }
 

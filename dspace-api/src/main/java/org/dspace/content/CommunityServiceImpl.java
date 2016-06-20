@@ -527,9 +527,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // Remove the logo
         setLogo(context, community, null);
 
-        // Remove all authorization policies
-        authorizeService.removeAllPolicies(context, community);
-
         // Remove any Handle
         handleService.unbindHandle(context, community);
 

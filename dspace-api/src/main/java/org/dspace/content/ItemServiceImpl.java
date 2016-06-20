@@ -294,17 +294,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogManager.getHeader(context, "remove_bundle", "item_id="
                 + item.getID() + ",bundle_id=" + bundle.getID()));
 
-
-        item.removeBundle(bundle);
-        bundle.removeItem(item);
-
-
         context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
                 Constants.BUNDLE, bundle.getID(), bundle.getName(), getIdentifiers(context, item)));
 
-        if (CollectionUtils.isEmpty(bundle.getItems())) {
             bundleService.delete(context, bundle);
-        }
     }
 
     @Override
@@ -617,9 +610,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         //Only clear collections after we have removed everything else from the item
         item.getCollections().clear();
         item.setOwningCollection(null);
-
-        // remove all of our authorization policies
-        authorizeService.removeAllPolicies(context, item);
 
         // Remove any Handle
         handleService.unbindHandle(context, item);
