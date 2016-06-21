@@ -1,4 +1,4 @@
-select name,count(item_id) from collection2item,collection WHERE collection2item.collection_id = collection.collection_id GROUP BY name ORDER BY name;
+select m.text_value as name,count(c2i.item_id) from collection2item c2i,collection c, metadatavalue m WHERE c2i.collection_id = c.collection_id AND c.collection_id = m.resource_id AND m.resource_type_id=3 AND m.metadata_field_id=64 GROUP BY name ORDER BY name;
 
 select email,firstname,lastname,count(item_id) from item,eperson WHERE eperson_id=submitter_id and in_archive GROUP BY email,firstname,lastname ORDER BY lastname;
 

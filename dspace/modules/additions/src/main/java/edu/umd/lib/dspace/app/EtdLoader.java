@@ -232,8 +232,6 @@ public class EtdLoader
                         + strEPerson);
             }
 
-            context.complete();
-
             // Open the zipfile
             ZipFile zip = new ZipFile(new File(strZipFile), ZipFile.OPEN_READ);
 
@@ -253,6 +251,8 @@ public class EtdLoader
                     loadItem(zip, strItem, (List) map.get(strItem));
                 }
             }
+
+            context.complete();
         }
 
         catch (Exception e)
