@@ -103,6 +103,10 @@
                     <groupId>xml-apis</groupId>
                     <artifactId>xml-apis</artifactId>
                 </exclusion>
+                <exclusion>
+                     <groupId>org.apache.commons</groupId>
+                     <artifactId>commons-lang3</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -150,6 +154,10 @@
                 <exclusion>
                     <groupId>org.javassist</groupId>
                     <artifactId>javassist</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.commons</groupId>
+                     <artifactId>commons-lang3</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
