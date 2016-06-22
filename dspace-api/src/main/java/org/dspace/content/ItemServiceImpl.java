@@ -614,11 +614,15 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Remove bundles
         removeAllBundles(context, item);
 
-        // Remove any Handle
-        handleService.unbindHandle(context, item);
-
         // remove version attached to the item
         removeVersion(context, item);
+
+        //Only clear collections after we have removed everything else from the item
+        item.getCollections().clear();
+        item.setOwningCollection(null);
+
+        // Remove any Handle
+        handleService.unbindHandle(context, item);
 
         // Finally remove item row
         itemDAO.delete(context, item);

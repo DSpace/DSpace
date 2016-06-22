@@ -70,8 +70,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
     @JoinColumn(name = "submitter_id")
     private EPerson submitter = null;
 
-
-    /** The bundles in this item - kept in sync with DB */
+    /** The Collections which contain this Item. */
     @ManyToMany(fetch = FetchType.LAZY, cascade={CascadeType.PERSIST})
     @JoinTable(
             name = "collection2item",
@@ -80,6 +79,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
     )
     private final List<Collection> collections = new ArrayList<>();
 
+    /** The bundles in this item - kept in sync with DB. */
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "items")
     private final List<Bundle> bundles = new ArrayList<>();
 

@@ -539,6 +539,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         }
     }
 
+    /**
+     * Persist to storage any changes in an object.
+     *
+     * @param context Session context.
+     * @param dso Object to be updated in storage.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
     @Override
     public void update(Context context, T dso) throws SQLException, AuthorizeException
     {

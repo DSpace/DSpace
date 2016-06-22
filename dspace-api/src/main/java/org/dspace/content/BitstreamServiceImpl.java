@@ -41,7 +41,7 @@ import java.util.UUID;
 public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> implements BitstreamService {
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(BitstreamServiceImpl.class);
+    private static final Logger log = Logger.getLogger(BitstreamServiceImpl.class);
 
 
     @Autowired(required = true)
@@ -220,7 +220,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         log.info(LogManager.getHeader(context, "update_bitstream",
                 "bitstream_id=" + bitstream.getID()));
+
         super.update(context, bitstream);
+
         if (bitstream.isModified())
         {
             context.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null, getIdentifiers(context, bitstream)));
@@ -236,29 +238,38 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         bitstreamDAO.save(context, bitstream);
     }
 
+    /**
+     * Mark a Bitstream "deleted".  It will be removed later by {@link #expunge}.
+     *
+     * @param context Session context.
+     * @param bitstream The Bitstream to mark.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
     @Override
     public void delete(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
 
         // changed to a check on delete
         // Check authorisation
         authorizeService.authorizeAction(context, bitstream, Constants.DELETE);
+
         log.info(LogManager.getHeader(context, "delete_bitstream",
                 "bitstream_id=" + bitstream.getID()));
 
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
                 String.valueOf(bitstream.getSequenceID()), getIdentifiers(context, bitstream)));
 
-        bitstream.getBundles().clear();
-
-
-        // Remove policies
-        authorizeService.removeAllPolicies(context, bitstream);
-
-        // Remove bitstream itself
+        // Mark bitstream deleted.
         bitstream.setDeleted(true);
         update(context, bitstream);
-        // Remove policies from the file, we do this at the end since the methods above still require write rights.
-        authorizeService.removeAllPolicies(context, bitstream);
+
+        //Remove our bitstream from all our bundles
+        final List<Bundle> bundles = bitstream.getBundles();
+        for (Bundle bundle : bundles) {
+            bundle.getBitstreams().remove(bitstream);
+        }
+        //Remove all bundles from the bitstream object, clearing the connection in 2 ways
+        bundles.clear();
     }
 
     @Override
@@ -295,12 +306,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                 return null;
             }
         }
-        else
-        if(bitstream.getCommunity() != null)
+        else if(bitstream.getCommunity() != null)
         {
             return bitstream.getCommunity();
-        }else
-        if(bitstream.getCollection() != null)
+        }else if(bitstream.getCollection() != null)
         {
             return bitstream.getCollection();
         }

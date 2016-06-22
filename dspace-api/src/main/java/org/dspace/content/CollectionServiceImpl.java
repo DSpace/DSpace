@@ -551,17 +551,18 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void removeItem(Context context, Collection collection, Item item) throws SQLException, AuthorizeException, IOException {
-                // Check authorisation
+        // Check authorisation
         authorizeService.authorizeAction(context, collection, Constants.REMOVE);
 
-        //Remove the item from the collection
-        item.removeCollection(collection);
-
         //Check if we orphaned our poor item
-        if (item.getCollections().isEmpty())
+        if (item.getCollections().size() == 1)
         {
             // Orphan; delete it
             itemService.delete(context, item);
+        } else {
+            //Remove the item from the collection if we have multiple collections
+            item.removeCollection(collection);
+
         }
 
         context.addEvent(new Event(Event.REMOVE, Constants.COLLECTION,
@@ -678,9 +679,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Delete bitstream logo
         setLogo(context, collection, null);
 
-        // Remove all authorization policies
-        authorizeService.removeAllPolicies(context, collection);
-
         Iterator<WorkspaceItem> workspaceItems = workspaceItemService.findByCollection(context, collection).iterator();
         while (workspaceItems.hasNext()) {
             WorkspaceItem workspaceItem = workspaceItems.next();
@@ -745,6 +743,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             owningCommunities.remove();
             owningCommunity.getCollections().remove(collection);
         }
+
+        // Remove all authorization policies
+        authorizeService.removeAllPolicies(context, collection);
 
         collectionDAO.delete(context, collection);
     }
