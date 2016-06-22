@@ -931,7 +931,7 @@ public class ItemsResource extends Resource
             while (itemIterator.hasNext())
             {
                 org.dspace.content.Item dspaceItem = itemIterator.next();
-                Item item = new Item(dspaceItem, servletContext, "", context);
+                Item item = new Item(dspaceItem, servletContext, expand, context);
                 writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                         request, context);
                 items.add(item);
