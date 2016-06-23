@@ -103,6 +103,11 @@
 
     <dc-type>
         <schema>journal</schema>
+        <element>hasJournalPage</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
         <element>website</element>
     </dc-type>
 
