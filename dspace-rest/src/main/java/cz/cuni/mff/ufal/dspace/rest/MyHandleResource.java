@@ -20,12 +20,12 @@ import java.util.Date;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.isBlank;
 
 @Disable
 @Path("/services")
 public class MyHandleResource extends Resource {
     private static Logger log = Logger.getLogger(MyHandleResource.class);
+    private static Logger logHandleHistory = Logger.getLogger("HandleHistory");
 
     public enum ORDER {ASC, asc, DESC, desc}
 
@@ -58,7 +58,10 @@ public class MyHandleResource extends Resource {
             for(TableRow row : rows){
                 String magicURL = row.getStringColumn("url");
                 String hdl = row.getStringColumn("handle");
-                result.add(new Handle(hdl, magicURL));
+                Handle handle = new Handle(hdl, magicURL);
+                //don't show the token on browse
+                handle.token = null;
+                result.add(handle);
             }
             context.complete();
         } catch (SQLException e) {
@@ -77,20 +80,48 @@ public class MyHandleResource extends Resource {
             try {
                 context = new org.dspace.core.Context();
                 String submitdate = new DCDate(new Date()).toString();
+                handle.submitdate = submitdate;
                 String subprefix = (isNotBlank(handle.subprefix)) ? handle.subprefix + "-" : "";
-                String magicURL = "";
-                for (String part : new String[]{handle.title, HandlePlugin.repositoryName, submitdate, handle.reportemail, handle.datasetName, handle.datasetVersion, handle.query, handle.url}){
-                    if(isBlank(part)){
-                        //optional dataset etc...
-                        part = "";
-                    }
-                    magicURL += HandlePlugin.magicBean + part;
-                }
+                String magicURL = handle.getMagicUrl();
                 String hdl = createHandle(subprefix, magicURL, context);
                 context.complete();
                 return new Handle(hdl, magicURL);
             }catch (SQLException e){
                 processException("Could not create handle, SQLException. Message: " + e.getMessage(), context);
+            }
+        }
+        throw new WebApplicationException(Response.Status.NOT_FOUND);
+    }
+
+    @PUT
+    @Path("/handles")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Handle updateHandle(Handle updatedHandle){
+        org.dspace.core.Context context = null;
+        if(isNotBlank(updatedHandle.url) && !updatedHandle.url.contains(HandlePlugin.magicBean)
+                && isNotBlank(updatedHandle.handle) && isNotBlank(updatedHandle.token)){
+            try {
+                context = new org.dspace.core.Context();
+                String query = "select * from handle where handle = ?  and " +
+                        "url like ?";
+                String[] params = new String[]{updatedHandle.handle, "%" + updatedHandle.token.replace("!", "!!").replace("%", "!%").replace("_", "!_").replace("[", "![") + "%"};
+                TableRowIterator tri = DatabaseManager.query(context,query, params);
+                List<TableRow> rows = tri.toList();
+                if(rows.size() == 1){
+                    TableRow row = rows.get(0);
+                    String magicURL = row.getStringColumn("url");
+                    String hdl = row.getStringColumn("handle");
+                    Handle oldHandle = new Handle(hdl, magicURL);
+                    logHandleHistory.info(String.format("Handle [%s] changed url from \"%s\" to \"%s\".", hdl, oldHandle.url, updatedHandle.url));
+                    //do the update
+                    oldHandle.url = updatedHandle.url;
+                    String newMagicUrl = oldHandle.getMagicUrl();
+                    row.setColumn("url", newMagicUrl);
+                    DatabaseManager.update(context, row);
+                    return oldHandle;
+                }
+            }catch (SQLException e){
+                processException("Could not update handle, SQLException. Message: " + e.getMessage(), context);
             }
         }
         throw new WebApplicationException(Response.Status.NOT_FOUND);
