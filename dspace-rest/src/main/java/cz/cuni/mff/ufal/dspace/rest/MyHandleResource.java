@@ -104,7 +104,7 @@ public class MyHandleResource extends Resource {
                 context = new org.dspace.core.Context();
                 String query = "select * from handle where handle = ?  and " +
                         "url like ?";
-                String[] params = new String[]{updatedHandle.handle.replace(Handle.HANDLE_URL,""), "%" + updatedHandle.token.replace("!", "!!").replace("%", "!%").replace("_", "!_").replace("[", "![") + "%"};
+                String[] params = new String[]{updatedHandle.handle, "%" + updatedHandle.token.replace("!", "!!").replace("%", "!%").replace("_", "!_").replace("[", "![") + "%"};
                 TableRowIterator tri = DatabaseManager.query(context,query, params);
                 List<TableRow> rows = tri.toList();
                 if(rows.size() == 1){

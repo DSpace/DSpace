@@ -106,4 +106,8 @@ public class Handle {
     public String getHandle() {
         return HANDLE_URL + handle;
     }
+
+    public void setHandle(String handle){
+        this.handle = handle.replace(Handle.HANDLE_URL,"");
+    }
 }
