@@ -19,6 +19,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 @XmlAccessorType(XmlAccessType.NONE)
 public class Handle {
 
+    public static final String HANDLE_URL = "http://hdl.handle.net/";
     public String handle;
     @XmlElement
     public String url;
@@ -103,6 +104,6 @@ public class Handle {
 
     @XmlElement
     public String getHandle() {
-        return "http://hdl.handle.net/" + handle;
+        return HANDLE_URL + handle;
     }
 }
