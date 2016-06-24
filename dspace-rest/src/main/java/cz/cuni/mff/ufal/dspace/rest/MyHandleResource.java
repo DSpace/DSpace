@@ -121,7 +121,7 @@ public class MyHandleResource extends Resource {
                     row.setTable("handle");
                     DatabaseManager.update(context, row);
                     context.complete();
-                    return oldHandle;
+                    return new Handle(oldHandle.handle,magicURL);
                 }
             }catch (SQLException e){
                 processException("Could not update handle, SQLException. Message: " + e.getMessage(), context);
