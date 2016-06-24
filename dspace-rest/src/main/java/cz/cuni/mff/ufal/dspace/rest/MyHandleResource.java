@@ -117,7 +117,10 @@ public class MyHandleResource extends Resource {
                     oldHandle.url = updatedHandle.url;
                     String newMagicUrl = oldHandle.getMagicUrl();
                     row.setColumn("url", newMagicUrl);
+                    //No idea why table is null at this point
+                    row.setTable("handle");
                     DatabaseManager.update(context, row);
+                    context.complete();
                     return oldHandle;
                 }
             }catch (SQLException e){
