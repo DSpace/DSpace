@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.util.InetAddressUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -94,7 +95,6 @@ public class SolrLogger
    	    }
    	    public String text()   { return text; }
    	}
-
 
     static
     {
@@ -334,32 +334,61 @@ public class SolrLogger
 		    doc1.addField("isBot",isSpiderBot);
             // Save the location information if valid, save the event without
             // location information if not valid
-            if(locationService != null)
-            {
-                Location location = locationService.getLocation(ip);
-                if (location != null
-                        && !("--".equals(location.countryCode)
-                        && location.latitude == -180 && location.longitude == -180))
-                {
-                    try
-                    {
-                        doc1.addField("continent", LocationUtils
-                                .getContinentCode(location.countryCode));
-                    }
-                    catch (Exception e)
-                    {
-                        System.out
-                                .println("COUNTRY ERROR: " + location.countryCode);
-                    }
-                    doc1.addField("countryCode", location.countryCode);
-                    doc1.addField("city", location.city);
-                    doc1.addField("latitude", location.latitude);
-                    doc1.addField("longitude", location.longitude);
-                    
-
-
-                }
-            }
+			Location location = null;
+			LookupService service = null;
+			if(InetAddressUtils.isIPv6Address(ip))
+			{
+				//create an auxilar location service if ipv6
+				String dbfilev6 = ConfigurationManager.getProperty("usage-statistics", "dbfilev6");
+				if (dbfilev6 != null)
+				{
+					try
+					{
+						service = new LookupService(dbfilev6,
+								LookupService.GEOIP_STANDARD);
+					}
+					catch (FileNotFoundException fe)
+					{
+						log.error("The GeoLite Database file is missing (" + dbfilev6 + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
+					}
+					catch (IOException e)
+					{
+						log.error("Unable to load GeoLite Database file (" + dbfilev6 + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
+					}
+				}
+				else
+				{
+					log.error("The required 'dbfilev6' configuration is missing in solr-statistics.cfg!");
+				}
+				location = service.getLocationV6(ip);;
+			}
+			else
+			{
+				log.info("locationService: " + locationService);
+				if(locationService != null)
+				{
+					location = locationService.getLocation(ip);
+				}
+			}
+			if (location != null
+					&& !("--".equals(location.countryCode)
+					&& location.latitude == -180 && location.longitude == -180))
+			{
+				try
+				{
+					doc1.addField("continent", LocationUtils
+							.getContinentCode(location.countryCode));
+				}
+				catch (Exception e)
+				{
+					System.out
+							.println("COUNTRY ERROR: " + location.countryCode);
+				}
+				doc1.addField("countryCode", location.countryCode);
+				doc1.addField("city", location.city);
+				doc1.addField("latitude", location.latitude);
+				doc1.addField("longitude", location.longitude);
+			}
         }
 
         if(dspaceObject != null){
@@ -389,17 +418,17 @@ public class SolrLogger
         // Save our basic info that we already have
 
 
-            if (isUseProxies() && xforwardedfor != null) {
-                /* This header is a comma delimited list */
-                for (String xfip : xforwardedfor.split(",")) {
-                    /* proxy itself will sometime populate this header with the same value in
-                    remote address. ordering in spec is vague, we'll just take the last
-                    not equal to the proxy
-                    */
-                    if (!xforwardedfor.contains(ip)) {
-                        ip = xfip.trim();
-                    }
-                }
+		if (isUseProxies() && xforwardedfor != null) {
+			/* This header is a comma delimited list */
+			for (String xfip : xforwardedfor.split(",")) {
+				/* proxy itself will sometime populate this header with the same value in
+				remote address. ordering in spec is vague, we'll just take the last
+				not equal to the proxy
+				*/
+				if (!xforwardedfor.contains(ip)) {
+					ip = xfip.trim();
+				}
+			}
 
             doc1.addField("ip", ip);
 
@@ -420,32 +449,61 @@ public class SolrLogger
 		    doc1.addField("isBot",isSpiderBot);
             // Save the location information if valid, save the event without
             // location information if not valid
-            if(locationService != null)
-            {
-                Location location = locationService.getLocation(ip);
-                if (location != null
-                        && !("--".equals(location.countryCode)
-                        && location.latitude == -180 && location.longitude == -180))
-                {
-                    try
-                    {
-                        doc1.addField("continent", LocationUtils
-                                .getContinentCode(location.countryCode));
-                    }
-                    catch (Exception e)
-                    {
-                        System.out
-                                .println("COUNTRY ERROR: " + location.countryCode);
-                    }
-                    doc1.addField("countryCode", location.countryCode);
-                    doc1.addField("city", location.city);
-                    doc1.addField("latitude", location.latitude);
-                    doc1.addField("longitude", location.longitude);
-                    
-
-
-                }
-            }
+			Location location = null;
+			LookupService service = null;
+			if(InetAddressUtils.isIPv6Address(ip))
+			{
+				//create an auxilar location service if ipv6
+				String dbfilev6 = ConfigurationManager.getProperty("usage-statistics", "dbfilev6");
+				if (dbfilev6 != null)
+				{
+					try
+					{
+						service = new LookupService(dbfilev6,
+								LookupService.GEOIP_STANDARD);
+					}
+					catch (FileNotFoundException fe)
+					{
+						log.error("The GeoLite Database file is missing (" + dbfilev6 + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
+					}
+					catch (IOException e)
+					{
+						log.error("Unable to load GeoLite Database file (" + dbfilev6 + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
+					}
+				}
+				else
+				{
+					log.error("The required 'dbfilev6' configuration is missing in solr-statistics.cfg!");
+				}
+				location = service.getLocationV6(ip);;
+			}
+			else
+			{
+				log.info("locationService: " + locationService);
+				if(locationService != null)
+				{
+					location = locationService.getLocation(ip);
+				}
+			}
+			if (location != null
+					&& !("--".equals(location.countryCode)
+					&& location.latitude == -180 && location.longitude == -180))
+			{
+				try
+				{
+					doc1.addField("continent", LocationUtils
+							.getContinentCode(location.countryCode));
+				}
+				catch (Exception e)
+				{
+					System.out
+							.println("COUNTRY ERROR: " + location.countryCode);
+				}
+				doc1.addField("countryCode", location.countryCode);
+				doc1.addField("city", location.city);
+				doc1.addField("latitude", location.latitude);
+				doc1.addField("longitude", location.longitude);
+			}
         }
 
         if(dspaceObject != null){
