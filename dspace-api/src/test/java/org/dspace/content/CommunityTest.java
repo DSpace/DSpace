@@ -1128,12 +1128,6 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         System.out.println("testDeleteHierarchyAuth");
         new NonStrictExpectations(authorizeService.getClass(), AuthorizeUtil.class)
         {{
-            // Allow current Community ADD perms (to create content to be deleted)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                    Constants.ADD, true); result = null;
-            // Allow *parent* Community ADD perms (to create content to be deleted)
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                    Constants.ADD, true); result = true;
             // Allow current Community DELETE perms (needed to delete a community)
             authorizeService.authorizeAction((Context) any, (Community) any,
                     Constants.DELETE, true); result = null;
@@ -1146,6 +1140,9 @@ public class CommunityTest extends AbstractDSpaceObjectTest
             // Allow current Collection DELETE perms (needed to delete a Collection)
             authorizeService.authorizeAction((Context) any, (Collection) any,
                     Constants.DELETE, true); result = null;
+            // Allow current Item WRITE perms (needed to remove identifiers from an Item prior to deletion)
+            authorizeService.authorizeAction((Context) any, (Item) any,
+                    Constants.WRITE, true); result = null;
         }};
 
         // Create a dummy Community hierarchy to test delete with
@@ -1158,12 +1155,14 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         Community grandchild = communityService.createSubcommunity(context, child);
         Collection childCol = collectionService.create(context, child);
         Collection grandchildCol = collectionService.create(context, grandchild);
+        // Create two separate items
         WorkspaceItem wsItem = workspaceItemService.create(context, childCol, false);
         Item item = installItemService.installItem(context, wsItem);
         wsItem = workspaceItemService.create(context, childCol, false);
         item = installItemService.installItem(context, wsItem);
 
-        // Commit these changes to our DB
+        // Done creating the objects. Turn auth system back on
+        context.restoreAuthSystemState();
 
         // Now, test hierarchical deletion
         UUID parentId = parent.getID();
@@ -1175,9 +1174,6 @@ public class CommunityTest extends AbstractDSpaceObjectTest
 
         // Delete the parent of this entire hierarchy
         communityService.delete(context, parent);
-
-        // Done altering the objects.
-        context.restoreAuthSystemState();
 
         // Test that everything created here is deleted.
         assertThat("top-level Community not deleted",
