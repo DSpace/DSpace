@@ -391,16 +391,6 @@ public class DCDateTest
                 equalTo("14-Apr-2010"));
     }
 
-    /**
-     * Test of getCurrent method, of class DCDate.
-     */
-    @Test
-    public void testGetCurrent()
-    {
-        assertTrue("testGetCurrent 0", DateUtils.isSameDay(DCDate.getCurrent().toDate(), new Date()));
-    }
-
-
 
     /**
      * Test of getMonthName method, of class DCDate.
