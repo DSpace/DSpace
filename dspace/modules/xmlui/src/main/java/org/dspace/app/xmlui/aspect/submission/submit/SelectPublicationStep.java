@@ -489,20 +489,15 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
     private void generateFundingInfo(List form, Request request) throws WingException {
-        try{
-            Item fundingInfo = form.addItem("jquery_radios","");
-            fundingInfo.addContent(T_funding_head);
-            fundingInfo.addContent(T_funding_help);
+        Item fundingInfo = form.addItem("jquery_radios","");
+        fundingInfo.addContent(T_funding_head);
+        fundingInfo.addContent(T_funding_help);
 
-            Radio fundingStatus = fundingInfo.addRadio("funding_status");
-            fundingStatus.addOption("1", T_funding_status_yes);
-            fundingStatus.addOption("0", T_funding_status_no);
-            Item grantInfo = form.addItem("grant-info","grant-info");
-            Text grantInfoText = grantInfo.addText("grant-info");
-            grantInfoText.setHelp(T_funding_desc1);
-
-        }catch (Exception e)
-        {}
-
+        Radio fundingStatus = fundingInfo.addRadio("funding_status");
+        fundingStatus.addOption("1", T_funding_status_yes);
+        fundingStatus.addOption("0", T_funding_status_no);
+        Item grantInfo = form.addItem("grant-info","grant-info");
+        Text grantInfoText = grantInfo.addText("grant-info");
+        grantInfoText.setHelp(T_funding_desc1);
     }
 }

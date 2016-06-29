@@ -76,6 +76,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             return ERROR_SELECT_JOURNAL;
         }
 
+        String grantInfo = request.getParameter("grant-info");
+        if (grantInfo != null) {
+            // need to validate grant info here
+            item.addMetadata("dryad.fundingEntity", null, grantInfo, null, 0);
+            item.update();
+        }
+
         EventLogger.log(context, "submission-select-publication", "status=complete");
         return STATUS_COMPLETE;
     }
@@ -215,7 +222,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
         DryadJournalConcept journalConcept = null;
 
-        if (journalConcept==null && journal != null && journal.length() > 0) {
+        if (journal != null && journal.length() > 0) {
             journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
         }
 
