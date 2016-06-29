@@ -46,8 +46,7 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
     private static final Logger log = Logger.getLogger(HandleResolverReader.class);
     
     public static final String CONTENTTYPE = "application/json; charset=utf-8";
-    
-    private Request req;
+
     private Response resp;
     private String action;
     private String handle;
@@ -58,7 +57,6 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
             Parameters par) throws ProcessingException, SAXException,
             IOException
     {
-        this.req = ObjectModelHelper.getRequest(objectModel);
         this.resp = ObjectModelHelper.getResponse(objectModel);
         this.action = par.getParameter("action", "listprefixes");
         this.handle = par.getParameter("handle", null);
@@ -146,13 +144,13 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(jsonString.getBytes("UTF-8"));
             IOUtils.copy(inputStream, out);
             out.flush();
+            out.close();
         } catch (Exception e) {
             log.error("Error: ", e);
         }
     }
     
     public void recycle() {
-        this.req = null;
         this.resp = null;
         this.action = null;
         this.handle = null;

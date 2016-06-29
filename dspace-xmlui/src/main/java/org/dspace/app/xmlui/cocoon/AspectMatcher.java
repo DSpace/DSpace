@@ -55,14 +55,16 @@ public class AspectMatcher extends AbstractLogEnabled implements Matcher
 
         String[] parts = uri.split("/");
 
-        int aspectID;
+        int aspectID = 0;
         try
         {
-            aspectID = Integer.valueOf(parts[0]);
+            if (parts[0].matches("\\d+")) {
+                aspectID = Integer.valueOf(parts[0]);
+            }
         }
         catch (NumberFormatException nfe)
         {
-            aspectID = 0;
+            // ignore
         }
 
         
