@@ -415,7 +415,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest
      * Test of delete method, of class Bitstream.
      */
     @Test
-    public void testDelete() throws IOException, SQLException, AuthorizeException
+    public void testDeleteAndExpunge() throws IOException, SQLException, AuthorizeException
     {
         new NonStrictExpectations(authorizeService.getClass())
         {{
@@ -430,10 +430,16 @@ public class BitstreamTest extends AbstractDSpaceObjectTest
         // tests is unpredictable we don't want to delete the global bitstream
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream delBS = bitstreamService.create(context, new FileInputStream(f));
-        
+        UUID bitstreamId = delBS.getID();
+
+        // Test that delete will flag the bitstream as deleted
         assertFalse("testIsDeleted 0", delBS.isDeleted());
         bitstreamService.delete(context, delBS);
         assertTrue("testDelete 0", delBS.isDeleted());
+
+        // Now test expunge actually removes the bitstream
+        bitstreamService.expunge(context, delBS);
+        assertThat("testExpunge 0", bitstreamService.find(context, bitstreamId), nullValue());
     }
 
     /**
