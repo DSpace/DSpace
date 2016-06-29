@@ -7,12 +7,8 @@ import org.dspace.JournalUtils;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
-import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.Concept;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.usagelogging.EventLogger;
@@ -45,6 +41,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public static final int ERROR_PUBMED_DOI = 8;
     public static final int ERROR_GENERIC = 9;
     public static final int ERROR_PUBMED_NAME = 11;
+    public static final int ERROR_INVALID_GRANT = 12;
 
     public static final int DISPLAY_MANUSCRIPT_NUMBER = 5;
     public static final int DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE = 6;
@@ -79,6 +76,9 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         String grantInfo = request.getParameter("grant-info");
         if (grantInfo != null) {
             // need to validate grant info here
+            if (!JournalUtils.isValidNSFGrantNumber(grantInfo)) {
+                return ERROR_INVALID_GRANT;
+            }
             item.addMetadata("dryad.fundingEntity", null, grantInfo, null, 0);
             item.update();
         }

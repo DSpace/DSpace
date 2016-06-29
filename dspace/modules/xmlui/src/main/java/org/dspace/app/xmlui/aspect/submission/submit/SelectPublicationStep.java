@@ -87,6 +87,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_funding_desc2 = message("xmlui.submit.select.funding.desc2");
     private static final Message T_funding_status_yes = message("xmlui_submit_funding_status_yes");
     private static final Message T_funding_status_no = message("xmlui_submit_funding_status_no");
+    private static final Message T_funding_error = message("xmlui.submit.select.funding.error");
 
     private static final Message T_select_yes = message("xmlui.Submission.submit.ReviewStep.yes");
     private static final Message T_select_no = message("xmlui.Submission.submit.ReviewStep.no");
@@ -499,5 +500,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Item grantInfo = form.addItem("grant-info","grant-info");
         Text grantInfoText = grantInfo.addText("grant-info");
         grantInfoText.setHelp(T_funding_desc1);
+        if (this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_GRANT) {
+            grantInfoText.addError(T_funding_error);
+        }
     }
 }
