@@ -294,17 +294,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogManager.getHeader(context, "remove_bundle", "item_id="
                 + item.getID() + ",bundle_id=" + bundle.getID()));
 
-
-        item.removeBundle(bundle);
-        bundle.removeItem(item);
-
-
         context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
                 Constants.BUNDLE, bundle.getID(), bundle.getName(), getIdentifiers(context, item)));
 
-        if (CollectionUtils.isEmpty(bundle.getItems())) {
             bundleService.delete(context, bundle);
-        }
     }
 
     @Override
@@ -582,18 +575,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public void delete(Context context, Item item) throws SQLException, AuthorizeException, IOException {
         authorizeService.authorizeAction(context, item, Constants.DELETE);
-
-        // Also delete the item if it appears in a harvested collection.
-        HarvestedItem hi = harvestedItemService.find(context, item);
-
-        if(hi!=null)
-        {
-            harvestedItemService.delete(context, hi);
-        }
-        
-        item.getCollections().clear();
-        item.setOwningCollection(null);
-        rawDelete(context,item);
+        rawDelete(context,  item);
     }
 
     @Override
@@ -614,11 +596,24 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Remove bundles
         removeAllBundles(context, item);
 
+        // remove version attached to the item
+        removeVersion(context, item);
+
+        // Also delete the item if it appears in a harvested collection.
+        HarvestedItem hi = harvestedItemService.find(context, item);
+
+        if(hi!=null)
+        {
+            harvestedItemService.delete(context, hi);
+        }
+
+        //Only clear collections after we have removed everything else from the item
+        item.getCollections().clear();
+        item.setOwningCollection(null);
+
         // Remove any Handle
         handleService.unbindHandle(context, item);
 
-        // remove version attached to the item
-        removeVersion(context, item);
 
         // Finally remove item row
         itemDAO.delete(context, item);
