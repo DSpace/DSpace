@@ -131,15 +131,14 @@ public class JSPStartSubmissionLookupStep extends JSPStep
         collection_id = UIUtil.getUUIDParameter(request, "collection");
     }
 
-        UUID collectionID = null;
-        if(!DEFAULT_COLLECTION_ID.equals(request.getParameter("collectionid"))) {
-            collectionID = UIUtil.getUUIDParameter(request, "collectionid");
+        if(collection_id == null && !DEFAULT_COLLECTION_ID.equals(request.getParameter("collectionid"))) {
+            collection_id = UIUtil.getUUIDParameter(request, "collectionid");
         }
         Collection col = null;
 
-        if (collectionID != null)
+        if (collection_id != null)
         {
-            col = collectionService.find(context, collectionID);
+            col = collectionService.find(context, collection_id);
         }
 
         // if we already have a valid collection, then we can forward directly
@@ -147,7 +146,7 @@ public class JSPStartSubmissionLookupStep extends JSPStep
         if (col != null)
         {
             log.debug("Select Collection page skipped, since a Collection ID was already found.  Collection ID="
-                    + collectionID);
+                    + collection_id);
         }
         else
         {
@@ -178,7 +177,7 @@ public class JSPStartSubmissionLookupStep extends JSPStep
             else {
                 request.setAttribute("collection_id", DEFAULT_COLLECTION_ID);
             }
-            request.setAttribute("collectionID", collectionID);
+            request.setAttribute("collectionID", collection_id);
 
             Map<String, List<String>> identifiers2providers = slService
                     .getProvidersIdentifiersMap();
