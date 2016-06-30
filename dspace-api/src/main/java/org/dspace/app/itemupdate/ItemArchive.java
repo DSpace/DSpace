@@ -11,6 +11,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -100,6 +101,23 @@ public class ItemArchive {
         {
             is = new FileInputStream(new File(dir, DUBLIN_CORE_XML));
             itarch.dtomList = MetadataUtilities.loadDublinCore(getDocumentBuilder(), is);
+            
+            //The code to search for local schema files was copied from org.dspace.app.itemimport.ItemImportServiceImpl.java
+            File file[] = dir.listFiles(
+                new FilenameFilter()
+                {
+                    @Override
+                    public boolean accept(File dir, String n)
+                    {
+                        return n.startsWith("metadata_");
+                    }
+                }
+            );
+            for (int i = 0; i < file.length; i++)
+            {
+                is = new FileInputStream(file[i]);
+                itarch.dtomList.addAll(MetadataUtilities.loadDublinCore(getDocumentBuilder(), is));
+            }
         }
         finally
         {
