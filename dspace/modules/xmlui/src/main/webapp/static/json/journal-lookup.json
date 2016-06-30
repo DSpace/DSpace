@@ -13,7 +13,7 @@
         "title" : "American Naturalist, The",
         "sponsor" : "American Society of Naturalists",
         "integrated" : "Y",
-        "issn" : "0003-0147",
+        "issn" : "",
         "embargo" : "Y",
         "submission" : "A",
         "hidden" : "N"
@@ -68,13 +68,13 @@
         "title" : "Biology Open",
         "integrated" : "Y",
         "hidden" : "N",
-        "issn" : "2046-6390",
+        "issn" : "",
         "embargo" : "N",
         "submission" : "R"
      },
      {
         "integrated" : "Y",
-        "issn" : "1313-2644",
+        "issn" : "",
         "embargo" : "Y",
         "submission" : "A",
         "hidden" : "N",
@@ -85,7 +85,7 @@
         "sponsor" : "$120",
         "title" : "Bioscience",
         "hidden" : "N",
-        "issn" : "0006-3568",
+        "issn" : "",
         "embargo" : "Y",
         "submission" : "R",
         "integrated" : "Y"
@@ -127,7 +127,7 @@
         "title" : "BMJ Open"
      },
      {
-        "issn" : "2049-4394",
+        "issn" : "",
         "submission" : "A",
         "embargo" : "Y",
         "hidden" : "Y",
@@ -139,14 +139,14 @@
         "integrated" : "Y",
         "hidden" : "Y",
         "submission" : "A",
-        "issn" : "2046-3758",
+        "issn" : "",
         "embargo" : "Y",
         "sponsor" : "British Editorial Society of Bone &amp; Joint Surgery",
         "title" : "Bone &amp; Joint Research"
      },
      {
         "hidden" : "Y",
-        "issn" : "2048-0091",
+        "issn" : "",
         "embargo" : "Y",
         "submission" : "A",
         "integrated" : "Y",
@@ -182,7 +182,7 @@
      },
      {
         "integrated" : "Y",
-        "issn" : "1754-8411",
+        "issn" : "",
         "submission" : "R",
         "embargo" : "N",
         "hidden" : "N",
@@ -264,7 +264,7 @@
      {
         "title" : "Environmental Epigenetics",
         "sponsor" : "$120",
-        "issn" : "2058-5888",
+        "issn" : "",
         "submission" : "R",
         "embargo" : "N",
         "hidden" : "N",
@@ -318,7 +318,7 @@
      {
         "integrated" : "Y",
         "submission" : "R",
-        "issn" : "2193-7052",
+        "issn" : "",
         "embargo" : "Y",
         "hidden" : "N",
         "title" : "GMS German Plastic, Reconstructive and Aesthetic Surgery",
@@ -328,7 +328,7 @@
         "title" : "GMS Health Technology Assessment",
         "sponsor" : "German National Library of Medicine",
         "embargo" : "Y",
-        "issn" : "1861-8863",
+        "issn" : "",
         "submission" : "A",
         "hidden" : "Y",
         "integrated" : "N"
@@ -361,7 +361,7 @@
         "hidden" : "N"
      },
      {
-        "issn" : "1865-066X",
+        "issn" : "",
         "embargo" : "Y",
         "submission" : "A",
         "hidden" : "Y",
@@ -370,7 +370,7 @@
         "sponsor" : "German National Library of Medicine"
      },
      {
-        "issn" : "1860-9171",
+        "issn" : "",
         "embargo" : "Y",
         "submission" : "R",
         "hidden" : "N",
@@ -383,13 +383,13 @@
         "title" : "GMS Onkologische Rehabilitation und Sozialmedizin",
         "hidden" : "N",
         "embargo" : "Y",
-        "issn" : "2194-2919",
+        "issn" : "",
         "submission" : "R",
         "integrated" : "Y"
      },
      {
         "embargo" : "Y",
-        "issn" : "1860-3572",
+        "issn" : "",
         "submission" : "R",
         "hidden" : "N",
         "integrated" : "Y",
@@ -399,7 +399,7 @@
      {
         "hidden" : "N",
         "submission" : "R",
-        "issn" : "1869-4241",
+        "issn" : "",
         "embargo" : "Y",
         "integrated" : "Y",
         "sponsor" : "German National Library of Medicine",
@@ -499,7 +499,7 @@
         "sponsor" : "$120",
         "title" : "The Journal of Experimental Biology",
         "hidden" : "N",
-        "issn" : "0022-0949",
+        "issn" : "",
         "submission" : "R",
         "embargo" : "N",
         "integrated" : "Y"
@@ -551,7 +551,7 @@
      },
      {
         "integrated" : "Y",
-        "issn" : "2058-5543",
+        "issn" : "",
         "submission" : "R",
         "embargo" : "N",
         "hidden" : "N",
@@ -600,7 +600,7 @@
         "integrated" : "Y",
         "hidden" : "N",
         "embargo" : "Y",
-        "issn" : "1314-6947",
+        "issn" : "",
         "submission" : "A"
      },
      {
@@ -627,7 +627,7 @@
         "integrated" : "Y",
         "hidden" : "Y",
         "embargo" : "N",
-        "issn" : "0342-7536",
+        "issn" : "",
         "submission" : "A"
      },
      {
@@ -638,15 +638,6 @@
         "issn" : "0030-1299",
         "submission" : "A",
         "hidden" : "N"
-     },
-     {
-        "integrated" : "N",
-        "embargo" : "Y",
-        "issn" : "0078-1304",
-        "submission" : "A",
-        "hidden" : "Y",
-        "title" : "North American Fauna",
-        "sponsor" : "US Fish & Wildlife Service"
      },
      {
         "title" : "Open Biology",
@@ -714,7 +705,7 @@
      {
         "integrated" : "Y",
         "hidden" : "Y",
-        "issn" : "1522-2152",
+        "issn" : "",
         "submission" : "R",
         "embargo" : "N",
         "sponsor" : "University of Chicago Press",
@@ -741,7 +732,7 @@
      {
         "integrated" : "N",
         "embargo" : "Y",
-        "issn" : "0032-0889",
+        "issn" : "",
         "submission" : "A",
         "hidden" : "Y",
         "title" : "Plant Physiology",
@@ -750,7 +741,7 @@
      {
         "hidden" : "Y",
         "submission" : "A",
-        "issn" : "0032-0919",
+        "issn" : "",
         "embargo" : "Y",
         "integrated" : "N",
         "sponsor" : "The Botanical Society of America",
@@ -887,14 +878,14 @@
         "title" : "Toxicological Sciences",
         "integrated" : "Y",
         "hidden" : "N",
-        "issn" : "1096-6080",
+        "issn" : "",
         "embargo" : "Y",
         "submission" : "R"
      },
      {
         "integrated" : "Y",
         "embargo" : "N",
-        "issn" : "2057-1577",
+        "issn" : "",
         "submission" : "R",
         "hidden" : "N",
         "title" : "Virus Evolution",
@@ -904,7 +895,7 @@
         "integrated" : "Y",
         "hidden" : "N",
         "submission" : "R",
-        "issn" : "2054-4642",
+        "issn" : "",
         "embargo" : "N",
         "sponsor" : "$120",
         "title" : "Work, Aging and Retirement"
