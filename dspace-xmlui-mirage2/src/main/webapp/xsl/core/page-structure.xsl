@@ -764,7 +764,7 @@
     <xsl:template match="dri:body">
         <div>
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
-                <div class="alert">
+                <div class="alert alert-warning">
                     <button type="button" class="close" data-dismiss="alert">&#215;</button>
                     <xsl:copy-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']/node()"/>
                 </div>
