@@ -224,7 +224,7 @@ div.carousel-inner div.item div.list-group-item div.list-group-item-heading h4.t
 #export-biblio-panel { background-color: whitesmoke;}
 
 footer.navbar-bottom {
-	z-index: -1;
+	z-index: 0;
 }
 
 .span-filter-applied-bordered {   
