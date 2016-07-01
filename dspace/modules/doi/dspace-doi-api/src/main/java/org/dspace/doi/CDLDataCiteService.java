@@ -101,7 +101,7 @@ public class CDLDataCiteService {
     }
 
     public static String generateEzidUrl(String aDOI) {
-        if (aDOI.startsWith("doi")) {
+        if (aDOI.toUpperCase().startsWith("DOI")) {
             aDOI = aDOI.substring(4);
         }
         return BASEURL + "/id/doi%3A" + aDOI;
