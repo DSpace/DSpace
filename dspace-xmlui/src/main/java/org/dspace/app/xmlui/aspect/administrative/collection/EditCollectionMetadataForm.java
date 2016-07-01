@@ -29,6 +29,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
+import org.dspace.core.Constants;
 
 
 /**
@@ -209,8 +210,8 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    
 		Para buttonList = main.addPara();
 	    buttonList.addButton("submit_save").setValue(T_submit_save);
-        //Only System Admins can Delete Collections
-	    if (authorizeService.isAdmin(context))
+
+	    if (AuthorizeManager.authorizeActionBoolean(context, thisCollection, Constants.DELETE))
         {
 	    	buttonList.addButton("submit_delete").setValue(T_submit_delete);
         }
