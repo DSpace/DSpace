@@ -174,36 +174,6 @@ public class OrcidPreferencesUtils {
 		return false;
 	}
 
-	public void prepareUpdateProfile(Map<String, Map<String, List<String>>> mapResearcherMetadataToSend,
-			ResearcherPage researcher, boolean force) {
-		List<RPPropertiesDefinition> metadataDefinitions = getApplicationService()
-				.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, PREFIX_ORCID_PROFILE_PREF);
-		for (RPPropertiesDefinition rppd : metadataDefinitions) {
-			String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst(PREFIX_ORCID_PROFILE_PREF, "");
-			String metadataShortnameORCID = rppd.getLabel();
-
-			List<RPProperty> metadatas = researcher.getAnagrafica4view().get(metadataShortnameINTERNAL);
-
-			Map<String, List<String>> mapMetadata = new HashMap<String, List<String>>();
-			List<String> listMetadata = new ArrayList<String>();
-
-			for (RPProperty metadata : metadatas) {
-				if (force || (researcher.getProprietaDellaTipologia(rppd) != null
-						&& !researcher.getProprietaDellaTipologia(rppd).isEmpty()
-						&& (Boolean) researcher.getProprietaDellaTipologia(rppd).get(0).getObject())) {
-					listMetadata.add(metadata.toString());
-				}
-			}
-
-			if (!listMetadata.isEmpty()) {
-				mapMetadata.put(metadataShortnameORCID, listMetadata);
-			}
-
-			mapResearcherMetadataToSend.put(researcher.getCrisID(), mapMetadata);
-
-		}
-	}
-
 	public List<Integer> getPreferiteWorksToSendToOrcid(String crisID) {
 		ResearcherPage researcher = getApplicationService().getEntityByCrisId(crisID, ResearcherPage.class);
 		List<Integer> itemIDsToSend = new ArrayList<Integer>();

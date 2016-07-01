@@ -101,6 +101,7 @@ public class OrcidService extends RestSource {
 	private static final String READ_BIO_ENDPOINT = "/orcid-bio";
 	
 	private static final String BIO_UPDATE_ENDPOINT = "/orcid-bio";
+	private static final String AFFILIATION_UPDATE_ENDPOINT = "/affiliations";
 	private static final String SEARCH_ENDPOINT = "search/orcid-bio/";	
 
 	private static final String READ_PUBLIC_SCOPE = "/read-public";
@@ -391,6 +392,43 @@ public class OrcidService extends RestSource {
 		return getOrcidMessage(response);
 	}
 
+	
+	   /**
+     * 
+     * Completely replaces all "works" research activities from a given
+     * work-source in the ORCID Record for the scholar represented by the
+     * specified orcid_id. (You can only update works that your client
+     * application has added)
+     * 
+     * Member API
+     * 
+     * @param id
+     * @param token
+     * @param profile
+     * @return
+     * @throws IOException
+     * @throws JAXBException
+     */
+    public OrcidMessage updateAffiliations(String id, String token, OrcidProfile profile) throws IOException, JAXBException {
+        WebTarget target = restConnector.getClientRest(id + AFFILIATION_UPDATE_ENDPOINT);
+
+        StringWriter sw = new StringWriter();
+        Marshaller marshaller = orcidMessageContext.createMarshaller();
+
+        validate(marshaller);
+
+        marshaller.marshal(wrapProfile(profile), sw);
+
+        Builder builder = target.request().accept(MediaType.APPLICATION_XML).acceptEncoding("UTF-8")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        Entity<String> entity = Entity.entity(sw.toString(), APPLICATION_VDN_ORCID_XML);
+        if(testMode) {
+            return new OrcidMessage();
+        }
+        Response response = builder.put(entity);
+        return getOrcidMessage(response);
+    }
+    
 	private void validate(Marshaller marshaller) throws FileNotFoundException {
 		SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = null;

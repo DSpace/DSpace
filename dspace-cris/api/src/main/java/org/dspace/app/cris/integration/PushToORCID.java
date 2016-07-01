@@ -10,8 +10,13 @@ package org.dspace.app.cris.integration;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,11 +36,17 @@ import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.configuration.RelationPreferenceConfiguration;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.model.OrganizationUnit;
 import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.RelationPreference;
 import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.jdyna.OUProperty;
+import org.dspace.app.cris.model.jdyna.RPNestedObject;
+import org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.RPNestedProperty;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
+import org.dspace.app.cris.model.jdyna.value.OUPointer;
 import org.dspace.app.cris.model.orcid.OrcidHistory;
 import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.app.cris.model.orcid.OrcidQueue;
@@ -45,6 +56,9 @@ import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authority.orcid.OrcidExternalIdentifierType;
 import org.dspace.authority.orcid.OrcidService;
 import org.dspace.authority.orcid.jaxb.Address;
+import org.dspace.authority.orcid.jaxb.Affiliation;
+import org.dspace.authority.orcid.jaxb.AffiliationType;
+import org.dspace.authority.orcid.jaxb.Affiliations;
 import org.dspace.authority.orcid.jaxb.Amount;
 import org.dspace.authority.orcid.jaxb.Biography;
 import org.dspace.authority.orcid.jaxb.Citation;
@@ -54,6 +68,7 @@ import org.dspace.authority.orcid.jaxb.Contributor;
 import org.dspace.authority.orcid.jaxb.ContributorAttributes;
 import org.dspace.authority.orcid.jaxb.ContributorEmail;
 import org.dspace.authority.orcid.jaxb.Country;
+import org.dspace.authority.orcid.jaxb.CreatedDate;
 import org.dspace.authority.orcid.jaxb.CreditName;
 import org.dspace.authority.orcid.jaxb.CurrencyCode;
 import org.dspace.authority.orcid.jaxb.Day;
@@ -114,10 +129,14 @@ import org.dspace.util.SimpleMapConverter;
 import org.dspace.utils.DSpace;
 
 import it.cilea.osd.common.core.SingleTimeStampInfo;
+import it.cilea.osd.jdyna.model.ANestedObject;
 import it.cilea.osd.jdyna.value.BooleanValue;
+import it.cilea.osd.jdyna.value.DateValue;
 import it.cilea.osd.jdyna.value.EmbeddedLinkValue;
+import it.cilea.osd.jdyna.value.PointerValue;
 import it.cilea.osd.jdyna.value.TextValue;
 import it.cilea.osd.jdyna.widget.WidgetLink;
+import it.cilea.osd.jdyna.widget.WidgetPointer;
 
 public class PushToORCID {
 
@@ -130,6 +149,8 @@ public class PushToORCID {
 	private static final int ORCID_PROJECTS_PREFS_DISABLED = 0;
 	private static final int ORCID_PROJECTS_PREFS_ALL = 1;
 	private static final int ORCID_PROJECTS_PREFS_SELECTED = 2;
+	
+	private static DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 
 	/** the logger */
 	private static Logger log = Logger.getLogger(PushToORCID.class);
@@ -140,6 +161,7 @@ public class PushToORCID {
 		log.debug("Working... push to ORCID");
 
 		Map<String, Map<String, List<String>>> mapResearcherMetadataToSend = new HashMap<String, Map<String, List<String>>>();
+		Map<String, Map<String, List<Map<String, List<String>>>>> mapResearcherMetadataNestedToSend = new HashMap<String, Map<String, List<Map<String, List<String>>>>>();
 		Map<String, Map<Integer, String>> mapPublicationsToSend = new HashMap<String, Map<Integer, String>>();
 		Map<String, Map<Integer, String>> mapProjectsToSend = new HashMap<String, Map<Integer, String>>();
 
@@ -212,7 +234,7 @@ public class PushToORCID {
 			if (buildORCIDProfile && !foundORCID) {
 				listNewResearcherToPushOnOrcid.add(crisID);
 				// default pushing all profile field founded on configuration
-				prepareUpdateProfile(applicationService, mapResearcherMetadataToSend, researcher, true);
+				prepareUpdateProfile(applicationService, mapResearcherMetadataToSend, mapResearcherMetadataNestedToSend, researcher, true);
 				// default pushing selected works
 
 				prepareWorks(applicationService, relationPreferenceService, searchService, mapPublicationsToSend, researcher, crisID,
@@ -250,7 +272,7 @@ public class PushToORCID {
 				}
 
 				if (prepareUpdateProfile) {
-					prepareUpdateProfile(applicationService, mapResearcherMetadataToSend, researcher, forceProfilePreferences);
+					prepareUpdateProfile(applicationService, mapResearcherMetadataToSend, mapResearcherMetadataNestedToSend, researcher, forceProfilePreferences);
 				}
 
 				if (prepareCreateWork && prepareUpdateWork) {
@@ -274,8 +296,8 @@ public class PushToORCID {
 			for (String crisId : listNewResearcherToPushOnOrcid) {
 				log.info("Prepare push for ResearcherPage crisID:" + crisId);
 				try {
-					OrcidProfile profile = buildOrcidProfile(applicationService, crisId, mapResearcherMetadataToSend,
-							orcidConfigurationMapping);
+					OrcidProfile profile = buildOrcidProfile(applicationService, crisId, mapResearcherMetadataToSend, mapResearcherMetadataNestedToSend,
+							orcidConfigurationMapping, true);
 					OrcidWorks works = buildOrcidWorks(context, crisId, mapPublicationsToSend);
 					FundingList fundings = buildOrcidFundings(context, applicationService, crisId, mapProjectsToSend);
 					OrcidActivities activities = new OrcidActivities();
@@ -326,8 +348,8 @@ public class PushToORCID {
                         {
                             OrcidProfile profile = buildOrcidProfile(
                                     applicationService, crisId,
-                                    mapResearcherMetadataToSend,
-                                    orcidConfigurationMapping);
+                                    mapResearcherMetadataToSend, mapResearcherMetadataNestedToSend,
+                                    orcidConfigurationMapping, false);
                             if (profile != null)
                             {
                                 //PUT personal information
@@ -335,6 +357,20 @@ public class PushToORCID {
                                         profile);
                                 log.info(
                                         "(A1) OrcidProfile for ResearcherPage crisID:"
+                                                + crisId);
+                            }
+                            
+                            OrcidProfile affilations = buildOrcidProfileForAffiliations(
+                                    applicationService, crisId,
+                                    mapResearcherMetadataToSend, mapResearcherMetadataNestedToSend,
+                                    orcidConfigurationMapping);
+                            if (affilations != null)
+                            {
+                                //PUT personal information
+                                orcidService.updateAffiliations(orcid, tokenUpdateBio,
+                                        profile);
+                                log.info(
+                                        "(A1) Affiliations for ResearcherPage crisID:"
                                                 + crisId);
                             }
                         }
@@ -745,41 +781,376 @@ public class PushToORCID {
 		mapPublicationsToSend.put(crisID, subResult);
 	}
 
+	/**
+	 * Prepare data configuration for Researcher Profile, fill custom data
+	 * structure with values getted from the ResearcherPage. Manage both first
+	 * level metadata then nested metadata.
+	 * 
+	 * Rules for "First level metadata": add the values only if the related
+	 * {@link OrcidPreferencesUtils.PREFIX_ORCID_PROFILE_PREF} is enabled. Rules
+	 * for "Nested metadata": if first level metadata is not found then try to
+	 * retrieve data from nested, if the related
+	 * {@link OrcidPreferencesUtils.PREFIX_ORCID_PROFILE_PREF} is enabled then
+	 * expose all instances of the nested otherwise expose the preferred nested or the
+	 * most recent nested. If the preferred nested is not set up then try to
+	 * retrieve the instance with "enddate" greatest or null and "startdate"
+	 * greatest.
+	 * 
+	 * The parameter "force" is used to expose the metadata also if the settings
+	 * preferences is disabled (used to force metadata exposition at first
+	 * time). The parameter "force" is NOT used for "Nested metadata" mapping
+	 * configuration because if the related preference settings is disabled this
+	 * means that the value to send is the preferred one or the most recent.
+	 * 
+	 * @param applicationService
+	 * @param mapResearcherMetadataToSend
+	 * @param mapResearcherMetadataNestedToSend
+	 * @param researcher
+	 * @param force
+	 */
 	public static void prepareUpdateProfile(ApplicationService applicationService,
-			Map<String, Map<String, List<String>>> mapResearcherMetadataToSend, ResearcherPage researcher,
+			Map<String, Map<String, List<String>>> mapResearcherMetadataToSend, Map<String, Map<String, List<Map<String, List<String>>>>> mapResearcherMetadataNestedToSend, ResearcherPage researcher,
 			boolean force) {
 		List<RPPropertiesDefinition> metadataDefinitions = applicationService
 				.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, OrcidPreferencesUtils.PREFIX_ORCID_PROFILE_PREF);
 		Map<String, List<String>> mapMetadata = new HashMap<String, List<String>>();
-		for (RPPropertiesDefinition rppd : metadataDefinitions) {
-			String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst(OrcidPreferencesUtils.PREFIX_ORCID_PROFILE_PREF, "");
-			String metadataShortnameORCID = rppd.getLabel();
+        //this map contains e.g. affiliation-> for each nested affiliation<nestedmetadata> -> list of nested metadata values
+        Map<String, List<Map<String, List<String>>>> nestedMapValueInstances = new HashMap<String, List<Map<String, List<String>>>>();
+        
+        for (RPPropertiesDefinition rppd : metadataDefinitions)
+        {
+            String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst(
+                    OrcidPreferencesUtils.PREFIX_ORCID_PROFILE_PREF, "");
+            String metadataShortnameORCID = rppd.getLabel();
 
-			List<RPProperty> metadatas = researcher.getAnagrafica4view().get(metadataShortnameINTERNAL);
+            List<RPProperty> metadatas = researcher.getAnagrafica4view()
+                    .get(metadataShortnameINTERNAL);
 
-			List<String> listMetadata = new ArrayList<String>();
+            if (metadatas == null || metadatas.isEmpty())
+            {
+                // manage mapping configuration on nested object
+                List<RPNestedObject> nestedObjects = applicationService
+                        .getNestedObjectsByParentIDAndShortname(
+                                researcher.getID(), metadataShortnameINTERNAL,
+                                researcher.getClassNested());
 
-			for (RPProperty metadata : metadatas) {
-				if (force || (researcher.getProprietaDellaTipologia(rppd) != null
-						&& !researcher.getProprietaDellaTipologia(rppd).isEmpty()
-						&& (Boolean) researcher.getProprietaDellaTipologia(rppd).get(0).getObject())) {
-					if (metadata.getTypo().getRendering() instanceof WidgetLink) {
-						EmbeddedLinkValue link = (EmbeddedLinkValue) metadata.getObject();
-						listMetadata.add(link.getDescriptionLink()+"###"+link.getValueLink());
-					}
-					else {
-						listMetadata.add(metadata.toString());
-					}
-				}
-			}
+                if (nestedObjects != null && !nestedObjects.isEmpty())
+                {
 
-			if (!listMetadata.isEmpty()) {
-				mapMetadata.put(metadataShortnameORCID, listMetadata);
-			}
+                    // this list contains for each nested the values (this list
+                    // is the object entry in the above map)
+                    List<Map<String, List<String>>> listMapMetadata = new ArrayList<Map<String, List<String>>>();
 
-		}
+                    RPNestedObject selectedForDateRules = null;
+                    Date selectedStartDate = null;
+                    Date selectedEndDate = null;
+                    boolean foundPreferred = false;
+                    boolean sendOnlyGreatest = false;
+                    for (RPNestedObject rpno : nestedObjects)
+                    {
+                        // organize all nested or only the preferred
+                        if ((researcher.getProprietaDellaTipologia(rppd) != null
+                                && !researcher.getProprietaDellaTipologia(rppd)
+                                        .isEmpty()
+                                && (Boolean) researcher
+                                        .getProprietaDellaTipologia(rppd).get(0)
+                                        .getObject()))
+                        {
+                            prepareNestedObjectConfiguration(rpno,
+                                    listMapMetadata);
+
+                        }
+                        else
+                        {
+                            sendOnlyGreatest = true;
+                            // found if have a preferred nested to send
+                            if (rpno.getPreferred())
+                            {
+                                foundPreferred = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (foundPreferred || sendOnlyGreatest)
+                    {
+                        for (RPNestedObject rpno : nestedObjects)
+                        {
+                            if (foundPreferred)
+                            {
+                                // send only the preferred or the nested with
+                                // the
+                                // greatest startdate and enddate null or
+                                // greater
+                                // then the others enddate
+                                if (rpno.getPreferred())
+                                {
+                                    prepareNestedObjectConfiguration(rpno,
+                                            listMapMetadata);
+                                    selectedForDateRules = null;
+                                }
+                            }
+                            else
+                            {
+                                if (selectedForDateRules == null)
+                                {
+                                    selectedForDateRules = rpno;
+
+                                    List<RPNestedProperty> listEndDate = rpno
+                                            .getAnagrafica4view()
+                                            .get("affiliationenddate");
+                                    if (listEndDate != null
+                                            && !listEndDate.isEmpty())
+                                    {
+                                        RPNestedProperty endDate = listEndDate
+                                                .get(0);
+                                        DateValue valED = (DateValue) endDate
+                                                .getValue();
+                                        selectedEndDate = valED.getObject();
+                                    }
+
+                                    List<RPNestedProperty> listStartDate = rpno
+                                            .getAnagrafica4view()
+                                            .get("affiliationstartdate");
+                                    if (listStartDate != null
+                                            && !listStartDate.isEmpty())
+                                    {
+                                        RPNestedProperty startDate = listStartDate
+                                                .get(0);
+                                        DateValue valSD = (DateValue) startDate
+                                                .getValue();
+                                        selectedStartDate = valSD.getObject();
+                                    }
+                                }
+                                else
+                                {
+
+                                    List<RPNestedProperty> listEndDate = rpno
+                                            .getAnagrafica4view()
+                                            .get("affiliationenddate");
+
+                                    if (listEndDate != null
+                                            && !listEndDate.isEmpty())
+                                    {
+                                        RPNestedProperty endDate = listEndDate
+                                                .get(0);
+                                        DateValue valED = (DateValue) endDate
+                                                .getValue();
+                                        // is valED is after selectedEndDate?
+                                        if (selectedEndDate!=null && valED.getObject().compareTo(
+                                                selectedEndDate) >= 0)
+                                        {
+
+                                            List<RPNestedProperty> listStartDate = rpno
+                                                    .getAnagrafica4view()
+                                                    .get("affiliationstartdate");
+                                            RPNestedProperty startDate = listStartDate
+                                                    .get(0);
+                                            DateValue valSD = (DateValue) startDate
+                                                    .getValue();
+                                            // is valSD is before
+                                            // selectedStartDate?
+                                            if (valSD.getObject().compareTo(
+                                                    selectedStartDate) > 1)
+                                            {
+                                                selectedEndDate = valED
+                                                        .getObject();
+                                                selectedStartDate = valSD
+                                                        .getObject();
+                                                selectedForDateRules = rpno;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (selectedEndDate == null)
+                                        {
+                                            // found it! done!
+                                            selectedForDateRules = rpno;
+                                            break;
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                    if (selectedForDateRules != null)
+                    {
+                        prepareNestedObjectConfiguration(selectedForDateRules,
+                                listMapMetadata);
+                    }
+                    nestedMapValueInstances.put(metadataShortnameORCID,
+                            listMapMetadata);
+                }
+            }
+            else
+            {
+
+                List<String> listMetadata = new ArrayList<String>();
+                for (RPProperty metadata : metadatas)
+                {
+                    if (force || (researcher
+                            .getProprietaDellaTipologia(rppd) != null
+                            && !researcher.getProprietaDellaTipologia(rppd)
+                                    .isEmpty()
+                            && (Boolean) researcher
+                                    .getProprietaDellaTipologia(rppd).get(0)
+                                    .getObject()))
+                    {
+                        if (metadata.getTypo()
+                                .getRendering() instanceof WidgetLink)
+                        {
+                            EmbeddedLinkValue link = (EmbeddedLinkValue) metadata
+                                    .getObject();
+                            listMetadata.add(link.getDescriptionLink() + "###"
+                                    + link.getValueLink());
+                        }
+                        else
+                        {
+                            listMetadata.add(metadata.toString());
+                        }
+                    }
+                }
+
+                if (!listMetadata.isEmpty())
+                {
+                    mapMetadata.put(metadataShortnameORCID, listMetadata);
+                }
+            }
+        }
+		mapResearcherMetadataNestedToSend.put(researcher.getCrisID(), nestedMapValueInstances);
 		mapResearcherMetadataToSend.put(researcher.getCrisID(), mapMetadata);
 	}
+
+	/**
+	 * Organize the maps to fill the values. In the case the metadata is a pointer to the OrganizationUnit and
+	 * is called with suffix 'orgunit' then try to retrieve a 'parentorgunit' metadata. This is usefull when
+	 * Orcid expose information about Affiliation, infact in this case the string value of the pointer with 
+	 * suffix 'orgunit' will be the department instead the 'parentorgunit' will be mapped on the organization tag.
+	 * 
+	 * @param metadataShortnameORCID - the key of the result map
+	 * @param mapMetadataNested - the result map that contains mapping for metadata to values 
+	 * @param rpno - the nested values
+	 * @param listMetadata - every instance of metadata
+	 * @param listMapMetadata - every instance of nested object
+	 */
+	private static void prepareNestedObjectConfiguration(RPNestedObject rpno, List<Map<String, List<String>>> listMapMetadata) {
+
+        //mapMetadata - map used temporary to fill mapMetadataNested
+        Map<String, List<String>> mapMetadata = new HashMap<String, List<String>>();
+        
+		for (String metadataNestedShortname : rpno.getAnagrafica4view().keySet()) {
+	        
+			List<RPNestedProperty> nestedMetadatas = rpno.getAnagrafica4view()
+					.get(metadataNestedShortname);
+			List<String> listMetadataParentOrgunit = new ArrayList<String>();
+			List<String> listMetadataParentOrgunitCity = new ArrayList<String>();
+			List<String> listMetadataParentOrgunitCountry = new ArrayList<String>();
+			List<String> listMetadataParentOrgunitRegion = new ArrayList<String>();
+			List<String> listMetadata = new ArrayList<String>();
+			for (RPNestedProperty metadata : nestedMetadatas) {
+
+                if (metadata.getTypo().getRendering() instanceof WidgetLink)
+                {
+                    EmbeddedLinkValue link = (EmbeddedLinkValue) metadata
+                            .getObject();
+                    listMetadata.add(link.getDescriptionLink() + "###"
+                            + link.getValueLink());
+                }
+                else if (metadata.getTypo()
+                        .getRendering() instanceof WidgetPointer)
+                {
+                    try
+                    {
+                        if (metadataNestedShortname.endsWith("orgunit"))
+                        {
+                            OrganizationUnit ou = (OrganizationUnit) metadata
+                                    .getObject();
+                            List<OUProperty> parentorgunits = ou
+                                    .getAnagrafica4view().get("parentorgunit");
+                            OrganizationUnit parentOU = null;
+                            boolean foundParent = false;
+                            for (OUProperty pp : parentorgunits)
+                            {
+                                listMetadataParentOrgunit.add(pp.toString());
+                                OUPointer pointer = (OUPointer)pp.getValue();
+                                parentOU = pointer.getObject();
+                                foundParent = true;
+                            }
+                            if(foundParent) {
+                                prepareOrganizationAddress(
+                                        listMetadataParentOrgunitCity,
+                                        listMetadataParentOrgunitCountry,
+                                        listMetadataParentOrgunitRegion, parentOU);
+                            }
+                            else {
+                                prepareOrganizationAddress(
+                                        listMetadataParentOrgunitCity,
+                                        listMetadataParentOrgunitCountry,
+                                        listMetadataParentOrgunitRegion, ou);                                
+                            }
+                            listMetadata.add(metadata.toString());
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.warn("Orcid push affiliation do not able to retrieve value for parentorgunit");
+                    }
+                    listMetadata.add(metadata.toString());
+                }
+                else
+                {
+                    listMetadata.add(metadata.toString());
+                }
+
+			}
+			if (!listMetadata.isEmpty()) {
+				mapMetadata.put(metadataNestedShortname, listMetadata);
+				
+				if(!listMetadataParentOrgunit.isEmpty()) {
+				    mapMetadata.put(metadataNestedShortname + ".parentorgunit", listMetadataParentOrgunit);
+				}
+                if(!listMetadataParentOrgunitCountry.isEmpty()) {
+                    mapMetadata.put(metadataNestedShortname + ".iso-3166-country", listMetadataParentOrgunitCountry);
+                }
+                if(!listMetadataParentOrgunitCity.isEmpty()) {
+                    mapMetadata.put(metadataNestedShortname + ".city", listMetadataParentOrgunitCity);
+                }
+                if(!listMetadataParentOrgunitRegion.isEmpty()) {
+                    mapMetadata.put(metadataNestedShortname + ".region", listMetadataParentOrgunitRegion);
+                }
+			}
+			
+		}
+		listMapMetadata.add(mapMetadata);		
+	}
+
+    private static void prepareOrganizationAddress(
+            List<String> listMetadataParentOrgunitCity,
+            List<String> listMetadataParentOrgunitCountry,
+            List<String> listMetadataParentOrgunitRegion, OrganizationUnit ou)
+    {
+        List<OUProperty> cityorgunits = ou
+                .getAnagrafica4view().get("city");
+        for (OUProperty pp : cityorgunits)
+        {
+            listMetadataParentOrgunitCity.add(pp.toString());
+        }
+        List<OUProperty> countryorgunits = ou
+                .getAnagrafica4view().get("iso-3166-country");
+        for (OUProperty pp : countryorgunits)
+        {
+            listMetadataParentOrgunitCountry.add(pp.toString());
+        }
+        List<OUProperty> regionorgunits = ou
+                .getAnagrafica4view().get("region");
+        for (OUProperty pp : regionorgunits)
+        {
+            listMetadataParentOrgunitRegion.add(pp.toString());
+        }
+    }
 
 	private static FundingList buildOrcidFundings(Context context, ApplicationService applicationService, String crisId,
 			Map<String, Map<Integer, String>> mapProjectsToSend) throws SQLException {
@@ -1133,13 +1504,26 @@ public class PushToORCID {
 		return orcidWork;
 	}
 
+	/**
+	 * Build OrcidProfile to send OrcidBio.
+	 * see http://members.orcid.org/api/xml-orcid-bio
+	 * 
+	 * @param applicationService
+	 * @param crisId
+	 * @param mapResearcherMetadataToSend
+	 * @param mapResearcherMetadataNestedToSend
+	 * @param orcidMetadataConfiguration
+	 * @param buildAffiliations - if true build xml with affiliations information
+	 * @return
+	 */
 	public static OrcidProfile buildOrcidProfile(ApplicationService applicationService, String crisId,
-			Map<String, Map<String, List<String>>> mapResearcherMetadataToSend,
-			Map<String, String> orcidMetadataConfiguration) {
+			Map<String, Map<String, List<String>>> mapResearcherMetadataToSend, Map<String, Map<String, List<Map<String, List<String>>>>> mapResearcherMetadataNestedToSend, 
+			Map<String, String> orcidMetadataConfiguration, boolean buildAffiliations) {
 
 		OrcidProfile profile = new OrcidProfile();
 
 		Map<String, List<String>> metadata = mapResearcherMetadataToSend.get(crisId);
+		Map<String, List<Map<String, List<String>>>> metadataNested = mapResearcherMetadataNestedToSend.get(crisId);
 
 		List<String> name = metadata.get("name");
 
@@ -1185,6 +1569,10 @@ public class PushToORCID {
 		}
 
 		List<String> keywords = metadata.get("keywords");
+		
+		List<Map<String, List<String>>> employments = metadataNested.get("affiliations-employment");
+		
+		List<Map<String, List<String>>> educations = metadataNested.get("affiliations-education");
 
 		OrcidBio bioJAXB = new OrcidBio();
 
@@ -1336,9 +1724,433 @@ public class PushToORCID {
 			bioJAXB.setKeywords(keywordsJAXB);
 		}
 
+		if(buildAffiliations) {
+            OrcidActivities orcidActivities = new OrcidActivities();
+            Affiliations affiliations = buildOrcidAffiliations(employments, educations);
+            orcidActivities.setAffiliations(affiliations);
+            profile.setOrcidActivities(orcidActivities);
+		}
 		profile.setOrcidBio(bioJAXB);
 		return profile;
 	}
+
+    /**
+     * Build OrcidProfile only to send Affiliations.
+     * See http://members.orcid.org/api/xml-affiliations
+     * 
+     * @param applicationService
+     * @param crisId
+     * @param mapResearcherMetadataToSend
+     * @param mapResearcherMetadataNestedToSend
+     * @param orcidMetadataConfiguration
+     * @return
+     */
+    public static OrcidProfile buildOrcidProfileForAffiliations(
+            ApplicationService applicationService, String crisId,
+            Map<String, Map<String, List<String>>> mapResearcherMetadataToSend,
+            Map<String, Map<String, List<Map<String, List<String>>>>> mapResearcherMetadataNestedToSend,
+            Map<String, String> orcidMetadataConfiguration)
+    {
+
+        OrcidProfile profile = new OrcidProfile();
+
+        Map<String, List<String>> metadata = mapResearcherMetadataToSend
+                .get(crisId);
+        Map<String, List<Map<String, List<String>>>> metadataNested = mapResearcherMetadataNestedToSend
+                .get(crisId);
+
+        List<Map<String, List<String>>> employments = metadataNested
+                .get("affiliations-employment");
+
+        List<Map<String, List<String>>> educations = metadataNested
+                .get("affiliations-education");
+
+        OrcidActivities orcidActivities = new OrcidActivities();
+        Affiliations affiliations = buildOrcidAffiliations(employments,
+                educations);
+        orcidActivities.setAffiliations(affiliations);
+        profile.setOrcidActivities(orcidActivities);
+
+        return profile;
+    }
+	
+    private static Affiliations buildOrcidAffiliations(List<Map<String, List<String>>> employments,
+            List<Map<String, List<String>>> educations)
+    {
+		Affiliations affiliations = new Affiliations();
+        if (employments != null)
+        {
+            for (Map<String, List<String>> employment : employments)
+            {
+                Affiliation affiliation = new Affiliation();
+
+                List<String> listStartDate = employment
+                        .get("affiliationstartdate");
+
+                if (listStartDate != null && !listStartDate.isEmpty())
+                {
+                    String stringStartDate = listStartDate.get(0);
+                    Date startDate;
+                    Calendar cal1 = Calendar.getInstance();
+                    try
+                    {
+                        startDate = df.parse(stringStartDate);
+                        cal1.setTime(startDate);
+                    }
+                    catch (ParseException e)
+                    {
+                        log.error(e.getMessage());
+                    }
+
+                    FuzzyDate fuzzyStartDate = new FuzzyDate();
+                    try
+                    {
+                        int yearSD = cal1.get(Calendar.YEAR);
+                        Year year = new Year();
+                        year.setValue(String.valueOf(yearSD));
+                        fuzzyStartDate.setYear(year);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+
+                    try
+                    {
+                        int monthSD = cal1.get(Calendar.MONTH);
+                        Month month = new Month();                        
+                        month.setValue(MessageFormat.format("{0,number,#00}", new Object[] {new Integer(monthSD)}));
+                        fuzzyStartDate.setMonth(month);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+
+                    try
+                    {
+                        int daySD = cal1.get(Calendar.DAY_OF_MONTH);
+                        Day day = new Day();
+                        day.setValue(MessageFormat.format("{0,number,#00}", new Object[] {new Integer(daySD)}));
+                        fuzzyStartDate.setDay(day);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+                    affiliation.setStartDate(fuzzyStartDate);
+                }
+
+                List<String> listEndDate = employment.get("affiliationenddate");
+                if (listEndDate != null && !listEndDate.isEmpty())
+                {
+                    String stringEndDate = listStartDate.get(0);
+                    Date endDate;
+                    Calendar cal2 = Calendar.getInstance();
+                    try
+                    {
+                        endDate = df.parse(stringEndDate);
+                        cal2.setTime(endDate);
+                    }
+                    catch (ParseException e)
+                    {
+                        log.error(e.getMessage());
+                    }
+                    
+                    
+                    
+
+                    FuzzyDate fuzzyEndDate = new FuzzyDate();
+                    try
+                    {
+                        int yearED = cal2.get(Calendar.YEAR);
+                        Year year = new Year();
+                        year.setValue(String.valueOf(yearED));
+                        fuzzyEndDate.setYear(year);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+
+                    try
+                    {
+                        int monthED = cal2.get(Calendar.MONTH);
+                        Month month = new Month();
+                        month.setValue(MessageFormat.format("{0,number,#00}", new Object[] {new Integer(monthED)}));
+                        fuzzyEndDate.setMonth(month);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+
+                    try
+                    {
+                        int dayED = cal2.get(Calendar.DAY_OF_MONTH);
+                        Day day = new Day();
+                        day.setValue(MessageFormat.format("{0,number,#00}", new Object[] {new Integer(dayED)}));
+                        fuzzyEndDate.setDay(day);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+
+                    affiliation.setEndDate(fuzzyEndDate);
+                }
+
+                affiliation.setType(AffiliationType.EMPLOYMENT);
+
+                List<String> listRole = employment.get("affiliationrole");
+                if (listRole != null && !listRole.isEmpty())
+                {
+                    String stringRole = listRole.get(0);
+                    affiliation.setRoleTitle(stringRole);
+                }
+
+                List<String> listOrgUnitname = employment
+                        .get("affiliationorgunit.parentorgunit");
+                Organization organization = new Organization();
+                String stringOUname = "";
+                if (listOrgUnitname != null && !listOrgUnitname.isEmpty())
+                {
+                    stringOUname = listOrgUnitname.get(0);
+                    List<String> listDeptname = employment
+                            .get("affiliationorgunit");
+                    if (listDeptname != null && !listDeptname.isEmpty())
+                    {
+                        String stringDeptname = listDeptname.get(0);
+                        affiliation.setDepartmentName(stringDeptname);
+                    }
+                }
+                else {
+                    List<String> listDeptname = employment
+                            .get("affiliationorgunit");
+                    if (listDeptname != null && !listDeptname.isEmpty())
+                    {
+                        stringOUname = listDeptname.get(0);
+                    }
+                }
+                
+
+                OrganizationAddress organizationAddress = new OrganizationAddress();
+                List<String> listOrgunitcity = employment
+                        .get("affiliationorgunit.city");
+                if (listOrgunitcity != null && !listOrgunitcity.isEmpty())
+                {
+                    organizationAddress.setCity(listOrgunitcity.get(0));
+                }
+
+                List<String> listOrgunitcountry = employment
+                        .get("affiliationorgunit.iso-3166-country");
+                if (listOrgunitcountry != null && !listOrgunitcountry.isEmpty())
+                {
+                    Iso3166Country isoCountry = Iso3166Country.fromValue(listOrgunitcountry.get(0));
+                    organizationAddress.setCountry(isoCountry);
+                }
+
+                List<String> listOrgunitregion = employment
+                        .get("affiliationorgunit.region");
+                if (listOrgunitregion != null && !listOrgunitregion.isEmpty())
+                {
+                    organizationAddress.setRegion(listOrgunitregion.get(0));
+                }
+
+                organization.setName(stringOUname);
+                organization.setAddress(organizationAddress);
+                affiliation.setOrganization(organization);
+
+                affiliations.getAffiliation().add(affiliation);
+            }
+        }
+        if (educations != null)
+        {
+            for (Map<String, List<String>> education : educations)
+            {
+                Affiliation affiliation = new Affiliation();
+
+                List<String> listStartDate = education
+                        .get("educationstartdate");
+
+                if (listStartDate != null && !listStartDate.isEmpty())
+                {
+                    String stringStartDate = listStartDate.get(0);
+                    Date startDate;
+                    Calendar cal1 = Calendar.getInstance();
+                    try
+                    {
+                        startDate = df.parse(stringStartDate);
+                        cal1.setTime(startDate);
+                    }
+                    catch (ParseException e)
+                    {
+                        log.error(e.getMessage());
+                    }
+
+                    FuzzyDate fuzzyStartDate = new FuzzyDate();
+                    
+                    try
+                    {
+                        int yearSD = cal1.get(Calendar.YEAR);
+                        Year year = new Year();
+                        year.setValue(String.valueOf(yearSD));
+                        fuzzyStartDate.setYear(year);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+
+                    try
+                    {
+                        int monthSD = cal1.get(Calendar.MONTH);
+                        Month month = new Month();
+                        month.setValue(MessageFormat.format("{0,number,#00}", new Object[] {new Integer(monthSD)}));
+                        fuzzyStartDate.setMonth(month);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+
+                    try
+                    {
+                        int daySD = cal1.get(Calendar.DAY_OF_MONTH);
+                        Day day = new Day();
+                        day.setValue(MessageFormat.format("{0,number,#00}", new Object[] {new Integer(daySD)}));
+                        fuzzyStartDate.setDay(day);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+                    affiliation.setStartDate(fuzzyStartDate);
+                }
+
+                List<String> listEndDate = education.get("educationenddate");
+                if (listEndDate != null && !listEndDate.isEmpty())
+                {
+                    String stringEndDate = listStartDate.get(0);
+                    Date endDate;
+                    Calendar cal2 = Calendar.getInstance();
+                    try
+                    {
+                        endDate = df.parse(stringEndDate);
+                        cal2.setTime(endDate);
+                    }
+                    catch (ParseException e)
+                    {
+                        log.error(e.getMessage());
+                    }
+
+                    FuzzyDate fuzzyEndDate = new FuzzyDate();
+                    
+                    try
+                    {
+                        int yearED = cal2.get(Calendar.YEAR);
+                        Year year = new Year();
+                        year.setValue(String.valueOf(yearED));
+                        fuzzyEndDate.setYear(year);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+
+                    try
+                    {
+                        int monthED = cal2.get(Calendar.MONTH);
+                        Month month = new Month();
+                        month.setValue(MessageFormat.format("{0,number,#00}", new Object[] {new Integer(monthED)}));
+                        fuzzyEndDate.setMonth(month);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+
+                    try
+                    {
+                        int dayED = cal2.get(Calendar.DAY_OF_MONTH);
+                        Day day = new Day();
+                        day.setValue(MessageFormat.format("{0,number,#00}", new Object[] {new Integer(dayED)}));
+                        fuzzyEndDate.setDay(day);
+                    }
+                    catch (Exception ex)
+                    {
+                        // nothing todo
+                    }
+                    affiliation.setEndDate(fuzzyEndDate);
+                }
+
+                affiliation.setType(AffiliationType.EDUCATION);
+
+                List<String> listRole = education.get("educationrole");
+                if (listRole != null && !listRole.isEmpty())
+                {
+                    String stringRole = listRole.get(0);
+                    affiliation.setRoleTitle(stringRole);
+                }
+
+                List<String> listOrgUnitname = education
+                        .get("educationorgunit.parentorgunit");
+                Organization organization = new Organization();
+
+                String stringOUname = "";
+                if (listOrgUnitname != null && !listOrgUnitname.isEmpty())
+                {
+                    stringOUname = listOrgUnitname.get(0);
+                    List<String> listDeptname = education
+                            .get("educationorgunit");
+                    if (listDeptname != null && !listDeptname.isEmpty())
+                    {
+                        String stringDeptname = listDeptname.get(0);
+                        affiliation.setDepartmentName(stringDeptname);
+                    }
+                }
+                else {
+                    List<String> listDeptname = education
+                            .get("educationorgunit");
+                    if (listDeptname != null && !listDeptname.isEmpty())
+                    {
+                        stringOUname = listDeptname.get(0);
+                    }
+                }
+
+                OrganizationAddress organizationAddress = new OrganizationAddress();
+                List<String> listOrgunitcity = education
+                        .get("educationorgunit.city");
+                if (listOrgunitcity != null && !listOrgunitcity.isEmpty())
+                {
+                    organizationAddress.setCity(listOrgunitcity.get(0));
+                }
+
+                List<String> listOrgunitcountry = education
+                        .get("educationorgunit.iso-3166-country");
+                if (listOrgunitcountry != null && !listOrgunitcountry.isEmpty())
+                {
+                    Iso3166Country isoCountry = Iso3166Country.fromValue(listOrgunitcountry.get(0));
+                    organizationAddress.setCountry(isoCountry);
+                }
+
+                List<String> listOrgunitregion = education
+                        .get("educationorgunit.region");
+                if (listOrgunitregion != null && !listOrgunitregion.isEmpty())
+                {
+                    organizationAddress.setRegion(listOrgunitregion.get(0));
+                }
+
+                organization.setName(stringOUname);
+                organization.setAddress(organizationAddress);
+                affiliation.setOrganization(organization);
+                
+                affiliations.getAffiliation().add(affiliation);
+            }
+        }
+
+        return affiliations;
+    }
 
 	private static String getFamilyName(String text) {
 		DCPersonName tmpPersonName = new DCPersonName(text);
@@ -1478,11 +2290,12 @@ public class PushToORCID {
 		boolean result = false;
 		try {
 			Map<String, Map<String, List<String>>> mapResearcherMetadataToSend = new HashMap<String, Map<String, List<String>>>();
+			Map<String, Map<String, List<Map<String, List<String>>>>> mapResearcherMetadataNestedToSend = new HashMap<String, Map<String, List<Map<String, List<String>>>>>();
 			Map<String, String> orcidConfigurationMapping = PushToORCID
 					.prepareConfigurationMappingForProfile(applicationService);
 			ResearcherPage researcher = (ResearcherPage) applicationService.getEntityByCrisId(crisId,
 					ResearcherPage.class);
-			PushToORCID.prepareUpdateProfile(applicationService, mapResearcherMetadataToSend, researcher, true);
+			PushToORCID.prepareUpdateProfile(applicationService, mapResearcherMetadataToSend, mapResearcherMetadataNestedToSend, researcher, true);
 
 			OrcidService orcidService = OrcidService.getOrcid();
 
@@ -1516,26 +2329,81 @@ public class PushToORCID {
 
 						log.info("(Q1)Prepare OrcidProfile for ResearcherPage crisID:" + crisId);
 						OrcidProfile profile = PushToORCID.buildOrcidProfile(applicationService, crisId,
-								mapResearcherMetadataToSend, orcidConfigurationMapping);
-						if (profile != null) {
-							try {
-								OrcidPreferencesUtils.printXML(profile);
-								OrcidMessage message = orcidService.updateBio(orcid, tokenUpdateBio, profile);
-								if (message.getErrorDesc() != null) {
-									throw new RuntimeException(message.getErrorDesc().getContent());
-								} else {
-									result = true;
-									orcidHistory.setTimestampSuccessAttempt(timestampAttempt);
-									log.info("(A1) OK OrcidProfile for ResearcherPage crisID:" + crisId);
-								}
-							} catch (Exception ex) {
-								// build message for orcid history
-								orcidHistory.setResponseMessage(ex.getMessage());
-								log.error("ERROR!!! (E1) ERROR OrcidProfile ResearcherPage crisID:" + crisId);
-							}
-							applicationService.saveOrUpdate(OrcidHistory.class, orcidHistory);
-							log.info("(A2) OK OrcidHistory for ResearcherPage crisID:" + crisId);
-						}
+								mapResearcherMetadataToSend, mapResearcherMetadataNestedToSend, orcidConfigurationMapping, false);
+                        OrcidProfile affiliations = PushToORCID
+                                .buildOrcidProfileForAffiliations(
+                                        applicationService, crisId,
+                                        mapResearcherMetadataToSend,
+                                        mapResearcherMetadataNestedToSend,
+                                        orcidConfigurationMapping);
+                        if (profile != null)
+                        {
+                            try
+                            {
+                                OrcidPreferencesUtils.printXML(profile);
+                                OrcidMessage message = orcidService.updateBio(
+                                        orcid, tokenUpdateBio, profile);
+                                if (message.getErrorDesc() != null)
+                                {
+                                    throw new RuntimeException(message
+                                            .getErrorDesc().getContent());
+                                }
+                                else
+                                {
+                                    result = true;
+                                    orcidHistory.setTimestampSuccessAttempt(
+                                            timestampAttempt);
+                                    log.info(
+                                            "(A1) OK OrcidProfile for ResearcherPage crisID:"
+                                                    + crisId);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                // build message for orcid history
+                                orcidHistory
+                                        .setResponseMessage(ex.getMessage());
+                                log.error(
+                                        "ERROR!!! (E1) ERROR OrcidProfile ResearcherPage crisID:"
+                                                + crisId);
+                            }
+                            applicationService.saveOrUpdate(OrcidHistory.class,
+                                    orcidHistory);
+                            log.info(
+                                    "(A2) OK OrcidHistory for ResearcherPage crisID:"
+                                            + crisId);
+                        }
+                        if (affiliations != null)
+                        {
+                            try
+                            {
+                                OrcidPreferencesUtils.printXML(affiliations);
+                                OrcidMessage message = orcidService
+                                        .updateAffiliations(orcid,
+                                                tokenUpdateBio, affiliations);
+                                if (message.getErrorDesc() != null)
+                                {
+                                    throw new RuntimeException(message
+                                            .getErrorDesc().getContent());
+                                }
+                                else
+                                {
+                                    result = true;
+                                    log.info(
+                                            "(A1) OK Affiliations for ResearcherPage crisID:"
+                                                    + crisId);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                log.error(
+                                        "ERROR!!! (E1) ERROR Affiliations ResearcherPage crisID:"
+                                                + crisId);
+                            }
+                            log.info(
+                                    "(A2) OK Affiliations for ResearcherPage crisID:"
+                                            + crisId);
+                        }
 					} else {
 						log.warn("WARNING!!! (W1) Token not released for:" + crisId);
 					}

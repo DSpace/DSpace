@@ -47,8 +47,7 @@ public class ScriptPushOrcid {
 	private static Logger log = Logger.getLogger(ScriptPushOrcid.class);
 
 	/**
-	 * Batch script to find potential matches between DSpace items and RP. See
-	 * the technical documentation for further details.
+	 * Batch script to push data to Orcid. Try with -h to see more helps.
 	 */
 	public static void main(String[] args) throws ParseException {
 
@@ -75,7 +74,7 @@ public class ScriptPushOrcid {
 					"Script work only on RP names modified after this date (ADMIN MODE default PUT method)");
 			options.addOption("D", "MODE_HOUR", true,
 					"Script work only on RP names modified in this hours range (ADMIN MODE default PUT method)");
-			options.addOption("p", "post", false, "works/fundings send with a PUT call (using only with -a and -s - ADMIN MODE default POST method)");
+			options.addOption("p", "post", false, "works/fundings send with a POST call (using only with -a and -s - ADMIN MODE default PUT method)");
 			
 			CommandLine line = parser.parse(options, args);
 
