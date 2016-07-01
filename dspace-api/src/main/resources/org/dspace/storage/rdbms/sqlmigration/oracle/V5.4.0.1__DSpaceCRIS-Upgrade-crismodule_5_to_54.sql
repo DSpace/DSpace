@@ -8,7 +8,7 @@
 
 BEGIN
 	EXECUTE IMMEDIATE
-    	'ALTER TABLE cris_metrics ADD COLUMN last boolean';
+    	'ALTER TABLE cris_metrics ADD COLUMN last number(1,0) not null';
 	EXCEPTION
 	WHEN OTHERS
     THEN
