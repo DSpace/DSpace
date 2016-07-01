@@ -314,7 +314,7 @@
 				</c:forEach>
 		<div class="dynaClear">&nbsp;</div>
 		<div class="jdyna-form-button">		
-			<input type="submit" value="<fmt:message key="jsp.layout.hku.researcher.button.save"/>" />
+			<input class="btn btn-default" type="submit" value="<fmt:message key="jsp.layout.hku.researcher.button.save"/>" />
 		</div>
 <div id="classificationtree_modal" class="modal fade">
   <div class="modal-dialog">

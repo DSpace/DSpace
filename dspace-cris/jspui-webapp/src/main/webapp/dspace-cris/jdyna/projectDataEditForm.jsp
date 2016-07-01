@@ -236,6 +236,48 @@
 										}
 									});	
 							});
+							j('#viewnested_'+id+' .nested_preferred_button').click(function(){
+								var ajaxurlpreferrednested = 
+									"<%= request.getContextPath() %>/cris/tools/${specificPartPath}/preferredNested.htm";
+									j.ajax( {
+										url : ajaxurlpreferrednested,
+										data : {
+											"elementID": j(this).attr('id').substr(('nested_'+id+'_preferred_').length),
+											"parentID" : ${anagraficadto.objectId},
+											"typeNestedID" : id,
+											"editmode" : true,
+											"preferred" : true,
+											"admin": ${admin}
+										},
+										success : function(data) {
+											j('#viewnested_'+id).html(data);
+											postfunction();
+										},
+										error : function(data) {
+										}
+									});	
+							});
+							j('#viewnested_'+id+' .nested_notpreferred_button').click(function(){
+								var ajaxurlnotpreferrednested = 
+									"<%= request.getContextPath() %>/cris/tools/${specificPartPath}/notPreferredNested.htm";
+									j.ajax( {
+										url : ajaxurlnotpreferrednested,
+										data : {
+											"elementID": j(this).attr('id').substr(('nested_'+id+'_notpreferred_').length),
+											"parentID" : ${anagraficadto.objectId},
+											"typeNestedID" : id,
+											"editmode" : true,
+											"preferred" : false,
+											"admin": ${admin}
+										},
+										success : function(data) {
+											j('#viewnested_'+id).html(data);
+											postfunction();
+										},
+										error : function(data) {
+										}
+									});	
+							});
 							j('#nested_'+id+'_addbutton').click(function(){
 								var ajaxurladdnested = 
 									"<%= request.getContextPath() %>/cris/tools/${specificPartPath}/addNested.htm";
