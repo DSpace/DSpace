@@ -251,7 +251,8 @@
 			<xsl:if test="$datatype='DataFile'">
 				<descriptions>
 					<description descriptionType="Other">
-						<xsl:value-of select="dspace:field[@element='description']"/>
+					        <!-- Exclude provenance fields, since these often contain private information -->
+						<xsl:value-of select="dspace:field[@element='description' and not(@qualifier='provenance')]"/>
 					</description>
 				</descriptions>
 			</xsl:if>
