@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.log4j.Logger;
@@ -53,12 +54,17 @@ public class Bitstream extends DSpaceObject {
 
     }
 
-    public Bitstream(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context) throws SQLException{
+    public Bitstream(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context ) throws SQLException{
         super(bitstream, servletContext);
-        setup(bitstream, servletContext, expand, context);
+        setup(bitstream, servletContext, expand, context, null);
     }
 
-    public void setup(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context) throws SQLException{
+    public Bitstream(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context, HttpServletRequest request) throws SQLException{
+        super(bitstream, servletContext);
+        setup(bitstream, servletContext, expand, context, request);
+    }
+
+    public void setup(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context, HttpServletRequest request) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
@@ -74,7 +80,11 @@ public class Bitstream extends DSpaceObject {
         description = bitstream.getDescription();
         format = bitstreamService.getFormatDescription(context, bitstream);
         sizeBytes = bitstream.getSize();
-        retrieveLink = "/bitstreams/" + bitstream.getID() + "/retrieve";
+        String path = "";
+        if(request != null){
+            path = request.getContextPath();
+        }
+        retrieveLink = path + "/bitstreams/" + bitstream.getID() + "/retrieve";
         mimeType = bitstreamService.getFormat(context, bitstream).getMIMEType();
         sequenceId = bitstream.getSequenceID();
         CheckSum checkSum = new CheckSum();
