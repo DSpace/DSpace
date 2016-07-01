@@ -393,6 +393,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     public void recycle()
     {
         this.validity = null;
+        this.availableExports = null;
         super.recycle();
     }
     

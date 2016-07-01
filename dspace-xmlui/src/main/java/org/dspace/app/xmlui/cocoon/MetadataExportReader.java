@@ -209,7 +209,10 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
     public void recycle() {        
         this.response = null;
         this.request = null;
-        
+        this.exporter = null;
+        this.filename = null;
+        this.csv = null;
+        super.recycle();
     }
 
 
