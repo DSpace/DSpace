@@ -3,15 +3,7 @@
 package org.datadryad.rest.resources.v1;
 
 import java.net.URI;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -86,7 +78,7 @@ public class ManuscriptResource {
         if(manuscript.isValid()) {
             try {
                 // Find the journal in database first.
-                manuscript.setJournal(journalStorage.findByPath(journalPath).getJournalFromJournalConcept());
+                manuscript.setJournalConcept(journalStorage.findByPath(journalPath));
                 manuscriptStorage.create(journalPath, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception creating manuscript", ex);
@@ -113,7 +105,7 @@ public class ManuscriptResource {
         if(manuscript.isValid()) {
             try {
                 StoragePath journalPath = StoragePath.createJournalPath(journalCode);
-                manuscript.setJournal(journalStorage.findByPath(journalPath).getJournalFromJournalConcept());
+                manuscript.setJournalConcept(journalStorage.findByPath(journalPath));
                 manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception updating manuscript", ex);
@@ -138,7 +130,7 @@ public class ManuscriptResource {
         if(manuscript.isValid()) {
             try {
                 StoragePath journalPath = StoragePath.createJournalPath(journalCode);
-                manuscript.setJournal(journalStorage.findByPath(journalPath).getJournalFromJournalConcept());
+                manuscript.setJournalConcept(journalStorage.findByPath(journalPath));
                 manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception updating manuscript", ex);

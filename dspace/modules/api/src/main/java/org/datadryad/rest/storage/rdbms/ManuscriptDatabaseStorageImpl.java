@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Journal;
@@ -125,7 +126,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             try {
                 Context context = getContext();
                 Journal journal = JournalDatabaseStorageImpl.getJournalByConceptID(context, journalConceptID);
-                manuscript.setJournal(journal);
                 manuscript.setJournalConcept(JournalUtils.getJournalConceptByISSN(journal.issn));
                 completeContext(context);
             } catch (SQLException e) {
@@ -167,7 +167,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         TableRow row = getTableRowByManuscriptId(context, msid, journalCode);
         if (row != null) {
             manuscript = manuscriptFromTableRow(row);
-            manuscript.getJournal().journalCode = journalCode;
+            manuscript.setJournalConcept(JournalUtils.getJournalConceptByJournalID(journalCode));
         }
         return manuscript;
     }
@@ -186,12 +186,12 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     private static List<TableRow> getTableRowsMatchingManuscript(Context context, Manuscript manuscript) throws SQLException, IOException {
         ArrayList<TableRow> finalRows = new ArrayList<TableRow>();
-        Journal journal = manuscript.getJournal();
-        if (journal == null) {
+        DryadJournalConcept journalConcept = manuscript.getJournalConcept();
+        if (journalConcept == null) {
             return null;
         }
         TableRow existingRow = null;
-        Integer journalConceptID = journal.conceptID;
+        Integer journalConceptID = journalConcept.getConceptID();
         if (manuscript.getManuscriptId() != null) {
             existingRow = getTableRowByManuscriptId(context, manuscript.getManuscriptId(), journal.journalCode);
         }
