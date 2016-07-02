@@ -193,40 +193,44 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         TableRow existingRow = null;
         Integer journalConceptID = journalConcept.getConceptID();
         if (manuscript.getManuscriptId() != null) {
-            existingRow = getTableRowByManuscriptId(context, manuscript.getManuscriptId(), journal.journalCode);
-        }
-        if (existingRow == null) {
-            // try looking it up by pub doi
-            String pubDOI = manuscript.getPublicationDOI();
-            if (!"".equals(pubDOI)) {
-                log.debug("Looking for a manuscript with publication DOI like " + pubDOI + " and " + COLUMN_JOURNAL_ID + " like " + journalConceptID);
-                String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? and " + COLUMN_JSON_DATA + " like '%\"publicationDOI\" : \"" + pubDOI + "\"%'";
-                existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE);
+            existingRow = getTableRowByManuscriptId(context, manuscript.getManuscriptId(), journalConcept.getJournalID());
+            if (existingRow != null) {
+                finalRows.add(existingRow);
             }
-        }
-        if (existingRow != null) {
-            finalRows.add(existingRow);
         } else {
-            // try looking it up by authors and title:
-            // first, query database for entries that have all surnames of authors in the json_data
-            // then, compare the title of those entries with the one we're looking for.
-            List<Author> authorList = manuscript.getAuthorList();
-            StringBuilder authorString = new StringBuilder();
-            for (Author author : authorList) {
-                authorString.append(" and " + COLUMN_JSON_DATA + " like '%\"familyName\" : \"" + StringEscapeUtils.escapeSql(author.familyName) + "\"%' ");
+            if (existingRow == null) {
+                // try looking it up by pub doi
+                String pubDOI = manuscript.getPublicationDOI();
+                if (!"".equals(pubDOI)) {
+                    log.debug("Looking for a manuscript with publication DOI like " + pubDOI + " and " + COLUMN_JOURNAL_ID + " like " + journalConceptID);
+                    String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? and " + COLUMN_JSON_DATA + " like '%\"publicationDOI\" : \"" + pubDOI + "\"%'";
+                    existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE);
+                }
             }
-            if (!"".equals(authorString.toString())) {
-                String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? " + authorString.toString();
-                TableRowIterator tableRowIterator = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE);
-                if (tableRowIterator != null) {
-                    List<TableRow> rows = tableRowIterator.toList();
-                    for (TableRow row : rows) {
-                        Manuscript databaseManuscript = manuscriptFromTableRow(row);
-                        String databaseTitle = StringUtils.deleteWhitespace(StringUtils.upperCase(databaseManuscript.getTitle()));
-                        String manuscriptTitle = StringUtils.deleteWhitespace(StringUtils.upperCase(manuscript.getTitle()));
-                        double score = JournalUtils.getHamrScore(databaseTitle, manuscriptTitle);
-                        if (score > 0.9) {
-                            finalRows.add(row);
+            if (existingRow != null) {
+                finalRows.add(existingRow);
+            } else {
+                // try looking it up by authors and title:
+                // first, query database for entries that have all surnames of authors in the json_data
+                // then, compare the title of those entries with the one we're looking for.
+                List<Author> authorList = manuscript.getAuthorList();
+                StringBuilder authorString = new StringBuilder();
+                for (Author author : authorList) {
+                    authorString.append(" and " + COLUMN_JSON_DATA + " like '%\"familyName\" : \"" + StringEscapeUtils.escapeSql(author.familyName) + "\"%' ");
+                }
+                if (!"".equals(authorString.toString())) {
+                    String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? " + authorString.toString();
+                    TableRowIterator tableRowIterator = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE);
+                    if (tableRowIterator != null) {
+                        List<TableRow> rows = tableRowIterator.toList();
+                        for (TableRow row : rows) {
+                            Manuscript databaseManuscript = manuscriptFromTableRow(row);
+                            String databaseTitle = StringUtils.deleteWhitespace(StringUtils.upperCase(databaseManuscript.getTitle()));
+                            String manuscriptTitle = StringUtils.deleteWhitespace(StringUtils.upperCase(manuscript.getTitle()));
+                            double score = JournalUtils.getHamrScore(databaseTitle, manuscriptTitle);
+                            if (score > 0.9) {
+                                finalRows.add(row);
+                            }
                         }
                     }
                 }
