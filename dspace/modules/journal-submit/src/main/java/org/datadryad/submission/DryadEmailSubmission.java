@@ -7,6 +7,7 @@ import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.AuthorsList;
 import org.datadryad.api.DryadJournalConcept;
+import org.datadryad.rest.storage.StorageException;
 import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 import org.dspace.core.ConfigurationManager;
@@ -346,41 +347,46 @@ public class DryadEmailSubmission extends HttpServlet {
         if ((manuscript != null) && (manuscript.isValid())) {
             // edit the manuscript ID to the canonical one:
             manuscript.setManuscriptId(JournalUtils.getCanonicalManuscriptID(manuscript));
-            JournalUtils.writeManuscriptToDB(manuscript);
-            LOGGER.debug ("this ms has status " + manuscript.getStatus());
-            Boolean approved = null;
+            try {
+                JournalUtils.writeManuscriptToDB(manuscript);
+                LOGGER.debug("this ms has status " + manuscript.getStatus());
+                Boolean approved = null;
 
-            if (manuscript.isAccepted()) {
-                approved = true;
-            } else if (manuscript.isRejected()) {
-                approved = false;
-            } else if (manuscript.isNeedsRevision()) {
-                approved = false;
-            } else if (manuscript.isPublished()) {
-                approved = true;
-            }
-
-            // if the status was "submitted," approved will still be null and we won't try to process any items.
-            if (approved != null) {
-                DSpaceKernelImpl kernelImpl = null;
-                try {
-                    kernelImpl = DSpaceKernelInit.getKernel(null);
-                    if (!kernelImpl.isRunning()) {
-                        kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
-                    }
-                } catch (Exception ex) {
-                    // Failed to start so destroy it and log and throw an exception
-                    try {
-                        if(kernelImpl != null) {
-                            kernelImpl.destroy();
-                        }
-                    } catch (Exception e1) {
-                        // Nothing to do
-                    }
-                    LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
+                if (manuscript.isAccepted()) {
+                    approved = true;
+                } else if (manuscript.isRejected()) {
+                    approved = false;
+                } else if (manuscript.isNeedsRevision()) {
+                    approved = false;
+                } else if (manuscript.isPublished()) {
+                    approved = true;
                 }
 
-                ApproveRejectReviewItem.reviewManuscript(manuscript);
+                // if the status was "submitted," approved will still be null and we won't try to process any items.
+                if (approved != null) {
+                    DSpaceKernelImpl kernelImpl = null;
+                    try {
+                        kernelImpl = DSpaceKernelInit.getKernel(null);
+                        if (!kernelImpl.isRunning()) {
+                            kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                        }
+                    } catch (Exception ex) {
+                        // Failed to start so destroy it and log and throw an exception
+                        try {
+                            if (kernelImpl != null) {
+                                kernelImpl.destroy();
+                            }
+                        } catch (Exception e1) {
+                            // Nothing to do
+                        }
+                        LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
+                    }
+
+                    ApproveRejectReviewItem.reviewManuscript(manuscript);
+                }
+            } catch (StorageException e) {
+                LOGGER.error("failed to write ms " + manuscript.getManuscriptId());
+                throw new SubmissionException("failed to write ms " + manuscript.getManuscriptId(), e);
             }
         } else {
             throw new SubmissionException("Parser could not validly parse the message");
