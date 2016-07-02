@@ -7,7 +7,7 @@
         "hidden" : "Y",
         "integrated" : "Y",
         "title" : "American Journal of Botany",
-        "sponsor" : "The Botanical Society of America"
+        "sponsor" : "$120"
      },
      {
         "title" : "American Naturalist, The",
@@ -20,12 +20,12 @@
      },
      {
         "integrated" : "N",
-        "embargo" : "Y",
+        "embargo" : "N",
         "issn" : "2168-0450",
         "submission" : "A",
         "hidden" : "Y",
         "title" : "Applications in Plant Sciences",
-        "sponsor" : "The Botanical Society of America"
+        "sponsor" : "$120"
      },
      {
         "title" : "Behavioral Ecology",
@@ -336,7 +336,7 @@
      {
         "hidden" : "Y",
         "embargo" : "Y",
-        "issn" : "",
+        "issn" : "2196-5226",
         "submission" : "A",
         "integrated" : "N",
         "sponsor" : "German National Library of Medicine",
@@ -345,7 +345,7 @@
      {
         "hidden" : "N",
         "embargo" : "Y",
-        "issn" : "",
+        "issn" : "2195-8831",
         "submission" : "R",
         "integrated" : "Y",
         "sponsor" : "German National Library of Medicine",
@@ -355,10 +355,10 @@
         "title" : "GMS Interdisciplinary Plastic and Reconstructive Surgery DGPW",
         "sponsor" : "German National Library of Medicine",
         "integrated" : "Y",
-        "issn" : "",
+        "issn" : "2193-8091",
         "embargo" : "Y",
         "submission" : "R",
-        "hidden" : "N"
+        "hidden" : "Y"
      },
      {
         "issn" : "1865-066X",
@@ -463,7 +463,7 @@
         "integrated" : "Y",
         "hidden" : "N",
         "embargo" : "N",
-        "issn" : "",
+        "issn" : "0021-9533",
         "submission" : "R",
         "sponsor" : "$120",
         "title" : "Journal of Cell Science"
@@ -641,10 +641,10 @@
      },
      {
         "integrated" : "N",
-        "embargo" : "Y",
+        "embargo" : "N",
         "issn" : "0078-1304",
         "submission" : "A",
-        "hidden" : "Y",
+        "hidden" : "N",
         "title" : "North American Fauna",
         "sponsor" : "US Fish & Wildlife Service"
      },
@@ -658,7 +658,7 @@
         "hidden" : "Y"
      },
      {
-        "issn" : "",
+        "issn" : "2054-7102",
         "embargo" : "Y",
         "submission" : "R",
         "hidden" : "N",
@@ -746,15 +746,6 @@
         "hidden" : "Y",
         "title" : "Plant Physiology",
         "sponsor" : "American Society of Plant Biologists"
-     },
-     {
-        "hidden" : "Y",
-        "submission" : "A",
-        "issn" : "0032-0919",
-        "embargo" : "Y",
-        "integrated" : "N",
-        "sponsor" : "The Botanical Society of America",
-        "title" : "Plant Science Bulletin"
      },
      {
         "sponsor" : "$120",
@@ -924,7 +915,7 @@
         "issn" : "1435-1935",
         "submission" : "A",
         "hidden" : "Y",
-        "title" : "Zoological Systematics and Evolution",
+        "title" : "Zoosystematics and Evolution",
         "sponsor" : "Pensoft"
      }
   ]
