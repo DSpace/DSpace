@@ -324,12 +324,14 @@ public class JournalUtils {
                 manuscriptStorage.create(storagePath, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception creating manuscript", ex);
+                throw ex;
             }
         } else {
             try {
                 manuscriptStorage.update(storagePath, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception updating manuscript", ex);
+                throw ex;
             }
         }
         return manuscript;
