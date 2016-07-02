@@ -386,7 +386,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 }
             } catch (StorageException e) {
                 LOGGER.error("failed to write ms " + manuscript.getManuscriptId());
-                throw new SubmissionException("failed to write ms " + manuscript.getManuscriptId());
+                throw new SubmissionException("failed to write ms " + manuscript.getManuscriptId(), e);
             }
         } else {
             throw new SubmissionException("Parser could not validly parse the message");
