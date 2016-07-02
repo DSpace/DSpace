@@ -55,6 +55,8 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     public static final String WEBSITE = "website";
     public static final String COVER_IMAGE = "coverImage";
 
+    public static final String HASJOURNALPAGE = "hasJournalPage";
+
     public static final String SUBSCRIPTION_PLAN = "SUBSCRIPTION";
     public static final String PREPAID_PLAN = "PREPAID";
     public static final String DEFERRED_PLAN = "DEFERRED";
@@ -86,6 +88,7 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
         metadataProperties.setProperty(CUSTOMER_ID, "journal.customerID");
         metadataProperties.setProperty(DESCRIPTION, "journal.description");
         metadataProperties.setProperty(MEMBERNAME, "journal.memberName");
+        metadataProperties.setProperty(HASJOURNALPAGE, "journal.hasJournalPage");
         metadataProperties.setProperty(WEBSITE, "journal.website");
         metadataProperties.setProperty(COVER_IMAGE, "journal.coverImage");
 
@@ -110,6 +113,7 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
         defaultMetadataValues.setProperty(metadataProperties.getProperty(MEMBERNAME), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(WEBSITE), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(COVER_IMAGE), "");
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(HASJOURNALPAGE), "");
     }
 
     // these are mandatory elements
@@ -374,6 +378,24 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     public void setMemberName(String value) {
         setConceptMetadataValue(metadataProperties.getProperty(MEMBERNAME), value);
+    }
+
+    public Boolean getHasJournalPage() {
+        String metadataValue = getConceptMetadataValue(metadataProperties.getProperty(HASJOURNALPAGE));
+        Boolean result = false;
+        if (metadataValue.equals("true")) {
+            result = true;
+        }
+        return result;
+    }
+
+    public void setHasJournalPage(String value) {
+        setConceptMetadataValue(metadataProperties.getProperty(HASJOURNALPAGE), value);
+    }
+
+    @JsonIgnore
+    public void setBooleanHasJournalPage(Boolean value) {
+        setHasJournalPage(value.toString());
     }
 
     @JsonIgnore
