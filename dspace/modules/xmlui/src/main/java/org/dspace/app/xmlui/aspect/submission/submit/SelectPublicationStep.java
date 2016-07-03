@@ -217,6 +217,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         doi.addItem().addContent("OR");
         Text cb = doi.addItem().addText("unknown_doi");
+        String pubName = request.getParameter("unknown_doi");
+        if (pubName != null) {
+            cb.setValue(pubName);
+        }
         cb.setHelp(T_unknown_doi);
 
 
@@ -305,8 +309,12 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 journalID.addOption(val, name);
             }
         }
-        if (manuscript != null) {
-            String selectedJournalID = manuscript.getJournalConcept().getJournalID();
+        String selectedJournalID = request.getParameter("journalIDStatusInReview");
+        if (selectedJournalID == null && manuscript != null) {
+            selectedJournalID = manuscript.getJournalConcept().getJournalID();
+        }
+        log.error("selected journal is " + selectedJournalID);
+        if (!"".equals(selectedJournalID)) {
             journalID.setOptionSelected(selectedJournalID);
         }
         journalID.setLabel(T_SELECT_LABEL);
@@ -328,7 +336,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 }
             }
         } else {
-            journalID.addOption(selectedJournalName, selectedJournalName);
+            log.error("journal was " + selectedJournalName);
+            journalID.setOptionSelected(selectedJournalName);
         }
     }
 
