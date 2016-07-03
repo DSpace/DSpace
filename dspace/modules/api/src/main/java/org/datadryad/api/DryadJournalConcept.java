@@ -190,6 +190,14 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     @Override
     public int compareTo(DryadJournalConcept journalConcept) {
+//        a negative number if our object comes before the one passed in;
+//        a positive number if our object comes after the one passed in;
+//        otherwise, zero (meaning they're equal in terms of ordering).
+        if ("".equals(this.getFullName())) {
+            return -1;
+        } else if ("".equals(journalConcept.getFullName())) {
+            return 1;
+        }
         return this.getFullName().toUpperCase().compareTo(journalConcept.getFullName().toUpperCase());
     }
 
