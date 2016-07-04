@@ -106,7 +106,7 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
         }
 
         // Specific style specified. Check style exists
-        if (isConfigurationDefinedForStyle(styleName))
+        if (!isConfigurationDefinedForStyle(styleName))
         {
             log.warn("dspace.cfg specifies undefined item display style '"
                     + styleName + "' for collection handle " + handle + ".  Using default");
