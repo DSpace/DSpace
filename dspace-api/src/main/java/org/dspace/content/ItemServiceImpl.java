@@ -727,18 +727,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             // if come from InstallItem: remove all submission/workflow policies
             authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_SUBMISSION);
             authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_WORKFLOW);
-
-            List<ResourcePolicy> policiesBundleToAdd = filterPoliciesToAdd(context, defaultCollectionPolicies, mybundle);
-            authorizeService.addPolicies(context, policiesBundleToAdd, mybundle);
+            addDefaultPoliciesNotInPlace(context, mybundle, defaultCollectionPolicies);
 
             for(Bitstream bitstream : mybundle.getBitstreams())
             {
                 // if come from InstallItem: remove all submission/workflow policies
                 authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_SUBMISSION);
                 authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_WORKFLOW);
-
-                List<ResourcePolicy> policiesBitstreamToAdd = filterPoliciesToAdd(context, defaultCollectionPolicies, bitstream);
-                authorizeService.addPolicies(context, policiesBitstreamToAdd, bitstream);
+                addDefaultPoliciesNotInPlace(context, bitstream, defaultCollectionPolicies);
             }
         }
     }
@@ -765,9 +761,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_WORKFLOW);
 
             // add default policies only if not already in place
-            List<ResourcePolicy> policiesToAdd = filterPoliciesToAdd(context, defaultCollectionPolicies, item);
-            authorizeService.addPolicies(context, policiesToAdd, item);
-        } finally {
+            addDefaultPoliciesNotInPlace(context, item, defaultCollectionPolicies);
+        } 
+        finally 
+        {
             context.restoreAuthSystemState();
         }
     }
@@ -889,22 +886,35 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         return collectionService.canEditBoolean(context, item.getOwningCollection(), false);
     }
 
+    
+    /*
+    With every finished submission a bunch of resource policy entries with have null value for the dspace_object column are generated in the database.
+prevent the generation of resource policy entry values with null dspace_object as value
 
+    */
 
-    protected List<ResourcePolicy> filterPoliciesToAdd(Context context, List<ResourcePolicy> defaultCollectionPolicies, DSpaceObject dso) throws SQLException, AuthorizeException {
-        List<ResourcePolicy> policiesToAdd = new ArrayList<>();
-        for (ResourcePolicy defaultCollectionPolicy : defaultCollectionPolicies){
-            //We do NOT alter the defaultCollectionPolicy since we would lose it if we do, instead clone it
-            ResourcePolicy rp = (ResourcePolicy) resourcePolicyService.clone(context, defaultCollectionPolicy);
-
-            rp.setAction(Constants.READ);
-            // if an identical policy is already in place don't add it
-            if(!authorizeService.isAnIdenticalPolicyAlreadyInPlace(context, dso, rp)){
-                rp.setRpType(ResourcePolicy.TYPE_INHERITED);
-                policiesToAdd.add(rp);
+    /**
+     * Add the default policies, which have not been already added to the given DSpace object
+     * 
+     * @param context
+     * @param dso
+     * @param defaultCollectionPolicies
+     * @throws SQLException
+     * @throws AuthorizeException 
+     */
+    protected void addDefaultPoliciesNotInPlace(Context context, DSpaceObject dso, List<ResourcePolicy> defaultCollectionPolicies) throws SQLException, AuthorizeException
+    {
+            for (ResourcePolicy defaultPolicy : defaultCollectionPolicies)
+            {
+                if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(context, dso, defaultPolicy.getGroup(), Constants.READ, defaultPolicy.getID()))
+                {
+                    ResourcePolicy newPolicy = resourcePolicyService.clone(context, defaultPolicy);
+                    newPolicy.setdSpaceObject(dso);
+                    newPolicy.setAction(Constants.READ);
+                    newPolicy.setRpType(ResourcePolicy.TYPE_INHERITED);
+                    resourcePolicyService.update(context, newPolicy);
+                }
             }
-        }
-        return policiesToAdd;
     }
 
     /**
