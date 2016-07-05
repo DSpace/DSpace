@@ -120,7 +120,7 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
             AuthorizeException
     {
         // First we find the collection which was selected
-        UUID id = Util.getUUIDParameter(request, "collection");
+        UUID id = Util.getUUIDParameter(request, "collectionid");
         String titolo = request.getParameter("search_title");
         String date = request.getParameter("search_year");
         String autori = request.getParameter("search_authors");
