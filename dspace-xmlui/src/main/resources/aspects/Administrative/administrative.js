@@ -1849,7 +1849,7 @@ function doEditBitstream(itemID, bitstreamID)
             // Update the metadata
             var primary = cocoon.request.get("primary");
             var description = cocoon.request.get("description");
-            var formatID = UUID.fromString(cocoon.request.get("formatID"));
+            var formatID = cocoon.request.get("formatID");
             var userFormat = cocoon.request.get("user_format");
             var bitstreamName = cocoon.request.get("bitstreamName");
 
