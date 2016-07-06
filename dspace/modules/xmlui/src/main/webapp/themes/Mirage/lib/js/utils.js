@@ -74,9 +74,6 @@ function initFirstSubmissionForm() {
     enableJournalPublished();
     // if I am in the first page
     if (jQuery("#aspect_submission_StepTransformer_div_submit-select-publication").length > 0) {
-        jQuery("#grant-info").hide();
-        jQuery("#aspect_submission_StepTransformer_item_grant-info").hide();
-
         // Status (onLoad of the page): STATUS_ACCEPTED
         if (jQuery('input[name|="article_status"]:checked').val()=='1') {
 
@@ -154,6 +151,15 @@ function initFirstSubmissionForm() {
             jQuery("#journalIDStatusInReview").hide();
             jQuery("#status_other_than_published").hide();
             enableNextButton();
+        }
+
+        // Status on page load: funding agency sponsorship YES
+        if (jQuery('input[name|="funding-status"]:checked').val()=='1') {
+            jQuery("#grant-info").show();
+            jQuery("#aspect_submission_StepTransformer_item_grant-info").show();
+        } else {
+            jQuery("#grant-info").hide();
+            jQuery("#aspect_submission_StepTransformer_item_grant-info").hide();
         }
 
         // Click: funding agency sponsorship YES

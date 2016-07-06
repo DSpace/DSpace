@@ -73,15 +73,20 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             return ERROR_SELECT_JOURNAL;
         }
 
+        String fundingStatus = request.getParameter("funding-status");
         String grantInfo = request.getParameter("grant-info");
-        if (grantInfo != null) {
-            // need to validate grant info here
-            if (!JournalUtils.isValidNSFGrantNumber(grantInfo)) {
-                return ERROR_INVALID_GRANT;
+        if (fundingStatus.equals("1")) {
+            if (grantInfo != null && !grantInfo.equals("")) {
+                if (!JournalUtils.isValidNSFGrantNumber(grantInfo)) {
+                    return ERROR_INVALID_GRANT;
+                }
             }
-            item.addMetadata("dryad.fundingEntity", null, grantInfo, null, 0);
-            item.update();
+        } else {
+            grantInfo = "no grant";
         }
+
+        item.addMetadata("dryad.fundingEntity", null, grantInfo, null, 0);
+        item.update();
 
         EventLogger.log(context, "submission-select-publication", "status=complete");
         return STATUS_COMPLETE;
@@ -174,7 +179,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         String identifier = request.getParameter("article_doi");
         if (identifier!=null && !identifier.equals("")) {
             // normalize and validate the identifier
-            Matcher doiMatcher = Pattern.compile("(doi:)*(.+\\/.+)").matcher(identifier);
+            Matcher doiMatcher = Pattern.compile("(doi:)*(.+/.+)").matcher(identifier);
             Matcher pmidMatcher = Pattern.compile("(\\d+)").matcher(identifier);
             if (doiMatcher.find()) {
                 identifier = doiMatcher.group(2);
