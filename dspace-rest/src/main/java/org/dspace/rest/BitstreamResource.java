@@ -116,7 +116,7 @@ public class BitstreamResource extends Resource
             writeStats(dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
-            bitstream = new Bitstream(dspaceBitstream, servletContext, expand, context, request);
+            bitstream = new Bitstream(dspaceBitstream, servletContext, expand, context);
             context.complete();
             log.trace("Bitsream(id=" + bitstreamId + ") was successfully read.");
 
@@ -241,7 +241,7 @@ public class BitstreamResource extends Resource
                     if (bitstreamService.getParentObject(context, dspaceBitstreams.get(i)) != null)
                     { // To eliminate bitstreams which cause exception, because of
                       // reading under administrator permissions
-                        bitstreams.add(new Bitstream(dspaceBitstreams.get(i), servletContext, expand, context, request));
+                        bitstreams.add(new Bitstream(dspaceBitstreams.get(i), servletContext, expand, context));
                         writeStats(dspaceBitstreams.get(i), UsageEvent.Action.VIEW, user_ip, user_agent,
                                 xforwardedfor, headers, request, context);
                     }

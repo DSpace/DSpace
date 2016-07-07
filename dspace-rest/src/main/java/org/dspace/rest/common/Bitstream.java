@@ -23,6 +23,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.utils.DSpace;
 
 /**
  * Created with IntelliJ IDEA.
@@ -56,15 +57,10 @@ public class Bitstream extends DSpaceObject {
 
     public Bitstream(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context ) throws SQLException{
         super(bitstream, servletContext);
-        setup(bitstream, servletContext, expand, context, null);
+        setup(bitstream, servletContext, expand, context);
     }
 
-    public Bitstream(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context, HttpServletRequest request) throws SQLException{
-        super(bitstream, servletContext);
-        setup(bitstream, servletContext, expand, context, request);
-    }
-
-    public void setup(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context, HttpServletRequest request) throws SQLException{
+    public void setup(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
@@ -80,10 +76,7 @@ public class Bitstream extends DSpaceObject {
         description = bitstream.getDescription();
         format = bitstreamService.getFormatDescription(context, bitstream);
         sizeBytes = bitstream.getSize();
-        String path = "";
-        if(request != null){
-            path = request.getContextPath();
-        }
+        String path = new DSpace().getRequestService().getCurrentRequest().getHttpServletRequest().getContextPath();
         retrieveLink = path + "/bitstreams/" + bitstream.getID() + "/retrieve";
         mimeType = bitstreamService.getFormat(context, bitstream).getMIMEType();
         sequenceId = bitstream.getSequenceID();
