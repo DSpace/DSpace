@@ -78,7 +78,7 @@
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>8.1-407.jdbc3</version>
+			<version>9.4-1206-jdbc41</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
