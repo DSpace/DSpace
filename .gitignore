@@ -37,3 +37,4 @@ META-INF/
 *.bak
 
 .*.sw[pon]
+/bin/
