@@ -253,6 +253,9 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     }
 
     public String getFullName() {
+        if (fullName == null) {
+            return "";
+        }
         return fullName;
     }
 
