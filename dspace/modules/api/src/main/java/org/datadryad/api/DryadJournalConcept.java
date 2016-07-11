@@ -258,6 +258,9 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     public void setFullName(String value) throws StorageException {
         Context context = null;
+        if (value == null) {
+            value = "";
+        }
         try {
             setConceptMetadataValue(journalMetadata.getProperty(FULLNAME), value);
             // update JournalUtils with this new concept
