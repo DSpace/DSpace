@@ -290,16 +290,10 @@ public class HandlePlugin implements HandleStorage
 
             ResolvedHandle rh = null;
             if (url.startsWith(magicBean)) {
-                String[] splits = url.split(magicBean);
+                String[] splits = url.split(magicBean,10);
                 url = splits[splits.length - 1];
-                if(splits.length == 6){
-                    //old entry
-                    // EMPTY, String title, String repository, String submitdate, String reportemail
-                    rh = new ResolvedHandle(url, splits[1], splits[2], splits[3], splits[4]);
-                }else if(splits.length == 9){
-                    // EMPTY, String title, String repository, String submitdate, String reportemail, String dataset_name, String dataset_version, String query
+                    // EMPTY, String title, String repository, String submitdate, String reportemail, String dataset_name, String dataset_version, String query, token is splits[8] but don't show that
                     rh = new ResolvedHandle(url, splits[1], splits[2], splits[3], splits[4], splits[5], splits[6], splits[7]);
-                }
             }else {
                 rh = new ResolvedHandle(url, dso);
             }
@@ -474,10 +468,6 @@ class ResolvedHandle {
     List<HandleValue> values;
     private int idx = -1;
     private int timestamp = 100;
-
-    public ResolvedHandle(String url, String title, String repository, String submitdate, String reportemail) {
-        init(url, title, repository, submitdate, reportemail);
-    }
 
     public ResolvedHandle(String url, String title, String repository, String submitdate, String reportemail, String datasetName, String datasetVersion, String query) {
         init(url, title, repository, submitdate, reportemail, datasetName, datasetVersion, query);
