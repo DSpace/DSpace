@@ -179,10 +179,10 @@ select.multiple {
 
 #ds-footer-logo {
     display: inline-block;
-    background: url('../../images/@mirelogo-small.png');
+    background: url('../../images/atmire-logo-small.svg');
     background-repeat: no-repeat;
-    width: 79px;
-    height: 40px;
+    width: 110px;
+    height: 30px;
 }
 
 #ds-footer-links {
