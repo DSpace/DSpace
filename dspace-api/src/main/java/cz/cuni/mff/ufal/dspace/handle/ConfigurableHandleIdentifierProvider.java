@@ -146,7 +146,7 @@ public class ConfigurableHandleIdentifierProvider extends IdentifierProvider {
     @Override
     public void reserve(Context context, DSpaceObject dso, String identifier) {
         try{
-            Handle handle = Handle.create( context, dso, identifier );
+            createNewIdentifier(context, dso, identifier);
         }catch(Exception e){
             log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());

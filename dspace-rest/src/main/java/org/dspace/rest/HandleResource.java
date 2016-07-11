@@ -27,6 +27,7 @@ import org.dspace.rest.common.Item;
 import org.dspace.rest.exceptions.ContextException;
 
 import se.kb.oai.OAIException;
+import se.kb.oai.pmh.ErrorResponseException;
 import se.kb.oai.pmh.OaiPmhServer;
 import se.kb.oai.pmh.Record;
 
@@ -197,9 +198,21 @@ public class HandleResource extends Resource {
             }
             org.dspace.content.Item item = (org.dspace.content.Item) dso;
             String title = item.getMetadata("dc.title");
-            AbstractFormat displayText = getCitation(prefix, suffix, "html");
+            AbstractFormat displayText = null;
+            ExportFormats exportFormats = null;
+            try{
+                displayText = getCitation(prefix, suffix, "html");
+                exportFormats = ExportFormats.getFormats(prefix + "/" + suffix);
+            }catch(ErrorResponseException e){
+                if(e.getCode().equals(ErrorResponseException.ID_DOES_NOT_EXIST)){
+                    //Refbox for item with no OAI ID, eg. ResumeStep
+                    displayText = new AbstractFormat("other");
+                    displayText.setValue(String.format("<a href=\"%s\">%<s</a>",String.format("http://hdl.handle.net/%s/%s", prefix, suffix)));
+                    exportFormats = new ExportFormats();
+                }
+
+            }
             FeaturedServices featuredServices = getFeaturedServices(item);
-            ExportFormats exportFormats = ExportFormats.getFormats(prefix + "/" + suffix);
 
             RefBoxData refBox = new RefBoxData();
             refBox.setTitle(title);
@@ -227,7 +240,6 @@ public class HandleResource extends Resource {
         OaiPmhServer server = new OaiPmhServer(url);
         Record record = server.getRecord(identifier, format);
         String metadataString = record.getMetadataAsString();
-
         AbstractFormat af = new AbstractFormat(format);
         af.setValue(metadataString);
         return af;

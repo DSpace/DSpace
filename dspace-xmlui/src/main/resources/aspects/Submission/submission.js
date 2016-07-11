@@ -185,6 +185,8 @@ function doSubmission()
                        workspaceID = workspace.getID();
                        
                        collectionSelected = true;
+
+					   FlowUtils.reservePID(getDSContext(), workspaceID);
                         
                        break; // We don't need to ask them for a collection again.   
                    }
