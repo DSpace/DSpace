@@ -332,16 +332,15 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     @Override
     public void clearMetadata(Context context, T dso, String schema, String element, String qualifier, String lang) throws SQLException {
-        // We will build a list of values NOT matching the values to clear
         Iterator<MetadataValue> metadata = dso.getMetadata().iterator();
         while (metadata.hasNext())
         {
             MetadataValue metadataValue = metadata.next();
+            // If this value matches, delete it
             if (match(schema, element, qualifier, lang, metadataValue))
             {
-                metadataValue.setDSpaceObject(null);
                 metadata.remove();
-//                metadataValueService.delete(context, metadataValue);
+                metadataValueService.delete(context, metadataValue);
             }
         }
         dso.setMetadataModified();
@@ -355,7 +354,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             if(values.contains(metadataValue))
             {
                 metadata.remove();
-//                metadataValueService.delete(context, metadataValue);
+                metadataValueService.delete(context, metadataValue);
             }
         }
         dso.setMetadataModified();
