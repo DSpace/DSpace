@@ -137,12 +137,22 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     @Override
     public List<Community> findAll(Context context) throws SQLException {
         MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        if(sortField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+        }
+
         return communityDAO.findAll(context, sortField);
     }
 
     @Override
     public List<Community> findAll(Context context, Integer limit, Integer offset) throws SQLException {
         MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        if(nameField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+        }
+
         return communityDAO.findAll(context, nameField, limit, offset);
     }
 
@@ -151,6 +161,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     {
         // get all communities that are not children
         MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        if(sortField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+        }
+
         return communityDAO.findAllNoParent(context, sortField);
     }
 

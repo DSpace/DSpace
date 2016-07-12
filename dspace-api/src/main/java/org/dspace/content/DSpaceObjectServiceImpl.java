@@ -207,7 +207,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, List<String> values) throws SQLException {
         MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
         if (metadataField == null) {
-            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier);
+            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not exist!");
         }
 
         addMetadata(context, dso, metadataField, lang, values);
@@ -219,7 +219,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         // until update() is called.
         MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
         if (metadataField == null) {
-            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier);
+            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not exist!");
         }
         addMetadata(context, dso, metadataField, lang, values, authorities, confidences);
     }
