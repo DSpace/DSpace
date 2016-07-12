@@ -49,7 +49,7 @@ import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
  * @author Fabio Bolognesi, fabio at atmire.com
  * @author Lantian Gai, lantian at atmire.com
  */
-public class PaypalImpl implements PaypalService {
+public class PaymentServiceImpl implements PaymentService {
     private static final Message T_funding_head = message("xmlui.submit.select.funding.head");
     private static final Message T_funding_question = message("xmlui.Submission.submit.CheckoutStep.funding.question");
     private static final Message T_funding_valid = message("xmlui.Submission.submit.CheckoutStep.funding.valid");
@@ -58,7 +58,7 @@ public class PaypalImpl implements PaypalService {
 
     private static final Message T_funding_desc1 = message("xmlui.Submission.submit.CheckoutStep.funding.desc1");
     private static final Message T_funding_desc2 = message("xmlui.submit.select.funding.desc2");
-    protected Logger log = Logger.getLogger(PaypalImpl.class);
+    protected Logger log = Logger.getLogger(PaymentServiceImpl.class);
 
     public String getSecureTokenId() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSSSSSSSSS");
@@ -416,7 +416,7 @@ public class PaypalImpl implements PaypalService {
     public void generateUserForm(Context context, Division mainDiv, String actionURL, String knotId, String type, Request request, Item item, DSpaceObject dso) throws WingException, SQLException {
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-        PaypalService paypalService = new DSpace().getSingletonService(PaypalService.class);
+        PaymentService paymentService = new DSpace().getSingletonService(PaymentService.class);
         String errorMessage = request.getParameter("encountError");
         ShoppingCart shoppingCart = null;
         Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
@@ -501,7 +501,7 @@ public class PaypalImpl implements PaypalService {
             }
         } catch (Exception e) {
             //TODO: handle the exceptions
-            paypalService.showSkipPaymentButton(mainDiv, "errors in generating the payment form:" + e.getMessage());
+            paymentService.showSkipPaymentButton(mainDiv, "errors in generating the payment form:" + e.getMessage());
             if (shoppingCart != null) {
                 shoppingCart.setNote("Payment error: " + e.getMessage());
                 shoppingCart.update();
@@ -511,7 +511,7 @@ public class PaypalImpl implements PaypalService {
 
 
         mainDiv.addHidden("submission-continue").setValue(knotId);
-        paypalService.addButtons(mainDiv);
+        paymentService.addButtons(mainDiv);
 
     }
 

@@ -9,17 +9,13 @@ package org.dspace.workflow.actions.processingaction;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
 import org.dspace.core.*;
 import org.dspace.paymentsystem.PaymentSystemService;
-import org.dspace.paymentsystem.PaypalService;
 import org.dspace.paymentsystem.ShoppingCart;
-import org.dspace.paymentsystem.Voucher;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
-import javax.mail.MessagingException;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
