@@ -61,7 +61,11 @@ public class PaymentServiceImpl implements PaymentService {
     private static final Message T_funding_desc2 = message("xmlui.submit.select.funding.desc2");
 
     private static final Message T_payment_note = message("xmlui.Submission.submit.Checkout.note");
+    private static final Message T_voucher_error = message("xmlui.Submission.submit.Checkout.voucher.error");
     protected Logger log = Logger.getLogger(PaymentServiceImpl.class);
+
+    private static final String PAYMENT_ERROR_VOUCHER = "voucher error";
+    private static final String PAYMENT_ERROR_GRANT = "grant error";
 
     public String getSecureTokenId() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSSSSSSSSS");
@@ -319,7 +323,7 @@ public class PaymentServiceImpl implements PaymentService {
             try {
                 workspaceItem = WorkspaceItem.findByItemId(context, shoppingCart.getItem());
             } catch (Exception e) {
-                log.error("couldn't find the item in the workspace, so block peopele other than admmin" + e);
+                log.error("couldn't find the item in the workspace, so block peopele other than admin" + e);
             }
             if (workspaceItem != null || AuthorizeManager.isAdmin(context, ePerson)) {
                 showSkipPaymentButton(maindiv, "Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please continue, and we will contact you regarding payment. Error code: Secure-null");
@@ -352,21 +356,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     }
 
-    public void generateGrantInfoForm(Division division, String grantInfo, String errorMessage) throws WingException {
-        division.addPara(T_funding_head);
-        if (grantInfo == null) {
-            division.addPara(T_funding_question);
-            List list = division.addList("grant-list");
-            list.addLabel(T_funding_desc1);
-            list.addItem().addText("grant-info");
-            list.addItem().addButton("submit-grant").setValue(T_button_proceed);
-            if (errorMessage != null && errorMessage.length() > 0) {
-                division.addPara("grant-error", "grant-error").addHighlight("bold").addContent(errorMessage);
-            }
-        } else {
-            division.addPara(T_funding_valid);
-            division.addHidden("show_button").setValue(T_button_finalize);
-        }
+    public void generateGrantInfoForm(Division mainDiv, String grantInfo, String errorMessage) throws WingException {
     }
 
     public void generateNoCostForm(Division actionsDiv, ShoppingCart shoppingCart, org.dspace.content.Item item, PaymentSystemConfigurationManager manager, PaymentSystemService paymentSystemService) throws WingException, SQLException {
@@ -437,7 +427,7 @@ public class PaymentServiceImpl implements PaymentService {
                     shoppingCart.setVoucher(voucher.getID());
                 } else {
                     // set the error message; this will be passed in as a request parameter for the next round.
-                    errorMessage = "The voucher code is not valid or the voucher code has been used";
+                    errorMessage = PAYMENT_ERROR_VOUCHER;
                 }
                 paymentSystemService.updateTotal(context, shoppingCart, null);
             }
@@ -466,7 +456,7 @@ public class PaymentServiceImpl implements PaymentService {
                     } else if (!"".equals(grantInfo)){
                         hasGrant = true;
                         grantInfo = null;
-                        errorMessage = T_funding_error.toString();
+                        errorMessage = PAYMENT_ERROR_GRANT;
                     } else {
                         hasGrant = false;
                     }
@@ -475,20 +465,34 @@ public class PaymentServiceImpl implements PaymentService {
                 }
             }
 
+            // Now that we've checked vouchers and grants, we can generate the corresponding UI and update the cart accordingly.
             if (hasGrant) {
                 if (grantInfo != null) {
-                    paymentSystemService.updateTotal(context, shoppingCart, "National Science Foundation");
+                    paymentSystemService.updateTotal(context, shoppingCart, "the US National Science Foundation");
                     shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                     shoppingCart.update();
                 }
-                generateGrantInfoForm(mainDiv, grantInfo, errorMessage);
+                mainDiv.addPara(T_funding_head);
+                if (grantInfo == null) {
+                    mainDiv.addPara(T_funding_question);
+                    List list = mainDiv.addList("grant-list");
+                    list.addLabel(T_funding_desc1);
+                    list.addItem().addText("grant-info");
+                    if (PAYMENT_ERROR_GRANT.equals(errorMessage)) {
+                        mainDiv.addPara("voucher-error", "voucher-error").addHighlight("bold").addContent(T_funding_error);
+                    }
+                    list.addItem().addButton("submit-grant").setValue(T_button_proceed);
+                } else {
+                    mainDiv.addPara(T_funding_valid);
+                    mainDiv.addHidden("show_button").setValue(T_button_finalize);
+                }
             } else {
                 if (shoppingCart.getTotal() == 0 || shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
                     generateNoCostForm(mainDiv, shoppingCart, item, manager, paymentSystemService);
                 } else {
                     Division voucherDiv = mainDiv.addDivision("voucher");
-                    if (errorMessage != null && errorMessage.length() > 0) {
-                        voucherDiv.addPara("voucher-error", "voucher-error").addHighlight("bold").addContent(errorMessage);
+                    if (PAYMENT_ERROR_VOUCHER.equals(errorMessage)) {
+                        voucherDiv.addPara("voucher-error", "voucher-error").addHighlight("bold").addContent(T_voucher_error);
                     }
 
                     generateVoucherForm(voucherDiv, voucherCode, actionURL, knotId);
