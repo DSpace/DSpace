@@ -53,19 +53,19 @@ public class PaymentServiceImpl implements PaymentService {
     private static final Message T_funding_head = message("xmlui.submit.select.funding.head");
     private static final Message T_funding_question = message("xmlui.Submission.submit.CheckoutStep.funding.question");
     private static final Message T_funding_valid = message("xmlui.Submission.submit.CheckoutStep.funding.valid");
+    private static final Message T_funding_error = message("xmlui.Submission.submit.CheckoutStep.funding.error");
     private static final Message T_button_finalize = message("xmlui.Submission.submit.CheckoutStep.button.finalize");
     private static final Message T_button_proceed = message("xmlui.Submission.submit.CheckoutStep.button.proceed");
 
     private static final Message T_funding_desc1 = message("xmlui.Submission.submit.CheckoutStep.funding.desc1");
     private static final Message T_funding_desc2 = message("xmlui.submit.select.funding.desc2");
+
+    private static final Message T_payment_note = message("xmlui.Submission.submit.Checkout.note");
     protected Logger log = Logger.getLogger(PaymentServiceImpl.class);
 
     public String getSecureTokenId() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSSSSSSSSS");
         return sdf.format(new Date());
-
-
-        //return DigestUtils.md5Hex(new Date().toString()); //"9a9ea8208de1413abc3d60c86cb1f4c5";
     }
 
     //generate a secure token from paypal
@@ -95,7 +95,7 @@ public class PaymentServiceImpl implements PaymentService {
                 userEmail = item.getSubmitter().getEmail();
                 userName = item.getSubmitter().getFullName();
             } catch (Exception e) {
-                log.error("cant get submitter's user name for paypal transaction");
+                log.error("can't get submitter's user name for paypal transaction");
             }
             String amount = "0.00";
 
@@ -143,8 +143,6 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
 
-//            if(ConfigurationManager.getProperty("payment-system","paypal.returnurl").length()>0)
-//            get.addParameter("RETURNURL", ConfigurationManager.getProperty("payment-system","paypal.returnurl"));
         } catch (Exception e) {
             log.error("get paypal secure token error:", e);
             return null;
@@ -382,7 +380,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
             finDiv.addPara("data-label", "bold").addContent("You have already paid for this submission.");
         } else if (shoppingCart.getTotal() == 0) {
-            finDiv.addPara("data-label", "bold").addContent("Your total due is 0.00.");
+            finDiv.addPara("data-label", "bold").addContent("Your total due is $0.00.");
         } else {
             finDiv.addPara("data-label", "bold").addContent("You are not being charged");
         }
@@ -407,8 +405,8 @@ public class PaymentServiceImpl implements PaymentService {
         List buttons = mainDiv.addList("paypal-form-buttons");
         Button skipButton = buttons.addItem().addButton("skip_payment");
         skipButton.setValue("Submit");
-        Button cancleButton = buttons.addItem().addButton(AbstractProcessingStep.CANCEL_BUTTON);
-        cancleButton.setValue("Cancel");
+        Button cancelButton = buttons.addItem().addButton(AbstractProcessingStep.CANCEL_BUTTON);
+        cancelButton.setValue("Cancel");
 
     }
 
@@ -468,7 +466,7 @@ public class PaymentServiceImpl implements PaymentService {
                     } else if (!"".equals(grantInfo)){
                         hasGrant = true;
                         grantInfo = null;
-                        errorMessage = "We could not verify your grant number against the NSF grants database. Providing this information is optional. You may try again or remove the number and proceed to provide payment information.";
+                        errorMessage = T_funding_error.toString();
                     } else {
                         hasGrant = false;
                     }
@@ -496,7 +494,7 @@ public class PaymentServiceImpl implements PaymentService {
                     generateVoucherForm(voucherDiv, voucherCode, actionURL, knotId);
                     Division creditcard = mainDiv.addDivision("creditcard");
                     generatePaypalForm(creditcard, shoppingCart, actionURL, type, context);
-                    mainDiv.addPara().addContent("NOTE: Proceed only if your submission is finalized. After submitting, a Dryad curator will review your submission. After this review, your data will be archived in Dryad, and your payment will be processed.");
+                    mainDiv.addPara().addContent(T_payment_note);
                 }
             }
         } catch (Exception e) {
@@ -508,7 +506,6 @@ public class PaymentServiceImpl implements PaymentService {
             }
             log.error("Exception when entering the checkout step:", e);
         }
-
 
         mainDiv.addHidden("submission-continue").setValue(knotId);
         paymentService.addButtons(mainDiv);

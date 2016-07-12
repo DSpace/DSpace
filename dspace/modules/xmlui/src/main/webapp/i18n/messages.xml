@@ -3047,6 +3047,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 		the US NSF has awarded to test the feasibility of direct sponsorship (<a href="http://www.datadryad.org">find out more</a>). If not, or if you would prefer to pay the DPC yourself,
 		leave the field blank and click "Proceed to payment."
 	</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.funding.error">We could not verify your grant number against the NSF grants database. Providing this information is optional.
+		You may try again or remove the number and proceed to provide payment information.</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.funding.valid">
 		The United States National Science Foundation has awarded a fund to test the feasibility of direct sponsorship (<a href="http://www.datadryad.org">find out more</a>).
 		<br/><br/>
@@ -3068,6 +3070,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     </message>
     <message key="xmlui.Submission.submit.Checkout.help"><div><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Please enter your payment information below.<br/><br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button when you are finished.</span></div>
     </message>
+	<message key="xmlui.Submission.submit.Checkout.note"><br/>NOTE: Proceed only if your submission is finalized. After submitting, a Dryad curator will review your submission. After this review, your data will be archived in Dryad, and your payment will be processed.</message>
 	<message key="xmlui.Submission.Submissions.default.reviewStep.reviewAction">Review stage</message>
 	<message key="xmlui.Submission.workflow.DryadReviewActionXMLUI.info1">Actions</message>
 	<message key="xmlui.Submission.submit.OverviewStep.help.add-datafile">Click the button to add a new data file, please be aware that if the data file isn't fully submitted when the dataset is approved/rejected that it will be deleted.</message>
