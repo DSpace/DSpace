@@ -2,53 +2,45 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.paymentsystem;
 
-import edu.harvard.hul.ois.mets.helper.DateTime;
 import org.apache.cocoon.environment.Request;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.util.SubmissionInfo;
-import org.dspace.app.xmlui.aspect.submission.FlowUtils;
-import org.dspace.app.xmlui.utils.HandleUtil;
+import org.dspace.JournalUtils;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.*;
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.app.xmlui.wing.element.Button;
+import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.*;
+import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.*;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.utils.DSpace;
+import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 
-import javax.mail.MessagingException;
 import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Random;
 
-import org.dspace.app.xmlui.wing.Message;
+import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
 
 /**
  *  Paypal Service for interacting with Payflow Pro API
@@ -57,25 +49,32 @@ import org.dspace.app.xmlui.wing.Message;
  * @author Fabio Bolognesi, fabio at atmire.com
  * @author Lantian Gai, lantian at atmire.com
  */
-public class PaypalImpl implements PaypalService{
+public class PaypalImpl implements PaypalService {
+    private static final Message T_funding_head = message("xmlui.submit.select.funding.head");
+    private static final Message T_funding_question = message("xmlui.Submission.submit.CheckoutStep.funding.question");
+    private static final Message T_funding_valid = message("xmlui.Submission.submit.CheckoutStep.funding.valid");
+    private static final Message T_button_finalize = message("xmlui.Submission.submit.CheckoutStep.button.finalize");
+    private static final Message T_button_proceed = message("xmlui.Submission.submit.CheckoutStep.button.proceed");
 
+    private static final Message T_funding_desc1 = message("xmlui.Submission.submit.CheckoutStep.funding.desc1");
+    private static final Message T_funding_desc2 = message("xmlui.submit.select.funding.desc2");
     protected Logger log = Logger.getLogger(PaypalImpl.class);
 
-    public String getSecureTokenId(){
+    public String getSecureTokenId() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSSSSSSSSS");
-       return sdf.format(new Date());
+        return sdf.format(new Date());
 
 
         //return DigestUtils.md5Hex(new Date().toString()); //"9a9ea8208de1413abc3d60c86cb1f4c5";
     }
 
     //generate a secure token from paypal
-    public String generateSecureToken(ShoppingCart shoppingCart,String secureTokenId, String type,Context context){
-        String secureToken=null;
-        String requestUrl = ConfigurationManager.getProperty("payment-system","paypal.payflow.link");
+    public String generateSecureToken(ShoppingCart shoppingCart, String secureTokenId, String type, Context context) {
+        String secureToken = null;
+        String requestUrl = ConfigurationManager.getProperty("payment-system", "paypal.payflow.link");
 
         try {
-            Item item =Item.find(context, shoppingCart.getItem());
+            Item item = Item.find(context, shoppingCart.getItem());
             String url = requestUrl;
             URL obj = new URL(url);
             HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
@@ -89,24 +88,23 @@ public class PaypalImpl implements PaypalService{
             String userLastName = "";
             String userEmail = "";
             String userName = "";
-            try{
+            try {
 
                 userFirstName = item.getSubmitter().getFirstName();
                 userLastName = item.getSubmitter().getLastName();
                 userEmail = item.getSubmitter().getEmail();
                 userName = item.getSubmitter().getFullName();
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
                 log.error("cant get submitter's user name for paypal transaction");
             }
             String amount = "0.00";
 
-            if(type.equals("S")){
+            if (type.equals("S")) {
                 //generate reauthorization form
                 amount = Double.toString(shoppingCart.getTotal());
             }
 
-            String urlParameters ="SECURETOKENID="+secureTokenId+"&CREATESECURETOKEN=Y"+"&MODE="+ConfigurationManager.getProperty("payment-system","paypal.mode")+"&PARTNER="+ConfigurationManager.getProperty("payment-system","paypal.partner")+"&VENDOR="+ConfigurationManager.getProperty("payment-system","paypal.vendor")+"&USER="+ConfigurationManager.getProperty("payment-system","paypal.user")+"&PWD="+ConfigurationManager.getProperty("payment-system","paypal.pwd")+"&TENDER="+type+"&TRXTYPE="+type+"&FIRSTNAME="+userFirstName+"&LASTNAME="+userLastName+"&COMMENT1="+userName+"&COMMENT2="+userEmail+"&AMT="+amount+"&CURRENCY="+shoppingCart.getCurrency();
+            String urlParameters = "SECURETOKENID=" + secureTokenId + "&CREATESECURETOKEN=Y" + "&MODE=" + ConfigurationManager.getProperty("payment-system", "paypal.mode") + "&PARTNER=" + ConfigurationManager.getProperty("payment-system", "paypal.partner") + "&VENDOR=" + ConfigurationManager.getProperty("payment-system", "paypal.vendor") + "&USER=" + ConfigurationManager.getProperty("payment-system", "paypal.user") + "&PWD=" + ConfigurationManager.getProperty("payment-system", "paypal.pwd") + "&TENDER=" + type + "&TRXTYPE=" + type + "&FIRSTNAME=" + userFirstName + "&LASTNAME=" + userLastName + "&COMMENT1=" + userName + "&COMMENT2=" + userEmail + "&AMT=" + amount + "&CURRENCY=" + shoppingCart.getCurrency();
 
             // Send post request
             con.setDoOutput(true);
@@ -131,18 +129,15 @@ public class PaypalImpl implements PaypalService{
             in.close();
 
             String[] results = response.toString().split("&");
-            for(String temp:results)
-            {
+            for (String temp : results) {
                 String[] result = temp.split("=");
-                if(result[0].contains("RESULT")&&!result[1].equals("0"))
-                {
+                if (result[0].contains("RESULT") && !result[1].equals("0")) {
                     //failed to get a secure token
-                    log.error("Failed to get a secure token from paypal:"+response.toString());
+                    log.error("Failed to get a secure token from paypal:" + response.toString());
                     break;
                 }
-                if(result[0].equals("SECURETOKEN"))
-                {
-                    secureToken=result[1];
+                if (result[0].equals("SECURETOKEN")) {
+                    secureToken = result[1];
                     break;
                 }
             }
@@ -150,49 +145,44 @@ public class PaypalImpl implements PaypalService{
 
 //            if(ConfigurationManager.getProperty("payment-system","paypal.returnurl").length()>0)
 //            get.addParameter("RETURNURL", ConfigurationManager.getProperty("payment-system","paypal.returnurl"));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("get paypal secure token error:", e);
             return null;
         }
 
         return secureToken;
     }
+
     //charge the credit card stored as a reference transaction
-    public boolean submitReferenceTransaction(Context c,WorkflowItem wfi,HttpServletRequest request){
+    public boolean submitReferenceTransaction(Context c, WorkflowItem wfi, HttpServletRequest request) {
         PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
 
-        try{
-            ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(c,wfi.getItem().getID());
-            if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)){
+        try {
+            ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(c, wfi.getItem().getID());
+            if (shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
                 //this shopping cart has already been charged
                 return true;
             }
-            Voucher voucher = Voucher.findById(c,shoppingCart.getVoucher());
+            Voucher voucher = Voucher.findById(c, shoppingCart.getVoucher());
 
-	    // check whether we're using the special voucher that simulates "payment failed"
-            if(voucher!=null&&ConfigurationManager.getProperty("payment-system","paypal.failed.voucher")!=null)
-            {
-                String failedVoucher = ConfigurationManager.getProperty("payment-system","paypal.failed.voucher");
-                 if(voucher.getCode().equals(failedVoucher)||voucher.getStatus().equals(Voucher.STATUS_USED))
-                 {
-                     log.debug("problem: 'payment failed' voucher has been used, rejecting payment");
-                     paymentSystemService.sendPaymentErrorEmail(c, wfi, shoppingCart, "problem: voucher has been used, rejecting payment");
-                     return false;
-                 }
+            // check whether we're using the special voucher that simulates "payment failed"
+            if (voucher != null && ConfigurationManager.getProperty("payment-system", "paypal.failed.voucher") != null) {
+                String failedVoucher = ConfigurationManager.getProperty("payment-system", "paypal.failed.voucher");
+                if (voucher.getCode().equals(failedVoucher) || voucher.getStatus().equals(Voucher.STATUS_USED)) {
+                    log.debug("problem: 'payment failed' voucher has been used, rejecting payment");
+                    paymentSystemService.sendPaymentErrorEmail(c, wfi, shoppingCart, "problem: voucher has been used, rejecting payment");
+                    return false;
+                }
             }
 
-            if(shoppingCart.getTotal()==0)
-            {
+            if (shoppingCart.getTotal() == 0) {
                 log.debug("shopping cart total is 0, not charging card");
                 paymentSystemService.sendPaymentWaivedEmail(c, wfi, shoppingCart);
                 //if the total is 0 , don't charge
                 return true;
-            }
-            else
-            {
+            } else {
                 log.debug("charging card");
-                return chargeCard(c, wfi, request,shoppingCart);
+                return chargeCard(c, wfi, request, shoppingCart);
             }
 
         } catch (Exception e) {
@@ -207,14 +197,13 @@ public class PaypalImpl implements PaypalService{
         PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
 //this method should get the reference code and submit it to paypal to do the actural charge process
 
-        if(shoppingCart.getTransactionId()==null){
+        if (shoppingCart.getTransactionId() == null) {
             String transactionIdAbsentError = "transaction id absent, cannot charge card";
             log.debug(transactionIdAbsentError);
             paymentSystemService.sendPaymentErrorEmail(c, wfi, shoppingCart, transactionIdAbsentError);
             return false;
         }
-        if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
-        {
+        if (shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
 
             //all ready changed
             return true;
@@ -227,17 +216,17 @@ public class PaypalImpl implements PaypalService{
             //setup the reference transaction
             post.addParameter("TENDER", "C");
             post.addParameter("TRXTYPE", "S");
-            post.addParameter("PWD", ConfigurationManager.getProperty("payment-system","paypal.pwd"));
+            post.addParameter("PWD", ConfigurationManager.getProperty("payment-system", "paypal.pwd"));
             post.addParameter("AMT", Double.toString(shoppingCart.getTotal()));
-            post.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
-            post.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
-            post.addParameter("USER", ConfigurationManager.getProperty("payment-system","paypal.user"));
+            post.addParameter("VENDOR", ConfigurationManager.getProperty("payment-system", "paypal.vendor"));
+            post.addParameter("PARTNER", ConfigurationManager.getProperty("payment-system", "paypal.partner"));
+            post.addParameter("USER", ConfigurationManager.getProperty("payment-system", "paypal.user"));
             post.addParameter("ORIGID", shoppingCart.getTransactionId());
 
             //TODO:add currency from shopping cart
             post.addParameter("CURRENCY", shoppingCart.getCurrency());
 
-            Item item = Item.find(c,shoppingCart.getItem());
+            Item item = Item.find(c, shoppingCart.getItem());
 
             String userFirstName = "";
 
@@ -247,7 +236,7 @@ public class PaypalImpl implements PaypalService{
 
             String userName = "";
 
-            try{
+            try {
                 userFirstName = item.getSubmitter().getFirstName();
 
                 userLastName = item.getSubmitter().getLastName();
@@ -256,7 +245,7 @@ public class PaypalImpl implements PaypalService{
 
                 userName = item.getSubmitter().getFullName();
 
-            }catch (Exception e)
+            } catch (Exception e)
 
             {
 
@@ -264,15 +253,13 @@ public class PaypalImpl implements PaypalService{
 
             }
 
-            post.addParameter("FIRSTNAME",userFirstName);
+            post.addParameter("FIRSTNAME", userFirstName);
 
-            post.addParameter("LASTNAME",userLastName);
+            post.addParameter("LASTNAME", userLastName);
 
-            post.addParameter("COMMENT1","Submitter's name :"+userName);
+            post.addParameter("COMMENT1", "Submitter's name :" + userName);
 
-            post.addParameter("COMMENT2","Submitter's email :"+userEmail);
-
-
+            post.addParameter("COMMENT2", "Submitter's email :" + userEmail);
 
 
             log.debug("paypal sale transaction url " + post);
@@ -282,21 +269,17 @@ public class PaypalImpl implements PaypalService{
                 case 202:
                     String string = post.getResponseBodyAsString();
                     String[] results = string.split("&");
-                    for(String temp:results)
-                    {
+                    for (String temp : results) {
                         String[] result = temp.split("=");
                         //TODO: ignore the error from paypal server, add the error check after figure out the correct way to process the credit card info
-                        if(result[0].contains("RESULT")&&result[1].equals("0"))
-                        {
+                        if (result[0].contains("RESULT") && result[1].equals("0")) {
                             //successfull
                             shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
-                            Date date= new Date();
+                            Date date = new Date();
                             shoppingCart.setPaymentDate(date);
-                            for(String s:results)
-                            {
+                            for (String s : results) {
                                 String[] strings = s.split("=");
-                                if(strings[0].contains("PNREF"))
-                                {
+                                if (strings[0].contains("PNREF")) {
                                     shoppingCart.setTransactionId(strings[1]);
                                     break;
                                 }
@@ -311,16 +294,15 @@ public class PaypalImpl implements PaypalService{
                     break;
                 default:
                     String result = "Paypal Reference Transaction Failure: "
-                            + post.getStatusCode() +  ": " + post.getResponseBodyAsString();
+                            + post.getStatusCode() + ": " + post.getResponseBodyAsString();
                     log.error(result);
                     paymentSystemService.sendPaymentRejectedEmail(c, wfi, shoppingCart);
                     return false;
             }
 
             post.releaseConnection();
-        }
-        catch (Exception e) {
-            log.error("error when submit paypal reference transaction: "+e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("error when submit paypal reference transaction: " + e.getMessage(), e);
             paymentSystemService.sendPaymentErrorEmail(c, wfi, null, "exception when submit reference transaction: " + e.getMessage());
             return false;
         }
@@ -328,51 +310,45 @@ public class PaypalImpl implements PaypalService{
         return false;
     }
 
-    public void generatePaypalForm(Division maindiv,ShoppingCart shoppingCart,String actionURL,String type,Context context) throws WingException,SQLException {
+    public void generatePaypalForm(Division maindiv, ShoppingCart shoppingCart, String actionURL, String type, Context context) throws WingException, SQLException {
 
         //return false if there is error in loading from paypal
         String secureTokenId = getSecureTokenId();
-        String secureToken = generateSecureToken(shoppingCart,secureTokenId,type,context);
-        WorkspaceItem workspaceItem=null;
-        if(secureToken==null){
+        String secureToken = generateSecureToken(shoppingCart, secureTokenId, type, context);
+        WorkspaceItem workspaceItem = null;
+        if (secureToken == null) {
             EPerson ePerson = context.getCurrentUser();
-            try{
-                workspaceItem=WorkspaceItem.findByItemId(context,shoppingCart.getItem());
+            try {
+                workspaceItem = WorkspaceItem.findByItemId(context, shoppingCart.getItem());
+            } catch (Exception e) {
+                log.error("couldn't find the item in the workspace, so block peopele other than admmin" + e);
             }
-            catch (Exception e)
-            {
-                log.error("couldn't find the item in the workspace, so block peopele other than admmin"+e);
-            }
-            if(workspaceItem!=null||AuthorizeManager.isAdmin(context,ePerson))
-            {
-                showSkipPaymentButton(maindiv,"Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please continue, and we will contact you regarding payment. Error code: Secure-null");
+            if (workspaceItem != null || AuthorizeManager.isAdmin(context, ePerson)) {
+                showSkipPaymentButton(maindiv, "Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please continue, and we will contact you regarding payment. Error code: Secure-null");
                 shoppingCart.setNote("Paypal returned null secure token");
                 shoppingCart.update();
-            }
-            else
-            {
+            } else {
                 //don't show the skip button if item is not in workspace steps and not admin users
-                showHelpPaymentButton(maindiv,"Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please contact administrator regarding payment. Error code: Secure-null");
+                showHelpPaymentButton(maindiv, "Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please contact administrator regarding payment. Error code: Secure-null");
 
             }
             log.error("PayPal Secure Token is null");
 
-        }
-        else{
+        } else {
             shoppingCart.setSecureToken(secureToken);
             shoppingCart.update();
-            List list= maindiv.addDivision("paypal-iframe").addList("paypal-fields");
-            list.addItem("secureTokenId","").addContent(secureTokenId);
-            list.addItem("secureToken","").addContent(secureToken);
-            list.addItem("testMode","").addContent(ConfigurationManager.getProperty("payment-system","paypal.mode"));
-            list.addItem("link","").addContent(ConfigurationManager.getProperty("payment-system","paypal.link"));
+            List list = maindiv.addDivision("paypal-iframe").addList("paypal-fields");
+            list.addItem("secureTokenId", "").addContent(secureTokenId);
+            list.addItem("secureToken", "").addContent(secureToken);
+            list.addItem("testMode", "").addContent(ConfigurationManager.getProperty("payment-system", "paypal.mode"));
+            list.addItem("link", "").addContent(ConfigurationManager.getProperty("payment-system", "paypal.link"));
         }
     }
 
-    public void generateVoucherForm(Division form,String voucherCode,String actionURL,String knotId) throws WingException{
+    public void generateVoucherForm(Division form, String voucherCode, String actionURL, String knotId) throws WingException {
 
         List list = form.addList("voucher-list");
-        list.addLabel("Voucher Code");
+        list.addLabel("Voucher Code ");
         list.addItem().addText("voucher").setValue(voucherCode);
         list.addItem().addButton("submit-voucher").setValue("Apply");
 
@@ -383,20 +359,14 @@ public class PaypalImpl implements PaypalService{
 
         Division finDiv = actionsDiv.addDivision("finalizedivision");
 
-        if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_VERIFIED))
-        {
+        if (shoppingCart.getStatus().equals(ShoppingCart.STATUS_VERIFIED)) {
             finDiv.addPara("data-label", "bold").addContent("Your payment information has been verified.");
         }
-        if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
-        {
+        if (shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
             finDiv.addPara("data-label", "bold").addContent("You have already paid for this submission.");
-        }
-        else if(shoppingCart.getTotal()==0)
-        {
-           finDiv.addPara("data-label", "bold").addContent("Your total due is 0.00.");
-        }
-        else
-        {
+        } else if (shoppingCart.getTotal() == 0) {
+            finDiv.addPara("data-label", "bold").addContent("Your total due is 0.00.");
+        } else {
             finDiv.addPara("data-label", "bold").addContent("You are not being charged");
         }
 
@@ -404,19 +374,19 @@ public class PaypalImpl implements PaypalService{
         finDiv.addHidden("show_button").setValue("Finalize and submit data for curation");
     }
 
-    public void showSkipPaymentButton(Division mainDiv,String message)throws WingException{
+    public void showSkipPaymentButton(Division mainDiv, String message) throws WingException {
         Division error = mainDiv.addDivision("error");
         error.addPara(message);
         error.addHidden("show_button").setValue("Skip payment and submit");
     }
 
-    public void showHelpPaymentButton(Division mainDiv,String message)throws WingException{
+    public void showHelpPaymentButton(Division mainDiv, String message) throws WingException {
         Division error = mainDiv.addDivision("error");
         error.addPara(message);
         //error.addHidden("show_button").setValue("Skip payment and submit");
     }
 
-    public void addButtons(Division mainDiv)throws WingException{
+    public void addButtons(Division mainDiv) throws WingException {
         List buttons = mainDiv.addList("paypal-form-buttons");
         Button skipButton = buttons.addItem().addButton("skip_payment");
         skipButton.setValue("Submit");
