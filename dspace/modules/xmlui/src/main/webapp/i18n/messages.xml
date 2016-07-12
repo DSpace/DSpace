@@ -3041,6 +3041,20 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.Submission.submit.OverviewStep.button.delete-datapackage">Delete entire submission</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit data package description</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.button.finalize">Finalize submission</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.button.proceed">Proceed to payment</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.funding.question">
+		Is the research associated with your data/publication funded by the United States National Science Foundation? If so, this grant information may be used to charge your DPC directly to a fund
+		the US NSF has awarded to test the feasibility of direct sponsorship (<a href="http://www.datadryad.org">find out more</a>). If not, or if you would prefer to pay the DPC yourself,
+		leave the field blank and click "Proceed to payment."
+	</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.funding.valid">
+		The United States National Science Foundation has awarded a fund to test the feasibility of direct sponsorship (<a href="http://www.datadryad.org">find out more</a>).
+		<br/><br/>
+		<span class="bold">Your grant number has been verified. Data Publishing Charge is covered by the United States National Science Foundation.</span>
+		<br/><br/>
+		Click the Finalize Submission button below to complete checkout.
+	</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.funding.desc1">Enter your grant number</message>
     <message key="xmlui.Submission.submit.Checkout.head">Check out &amp; submit</message>
     <message key="xmlui.Submission.submit.Checkout.trail">
         <div><br/>

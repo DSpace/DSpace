@@ -354,7 +354,24 @@ public class PaypalImpl implements PaypalService {
 
     }
 
-    public void generateNoCostForm( Division actionsDiv,ShoppingCart shoppingCart, org.dspace.content.Item item,PaymentSystemConfigurationManager manager,PaymentSystemService paymentSystemService) throws WingException, SQLException {
+    public void generateGrantInfoForm(Division division, String grantInfo, String errorMessage) throws WingException {
+        division.addPara(T_funding_head);
+        if (grantInfo == null) {
+            division.addPara(T_funding_question);
+            List list = division.addList("grant-list");
+            list.addLabel(T_funding_desc1);
+            list.addItem().addText("grant-info");
+            list.addItem().addButton("submit-grant").setValue(T_button_proceed);
+            if (errorMessage != null && errorMessage.length() > 0) {
+                division.addPara("grant-error", "grant-error").addHighlight("bold").addContent(errorMessage);
+            }
+        } else {
+            division.addPara(T_funding_valid);
+            division.addHidden("show_button").setValue(T_button_finalize);
+        }
+    }
+
+    public void generateNoCostForm(Division actionsDiv, ShoppingCart shoppingCart, org.dspace.content.Item item, PaymentSystemConfigurationManager manager, PaymentSystemService paymentSystemService) throws WingException, SQLException {
         //Lastly add the finalize submission button
 
         Division finDiv = actionsDiv.addDivision("finalizedivision");
@@ -395,83 +412,96 @@ public class PaypalImpl implements PaypalService {
 
     }
 
-    //this methord should genearte a secure token from paypal and then generate a user crsedit card form
-    public void generateUserForm(Context context,Division mainDiv,String actionURL,String knotId,String type,Request request, Item item, DSpaceObject dso) throws WingException, SQLException{
+    //this method should generate a secure token from paypal and then generate a user credit card form
+    public void generateUserForm(Context context, Division mainDiv, String actionURL, String knotId, String type, Request request, Item item, DSpaceObject dso) throws WingException, SQLException {
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
-        PaymentSystemService payementSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
         PaypalService paypalService = new DSpace().getSingletonService(PaypalService.class);
-        //mainDiv.setHead("Checkout");
         String errorMessage = request.getParameter("encountError");
         ShoppingCart shoppingCart = null;
-        try{
-            //create new transaction or update transaction id with item
-            String previous_email = request.getParameter("login_email");
-            EPerson eperson = EPerson.findByEmail(context,previous_email);
-            shoppingCart = payementSystemService.getShoppingCartByItemId(context,item.getID());
-            if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
-            {
-                  //shopping cart already paid, not need to generate a form
-                paypalService.generateNoCostForm(mainDiv, shoppingCart,item, manager, payementSystemService);
-            }
-            else{
+        Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
+        if (dataPackage != null) {
+            item = dataPackage;
+        }
+        try {
+            shoppingCart = paymentSystemService.getShoppingCartByItemId(context, item.getID());
 
+            // look up any vouchers that have been applied:
             VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
-            String voucherCode = "";
-            if(request.getParameter("submit-voucher")!=null)
-            {    //user is using the voucher code
+            String voucherCode = null;
+            Voucher voucher = Voucher.findById(context, shoppingCart.getVoucher());
+            // if there's no voucher in the cart, check the request parameters for a voucher:
+            if (voucher == null && request.getParameter("submit-voucher") != null) {
                 voucherCode = request.getParameter("voucher");
-                if(voucherCode!=null&&voucherCode.length()>0){
-                    if(!voucherValidationService.voucherUsed(context,voucherCode)) {
-                        Voucher voucher = Voucher.findByCode(context,voucherCode);
-                        shoppingCart.setVoucher(voucher.getID());
-                        payementSystemService.updateTotal(context,shoppingCart,null);
+                if (!voucherValidationService.voucherUsed(context, voucherCode)) {
+                    voucher = Voucher.findByCode(context, voucherCode);
+                    // put the voucher ID in the shopping cart so we can access it next time, if it's good.
+                    shoppingCart.setVoucher(voucher.getID());
+                } else {
+                    // set the error message; this will be passed in as a request parameter for the next round.
+                    errorMessage = "The voucher code is not valid or the voucher code has been used";
+                }
+                paymentSystemService.updateTotal(context, shoppingCart, null);
+            }
+
+            // similarly, check for existence of either dryad.fundingEntity metadata or a grant-info request parameter
+            String grantInfo = null;
+            boolean hasGrant = true;
+            DCValue[] fundingEntities = item.getMetadata("dryad.fundingEntity");
+            if (fundingEntities != null && fundingEntities.length > 0) {
+                grantInfo = fundingEntities[0].value;
+                if ("no grant".equals(grantInfo)) {
+                    hasGrant = false;
+                } else if ("blank".equals(grantInfo)) {
+                    hasGrant = true;
+                    grantInfo = null;
+                    item.clearMetadata("dryad.fundingEntity");
+                    item.update();
+                }
+            } else {
+                grantInfo = request.getParameter("grant-info");
+                if (grantInfo != null) {
+                    if (JournalUtils.isValidNSFGrantNumber(grantInfo)) {
+                        hasGrant = true;
+                        item.addMetadata("dryad", "fundingEntity", null, null, grantInfo);
+                        item.update();
+                    } else if (!"".equals(grantInfo)){
+                        hasGrant = true;
+                        grantInfo = null;
+                        errorMessage = "We could not verify your grant number against the NSF grants database. Providing this information is optional. You may try again or remove the number and proceed to provide payment information.";
+                    } else {
+                        hasGrant = false;
                     }
-                    else
-                    {
-                        errorMessage = "The voucher code is not valid:can't find the voucher code or the voucher code has been used";
+                } else {
+                    hasGrant = false;
+                }
+            }
+
+            if (hasGrant) {
+                if (grantInfo != null) {
+                    paymentSystemService.updateTotal(context, shoppingCart, "National Science Foundation");
+                    shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
+                    shoppingCart.update();
+                }
+                generateGrantInfoForm(mainDiv, grantInfo, errorMessage);
+            } else {
+                if (shoppingCart.getTotal() == 0 || shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
+                    generateNoCostForm(mainDiv, shoppingCart, item, manager, paymentSystemService);
+                } else {
+                    Division voucherDiv = mainDiv.addDivision("voucher");
+                    if (errorMessage != null && errorMessage.length() > 0) {
+                        voucherDiv.addPara("voucher-error", "voucher-error").addHighlight("bold").addContent(errorMessage);
                     }
-                }
-                else
-                {
-                    shoppingCart.setVoucher(null);
-                    payementSystemService.updateTotal(context,shoppingCart,null);
-                }
 
+                    generateVoucherForm(voucherDiv, voucherCode, actionURL, knotId);
+                    Division creditcard = mainDiv.addDivision("creditcard");
+                    generatePaypalForm(creditcard, shoppingCart, actionURL, type, context);
+                    mainDiv.addPara().addContent("NOTE: Proceed only if your submission is finalized. After submitting, a Dryad curator will review your submission. After this review, your data will be archived in Dryad, and your payment will be processed.");
+                }
             }
-
-            if(shoppingCart.getTotal()==0||shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)||!shoppingCart.getCurrency().equals("USD"))
-            {
-                paypalService.generateNoCostForm(mainDiv, shoppingCart,item, manager, payementSystemService);
-            }
-            else
-            {
-
-                Division voucher = mainDiv.addDivision("voucher");
-                if(errorMessage!=null&&errorMessage.length()>0) {
-                    voucher.addPara("voucher-error","voucher-error").addHighlight("bold").addContent(errorMessage);
-
-                }
-
-                Voucher voucher1 = Voucher.findById(context,shoppingCart.getVoucher());
-                if(voucher1!=null){
-                    paypalService.generateVoucherForm(voucher,voucher1.getCode(),actionURL,knotId);
-                }
-                else if(voucherCode!=null&&voucherCode.length()>0){
-                    paypalService.generateVoucherForm(voucher,voucherCode,actionURL,knotId);
-                }
-                else{
-                    paypalService.generateVoucherForm(voucher,null,actionURL,knotId);
-                }
-                Division creditcard = mainDiv.addDivision("creditcard");
-                paypalService.generatePaypalForm(creditcard,shoppingCart,actionURL,type,context);
-
-            }
-
-            }
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             //TODO: handle the exceptions
-            paypalService.showSkipPaymentButton(mainDiv,"errors in generate the payment form:"+e.getMessage());
+            paypalService.showSkipPaymentButton(mainDiv, "errors in generating the payment form:" + e.getMessage());
             if (shoppingCart != null) {
                 shoppingCart.setNote("Payment error: " + e.getMessage());
                 shoppingCart.update();
@@ -481,7 +511,6 @@ public class PaypalImpl implements PaypalService {
 
 
         mainDiv.addHidden("submission-continue").setValue(knotId);
-        mainDiv.addPara().addContent("NOTE : Proceed only if your submission is finalized. After submitting, a Dryad curator will review your submission. After this review, your data will be archived in Dryad, and your payment will be processed.");
         paypalService.addButtons(mainDiv);
 
     }

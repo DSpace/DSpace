@@ -75,14 +75,17 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
         String fundingStatus = request.getParameter("funding-status");
         String grantInfo = request.getParameter("grant-info");
-        if (fundingStatus.equals("1")) {
-            if (grantInfo != null && !grantInfo.equals("")) {
-                if (!JournalUtils.isValidNSFGrantNumber(grantInfo)) {
-                    return ERROR_INVALID_GRANT;
-                }
+        if (grantInfo != null && !grantInfo.equals("")) {
+            if (!JournalUtils.isValidNSFGrantNumber(grantInfo)) {
+                return ERROR_INVALID_GRANT;
             }
-        } else {
+        }
+        if (fundingStatus != null && fundingStatus.equals("0")) {
             grantInfo = "no grant";
+        }
+
+        if (grantInfo == null || "".equals(grantInfo)) {
+            grantInfo = "blank";
         }
 
         item.addMetadata("dryad.fundingEntity", null, grantInfo, null, 0);
