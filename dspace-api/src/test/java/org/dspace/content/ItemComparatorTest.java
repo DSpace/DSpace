@@ -34,6 +34,7 @@ public class ItemComparatorTest extends AbstractUnitTest
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+    private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
 
     /**
      * Item instance for the tests
@@ -104,6 +105,9 @@ public class ItemComparatorTest extends AbstractUnitTest
     {
         context.turnOffAuthorisationSystem();
           try{
+              // Remove all values added to the test MetadataField (MetadataField cannot be deleted if it is still used)
+              metadataValueService.deleteByMetadataField(context, metadataField);
+              // Delete the (unused) metadataField
               metadataFieldService.delete(context, metadataField);
               communityService.delete(context, owningCommunity);
               context.restoreAuthSystemState();

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * Service implementation for the MetadataField object.
@@ -140,11 +141,29 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
                     "Only administrators may modify the metadata registry");
         }
 
+        // Check for existing usages of this field
+        List<MetadataValue> values = null;
+        try
+        {
+           values = metadataValueService.findByField(context, metadataField);
+        }
+        catch(IOException io)
+        {
+            // ignore
+        }
+
+        // Only remove this field if it is NOT in use (as we don't want to bulk delete metadata values)
+        if(CollectionUtils.isEmpty(values))
+        {
+            metadataFieldDAO.delete(context, metadataField);
+        }
+        else
+        {
+            throw new IllegalStateException("Metadata field " + metadataField.toString() + " cannot be deleted as it is currently used by one or more objects.");
+        }
+
         log.info(LogManager.getHeader(context, "delete_metadata_field",
                 "metadata_field_id=" + metadataField.getID()));
-
-        metadataValueService.deleteByMetadataField(context, metadataField);
-        metadataFieldDAO.delete(context, metadataField);
     }
 
     /**
