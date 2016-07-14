@@ -163,7 +163,7 @@ public class JSONLookupSearcher extends AbstractGenerator {
 
     public String getLookupURI() {
         if(lookupURI ==null){
-            lookupURI = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("publication-lookup.publication.url");
+            lookupURI = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("publication.url","*");
         }
         return lookupURI;
     }
