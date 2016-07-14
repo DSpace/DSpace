@@ -78,7 +78,7 @@ public class XMLUIStartSubmissionLookupStep extends AbstractProcessingStep {
 
     public String getPublicationUrl(){
         if(publicationUrl==null){
-            publicationUrl=configurationService.getProperty("publication-lookup.publication.url");
+            publicationUrl=configurationService.getProperty("publication-lookup.url", "*");
         }
         return publicationUrl;
     }
