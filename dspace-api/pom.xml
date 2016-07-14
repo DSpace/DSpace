@@ -38,6 +38,7 @@
                 <version>2.0.2</version>
                 <configuration>
                     <debug>true</debug>
+                    <fork>true</fork>
                     <!--<showDeprecation>true</showDeprecation>-->
                 </configuration>
             </plugin>
