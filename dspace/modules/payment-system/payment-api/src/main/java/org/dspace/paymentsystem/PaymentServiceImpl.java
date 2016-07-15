@@ -358,9 +358,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     }
 
-    public void generateGrantInfoForm(Division mainDiv, String grantInfo, String errorMessage) throws WingException {
-    }
-
     public void generateNoCostForm(Division actionsDiv, ShoppingCart shoppingCart, org.dspace.content.Item item, PaymentSystemConfigurationManager manager, PaymentSystemService paymentSystemService) throws WingException, SQLException {
         //Lastly add the finalize submission button
 
@@ -507,7 +504,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
         } catch (Exception e) {
             //TODO: handle the exceptions
-            paymentService.showSkipPaymentButton(mainDiv, "errors in generating the payment form:" + e.getMessage());
+            showSkipPaymentButton(mainDiv, "errors in generating the payment form:" + e.getMessage());
             if (shoppingCart != null) {
                 shoppingCart.setNote("Payment error: " + e.getMessage());
                 shoppingCart.update();
@@ -516,7 +513,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         mainDiv.addHidden("submission-continue").setValue(knotId);
-        paymentService.addButtons(mainDiv);
+        addButtons(mainDiv);
 
     }
 
