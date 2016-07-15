@@ -1973,6 +1973,15 @@ span.composite-help {
     text-align: left;
 }
 
+span.ds-form-label-grant-info {
+    display: block;
+    font-weight: normal;
+    font-size: 80%;
+    color: black;
+    background-color: inherit;
+    text-align: left;
+}
+
 div.spacer {
     height: 15px;
     margin: 0;

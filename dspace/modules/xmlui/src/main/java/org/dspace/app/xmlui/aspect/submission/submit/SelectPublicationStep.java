@@ -508,7 +508,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         fundingRadio.addOption("0", T_funding_status_no);
 
         Text grantInfoText = form.addItem("grant-info","grant-info").addText("grant-info");
-        grantInfoText.setHelp(T_funding_desc1);
+        grantInfoText.setLabel(T_funding_desc1);
         if (this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_GRANT) {
             fundingRadio.setOptionSelected("1");
             grantInfoText.setValue(request.getParameter("grant-info"));
