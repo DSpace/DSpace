@@ -51,6 +51,8 @@ import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
  */
 public class PaymentServiceImpl implements PaymentService {
     private static final Message T_funding_head = message("xmlui.submit.select.funding.head");
+    private static final Message T_HEAD = message("xmlui.Submission.submit.Checkout.head");
+    private static final Message T_HELP = message("xmlui.Submission.submit.Checkout.help");
     private static final Message T_funding_question = message("xmlui.Submission.submit.CheckoutStep.funding.question");
     private static final Message T_funding_valid = message("xmlui.Submission.submit.CheckoutStep.funding.valid");
     private static final Message T_funding_error = message("xmlui.Submission.submit.CheckoutStep.funding.error");
@@ -490,6 +492,8 @@ public class PaymentServiceImpl implements PaymentService {
                 if (shoppingCart.getTotal() == 0 || shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
                     generateNoCostForm(mainDiv, shoppingCart, item, manager, paymentSystemService);
                 } else {
+                    mainDiv.setHead(T_HEAD);
+                    mainDiv.addPara(T_HELP);
                     Division voucherDiv = mainDiv.addDivision("voucher");
                     if (PAYMENT_ERROR_VOUCHER.equals(errorMessage)) {
                         voucherDiv.addPara("voucher-error", "voucher-error").addHighlight("bold").addContent(T_voucher_error);
