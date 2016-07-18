@@ -62,6 +62,7 @@ public class InstallItemServiceImpl implements InstallItemService
             AuthorizeException
     {
         Item item = is.getItem();
+        Collection collection = is.getCollection();
         try {
             if(suppliedHandle == null)
             {
@@ -81,7 +82,7 @@ public class InstallItemServiceImpl implements InstallItemService
         // As this is a BRAND NEW item, as a final step we need to remove the
         // submitter item policies created during deposit and replace them with
         // the default policies from the collection.
-        itemService.inheritCollectionDefaultPolicies(c, item, is.getCollection());
+        itemService.inheritCollectionDefaultPolicies(c, item, collection);
 
         return item;
     }
@@ -182,7 +183,7 @@ public class InstallItemServiceImpl implements InstallItemService
 
         // If an issue date was passed in and it wasn't set to "today" (literal string)
         // then note this previous issue date in provenance message
-        if (currentDateIssued.isEmpty())
+        if (!currentDateIssued.isEmpty())
         {
             String previousDateIssued = currentDateIssued.get(0).getValue();
             if(previousDateIssued!=null && !previousDateIssued.equalsIgnoreCase("today"))
