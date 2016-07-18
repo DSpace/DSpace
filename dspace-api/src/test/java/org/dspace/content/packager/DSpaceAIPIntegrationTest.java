@@ -11,12 +11,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import mockit.NonStrictExpectations;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -32,6 +35,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.MockConfigurationManager;
 import org.dspace.core.PluginManager;
+import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -320,6 +324,87 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     }
     
     /**
+     * Test restoration from AIP of an access restricted Community
+     */
+    @Test
+    public void testRestoreRestrictedCommunity() throws Exception
+    {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
+           AuthorizeManager.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testRestoreRestrictedCommunity() - BEGIN");
+
+        // Locate the top-level Community (as a parent)
+        Community parent = (Community) HandleManager.resolveToObject(context, topCommunityHandle);
+
+        // Create a brand new (empty) Community to test with
+        Community community = parent.createSubcommunity();
+        community.addMetadata("dc", "title", null, null, "Restricted Community");
+        community.update();
+        String communityHandle = community.getHandle();
+
+        // Create a new Group to access restrict to
+        Group group = Group.create(context);
+        group.setName("Special Users");
+        group.update();
+
+        // Create a custom resource policy for this community
+        List<ResourcePolicy> policies = new ArrayList<>();
+        ResourcePolicy admin_policy = ResourcePolicy.create(context);
+        admin_policy.setRpName("Admin Read-Only");
+        Group adminGroup = Group.find(context, Group.ADMIN_ID);
+        admin_policy.setGroup(adminGroup);
+        admin_policy.setAction(Constants.READ);
+        policies.add(admin_policy);
+
+        // Replace default community policies with this new one
+        AuthorizeManager.removeAllPolicies(context, community);
+        AuthorizeManager.addPolicies(context, policies, community);
+        // Commit these changes to our DB
+        context.commit();
+
+        // Ensure Community AIP is exported (overwrite it, as we just updated policies)
+        log.info("testRestoreRestrictedCommunity() - CREATE Community AIP (overwrite)");
+        File aipFile = createAIP(community, null, false, true);
+
+        // Now, delete that Community
+        log.info("testRestoreRestrictedCommunity() - DELETE Community");
+        parent.removeSubcommunity(community);
+        // Commit these changes to our DB
+        context.commit();
+
+        // Assert the deleted Community no longer exists
+        DSpaceObject obj = HandleManager.resolveToObject(context, communityHandle);
+        assertThat("testRestoreRestrictedCommunity() Community " + communityHandle + " doesn't exist", obj, nullValue());
+
+        // Restore Community from AIP (non-recursive)
+        log.info("testRestoreRestrictedCommunity() - RESTORE Community");
+        restoreFromAIP(parent, aipFile, null, false);
+        // Commit these changes to our DB
+        context.commit();
+
+        // Assert the deleted Community is RESTORED
+        DSpaceObject objRestored = HandleManager.resolveToObject(context, communityHandle);
+        assertThat("testRestoreRestrictedCommunity() Community " + communityHandle + " exists", objRestored, notNullValue());
+
+        // Assert the number of restored policies is equal
+        List<ResourcePolicy> policiesRestored = AuthorizeManager.getPolicies(context, objRestored);
+        assertEquals("testRestoreRestrictedCommunity() restored policy count equal", policies.size(), policiesRestored.size());
+
+        // Assert the restored policy has same name, group and permission settings
+        ResourcePolicy restoredPolicy = policiesRestored.get(0);
+        assertEquals("testRestoreRestrictedCommunity() restored policy group successfully", admin_policy.getGroup().getName(), restoredPolicy.getGroup().getName());
+        assertEquals("testRestoreRestrictedCommunity() restored policy action successfully", admin_policy.getAction(), restoredPolicy.getAction());
+        assertEquals("testRestoreRestrictedCommunity() restored policy name successfully", admin_policy.getRpName(), restoredPolicy.getRpName());
+
+        log.info("testRestoreRestrictedCommunity() - END");
+    }
+
+    /**
      * Test replacement from AIP of entire Community Hierarchy
      */
     @Test
@@ -488,6 +573,87 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         assertObjectsExist(infoMap);
         
         log.info("testRestoreCollectionHierarchy() - END");
+    }
+    
+        /**
+     * Test restoration from AIP of an access restricted Collection
+     */
+    @Test
+    public void testRestoreRestrictedCollection() throws Exception
+    {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
+            AuthorizeManager.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testRestoreRestrictedCollection() - BEGIN");
+
+        // Locate the top-level Community (as a parent)
+        Community parent = (Community) HandleManager.resolveToObject(context, topCommunityHandle);
+
+        // Create a brand new (empty) Collection to test with
+        Collection collection = parent.createCollection();
+        collection.addMetadata("dc", "title", null, null, "Restricted Collection");
+        collection.update();
+        String collectionHandle = collection.getHandle();
+
+        // Create a new Group to access restrict to
+        Group group = Group.create(context);
+        group.setName("Special Users");
+        group.update();
+
+        // Create a custom resource policy for this collection
+        List<ResourcePolicy> policies = new ArrayList<>();
+        ResourcePolicy admin_policy = ResourcePolicy.create(context);
+        admin_policy.setRpName("Admin Read-Only");
+        Group adminGroup = Group.find(context, Group.ADMIN_ID);
+        admin_policy.setGroup(adminGroup);
+        admin_policy.setAction(Constants.READ);
+        policies.add(admin_policy);
+
+        // Replace default collection policies with this new one
+        AuthorizeManager.removeAllPolicies(context, collection);
+        AuthorizeManager.addPolicies(context, policies, collection);
+        // Commit these changes to our DB
+        context.commit();
+
+        // Ensure collection AIP is exported (overwrite it, as we just updated policies)
+        log.info("testRestoreRestrictedCollection() - CREATE Collection AIP (overwrite)");
+        File aipFile = createAIP(collection, null, false, true);
+
+        // Now, delete that Collection
+        log.info("testRestoreRestrictedCollection() - DELETE Collection");
+        parent.removeCollection(collection);
+        // Commit these changes to our DB
+        context.commit();
+
+        // Assert the deleted collection no longer exists
+        DSpaceObject obj = HandleManager.resolveToObject(context, collectionHandle);
+        assertThat("testRestoreRestrictedCollection() Collection " + collectionHandle + " doesn't exist", obj, nullValue());
+
+        // Restore Collection from AIP (non-recursive)
+        log.info("testRestoreRestrictedCollection() - RESTORE Collection");
+        restoreFromAIP(parent, aipFile, null, false);
+        // Commit these changes to our DB
+        context.commit();
+
+        // Assert the deleted Collection is RESTORED
+        DSpaceObject objRestored = HandleManager.resolveToObject(context, collectionHandle);
+        assertThat("testRestoreRestrictedCollection() Collection " + collectionHandle + " exists", objRestored, notNullValue());
+
+        // Assert the number of restored policies is equal
+        List<ResourcePolicy> policiesRestored = AuthorizeManager.getPolicies(context, objRestored);
+        assertEquals("testRestoreRestrictedCollection() restored policy count equal", policies.size(), policiesRestored.size());
+
+        // Assert the restored policy has same name, group and permission settings
+        ResourcePolicy restoredPolicy = policiesRestored.get(0);
+        assertEquals("testRestoreRestrictedCollection() restored policy group successfully", admin_policy.getGroup().getName(), restoredPolicy.getGroup().getName());
+        assertEquals("testRestoreRestrictedCollection() restored policy action successfully", admin_policy.getAction(), restoredPolicy.getAction());
+        assertEquals("testRestoreRestrictedCollection() restored policy name successfully", admin_policy.getRpName(), restoredPolicy.getRpName());
+
+        log.info("testRestoreRestrictedCollection() - END");
     }
     
     /**
@@ -668,6 +834,76 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         assertEquals("testRestoreItem() bitstream checksum", restoredBitstream.getChecksum(), bitstreamCheckSum);
 
         log.info("testRestoreItem() - END");
+    }
+    
+    /**
+     * Test restoration from AIP of an access restricted Item
+     */
+    @Test
+    public void testRestoreRestrictedItem() throws Exception
+    {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
+            AuthorizeManager.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testRestoreRestrictedItem() - BEGIN");
+
+        // Locate the item (from our test data)
+        Item testItem = (Item) HandleManager.resolveToObject(context, testItemHandle);
+
+        // Create a custom resource policy for this Item
+        List<ResourcePolicy> policies = new ArrayList<>();
+        ResourcePolicy admin_policy = ResourcePolicy.create(context);
+        admin_policy.setRpName("Admin Read-Only");
+        Group adminGroup = Group.find(context, Group.ADMIN_ID);
+        admin_policy.setGroup(adminGroup);
+        admin_policy.setAction(Constants.READ);
+        policies.add(admin_policy);
+        testItem.replaceAllItemPolicies(policies);
+        // Commit these changes to our DB
+        context.commit();
+
+        // Ensure item AIP is exported (overwrite it, as we just updated policies)
+        log.info("testRestoreRestrictedItem() - CREATE Item AIP (overwrite)");
+        File aipFile = createAIP(testItem, null, false, true);
+
+        // Get parent, so we can restore under the same parent
+        Collection parent = (Collection) testItem.getParentObject();
+
+        // Now, delete that item
+        log.info("testRestoreRestrictedItem() - DELETE Item");
+        parent.removeItem(testItem);
+        // Commit these changes to our DB
+        context.commit();
+
+        // Assert the deleted item no longer exists
+        DSpaceObject obj = HandleManager.resolveToObject(context, testItemHandle);
+        assertThat("testRestoreRestrictedItem() item " + testItemHandle + " doesn't exist", obj, nullValue());
+
+        // Restore Item from AIP (non-recursive)
+        log.info("testRestoreRestrictedItem() - RESTORE Item");
+        restoreFromAIP(parent, aipFile, null, false);
+        // Commit these changes to our DB
+        context.commit();
+
+        // Assert the deleted item is RESTORED
+        DSpaceObject objRestored = HandleManager.resolveToObject(context, testItemHandle);
+        assertThat("testRestoreRestrictedItem() item " + testItemHandle + " exists", objRestored, notNullValue());
+
+        // Assert the number of restored policies is equal
+        List<ResourcePolicy> policiesRestored = AuthorizeManager.getPolicies(context, objRestored);
+        assertEquals("testRestoreRestrictedItem() restored policy count equal", policies.size(), policiesRestored.size());
+
+        // Assert the restored policy has same name, group and permission settings
+        ResourcePolicy restoredPolicy = policiesRestored.get(0);
+        assertEquals("testRestoreRestrictedItem() restored policy group successfully", admin_policy.getGroup().getName(), restoredPolicy.getGroup().getName());
+        assertEquals("testRestoreRestrictedItem() restored policy action successfully", admin_policy.getAction(), restoredPolicy.getAction());
+        assertEquals("testRestoreRestrictedItem() restored policy name successfully", admin_policy.getRpName(), restoredPolicy.getRpName());
+
+        log.info("testRestoreRestrictedItem() - END");
     }
     
     /**
