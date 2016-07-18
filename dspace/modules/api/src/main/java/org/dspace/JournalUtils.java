@@ -513,7 +513,14 @@ public class JournalUtils {
     }
 
     public static boolean isValidNSFGrantNumber(String grantInfo) {
+        log.error("grant number is " + grantInfo);
+        Matcher matcher = Pattern.compile("^.*?(\\d+).*$").matcher(grantInfo);
+        if (matcher.find()) {
+            grantInfo = matcher.group(1);
+        }
+
         String nsfAPIURL = nsfApiRoot + grantInfo + ".json";
+        log.error("checking " + nsfAPIURL);
         try {
             URL url = new URL(nsfAPIURL.replaceAll("\\s+", ""));
             ObjectMapper m = new ObjectMapper();
