@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
 
 import javax.xml.xpath.XPathExpressionException;
 import java.util.ArrayList;
@@ -140,12 +141,17 @@ public class XMLtoBio extends Converter {
     }
 
     protected void setBiography(Node xml, Bio bio) {
-        try {
-            String biography = XMLUtils.getTextContent(xml, BIOGRAPHY);
+            String biography = this.getTextContent(xml, "biography");
             bio.setBiography(biography);
-        } catch (XPathExpressionException e) {
-            log.error("Error in finding the biography in bio xml.", e);
+    }
+
+    private String getTextContent(Node xml, String tag) {
+        String text = "";
+        NodeList biographyNodeList = ((Element) xml).getElementsByTagName(tag);
+        if (biographyNodeList.getLength() > 0) {
+            text = biographyNodeList.item(0).getTextContent();
         }
+        return text;
     }
 
     protected void setResearcherUrls(Node xml, Bio bio) {
