@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Date;
 
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -454,34 +454,32 @@ public class METSRightsCrosswalk
             throw new CrosswalkObjectNotSupported("Wrong target object type, METSRightsCrosswalk cannot crosswalk a SITE object.");
         }
 
-        //First, clear all existing Policies on this DSpace Object
-        // as we don't want them to conflict with policies we will be adding
         if(!ml.isEmpty())
         {
-            authorizeService.removeAllPolicies(context, dso);
+            Element topElement = ml.get(0);
+            // If we're fed a <RightsDeclarationMD> wrapper object, recurse on its guts
+            if(topElement.getName().equals("RightsDeclarationMD"))
+            {
+                ingest(context, dso, topElement.getChildren(), createMissingMetadataFields);
+            }
         }
 
-        // Loop through each Element in the List
-        List<ResourcePolicy> policies = new ArrayList<ResourcePolicy>();
+        // Loop through each Element in the passed in List, creating a ResourcePolicy for each
+        List<ResourcePolicy> policies = new ArrayList<>();
         for (Element element : ml)
         {
-            // if we're fed a <RightsDeclarationMD> wrapper object, recurse on its guts:
-            if (element.getName().equals("RightsDeclarationMD"))
-            {
-                ingest(context, dso, element.getChildren(), createMissingMetadataFields);
-            }
-            // "Context" section (where permissions are stored)
-            else if (element.getName().equals("Context"))
+            // Must be a "Context" section (where permissions are stored)
+            if (element.getName().equals("Context"))
             {
                 //get what class of context this is
                 String contextClass = element.getAttributeValue("CONTEXTCLASS");
                 
                 ResourcePolicy rp = resourcePolicyService.create(context);
-        		SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
+                SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
         		
-        		// get reference to the <Permissions> element
-        		// Note: we are assuming here that there will only ever be ONE <Permissions>
-        		//  element. Currently there are no known use cases for multiple.
+                // get reference to the <Permissions> element
+                // Note: we are assuming here that there will only ever be ONE <Permissions>
+                //  element. Currently there are no known use cases for multiple.
                 Element permsElement = element.getChild("Permissions", METSRights_NS);
                 if(permsElement == null) {
                 	log.error("No <Permissions> element was found. Skipping this <Context> element.");
@@ -600,86 +598,21 @@ public class METSRightsCrosswalk
                     log.error("Unrecognized CONTEXTCLASS:  " + contextClass);
                 }
                 
-                //set permissions on policy and add to object
+                //set permissions on policy add to list of policies
                 rp.setAction(parsePermissions(permsElement));
-            	policies.add(rp);
-            	assignPermissions(context, dso, policies);
-                
+                policies.add(rp);
             } //end if "Context" element
-        }//end while loop
-    }
+        }//end for loop
 
-
-    /**
-     * Parses the 'permsElement' (corresponding to a <code>Permissions</code>
-     * element), and assigns those permissions to the specified Group
-     * on the specified DSpace Object.
-     *
-     * @param context DSpace context object
-     * @param dso The DSpace Object
-     */
-private void assignPermissions(Context context, DSpaceObject dso, List<ResourcePolicy> policies)
-        throws SQLException, AuthorizeException
-    {
-        authorizeService.removeAllPolicies(context, dso);
-        if (policies == null){
-            throw new AuthorizeException("Policies are null");
-        }
-        else{
+        // Finally, as long as the compiled list of policies is not empty,
+        // replace existing object policies with the new ones
+        if(!CollectionUtils.isEmpty(policies))
+        {
+            // Remove all existing policies
+            authorizeService.removeAllPolicies(context, dso);
+            // Update with new list of policies
             authorizeService.addPolicies(context, policies, dso);
         }
-    }
-
-    private void assignPermissions(Context context, DSpaceObject dso, Group group, Element permsElement)
-            throws SQLException, AuthorizeException
-    {
-        //first, parse our permissions to determine which action we are allowing in DSpace
-        int actionID = parsePermissions(permsElement);
-
-        //If action ID is less than base READ permissions (value=0),
-        // then something must've gone wrong in the parsing
-        if(actionID < Constants.READ)
-        {
-            log.warn("Unable to properly restore all access permissions on object ("
-                        + "type=" + Constants.typeText[dso.getType()] + ", "
-                        + "handle=" + dso.getHandle() + ", "
-                        + "ID=" + dso.getID()
-                        + ") for group '" + group.getName() + "'.");
-        }
-
-        //Otherwise, add the appropriate group policy for this object
-        authorizeService.addPolicy(context, dso, actionID, group);
-    }
-
-     /**
-     * Parses the 'permsElement' (corresponding to a <code>Permissions</code>
-     * element), and assigns those permissions to the specified EPerson
-     * on the specified DSpace Object.
-     *
-     * @param context DSpace context object
-     * @param dso The DSpace Object
-     * @param person The DSpace EPerson
-     * @param permsElement The METSRights <code>Permissions</code> element
-     */
-    private void assignPermissions(Context context, DSpaceObject dso, EPerson person, Element permsElement)
-            throws SQLException, AuthorizeException
-    {
-        //first, parse our permissions to determine which action we are allowing in DSpace
-        int actionID = parsePermissions(permsElement);
-
-        //If action ID is less than base READ permissions (value=0),
-        // then something must've gone wrong in the parsing
-        if(actionID < Constants.READ)
-        {
-            log.warn("Unable to properly restore all access permissions on object ("
-                        + "type=" + Constants.typeText[dso.getType()] + ", "
-                        + "handle=" + dso.getHandle() + ", "
-                        + "ID=" + dso.getID()
-                        + ") for person '" + person.getEmail() + "'.");
-        }
-
-        //Otherwise, add the appropriate EPerson policy for this object
-        authorizeService.addPolicy(context, dso, actionID, person);
     }
 
     /**
