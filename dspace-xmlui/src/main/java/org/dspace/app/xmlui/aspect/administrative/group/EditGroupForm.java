@@ -37,7 +37,7 @@ import java.util.List;
  * 
  * @author Alexey Maslov
  * @author Scott Phillips
- * @author Oriol Olivé - DS-3205
+ * @author Oriol OlivÃ© - DS-3205
  */
 public class EditGroupForm extends AbstractDSpaceTransformer   
 {
