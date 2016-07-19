@@ -141,16 +141,6 @@ public class DatabaseRegistryUpdater implements FlywayCallback
     }
 
     @Override
-    public void beforeInit(Connection connection) {
-
-    }
-
-    @Override
-    public void afterInit(Connection connection) {
-
-    }
-
-    @Override
     public void beforeBaseline(Connection connection) {
 
     }
