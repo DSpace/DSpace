@@ -3043,9 +3043,9 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.Submission.submit.CheckoutStep.button.finalize">Finalize submission</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.button.proceed">Proceed to checkout</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.funding.question">
-		Is the research associated with your data/publication funded by the United States National Science Foundation? If so, this grant information may be used to charge your DPC directly to a fund
-		the US NSF has awarded to test the feasibility of direct sponsorship (<a href="http://blog.datadryad.org/2016/07/20/piloting-new-ways-for-funders-to-support-data-stewardship">find out more</a>). If not, or if you would prefer to pay the DPC yourself,
-		leave the field blank and click "Proceed to payment."
+		Is the research associated with your data/publication funded by the United States National Science Foundation? If so, this information may be used to charge your DPC directly to the US NSF.
+		Dryad and the US NSF are testing the feasibility of a fund for the direct sponsorship of data deposits (<a href="http://blog.datadryad.org/2016/07/20/piloting-new-ways-for-funders-to-support-data-stewardship">find out more</a>).
+		If not, or if you would prefer to pay the DPC yourself, leave the field blank and click "Proceed to checkout."
 	</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.funding.error">We could not verify your grant number against the US NSF grants database. Providing this information is optional.
 		You may try again or remove the number and proceed to provide payment information.</message>
