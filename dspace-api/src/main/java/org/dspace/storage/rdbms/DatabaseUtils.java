@@ -257,8 +257,8 @@ public class DatabaseUtils
                 // If clean is disabled, return immediately
                 if(flyway.isCleanDisabled())
                 {
-                    System.out.println("WARNING: 'clean' command is currently disabled, as it is dangerous to run in Production scenarios!");
-                    System.out.println("\n In order to run a 'clean' you first must enable it in your DSpace config by specifying 'db.cleanDisabled=false'.");
+                    System.out.println("\nWARNING: 'clean' command is currently disabled, as it is dangerous to run in Production scenarios!");
+                    System.out.println("\nIn order to run a 'clean' you first must enable it in your DSpace config by specifying 'db.cleanDisabled=false'.\n");
                     System.exit(1);
                 }
 
@@ -278,7 +278,7 @@ public class DatabaseUtils
                             System.out.println("\nERROR: The database user '" + username + "' does not have sufficient privileges to run a 'database clean' (via Flyway).");
                             System.out.println("\nIn order to run a 'clean', the database user MUST have 'superuser' privileges");
                             System.out.println("OR the '" + PostgresUtils.PGCRYPTO + "' extension must be installed in a separate schema (see documentation).");
-                            System.out.println("\nOptionally, you could also manually remove the '" + PostgresUtils.PGCRYPTO + "' extension first (DROP EXTENSION " + PostgresUtils.PGCRYPTO + " CASCADE), then rerun the 'clean'");
+                            System.out.println("\nOptionally, you could also manually remove the '" + PostgresUtils.PGCRYPTO + "' extension first (DROP EXTENSION " + PostgresUtils.PGCRYPTO + " CASCADE;), then rerun the 'clean'");
                             System.exit(1);
                         }
                     }

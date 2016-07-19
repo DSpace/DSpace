@@ -16,6 +16,7 @@ import org.dspace.event.Event;
 import org.dspace.event.factory.EventServiceFactory;
 import org.dspace.event.service.EventService;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
+import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
 import org.springframework.util.CollectionUtils;
 
@@ -83,6 +84,21 @@ public class Context
 
     private DBConnection dbConnection;
 
+    static
+    {
+        // Before initializing a Context object, we need to ensure the database
+        // is up-to-date. This ensures any outstanding Flyway migrations are run
+        // PRIOR to Hibernate initializing (occurs when DBConnection is loaded in init() below).
+        try
+        {
+            DatabaseUtils.updateDatabase();
+        }
+        catch(SQLException sqle)
+        {
+            log.fatal("Cannot initialize database via Flyway!", sqle);
+        }
+    }
+
     protected Context(EventService eventService, DBConnection dbConnection)  {
         this.eventService = eventService;
         this.dbConnection = dbConnection;
@@ -93,9 +109,6 @@ public class Context
     /**
      * Construct a new context object with default options. A database connection is opened.
      * No user is authenticated.
-     *
-     * @exception SQLException
-     *                if there was an error obtaining a database connection
      */
     public Context()
     {
