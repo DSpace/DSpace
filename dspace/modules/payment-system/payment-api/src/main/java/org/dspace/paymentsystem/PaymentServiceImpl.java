@@ -450,6 +450,7 @@ public class PaymentServiceImpl implements PaymentService {
                 if (grantInfo != null) {
                     if (JournalUtils.isValidNSFGrantNumber(grantInfo)) {
                         hasGrant = true;
+                        item.clearMetadata("dryad.fundingEntity");
                         item.addMetadata("dryad", "fundingEntity", null, null, grantInfo);
                         item.update();
                     } else if (!"".equals(grantInfo)){
@@ -457,10 +458,11 @@ public class PaymentServiceImpl implements PaymentService {
                         grantInfo = null;
                         errorMessage = PAYMENT_ERROR_GRANT;
                     } else {
+                        grantInfo = null;
                         hasGrant = false;
                     }
                 } else {
-                    hasGrant = false;
+                    hasGrant = true;
                 }
             }
 
@@ -481,9 +483,14 @@ public class PaymentServiceImpl implements PaymentService {
                         mainDiv.addPara("voucher-error", "voucher-error").addHighlight("bold").addContent(T_funding_error);
                     }
                     list.addItem().addButton("submit-grant").setValue(T_button_proceed);
+                    Button cancelButton = list.addItem().addButton(AbstractProcessingStep.CANCEL_BUTTON);
+                    cancelButton.setValue("Cancel");
                 } else {
                     mainDiv.addPara(T_funding_valid);
                     mainDiv.addHidden("show_button").setValue(T_button_finalize);
+                    List buttons = mainDiv.addList("paypal-form-buttons");
+                    Button skipButton = buttons.addItem().addButton("skip_payment");
+                    skipButton.setValue("Submit");
                 }
             } else {
                 if (shoppingCart.getTotal() == 0 || shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
@@ -501,6 +508,8 @@ public class PaymentServiceImpl implements PaymentService {
                     generatePaypalForm(creditcard, shoppingCart, actionURL, type, context);
                     mainDiv.addPara().addContent(T_payment_note);
                 }
+                mainDiv.addHidden("submission-continue").setValue(knotId);
+                addButtons(mainDiv);
             }
         } catch (Exception e) {
             //TODO: handle the exceptions
@@ -510,10 +519,10 @@ public class PaymentServiceImpl implements PaymentService {
                 shoppingCart.update();
             }
             log.error("Exception when entering the checkout step:", e);
+            mainDiv.addHidden("submission-continue").setValue(knotId);
+            addButtons(mainDiv);
         }
 
-        mainDiv.addHidden("submission-continue").setValue(knotId);
-        addButtons(mainDiv);
 
     }
 
