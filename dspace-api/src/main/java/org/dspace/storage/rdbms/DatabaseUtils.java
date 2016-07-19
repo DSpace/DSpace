@@ -110,8 +110,13 @@ public class DatabaseUtils
                     printDBInfo(connection);
 
                     // Print any database warnings/errors found (if any)
-                    printDBWarnings(connection);
-                    System.exit(0);
+                    boolean issueFound = printDBIssues(connection);
+
+                    // If issues found, exit with an error status (even if connection succeeded).
+                    if(issueFound)
+                        System.exit(1);
+                    else
+                        System.exit(0);
                 }
                 catch (SQLException sqle)
                 {
@@ -149,8 +154,13 @@ public class DatabaseUtils
                     }
 
                     // Print any database warnings/errors found (if any)
-                    printDBWarnings(connection);
-                    System.exit(0);
+                    boolean issueFound = printDBIssues(connection);
+
+                    // If issues found, exit with an error status
+                    if(issueFound)
+                        System.exit(1);
+                    else
+                        System.exit(0);
                 }
                 catch (SQLException e)
                 {
@@ -360,10 +370,13 @@ public class DatabaseUtils
      * Print any warnings about current database setup to System.err (if any).
      * This is utilized by both the 'test' and 'info' commandline options.
      * @param connection current database connection
+     * @return boolean true if database issues found, false otherwise
      * @throws SQLException if database error occurs
      */
-    private static void printDBWarnings(Connection connection) throws SQLException
+    private static boolean printDBIssues(Connection connection) throws SQLException
     {
+        boolean issueFound = false;
+
         // Get the DB Type
         String dbType = getDbType(connection);
 
@@ -390,6 +403,7 @@ public class DatabaseUtils
                     System.out.println(requirementsMsg);
                     System.out.println("To update it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
                     System.out.println("\n  ALTER EXTENSION " + PostgresUtils.PGCRYPTO + " UPDATE TO '" + pgcryptoAvailable + "';\n");
+                    issueFound = true;
                 }
                 else if(pgcryptoInstalled==null) // If it's not installed in database
                 {
@@ -397,6 +411,7 @@ public class DatabaseUtils
                     System.out.println(requirementsMsg);
                     System.out.println("To install it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
                     System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
+                    issueFound = true;
                 }
             }
             // Check if installed in Postgres, but an unsupported version
@@ -406,6 +421,7 @@ public class DatabaseUtils
                 System.out.println(requirementsMsg);
                 System.out.println("Make sure you are running a supported version of PostgreSQL, and then install " + PostgresUtils.PGCRYPTO + " version >= " + PostgresUtils.PGCRYPTO_VERSION);
                 System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
+                issueFound = true;
             }
             else if(pgcryptoAvailable==null) // If it's not installed in Postgres
             {
@@ -414,8 +430,10 @@ public class DatabaseUtils
                 System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
                 System.out.println("Once the extension is installed globally, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
                 System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
+                issueFound = true;
             }
         }
+        return issueFound;
     }
 
     /**
