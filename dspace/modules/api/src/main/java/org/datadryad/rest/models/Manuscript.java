@@ -190,6 +190,7 @@ public class Manuscript {
 
     public Manuscript(LegacyManuscript legacyManuscript) {
         DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(legacyManuscript.Journal_Code);
+        this.setJournalConcept(journalConcept);
         // Required fields are: manuscriptID, status, authors (though author identifiers are optional), and title. All other fields are optional.
         this.manuscriptId = legacyManuscript.Submission_Metadata.Manuscript;
         this.title = legacyManuscript.Submission_Metadata.Article_Title;
