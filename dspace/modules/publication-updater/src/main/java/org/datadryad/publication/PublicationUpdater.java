@@ -62,7 +62,20 @@ public class PublicationUpdater extends HttpServlet {
         String requestURI = aRequest.getRequestURI();
         if (requestURI.contains("retrieve")) {
             LOGGER.info("manually checking publications");
-            checkPublications();
+            String queryString = aRequest.getQueryString();
+            if (queryString != null) {
+                DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(queryString);
+                if (journalConcept == null) {
+                    journalConcept = JournalUtils.getJournalConceptByISSN(queryString);
+                }
+                if (journalConcept != null) {
+                    checkSinglePublication(journalConcept);
+                } else {
+                    aResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "no journal concept found by the identifier " + queryString);
+                }
+            } else {
+                checkPublications();
+            }
         } else {
             aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "parameter not available for GET");
         }
@@ -82,6 +95,31 @@ public class PublicationUpdater extends HttpServlet {
             }
             context.restoreAuthSystemState();
             LOGGER.info("finished updating publications");
+        } catch (SQLException e) {
+            throw new RuntimeException("Couldn't get context", e);
+        }
+        finally {
+            try {
+                if (context != null) {
+                    context.complete();
+                }
+            } catch (SQLException e) {
+                context.abort();
+                throw new RuntimeException("Context.complete threw an exception, aborting instead");
+            }
+        }
+    }
+
+    private void checkSinglePublication(DryadJournalConcept dryadJournalConcept) {
+        Context context = null;
+        try {
+            LOGGER.info("checking single publication " + dryadJournalConcept.getFullName());
+            context = new Context();
+            context.turnOffAuthorisationSystem();
+            updateWorkflowItems(context, dryadJournalConcept);
+            updateArchivedItems(context, dryadJournalConcept);
+            context.restoreAuthSystemState();
+            LOGGER.info("finished updating publication");
         } catch (SQLException e) {
             throw new RuntimeException("Couldn't get context", e);
         }
@@ -388,7 +426,7 @@ public class PublicationUpdater extends HttpServlet {
         myPublicationUpdaterTimer = new Timer();
         // schedule harvesting to the number of days set in the configuration:
         // timers are set in units of milliseconds.
-        int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("publication.updater.timer"));
+//        int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("publication.updater.timer"));
 //        myPublicationUpdaterTimer.schedule(new PublicationHarvester(), 0, 1000 * 60 * 60 * 24 * timerInterval);
     }
 

@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
-import org.datadryad.rest.models.Organization;
-import org.datadryad.rest.storage.AbstractOrganizationStorage;
+import org.datadryad.rest.models.Journal;
+import org.datadryad.rest.storage.AbstractJournalStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.dspace.core.ConfigurationManager;
@@ -25,28 +25,28 @@ import org.dspace.JournalUtils;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage {
-    private static Logger log = Logger.getLogger(OrganizationDatabaseStorageImpl.class);
+public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
+    private static Logger log = Logger.getLogger(JournalDatabaseStorageImpl.class);
 
-    // Database objects
-    static final String ORGANIZATION_TABLE = "organization";
+    // Database objects: still named organization, even though we've refactored to journal in the codebase
+    static final String JOURNAL_TABLE = "organization";
 
     static final String COLUMN_ID = "organization_id";
     static final String COLUMN_CODE = "code";
     static final String COLUMN_NAME = "name";
     static final String COLUMN_ISSN = "issn";
-    static final List<String> ORGANIZATION_COLUMNS = Arrays.asList(
+    static final List<String> JOURNAL_COLUMNS = Arrays.asList(
             COLUMN_ID,
             COLUMN_CODE,
             COLUMN_NAME,
             COLUMN_ISSN
     );
 
-    public OrganizationDatabaseStorageImpl(String configFileName) {
+    public JournalDatabaseStorageImpl(String configFileName) {
         setConfigFile(configFileName);
     }
 
-    public OrganizationDatabaseStorageImpl() {
+    public JournalDatabaseStorageImpl() {
         // For use when ConfigurationManager is already configured
     }
 
@@ -86,32 +86,32 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         }
     }
 
-    static Organization organizationFromTableRow(TableRow row) {
+    static Journal journalFromTableRow(TableRow row) {
         if(row != null) {
-            Organization organization = new Organization();
-            organization.organizationId = row.getIntColumn(COLUMN_ID);
-            organization.organizationCode = row.getStringColumn(COLUMN_CODE);
-            organization.organizationName = row.getStringColumn(COLUMN_NAME);
-            organization.organizationISSN = row.getStringColumn(COLUMN_ISSN);
-            if (organization.organizationISSN == null) {
-                organization.organizationISSN = "";
+            Journal journal = new Journal();
+            journal.conceptID = row.getIntColumn(COLUMN_ID);
+            journal.journalCode = row.getStringColumn(COLUMN_CODE);
+            journal.fullName = row.getStringColumn(COLUMN_NAME);
+            journal.issn = row.getStringColumn(COLUMN_ISSN);
+            if (journal.issn == null) {
+                journal.issn = "";
             }
-            return organization;
+            return journal;
         } else {
             return null;
         }
     }
 
-    public static Organization getOrganizationByCodeOrISSN(Context context, String codeOrISSN) throws SQLException {
-        String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE UPPER(code) = UPPER(?) OR UPPER(issn) = UPPER(?)";
-        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, codeOrISSN, codeOrISSN);
-        return organizationFromTableRow(row);
+    public static Journal getJournalByCodeOrISSN(Context context, String codeOrISSN) throws SQLException {
+        String query = "SELECT * FROM " + JOURNAL_TABLE + " WHERE UPPER(" + COLUMN_CODE + ") = UPPER(?) OR UPPER(" + COLUMN_ISSN + ") = UPPER(?)";
+        TableRow row = DatabaseManager.querySingleTable(context, JOURNAL_TABLE, query, codeOrISSN, codeOrISSN);
+        return journalFromTableRow(row);
     }
 
-    public static Organization getOrganizationByConceptID(Context context, int conceptID) throws SQLException {
-        String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE organization_id = ?";
-        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, conceptID);
-        return organizationFromTableRow(row);
+    public static Journal getJournalByConceptID(Context context, int conceptID) throws SQLException {
+        String query = "SELECT * FROM " + JOURNAL_TABLE + " WHERE " + COLUMN_ID + " = ?";
+        TableRow row = DatabaseManager.querySingleTable(context, JOURNAL_TABLE, query, conceptID);
+        return journalFromTableRow(row);
     }
 
     @Override
@@ -149,7 +149,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
             }
         } catch (SQLException ex) {
             abortContext(context);
-            throw new StorageException("Exception reading organizations", ex);
+            throw new StorageException("Exception reading journals", ex);
         }
     }
 
@@ -168,7 +168,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
                 completeContext(context);
             } catch (Exception ex) {
                 abortContext(context);
-                throw new StorageException("Can't create new organization: couldn't remove temporary organization.");
+                throw new StorageException("Can't create new journal: couldn't remove temporary journal.");
             }
         } else {
             try {
@@ -179,34 +179,34 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
                 completeContext(context);
             } catch (Exception ex) {
                 abortContext(context);
-                throw new StorageException("Exception creating organization: " + ex.getMessage(), ex);
+                throw new StorageException("Exception creating journal: " + ex.getMessage(), ex);
             }
         }
     }
 
     @Override
     protected DryadJournalConcept readObject(StoragePath path) throws StorageException {
-        String organizationCode = path.getOrganizationCode();
+        String journalCode = path.getJournalCode();
         Context context = null;
         try {
             context = getContext();
-            Organization organization = getOrganizationByCodeOrISSN(context, organizationCode);
-            if (organizationCode.equals(organization.organizationISSN)) {
-                // this is an ISSN, replace organizationCode with the organization's code.
-                organizationCode = organization.organizationCode;
+            Journal journal = getJournalByCodeOrISSN(context, journalCode);
+            if (journalCode.equals(journal.issn)) {
+                // this is an ISSN, replace journalCode with the journal's code.
+                journalCode = journal.journalCode;
             }
             completeContext(context);
         } catch (Exception e) {
             abortContext(context);
-            throw new StorageException("Exception reading organization: " + e.getMessage());
+            throw new StorageException("Exception reading journal: " + e.getMessage());
         }
-        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(organizationCode);
+        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(journalCode);
         return journalConcept;
     }
 
     @Override
     protected void deleteObject(StoragePath path) throws StorageException {
-        throw new StorageException("can't delete an organization");
+        throw new StorageException("can't delete an journal");
     }
 
     @Override
@@ -228,7 +228,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
             completeContext(context);
         } catch (Exception ex) {
             abortContext(context);
-            throw new StorageException("Exception updating organization: " + ex.getMessage(), ex);
+            throw new StorageException("Exception updating journal: " + ex.getMessage(), ex);
         }
     }
 

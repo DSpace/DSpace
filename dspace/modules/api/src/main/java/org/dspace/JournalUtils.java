@@ -9,7 +9,6 @@ import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
@@ -503,7 +502,6 @@ public class JournalUtils {
         }
 
         if (dryadJournalConcept != null) {
-            manuscript.setOrganization(new Organization(dryadJournalConcept));
             manuscript.setJournalConcept(dryadJournalConcept);
         }
         manuscript.setStatus(Manuscript.STATUS_PUBLISHED);
