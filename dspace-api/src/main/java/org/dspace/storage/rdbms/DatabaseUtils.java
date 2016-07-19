@@ -386,34 +386,34 @@ public class DatabaseUtils
                 // Check if installed in database, but outdated version
                 if(pgcryptoInstalled!=null && pgcryptoInstalled.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
                 {
-                    System.err.println("\nWARNING: Required PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is OUTDATED (installed version=" + pgcryptoInstalled + ", available version = " + pgcryptoAvailable + ").");
-                    System.err.println(requirementsMsg);
-                    System.err.println("To update it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
-                    System.err.println("\n  ALTER EXTENSION " + PostgresUtils.PGCRYPTO + " UPDATE TO '" + pgcryptoAvailable + "';\n");
+                    System.out.println("\nWARNING: Required PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is OUTDATED (installed version=" + pgcryptoInstalled + ", available version = " + pgcryptoAvailable + ").");
+                    System.out.println(requirementsMsg);
+                    System.out.println("To update it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                    System.out.println("\n  ALTER EXTENSION " + PostgresUtils.PGCRYPTO + " UPDATE TO '" + pgcryptoAvailable + "';\n");
                 }
                 else if(pgcryptoInstalled==null) // If it's not installed in database
                 {
-                    System.err.println("\nWARNING: Required PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT INSTALLED on this database.");
-                    System.err.println(requirementsMsg);
-                    System.err.println("To install it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
-                    System.err.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
+                    System.out.println("\nWARNING: Required PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT INSTALLED on this database.");
+                    System.out.println(requirementsMsg);
+                    System.out.println("To install it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                    System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
                 }
             }
             // Check if installed in Postgres, but an unsupported version
             else if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
             {
-                System.err.println("\nWARNING: UNSUPPORTED version of PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension found (version=" + pgcryptoAvailable + ").");
-                System.err.println(requirementsMsg);
-                System.err.println("Make sure you are running a supported version of PostgreSQL, and then install " + PostgresUtils.PGCRYPTO + " version >= " + PostgresUtils.PGCRYPTO_VERSION);
-                System.err.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
+                System.out.println("\nWARNING: UNSUPPORTED version of PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension found (version=" + pgcryptoAvailable + ").");
+                System.out.println(requirementsMsg);
+                System.out.println("Make sure you are running a supported version of PostgreSQL, and then install " + PostgresUtils.PGCRYPTO + " version >= " + PostgresUtils.PGCRYPTO_VERSION);
+                System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
             }
             else if(pgcryptoAvailable==null) // If it's not installed in Postgres
             {
-                System.err.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT AVAILABLE. Please install it into this PostgreSQL instance.");
-                System.err.println(requirementsMsg);
-                System.err.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
-                System.err.println("Once the extension is installed globally, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
-                System.err.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
+                System.out.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT AVAILABLE. Please install it into this PostgreSQL instance.");
+                System.out.println(requirementsMsg);
+                System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
+                System.out.println("Once the extension is installed globally, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
             }
         }
     }
