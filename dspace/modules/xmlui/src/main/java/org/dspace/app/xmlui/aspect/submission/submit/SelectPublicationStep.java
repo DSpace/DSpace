@@ -509,10 +509,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         Text grantInfoText = form.addItem("grant-info","grant-info").addText("grant-info");
         grantInfoText.setLabel(T_funding_desc1);
-        if (this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_GRANT) {
-            fundingRadio.setOptionSelected("1");
-            grantInfoText.setValue(request.getParameter("grant-info"));
-            grantInfoText.addError(T_funding_error);
-        }
+//        if (this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_GRANT) {
+//            fundingRadio.setOptionSelected("1");
+//            grantInfoText.setValue(request.getParameter("grant-info"));
+//            grantInfoText.addError(T_funding_error);
+//        }
     }
 }

@@ -7,6 +7,7 @@ import org.dspace.JournalUtils;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -75,9 +76,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
         String fundingStatus = request.getParameter("funding-status");
         String grantInfo = request.getParameter("grant-info");
+        int confidence = 0;
         if (grantInfo != null && !grantInfo.equals("")) {
             if (!JournalUtils.isValidNSFGrantNumber(grantInfo)) {
-                return ERROR_INVALID_GRANT;
+//                return ERROR_INVALID_GRANT;
+                confidence = Choices.CF_REJECTED;
+            } else {
+                confidence = Choices.CF_ACCEPTED;
             }
         }
         if (fundingStatus != null && fundingStatus.equals("0")) {
@@ -88,7 +93,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             grantInfo = "blank";
         }
 
-        item.addMetadata("dryad.fundingEntity", null, grantInfo, null, 0);
+        item.addMetadata("dryad.fundingEntity", null, grantInfo, null, confidence);
         item.update();
 
         EventLogger.log(context, "submission-select-publication", "status=complete");
