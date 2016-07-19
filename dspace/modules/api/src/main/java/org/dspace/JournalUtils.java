@@ -513,7 +513,9 @@ public class JournalUtils {
     }
 
     public static boolean isValidNSFGrantNumber(String grantInfo) {
-        log.error("grant number is " + grantInfo);
+        if ("".equals(StringUtils.stripToEmpty(grantInfo))) {
+            return false;
+        }
         Matcher matcher = Pattern.compile("^.*?(\\d+).*$").matcher(grantInfo);
         if (matcher.find()) {
             grantInfo = matcher.group(1);
