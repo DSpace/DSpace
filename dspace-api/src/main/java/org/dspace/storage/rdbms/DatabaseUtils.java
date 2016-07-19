@@ -80,8 +80,6 @@ public class DatabaseUtils
      */
     public static void main(String[] argv)
     {
-        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
-
         // Usage checks
         if (argv.length < 1)
         {
@@ -106,15 +104,14 @@ public class DatabaseUtils
                 System.out.println("\nAttempting to connect to database");
                 try(Connection connection = dataSource.getConnection())
                 {
-                    // Just do a high level test by getting our configured DataSource and attempting to connect to it
-                    DatabaseMetaData meta = connection.getMetaData();
                     System.out.println("Connected successfully!");
-                    System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
-                    System.out.println(" - URL: " + meta.getURL());
-                    System.out.println(" - Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
-                    System.out.println(" - Username: " + meta.getUserName());
-                    System.out.println(" - Password: [hidden]");
-                    System.out.println(" - Schema: " + getSchemaName(connection));
+
+                    // Print basic database connection information
+                    printDBInfo(connection);
+
+                    // Print any database warnings/errors found (if any)
+                    printDBWarnings(connection);
+                    System.exit(0);
                 }
                 catch (SQLException sqle)
                 {
@@ -129,23 +126,8 @@ public class DatabaseUtils
             {
                 try(Connection connection = dataSource.getConnection())
                 {
-                    // Get basic Database info
-                    DatabaseMetaData meta = connection.getMetaData();
-                    String dbType = getDbType(connection);
-                    System.out.println("\nDatabase Type: " + dbType);
-                    System.out.println("Database URL: " + meta.getURL());
-                    System.out.println("Database Schema: " + getSchemaName(connection));
-                    System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
-                    System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
-
-                    // For Postgres, report whether pgcrypto is installed
-                    // (If it isn't, we'll also write out warnings...see below)
-                    if(dbType.equals(DBMS_POSTGRES))
-                    {
-                        boolean pgcryptoUpToDate = PostgresUtils.isPgcryptoUpToDate();
-                        Double pgcryptoVersion = PostgresUtils.getPgcryptoInstalledVersion(connection);
-                        System.out.println("PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension installed/up-to-date? " + pgcryptoUpToDate  + " " + ((pgcryptoVersion!=null) ? "(version=" + pgcryptoVersion + ")" : "(not installed)"));
-                    }
+                    // Print basic Database info
+                    printDBInfo(connection);
 
                     // Get info table from Flyway
                     System.out.println("\n" + MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
@@ -166,55 +148,9 @@ public class DatabaseUtils
                         }
                     }
 
-                    // For PostgreSQL databases, we need to check for the 'pgcrypto' extension.
-                    // If it is NOT properly installed, we'll need to warn the user, as DSpace will be unable to proceed.
-                    if(dbType.equals(DBMS_POSTGRES))
-                    {
-                        // Get version of pgcrypto available in this postgres instance
-                        Double pgcryptoAvailable = PostgresUtils.getPgcryptoAvailableVersion(connection);
-
-                        // Generic requirements message
-                        String requirementsMsg = "\n** DSpace REQUIRES PostgreSQL >= " + PostgresUtils.POSTGRES_VERSION + " AND " + PostgresUtils.PGCRYPTO + " extension >= " + PostgresUtils.PGCRYPTO_VERSION + " **\n";
-
-                        // Check if installed in PostgreSQL & a supported version
-                        if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION)>=0)
-                        {
-                            // We now know it's available in this Postgres. Let's see if it is installed in this database.
-                            Double pgcryptoInstalled = PostgresUtils.getPgcryptoInstalledVersion(connection);
-
-                            // Check if installed in database, but outdated version
-                            if(pgcryptoInstalled!=null && pgcryptoInstalled.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
-                            {
-                                System.out.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is OUTDATED (installed version=" + pgcryptoInstalled + ", available version = " + pgcryptoAvailable + ").");
-                                System.out.println(requirementsMsg);
-                                System.out.println("To update it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
-                                System.out.println("\n  ALTER EXTENSION " + PostgresUtils.PGCRYPTO + " UPDATE TO '" + pgcryptoAvailable + "';\n");
-                            }
-                            else if(pgcryptoInstalled==null) // If it's not installed in database
-                            {
-                                System.out.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT INSTALLED on this database.");
-                                System.out.println(requirementsMsg);
-                                System.out.println("To install it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
-                                System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
-                            }
-                        }
-                        // Check if installed in Postgres, but an unsupported version
-                        else if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
-                        {
-                            System.out.println("\nWARNING: UNSUPPORTED version of PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension found (version=" + pgcryptoAvailable + ").");
-                            System.out.println(requirementsMsg);
-                            System.out.println("Make sure you are running a supported version of PostgreSQL, and then install " + PostgresUtils.PGCRYPTO + " version >= " + PostgresUtils.PGCRYPTO_VERSION);
-                            System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
-                        }
-                        else if(pgcryptoAvailable==null) // If it's not installed in Postgres
-                        {
-                            System.out.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT AVAILABLE. Please install it into this PostgreSQL instance.");
-                            System.out.println(requirementsMsg);
-                            System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
-                            System.out.println("Once the extension is installed globally, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
-                            System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
-                        }
-                    }
+                    // Print any database warnings/errors found (if any)
+                    printDBWarnings(connection);
+                    System.exit(0);
                 }
                 catch (SQLException e)
                 {
@@ -260,6 +196,7 @@ public class DatabaseUtils
                         updateDatabase(dataSource, connection);
                     }
                     System.out.println("Done.");
+                    System.exit(0);
                 }
                 catch(SQLException e)
                 {
@@ -277,6 +214,7 @@ public class DatabaseUtils
                     System.out.println("Attempting to repair any previously failed migrations (or mismatched checksums) via FlywayDB... (Check dspace logs for details)");
                     flyway.repair();
                     System.out.println("Done.");
+                    System.exit(0);
                 }
                 catch(SQLException|FlywayException e)
                 {
@@ -291,9 +229,10 @@ public class DatabaseUtils
                 try (Connection connection = dataSource.getConnection();)
                 {
                     System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
-                    System.out.println("Attempting to validate database status (and migration checksums) via FlywayDB... (Check dspace logs for more details)");
+                    System.out.println("Attempting to validate database status (and migration checksums) via FlywayDB...");
                     flyway.validate();
-                    System.out.println("Done.");
+                    System.out.println("No errors thrown. Validation succeeded. (Check dspace logs for more details)");
+                    System.exit(0);
                 }
                 catch(SQLException|FlywayException e)
                 {
@@ -305,6 +244,14 @@ public class DatabaseUtils
             // "clean" = Run Flyway clean script
             else if(argv[0].equalsIgnoreCase("clean"))
             {
+                // If clean is disabled, return immediately
+                if(flyway.isCleanDisabled())
+                {
+                    System.out.println("WARNING: 'clean' command is currently disabled, as it is dangerous to run in Production scenarios!");
+                    System.out.println("\n In order to run a 'clean' you first must enable it in your DSpace config by specifying 'db.cleanDisabled=false'.");
+                    System.exit(1);
+                }
+
                 try (Connection connection = dataSource.getConnection())
                 {
                     String dbType = getDbType(connection);
@@ -348,6 +295,7 @@ public class DatabaseUtils
                         System.out.println("Scrubbing database clean... (Check dspace logs for details)");
                         cleanDatabase(flyway, dataSource);
                         System.out.println("Done.");
+                        System.exit(0);
                     }
                 }
                 catch(SQLException e)
@@ -366,8 +314,9 @@ public class DatabaseUtils
                 System.out.println(" - migrate       = Migrate the database to the latest version");
                 System.out.println(" - repair        = Attempt to repair any previously failed database migrations or checksum mismatches (via Flyway repair)");
                 System.out.println(" - validate      = Validate current database's migration status (via Flyway validate), validating all migration checksums.");
-                System.out.println(" - clean         = DESTROY all data and tables in database (WARNING there is no going back!)");
+                System.out.println(" - clean         = DESTROY all data and tables in database (WARNING there is no going back!). Requires 'db.cleanDisabled=false' setting in config.");
                 System.out.println("");
+                System.exit(0);
             }
 
         }
@@ -379,7 +328,95 @@ public class DatabaseUtils
         }
     }
 
+    /**
+     * Print basic information about the current database to System.out.
+     * This is utilized by both the 'test' and 'info' commandline options.
+     * @param connection current database connection
+     * @throws SQLException if database error occurs
+     */
+    private static void printDBInfo(Connection connection) throws SQLException
+    {
+        // Get basic Database info from connection
+        DatabaseMetaData meta = connection.getMetaData();
+        String dbType = getDbType(connection);
+        System.out.println("\nDatabase Type: " + dbType);
+        System.out.println("Database URL: " + meta.getURL());
+        System.out.println("Database Schema: " + getSchemaName(connection));
+        System.out.println("Database Username: " + meta.getUserName());
+        System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
+        System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
 
+        // For Postgres, report whether pgcrypto is installed
+        // (If it isn't, we'll also write out warnings...see below)
+        if(dbType.equals(DBMS_POSTGRES))
+        {
+            boolean pgcryptoUpToDate = PostgresUtils.isPgcryptoUpToDate();
+            Double pgcryptoVersion = PostgresUtils.getPgcryptoInstalledVersion(connection);
+            System.out.println("PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension installed/up-to-date? " + pgcryptoUpToDate  + " " + ((pgcryptoVersion!=null) ? "(version=" + pgcryptoVersion + ")" : "(not installed)"));
+        }
+    }
+
+    /**
+     * Print any warnings about current database setup to System.err (if any).
+     * This is utilized by both the 'test' and 'info' commandline options.
+     * @param connection current database connection
+     * @throws SQLException if database error occurs
+     */
+    private static void printDBWarnings(Connection connection) throws SQLException
+    {
+        // Get the DB Type
+        String dbType = getDbType(connection);
+
+        // For PostgreSQL databases, we need to check for the 'pgcrypto' extension.
+        // If it is NOT properly installed, we'll need to warn the user, as DSpace will be unable to proceed.
+        if(dbType.equals(DBMS_POSTGRES))
+        {
+            // Get version of pgcrypto available in this postgres instance
+            Double pgcryptoAvailable = PostgresUtils.getPgcryptoAvailableVersion(connection);
+
+            // Generic requirements message
+            String requirementsMsg = "\n** DSpace REQUIRES PostgreSQL >= " + PostgresUtils.POSTGRES_VERSION + " AND " + PostgresUtils.PGCRYPTO + " extension >= " + PostgresUtils.PGCRYPTO_VERSION + " **\n";
+
+            // Check if installed in PostgreSQL & a supported version
+            if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION)>=0)
+            {
+                // We now know it's available in this Postgres. Let's see if it is installed in this database.
+                Double pgcryptoInstalled = PostgresUtils.getPgcryptoInstalledVersion(connection);
+
+                // Check if installed in database, but outdated version
+                if(pgcryptoInstalled!=null && pgcryptoInstalled.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
+                {
+                    System.err.println("\nWARNING: Required PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is OUTDATED (installed version=" + pgcryptoInstalled + ", available version = " + pgcryptoAvailable + ").");
+                    System.err.println(requirementsMsg);
+                    System.err.println("To update it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                    System.err.println("\n  ALTER EXTENSION " + PostgresUtils.PGCRYPTO + " UPDATE TO '" + pgcryptoAvailable + "';\n");
+                }
+                else if(pgcryptoInstalled==null) // If it's not installed in database
+                {
+                    System.err.println("\nWARNING: Required PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT INSTALLED on this database.");
+                    System.err.println(requirementsMsg);
+                    System.err.println("To install it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                    System.err.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
+                }
+            }
+            // Check if installed in Postgres, but an unsupported version
+            else if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
+            {
+                System.err.println("\nWARNING: UNSUPPORTED version of PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension found (version=" + pgcryptoAvailable + ").");
+                System.err.println(requirementsMsg);
+                System.err.println("Make sure you are running a supported version of PostgreSQL, and then install " + PostgresUtils.PGCRYPTO + " version >= " + PostgresUtils.PGCRYPTO_VERSION);
+                System.err.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
+            }
+            else if(pgcryptoAvailable==null) // If it's not installed in Postgres
+            {
+                System.err.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT AVAILABLE. Please install it into this PostgreSQL instance.");
+                System.err.println(requirementsMsg);
+                System.err.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
+                System.err.println("Once the extension is installed globally, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                System.err.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
+            }
+        }
+    }
 
     /**
      * Setup/Initialize the Flyway API to run against our DSpace database
@@ -401,6 +438,9 @@ public class DatabaseUtils
                 flywaydb = new Flyway();
                 flywaydb.setDataSource(datasource);
                 flywaydb.setEncoding("UTF-8");
+
+                // Default cleanDisabled to "true" (which disallows the ability to run 'database clean')
+                flywaydb.setCleanDisabled(config.getBooleanProperty("db.cleanDisabled", true));
 
                 // Migration scripts are based on DBMS Keyword (see full path below)
                 String dbType = getDbType(connection);
