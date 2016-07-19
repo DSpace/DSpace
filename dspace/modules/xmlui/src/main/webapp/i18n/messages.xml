@@ -2857,13 +2857,19 @@
             <li>4. Check out &amp; submit</li>
         </ul>
     </message>
-    <message key="xmlui.submit.select.pub.help">
-Thank you for archiving your data in the Dryad Digital Repository, where it can be easily discovered, cited and re-used. Follow the steps below to describe your publication, upload your data files, and finalize/pay for your submission. You may save your submission at any time and return to it later at <a href="/submissions" target="_blank">My Submissions</a>. For questions about and best practices for depositing your data, please see our <a href="/pages/faq#depositing" target="_blank">FAQ</a>.<br />
-<br />
-Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-term access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from members and data submitters.<br />
-<br />Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data. In many cases, this charge is covered by <a href="/pages/integratedJournals" target="_blank">supporting journals, societies, and publishers</a>. In the absence of a sponsoring organization, the submitter is required to pay the DPC.
-    </message>
-    <message key="xmlui.submit.select.country.head"><span class="ds-form-label">Country-based Fee Waiver</span><br /><br /></message>
+	<message key="xmlui.submit.select.pub.help">
+		Thank you for archiving your data in the Dryad Digital Repository, where it can be easily discovered, cited and re-used.
+		Follow the steps below to describe your publication, upload your data files, and finalize/pay for your submission.
+		You may save your submission at any time and return to it later at <a href="/submissions" target="_blank">My Submissions</a>.
+		For questions about and best practices for depositing your data, please see our <a href="/pages/faq#depositing" target="_blank">FAQ</a>.
+		<br/><br/>
+		Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data.
+		In many cases, this charge is covered by <a href="/pages/integratedJournals" target="_blank">supporting journals, societies, and publishers</a>.
+		In the absence of a sponsoring organization, the submitter is required to pay the DPC.
+		<br/><br/>
+		Fields marked with an asterisk (*) are required.
+	</message>
+	<message key="xmlui.submit.select.country.head"><span class="ds-form-label">Country-based Fee Waiver</span><br /><br /></message>
     <message key="xmlui.submit.select.country.help">
 <span class="country-help">Waivers are granted upon request for submissions by researchers employed by an institution in an Eligible Country or who are independent researchers-in-residence in an Eligible Country. Eligible countries are those listed by the World Bank as low-income or lower-middle-income economies. Select a country to request a waiver before you begin your submission.</span>
     </message>
@@ -2885,6 +2891,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.submit.select.pub.form.option.existing">Select existing data package</message>
 	<message key="xmlui.submit.select.pub.form.error">Please fill in a valid data package
 		identifier</message>
+	<message key="xmlui.submit.select.license.head"><span class="ds-form-label">Data Release Agreement *</span><br/><br/></message>
 	<message key="xmlui.submit.select.pub.form.license">&#160;By clicking this checkbox, I certify that I have read and agree to the Dryad  <a target="_blank" href="/pages/policies">Terms of Service</a>. I understand that by submitting data to Dryad,
 		I am agreeing to release it under the terms of the <div id="cc-label" style="display: inline;"><a
 			href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative Commons Zero
@@ -3331,7 +3338,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui_submit_publication_article_status_in_review">&#160; In preparation or in review</message>
     <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
     <message key="xmlui.submit.publication.unknown_doi">I do not know the DOI or PubMedID for my publication. It was published in the journal:</message>
-    <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select the status of your publication</span><br/></message>
+    <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select the status of your publication *</span><br/></message>
     <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.<br />
     <br /><strong>Did you receive an email from your journal with a link to Dryad? Using this link to initiate your submission will save you time and effort by automatically entering the article metadata and the correct payment type for your journal.</strong></message>
 

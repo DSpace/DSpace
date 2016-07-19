@@ -105,6 +105,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     private static final Message T_asterisk_explanation = message("xmlui.submit.publication.journal.manu.acc.asterisk_explanation");
 
+    protected static final Message T_license_head = message("xmlui.submit.select.country.head");
 
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, SQLException, IOException,
@@ -133,9 +134,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         addSubmissionProgressList(div);
 
         List form = div.addList("submit-create-publication", List.TYPE_FORM);
-
-        generateCountryList(form,request);
-        generateFundingInfo(form,request);
 
         boolean submitExisting = ConfigurationManager.getBooleanProperty("submit.dataset.existing-datasets", true);
 
@@ -196,8 +194,11 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         addManuscriptNumber(request, newItem, manuscriptNumber);
 
+        generateCountryList(form,request);
+        generateFundingInfo(form,request);
+
         // add License checkbox.
-        addLicence(form);
+        addLicense(form);
 
         //add "Next" button
 	    Item actions = form.addItem();
@@ -425,8 +426,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
        }
 
 
-    private void addLicence(List form) throws WingException {
-        CheckBox licensebox = form.addItem("license_accepted","license_accepted").addCheckBox("license_accept");
+    private void addLicense(List form) throws WingException {
+        Item licenseItem = form.addItem("license_accepted","license_accepted");
+        licenseItem.addContent(T_license_head);
+        CheckBox licensebox = licenseItem.addCheckBox("license_accept");
         licensebox.addOption(String.valueOf(Boolean.TRUE), T_PUB_LICENSE);
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.STATUS_LICENSE_NOT_ACCEPTED)
             licensebox.addError(T_PUB_LICENSE_ERROR);
