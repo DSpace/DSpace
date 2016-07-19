@@ -86,7 +86,7 @@ public class DatabaseUtils
         if (argv.length < 1)
         {
             System.out.println("\nDatabase action argument is missing.");
-            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
+            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', 'validate' or 'clean'");
             System.out.println("\nOr, type 'database help' for more information.\n");
             System.exit(1);
         }
@@ -285,6 +285,23 @@ public class DatabaseUtils
                     System.exit(1);
                 }
             }
+            // "validate" = Run Flyway validation to check for database errors/issues
+            else if(argv[0].equalsIgnoreCase("validate"))
+            {
+                try (Connection connection = dataSource.getConnection();)
+                {
+                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
+                    System.out.println("Attempting to validate database status (and migration checksums) via FlywayDB... (Check dspace logs for more details)");
+                    flyway.validate();
+                    System.out.println("Done.");
+                }
+                catch(SQLException|FlywayException e)
+                {
+                    System.err.println("Validation exception:");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+            }
             // "clean" = Run Flyway clean script
             else if(argv[0].equalsIgnoreCase("clean"))
             {
@@ -348,6 +365,7 @@ public class DatabaseUtils
                 System.out.println(" - info / status = Describe basic info/status about database, including validating the compatibility of this database");
                 System.out.println(" - migrate       = Migrate the database to the latest version");
                 System.out.println(" - repair        = Attempt to repair any previously failed database migrations or checksum mismatches (via Flyway repair)");
+                System.out.println(" - validate      = Validate current database's migration status (via Flyway validate), validating all migration checksums.");
                 System.out.println(" - clean         = DESTROY all data and tables in database (WARNING there is no going back!)");
                 System.out.println("");
             }
