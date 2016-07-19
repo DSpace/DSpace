@@ -403,24 +403,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
         setHasJournalPage(value.toString());
     }
 
-    public Boolean getHasJournalPage() {
-        String metadataValue = getConceptMetadataValue(journalMetadata.getProperty(HASJOURNALPAGE));
-        Boolean result = false;
-        if (metadataValue.equals("true")) {
-            result = true;
-        }
-        return result;
-    }
-
-    public void setHasJournalPage(String value) {
-        setConceptMetadataValue(journalMetadata.getProperty(HASJOURNALPAGE), value);
-    }
-
-    @JsonIgnore
-    public void setBooleanHasJournalPage(Boolean value) {
-        setHasJournalPage(value.toString());
-    }
-
     @JsonIgnore
     public String getIdentifier() {
         return conceptIdentifier;
