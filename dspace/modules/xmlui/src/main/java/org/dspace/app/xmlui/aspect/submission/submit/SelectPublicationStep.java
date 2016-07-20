@@ -84,6 +84,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_funding_head = message("xmlui.submit.select.funding.head");
     private static final Message T_funding_help = message("xmlui.submit.select.funding.help");
     private static final Message T_funding_desc1 = message("xmlui.submit.select.funding.desc1");
+    private static final Message T_funding_desc1_help = message("xmlui.submit.select.funding.desc1.help");
     private static final Message T_funding_desc2 = message("xmlui.submit.select.funding.desc2");
     private static final Message T_funding_status_yes = message("xmlui_submit_funding_status_yes");
     private static final Message T_funding_status_no = message("xmlui_submit_funding_status_no");
@@ -105,7 +106,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     private static final Message T_asterisk_explanation = message("xmlui.submit.publication.journal.manu.acc.asterisk_explanation");
 
-    protected static final Message T_license_head = message("xmlui.submit.select.country.head");
+    protected static final Message T_license_head = message("xmlui.submit.select.license.head");
 
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, SQLException, IOException,
@@ -512,7 +513,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 //
         Text grantInfoText = form.addItem("grant-info","grant-info").addText("grant-info");
         grantInfoText.setLabel(T_funding_desc1);
-        grantInfoText.setHelp("test help");
+//        grantInfoText.setHelp(T_funding_desc1_help);
 //        if (this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_GRANT) {
 //            fundingRadio.setOptionSelected("1");
 //            grantInfoText.setValue(request.getParameter("grant-info"));

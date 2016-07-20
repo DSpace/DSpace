@@ -2882,7 +2882,7 @@
 	</message>
 	<message key="xmlui.submit.select.funding.error">We could not verify your grant number against the US NSF grants database.
 		Providing this information is optional. You may try again or remove the number to proceed with your submission.</message>
-	<message key="xmlui.submit.select.funding.desc1"><span class="ds-form-label-grant-info">Enter your grant number:</span></message>
+	<message key="xmlui.submit.select.funding.desc1"><span class="ds-form-label-grant-info">Enter your grant number:</span><br/>*(e.g. 1234567 or DBI-1234567)</message>
 	<message key="xmlui.submit.select.funding.desc2">Add another grant number</message>
 	<message key="xmlui.submit.select.pub.form_head">Submit new content</message>
 	<message key="xmlui.submit.select.pub.form.help">The dryad identifier of the data package,
