@@ -1990,6 +1990,25 @@ span.ds-form-label-grant-info-help {
     text-align: left;
 }
 
+span.ds-form-label-grant-info-2 {
+    display: block;
+    font-weight: normal;
+    color: black;
+    background-color: inherit;
+    text-align: left;
+}
+span.ds-form-label-grant-info-help-2 {
+    display: block;
+    font-weight: normal;
+    color: gray;
+    background-color: inherit;
+    text-align: left;
+}
+
+#aspect_submission_submit_CheckoutStep_list_grant-list {
+    list-style-type: none;
+}
+
 div.spacer {
     height: 15px;
     margin: 0;

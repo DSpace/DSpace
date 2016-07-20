@@ -3063,7 +3063,7 @@
 		<br/><br/>
 		Click the Finalize Submission button below to complete checkout.
 	</message>
-	<message key="xmlui.Submission.submit.CheckoutStep.funding.desc1"><span class="ds-form-label-grant-info">US NSF grant number, if applicable</span><span class="ds-form-label-grant-info-help">(e.g. 1234567 or DBI-1234567)</span></message>
+	<message key="xmlui.Submission.submit.CheckoutStep.funding.desc1"><span class="ds-form-label-grant-info-2">US NSF grant number, if applicable</span><span class="ds-form-label-grant-info-help-2">(e.g. 1234567 or DBI-1234567)</span></message>
 
 	<message key="xmlui.Submission.submit.Checkout.head">Check out &amp; submit</message>
     <message key="xmlui.Submission.submit.Checkout.trail">
