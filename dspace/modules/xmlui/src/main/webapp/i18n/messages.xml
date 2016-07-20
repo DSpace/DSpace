@@ -2882,7 +2882,7 @@
 	</message>
 	<message key="xmlui.submit.select.funding.error">We could not verify your grant number against the US NSF grants database.
 		Providing this information is optional. You may try again or remove the number to proceed with your submission.</message>
-	<message key="xmlui.submit.select.funding.desc1"><span class="ds-form-label-grant-info">Enter your grant number:</span><br/>*(e.g. 1234567 or DBI-1234567)</message>
+	<message key="xmlui.submit.select.funding.desc1"><span class="ds-form-label-grant-info">Enter your grant number:</span><span class="ds-form-label-grant-info-help">*(e.g. 1234567 or DBI-1234567)</span></message>
 	<message key="xmlui.submit.select.funding.desc2">Add another grant number</message>
 	<message key="xmlui.submit.select.pub.form_head">Submit new content</message>
 	<message key="xmlui.submit.select.pub.form.help">The dryad identifier of the data package,
@@ -2891,7 +2891,7 @@
 	<message key="xmlui.submit.select.pub.form.option.existing">Select existing data package</message>
 	<message key="xmlui.submit.select.pub.form.error">Please fill in a valid data package
 		identifier</message>
-	<message key="xmlui.submit.select.license.head"><span class="ds-form-label">Data Release Agreement *</span><br/><br/></message>
+	<message key="xmlui.submit.select.license.head"><span class="ds-form-label">Data Release Agreement*</span><br/><br/></message>
 	<message key="xmlui.submit.select.pub.form.license">&#160;By clicking this checkbox, I certify that I have read and agree to the Dryad  <a target="_blank" href="/pages/policies">Terms of Service</a>. I understand that by submitting data to Dryad,
 		I am agreeing to release it under the terms of the <div id="cc-label" style="display: inline;"><a
 			href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative Commons Zero
@@ -3338,7 +3338,7 @@
     <message key="xmlui_submit_publication_article_status_in_review">&#160; In preparation or in review</message>
     <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
     <message key="xmlui.submit.publication.unknown_doi">I do not know the DOI or PubMedID for my publication. It was published in the journal:</message>
-    <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select the status of your publication *</span><br/></message>
+    <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select the status of your publication*</span><br/></message>
     <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.<br />
     <br /><strong>Did you receive an email from your journal with a link to Dryad? Using this link to initiate your submission will save you time and effort by automatically entering the article metadata and the correct payment type for your journal.</strong></message>
 

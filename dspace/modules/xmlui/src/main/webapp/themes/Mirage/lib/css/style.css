@@ -1981,6 +1981,14 @@ span.ds-form-label-grant-info {
     background-color: inherit;
     text-align: left;
 }
+span.ds-form-label-grant-info-help {
+    display: block;
+    font-weight: normal;
+    font-size: 70%;
+    color: gray;
+    background-color: inherit;
+    text-align: left;
+}
 
 div.spacer {
     height: 15px;
