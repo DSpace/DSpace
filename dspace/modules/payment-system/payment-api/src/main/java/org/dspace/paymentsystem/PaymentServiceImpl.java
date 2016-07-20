@@ -442,21 +442,45 @@ public class PaymentServiceImpl implements PaymentService {
             } else {
                 grantInfo = request.getParameter("grant-info");
                 log.error("grant is now -" + grantInfo + "-");
-                if (!"".equals(StringUtils.stripToEmpty(grantInfo))) {
-                    int confidence = 0;
-                    if (JournalUtils.isValidNSFGrantNumber(grantInfo)) {
-                        log.error("valid grant");
-                        confidence = Choices.CF_ACCEPTED;
-                    } else {
-                        log.error("invalid grant");
-                        confidence = Choices.CF_REJECTED;
-                    }
-                    item.clearMetadata("dryad.fundingEntity");
-                    item.addMetadata("dryad", "fundingEntity", null, null, grantInfo, "NSF", confidence);
-                    item.update();
+                if (grantInfo == null) {
+                    hasGrant = true;
+                    log.error("should ask about grant");
                 } else {
-                    hasGrant = false;
+                    if ("".equals(StringUtils.stripToEmpty(grantInfo))) {
+                        hasGrant = false;
+                        log.error("no grant, go to payment screen");
+                    } else {
+                        int confidence = 0;
+                        if (JournalUtils.isValidNSFGrantNumber(grantInfo)) {
+                            log.error("valid grant");
+                            confidence = Choices.CF_ACCEPTED;
+                        } else {
+                            log.error("invalid grant");
+                            confidence = Choices.CF_REJECTED;
+                        }
+                        item.clearMetadata("dryad.fundingEntity");
+                        item.addMetadata("dryad", "fundingEntity", null, null, grantInfo, "NSF", confidence);
+                        item.update();
+                        hasGrant = true;
+                        log.error("added grant info " + grantInfo);
+                    }
                 }
+
+//                if (!"".equals(StringUtils.stripToEmpty(grantInfo))) {
+//                    int confidence = 0;
+//                    if (JournalUtils.isValidNSFGrantNumber(grantInfo)) {
+//                        log.error("valid grant");
+//                        confidence = Choices.CF_ACCEPTED;
+//                    } else {
+//                        log.error("invalid grant");
+//                        confidence = Choices.CF_REJECTED;
+//                    }
+//                    item.clearMetadata("dryad.fundingEntity");
+//                    item.addMetadata("dryad", "fundingEntity", null, null, grantInfo, "NSF", confidence);
+//                    item.update();
+//                } else {
+//                    hasGrant = false;
+//                }
             }
 
             // Now that we've checked vouchers and grants, we can generate the corresponding UI and update the cart accordingly.
