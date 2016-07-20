@@ -10,6 +10,7 @@ package org.dspace.paymentsystem;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.JournalUtils;
 import org.dspace.app.xmlui.wing.Message;
@@ -22,6 +23,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -367,7 +369,7 @@ public class PaymentServiceImpl implements PaymentService {
             finDiv.addPara("data-label", "bold").addContent("Your payment information has been verified.");
         }
         if (shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
-            finDiv.addPara("data-label", "bold").addContent("You have already paid for this submission.");
+            finDiv.addPara("data-label", "bold").addContent("Your DPC has been paid.");
         } else if (shoppingCart.getTotal() == 0) {
             finDiv.addPara("data-label", "bold").addContent("Your total due is $0.00.");
         } else {
@@ -437,60 +439,47 @@ public class PaymentServiceImpl implements PaymentService {
             DCValue[] fundingEntities = item.getMetadata("dryad.fundingEntity");
             if (fundingEntities != null && fundingEntities.length > 0) {
                 grantInfo = fundingEntities[0].value;
-                if ("no grant".equals(grantInfo)) {
-                    hasGrant = false;
-                } else if ("blank".equals(grantInfo)) {
-                    hasGrant = true;
-                    grantInfo = null;
-                    item.clearMetadata("dryad.fundingEntity");
-                    item.update();
-                }
             } else {
                 grantInfo = request.getParameter("grant-info");
-                if (grantInfo != null) {
+                log.error("grant is now -" + grantInfo + "-");
+                if (!"".equals(StringUtils.stripToEmpty(grantInfo))) {
+                    int confidence = 0;
                     if (JournalUtils.isValidNSFGrantNumber(grantInfo)) {
-                        hasGrant = true;
-                        item.clearMetadata("dryad.fundingEntity");
-                        item.addMetadata("dryad", "fundingEntity", null, null, grantInfo);
-                        item.update();
-                    } else if (!"".equals(grantInfo)){
-                        hasGrant = true;
-                        grantInfo = null;
-                        errorMessage = PAYMENT_ERROR_GRANT;
+                        log.error("valid grant");
+                        confidence = Choices.CF_ACCEPTED;
                     } else {
-                        grantInfo = null;
-                        hasGrant = false;
+                        log.error("invalid grant");
+                        confidence = Choices.CF_REJECTED;
                     }
-                } else {
-                    hasGrant = true;
+                    item.clearMetadata("dryad.fundingEntity");
+                    item.addMetadata("dryad", "fundingEntity", null, null, grantInfo, "NSF", confidence);
+                    item.update();
                 }
             }
 
             // Now that we've checked vouchers and grants, we can generate the corresponding UI and update the cart accordingly.
             if (hasGrant) {
-                if (grantInfo != null) {
+                log.error("grant is -" + grantInfo + "-");
+                if (!"".equals(StringUtils.stripToEmpty(grantInfo))) {
+                    log.error("nsf pays");
                     paymentSystemService.updateTotal(context, shoppingCart, "the US National Science Foundation");
                     shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                     shoppingCart.update();
-                }
-                mainDiv.addPara(T_funding_head);
-                if (grantInfo == null) {
-                    mainDiv.addPara(T_funding_question);
-                    List list = mainDiv.addList("grant-list");
-                    list.addLabel(T_funding_desc1);
-                    list.addItem().addText("grant-info");
-                    if (PAYMENT_ERROR_GRANT.equals(errorMessage)) {
-                        mainDiv.addPara("voucher-error", "voucher-error").addHighlight("bold").addContent(T_funding_error);
-                    }
-                    list.addItem().addButton("submit-grant").setValue(T_button_proceed);
-                    Button cancelButton = list.addItem().addButton(AbstractProcessingStep.CANCEL_BUTTON);
-                    cancelButton.setValue("Cancel");
-                } else {
                     mainDiv.addPara(T_funding_valid);
                     mainDiv.addHidden("show_button").setValue(T_button_finalize);
                     List buttons = mainDiv.addList("paypal-form-buttons");
                     Button skipButton = buttons.addItem().addButton("skip_payment");
                     skipButton.setValue("Submit");
+                } else {
+                    log.error("ask");
+                    mainDiv.addPara(T_funding_head);
+                    mainDiv.addPara(T_funding_question);
+                    List list = mainDiv.addList("grant-list");
+                    list.addLabel(T_funding_desc1);
+                    list.addItem().addText("grant-info");
+                    list.addItem().addButton("submit-grant").setValue(T_button_proceed);
+                    Button cancelButton = list.addItem().addButton(AbstractProcessingStep.CANCEL_BUTTON);
+                    cancelButton.setValue("Cancel");
                 }
             } else {
                 if (shoppingCart.getTotal() == 0 || shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {

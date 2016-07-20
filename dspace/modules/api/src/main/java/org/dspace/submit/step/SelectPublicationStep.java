@@ -80,22 +80,15 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         if (grantInfo != null && !grantInfo.equals("")) {
             if (!JournalUtils.isValidNSFGrantNumber(grantInfo)) {
 //                return ERROR_INVALID_GRANT;
+                log.error("invalid grant");
                 confidence = Choices.CF_REJECTED;
             } else {
+                log.error("valid grant");
                 confidence = Choices.CF_ACCEPTED;
             }
+            item.addMetadata("dryad.fundingEntity", null, grantInfo, "NSF", confidence);
+            item.update();
         }
-        if (fundingStatus != null && fundingStatus.equals("0")) {
-            grantInfo = "no grant";
-        }
-
-        if (grantInfo == null || "".equals(grantInfo)) {
-            grantInfo = "blank";
-        }
-
-        item.addMetadata("dryad.fundingEntity", null, grantInfo, null, confidence);
-        item.update();
-
         EventLogger.log(context, "submission-select-publication", "status=complete");
         return STATUS_COMPLETE;
     }
