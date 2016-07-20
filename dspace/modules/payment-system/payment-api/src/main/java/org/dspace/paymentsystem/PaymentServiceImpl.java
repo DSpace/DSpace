@@ -475,7 +475,7 @@ public class PaymentServiceImpl implements PaymentService {
                     mainDiv.addPara(T_funding_head);
                     mainDiv.addPara(T_funding_question);
                     List list = mainDiv.addList("grant-list");
-                    list.addLabel(T_funding_desc1);
+                    list.addItem(T_funding_desc1);
                     list.addItem().addText("grant-info");
                     list.addItem().addButton("submit-grant").setValue(T_button_proceed);
                     Button cancelButton = list.addItem().addButton(AbstractProcessingStep.CANCEL_BUTTON);
