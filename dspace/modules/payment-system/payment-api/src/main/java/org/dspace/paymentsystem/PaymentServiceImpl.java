@@ -454,6 +454,8 @@ public class PaymentServiceImpl implements PaymentService {
                     item.clearMetadata("dryad.fundingEntity");
                     item.addMetadata("dryad", "fundingEntity", null, null, grantInfo, "NSF", confidence);
                     item.update();
+                } else {
+                    hasGrant = false;
                 }
             }
 
