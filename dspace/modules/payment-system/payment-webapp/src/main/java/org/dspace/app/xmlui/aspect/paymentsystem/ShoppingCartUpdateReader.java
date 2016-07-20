@@ -104,7 +104,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         switch (paymentSystemService.getWaiver(context,shoppingCart,""))
         {
 	case ShoppingCart.COUNTRY_WAIVER: waiverMessage = "Data Publishing Charge has been waived due to submitter's association with " + StringEscapeUtils.escapeJava(shoppingCart.getCountry()) + "."; break;
-	case ShoppingCart.JOUR_WAIVER: waiverMessage = "Data Publishing Charges are covered for all submissions to " + shoppingCart.getJournal() + "."; break;
+	case ShoppingCart.JOUR_WAIVER: waiverMessage = "Your Data Publishing Charge is covered by " + shoppingCart.getJournal() + "."; break;
 	case ShoppingCart.VOUCHER_WAIVER: waiverMessage = "Voucher code applied to Data Publishing Charge."; break;
 	}
 

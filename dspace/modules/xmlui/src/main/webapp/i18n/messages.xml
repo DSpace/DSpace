@@ -2882,7 +2882,7 @@
 	</message>
 	<message key="xmlui.submit.select.funding.error">We could not verify your grant number against the US NSF grants database.
 		Providing this information is optional. You may try again or remove the number to proceed with your submission.</message>
-	<message key="xmlui.submit.select.funding.desc1"><span class="ds-form-label-grant-info">Enter your grant number:</span><span class="ds-form-label-grant-info-help">*(e.g. 1234567 or DBI-1234567)</span></message>
+	<message key="xmlui.submit.select.funding.desc1"><span class="ds-form-label-grant-info">US NSF grant number, if applicable:</span><span class="ds-form-label-grant-info-help">(e.g. 1234567 or DBI-1234567)</span></message>
 	<message key="xmlui.submit.select.funding.desc2">Add another grant number</message>
 	<message key="xmlui.submit.select.pub.form_head">Submit new content</message>
 	<message key="xmlui.submit.select.pub.form.help">The dryad identifier of the data package,
@@ -3059,12 +3059,13 @@
 	<message key="xmlui.Submission.submit.CheckoutStep.funding.valid">
 		The United States National Science Foundation has awarded a fund to test the feasibility of direct sponsorship (<a href="http://blog.datadryad.org/2016/07/20/piloting-new-ways-for-funders-to-support-data-stewardship">find out more</a>).
 		<br/><br/>
-		<span class="bold">Your grant number has been verified. Data Publishing Charge is covered by the United States National Science Foundation.</span>
+		<span class="bold">Thank you for providing your grant information. Your Data Publishing Charge is covered by the United States National Science Foundation.</span>
 		<br/><br/>
 		Click the Finalize Submission button below to complete checkout.
 	</message>
-	<message key="xmlui.Submission.submit.CheckoutStep.funding.desc1">Enter your grant number</message>
-    <message key="xmlui.Submission.submit.Checkout.head">Check out &amp; submit</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.funding.desc1"><span class="ds-form-label-grant-info">US NSF grant number, if applicable</span><span class="ds-form-label-grant-info-help">(e.g. 1234567 or DBI-1234567)</span></message>
+
+	<message key="xmlui.Submission.submit.Checkout.head">Check out &amp; submit</message>
     <message key="xmlui.Submission.submit.Checkout.trail">
         <div><br/>
             <ul class="navigation-link">
