@@ -9,7 +9,9 @@ package org.dspace.discovery;
 
 import org.apache.log4j.Logger;
 import org.apache.commons.cli.*;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 import java.io.IOException;
@@ -41,19 +43,26 @@ public class IndexClient {
         Context context = new Context();
         context.setIgnoreAuthorization(true);
 
-        String usage = "org.dspace.discovery.IndexClient [-cbhf[r <item handle>]] or nothing to update/clean an existing index.";
+        String usage = "org.dspace.discovery.IndexClient [-cbhf] | [-r <handle>] | [-i <handle>] or nothing to update/clean an existing index.";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
 
         options
                 .addOption(OptionBuilder
-                        .withArgName("item handle")
+                        .withArgName("handle to remove")
                         .hasArg(true)
                         .withDescription(
                                 "remove an Item, Collection or Community from index based on its handle")
                         .create("r"));
 
+        options
+                .addOption(OptionBuilder
+                        .withArgName("handle to add or update")
+                        .hasArg(true)
+                        .withDescription(
+                                "add or update an Item, Collection or Community based on its handle")
+                        .create("i"));
 
         options
                 .addOption(OptionBuilder
@@ -119,6 +128,14 @@ public class IndexClient {
             indexer.optimize();
         } else if(line.hasOption('s')) {
             checkRebuildSpellCheck(line, indexer);
+        } else if(line.hasOption('i')) {
+            final String handle = line.getOptionValue('i');
+            final DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handle);
+            if (dso == null) {
+                throw new IllegalArgumentException("Cannot resolve " + handle + " to a DSpace object");
+            }
+            log.info("Forcibly Indexing " + handle);
+            indexer.indexContent(context, dso, true, true);
         } else {
             log.info("Updating and Cleaning Index");
             indexer.cleanIndex(line.hasOption("f"));
