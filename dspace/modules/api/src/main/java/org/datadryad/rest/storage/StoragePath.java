@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.models.Journal;
 
 /**
  *
@@ -44,29 +44,29 @@ public class StoragePath extends ArrayList<StoragePathElement> {
 
     // Methods for accessing/creating StoragePaths for Manuscripts and Organizations
 
-    public static StoragePath createOrganizationPath(String organizationCode) {
+    public static StoragePath createJournalPath(String journalCode) {
         StoragePath path = new StoragePath();
-        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+        path.addPathElement(Journal.JOURNAL_CODE, journalCode);
         return path;
     }
 
-    public static StoragePath createManuscriptPath(String organizationCode, String manuscriptId) {
+    public static StoragePath createManuscriptPath(String journalCode, String manuscriptId) {
         StoragePath path = new StoragePath();
-        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+        path.addPathElement(Journal.JOURNAL_CODE, journalCode);
         path.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
         return path;
     }
 
-    public void setOrganizationCode(String organizationCode) {
-        if (getOrganizationCode() == null) {   // can't add ManuscriptId to a path that doesn't have an organization
-            this.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+    public void setJournalCode(String journalCode) {
+        if (getJournalCode() == null) {   // can't add ManuscriptId to a path that doesn't have an journal
+            this.addPathElement(Journal.JOURNAL_CODE, journalCode);
         } else {
-            this.set(0, new StoragePathElement(Organization.ORGANIZATION_CODE, organizationCode));
+            this.set(0, new StoragePathElement(Journal.JOURNAL_CODE, journalCode));
         }
     }
 
     public void setManuscriptId(String manuscriptId) {
-        if (this.getOrganizationCode() == null) {   // can't add ManuscriptId to a path that doesn't have an organization
+        if (this.getJournalCode() == null) {   // can't add ManuscriptId to a path that doesn't have an journal
             return;
         }
         if (this.getManuscriptId() == null) {
@@ -76,10 +76,10 @@ public class StoragePath extends ArrayList<StoragePathElement> {
         }
     }
 
-    public String getOrganizationCode() {
+    public String getJournalCode() {
         if(this.size() >= 1) {
-            String organizationCode = this.get(0).value;
-            return organizationCode;
+            String journalCode = this.get(0).value;
+            return journalCode;
         } else {
             return null;
         }

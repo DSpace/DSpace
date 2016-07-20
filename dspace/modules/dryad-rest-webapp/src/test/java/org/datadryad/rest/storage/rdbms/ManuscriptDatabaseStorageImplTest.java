@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -25,8 +25,8 @@ import org.dspace.JournalUtils;
  */
 public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
     private static Logger log = Logger.getLogger(ManuscriptDatabaseStorageImplTest.class);
-    private static final String TEST_ORGANIZATION_CODE = "test";
-    private static final String TEST_ORGANIZATION_NAME = "Test Organization";
+    private static final String TEST_JOURNAL_CODE = "test";
+    private static final String TEST_JOURNAL_NAME = "Test Journal";
     private static final String TEST_MANUSCRIPT_ID_1 = "MS_TEST_12345";
     private static final String TEST_MANUSCRIPT_ID_2 = "MS_TEST_99999";
 
@@ -35,26 +35,26 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
     private StoragePath manuscriptPath2 = new StoragePath();
 
     public ManuscriptDatabaseStorageImplTest() {
-        collectionPath = StoragePath.createOrganizationPath(TEST_ORGANIZATION_CODE);
-        manuscriptPath1 = StoragePath.createManuscriptPath(TEST_ORGANIZATION_CODE, TEST_MANUSCRIPT_ID_1);
-        manuscriptPath2 = StoragePath.createManuscriptPath(TEST_ORGANIZATION_CODE, TEST_MANUSCRIPT_ID_2);
+        collectionPath = StoragePath.createJournalPath(TEST_JOURNAL_CODE);
+        manuscriptPath1 = StoragePath.createManuscriptPath(TEST_JOURNAL_CODE, TEST_MANUSCRIPT_ID_1);
+        manuscriptPath2 = StoragePath.createManuscriptPath(TEST_JOURNAL_CODE, TEST_MANUSCRIPT_ID_2);
     }
 
     @Before
     public void setUp() {
         super.setUp();
-        // Create an organization
-        Organization organization = null;
+        // Create an journal
+        Journal journal = null;
         try {
             DryadJournalConcept journalConcept = new DryadJournalConcept();
-            journalConcept.setFullName(TEST_ORGANIZATION_NAME);
-            journalConcept.setJournalID(TEST_ORGANIZATION_CODE);
+            journalConcept.setFullName(TEST_JOURNAL_NAME);
+            journalConcept.setJournalID(TEST_JOURNAL_CODE);
             Context context = new Context();
             JournalUtils.addDryadJournalConcept(context, journalConcept);
-            organization = OrganizationDatabaseStorageImpl.getOrganizationByCodeOrISSN(context, TEST_ORGANIZATION_CODE);
+            journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, TEST_JOURNAL_CODE);
             context.complete();
         } catch (Exception ex) {
-            fail("Exception setting up test organization: " + ex);
+            fail("Exception setting up test journal: " + ex);
         }
 
         // Create a manuscript
@@ -63,7 +63,7 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
         manuscript.setManuscriptId(TEST_MANUSCRIPT_ID_1);
         try {
             DatabaseManager.deleteByValue(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, ManuscriptDatabaseStorageImpl.COLUMN_MSID, TEST_MANUSCRIPT_ID_1);
-            TableRow manuscriptRow = ManuscriptDatabaseStorageImpl.tableRowFromManuscript(manuscript, organization.organizationId);
+            TableRow manuscriptRow = ManuscriptDatabaseStorageImpl.tableRowFromManuscript(manuscript, journal.conceptID);
             manuscriptRow.setColumn(ManuscriptDatabaseStorageImpl.COLUMN_VERSION, 1);
             manuscriptRow.setColumn(ManuscriptDatabaseStorageImpl.COLUMN_ACTIVE, ManuscriptDatabaseStorageImpl.ACTIVE_TRUE);
             DatabaseManager.insert(context, manuscriptRow);
@@ -78,9 +78,9 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
         try {
             DatabaseManager.deleteByValue(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, ManuscriptDatabaseStorageImpl.COLUMN_MSID, TEST_MANUSCRIPT_ID_1);
             DatabaseManager.deleteByValue(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, ManuscriptDatabaseStorageImpl.COLUMN_MSID, TEST_MANUSCRIPT_ID_2);
-            DatabaseManager.deleteByValue(context, OrganizationDatabaseStorageImpl.ORGANIZATION_TABLE, OrganizationDatabaseStorageImpl.COLUMN_CODE, TEST_ORGANIZATION_CODE);
+            DatabaseManager.deleteByValue(context, JournalDatabaseStorageImpl.JOURNAL_TABLE, JournalDatabaseStorageImpl.COLUMN_CODE, TEST_JOURNAL_CODE);
         } catch (SQLException ex) {
-            fail("Exception clearing test organization and manuscript: " + ex);
+            fail("Exception clearing test journal and manuscript: " + ex);
         }
         super.tearDown();
     }

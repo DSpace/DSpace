@@ -4,24 +4,13 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.Author;
-import org.datadryad.rest.models.AuthorsList;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.storage.StorageException;
 import org.dspace.JournalUtils;
-import org.dspace.content.authority.Concept;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
 import org.dspace.workflow.ApproveRejectReviewItem;
-import org.dspace.workflow.ApproveRejectReviewItemException;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.DCValue;
 
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -34,10 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.lang.Runtime;
 import java.lang.RuntimeException;
-import java.lang.reflect.Array;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -339,8 +325,6 @@ public class DryadEmailSubmission extends HttpServlet {
             parser = getEmailParser(journalConcept.getParsingScheme());
             parser.parseMessage(dryadContent);
             manuscript = parser.getManuscript();
-            // make sure that the manuscript has the journalCode even if we found the parser by name:
-            manuscript.getOrganization().organizationCode = journalCode;
         } catch (SubmissionException e) {
             throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
         }

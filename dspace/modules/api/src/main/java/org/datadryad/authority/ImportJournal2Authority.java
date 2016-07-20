@@ -144,7 +144,7 @@ public final class ImportJournal2Authority {
                                         Map<String,String> val = journalProperties.get(authorityValue.getValue());
                                         if (val!=null) {
                                             journalProperties.remove(authorityValue.getValue());
-                                            for (String prop : DryadJournalConcept.journalMetadata.stringPropertyNames()) {
+                                            for (String prop : DryadJournalConcept.getMetadataPropertyNames()) {
                                                 if (val.get(prop)!=null && val.get(prop).length()>0) {
                                                     aConcept.addMetadata(context, "journal",prop,null,"",val.get(prop),authorityValue.getId(),0);
                                                 }
@@ -172,7 +172,7 @@ public final class ImportJournal2Authority {
                     aConcept.setLang(context, "en");
                     aConcept.setStatus(context, Concept.Status.ACCEPTED.name());
                     aConcept.setTopConcept(context, true);
-                    for (String prop : DryadJournalConcept.journalMetadata.stringPropertyNames()) {
+                    for (String prop : DryadJournalConcept.getMetadataPropertyNames()) {
                         if (val.get(prop)!=null && val.get(prop).length()>0) {
                             aConcept.addMetadata(context, "journal",prop,null,"",val.get(prop),aConcept.getIdentifier(),0);
                         }
@@ -210,7 +210,7 @@ public final class ImportJournal2Authority {
                 String str = "journal." + journalType + ".";
 
                 Map<String, String> map = new HashMap<String, String>();
-                for (String prop : DryadJournalConcept.journalMetadata.stringPropertyNames()) {
+                for (String prop : DryadJournalConcept.getMetadataPropertyNames()) {
                     String newprop = properties.getProperty(str + prop);
                     if (newprop != null) {
                         map.put(prop, newprop);

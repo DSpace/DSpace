@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.models.Journal;
 
 /**
  *
@@ -16,14 +16,14 @@ public abstract class AbstractManuscriptStorage extends AbstractStorage<Manuscri
 
     @Override
     public final void checkCollectionPath(StoragePath path) throws StorageException {
-        final List<String> expectedKeyPath = Arrays.asList(Organization.ORGANIZATION_CODE);
+        final List<String> expectedKeyPath = Arrays.asList(Journal.JOURNAL_CODE);
         checkPath(path, expectedKeyPath);
 
     }
 
     @Override
     public final void checkObjectPath(StoragePath path) throws StorageException {
-        final List<String> expectedKeyPath = Arrays.asList(Organization.ORGANIZATION_CODE, Manuscript.MANUSCRIPT_ID);
+        final List<String> expectedKeyPath = Arrays.asList(Journal.JOURNAL_CODE, Manuscript.MANUSCRIPT_ID);
         checkPath(path, expectedKeyPath);
     }
 
