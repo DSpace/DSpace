@@ -17,10 +17,9 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.content.*;
 import org.xml.sax.SAXException;
@@ -50,18 +49,24 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-
     public StatisticsTransformer(Date dateStart, Date dateEnd) {
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
 
-		this.context = new Context();
-	}
+        try {
+            this.context = new Context();
+        } catch (SQLException e) {
+            log.error("Error getting context in StatisticsTransformer:" + e.getMessage());
+        }
+    }
 
     public StatisticsTransformer() {
-		this.context = new Context();
-	}
+        try {
+            this.context = new Context();
+        } catch (SQLException e) {
+            log.error("Error getting context in StatisticsTransformer:" + e.getMessage());
+        }
+    }
 
     /**
      * Add a page title and trail links
@@ -74,7 +79,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
         if(dso != null)
         {
-            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath, true);
+            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
         }
         pageMeta.addTrailLink(contextPath + "/handle" + (dso != null && dso.getHandle() != null ? "/" + dso.getHandle() : "/statistics"), T_statistics_trail);
 
@@ -136,16 +141,16 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 		}
 		*/
 		try {
-            /** List of the top 10 items for the entire repository **/
+            /** List of the top n items for the entire repository **/
 			StatisticsListing statListing = new StatisticsListing(
 					new StatisticsDataVisits());
 
 			statListing.setTitle(T_head_visits_total);
 			statListing.setId("list1");
 
-            //Adding a new generator for our top 10 items without a name length delimiter
+            //Adding a new generator for our top n items without a name length delimiter
             DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
-            dsoAxis.addDsoChild(Constants.ITEM, 10, false, -1);
+            dsoAxis.addDsoChild(Constants.ITEM, chooseResultCount(), false, -1);
             statListing.addDatasetGenerator(dsoAxis);
 
             //Render the list as a table
@@ -176,7 +181,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			statListing.setId("list1");
 
 			DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
-			dsoAxis.addDsoChild(dso.getType(), 10, false, -1);
+			dsoAxis.addDsoChild(dso.getType(), chooseResultCount(), false, -1);
 			statListing.addDatasetGenerator(dsoAxis);
 
 			addDisplayListing(division, statListing);
@@ -202,7 +207,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			statisticsTable.addDatasetGenerator(timeAxis);
 
 			DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
-			dsoAxis.addDsoChild(dso.getType(), 10, false, -1);
+			dsoAxis.addDsoChild(dso.getType(), chooseResultCount(), false, -1);
 			statisticsTable.addDatasetGenerator(dsoAxis);
 
 			addDisplayTable(division, statisticsTable);
@@ -218,14 +223,14 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
              //Make sure our item has at least one bitstream
              org.dspace.content.Item item = (org.dspace.content.Item) dso;
             try {
-                if(itemService.hasUploadedFiles(item)){
+                if(item.hasUploadedFiles()){
                     StatisticsListing statsList = new StatisticsListing(new StatisticsDataVisits(dso));
 
                     statsList.setTitle(T_head_visits_bitstream);
                     statsList.setId("list-bit");
 
                     DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
-                    dsoAxis.addDsoChild(Constants.BITSTREAM, 10, false, -1);
+                    dsoAxis.addDsoChild(Constants.BITSTREAM, chooseResultCount(), false, -1);
                     statsList.addDatasetGenerator(dsoAxis);
 
                     addDisplayListing(division, statsList);
@@ -250,7 +255,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
             DatasetTypeGenerator typeAxis = new DatasetTypeGenerator();
             typeAxis.setType("countryCode");
-            typeAxis.setMax(10);
+            typeAxis.setMax(chooseResultCount());
             statListing.addDatasetGenerator(typeAxis);
 
             addDisplayListing(division, statListing);
@@ -273,7 +278,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
             DatasetTypeGenerator typeAxis = new DatasetTypeGenerator();
             typeAxis.setType("city");
-            typeAxis.setMax(10);
+            typeAxis.setMax(chooseResultCount());
             statListing.addDatasetGenerator(typeAxis);
 
             addDisplayListing(division, statListing);
@@ -410,5 +415,19 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 		}
 
 	}
+    
+    /**
+     * Gets the number of results to display from usage-statistics.cfg
+     * Returns 10 if there is no such entry in usage-statistics.cfg
+     * */
+    private int chooseResultCount() {
+        Integer numItems = ConfigurationManager.getIntProperty("usage-statistics", "itemcount.usage");
+        if(numItems == null ){
+            numItems = 10;
+        }
+        return numItems;
+        
+    }
+    
 
 }
