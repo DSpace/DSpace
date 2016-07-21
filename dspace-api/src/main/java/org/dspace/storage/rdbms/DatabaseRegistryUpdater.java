@@ -15,6 +15,8 @@ import org.dspace.administer.RegistryLoader;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.slf4j.Logger;
@@ -74,8 +76,7 @@ public class DatabaseRegistryUpdater implements FlywayCallback
             MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
 
             // Check if XML Workflow is enabled in workflow.cfg
-            String framework = config.getProperty("workflow.framework");
-            if (framework!=null && framework.equals("xmlworkflow"))
+            if (WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService)
             {
                 // If so, load in the workflow metadata types as well
                 MetadataImporter.loadRegistry(base + "workflow-types.xml", true);

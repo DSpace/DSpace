@@ -29,7 +29,10 @@ importClass(Packages.org.dspace.eperson.EPerson);
 importClass(Packages.org.dspace.eperson.Group);
 importClass(Packages.org.dspace.app.util.Util);
 
+importClass(Packages.org.dspace.workflow.factory.WorkflowServiceFactory);
 importClass(Packages.org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory);
+importClass(Packages.org.dspace.xmlworkflow.service.XmlWorkflowService);
+
 importClass(Packages.java.util.Set);
 
 importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
@@ -45,7 +48,6 @@ importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowCurationUtil
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMetadataImportUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowBatchImportUtils);
 importClass(Packages.java.lang.System);
-importClass(Packages.org.dspace.core.ConfigurationManager);
 
 /**
  * Simple access method to access the current cocoon object model.
@@ -2698,7 +2700,7 @@ function doAssignCollectionRoles(collectionID)
 		{
 			result = doDeleteCollectionRole(collectionID, "DEFAULT_READ");
 		}else{
-            if(StringUtils.equals(ConfigurationManager.getProperty("workflow.framework"), "xmlworkflow")){
+            if(WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService){
                 if(workflow == null){
                     var collection = getCollectionService().find(getDSContext(),collectionID);
                     workflow = getXmlWorkflowFactory().getWorkflow(collection);
