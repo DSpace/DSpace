@@ -197,7 +197,7 @@ public class DatabaseUtils
                             System.out.println("use an OLD version " + argv[1] + " Database with a newer DSpace API. NEVER do this in a");
                             System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
                             // Update the database, to the version specified.
-                            updateDatabase(dataSource, connection, argv[1], true);
+                            updateDatabase(dataSource, connection, argv[1], false);
                         }
                     }
                     else
@@ -550,8 +550,8 @@ public class DatabaseUtils
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection)
             throws SQLException
     {
-        // By default, upgrade to the *latest* version and run migrations out-of-order
-        updateDatabase(datasource, connection, null, true);
+        // By default, upgrade to the *latest* version and never run migrations out-of-order
+        updateDatabase(datasource, connection, null, false);
     }
 
     /**
@@ -1373,13 +1373,28 @@ public class DatabaseUtils
         flywaydb = null;
     }
 
+    /**
+     * Returns the current Flyway schema_version being used by the given database.
+     * (i.e. the version of the highest numbered migration that this database has run)
+     * @param connection current DB Connection
+     * @return version as string
+     * @throws SQLException if database error occurs
+     */
     public static String getCurrentFlywayState(Connection connection) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT \"version\" FROM \"schema_version\" ORDER BY \"installed_rank\" desc");
+        PreparedStatement statement = connection.prepareStatement("SELECT \"version\" FROM \"schema_version\" ORDER BY \"version\" desc");
         ResultSet resultSet = statement.executeQuery();
         resultSet.next();
         return resultSet.getString("version");
     }
 
+    /**
+     * Return the DSpace version that this Flyway-enabled database reports to be compatible with.
+     * The version is retrieved from Flyway, and parsed into a Double to represent an actual
+     * DSpace version number (e.g. 5.0, 6.0, etc)
+     * @param connection current DB Connection
+     * @return reported DSpace version as a Double
+     * @throws SQLException if database error occurs
+     */
     public static Double getCurrentFlywayDSpaceState(Connection connection) throws SQLException
     {
         String flywayState = getCurrentFlywayState(connection);
