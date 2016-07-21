@@ -8,11 +8,8 @@ import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.Concept;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.usagelogging.EventLogger;
@@ -45,6 +42,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public static final int ERROR_PUBMED_DOI = 8;
     public static final int ERROR_GENERIC = 9;
     public static final int ERROR_PUBMED_NAME = 11;
+    public static final int ERROR_INVALID_GRANT = 12;
 
     public static final int DISPLAY_MANUSCRIPT_NUMBER = 5;
     public static final int DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE = 6;
@@ -76,6 +74,21 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             return ERROR_SELECT_JOURNAL;
         }
 
+        String fundingStatus = request.getParameter("funding-status");
+        String grantInfo = request.getParameter("grant-info");
+        int confidence = 0;
+        if (grantInfo != null && !grantInfo.equals("")) {
+            if (!JournalUtils.isValidNSFGrantNumber(grantInfo)) {
+//                return ERROR_INVALID_GRANT;
+                log.error("invalid grant");
+                confidence = Choices.CF_REJECTED;
+            } else {
+                log.error("valid grant");
+                confidence = Choices.CF_ACCEPTED;
+            }
+            item.addMetadata("dryad.fundingEntity", null, grantInfo, "NSF", confidence);
+            item.update();
+        }
         EventLogger.log(context, "submission-select-publication", "status=complete");
         return STATUS_COMPLETE;
     }
@@ -167,7 +180,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         String identifier = request.getParameter("article_doi");
         if (identifier!=null && !identifier.equals("")) {
             // normalize and validate the identifier
-            Matcher doiMatcher = Pattern.compile("(doi:)*(.+\\/.+)").matcher(identifier);
+            Matcher doiMatcher = Pattern.compile("(doi:)*(.+/.+)").matcher(identifier);
             Matcher pmidMatcher = Pattern.compile("(\\d+)").matcher(identifier);
             if (doiMatcher.find()) {
                 identifier = doiMatcher.group(2);
@@ -215,7 +228,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
         DryadJournalConcept journalConcept = null;
 
-        if (journalConcept==null && journal != null && journal.length() > 0) {
+        if (journal != null && journal.length() > 0) {
             journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
         }
 

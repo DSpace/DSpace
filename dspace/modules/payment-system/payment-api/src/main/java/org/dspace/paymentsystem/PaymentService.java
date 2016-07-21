@@ -35,7 +35,7 @@ import java.util.Date;
  * @author Fabio Bolognesi, fabio at atmire.com
  * @author Lantian Gai, lantian at atmire.com
  */
-public interface PaypalService
+public interface PaymentService
 {
     public String getSecureTokenId();
 

@@ -47,6 +47,7 @@ public class JournalUtils {
     }
 
     public final static String crossRefApiRoot = "http://api.crossref.org/";
+    public final static String nsfApiRoot = "http://api.nsf.gov/services/v1/awards/";
 
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByConceptIdentifier = new HashMap<String, DryadJournalConcept>();
 
@@ -509,6 +510,43 @@ public class JournalUtils {
             manuscript.optionalProperties.put("crossref-score", String.valueOf(jsonNode.path("score").floatValue()));
         }
         return manuscript;
+    }
+
+    public static boolean isValidNSFGrantNumber(String grantInfo) {
+        if ("".equals(StringUtils.stripToEmpty(grantInfo))) {
+            return false;
+        }
+        Matcher matcher = Pattern.compile("^.*?(\\d+).*$").matcher(grantInfo);
+        if (matcher.find()) {
+            grantInfo = matcher.group(1);
+        }
+
+        String nsfAPIURL = nsfApiRoot + grantInfo + ".json";
+        log.error("checking " + nsfAPIURL);
+        try {
+            URL url = new URL(nsfAPIURL.replaceAll("\\s+", ""));
+            ObjectMapper m = new ObjectMapper();
+            JsonNode responseNode = m.readTree(url.openStream()).path("response");
+            if (responseNode != null) {
+                JsonNode awardNode = responseNode.path("award");
+                if (awardNode != null && awardNode.isArray()) {
+                    Iterator<JsonNode> awards = awardNode.elements();
+                    while (awards.hasNext()) {
+                        JsonNode award = awards.next();
+                        if (award.has("agency") && "NSF".equals(award.get("agency").textValue())) {
+                            if (award.has("id") && grantInfo.equals(award.get("id").textValue())) {
+                                log.error("valid grant number");
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.debug("Couldn't find JSON matching URL " + nsfAPIURL);
+
+        }
+        return false;
     }
 
 

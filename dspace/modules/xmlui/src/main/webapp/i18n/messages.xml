@@ -2857,17 +2857,33 @@
             <li>4. Check out &amp; submit</li>
         </ul>
     </message>
-    <message key="xmlui.submit.select.pub.help">
-Thank you for archiving your data in the Dryad Digital Repository, where it can be easily discovered, cited and re-used. Follow the steps below to describe your publication, upload your data files, and finalize/pay for your submission. You may save your submission at any time and return to it later at <a href="/submissions" target="_blank">My Submissions</a>. For questions about and best practices for depositing your data, please see our <a href="/pages/faq#depositing" target="_blank">FAQ</a>.<br />
-<br />
-Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-term access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from members and data submitters.<br />
-<br />Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data. In many cases, this charge is covered by <a href="/pages/integratedJournals" target="_blank">supporting journals, societies, and publishers</a>. In the absence of a sponsoring organization, the submitter is required to pay the DPC.
-    </message>
-    <message key="xmlui.submit.select.country.head"><span class="ds-form-label">Country-based Fee Waiver</span><br /><br /></message>
+	<message key="xmlui.submit.select.pub.help">
+		Thank you for archiving your data in the Dryad Digital Repository, where it can be easily discovered, cited and re-used.
+		Follow the steps below to describe your publication, upload your data files, and finalize/pay for your submission.
+		You may save your submission at any time and return to it later at <a href="/submissions" target="_blank">My Submissions</a>.
+		For questions about and best practices for depositing your data, please see our <a href="/pages/faq#depositing" target="_blank">FAQ</a>.
+		<br/><br/>
+		Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data.
+		In many cases, this charge is covered by <a href="/pages/integratedJournals" target="_blank">supporting journals, societies, and publishers</a>.
+		In the absence of a sponsoring organization, the submitter is required to pay the DPC.
+		<br/><br/>
+		Fields marked with an asterisk (*) are required.
+	</message>
+	<message key="xmlui.submit.select.country.head"><span class="ds-form-label">Country-based Fee Waiver</span><br /><br /></message>
     <message key="xmlui.submit.select.country.help">
 <span class="country-help">Waivers are granted upon request for submissions by researchers employed by an institution in an Eligible Country or who are independent researchers-in-residence in an Eligible Country. Eligible countries are those listed by the World Bank as low-income or lower-middle-income economies. Select a country to request a waiver before you begin your submission.</span>
     </message>
     <message key="xmlui.submit.select.country.error">Please select a country</message>
+	<message key="xmlui.submit.select.funding.head"><span class="ds-form-label">Funding Agency Sponsorship</span><br /><br /></message>
+	<message key="xmlui.submit.select.funding.help">
+		Is the research associated with your data/publication funded by the United States National Science Foundation?
+		Data Publishing Charges associated with US NSF-funded research may be covered if there is no sponsor already in place (<a href="http://blog.datadryad.org/2016/07/20/piloting-new-ways-for-funders-to-support-data-stewardship">find out more</a>).
+		If applicable, this sponsorship will be applied at checkout.
+	</message>
+	<message key="xmlui.submit.select.funding.error">We could not verify your grant number against the US NSF grants database.
+		Providing this information is optional. You may try again or remove the number to proceed with your submission.</message>
+	<message key="xmlui.submit.select.funding.desc1"><span class="ds-form-label-grant-info">US NSF grant number, if applicable:</span><span class="ds-form-label-grant-info-help">(e.g. 1234567 or DBI-1234567)</span></message>
+	<message key="xmlui.submit.select.funding.desc2">Add another grant number</message>
 	<message key="xmlui.submit.select.pub.form_head">Submit new content</message>
 	<message key="xmlui.submit.select.pub.form.help">The dryad identifier of the data package,
 		example: 10255/dryad.11</message>
@@ -2875,6 +2891,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.submit.select.pub.form.option.existing">Select existing data package</message>
 	<message key="xmlui.submit.select.pub.form.error">Please fill in a valid data package
 		identifier</message>
+	<message key="xmlui.submit.select.license.head"><span class="ds-form-label">Data Release Agreement*</span><br/><br/></message>
 	<message key="xmlui.submit.select.pub.form.license">&#160;By clicking this checkbox, I certify that I have read and agree to the Dryad  <a target="_blank" href="/pages/policies">Terms of Service</a>. I understand that by submitting data to Dryad,
 		I am agreeing to release it under the terms of the <div id="cc-label" style="display: inline;"><a
 			href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative Commons Zero
@@ -3031,7 +3048,24 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.Submission.submit.OverviewStep.button.delete-datapackage">Delete entire submission</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit data package description</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.button.finalize">Finalize submission</message>
-    <message key="xmlui.Submission.submit.Checkout.head">Check out &amp; submit</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.button.proceed">Proceed to checkout</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.funding.question">
+		Is the research associated with your data/publication funded by the United States National Science Foundation? If so, this information may be used to charge your DPC directly to the US NSF.
+		Dryad and the US NSF are testing the feasibility of a fund for the direct sponsorship of data deposits (<a href="http://blog.datadryad.org/2016/07/20/piloting-new-ways-for-funders-to-support-data-stewardship">find out more</a>).
+		If not, or if you would prefer to pay the DPC yourself, leave the field blank and click "Proceed to checkout."
+	</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.funding.error">We could not verify your grant number against the US NSF grants database. Providing this information is optional.
+		You may try again or remove the number and proceed to provide payment information.</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.funding.valid">
+		The United States National Science Foundation has awarded a fund to test the feasibility of direct sponsorship (<a href="http://blog.datadryad.org/2016/07/20/piloting-new-ways-for-funders-to-support-data-stewardship">find out more</a>).
+		<br/><br/>
+		<span class="bold">Thank you for providing your grant information. Your Data Publishing Charge is covered by the United States National Science Foundation.</span>
+		<br/><br/>
+		Click the Finalize Submission button below to complete checkout.
+	</message>
+	<message key="xmlui.Submission.submit.CheckoutStep.funding.desc1"><span class="ds-form-label-grant-info-2">US NSF grant number, if applicable</span><span class="ds-form-label-grant-info-help-2">(e.g. 1234567 or DBI-1234567)</span></message>
+
+	<message key="xmlui.Submission.submit.Checkout.head">Check out &amp; submit</message>
     <message key="xmlui.Submission.submit.Checkout.trail">
         <div><br/>
             <ul class="navigation-link">
@@ -3044,6 +3078,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     </message>
     <message key="xmlui.Submission.submit.Checkout.help"><div><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Please enter your payment information below.<br/><br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button when you are finished.</span></div>
     </message>
+	<message key="xmlui.Submission.submit.Checkout.voucher.error">The voucher code is not valid or the voucher code has been used</message>
+	<message key="xmlui.Submission.submit.Checkout.note"><br/>NOTE: Proceed only if your submission is finalized. After submitting, a Dryad curator will review your submission. After this review, your data will be archived in Dryad, and your payment will be processed.</message>
 	<message key="xmlui.Submission.Submissions.default.reviewStep.reviewAction">Review stage</message>
 	<message key="xmlui.Submission.workflow.DryadReviewActionXMLUI.info1">Actions</message>
 	<message key="xmlui.Submission.submit.OverviewStep.help.add-datafile">Click the button to add a new data file, please be aware that if the data file isn't fully submitted when the dataset is approved/rejected that it will be deleted.</message>
@@ -3294,13 +3330,16 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.Submission.Submissions.step.head.pendingPublicationStep_pool">Publication Blackout: Unclaimed</message>
     <message key="xmlui.Submission.Submissions.step.head.pendingPublicationStep_claimed">Publication Blackout: Claimed</message>
 
+	<message key="xmlui_submit_funding_status_yes">&#160; Yes</message>
+	<message key="xmlui_submit_funding_status_no">&#160; No</message>
+
 
     <message key="xmlui_submit_publication_article_status_published">&#160; Published</message>
     <message key="xmlui_submit_publication_article_status_accepted">&#160; Accepted</message>
     <message key="xmlui_submit_publication_article_status_in_review">&#160; In preparation or in review</message>
     <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
     <message key="xmlui.submit.publication.unknown_doi">I do not know the DOI or PubMedID for my publication. It was published in the journal:</message>
-    <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select the status of your publication</span><br/></message>
+    <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select the status of your publication*</span><br/></message>
     <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.<br />
     <br /><strong>Did you receive an email from your journal with a link to Dryad? Using this link to initiate your submission will save you time and effort by automatically entering the article metadata and the correct payment type for your journal.</strong></message>
 

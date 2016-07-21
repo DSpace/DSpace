@@ -17,8 +17,7 @@ import org.dspace.content.authority.Scheme;
 import org.dspace.core.*;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.paymentsystem.PaymentSystemService;
-import org.dspace.paymentsystem.PaymentSystemImpl;
-import org.dspace.paymentsystem.PaypalService;
+import org.dspace.paymentsystem.PaymentService;
 import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.paymentsystem.Voucher;
 import org.dspace.utils.DSpace;
@@ -116,8 +115,8 @@ public class FinalPaymentAction extends ProcessingAction {
 
 	    
 	    // process payment via PayPal
-            PaypalService paypalService = new DSpace().getSingletonService(PaypalService.class);
-            if(paypalService.submitReferenceTransaction(c,wfi,request)){
+            PaymentService paymentService = new DSpace().getSingletonService(PaymentService.class);
+            if(paymentService.submitReferenceTransaction(c,wfi,request)){
 		log.info("processed PayPal payment for Item " + itemID);
                 return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
             }

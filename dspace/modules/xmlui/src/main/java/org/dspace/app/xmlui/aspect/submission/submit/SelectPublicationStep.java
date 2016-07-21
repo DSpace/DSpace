@@ -15,7 +15,6 @@ import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.*;
 import org.dspace.core.ConfigurationManager;
@@ -82,7 +81,16 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     protected static final Message T_Country_help= message("xmlui.submit.select.country.help");
     protected static final Message T_Country_error= message("xmlui.submit.select.country.error");
 
+    private static final Message T_funding_head = message("xmlui.submit.select.funding.head");
+    private static final Message T_funding_help = message("xmlui.submit.select.funding.help");
+    private static final Message T_funding_desc1 = message("xmlui.submit.select.funding.desc1");
+    private static final Message T_funding_desc2 = message("xmlui.submit.select.funding.desc2");
+    private static final Message T_funding_status_yes = message("xmlui_submit_funding_status_yes");
+    private static final Message T_funding_status_no = message("xmlui_submit_funding_status_no");
+    private static final Message T_funding_error = message("xmlui.submit.select.funding.error");
 
+    private static final Message T_select_yes = message("xmlui.Submission.submit.ReviewStep.yes");
+    private static final Message T_select_no = message("xmlui.Submission.submit.ReviewStep.no");
 
     private static final Message T_article_status = message("xmlui.submit.publication.article_status");
     private static final Message T_article_status_help = message("xmlui.submit.publication.article_status_help");
@@ -97,6 +105,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     private static final Message T_asterisk_explanation = message("xmlui.submit.publication.journal.manu.acc.asterisk_explanation");
 
+    protected static final Message T_license_head = message("xmlui.submit.select.license.head");
 
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, SQLException, IOException,
@@ -125,8 +134,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         addSubmissionProgressList(div);
 
         List form = div.addList("submit-create-publication", List.TYPE_FORM);
-
-        generateCountryList(form,request);
 
         boolean submitExisting = ConfigurationManager.getBooleanProperty("submit.dataset.existing-datasets", true);
 
@@ -187,8 +194,11 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         addManuscriptNumber(request, newItem, manuscriptNumber);
 
+        generateCountryList(form,request);
+        generateFundingInfo(form,request);
+
         // add License checkbox.
-        addLicence(form);
+        addLicense(form);
 
         //add "Next" button
 	    Item actions = form.addItem();
@@ -208,6 +218,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         doi.addItem().addContent("OR");
         Text cb = doi.addItem().addText("unknown_doi");
+        String pubName = request.getParameter("unknown_doi");
+        if (pubName != null) {
+            cb.setValue(pubName);
+        }
         cb.setHelp(T_unknown_doi);
 
 
@@ -223,7 +237,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     private void addArticleStatusRadios(Request request, List form, Manuscript manuscript) throws WingException {
         // add "article status" radios
-        Item articleStatus = form.addItem("article_status", "");
+        Item articleStatus = form.addItem("jquery_radios", "");
         articleStatus.addContent(T_article_status);
         Radio accessRadios = articleStatus.addRadio("article_status");
         accessRadios.setHelp(T_article_status_help);
@@ -296,8 +310,12 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 journalID.addOption(val, name);
             }
         }
-        if (manuscript != null) {
-            String selectedJournalID = manuscript.getJournalConcept().getJournalID();
+        String selectedJournalID = request.getParameter("journalIDStatusInReview");
+        if (selectedJournalID == null && manuscript != null) {
+            selectedJournalID = manuscript.getJournalConcept().getJournalID();
+        }
+        log.error("selected journal is " + selectedJournalID);
+        if (!"".equals(selectedJournalID)) {
             journalID.setOptionSelected(selectedJournalID);
         }
         journalID.setLabel(T_SELECT_LABEL);
@@ -319,7 +337,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 }
             }
         } else {
-            journalID.addOption(selectedJournalName, selectedJournalName);
+            log.error("journal was " + selectedJournalName);
+            journalID.setOptionSelected(selectedJournalName);
         }
     }
 
@@ -407,8 +426,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
        }
 
 
-    private void addLicence(List form) throws WingException {
-        CheckBox licensebox = form.addItem("license_accepted","license_accepted").addCheckBox("license_accept");
+    private void addLicense(List form) throws WingException {
+        Item licenseItem = form.addItem("license_accepted","license_accepted");
+        licenseItem.addContent(T_license_head);
+        CheckBox licensebox = licenseItem.addCheckBox("license_accept");
         licensebox.addOption(String.valueOf(Boolean.TRUE), T_PUB_LICENSE);
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.STATUS_LICENSE_NOT_ACCEPTED)
             licensebox.addError(T_PUB_LICENSE_ERROR);
@@ -478,5 +499,23 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         }
         }catch (Exception e)
         {}
+    }
+
+    private void generateFundingInfo(List form, Request request) throws WingException {
+        Item fundingInfo = form.addItem("funding-info","");
+        fundingInfo.addContent(T_funding_head);
+        fundingInfo.addContent(T_funding_help);
+//
+//        Radio fundingRadio = fundingInfo.addRadio("funding-status");
+//        fundingRadio.addOption("1", T_funding_status_yes);
+//        fundingRadio.addOption("0", T_funding_status_no);
+//
+        Text grantInfoText = form.addItem("grant-info","grant-info").addText("grant-info");
+        grantInfoText.setLabel(T_funding_desc1);
+//        if (this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_GRANT) {
+//            fundingRadio.setOptionSelected("1");
+//            grantInfoText.setValue(request.getParameter("grant-info"));
+//            grantInfoText.addError(T_funding_error);
+//        }
     }
 }

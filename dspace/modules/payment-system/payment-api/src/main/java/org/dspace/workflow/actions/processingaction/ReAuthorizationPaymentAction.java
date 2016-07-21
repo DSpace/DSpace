@@ -10,11 +10,8 @@ package org.dspace.workflow.actions.processingaction;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.paymentsystem.PaypalService;
-import org.dspace.utils.DSpace;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
-import org.dspace.workflow.actions.WorkflowActionConfig;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;

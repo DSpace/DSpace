@@ -645,7 +645,7 @@
     <!-- First submission form: added and rewrote some templates to manage the form using jquery, to lead the user through the submission -->
 
     <!-- First submission form: Article Status Radios -->
-    <xsl:template match="dri:body/dri:div/dri:list/dri:item[@n='article_status']/dri:field[@n='article_status']">
+    <xsl:template match="dri:body/dri:div/dri:list/dri:item[@n='jquery_radios']/dri:field">
 
         <br/>
         <span>
