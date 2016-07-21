@@ -403,7 +403,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 payerName = "Country";
                 break;
             case ShoppingCart.JOUR_WAIVER:
-                payerName = "Journal";
+                payerName = "Sponsor";
                 break;
             case ShoppingCart.VOUCHER_WAIVER:
                 payerName = "Voucher";
