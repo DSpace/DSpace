@@ -44,12 +44,9 @@
 -- JVMs.  The SQL code below will typically only be required after a direct
 -- SQL data dump from a backup or somesuch.
 
-
--- There should be one of these calls for every ID sequence defined in
--- database_schema.sql.
-
--- depends on being run from sqlplus with incseq.sql in the current path
+-- Depends on being run from sqlplus with incseq.sql in the current path
 -- you can find incseq.sql at: http://akadia.com/services/scripts/incseq.sql
+-- Here that script was renamed to updateseq.sql.
 
 @updateseq.sql bitstreamformatregistry_seq bitstreamformatregistry bitstream_format_id ""
 @updateseq.sql fileextension_seq fileextension file_extension_id ""
@@ -59,7 +56,6 @@
 @updateseq.sql tasklistitem_seq tasklistitem tasklist_id ""
 @updateseq.sql registrationdata_seq registrationdata registrationdata_id ""
 @updateseq.sql subscription_seq subscription subscription_id ""
-@updateseq.sql communities2item_seq communities2item id ""
 @updateseq.sql metadatafieldregistry_seq metadatafieldregistry metadata_field_id ""
 @updateseq.sql metadatavalue_seq metadatavalue metadata_value_id ""
 @updateseq.sql metadataschemaregistry_seq metadataschemaregistry metadata_schema_id ""

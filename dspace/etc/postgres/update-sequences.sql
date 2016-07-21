@@ -45,10 +45,6 @@
 -- SQL data dump from a backup or somesuch.
 
 
--- There should be one of these calls for every ID sequence defined in
--- database_schema.sql.
-
-
 SELECT setval('bitstreamformatregistry_seq', max(bitstream_format_id)) FROM bitstreamformatregistry;
 SELECT setval('fileextension_seq', max(file_extension_id)) FROM fileextension;
 SELECT setval('resourcepolicy_seq', max(policy_id)) FROM resourcepolicy;
@@ -57,7 +53,6 @@ SELECT setval('workflowitem_seq', max(workflow_id)) FROM workflowitem;
 SELECT setval('tasklistitem_seq', max(tasklist_id)) FROM tasklistitem;
 SELECT setval('registrationdata_seq', max(registrationdata_id)) FROM registrationdata;
 SELECT setval('subscription_seq', max(subscription_id)) FROM subscription;
-SELECT setval('communities2item_seq', max(id)) FROM communities2item;
 SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadatafieldregistry;
 SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
 SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
