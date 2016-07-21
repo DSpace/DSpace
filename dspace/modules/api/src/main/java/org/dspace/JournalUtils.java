@@ -190,18 +190,30 @@ public class JournalUtils {
     }
 
     public static DryadJournalConcept getJournalConceptByJournalID(String journalID) {
+        if (journalID == null) {
+            return null;
+        }
         return journalConceptHashMapByJournalID.get(journalID.toUpperCase());
     }
 
     public static DryadJournalConcept getJournalConceptByJournalName(String fullName) {
+        if (fullName == null) {
+            return null;
+        }
         return journalConceptHashMapByJournalName.get(fullName.toUpperCase());
     }
 
     public static DryadJournalConcept getJournalConceptByCustomerID(String customerID) {
+        if (customerID == null) {
+            return null;
+        }
         return journalConceptHashMapByCustomerID.get(customerID);
     }
 
     public static DryadJournalConcept getJournalConceptByISSN(String ISSN) {
+        if (ISSN == null) {
+            return null;
+        }
         return journalConceptHashMapByISSN.get(ISSN);
     }
 
