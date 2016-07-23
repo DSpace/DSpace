@@ -709,8 +709,6 @@ public class FlowItemUtils
 		// Save our changes
 		bitstreamService.update(context, bitstream);
 
-        processAccessFields(context, request, ((Item)bitstreamService.getParentObject(context,bitstream)).getOwningCollection(), bitstream);
-
         result.setContinue(true);
         result.setOutcome(true);
         result.setMessage(T_bitstream_updated);

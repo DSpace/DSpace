@@ -66,6 +66,8 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
 
     private static final Message T_label_date_help =
             message("xmlui.administrative.authorization.AccessStep.label_date_help");
+    private static final Message T_label_date_displayonly_help =
+            message("xmlui.administrative.authorization.AccessStep.label_date_displayonly_help");
 
     public static final int RADIO_OPEN_ACCESS_ITEM_VISIBLE=0;
     public static final int RADIO_OPEN_ACCESS_ITEM_EMBARGOED=1;
@@ -188,31 +190,27 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
         }
     }
 
-    public void addEmbargoDateSimpleForm(DSpaceObject dso, List form, int errorFlag) throws SQLException, WingException {
+    public void addEmbargoDateDisplayOnly(final DSpaceObject dso, final List list) throws SQLException, WingException {
+        final Text text = list.addItem().addText("embargo");
+        text.setLabel(T_item_embargoed);
+        text.setHelp(T_label_date_displayonly_help);
+        populateEmbargoDetail(dso, text);
+        text.setDisabled(true);
+    }
 
-        String date=null;
-
-        if(dso!=null){
-            java.util.List<ResourcePolicy> policies = authorizeService.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
-            if(policies.size() > 0){
-                ResourcePolicy rp = policies.get(0);
-                if(rp.getStartDate() != null)
-                {
-                    date = DateFormatUtils.format(rp.getStartDate(), "yyyy-MM-dd");
-                }
-                globalReason = rp.getRpDescription();
+    private void populateEmbargoDetail(final DSpaceObject dso, final Text text) throws SQLException, WingException {
+        final java.util.List<ResourcePolicy> policies = authorizeService.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
+        if (policies.size() > 0) {
+            final ResourcePolicy firstCustomPolicy = policies.get(0);
+            if (firstCustomPolicy.getStartDate() != null) {
+                final String dateString = DateFormatUtils.format(firstCustomPolicy.getStartDate(), "yyyy-MM-dd");
+                text.setValue(dateString);
+                globalReason = firstCustomPolicy.getRpDescription();
             }
         }
-//        CheckBox privateCheckbox = form.addItem().addCheckBox("emabrgo_option");
-//        privateCheckbox.setLabel(T_item_embargoed);
-//        if(date!=null){
-//            privateCheckbox.addOption(true, CB_EMBARGOED, "");
-//        }
-//        else{
-//            privateCheckbox.addOption(false, CB_EMBARGOED, "");
-//        }
+    }
 
-        // Date
+    public void addEmbargoDateSimpleForm(DSpaceObject dso, List form, int errorFlag) throws SQLException, WingException {
         Text startDate = form.addItem().addText("embargo_until_date");
         startDate.setLabel(T_item_embargoed);
         if (errorFlag == org.dspace.submit.step.AccessStep.STATUS_ERROR_FORMAT_DATE){
@@ -222,8 +220,8 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
             startDate.addError(T_error_missing_date);
         }
 
-        if(date!=null){
-            startDate.setValue(date);
+        if (dso != null) {
+            populateEmbargoDetail(dso, startDate);
         }
         startDate.setHelp(T_label_date_help);
     }
