@@ -14,12 +14,12 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Context;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -63,12 +63,6 @@ public class AuthorityValue {
      * represents the last time that DSpace got updated information from its external source
      */
     private Date lastModified;
-
-    @Autowired(required = true)
-    protected AuthorityTypes authorityTypes;
-
-    @Autowired(required = true)
-    protected MetadataValueService metadataValueService;
 
     public AuthorityValue() {
     }
@@ -187,7 +181,7 @@ public class AuthorityValue {
     public void updateItem(Context context, Item currentItem, MetadataValue value) throws SQLException, AuthorizeException {
         value.setValue(getValue());
         value.setAuthority(getId());
-        metadataValueService.update(context, value, true);
+        ContentServiceFactory.getInstance().getMetadataValueService().update(context, value, true);
     }
 
     /**
