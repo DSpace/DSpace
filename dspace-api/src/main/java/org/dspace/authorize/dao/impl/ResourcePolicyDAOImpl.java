@@ -87,7 +87,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         List<ResourcePolicy> results;
         if (notPolicyID != -1)
         {
-            criteria.add(Restrictions.and(Restrictions.not(Restrictions.eq("id", action))));
+            criteria.add(Restrictions.and(Restrictions.not(Restrictions.eq("id", notPolicyID))));
         }
 
         return list(criteria);
