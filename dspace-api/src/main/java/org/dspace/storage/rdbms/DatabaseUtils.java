@@ -191,13 +191,29 @@ public class DatabaseUtils
                         {
                             // Otherwise, we assume "argv[1]" is a valid migration version number
                             // This is only for testing! Never specify for Production!
-                            System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
+                            String migrationVersion = argv[1];
+                            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+
+                            System.out.println("You've specified to migrate your database ONLY to version " + migrationVersion + " ...");
                             System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
                             System.out.println("or Bitstream Format Registry auto-update. This is because you are attempting to");
-                            System.out.println("use an OLD version " + argv[1] + " Database with a newer DSpace API. NEVER do this in a");
+                            System.out.println("use an OLD version " + migrationVersion + " Database with a newer DSpace API. NEVER do this in a");
                             System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
-                            // Update the database, to the version specified.
-                            updateDatabase(dataSource, connection, argv[1], false);
+
+                            System.out.print("Are you SURE you only want to migrate your database to version " + migrationVersion + "? [y/n]: ");
+                            String choiceString = input.readLine();
+                            input.close();
+
+                            if (choiceString.equalsIgnoreCase("y"))
+                            {
+                                System.out.println("Migrating database ONLY to version " + migrationVersion + " ... (Check logs for details)");
+                                // Update the database, to the version specified.
+                                updateDatabase(dataSource, connection, migrationVersion, false);
+                            }
+                            else
+                            {
+                                System.out.println("No action performed.");
+                            }
                         }
                     }
                     else
@@ -306,6 +322,10 @@ public class DatabaseUtils
                         cleanDatabase(flyway, dataSource);
                         System.out.println("Done.");
                         System.exit(0);
+                    }
+                    else
+                    {
+                        System.out.println("No action performed.");
                     }
                 }
                 catch(SQLException e)
