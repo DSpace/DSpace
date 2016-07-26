@@ -29,6 +29,9 @@ public class MetadataChecker {
     // map of mandatory metadata fields
     private Map<String, List<String>> requiredMap = new HashMap<String, List<String>>();
     
+    // map of non repeatable fields
+    private Map<String, List<String>> singleValueMap = new HashMap<String, List<String>>();
+    
     private static DCInputsReader reader = null;
     
     static{
@@ -81,6 +84,15 @@ public class MetadataChecker {
                     // we have an entry but does it have a value?
                     throw new IllegalStateException(field + " is a mandatory metadata field and must have a value");
                 }
+            }
+        }
+        
+        List<String> unRepeatable = this.getSingleValueList(collection.getHandle());
+        for (String field : unRepeatable){
+            Metadatum value[] = item.getMetadataByMetadataString(field);
+            if(value.length > 1){
+                // we have a non repeatable field with more than one value  
+                throw new IllegalStateException(field + " is a non repeatable metadata field and cannot have more than one value");
             }
         }
     }
@@ -162,6 +174,21 @@ public class MetadataChecker {
         
         return all;
     }
+    /**
+     * @param handle Collection handle.
+     * @return List of un repeatable fields in datashare.
+     */
+    private List<String> getSingleValueList(String handle)
+    {
+        List<String> all = this.singleValueMap.get(handle);
+        if(all == null){
+            this.cacheMetadataList(handle);
+            all = this.allowedMap.get(handle);
+        }
+        
+        return all;
+    }
+    
     
     /**
      * Fetch list of mandatory and allowed fields in datashare.
@@ -181,6 +208,7 @@ public class MetadataChecker {
         
         List<String> allowed = new ArrayList<String>(100);
         List<String> required = new ArrayList<String>(10);
+        List<String> notRepeatable = new ArrayList<String>(10);
         
         // rights is not a mandatory field in the user interface
         // but it must be with SWORD/batch ingest
@@ -203,11 +231,16 @@ public class MetadataChecker {
                     if(!exceptions.contains(field)){
                         allowed.add(field);
                     }
+                    
+                    if(!input.getRepeatable()){
+                        notRepeatable.add(field);
+                    }
                 }
             }
             
             this.requiredMap.put(handle, required);
             this.allowedMap.put(handle, allowed);
+            this.singleValueMap.put(handle, notRepeatable);
         }
         catch(DCInputsReaderException ex){
             throw new RuntimeException(ex);
