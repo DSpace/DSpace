@@ -49,8 +49,6 @@ public interface PaymentService
 
     public void generatePaypalForm(Division mandiv, ShoppingCart shoppingCart, String actionURL, String type,Context context) throws WingException, SQLException;
 
-    public void generateVoucherForm(Division form, String voucherCode, String actionURL, String knotId) throws WingException;
-
     public void generateNoCostForm(Division actionsDiv, ShoppingCart transaction, org.dspace.content.Item item, PaymentSystemConfigurationManager manager, PaymentSystemService paymentSystemService) throws WingException, SQLException;
 
     public void showSkipPaymentButton(Division mainDiv, String message) throws WingException;

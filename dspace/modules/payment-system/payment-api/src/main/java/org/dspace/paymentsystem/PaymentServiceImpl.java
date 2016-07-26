@@ -351,15 +351,6 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    public void generateVoucherForm(Division form, String voucherCode, String actionURL, String knotId) throws WingException {
-
-        List list = form.addList("voucher-list");
-        list.addLabel("Voucher Code ");
-        list.addItem().addText("voucher").setValue(voucherCode);
-        list.addItem().addButton("submit-voucher").setValue("Apply");
-
-    }
-
     public void generateNoCostForm(Division actionsDiv, ShoppingCart shoppingCart, org.dspace.content.Item item, PaymentSystemConfigurationManager manager, PaymentSystemService paymentSystemService) throws WingException, SQLException {
         //Lastly add the finalize submission button
 
@@ -513,12 +504,6 @@ public class PaymentServiceImpl implements PaymentService {
                 } else {
                     mainDiv.setHead(T_HEAD);
                     mainDiv.addPara(T_HELP);
-                    Division voucherDiv = mainDiv.addDivision("voucher");
-                    if (PAYMENT_ERROR_VOUCHER.equals(errorMessage)) {
-                        voucherDiv.addPara("voucher-error", "voucher-error").addHighlight("bold").addContent(T_voucher_error);
-                    }
-
-                    generateVoucherForm(voucherDiv, voucherCode, actionURL, knotId);
                     Division creditcard = mainDiv.addDivision("creditcard");
                     generatePaypalForm(creditcard, shoppingCart, actionURL, type, context);
                     mainDiv.addPara().addContent(T_payment_note);
