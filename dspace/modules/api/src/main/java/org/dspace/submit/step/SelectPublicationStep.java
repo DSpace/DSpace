@@ -202,44 +202,47 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         }
 
         // Find the journal concept:
-        String journal = null;
-        // look in the item's metadata, in case the journal name was loaded by a crosswalk.
-        DCValue[] dcValues = item.getMetadata("prism.publicationName");
-        if (dcValues.length > 0) {
-            journal = dcValues[0].value;
-            item.clearMetadata("prism.publicationName");
-        }
-
-        // then look in the request parameter for publication name.
-        if (journal == null || "".equals(journal)) {
-            journal = request.getParameter("prism_publicationName");
-        }
-
-        // then look in the unknown_doi parameter.
-        if (journal == null || "".equals(journal)) {
-            journal = request.getParameter("unknown_doi");
-        }
-
-        // clean the name
-        if (journal != null) {
-            journal=journal.replace("*", "");
-            journal=journal.trim();
-        }
-
         DryadJournalConcept journalConcept = null;
 
-        if (journal != null && journal.length() > 0) {
-            journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
+        // Look for a journal ID, if it's in review
+        if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW) {
+            String journalID = request.getParameter("journalIDStatusInReview");
+            if (journalID != null && journalID.length() > 0) {
+                journalConcept = JournalUtils.getJournalConceptByJournalID(journalID);
+            }
         }
 
-        // Look for a journal ID
-        String journalID = request.getParameter("journalIDStatusInReview");
-
-        if (journalConcept==null && journalID != null && journalID.length() > 0) {
-            journalConcept = JournalUtils.getJournalConceptByJournalID(journalID);
-        }
-
+        String journal = null;
         if (journalConcept == null) {
+            // look in the item's metadata, in case the journal name was loaded by a crosswalk.
+            DCValue[] dcValues = item.getMetadata("prism.publicationName");
+            if (dcValues.length > 0) {
+                journal = dcValues[0].value;
+                item.clearMetadata("prism.publicationName");
+            }
+
+            // then look in the request parameter for publication name.
+            if (journal == null || "".equals(journal)) {
+                journal = request.getParameter("prism_publicationName");
+            }
+
+            // then look in the unknown_doi parameter.
+            if (journal == null || "".equals(journal)) {
+                journal = request.getParameter("unknown_doi");
+            }
+
+            // clean the name
+            if (journal != null) {
+                journal = journal.replace("*", "");
+                journal = journal.trim();
+            }
+
+            if (journal != null && journal.length() > 0) {
+                journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
+            }
+        }
+
+        if (journalConcept == null && journal != null) {
             // if article is PUBLISHED or ACCEPTED, can be any journal, so we should make a temp journal.
             if ((Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) || (Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED)) {
                 try {
