@@ -45,7 +45,7 @@
 -- SQL data dump from a backup or somesuch.
 
 -- Depends on being run from sqlplus with incseq.sql in the current path
--- you can find incseq.sql at: http://akadia.com/services/scripts/incseq.sql
+-- you can find incseq.sql at: http://www.akadia.com/services/scripts/incseq.sql
 -- Here that script was renamed to updateseq.sql.
 
 @updateseq.sql bitstreamformatregistry_seq bitstreamformatregistry bitstream_format_id ""
