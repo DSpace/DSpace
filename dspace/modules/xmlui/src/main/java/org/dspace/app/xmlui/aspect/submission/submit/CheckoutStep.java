@@ -52,7 +52,7 @@ public class CheckoutStep extends AbstractStep {
         org.dspace.content.Item item = submissionInfo.getSubmissionItem().getItem();
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         PaymentService paymentService = new DSpace().getSingletonService(PaymentService.class);
-        paymentService.generateUserForm(context,mainDiv,actionURL,knot.getId(),"A",request,item,dso);
+        paymentService.generateUserForm(context,mainDiv,actionURL,knot.getId(), PaymentServiceImpl.PAYPAL_AUTHORIZE,request,item,dso);
 
 
     }

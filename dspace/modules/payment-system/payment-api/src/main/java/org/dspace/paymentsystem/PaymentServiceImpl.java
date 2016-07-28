@@ -71,13 +71,16 @@ public class PaymentServiceImpl implements PaymentService {
     private static final String PAYMENT_ERROR_VOUCHER = "voucher error";
     private static final String PAYMENT_ERROR_GRANT = "grant error";
 
+    public static final String PAYPAL_AUTHORIZE = "A";
+    public static final String PAYPAL_SALE = "S";
+
     public String getSecureTokenId() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSSSSSSSSS");
         return sdf.format(new Date());
     }
 
     //generate a secure token from paypal
-    public String generateSecureToken(ShoppingCart shoppingCart, String secureTokenId, String type, Context context) {
+    public String generateSecureToken(ShoppingCart shoppingCart, String secureTokenId, String transactionType, Context context) {
         String secureToken = null;
         String requestUrl = ConfigurationManager.getProperty("payment-system", "paypal.payflow.link");
 
@@ -107,12 +110,12 @@ public class PaymentServiceImpl implements PaymentService {
             }
             String amount = "0.00";
 
-            if (type.equals("S")) {
+            if (transactionType.equals(PAYPAL_SALE)) {
                 //generate reauthorization form
                 amount = Double.toString(shoppingCart.getTotal());
             }
 
-            String urlParameters = "SECURETOKENID=" + secureTokenId + "&CREATESECURETOKEN=Y" + "&MODE=" + ConfigurationManager.getProperty("payment-system", "paypal.mode") + "&PARTNER=" + ConfigurationManager.getProperty("payment-system", "paypal.partner") + "&VENDOR=" + ConfigurationManager.getProperty("payment-system", "paypal.vendor") + "&USER=" + ConfigurationManager.getProperty("payment-system", "paypal.user") + "&PWD=" + ConfigurationManager.getProperty("payment-system", "paypal.pwd") + "&TENDER=" + type + "&TRXTYPE=" + type + "&FIRSTNAME=" + userFirstName + "&LASTNAME=" + userLastName + "&COMMENT1=" + userName + "&COMMENT2=" + userEmail + "&AMT=" + amount + "&CURRENCY=" + shoppingCart.getCurrency();
+            String urlParameters = "SECURETOKENID=" + secureTokenId + "&CREATESECURETOKEN=Y" + "&MODE=" + ConfigurationManager.getProperty("payment-system", "paypal.mode") + "&PARTNER=" + ConfigurationManager.getProperty("payment-system", "paypal.partner") + "&VENDOR=" + ConfigurationManager.getProperty("payment-system", "paypal.vendor") + "&USER=" + ConfigurationManager.getProperty("payment-system", "paypal.user") + "&PWD=" + ConfigurationManager.getProperty("payment-system", "paypal.pwd") + "&TENDER=" + transactionType + "&TRXTYPE=" + transactionType + "&FIRSTNAME=" + userFirstName + "&LASTNAME=" + userLastName + "&COMMENT1=" + userName + "&COMMENT2=" + userEmail + "&AMT=" + amount + "&CURRENCY=" + shoppingCart.getCurrency();
 
             // Send post request
             con.setDoOutput(true);
@@ -221,7 +224,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             //setup the reference transaction
             post.addParameter("TENDER", "C");
-            post.addParameter("TRXTYPE", "S");
+            post.addParameter("TRXTYPE", PaymentServiceImpl.PAYPAL_SALE);
             post.addParameter("PWD", ConfigurationManager.getProperty("payment-system", "paypal.pwd"));
             post.addParameter("AMT", Double.toString(shoppingCart.getTotal()));
             post.addParameter("VENDOR", ConfigurationManager.getProperty("payment-system", "paypal.vendor"));
@@ -316,11 +319,11 @@ public class PaymentServiceImpl implements PaymentService {
         return false;
     }
 
-    public void generatePaypalForm(Division maindiv, ShoppingCart shoppingCart, String actionURL, String type, Context context) throws WingException, SQLException {
+    public void generatePaypalForm(Division maindiv, ShoppingCart shoppingCart, String actionURL, String transactionType, Context context) throws WingException, SQLException {
 
         //return false if there is error in loading from paypal
         String secureTokenId = getSecureTokenId();
-        String secureToken = generateSecureToken(shoppingCart, secureTokenId, type, context);
+        String secureToken = generateSecureToken(shoppingCart, secureTokenId, transactionType, context);
         WorkspaceItem workspaceItem = null;
         if (secureToken == null) {
             EPerson ePerson = context.getCurrentUser();
@@ -402,7 +405,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     //this method should generate a secure token from paypal and then generate a user credit card form
-    public void generateUserForm(Context context, Division mainDiv, String actionURL, String knotId, String type, Request request, Item item, DSpaceObject dso) throws WingException, SQLException {
+    public void generateUserForm(Context context, Division mainDiv, String actionURL, String knotId, String transactionType, Request request, Item item, DSpaceObject dso) throws WingException, SQLException {
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
         PaymentService paymentService = new DSpace().getSingletonService(PaymentService.class);
@@ -520,7 +523,7 @@ public class PaymentServiceImpl implements PaymentService {
 
                     generateVoucherForm(voucherDiv, voucherCode, actionURL, knotId);
                     Division creditcard = mainDiv.addDivision("creditcard");
-                    generatePaypalForm(creditcard, shoppingCart, actionURL, type, context);
+                    generatePaypalForm(creditcard, shoppingCart, actionURL, transactionType, context);
                     mainDiv.addPara().addContent(T_payment_note);
                 }
                 mainDiv.addHidden("submission-continue").setValue(knotId);
