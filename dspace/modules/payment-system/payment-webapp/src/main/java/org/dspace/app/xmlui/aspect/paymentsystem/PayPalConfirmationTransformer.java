@@ -31,10 +31,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.paymentsystem.PaymentSystemConfigurationManager;
-import org.dspace.paymentsystem.PaymentSystemException;
-import org.dspace.paymentsystem.PaymentSystemService;
-import org.dspace.paymentsystem.ShoppingCart;
+import org.dspace.paymentsystem.*;
 import org.xml.sax.SAXException;
 import org.dspace.utils.DSpace;
 
@@ -104,7 +101,7 @@ public class PayPalConfirmationTransformer extends AbstractDSpaceTransformer{
         formBody.addItem().addText("USER").setValue(ConfigurationManager.getProperty("paypal.user"));
         formBody.addItem().addText("PWD").setValue(ConfigurationManager.getProperty("paypal.pwd"));
         formBody.addItem().addText("TENDER").setValue("C");
-        formBody.addItem().addText("TRXTYPE").setValue("A");
+        formBody.addItem().addText("TRXTYPE").setValue(PaymentServiceImpl.PAYPAL_AUTHORIZE);
         formBody.addItem().addText("CURRENCY").setValue("USD");
         formBody.addItem().addText("AMT").setValue("0.00");
 
@@ -160,7 +157,7 @@ public class PayPalConfirmationTransformer extends AbstractDSpaceTransformer{
 
             post.addParameter("TENDER", "C");
             //setup the reference transaction
-            post.addParameter("TRXTYPE", "A");
+            post.addParameter("TRXTYPE", PaymentServiceImpl.PAYPAL_AUTHORIZE);
             post.addParameter("AMT", "0");
             //TODO:add currency from shopping cart
             post.addParameter("CURRENCY", "USD");

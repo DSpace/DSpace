@@ -18,6 +18,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.paymentsystem.PaymentService;
+import org.dspace.paymentsystem.PaymentServiceImpl;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -48,7 +49,7 @@ public class ReAuthorizationPaymentActionXMLUI extends AbstractXMLUIAction {
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/workflow_new";
         Division mainDiv = body.addInteractiveDivision("submit-completed-dataset", actionURL, Division.METHOD_POST, "primary submission");
         //generate form
-        paymentService.generateUserForm(context,mainDiv,actionURL,knot.getId(),"S",request,item,dso);
+        paymentService.generateUserForm(context,mainDiv,actionURL,knot.getId(), PaymentServiceImpl.PAYPAL_SALE,request,item,dso);
 
     }
 
