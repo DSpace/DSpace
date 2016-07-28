@@ -487,7 +487,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             // Now that we've checked vouchers and grants, we can generate the corresponding UI and update the cart accordingly.
-            if (hasGrant) {
+            if (hasGrant && transactionType.equals(PAYPAL_AUTHORIZE)) {
                 log.error("grant is -" + grantInfo + "-");
                 if (!"".equals(StringUtils.stripToEmpty(grantInfo))) {
                     log.error("nsf pays");
