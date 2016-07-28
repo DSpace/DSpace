@@ -8,19 +8,21 @@
 package org.dspace.handle;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.dao.HandleDAO;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
@@ -46,6 +48,8 @@ public class HandleServiceImpl implements HandleService
     @Autowired(required = true)
     protected HandleDAO handleDAO;
 
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     @Autowired
     protected SiteService siteService;
@@ -66,7 +70,7 @@ public class HandleServiceImpl implements HandleService
             return null;
         }
 
-        String url = ConfigurationManager.getProperty("dspace.url")
+        String url = configurationService.getProperty("dspace.url")
                 + "/handle/" + handle;
 
         if (log.isDebugEnabled())
@@ -81,9 +85,9 @@ public class HandleServiceImpl implements HandleService
     public String resolveUrlToHandle(Context context, String url)
             throws SQLException
     {
-        String dspaceUrl = ConfigurationManager.getProperty("dspace.url")
+        String dspaceUrl = configurationService.getProperty("dspace.url")
                 + "/handle/";
-        String handleResolver = ConfigurationManager.getProperty("handle.canonical.prefix");
+        String handleResolver = configurationService.getProperty("handle.canonical.prefix");
 
         String handle = null;
 
@@ -119,8 +123,8 @@ public class HandleServiceImpl implements HandleService
         // Let the admin define a new prefix, if not then we'll use the
         // CNRI default. This allows the admin to use "hdl:" if they want to or
         // use a locally branded prefix handle.myuni.edu.
-        String handlePrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
-        if (handlePrefix == null || handlePrefix.length() == 0)
+        String handlePrefix = configurationService.getProperty("handle.canonical.prefix");
+        if (StringUtils.isBlank(handlePrefix))
         {
             handlePrefix = "http://hdl.handle.net/";
         }
@@ -133,7 +137,7 @@ public class HandleServiceImpl implements HandleService
             throws SQLException
     {
         Handle handle = handleDAO.create(context, new Handle());
-        String handleId = createId(handle.getID());
+        String handleId = createId(context);
 
         handle.setHandle(handleId);
         handle.setDSpaceObject(dso);
@@ -302,8 +306,8 @@ public class HandleServiceImpl implements HandleService
     @Override
     public String getPrefix()
     {
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
-        if (null == prefix)
+        String prefix = configurationService.getProperty("handle.prefix");
+        if (StringUtils.isBlank(prefix))
         {
             prefix = EXAMPLE_PREFIX; // XXX no good way to exit cleanly
             log.error("handle.prefix is not configured; using " + prefix);
@@ -386,18 +390,22 @@ public class HandleServiceImpl implements HandleService
     }
 
     /**
-     * Create a new handle id. The implementation uses the PK of the RDBMS
-     * Handle table.
+     * Create/mint a new handle id.
      *
+     * @param context DSpace Context
      * @return A new handle id
      * @exception SQLException
      *                If a database error occurs
      */
-    protected String createId(int id) throws SQLException
+    protected String createId(Context context) throws SQLException
     {
+        // Get configured prefix
         String handlePrefix = getPrefix();
 
-        return handlePrefix + (handlePrefix.endsWith("/") ? "" : "/") + id;
+        // Get next available suffix (as a Long, since DSpace uses an incrementing sequence)
+        Long handleSuffix = handleDAO.getNextHandleSuffix(context);
+
+        return handlePrefix + (handlePrefix.endsWith("/") ? "" : "/") + handleSuffix.toString();
     }
 
     @Override

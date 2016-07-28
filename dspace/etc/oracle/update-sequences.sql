@@ -63,6 +63,7 @@
 @updateseq.sql harvested_item_seq harvested_item id ""
 @updateseq.sql webapp_seq webapp webapp_id ""
 @updateseq.sql requestitem_seq requestitem requestitem_id ""
+@updateseq.sql handle_id_seq handle handle_id ""
 
 -- Handle Sequence is a special case.  Since Handles minted by DSpace use the 'handle_seq',
 -- we need to ensure the next assigned handle will *always* be unique.  So, 'handle_seq'
