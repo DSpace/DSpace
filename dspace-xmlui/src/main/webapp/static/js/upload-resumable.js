@@ -187,7 +187,7 @@ if(doResumable){
     });
 
     r.on('fileSuccess', function(file, message){
-        var TIMEOUT = 300000; // 5 mins
+        var TIMEOUT = 28800000; // 8 hours
         var INTERVAL = 3000;  // 3 seconds
         var attempts = 0;
 
