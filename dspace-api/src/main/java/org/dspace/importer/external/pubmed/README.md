@@ -33,4 +33,4 @@ These classes are simply implementations based of the base classes defined in im
 ## Service classes <a name="Service-classes"></a> ##
 
 - "GeneratePubmedQueryService". Generates the pubmed query which is used to retrieve the records. This is based on a given item.
-- "ImportMetadataSourceServiceImpl". Child class of "AbstractImportMetadataSourceService", retrieving the records from pubmed.
+- "PubmedImportMetadataSourceServiceImpl". Child class of "AbstractImportMetadataSourceService", retrieving the records from pubmed.

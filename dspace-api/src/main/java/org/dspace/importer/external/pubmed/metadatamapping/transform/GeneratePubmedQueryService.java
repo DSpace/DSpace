@@ -6,26 +6,40 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external.pubmed.metadatamapping.service;
+package org.dspace.importer.external.pubmed.metadatamapping.transform;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.importer.external.MetadataSourceException;
-import org.dspace.importer.external.Query;
-import org.dspace.importer.external.metadatamapping.service.GenerateQueryService;
+import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.metadatamapping.transform.GenerateQueryService;
 
 import java.util.List;
 
 /**
- * Created by jonas - jonas@atmire.com on 06/11/15.
+ * This class is an implementation of {@link GenerateQueryService}
+ * Represents a service that generates the pubmed query which is used to retrieve the records.
+ * This is based on a given item.
+ *
+ * @author Jonas - (jonas at atmire dot com)
  */
 public class GeneratePubmedQueryService implements GenerateQueryService {
+
+
+    /**
+     * Create a Query object based on a given item.
+     * If the item has at least 1 value for dc.identifier.doi, the first one will be used.
+     * If no DOI is found, the title will be used.
+     * When no DOI or title is found, an null object is returned instead.
+     * @param item the Item to create a Query from
+     */
     @Override
     public Query generateQueryForItem(Item item) throws MetadataSourceException {
         Query query = new Query();
 
+        // Retrieve an instance of the ItemService to access business calls on an item.
         ItemService itemService = ContentServiceFactory.getInstance().getItemService();
         List<MetadataValue> doi = itemService.getMetadata(item, "dc", "identifier", "doi", Item.ANY);
 

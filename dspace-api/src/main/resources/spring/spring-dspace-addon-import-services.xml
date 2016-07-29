@@ -24,7 +24,7 @@
 
     </bean>
 
-    <bean id="PubmedImportService" class="org.dspace.importer.external.pubmed.service.other.ImportMetadataSourceServiceImpl" scope="singleton">
+    <bean id="PubmedImportService" class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
         <property name="baseAddress" value="http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
 
