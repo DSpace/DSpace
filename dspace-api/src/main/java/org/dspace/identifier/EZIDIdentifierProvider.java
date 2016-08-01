@@ -25,6 +25,8 @@ import org.dspace.identifier.ezid.EZIDRequest;
 import org.dspace.identifier.ezid.EZIDRequestFactory;
 import org.dspace.identifier.ezid.EZIDResponse;
 import org.dspace.identifier.ezid.Transform;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
+import org.dspace.identifier.service.DOIService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,17 +59,17 @@ import org.springframework.beans.factory.annotation.Required;
  * fully-qualified names of all metadata fields to be looked up on a DSpace
  * object and their values set on mapped fully-qualified names in the object's
  * DataCite metadata.</li>
- * 
+ *
  * <li>A second map ("crosswalkTransform") provides Transform instances mapped
  * from EZID metadata field names. This allows the crosswalk to rewrite field
  * values where the form maintained by DSpace is not directly usable in EZID
  * metadata.</li>
- * 
+ *
  * <li>Optional: A boolean property ("generateDataciteXML") that controls the
  * creation and inclusion of DataCite xml schema during the metadata
  * crosswalking. The default "DataCite" dissemination plugin uses
  * DIM2DataCite.xsl for crosswalking. Default value: false.</li>
- * 
+ *
  * <li>Optional: A string property ("disseminationCrosswalkName") that can be
  * used to set the name of the dissemination crosswalk plugin for metadata
  * crosswalking. Default value: "DataCite".</li>
@@ -81,7 +83,7 @@ public class EZIDIdentifierProvider
     private static final Logger log = LoggerFactory.getLogger(EZIDIdentifierProvider.class);
 
     // Configuration property names
-    static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
+    public static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
     static final String CFG_USER = "identifier.doi.ezid.user";
     static final String CFG_PASSWORD = "identifier.doi.ezid.password";
     static final String CFG_PUBLISHER = "identifier.doi.ezid.publisher";
@@ -89,14 +91,6 @@ public class EZIDIdentifierProvider
     // DataCite metadata field names
     static final String DATACITE_PUBLISHER = "datacite.publisher";
     static final String DATACITE_PUBLICATION_YEAR = "datacite.publicationyear";
-
-    // DSpace metadata field name elements
-    // XXX move these to MetadataSchema or some such
-    public static final String MD_SCHEMA = "dc";
-    public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = null;
-
-    private static final String DOI_SCHEME = "doi:";
 
     protected boolean GENERATE_DATACITE_XML = false;
 
@@ -117,6 +111,9 @@ public class EZIDIdentifierProvider
     @Autowired(required = true)
     protected ItemService itemService;
 
+    @Autowired(required = true)
+    protected IdentifierServiceFactory identifierServiceFactory;
+
     @Override
     public boolean supports(Class<? extends Identifier> identifier)
     {
@@ -132,7 +129,8 @@ public class EZIDIdentifierProvider
         }
         else
         {
-            return identifier.startsWith(DOI_SCHEME);
+            return identifier.startsWith(DOI.SCHEME)
+                    || identifier.startsWith(DOI.RESOLVER);
         } // XXX more thorough test?
     }
 
@@ -143,18 +141,21 @@ public class EZIDIdentifierProvider
         log.debug("register {}", dso);
 
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
-        List<MetadataValue> identifiers = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> identifiers = dsoService.getMetadata(dso,
+                URI_METADATA_SCHEMA, URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null);
         for (MetadataValue identifier : identifiers)
         {
-            if ((null != identifier.getValue()) && (identifier.getValue().startsWith(DOI_SCHEME)))
+            String identifierValue = identifier.getValue();
+            if (supports(identifierValue))
             {
-                return identifier.getValue();
+                return identifierValue;
             }
         }
 
         String id = mint(context, dso);
         try {
-            dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, id);
+            dsoService.addMetadata(context, dso, URI_METADATA_SCHEMA,
+                    URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null, id);
             dsoService.update(context, dso);
         } catch (SQLException | AuthorizeException ex) {
             throw new IdentifierException("New identifier not stored", ex);
@@ -182,8 +183,10 @@ public class EZIDIdentifierProvider
         {
             try {
                 DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(object);
-                dsoService.addMetadata(context, object, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
-                        idToDOI(identifier));
+                DOIService doiService = identifierServiceFactory.getDOIService();
+                dsoService.addMetadata(context, object, URI_METADATA_SCHEMA,
+                        URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null,
+                        doiService.DOIToExternalForm(identifier));
                 dsoService.update(context, object);
                 log.info("registered {}", identifier);
             } catch (SQLException | AuthorizeException | IdentifierException ex) {
@@ -219,8 +222,11 @@ public class EZIDIdentifierProvider
         if (response.isSuccess())
         {
             DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+            DOIService doiService = identifierServiceFactory.getDOIService();
             try {
-                dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, idToDOI(identifier));
+                dsoService.addMetadata(context, dso, URI_METADATA_SCHEMA,
+                        URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null,
+                        doiService.DOIToExternalForm(identifier));
                 dsoService.update(context, dso);
                 log.info("reserved {}", identifier);
             } catch (SQLException | AuthorizeException ex) {
@@ -301,11 +307,12 @@ public class EZIDIdentifierProvider
     {
         log.debug("resolve {}", identifier);
 
+        DOIService doiService = identifierServiceFactory.getDOIService();
         Iterator<Item> found;
         try {
             found = itemService.findByMetadataField(context,
-                    MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER,
-                    idToDOI(identifier));
+                    URI_METADATA_SCHEMA, URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER,
+                    doiService.DOIToExternalForm(identifier));
         } catch (IdentifierException | SQLException | AuthorizeException | IOException ex) {
             log.error(ex.getMessage());
             throw new IdentifierNotResolvableException(ex);
@@ -331,9 +338,10 @@ public class EZIDIdentifierProvider
 
         MetadataValue found = null;
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(object);
-        for (MetadataValue candidate : dsoService.getMetadata(object, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null))
+        for (MetadataValue candidate : dsoService.getMetadata(object,
+                URI_METADATA_SCHEMA, URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null))
         {
-            if (candidate.getValue().startsWith(DOI_SCHEME))
+            if (supports(candidate.getValue()))
             {
                 found = candidate;
                 break;
@@ -359,22 +367,25 @@ public class EZIDIdentifierProvider
 
         // delete from EZID
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
-        List<MetadataValue> metadata = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = dsoService.getMetadata(dso,
+                URI_METADATA_SCHEMA, URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null);
         List<String> remainder = new ArrayList<>();
         int skipped = 0;
         for (MetadataValue id : metadata)
         {
-            if (!id.getValue().startsWith(DOI_SCHEME))
+            String idValue = id.getValue();
+            if (!supports(idValue))
             {
-                remainder.add(id.getValue());
+                remainder.add(idValue);
                 continue;
             }
 
             EZIDResponse response;
             try {
+                DOIService doiService = identifierServiceFactory.getDOIService();
                 EZIDRequest request = requestFactory.getInstance(loadAuthority(),
                         loadUser(), loadPassword());
-                response = request.delete(DOIToId(id.getValue()));
+                response = request.delete(doiService.DOIFromExternalFormat(idValue));
             } catch (URISyntaxException e) {
                 log.error("Bad URI in metadata value:  {}", e.getMessage());
                 remainder.add(id.getValue());
@@ -399,8 +410,10 @@ public class EZIDIdentifierProvider
 
         // delete from item
         try {
-            dsoService.clearMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-            dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, remainder);
+            dsoService.clearMetadata(context, dso, URI_METADATA_SCHEMA,
+                    URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null);
+            dsoService.addMetadata(context, dso, URI_METADATA_SCHEMA,
+                    URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null, remainder);
             dsoService.update(context, dso);
         } catch (SQLException | AuthorizeException e) {
             log.error("Failed to re-add identifiers:  {}", e.getMessage());
@@ -419,12 +432,14 @@ public class EZIDIdentifierProvider
         log.debug("delete {} from {}", identifier, dso);
 
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
-        List<MetadataValue> metadata = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = dsoService.getMetadata(dso,
+                URI_METADATA_SCHEMA, URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null);
         List<String> remainder = new ArrayList<>();
         int skipped = 0;
+        DOIService doiService = identifierServiceFactory.getDOIService();
         for (MetadataValue id : metadata)
         {
-            if (!id.getValue().equals(idToDOI(identifier)))
+            if (!id.getValue().equals(doiService.DOIToExternalForm(identifier)))
             {
                 remainder.add(id.getValue());
                 continue;
@@ -434,7 +449,7 @@ public class EZIDIdentifierProvider
             try {
                 EZIDRequest request = requestFactory.getInstance(loadAuthority(),
                         loadUser(), loadPassword());
-                response = request.delete(DOIToId(id.getValue()));
+                response = request.delete(doiService.DOIFromExternalFormat(id.getValue()));
             } catch (URISyntaxException e) {
                 log.error("Bad URI in metadata value {}:  {}", id.getValue(), e.getMessage());
                 remainder.add(id.getValue());
@@ -460,8 +475,10 @@ public class EZIDIdentifierProvider
 
         // delete from item
         try {
-            dsoService.clearMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-            dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, remainder);
+            dsoService.clearMetadata(context, dso, URI_METADATA_SCHEMA,
+                    URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null);
+            dsoService.addMetadata(context, dso, URI_METADATA_SCHEMA,
+                    URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null, remainder);
             dsoService.update(context, dso);
         } catch (SQLException | AuthorizeException e) {
             log.error("Failed to re-add identifiers:  {}", e.getMessage());
@@ -470,36 +487,6 @@ public class EZIDIdentifierProvider
         if (skipped > 0)
         {
             throw new IdentifierException(identifier + " could not be deleted.");
-        }
-    }
-
-    /**
-     * Format a naked identifier as a DOI with our configured authority prefix.
-     * 
-     * @throws IdentifierException if authority prefix is not configured.
-     */
-    String idToDOI(String id)
-            throws IdentifierException
-    {
-        return "doi:" + loadAuthority() + id;
-    }
-
-    /**
-     * Remove scheme and our configured authority prefix from a doi: URI string.
-     * @return naked local identifier.
-     * @throws IdentifierException if authority prefix is not configured.
-     */
-    String DOIToId(String DOI)
-            throws IdentifierException
-    {
-        String prefix = "doi:" + loadAuthority();
-        if (DOI.startsWith(prefix))
-        {
-            return DOI.substring(prefix.length());
-        }
-        else
-        {
-            return DOI;
         }
     }
 

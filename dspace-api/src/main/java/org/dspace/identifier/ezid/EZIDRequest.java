@@ -37,22 +37,31 @@ public class EZIDRequest
 {
     private static final Logger log = LoggerFactory.getLogger(EZIDRequest.class);
 
-    private static final String ID_PATH = "/id/" + DOI.SCHEME;
+    /** Local path part for requests of specific identifiers. */
+    private static final String ID_PATH = "/id/";
 
+    /** Local path part for requests to mint identifiers. */
     private static final String SHOULDER_PATH = "/shoulder/" + DOI.SCHEME;
 
+    /** Name of the UTF-8 encoding. */
     private static final String UTF_8 = "UTF-8";
 
+    /** Name of the object status metadata field. */
     private static final String MD_KEY_STATUS = "_status";
 
+    /** HTTP client connection to EZID. */
     private final AbstractHttpClient client;
 
+    /** URI scheme for access to EZID. */
     private final String scheme;
 
+    /** URL host for access to EZID. */
     private final String host;
 
+    /** URL local path to EZID services. */
     private final String path;
 
+    /** EZID unique name authority prefix. */
     private final String authority;
 
     /**
@@ -140,6 +149,7 @@ public class EZIDRequest
     /**
      * Fetch the metadata bound to an identifier.
      *
+     * @param name a doi: URI
      * @throws IdentifierException if the response is error or body malformed.
      * @throws IOException if the HTTP request fails.
      * @throws URISyntaxException
@@ -149,7 +159,7 @@ public class EZIDRequest
     {
         // GET path
         HttpGet request;
-        URI uri = new URI(scheme, host, path + ID_PATH + authority + name, null);
+        URI uri = new URI(scheme, host, path + ID_PATH + name, null);
         log.debug("EZID lookup {}", uri.toASCIIString());
         request = new HttpGet(uri);
         HttpResponse response = client.execute(request);
@@ -161,6 +171,7 @@ public class EZIDRequest
      * request path. Note: to "reserve" a given identifier, include "_status =
      * reserved" in {@link metadata}.
      *
+     * @param name a doi: URI
      * @param metadata ANVL-encoded key/value pairs.
      * @return
      */
@@ -169,7 +180,7 @@ public class EZIDRequest
     {
         // PUT path [+metadata]
         HttpPut request;
-        URI uri = new URI(scheme, host, path + ID_PATH + authority + '/' + name, null);
+        URI uri = new URI(scheme, host, path + ID_PATH + name, null);
         log.debug("EZID create {}", uri.toASCIIString());
         request = new HttpPut(uri);
         if (null != metadata)
@@ -207,6 +218,7 @@ public class EZIDRequest
     /**
      * Alter the metadata bound to an identifier.
      *
+     * @param name a doi: URI
      * @param metadata fields to be altered. Leave the value of a field's empty
      *                 to delete the field.
      * @return
@@ -220,7 +232,7 @@ public class EZIDRequest
         }
         // POST path +metadata
         HttpPost request;
-        URI uri = new URI(scheme, host, path + ID_PATH + authority + name, null);
+        URI uri = new URI(scheme, host, path + ID_PATH + name, null);
         log.debug("EZID modify {}", uri.toASCIIString());
         request = new HttpPost(uri);
         request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
@@ -230,13 +242,15 @@ public class EZIDRequest
 
     /**
      * Destroy a reserved identifier. Fails if ID was ever public.
+     *
+     * @param name a doi: URI
      */
     public EZIDResponse delete(String name)
             throws IOException, IdentifierException, URISyntaxException
     {
         // DELETE path
         HttpDelete request;
-        URI uri = new URI(scheme, host, path + ID_PATH + authority + name, null);
+        URI uri = new URI(scheme, host, path + ID_PATH + name, null);
         log.debug("EZID delete {}", uri.toASCIIString());
         request = new HttpDelete(uri);
         HttpResponse response = client.execute(request);
@@ -249,7 +263,7 @@ public class EZIDRequest
     public EZIDResponse withdraw(String name)
             throws IOException, IdentifierException, URISyntaxException
     {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put(MD_KEY_STATUS, "unavailable");
         return modify(name, metadata);
     }
@@ -262,7 +276,7 @@ public class EZIDRequest
     public EZIDResponse withdraw(String name, String reason)
             throws IOException, IdentifierException, URISyntaxException
     {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put(MD_KEY_STATUS, "unavailable | " + escape(reason));
         return modify(name, metadata);
     }
