@@ -115,7 +115,7 @@ public class PaymentServiceImpl implements PaymentService {
                 amount = Double.toString(shoppingCart.getTotal());
             }
 
-            String urlParameters = "SECURETOKENID=" + secureTokenId + "&CREATESECURETOKEN=Y" + "&MODE=" + ConfigurationManager.getProperty("payment-system", "paypal.mode") + "&PARTNER=" + ConfigurationManager.getProperty("payment-system", "paypal.partner") + "&VENDOR=" + ConfigurationManager.getProperty("payment-system", "paypal.vendor") + "&USER=" + ConfigurationManager.getProperty("payment-system", "paypal.user") + "&PWD=" + ConfigurationManager.getProperty("payment-system", "paypal.pwd") + "&TENDER=" + transactionType + "&TRXTYPE=" + transactionType + "&FIRSTNAME=" + userFirstName + "&LASTNAME=" + userLastName + "&COMMENT1=" + userName + "&COMMENT2=" + userEmail + "&AMT=" + amount + "&CURRENCY=" + shoppingCart.getCurrency();
+            String urlParameters = "SECURETOKENID=" + secureTokenId + "&CREATESECURETOKEN=Y" + "&MODE=" + ConfigurationManager.getProperty("payment-system", "paypal.mode") + "&PARTNER=" + ConfigurationManager.getProperty("payment-system", "paypal.partner") + "&VENDOR=" + ConfigurationManager.getProperty("payment-system", "paypal.vendor") + "&USER=" + ConfigurationManager.getProperty("payment-system", "paypal.user") + "&PWD=" + ConfigurationManager.getProperty("payment-system", "paypal.pwd") + "&TENDER=C" + "&TRXTYPE=" + transactionType + "&FIRSTNAME=" + userFirstName + "&LASTNAME=" + userLastName + "&COMMENT1=" + userName + "&COMMENT2=" + userEmail + "&AMT=" + amount + "&CURRENCY=" + shoppingCart.getCurrency();
 
             // Send post request
             con.setDoOutput(true);
@@ -435,18 +435,18 @@ public class PaymentServiceImpl implements PaymentService {
                 grantInfo = fundingEntities[0].value;
             } else {
                 grantInfo = request.getParameter("grant-info");
-                log.error("grant is now -" + grantInfo + "-");
+                log.debug("grant is now -" + grantInfo + "-");
                 if (grantInfo == null) {
                     hasGrant = true;
-                    log.error("should ask about grant");
+                    log.debug("should ask about grant");
                 } else {
                     if ("".equals(StringUtils.stripToEmpty(grantInfo))) {
                         hasGrant = false;
-                        log.error("no grant, go to payment screen");
+                        log.debug("no grant, go to payment screen");
                     } else {
                         int confidence = 0;
                         if (JournalUtils.isValidNSFGrantNumber(grantInfo)) {
-                            log.error("valid grant");
+                            log.debug("valid grant");
                             confidence = Choices.CF_ACCEPTED;
                         } else {
                             log.error("invalid grant");
@@ -456,7 +456,7 @@ public class PaymentServiceImpl implements PaymentService {
                         item.addMetadata("dryad", "fundingEntity", null, null, grantInfo, "NSF", confidence);
                         item.update();
                         hasGrant = true;
-                        log.error("added grant info " + grantInfo);
+                        log.debug("added grant info " + grantInfo);
                     }
                 }
 
@@ -481,7 +481,7 @@ public class PaymentServiceImpl implements PaymentService {
             if (hasGrant && transactionType.equals(PAYPAL_AUTHORIZE)) {
                 log.error("grant is -" + grantInfo + "-");
                 if (!"".equals(StringUtils.stripToEmpty(grantInfo))) {
-                    log.error("nsf pays");
+                    log.debug("nsf pays");
                     paymentSystemService.updateTotal(context, shoppingCart, "the US National Science Foundation");
                     shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                     shoppingCart.update();
@@ -491,7 +491,7 @@ public class PaymentServiceImpl implements PaymentService {
                     Button skipButton = buttons.addItem().addButton("skip_payment");
                     skipButton.setValue("Submit");
                 } else {
-                    log.error("ask");
+                    log.debug("ask");
                     mainDiv.addPara(T_funding_head);
                     mainDiv.addPara(T_funding_question);
                     List list = mainDiv.addList("grant-list");
