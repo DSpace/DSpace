@@ -10,6 +10,7 @@
 # {4}  Url for the review
 # {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
 # {6}  The journal name (or "not available" if the metadata doesn't contain one)
+# {7}  Formatted DOI
 
 Subject: Dryad: Data package received for review {1}
 
@@ -28,6 +29,19 @@ YOUR DRYAD DOI
 Your data package has been assigned a unique identifier, called a DOI. This DOI is provisional for now, but may be included in the article manuscript. It will be fully registered with the DOI system when your submission has been approved by Dryad curation staff.
 
 {1}
+
+
+CITING YOUR DRYAD DATA
+
+Ensure that readers can find your data!
+
+We recommend that the article include a link to the Dryad data as follows:
+
+Data available from the Dryad Digital Repository: {7}
+
+Your journal may follow the CrossRef recommendation that the data package be cited in the article Reference list. If so, the citation should include the Dryad package DOI, e.g.:
+
+Author(s) (Year). {2}. Dryad Digital Repository. {1}
 
 
 REVIEWER ACCESS TO YOUR DRYAD DATA

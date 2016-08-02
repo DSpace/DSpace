@@ -226,6 +226,7 @@ public class DryadReviewAction extends ProcessingAction {
         
         email.addArgument(journalName);
 
+            email.addArgument(DOIIdentifierProvider.getFullDOIURL(wf.getItem()));
             email.send();
         } catch (Exception e) {
             log.error(LogManager.getHeader(c, "Error while email reviewer", "WorkflowItemId: " + wf.getID()), e);
