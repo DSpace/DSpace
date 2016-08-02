@@ -31,6 +31,8 @@ import java.net.URL;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -355,6 +357,29 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         }
         return null;
 
+    }
+
+    /**
+     * Returns a fully-formatted DOI URL
+     *
+     * @param item the item to check for a DOI
+     * @return fully-formatted dx.doi.org url
+     */
+
+    public static String getFullDOIURL(Item item) {
+        String doi_url = "";
+        if (item != null) {
+            String itemDOI = getDoiValue(item);
+            if (itemDOI != null) {
+                Matcher doimatcher = Pattern.compile("doi:(.+)").matcher(itemDOI);
+                if (doimatcher.find()) {
+                    doi_url = "http://dx.doi.org/" + doimatcher.group(1);
+                } else {
+                    doi_url = "http://dx.doi.org/" + itemDOI;
+                }
+            }
+        }
+        return doi_url;
     }
 
     public DSpaceObject resolve(Context context, String identifier, String... attributes) throws IdentifierNotFoundException, IdentifierNotResolvableException {
