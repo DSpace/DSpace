@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -44,10 +43,13 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.FormatIdentifier;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
+import org.dspace.eperson.EPerson;
 
 /**
  * Action that responds to requests related to resumable upload.
@@ -56,7 +58,7 @@ public class ResumableUpload extends AbstractAction
 {
     private static final Logger log = Logger.getLogger(ResumableUpload.class);
     
-    private static String tempDir;    
+    private static String tempDir;
     private String submissionDir;
     private String chunkDir;
     private String handle;
@@ -119,7 +121,6 @@ public class ResumableUpload extends AbstractAction
             String source,
             Parameters parameters) throws Exception
     {
-        Response response = ObjectModelHelper.getResponse(objectModel);
         Request request = ObjectModelHelper.getRequest(objectModel);
         this.init(request);
         
@@ -132,26 +133,26 @@ public class ResumableUpload extends AbstractAction
             String complete = request.getParameter("complete");
             if(complete != null && Boolean.valueOf(complete))
             {
-                Bitstream b = this.doCompleteResumable(request, objectModel);    
-                if(b != null)
+                String bId = this.getCompletedBitstreamId(objectModel);    
+                if(bId != null)
                 {
-                    log.info("bitstream created " + b.getID() + " for " +
+                    log.info("bitstream created " + bId + " for " +
                             this.handle);
-                    returnValues.put("bitstream", String.valueOf(b.getID()));
+                    returnValues.put("bitstream", bId);
                 }
             }
             else{
-                doGetResumable(request, response);
+                doGetResumable(objectModel);
             }
         }
         else if(request.getMethod().equals("POST"))
         {
             returnValues = new HashMap<String, String>();
-            doPostResumable(request, response);
+            doPostResumable(objectModel);
         }
         else if(request.getMethod().equals("DELETE"))
         {
-            if(this.doDeleteResumable(request, objectModel))
+            if(this.doDeleteResumable(objectModel))
             {
                 returnValues = new HashMap<String, String>();
                 returnValues.put("status", "200");
@@ -164,15 +165,15 @@ public class ResumableUpload extends AbstractAction
     /**
      * Resumable.js uses HTTP GET to recognize whether a specific part/chunk of
      * a file was uploaded already. This method handles those requests.
-     * @param request
-     * @param response
+     * @param objectModel
      * @throws IOException
      */
-    private void doGetResumable(
-            HttpServletRequest request,
-            HttpServletResponse response) 
+    private void doGetResumable(@SuppressWarnings("rawtypes") Map objectModel) 
         throws IOException
     {
+        Response response = ObjectModelHelper.getResponse(objectModel);
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        
         int resumableTotalChunks =
                 Integer.parseInt(request.getParameter("resumableTotalChunks").toString());
         int resumableChunkNumber =
@@ -206,11 +207,7 @@ public class ResumableUpload extends AbstractAction
                 {
                     // its possible for the final request to be a GET request,
                     // in this case process file
-                    this.uploadComplete(
-                            request.getSession(),
-                            request.getParameter("resumableFilename"),
-                            request.getParameter("resumableIdentifier"),
-                            resumableTotalChunks);
+                    this.uploadComplete(objectModel, resumableTotalChunks);
                 }
 
             }
@@ -231,15 +228,17 @@ public class ResumableUpload extends AbstractAction
      * Resumable.js sends chunks of files using HTTP POST. If a chunk was the
      * last missing one, we have to assemble the file and return it. If other
      * chunks are missing, we just return null.
-     * @param request
-     * @param response
+     * @param objectModel
      * @throws FileSizeLimitExceededException
      * @throws IOException
      * @throws ServletException
      */
-    private void doPostResumable(Request request, HttpServletResponse response)
+    private void doPostResumable(@SuppressWarnings("rawtypes") Map objectModel)
             throws FileSizeLimitExceededException, IOException, ServletException 
     {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        Response response = ObjectModelHelper.getResponse(objectModel);
+        
         int resumableTotalChunks =
                 Integer.parseInt(request.getParameter("resumableTotalChunks"));
         int resumableChunkNumber =
@@ -274,19 +273,27 @@ public class ResumableUpload extends AbstractAction
                 if(resumableChunkNumber == resumableTotalChunks)
                 {
                     // we have the final chunk process upload
-                    this.uploadComplete(
-                            request.getSession(),
-                            resumableFilename,
-                            resumableIdentifier,
-                            resumableTotalChunks);
+                    this.uploadComplete(objectModel, resumableTotalChunks);
                 }
             }
             else
             {
                 log.debug(chunkPath + " Uploaded");
-
-                // chunk is the whole file
-                this.processFile(request.getSession(), chunk, resumableIdentifier);
+                
+                try
+                {
+                    // chunk is the whole file
+                    this.processFile(
+                            ContextUtil.obtainContext(objectModel).getCurrentUser(),
+                            Integer.parseInt(request.getParameter("submissionId")),
+                            request.getSession(),
+                            chunk,
+                            resumableIdentifier);
+                }
+                catch(SQLException ex)
+                {
+                    throw new RuntimeException(ex);
+                }
             }
         }
         else
@@ -301,15 +308,15 @@ public class ResumableUpload extends AbstractAction
     
     /**
      * Delete previously uploaded bitstream
-     * @param request
      * @param objectModel
      * @return True if bitstream successfully deleted.
      */
     private boolean doDeleteResumable(
-            Request request,
             @SuppressWarnings("rawtypes") Map objectModel)
     {
         boolean success = false;
+        
+        Request request = ObjectModelHelper.getRequest(objectModel);
         
         try
         {
@@ -385,68 +392,29 @@ public class ResumableUpload extends AbstractAction
 
     /**
      * Complete resumable upload.
-     * @param request
      * @param objectModel
      * @return
      */
-    private Bitstream doCompleteResumable(
-            Request request,
+    private String getCompletedBitstreamId(
             @SuppressWarnings("rawtypes") Map objectModel)
     {
-        Bitstream b = null;
+        String id = null;
 
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        
         // get upload details from session
-        HttpSession session = request.getSession(); 
         String resumableIdentifier = request.getParameter("resumableIdentifier");
-        Object obj = session.getAttribute(resumableIdentifier);
+        Object obj = request.getSession().getAttribute(resumableIdentifier);
         
         if(obj != null){
-            // this will prevent this happening again
-            session.removeAttribute(resumableIdentifier);
-            
-            try{
-                if(obj instanceof File){
-                    // a file has been found in session, create bitstream
-                    SubmissionInfo si = FlowUtils.obtainSubmissionInfo(
-                        objectModel, 'S' + request.getParameter("submissionId"));
-                    Item item = si.getSubmissionItem().getItem();
-                    Context context = ContextUtil.obtainContext(objectModel);
-                    b = this.createBitstream(context, (File)obj, item);
-                    
-                    // delete file and upload
-                    log.info("deleting " + this.chunkDir);
-                    if(!deleteDirectory(new File(this.chunkDir)))
-                    {
-                        log.warn("Couldn't delete submission upload path " + this.submissionDir + ", ignoring it.");
-                    }
-
-                    context.commit();
-                }
-                else if(obj instanceof RuntimeException)
-                {
-                    throw(RuntimeException)obj;
-                }
-                else
-                {
-                    throw new RuntimeException("Nothing found in session for " + resumableIdentifier);
-                }
-            }
-            catch(SQLException ex){
-                throw new RuntimeException(ex);
-            }
-            catch(AuthorizeException ex){
-                throw new RuntimeException(ex);
-            }
-            catch(IOException ex){
-                throw new RuntimeException(ex);
-            }
+            id = obj.toString();
         }
         else
         {
-          log.warn("No attribute found in session for " + resumableIdentifier);
+            log.warn("No attribute found in session for " + resumableIdentifier);
         }
         
-        return b;
+        return id;
     }
             
     /**
@@ -466,7 +434,6 @@ public class ResumableUpload extends AbstractAction
 
             // do we already have a bundle?
             Bundle[] bundles = item.getBundles("ORIGINAL");
-
 
             if (bundles.length < 1)
             {
@@ -536,11 +503,15 @@ public class ResumableUpload extends AbstractAction
     
     /**
      * Do some post processing on reassembled / uploaded file.
+     * @param user DSpace EPerson.
+     * @param submissionId DSpace submission identifier.
      * @param session User session
      * @param file The reassembled/uploaded file
      * @param resumableIdentifier Unique identifier of resumable upload.
      */
     private void processFile(
+            EPerson user,
+            int submissionId,
             HttpSession session,
             File file,
             String resumableIdentifier)
@@ -568,37 +539,75 @@ public class ResumableUpload extends AbstractAction
             }
             else
             {
-                // file good, store in session
-                session.setAttribute(resumableIdentifier, file);
+                // virus check good, attach file to DSpace item
+                try
+                {
+                    // create new context as this can be executed outside of a request
+                    Context ctx = new Context();
+                    ctx.setCurrentUser(user);
+                    
+                    // find item
+                    InProgressSubmission ips = WorkspaceItem.find(ctx, submissionId);
+                    Item item = ips.getItem();
+                    
+                    // create new bitstream
+                    Bitstream b = this.createBitstream(ctx, file, item);
+                    
+                    // delete file and upload
+                    log.info("deleting " + this.chunkDir);
+                    if(!deleteDirectory(new File(this.chunkDir)))
+                    {
+                        log.warn("Couldn't delete submission upload path " + this.submissionDir + ", ignoring it.");
+                    }
+
+                    ctx.complete();
+                    
+                    // all good, store bitstream id in session
+                    session.setAttribute(resumableIdentifier, b.getID());
+                }
+                catch(SQLException ex)
+                { 
+                    throw new RuntimeException(ex);
+                }
             }
         }
     }
     
     /**
      * All the chunks have been uploaded, kick off file re-assembly
-     * @param session User session
-     * @param resumableFilename Name of the file uploaded.
-     * @param resumableIdentifier Unique identifier of resumable upload.
+     * @param objectModel
      * @param resumableTotalChunks Total number of chunks uploaded.
      */
     private void uploadComplete(
-            HttpSession session,
-            String resumableFilename,
-            String resumableIdentifier,
+            @SuppressWarnings("rawtypes") Map objectModel,
             int resumableTotalChunks)
     {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        
         // check chunk count is correct
         int noOfChunks = new File(this.chunkDir).listFiles().length;
         if(noOfChunks >= resumableTotalChunks)
         {
+            String resumableFilename = request.getParameter("resumableFilename");
+            String resumableIdentifier = request.getParameter("resumableIdentifier");
+
             log.info("Upload of " + resumableIdentifier + " complete. Start file reassembly");
             
-            // recreate file in a new thread 
-            new FileReassembler(
-                    session,
-                    resumableFilename,
-                    resumableIdentifier,
-                    resumableTotalChunks).start();
+            try
+            {
+                // recreate file in a new thread 
+                new FileReassembler(
+                        ContextUtil.obtainContext(objectModel),
+                        Integer.parseInt(request.getParameter("submissionId")),
+                        request.getSession(),
+                        resumableFilename,
+                        resumableIdentifier,
+                        resumableTotalChunks).start();
+            }
+            catch(SQLException ex)
+            {
+                throw new RuntimeException(ex);
+            }
         }
         else
         {
@@ -675,27 +684,35 @@ public class ResumableUpload extends AbstractAction
      */
     public class FileReassembler extends Thread
     {
+        private EPerson user;
+        private int submissionId;
         private String resumableFilename;
         private String resumableIdentifier;
         private int resumableTotalChunks;
         private HttpSession session;
 
         /**
+         * @param context DSpace context.
+         * @param submissionId DSpace submission identifier.
+         * @param session HTTPS session.
          * @param resumableFilename Name of the file uploaded.
          * @param resumableIdentifier Unique identifier of resumable upload.
          * @param resumableTotalChunks Total number of chunks uploaded.
-         * @param session User session.
          */
         public FileReassembler(
+                Context context,
+                int submissionId,
                 HttpSession session,
                 String resumableFilename,
                 String resumableIdentifier,
                 int resumableTotalChunks)
         {
+            this.submissionId = submissionId;
             this.resumableFilename = resumableFilename;
             this.resumableIdentifier = resumableIdentifier;
             this.resumableTotalChunks = resumableTotalChunks;
             this.session = session;
+            this.user = context.getCurrentUser();
         }
         
         /**
@@ -776,6 +793,8 @@ public class ResumableUpload extends AbstractAction
             {
                 // recreate file from chunks and process file
                 ResumableUpload.this.processFile(
+                        this.user,
+                        this.submissionId,
                         this.session,
                         this.makeFileFromChunks(),
                         this.resumableIdentifier);

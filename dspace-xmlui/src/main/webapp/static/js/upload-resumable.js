@@ -421,9 +421,9 @@ if(doResumable){
             }
             else{
                 var bytes = $(cell).find("[name^='file-extra-bytes']").val();
-                var format = $(cell).find("[name='file-extra-format']").val();
-                var checksum = $(cell).find("[name='file-extra-algorithm']").val() +
-                    ":" + $(cell).find("[name='file-extra-checksum']").val();
+                var format = $(cell).find("[name^='file-extra-format']").val();
+                var checksum = $(cell).find("[name^='file-extra-algorithm']").val() +
+                    ":" + $(cell).find("[name^='file-extra-checksum']").val();
 
                 var row = '<tr id="' + newRowId + '"><td colspan="7"><div>\
                              <strong>bytes:</strong> ' +  bytes + '&nbsp\
