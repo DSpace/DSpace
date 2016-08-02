@@ -114,11 +114,7 @@ public class WorkflowEmailManager {
             }
 
             // add a DOI URL as well:
-            String doi_url = "";
-            Matcher doimatcher = Pattern.compile("doi:(.+)").matcher(datapackageDoi);
-            if (doimatcher.find()) {
-                doi_url = "http://dx.doi.org/" + doimatcher.group(1);
-            }
+            String doi_url = DOIIdentifierProvider.getFullDOIURL(i);
 
             email.addArgument(title);                 // {0}  Title of data package
             email.addArgument(datapackageDoi);        // {1}  The doi identifier of the data package
