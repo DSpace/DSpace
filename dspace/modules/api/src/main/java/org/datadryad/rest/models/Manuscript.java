@@ -86,6 +86,7 @@ public class Manuscript {
 
     public static final List<String> SUBMITTED_STATUSES = Arrays.asList(
             STATUS_SUBMITTED,
+            STATUS_NEEDS_REVISION,
             "revision in review",
             "revision under review",
             "in review"
@@ -97,7 +98,6 @@ public class Manuscript {
 
     public static final List<String> REJECTED_STATUSES = Arrays.asList(
             STATUS_REJECTED,
-            STATUS_NEEDS_REVISION,
             "transferred",
             "rejected w/o review"
     );
