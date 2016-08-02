@@ -727,7 +727,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         try {
             Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_error"));
             // only send result of shopping cart errors to administrators
-            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.alert.recipient"));
+            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.help.email"));
             email.addArgument(wfi.getItem().getName());
             email.addArgument(wfi.getItem().getID());
             email.addArgument(error);
@@ -769,7 +769,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
             Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_rejected"));
             // temporarily only send result of shopping cart errors to administrators
             email.addRecipient(wfi.getSubmitter().getEmail());
-            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.alert.recipient"));
+            email.addRecipient(ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.help.email"));
             email.addArgument(wfi.getItem().getName());
 
             email.addArgument(wfi.getSubmitter().getFullName() + " (" + wfi.getSubmitter().getEmail() + ")");
