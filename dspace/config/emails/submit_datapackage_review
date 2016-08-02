@@ -5,7 +5,7 @@
 #
 # {0}  Title of submission
 # {1}  Doi of the data package
-# {2}  Title of the data package
+# {2}  Data file(s)
 # {3}  Submitter name/email
 # {4}  Url for the review
 # {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
@@ -41,7 +41,7 @@ Data available from the Dryad Digital Repository: {7}
 
 Your journal may follow the CrossRef recommendation that the data package be cited in the article Reference list. If so, the citation should include the Dryad package DOI, e.g.:
 
-Author(s) (Year). {2}. Dryad Digital Repository. {1}
+Author(s) (Year). {0}. Dryad Digital Repository. {1}
 
 
 REVIEWER ACCESS TO YOUR DRYAD DATA
