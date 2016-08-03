@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.JournalUtils;
@@ -654,7 +655,7 @@ public class Manuscript {
             } else {
                 citation.append(", online in advance of print.");
             }
-            fullCitation = citation.toString();
+            fullCitation = StringEscapeUtils.unescapeHtml(citation.toString());
         }
         return fullCitation;
     }
