@@ -380,37 +380,50 @@ public class PublicationUpdater extends HttpServlet {
         return queryManuscript;
     }
 
-    private void updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context) {
-        if (!"".equals(manuscript.getPublicationDOI())) {
+    private boolean updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context) {
+        boolean changed = false;
+        if (!"".equals(manuscript.getPublicationDOI()) && !item.hasMetadataEqualTo(PUBLICATION_DOI, manuscript.getPublicationDOI())) {
+            changed = true;
             item.clearMetadata(PUBLICATION_DOI);
             item.addMetadata(PUBLICATION_DOI, null, manuscript.getPublicationDOI(), null, -1);
         }
-        if (!"".equals(manuscript.getFullCitation())) {
+        if (!"".equals(manuscript.getFullCitation()) && !item.hasMetadataEqualTo(FULL_CITATION, manuscript.getFullCitation())) {
+            changed = true;
             item.clearMetadata(FULL_CITATION);
             item.addMetadata(FULL_CITATION, null, manuscript.getFullCitation(), null, -1);
         }
-        if (!"".equals(manuscript.getManuscriptId())) {
+        if (!"".equals(manuscript.getManuscriptId()) && !item.hasMetadataEqualTo(MANUSCRIPT_NUMBER, manuscript.getManuscriptId())) {
+            changed = true;
             item.clearMetadata(MANUSCRIPT_NUMBER);
             item.addMetadata(MANUSCRIPT_NUMBER, null, manuscript.getManuscriptId(), null, -1);
         }
+
+        SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
         if (manuscript.getPublicationDate() != null) {
-            SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
-            item.clearMetadata(PUBLICATION_DATE);
-            item.addMetadata(PUBLICATION_DATE, null, dateIso.format(manuscript.getPublicationDate()), null, -1);
-        }
-        item.clearMetadata(CITATION_IN_PROGRESS);
-        item.addMetadata(CITATION_IN_PROGRESS, null, "true", null, -1);
-
-        if (manuscript.optionalProperties.containsKey("provenance")) {
-            item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + manuscript.optionalProperties.get("provenance") + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
+            String dateString = dateIso.format(manuscript.getPublicationDate());
+            if (!item.hasMetadataEqualTo(PUBLICATION_DATE, dateString)) {
+                changed = true;
+                item.clearMetadata(PUBLICATION_DATE);
+                item.addMetadata(PUBLICATION_DATE, null, dateString, null, -1);
+            }
         }
 
-        try {
-            item.update();
-            context.commit();
-        } catch (Exception e) {
-            LOGGER.error("couldn't save metadata: " + e.getMessage());
+        if (changed) {
+            item.clearMetadata(CITATION_IN_PROGRESS);
+            item.addMetadata(CITATION_IN_PROGRESS, null, "true", null, -1);
+
+            if (manuscript.optionalProperties.containsKey("provenance")) {
+                item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + manuscript.optionalProperties.get("provenance") + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
+            }
+
+            try {
+                item.update();
+                context.commit();
+            } catch (Exception e) {
+                LOGGER.error("couldn't save metadata: " + e.getMessage());
+            }
         }
+        return changed;
     }
 
     @Override
