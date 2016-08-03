@@ -82,19 +82,20 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
                 || identifier.startsWith(canonicalPrefix)
                 || identifier.startsWith("hdl:")
                 || identifier.startsWith("info:hdl")
-                || identifier.matches("^https?://hdl.handle.net/")
-                || identifier.matches("^https?://.+/handle/"))
+                || identifier.matches("^https?://hdl\\.handle\\.net/.*")
+                || identifier.matches("^https?://.+/handle/.*"))
         {
             return true;
         }
-        // return false if identifier starts with DOI prefix
-        if(identifier.startsWith("10.") || identifier.matches("^https?://dx.doi.org") || identifier.startsWith("doi:"))
-        	return false;
-        // return false if identifier does not contain a '/' or is a URL that does not match above patterns 
-        if(! identifier.contains("/") || identifier.matches("^https?://.+"))
-        	return false;
-        // otherwise, assumed a valid handle
-        return true;
+        // return true if base prefix matches in case of multi-instance deployment with derived prefixes demarcated by a dot "." 
+        if(prefix.contains(".")) {
+            String[] splitPrefix = prefix.split("\\.");
+            if(splitPrefix.length > 1 && identifier.startsWith(splitPrefix[0])) {
+                return true;
+            }
+        }
+        // otherwise, assume invalid handle
+        return false;
     }
 
     @Override
