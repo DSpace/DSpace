@@ -396,10 +396,10 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
-                        <!-- ERJ Open Access -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Atoxicological%5C+sciences%5C%7C%5C%7C%5C%7CToxicological%5C+Sciences"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-TOXSCICover.png" alt="Toxicological Sciences" /></a>
+                        <!-- ERJ Open Research -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aerj%5C+open%5C+research%5C%7C%5C%7C%5C%7CERJ%5C+Open%5C+Research"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ERJOR.png" alt="ERJ Open Research" /></a>
                         <!-- European Respiratory Journal -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aeuropean%5C+respiratory%5C+journal%5C%7C%5C%7C%5C%7CEuropean%5C+Respiratory%5C+Journal"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ERJOR.png" alt="European Respiratory Journal" /></a>
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aeuropean%5C+respiratory%5C+journal%5C%7C%5C%7C%5C%7CEuropean%5C+Respiratory%5C+Journal"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ERJ.png" alt="European Respiratory Journal" /></a>
                         <!-- Applications in Plant Sciences -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aapplications%5C+in%5C+plant%5C+sciences%5C%7C%5C%7C%5C%7CApplications%5C+in%5C+Plant%5C+Sciences"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-APPS.png" alt="Applications in Plant Sciences" /></a>
                         <!-- Journal of Systematics and Evolution -->
