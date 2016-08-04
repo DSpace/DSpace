@@ -37,6 +37,9 @@ public class Handle implements ReloadableEntity<Integer> {
     @JoinColumn(name = "resource_id")
     private DSpaceObject dso;
 
+    /*
+     * {@see org.dspace.core.Constants#Constants Constants}
+     */
     @Column(name = "resource_type_id")
     private Integer resourceTypeId;
 
@@ -74,10 +77,16 @@ public class Handle implements ReloadableEntity<Integer> {
         return dso;
     }
 
+    /*
+     * @param resourceTypeId the integer constant of the DSO, see {@link org.dspace.core.Constants#Constants Constants}
+     */
     public void setResourceTypeId(Integer resourceTypeId) {
         this.resourceTypeId = resourceTypeId;
     }
 
+    /*
+     * @return the integer constant of the DSO, see {@link org.dspace.core.Constants#Constants Constants}
+     */
     public Integer getResourceTypeId() {
         return resourceTypeId;
     }

@@ -88,7 +88,7 @@ public class DOI
      * returns the resource type of the DSpaceObject the DOI is or was assigned 
      * to. The resource type is set automatically when a DOI is assigned to a 
      * DSpaceObject, using {@link #setDSpaceObject(org.dspace.content.DSpaceObject) }.
-     * @return 
+     * @return the integer constant of the DSO, see {@link org.dspace.core.Constants#Constants Constants}
      */
     public Integer getResourceTypeId() {
         return this.resourceTypeId;

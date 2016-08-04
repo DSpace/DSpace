@@ -37,9 +37,9 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
 
     /**
      * Build the collection for the given DSpaceObject.  In this implementation,
-     * if the object is not a DSpace COllection, it will throw an exception
+     * if the object is not a DSpace Collection, it will throw DSpaceSwordException
      * @param dso
-     * @return
+     * @return the SWORD ATOM collection
      * @throws DSpaceSwordException
      */
     public SwordCollection buildCollection(Context context, DSpaceObject dso,

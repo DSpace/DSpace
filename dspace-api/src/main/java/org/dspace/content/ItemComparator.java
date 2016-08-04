@@ -225,7 +225,7 @@ public class ItemComparator implements Comparator, Serializable
     /**
      * Normalize the title of a Metadatum.
      * @param value
-     * @return
+     * @return normalized title
      */
     protected String normalizeTitle(MetadataValue value)
     {

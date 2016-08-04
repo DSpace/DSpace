@@ -1194,9 +1194,9 @@ public class METSManifest
     }
 
     /**
-     * Get an aray of all AMDID values for this object
+     * Get an array of all AMDID values for this object
      * 
-     * @return
+     * @return array of all AMDID values for this object
      * @throws MetadataValidationException if metadata validation error
      */
     protected String[] getAmdIDs()

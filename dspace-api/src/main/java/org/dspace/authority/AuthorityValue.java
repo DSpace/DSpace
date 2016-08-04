@@ -242,9 +242,9 @@ public class AuthorityValue {
     }
 
     /**
-     * Provides a string that will be allow a this AuthorityType to be recognized and provides information to create a new instance to be created using public AuthorityValue newInstance(String info).
-     * See the implementation of com.atmire.org.dspace.authority.AuthorityValueGenerator#generateRaw(java.lang.String, java.lang.String) for more precisions.
-     * @return 
+     * Provides a string that will allow this AuthorityType to be recognized and provides information to create a new instance to be created using public AuthorityValue newInstance(String info).
+     * See the implementation of {@link com.atmire.org.dspace.authority.AuthorityValueGenerator#generateRaw(java.lang.String, java.lang.String) AuthorityValueGenerator#generateRaw(java.lang.String, java.lang.String)} for more details.
+     * @return see {@link org.dspace.authority.service.AuthorityValueService#GENERATE AuthorityValueService.GENERATE}
      */
     public String generateString() {
         return AuthorityValueServiceImpl.GENERATE;
