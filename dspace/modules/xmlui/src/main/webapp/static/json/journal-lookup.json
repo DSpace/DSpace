@@ -271,6 +271,24 @@
         "integrated" : "Y"
      },
      {
+        "title" : "ERJ Open Research",
+        "sponsor" : "European Respiratory Society",
+        "issn" : "2312-0541",
+        "submission" : "A",
+        "embargo" : "T",
+        "hidden" : "T",
+        "integrated" : "Y"
+     },
+     {
+        "title" : "European Respiratory Journal",
+        "sponsor" : "European Respiratory Society",
+        "issn" : "0903-1936",
+        "submission" : "A",
+        "embargo" : "T",
+        "hidden" : "T",
+        "integrated" : "Y"
+     },
+     {
         "sponsor" : "Evidence-based Preclinical Medicine",
         "title" : "Evidence-based Preclinical Medicine",
         "hidden" : "N",

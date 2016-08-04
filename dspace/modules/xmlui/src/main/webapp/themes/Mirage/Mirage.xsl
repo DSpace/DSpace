@@ -396,15 +396,14 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
+                        <!-- ERJ Open Access -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Atoxicological%5C+sciences%5C%7C%5C%7C%5C%7CToxicological%5C+Sciences"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-TOXSCICover.png" alt="Toxicological Sciences" /></a>
+                        <!-- European Respiratory Journal -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aeuropean%5C+respiratory%5C+journal%5C%7C%5C%7C%5C%7CEuropean%5C+Respiratory%5C+Journal"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ERJOR.png" alt="European Respiratory Journal" /></a>
                         <!-- Applications in Plant Sciences -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aapplications%5C+in%5C+plant%5C+sciences%5C%7C%5C%7C%5C%7CApplications%5C+in%5C+Plant%5C+Sciences"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-APPS.png" alt="Applications in Plant Sciences" /></a>
                         <!-- Journal of Systematics and Evolution -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+systematics%5C+and%5C+evolution%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Systematics%5C+and%5C+Evolution"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JSE_Cover.png" alt="Journal of Systematics and Evolution" /></a>
-                        <!-- Toxicological Sciences -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Atoxicological%5C+sciences%5C%7C%5C%7C%5C%7CToxicological%5C+Sciences"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-TOXSCICover.png" alt="Toxicological Sciences" /></a>
-                        <!-- Behavioral Ecology -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abehavioral%5C+ecology%5C%7C%5C%7C%5C%7CBehavioral%5C+Ecology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BEHECOCover.png" alt="Behavioral Ecology" /></a>
-
 
                     </div>
                 </div>
