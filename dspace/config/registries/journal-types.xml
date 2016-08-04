@@ -49,11 +49,6 @@
 
     <dc-type>
         <schema>journal</schema>
-        <element>subscriptionPaid</element>
-    </dc-type>
-
-    <dc-type>
-        <schema>journal</schema>
         <element>sponsorName</element>
     </dc-type>
 
