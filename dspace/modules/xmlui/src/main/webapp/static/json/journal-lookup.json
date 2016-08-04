@@ -275,8 +275,8 @@
         "sponsor" : "European Respiratory Society",
         "issn" : "2312-0541",
         "submission" : "A",
-        "embargo" : "T",
-        "hidden" : "T",
+        "embargo" : "Y",
+        "hidden" : "Y",
         "integrated" : "Y"
      },
      {
@@ -284,8 +284,8 @@
         "sponsor" : "European Respiratory Society",
         "issn" : "0903-1936",
         "submission" : "A",
-        "embargo" : "T",
-        "hidden" : "T",
+        "embargo" : "Y",
+        "hidden" : "Y",
         "integrated" : "Y"
      },
      {
