@@ -43,7 +43,6 @@ import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -220,50 +219,6 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     }
     
     /**
-     * Create an initial set of AIPs for the test content generated in setUpClass() above.
-     */
-    @Before
-    @Override
-    public void init()
-    {
-        // call init() from AbstractUnitTest to initialize testing framework
-        super.init();
-        
-        try
-        {
-            // Locate the top level community (from our test data)
-            Community topCommunity = (Community) HandleManager.resolveToObject(context, topCommunityHandle);
-
-            log.info("init() - CREATE TEST AIPS");
-            // NOTE: This will not overwrite the AIPs if they already exist.
-            // But, it does ensure they are created PRIOR to running any of the below tests.
-            // (So, essentially, this runs ONCE...after that, it'll be ignored since AIPs already exist)
-            // While ideally, you don't want to share data between tests, generating AIPs is VERY timeconsuming.
-            createAIP(topCommunity, null, true, false);
-        }
-        catch(PackageException|CrosswalkException ex)
-        {
-            log.error("Packaging Error in init()", ex);
-            fail("Packaging Error in init(): " + ex.getMessage());
-        }
-        catch (AuthorizeException ex)
-        {
-            log.error("Authorization Error in init()", ex);
-            fail("Authorization Error in init(): " + ex.getMessage());
-        }
-        catch (IOException ex)
-        {
-            log.error("IO Error in init()", ex);
-            fail("IO Error in init(): " + ex.getMessage());
-        }
-        catch (SQLException ex)
-        {
-            log.error("SQL Error in init()", ex);
-            fail("SQL Error in init(): " + ex.getMessage());
-        }
-    }
-    
-    /**
      * Test restoration from AIP of entire Community Hierarchy
      */
     @Test
@@ -288,9 +243,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         HashMap<String,String> infoMap = new HashMap<String,String>();
         saveObjectInfo(topCommunity, infoMap);
 
-        // Ensure community & child AIPs are exported (but don't overwrite)
+        // Export community & child AIPs
         log.info("testRestoreCommunityHierarchy() - CREATE AIPs");
-        File aipFile = createAIP(topCommunity, null, true, false);
+        File aipFile = createAIP(topCommunity, null, true);
 
         // Delete everything from parent community on down
         log.info("testRestoreCommunityHierarchy() - DELETE Community Hierarchy");
@@ -367,9 +322,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Commit these changes to our DB
         context.commit();
 
-        // Ensure Community AIP is exported (overwrite it, as we just updated policies)
-        log.info("testRestoreRestrictedCommunity() - CREATE Community AIP (overwrite)");
-        File aipFile = createAIP(community, null, false, true);
+        // Export collection AIP
+        log.info("testRestoreRestrictedCommunity() - CREATE Community AIP");
+        File aipFile = createAIP(community, null, false);
 
         // Now, delete that Community
         log.info("testRestoreRestrictedCommunity() - DELETE Community");
@@ -425,9 +380,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Get the count of collections under our Community or any Sub-Communities
         int numberOfCollections = topCommunity.getAllCollections().length;
         
-        // Ensure community & child AIPs are exported (but don't overwrite)
+        // Export community & child AIPs
         log.info("testReplaceCommunityHierarchy() - CREATE AIPs");
-        File aipFile = createAIP(topCommunity, null, true, false);
+        File aipFile = createAIP(topCommunity, null, true);
         
         // Get some basic info about Collection to be deleted
         // In this scenario, we'll delete the test "Grandchild Collection" 
@@ -502,9 +457,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Get its current name / title
         String oldName = topCommunity.getName();
         
-        // Ensure only community AIP is exported (but don't overwrite)
+        // Export only community AIP
         log.info("testReplaceCommunityOnly() - CREATE Community AIP");
-        File aipFile = createAIP(topCommunity, null, false, false);
+        File aipFile = createAIP(topCommunity, null, false);
         
         // Change the Community name
         String newName = "This is NOT my Community name!";
@@ -550,9 +505,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         HashMap<String,String> infoMap = new HashMap<String,String>();
         saveObjectInfo(testCollection, infoMap);
 
-        // Ensure collection & child AIPs are exported (but don't overwrite)
+        // Export collection & child AIPs
         log.info("testRestoreCollectionHierarchy() - CREATE AIPs");
-        File aipFile = createAIP(testCollection, null, true, false);
+        File aipFile = createAIP(testCollection, null, true);
 
         // Delete everything from collection on down
         log.info("testRestoreCollectionHierarchy() - DELETE Collection Hierarchy");
@@ -619,9 +574,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Commit these changes to our DB
         context.commit();
 
-        // Ensure collection AIP is exported (overwrite it, as we just updated policies)
-        log.info("testRestoreRestrictedCollection() - CREATE Collection AIP (overwrite)");
-        File aipFile = createAIP(collection, null, false, true);
+        // Export collection AIP
+        log.info("testRestoreRestrictedCollection() - CREATE Collection AIP");
+        File aipFile = createAIP(collection, null, false);
 
         // Now, delete that Collection
         log.info("testRestoreRestrictedCollection() - DELETE Collection");
@@ -677,9 +632,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // How many items are in this Collection?
         int numberOfItems = testCollection.countItems();
         
-        // Ensure collection & child AIPs are exported (but don't overwrite)
+        // Export collection & child AIPs
         log.info("testReplaceCollectionHierarchy() - CREATE AIPs");
-        File aipFile = createAIP(testCollection, null, true, false);
+        File aipFile = createAIP(testCollection, null, true);
         
         // Get some basic info about Item to be deleted
         // In this scenario, we'll delete the test "Grandchild Collection Item #1" 
@@ -738,9 +693,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Get its current name / title
         String oldName = testCollection.getName();
         
-        // Ensure only collection AIP is exported (but don't overwrite)
+        // Export only collection AIP
         log.info("testReplaceCollectionOnly() - CREATE Collection AIP");
-        File aipFile = createAIP(testCollection, null, false, false);
+        File aipFile = createAIP(testCollection, null, false);
         
         // Change the Collection name
         String newName = "This is NOT my Collection name!";
@@ -801,9 +756,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         if(bitstreamCount<=0)
             fail("No test bitstream found for Item in testRestoreItem()!");
 
-        // Ensure item AIP is exported (but don't overwrite)
+        // Export item AIP
         log.info("testRestoreItem() - CREATE Item AIP");
-        File aipFile = createAIP(testItem, null, false, false);
+        File aipFile = createAIP(testItem, null, false);
         
         // Get parent, so we can restore under the same parent
         Collection parent = (Collection) testItem.getParentObject();
@@ -851,8 +806,19 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
 
         log.info("testRestoreRestrictedItem() - BEGIN");
 
-        // Locate the item (from our test data)
-        Item testItem = (Item) HandleManager.resolveToObject(context, testItemHandle);
+        // Locate the test Collection (as a parent)
+        Collection parent = (Collection) HandleManager.resolveToObject(context, testCollectionHandle);
+
+        // Create a brand new Item to test with (since we will be changing policies)
+        WorkspaceItem wsItem = WorkspaceItem.create(context, parent, false);
+        Item item = InstallItem.installItem(context, wsItem);
+        item.addMetadata("dc", "title", null, null, "Test Restricted Item");
+        // Create a test Bitstream in the ORIGINAL bundle
+        File f = new File(testProps.get("test.bitstream").toString());
+        Bitstream b = item.createSingleBitstream(new FileInputStream(f));
+        b.setName("Test Bitstream");
+        b.update();
+        item.update();
 
         // Create a custom resource policy for this Item
         List<ResourcePolicy> policies = new ArrayList<>();
@@ -862,26 +828,26 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         admin_policy.setGroup(adminGroup);
         admin_policy.setAction(Constants.READ);
         policies.add(admin_policy);
-        testItem.replaceAllItemPolicies(policies);
+        item.replaceAllItemPolicies(policies);
         // Commit these changes to our DB
         context.commit();
 
-        // Ensure item AIP is exported (overwrite it, as we just updated policies)
-        log.info("testRestoreRestrictedItem() - CREATE Item AIP (overwrite)");
-        File aipFile = createAIP(testItem, null, false, true);
+        // Export item AIP
+        log.info("testRestoreRestrictedItem() - CREATE Item AIP");
+        File aipFile = createAIP(item, null, false);
 
-        // Get parent, so we can restore under the same parent
-        Collection parent = (Collection) testItem.getParentObject();
-
+        // Get item handle, so we can check that it is later restored properly
+        String itemHandle = item.getHandle();
+        
         // Now, delete that item
         log.info("testRestoreRestrictedItem() - DELETE Item");
-        parent.removeItem(testItem);
+        parent.removeItem(item);
         // Commit these changes to our DB
         context.commit();
 
         // Assert the deleted item no longer exists
-        DSpaceObject obj = HandleManager.resolveToObject(context, testItemHandle);
-        assertThat("testRestoreRestrictedItem() item " + testItemHandle + " doesn't exist", obj, nullValue());
+        DSpaceObject obj = HandleManager.resolveToObject(context, itemHandle);
+        assertThat("testRestoreRestrictedItem() item " + itemHandle + " doesn't exist", obj, nullValue());
 
         // Restore Item from AIP (non-recursive)
         log.info("testRestoreRestrictedItem() - RESTORE Item");
@@ -890,8 +856,8 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         context.commit();
 
         // Assert the deleted item is RESTORED
-        DSpaceObject objRestored = HandleManager.resolveToObject(context, testItemHandle);
-        assertThat("testRestoreRestrictedItem() item " + testItemHandle + " exists", objRestored, notNullValue());
+        DSpaceObject objRestored = HandleManager.resolveToObject(context, itemHandle);
+        assertThat("testRestoreRestrictedItem() item " + itemHandle + " exists", objRestored, notNullValue());
 
         // Assert the number of restored policies is equal
         List<ResourcePolicy> policiesRestored = AuthorizeManager.getPolicies(context, objRestored);
@@ -912,46 +878,57 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     @Test
     public void testRestoreItemNoPolicies() throws Exception
     {
-        new NonStrictExpectations(authorizeService.getClass())
+        new NonStrictExpectations(AuthorizeManager.class)
         {{
             // Allow Full Admin permissions. Since we are working with an object
             // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
-            authorizeService.isAdmin((Context) any); result = true;
+            AuthorizeManager.isAdmin((Context) any); result = true;
         }};
 
         log.info("testRestoreItemNoPolicies() - BEGIN");
 
-        // Locate the item (from our test data)
-        Item testItem = (Item) handleService.resolveToObject(context, testItemHandle);
+        // Locate the test Collection (as a parent)
+        Collection parent = (Collection) HandleManager.resolveToObject(context, testCollectionHandle);
+
+        // Create a brand new Item to test with (since we will be changing policies)
+        WorkspaceItem wsItem = WorkspaceItem.create(context, parent, false);
+        Item item = InstallItem.installItem(context, wsItem);
+        item.addMetadata("dc", "title", null, null, "Test No Policies Item");
+        // Create a test Bitstream in the ORIGINAL bundle
+        File f = new File(testProps.get("test.bitstream").toString());
+        Bitstream b = item.createSingleBitstream(new FileInputStream(f));
+        b.setName("Test Bitstream");
+        b.update();
+        item.update();
 
         // Remove all existing policies from the Item
-        authorizeService.removeAllPolicies(context, testItem);
+        AuthorizeManager.removeAllPolicies(context, item);
 
-        // Ensure item AIP is exported (overwrite it, as we just updated policies)
-        log.info("testRestoreItemNoPolicies() - CREATE Item AIP (overwrite)");
-        File aipFile = createAIP(testItem, null, false, true);
+        // Export item AIP
+        log.info("testRestoreItemNoPolicies() - CREATE Item AIP");
+        File aipFile = createAIP(item, null, false);
 
-        // Get parent, so we can restore under the same parent
-        Collection parent = (Collection) itemService.getParentObject(context, testItem);
+        // Get item handle, so we can check that it is later restored properly
+        String itemHandle = item.getHandle();
 
         // Now, delete that item
         log.info("testRestoreItemNoPolicies() - DELETE Item");
-        collectionService.removeItem(context, parent, testItem);
+        parent.removeItem(item);
 
         // Assert the deleted item no longer exists
-        DSpaceObject obj = handleService.resolveToObject(context, testItemHandle);
-        assertThat("testRestoreItemNoPolicies() item " + testItemHandle + " doesn't exist", obj, nullValue());
+        DSpaceObject obj = HandleManager.resolveToObject(context, itemHandle);
+        assertThat("testRestoreItemNoPolicies() item " + itemHandle + " doesn't exist", obj, nullValue());
 
         // Restore Item from AIP (non-recursive)
         log.info("testRestoreItemNoPolicies() - RESTORE Item");
         restoreFromAIP(parent, aipFile, null, false);
 
         // Assert the deleted item is RESTORED
-        DSpaceObject objRestored = handleService.resolveToObject(context, testItemHandle);
-        assertThat("testRestoreItemNoPolicies() item " + testItemHandle + " exists", objRestored, notNullValue());
+        DSpaceObject objRestored = HandleManager.resolveToObject(context, itemHandle);
+        assertThat("testRestoreItemNoPolicies() item " + itemHandle + " exists", objRestored, notNullValue());
 
         // Assert the restored item also has ZERO policies
-        List<ResourcePolicy> policiesRestored = authorizeService.getPolicies(context, objRestored);
+        List<ResourcePolicy> policiesRestored = AuthorizeManager.getPolicies(context, objRestored);
         assertEquals("testRestoreItemNoPolicies() restored policy count is zero", 0, policiesRestored.size());
 
         log.info("testRestoreItemNoPolicies() - END");
@@ -978,9 +955,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Get its current name / title
         String oldName = testItem.getName();
         
-        // Ensure item AIP is exported (but don't overwrite)
+        // Export item AIP
         log.info("testReplaceItem() - CREATE Item AIP");
-        File aipFile = createAIP(testItem, null, false, false);
+        File aipFile = createAIP(testItem, null, false);
         
         // Change the Item name
         String newName = "This is NOT my Item name!";
@@ -1026,9 +1003,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         Collection[] mappedCollections = item.getCollections();
         assertEquals("testRestoreMappedItem() item " + testMappedItemHandle + " is mapped to multiple collections", 2, mappedCollections.length);
         
-        // Ensure mapped item AIP is exported (but don't overwrite)
+        // Export mapped item AIP
         log.info("testRestoreMappedItem() - CREATE Mapped Item AIP");
-        File aipFile = createAIP(item, null, false, false);
+        File aipFile = createAIP(item, null, false);
         
         // Now, delete that item (must be removed from BOTH collections to delete it)
         log.info("testRestoreMappedItem() - DELETE Item");
@@ -1065,10 +1042,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
      * @param dso DSpaceObject to create AIP(s) for
      * @param pkParams any special PackageParameters to pass (if any)
      * @param recursive whether to recursively create AIPs or just a single AIP
-     * @param overwrite whether to overwrite the local AIP file if it is found
      * @return exported root AIP file
      */
-    private File createAIP(DSpaceObject dso, PackageParameters pkgParams, boolean recursive, boolean overwrite)
+    private File createAIP(DSpaceObject dso, PackageParameters pkgParams, boolean recursive)
             throws PackageException, CrosswalkException, AuthorizeException, SQLException, IOException
     {
         // Get a reference to the configured "AIP" package disseminator
@@ -1077,14 +1053,13 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         if (dip == null)
         {
             fail("Could not find a disseminator for type 'AIP'");
+            return null;
         }
-        
-        // Export file (this is placed in JUnit's temporary folder, so that it can be cleaned up after tests complete)
-        File exportAIPFile = new File(testFolder.getRoot().getAbsolutePath() + File.separator + PackageUtils.getPackageName(dso, "zip"));
-        
-        // To save time, we'll skip re-exporting AIPs, unless overwrite == true
-        if(!exportAIPFile.exists() || overwrite)
+        else
         {
+            // Export file (this is placed in JUnit's temporary folder, so that it can be cleaned up after tests complete)
+            File exportAIPFile = new File(testFolder.getRoot().getAbsolutePath() + File.separator + PackageUtils.getPackageName(dso, "zip"));
+
             // If unspecified, set default PackageParameters
             if (pkgParams==null)
                 pkgParams = new PackageParameters();
@@ -1094,9 +1069,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
                 dip.disseminateAll(context, dso, pkgParams, exportAIPFile);
             else
                 dip.disseminate(context, dso, pkgParams, exportAIPFile);
+
+            return exportAIPFile;
         }
-        
-        return exportAIPFile;
     }
     
     /**
@@ -1117,24 +1092,29 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         {
             fail("Could not find a ingestor for type 'AIP'");
         }
-        
-        if(!aipFile.exists())
-        {
-            fail("AIP Package File does NOT exist: " + aipFile.getAbsolutePath());
-        }
-        
-        // If unspecified, set default PackageParameters
-        if(pkgParams==null)
-            pkgParams = new PackageParameters();
-        
-        // Ensure restore mode is enabled
-        pkgParams.setRestoreModeEnabled(true);
-        
-        // Actually ingest the object(s) from AIPs
-        if(recursive)
-            sip.ingestAll(context, parent, aipFile, pkgParams, null);
         else
-            sip.ingest(context, parent, aipFile, pkgParams, null);
+        {
+            if(!aipFile.exists())
+            {
+                fail("AIP Package File does NOT exist: " + aipFile.getAbsolutePath());
+            }
+
+            // If unspecified, set default PackageParameters
+            if(pkgParams==null)
+                pkgParams = new PackageParameters();
+
+            // Ensure restore mode is enabled
+            pkgParams.setRestoreModeEnabled(true);
+
+            // Actually ingest the object(s) from AIPs
+            if(recursive)
+                sip.ingestAll(context, parent, aipFile, pkgParams, null);
+            else
+                sip.ingest(context, parent, aipFile, pkgParams, null);
+
+            // Delete the AIP file as we are done with it
+            aipFile.delete();
+        }
     }
     
     /**
@@ -1155,24 +1135,29 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         {
             fail("Could not find a ingestor for type 'AIP'");
         }
-        
-        if(!aipFile.exists())
-        {
-            fail("AIP Package File does NOT exist: " + aipFile.getAbsolutePath());
-        }
-        
-        // If unspecified, set default PackageParameters
-        if (pkgParams==null)
-            pkgParams = new PackageParameters();
-        
-        // Ensure restore mode is enabled
-        pkgParams.setRestoreModeEnabled(true);
-        
-        // Actually replace the object(s) from AIPs
-        if(recursive)
-            sip.replaceAll(context, dso, aipFile, pkgParams);
         else
-            sip.replace(context, dso, aipFile, pkgParams);
+        {
+            if(!aipFile.exists())
+            {
+                fail("AIP Package File does NOT exist: " + aipFile.getAbsolutePath());
+            }
+
+            // If unspecified, set default PackageParameters
+            if (pkgParams==null)
+                pkgParams = new PackageParameters();
+
+            // Ensure restore mode is enabled
+            pkgParams.setRestoreModeEnabled(true);
+
+            // Actually replace the object(s) from AIPs
+            if(recursive)
+                sip.replaceAll(context, dso, aipFile, pkgParams);
+            else
+                sip.replace(context, dso, aipFile, pkgParams);
+
+            // Delete the AIP file as we are done with it
+            aipFile.delete();
+        }
     }
     
     /**
