@@ -916,6 +916,57 @@ public class ITDSpaceAIP extends AbstractUnitTest
     }
 
     /**
+     * Test restoration from AIP of an Item that has no access policies associated with it.
+     */
+    @Test
+    public void testRestoreItemNoPolicies() throws Exception
+    {
+        new NonStrictExpectations(authorizeService.getClass())
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
+            authorizeService.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testRestoreItemNoPolicies() - BEGIN");
+
+        // Locate the item (from our test data)
+        Item testItem = (Item) handleService.resolveToObject(context, testItemHandle);
+
+        // Remove all existing policies from the Item
+        authorizeService.removeAllPolicies(context, testItem);
+
+        // Ensure item AIP is exported (overwrite it, as we just updated policies)
+        log.info("testRestoreItemNoPolicies() - CREATE Item AIP (overwrite)");
+        File aipFile = createAIP(testItem, null, false, true);
+
+        // Get parent, so we can restore under the same parent
+        Collection parent = (Collection) itemService.getParentObject(context, testItem);
+
+        // Now, delete that item
+        log.info("testRestoreItemNoPolicies() - DELETE Item");
+        collectionService.removeItem(context, parent, testItem);
+
+        // Assert the deleted item no longer exists
+        DSpaceObject obj = handleService.resolveToObject(context, testItemHandle);
+        assertThat("testRestoreItemNoPolicies() item " + testItemHandle + " doesn't exist", obj, nullValue());
+
+        // Restore Item from AIP (non-recursive)
+        log.info("testRestoreItemNoPolicies() - RESTORE Item");
+        restoreFromAIP(parent, aipFile, null, false);
+
+        // Assert the deleted item is RESTORED
+        DSpaceObject objRestored = handleService.resolveToObject(context, testItemHandle);
+        assertThat("testRestoreItemNoPolicies() item " + testItemHandle + " exists", objRestored, notNullValue());
+
+        // Assert the restored item also has ZERO policies
+        List<ResourcePolicy> policiesRestored = authorizeService.getPolicies(context, objRestored);
+        assertEquals("testRestoreItemNoPolicies() restored policy count is zero", 0, policiesRestored.size());
+
+        log.info("testRestoreItemNoPolicies() - END");
+    }
+
+    /**
      * Test replacement from AIP of an Item object
      */
     @Test
