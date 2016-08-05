@@ -118,7 +118,7 @@ public class BitstreamResource extends Resource
 
             bitstream = new Bitstream(dspaceBitstream, servletContext, expand, context);
             context.complete();
-            log.trace("Bitsream(id=" + bitstreamId + ") was successfully read.");
+            log.trace("Bitstream(id=" + bitstreamId + ") was successfully read.");
 
         }
         catch (SQLException e)
@@ -311,7 +311,7 @@ public class BitstreamResource extends Resource
             writeStats(dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
-            log.trace("Bitsream(id=" + bitstreamId + ") data was successfully read.");
+            log.trace("Bitstream(id=" + bitstreamId + ") data was successfully read.");
             inputStream = bitstreamService.retrieve(context, dspaceBitstream);
             type = dspaceBitstream.getFormat(context).getMIMEType();
 

@@ -103,7 +103,7 @@ implements DOIConnector
     /** 
      * DisseminationCrosswalk to map local metadata into DataCite metadata.
      * The name of the crosswalk is set by spring dependency injection using
-     * {@link setDisseminationCrosswalk(String) setDisseminationCrosswalk} which
+     * {@link #setDisseminationCrosswalkName(String) setDisseminationCrosswalkName} which
      * instantiates the crosswalk.
      */
     protected ParameterizedDisseminationCrosswalk xwalk;
@@ -545,7 +545,7 @@ implements DOIConnector
             // 412 Precondition failed: DOI was not reserved before registration!
             case (412) :
             {
-                log.error("We tried to register a DOI {} that was not reserved "
+                log.error("We tried to register a DOI {} that has not been reserved "
                         + "before! The registration agency told us: {}.", doi,
                         resp.getContent());
                 throw new DOIIdentifierException("There was an error in handling "
@@ -571,8 +571,8 @@ implements DOIConnector
     public void updateMetadata(Context context, DSpaceObject dso, String doi) 
             throws DOIIdentifierException
     { 
-        // We can use reserveDOI to update metadata. Datacite API uses the same
-        // request for reservartion as for updating metadata.
+        // We can use reserveDOI to update metadata. DataCite API uses the same
+        // request for reservation as for updating metadata.
         this.reserveDOI(context, dso, doi);
     }
     
@@ -612,7 +612,7 @@ implements DOIConnector
         }
         finally
         {
-            // release ressources
+            // release resources
             try
             {
                 EntityUtils.consume(reqEntity);
@@ -731,7 +731,7 @@ implements DOIConnector
         }
         finally
         {
-            // release ressources
+            // release resources
             try
             {
                 EntityUtils.consume(reqEntity);
@@ -748,7 +748,7 @@ implements DOIConnector
      * 
      * @param req
      * @param doi
-     * @return
+     * @return response from DataCite
      * @throws DOIIdentifierException if DOI error
      */
     protected DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
@@ -774,7 +774,7 @@ implements DOIConnector
                 content = EntityUtils.toString(entity, "UTF-8");
             }
 
-            /* While debugging it can be useful to see whitch requests are send:
+            /* While debugging it can be useful to see which requests are sent:
              *
              * log.debug("Going to send HTTP request of type " + req.getMethod() + ".");
              * log.debug("Will be send to " + req.getURI().toString() + ".");
@@ -861,7 +861,7 @@ implements DOIConnector
         {
             try
             {
-                // Release any ressources used by HTTP-Request.
+                // Release any resources used by HTTP-Request.
                 if (null != entity)
                 {
                     EntityUtils.consume(entity);

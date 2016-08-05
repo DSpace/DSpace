@@ -323,7 +323,7 @@ public class VersionUtil
      * 
      * @param context
      * @param stringVersionID
-     * @return
+     * @return version summary string
      */
     public static String getSummary(Context context, String stringVersionID)
     {

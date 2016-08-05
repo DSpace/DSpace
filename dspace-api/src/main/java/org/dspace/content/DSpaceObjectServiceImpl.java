@@ -363,11 +363,17 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     /**
      * Retrieve first metadata field value
      * @param dso
-     * @param language
-     * @param element
+     *            The DSpaceObject which we ask for metadata.
      * @param schema
+     *            the schema for the metadata field. <em>Must</em> match
+     *            the <code>name</code> of an existing metadata schema.
+     * @param element
+     *            the element to match, or <code>Item.ANY</code>
      * @param qualifier
-     * @return 
+     *            the qualifier to match, or <code>Item.ANY</code>
+     * @param language
+     *            the language to match, or <code>Item.ANY</code>
+     * @return the first metadata field value
      */
     @Override
     public String getMetadataFirstValue(T dso, String schema, String element, String qualifier, String language){

@@ -253,10 +253,10 @@ public class AccessSettingTag extends TagSupport
     }
 
     /**
-     * Set the browseInfo
+     * Set the subInfo (SubmissionInfo)
      *
-     * @param browseInfo
-     *            the browseInfo
+     * @param subInfo
+     *            the subInfo
      */
     public void setSubInfo(SubmissionInfo subInfo)
     {
@@ -276,7 +276,7 @@ public class AccessSettingTag extends TagSupport
     /**
      * Set the the dso
      *
-     * @param the dso
+     * @param dso
      *            the dso
      */
     public void setDso(DSpaceObject dso)
@@ -297,7 +297,7 @@ public class AccessSettingTag extends TagSupport
     /**
      * Set the the rp
      *
-     * @param the rp
+     * @param rp
      *            the rp
      */
     public void setRp(ResourcePolicy rp)
