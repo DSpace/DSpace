@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Date;
 
 import java.text.SimpleDateFormat;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -435,171 +434,167 @@ public class METSRightsCrosswalk
     public void ingest(Context context, DSpaceObject dso, List<Element> ml)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
-        // we cannot crosswalk METSRights to a SITE object
+        // SITE objects are not supported by the METSRightsCrosswalk
         if (dso.getType() == Constants.SITE)
         {
             throw new CrosswalkObjectNotSupported("Wrong target object type, METSRightsCrosswalk cannot crosswalk a SITE object.");
         }
 
-        if(!ml.isEmpty())
+        // If we're fed the top-level <RightsDeclarationMD> wrapper element, recurse into its guts.
+        // What we need to analyze are the <Context> elements underneath it.
+        if(!ml.isEmpty() && ml.get(0).getName().equals("RightsDeclarationMD"))
         {
-            Element topElement = ml.get(0);
-            // If we're fed a <RightsDeclarationMD> wrapper object, recurse on its guts
-            if(topElement.getName().equals("RightsDeclarationMD"))
-            {
-                ingest(context, dso, topElement.getChildren());
-            }
+            ingest(context, dso, ml.get(0).getChildren());
         }
-        
-        // Loop through each Element in the List, creating a ResourcePolicy for each
-        List<ResourcePolicy> policies = new ArrayList<>();
-        for (Element element : ml)
+        else
         {
-            // Must be a "Context" section (where permissions are stored)
-            if (element.getName().equals("Context"))
+            // Loop through each <Context> Element in the passed in List, creating a ResourcePolicy for each
+            List<ResourcePolicy> policies = new ArrayList<>();
+            for (Element element : ml)
             {
-                //get what class of context this is
-                String contextClass = element.getAttributeValue("CONTEXTCLASS");
+                // Must be a "Context" section (where permissions are stored)
+                if (element.getName().equals("Context"))
+                {
+                    //get what class of context this is
+                    String contextClass = element.getAttributeValue("CONTEXTCLASS");
 
-                ResourcePolicy rp = ResourcePolicy.create(context);
-                SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
-        		
-                // get reference to the <Permissions> element
-                // Note: we are assuming here that there will only ever be ONE <Permissions>
-                //  element. Currently there are no known use cases for multiple.
-                Element permsElement = element.getChild("Permissions", METSRights_NS);
-                if(permsElement == null) {
-                	log.error("No <Permissions> element was found. Skipping this <Context> element.");
-                	continue;
-                }
-                
-                if (element.getAttributeValue("rpName") != null)
-                {
-                    rp.setRpName(element.getAttributeValue("rpName"));
-                }
-                try {
-                    if (element.getAttributeValue("start-date") != null)
-                    {
-                        rp.setStartDate(sdf.parse(element.getAttributeValue("start-date")));
-                    }
-                    if (element.getAttributeValue("end-date") != null)
-                    {
-                    	rp.setEndDate(sdf.parse(element.getAttributeValue("end-date")));
-                    }
-                }catch (ParseException ex) {
-                    log.error("Failed to parse embargo date. The date needs to be in the format 'yyyy-MM-dd'.", ex);
-                }
-                
-                //Check if this permission pertains to Anonymous users
-                if(ANONYMOUS_CONTEXTCLASS.equals(contextClass))
-                {
-                    //get DSpace Anonymous group, ID=0
-                    Group anonGroup = Group.find(context, Group.ANONYMOUS_ID);
-                    if(anonGroup==null)
-                    {
-                        throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Anonymous Group is missing from the database.");
+                    ResourcePolicy rp = ResourcePolicy.create(context);
+                    SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
+
+                    // get reference to the <Permissions> element
+                    // Note: we are assuming here that there will only ever be ONE <Permissions>
+                    //  element. Currently there are no known use cases for multiple.
+                    Element permsElement = element.getChild("Permissions", METSRights_NS);
+                    if(permsElement == null) {
+                            log.error("No <Permissions> element was found. Skipping this <Context> element.");
+                            continue;
                     }
 
-                    rp.setGroup(anonGroup);
-                } // else if this permission declaration pertains to Administrators
-                else if(ADMIN_CONTEXTCLASS.equals(contextClass))
-                {
-                    //get DSpace Administrator group, ID=1
-                    Group adminGroup = Group.find(context, Group.ADMIN_ID);
-                    if(adminGroup==null)
+                    if (element.getAttributeValue("rpName") != null)
                     {
-                        throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Administrator Group is missing from the database.");
+                        rp.setRpName(element.getAttributeValue("rpName"));
                     }
-
-                    rp.setGroup(adminGroup);
-                } // else if this permission pertains to another DSpace group
-                else if(GROUP_CONTEXTCLASS.equals(contextClass))
-                {
-                    try
-                    {
-                        //we need to find the name of DSpace group it pertains to
-                        //Get the text within the <UserName> child element,
-                        // this is the group's name
-                        String groupName = element.getChildTextTrim("UserName", METSRights_NS);
-
-                        //Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
-                        // from its external format (e.g. COLLECTION_<handle>_ADMIN)
-                        groupName = PackageUtils.translateGroupNameForImport(context, groupName);
-
-                        //Check if this group exists in DSpace already
-                        Group group = Group.findByName(context, groupName);
-
-                        //if not found, throw an error -- user should restore group from the SITE AIP
-                        if(group==null)
+                    try {
+                        if (element.getAttributeValue("start-date") != null)
                         {
-                            throw new CrosswalkInternalException("Cannot restore Group permissions on object ("
+                            rp.setStartDate(sdf.parse(element.getAttributeValue("start-date")));
+                        }
+                        if (element.getAttributeValue("end-date") != null)
+                        {
+                            rp.setEndDate(sdf.parse(element.getAttributeValue("end-date")));
+                        }
+                    }catch (ParseException ex) {
+                        log.error("Failed to parse embargo date. The date needs to be in the format 'yyyy-MM-dd'.", ex);
+                    }
+
+                    //Check if this permission pertains to Anonymous users
+                    if(ANONYMOUS_CONTEXTCLASS.equals(contextClass))
+                    {
+                        //get DSpace Anonymous group, ID=0
+                        Group anonGroup = Group.find(context, Group.ANONYMOUS_ID);
+                        if(anonGroup==null)
+                        {
+                            throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Anonymous Group is missing from the database.");
+                        }
+
+                        rp.setGroup(anonGroup);
+                    } // else if this permission declaration pertains to Administrators
+                    else if(ADMIN_CONTEXTCLASS.equals(contextClass))
+                    {
+                        //get DSpace Administrator group, ID=1
+                        Group adminGroup = Group.find(context, Group.ADMIN_ID);
+                        if(adminGroup==null)
+                        {
+                            throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Administrator Group is missing from the database.");
+                        }
+
+                        rp.setGroup(adminGroup);
+                    } // else if this permission pertains to another DSpace group
+                    else if(GROUP_CONTEXTCLASS.equals(contextClass))
+                    {
+                        try
+                        {
+                            //we need to find the name of DSpace group it pertains to
+                            //Get the text within the <UserName> child element,
+                            // this is the group's name
+                            String groupName = element.getChildTextTrim("UserName", METSRights_NS);
+
+                            //Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
+                            // from its external format (e.g. COLLECTION_<handle>_ADMIN)
+                            groupName = PackageUtils.translateGroupNameForImport(context, groupName);
+
+                            //Check if this group exists in DSpace already
+                            Group group = Group.findByName(context, groupName);
+
+                            //if not found, throw an error -- user should restore group from the SITE AIP
+                            if(group==null)
+                            {
+                                throw new CrosswalkInternalException("Cannot restore Group permissions on object ("
+                                        + "type=" + Constants.typeText[dso.getType()] + ", "
+                                        + "handle=" + dso.getHandle() + ", "
+                                        + "ID=" + dso.getID()
+                                        + "). The Group named '" + groupName + "' is missing from DSpace. "
+                                        + "Please restore this group using the SITE AIP, or recreate it.");
+                            }
+
+                            //assign group to policy
+                            rp.setGroup(group);
+                        }
+                        catch(PackageException pe)
+                        {
+                            //A PackageException will only be thrown if translateDefaultGroupName() fails
+                            //We'll just wrap it as a CrosswalkException and throw it upwards
+                            throw new CrosswalkException(pe);
+                        }
+                    }// else if this permission pertains to a DSpace person
+                    else if(PERSON_CONTEXTCLASS.equals(contextClass))
+                    {
+                        //we need to find the person it pertains to
+                        // Get the text within the <UserName> child element,
+                        // this is the person's email address
+                        String personEmail = element.getChildTextTrim("UserName", METSRights_NS);
+
+                        //Check if this person exists in DSpace already
+                        EPerson person = EPerson.findByEmail(context, personEmail);
+
+                        //If cannot find by email, try by netID
+                        //(though METSRights should contain email if it was exported by DSpace)
+                        if(person==null)
+                        {
+                            person = EPerson.findByNetid(context, personEmail);
+                        }
+
+                        //if not found, throw an error -- user should restore person from the SITE AIP
+                        if(person==null)
+                        {
+                            throw new CrosswalkInternalException("Cannot restore Person permissions on object ("
                                     + "type=" + Constants.typeText[dso.getType()] + ", "
                                     + "handle=" + dso.getHandle() + ", "
                                     + "ID=" + dso.getID()
-                                    + "). The Group named '" + groupName + "' is missing from DSpace. "
-                                    + "Please restore this group using the SITE AIP, or recreate it.");
+                                    + "). The Person with email/netid '" + personEmail + "' is missing from DSpace. "
+                                    + "Please restore this Person object using the SITE AIP, or recreate it.");
                         }
 
-                        //assign group to policy
-                        rp.setGroup(group);
-                    }
-                    catch(PackageException pe)
-                    {
-                        //A PackageException will only be thrown if translateDefaultGroupName() fails
-                        //We'll just wrap it as a CrosswalkException and throw it upwards
-                        throw new CrosswalkException(pe);
-                    }
-                }// else if this permission pertains to a DSpace person
-                else if(PERSON_CONTEXTCLASS.equals(contextClass))
-                {
-                    //we need to find the person it pertains to
-                    // Get the text within the <UserName> child element,
-                    // this is the person's email address
-                    String personEmail = element.getChildTextTrim("UserName", METSRights_NS);
-
-                    //Check if this person exists in DSpace already
-                    EPerson person = EPerson.findByEmail(context, personEmail);
-
-                    //If cannot find by email, try by netID
-                    //(though METSRights should contain email if it was exported by DSpace)
-                    if(person==null)
-                    {
-                        person = EPerson.findByNetid(context, personEmail);
+                        //assign person to the policy
+                        rp.setEPerson(person);
+                    }//end if Person
+                    else {
+                        log.error("Unrecognized CONTEXTCLASS:  " + contextClass);
                     }
 
-                    //if not found, throw an error -- user should restore person from the SITE AIP
-                    if(person==null)
-                    {
-                        throw new CrosswalkInternalException("Cannot restore Person permissions on object ("
-                                + "type=" + Constants.typeText[dso.getType()] + ", "
-                                + "handle=" + dso.getHandle() + ", "
-                                + "ID=" + dso.getID()
-                                + "). The Person with email/netid '" + personEmail + "' is missing from DSpace. "
-                                + "Please restore this Person object using the SITE AIP, or recreate it.");
-                    }
+                    //set permissions on policy add to list of policies
+                    rp.setAction(parsePermissions(permsElement));
+                    policies.add(rp);
+                } //end if "Context" element
+            }//end for loop
 
-                    //assign person to the policy
-                    rp.setEPerson(person);
-                }//end if Person
-                else {
-                    log.error("Unrecognized CONTEXTCLASS:  " + contextClass);
-                }
-                
-                //set permissions on policy add to list of policies
-                rp.setAction(parsePermissions(permsElement));
-                policies.add(rp);
-            } //end if "Context" element
-        }//end for loop
-        
-        // Finally, as long as the compiled list of policies is not empty,
-        // replace existing object policies with the new ones
-        if(!CollectionUtils.isEmpty(policies))
-        {
-            // Remove all existing policies
+            // Finally, we need to remove any existing policies from the current object,
+            // and replace them with the policies provided via METSRights. NOTE:
+            // if the list of policies provided by METSRights is an empty list, then
+            // the final object will have no policies attached.
             AuthorizeManager.removeAllPolicies(context, dso);
-            // Update with new list of policies
             AuthorizeManager.addPolicies(context, policies, dso);
-        }
+        } // end else
     }
 
     /**
