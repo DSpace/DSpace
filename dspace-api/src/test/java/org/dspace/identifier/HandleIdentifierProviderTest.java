@@ -25,6 +25,12 @@ import static org.junit.Assert.*;
 
 /**
  * Test the HandleIdentifierProvider.
+ * <p>
+ * We need to define a Bean for the System Under Test so that we can get Spring
+ * to do autowiring on it.  There are several conflicting definitions of Handle
+ * provider beans in the XML Spring configuration, so to test them all we'd have
+ * to reconfigure between tests.  Instead, create a new definition just for
+ * testing so that we know that we have the one that we want.
  *
  * @author mwood
  */
@@ -33,9 +39,6 @@ public class HandleIdentifierProviderTest
 {
     /** A name for our testing bean definition. */
     private static final String BEAN_NAME = "test-HandleIdentifierProvider";
-
-    /** DSpace service manager. */
-    private static ServiceManager serviceManager;
 
     /** Spring application context. */
     private static GenericApplicationContext applicationContext;
@@ -47,17 +50,14 @@ public class HandleIdentifierProviderTest
     @BeforeClass
     public static void setUpClass()
     {
-        serviceManager = kernelImpl.getServiceManager();
+        ServiceManager serviceManager = kernelImpl.getServiceManager();
 
-        // We need to define a Bean for the System Under Test so that we can
-        // get Spring to do autowiring on it.  There are several conflicting
-        // definitions of Handle provider beans, so to test them all we'd have
-        // to reconfigure between tests.  Instead, create a new definition just
-        // for testing so that we know we have the one that we want.
         applicationContext
                 = (GenericApplicationContext) serviceManager.getServiceByName(
                         ApplicationContext.class.getName(),
                         ApplicationContext.class);
+
+        // Define our special bean for testing the target class.
         GenericBeanDefinition bd = new GenericBeanDefinition();
         bd.setBeanClass(HandleIdentifierProvider.class);
         applicationContext.registerBeanDefinition(BEAN_NAME, bd); // Now our SUT is a Bean.
@@ -101,7 +101,7 @@ public class HandleIdentifierProviderTest
     /**
      * Test of supports(String) method, of class HandleIdentifierProvider.
      * Read a property list of identifiers and ask an instance of the provider
-     * whether it supports them.  Properties are "identifier = true/false",
+     * whether it supports each.  Properties are "identifier = true/false",
      * where the value indicates whether the identifier should be supported.
      * The list is a .properties on the class path.
      */
