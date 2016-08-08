@@ -25,10 +25,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionReader;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * This is the Spring implementation of the service manager.
@@ -39,12 +37,12 @@ public final class SpringServiceManager implements ServiceManagerSystem {
 
     private static Logger log = LoggerFactory.getLogger(SpringServiceManager.class);
 
-    private GenericApplicationContext applicationContext;
+    private ClassPathXmlApplicationContext applicationContext;
 
     /**
      * @return the parent core Spring {@link ApplicationContext}
      */
-    public GenericApplicationContext getApplicationContext() {
+    public ClassPathXmlApplicationContext getApplicationContext() {
         return applicationContext;
     }
     /**
@@ -205,24 +203,15 @@ public final class SpringServiceManager implements ServiceManagerSystem {
                 }
             }
         }
-
-        applicationContext = new GenericApplicationContext();
-        // Make sure that the Spring files from the configuration directory can
-        // override the Spring files from our JARs.
+        String[] allPaths = pathList.toArray(new String[pathList.size()]);
+        applicationContext = new ClassPathXmlApplicationContext(allPaths, false);
+        // Make sure that the spring files from the config directoy can override the spring files from our jars
         applicationContext.setAllowBeanDefinitionOverriding(true);
         applicationContext.setAllowCircularReferences(true);
         //applicationContext.registerShutdownHook(); // this interferes with the kernel shutdown hook
         // add the config interceptors (partially done in the xml)
         applicationContext.addBeanFactoryPostProcessor( new DSpaceBeanFactoryPostProcessor(parent, configurationService, testMode) );
-
-        // Load all of those XML bean definition files.
-        BeanDefinitionReader bdr = new XmlBeanDefinitionReader(applicationContext);
-        String[] allPaths = pathList.toArray(new String[pathList.size()]);
-        bdr.loadBeanDefinitions(allPaths);
-
-        // Resolve bean relationships, instantiate singletons, etc.
         applicationContext.refresh();
-
         if (developmentMode) {
             log.warn("Spring Service Manager is running in developmentMode, services will be loaded on demand only");
             // TODO find a way to set this sucker to super duper lazy mode? it is currently not actually doing it
@@ -230,7 +219,6 @@ public final class SpringServiceManager implements ServiceManagerSystem {
             applicationContext.getBeanFactory().preInstantiateSingletons();
             applicationContext.getBeanFactory().freezeConfiguration();
         }
-
         long totalTime = System.currentTimeMillis() - startTime;
         log.info("Spring Service Manager started up in "+totalTime+" ms with "+applicationContext.getBeanDefinitionCount()+" services...");
     }
