@@ -130,7 +130,7 @@
                                <div>
                                  <a href="http://www.ed.ac.uk/">THE UNIVERSITY OF EDINBURGH</a>
                                </div>
-                               <div id="footer-dsa">
+                               <div id="footer-dsa" class="hidden-xs">
                                  <a href="https://assessment.datasealofapproval.org/assessment_175/seal/html/">
                                    <img border="0" src="{$theme-path}/images/dsa.png" alt="dsa_logo" width="80"/>
                                  </a>
@@ -141,8 +141,16 @@
                              <div class="container">
                                <div id="footer-2-col-1">
                                  <ul>
-                                   <li><a href="http://www.ed.ac.uk/about/website/accessibility">Accessibility</a></li>
-                                   <li><a href="http://www.ed.ac.uk/about/website/privacy">Privacy &amp; cookies</a></li>
+                                   <li>
+                                     <a href="http://www.ed.ac.uk/about/website/accessibility">Accessibility</a>
+                                   </li>
+                                   <li>
+                                     <a href="http://www.ed.ac.uk/about/website/privacy">Privacy &amp; cookies</a>
+                                   </li>
+
+                                   <li>
+                                     <a href="http://www.ed.ac.uk/information-services/research-support/data-library/contact-us">Contact Us</a>
+                                   </li>
                                  </ul>
                                </div>
                                <div id="footer-2-col-2">
@@ -374,7 +382,7 @@
                         </a>
                     </div>
 
-                    <div id="header-eduni" class="navbar-header">
+                    <div id="header-eduni" class="navbar-header hidden-xs">
                       <a href="http://www.ed.ac.uk/home" class="navbar-brand">
                         <img alt="Edinburgh DataShare" src="{$theme-path}/images/edinburgh-uni.png" />
                       </a>
@@ -534,7 +542,7 @@
             <div id="is-banner-text">
               <a href="http://www.ed.ac.uk/information-services">INFORMATION SERVICES</a>
             </div>
-            <div id="is-banner-contact-us">
+            <div id="is-banner-contact-us" class="hidden-xs">
               <a href="http://www.ed.ac.uk/information-services/research-support/data-library/contact-us">
               <img alt="Contact Us" src="{$theme-path}/images/contact-us.png"/>
               </a>

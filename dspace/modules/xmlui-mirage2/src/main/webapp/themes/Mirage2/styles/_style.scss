@@ -162,13 +162,26 @@ header .navbar-brand img {
     padding-top: 0.6em;
 }
 
-#footer-2 ul{
-    list-style-type: none;
-    padding: 0 5em 0 0;
+#footer-2 ul {
+  list-style-type: none;
 }
 
+/* line 170, _style.scss */
 #footer-2-col-1{
-    float: left;
+  float: left;
+}
+
+#footer-2-col-1 ul{
+  padding: 0 5em 0 0;
+}
+
+
+#footer-2-col-2{
+  float: left;
+}
+
+#footer-2-col-2 ul{
+  padding: 0;
 }
 
 #footer-2 a:visited{
