@@ -72,7 +72,7 @@ public class BatchImportMain extends AbstractDSpaceTransformer {
         select.addOption("",T_collection_default);
         for (Collection collection : collections)
         {
-            select.addOption(collection.getHandle(), CollectionDropDown.collectionPath(collection));
+            select.addOption(collection.getHandle(), CollectionDropDown.collectionPath(context, collection));
         }
 
         //Zip File Upload
