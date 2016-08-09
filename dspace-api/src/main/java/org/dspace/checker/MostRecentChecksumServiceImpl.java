@@ -60,11 +60,13 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
      * Find all bitstreams that were set to not be processed for the specified
      * date range.
      *
+     * @param context Context
      * @param startDate
      *            the start of the date range
      * @param endDate
      *            the end of the date range
      * @return a list of BitstreamHistoryInfo objects
+     * @throws SQLException if database error
      */
     @Override
     public List<MostRecentChecksum> findNotProcessedBitstreamsReport(Context context, Date startDate, Date endDate) throws SQLException
@@ -76,6 +78,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
      * Select the most recent bitstream for a given date range with the
      * specified status.
      *
+     * @param context Context
      * @param startDate
      *            the start date range
      * @param endDate
@@ -84,6 +87,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
      *            the result code
      *
      * @return a list of BitstreamHistoryInfo objects
+     * @throws SQLException if database error
      */
     @Override
     public List<MostRecentChecksum> findBitstreamResultTypeReport(Context context, Date startDate, Date endDate, ChecksumResultCode resultCode) throws SQLException {
@@ -94,6 +98,8 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
      * Queries the bitstream table for bitstream IDs that are not yet in the
      * most_recent_checksum table, and inserts them into the
      * most_recent_checksum and checksum_history tables.
+     * @param context Context
+     * @throws SQLException if database error
      */
     @Override
     public void updateMissingBitstreams(Context context) throws SQLException {
@@ -161,7 +167,9 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
      * Get the oldest most recent checksum record. If more than
      * one found the first one in the result set is returned.
      *
+     * @param context COntext
      * @return the oldest MostRecentChecksum or NULL if the table is empty
+     * @throws SQLException if database error
      *
      */
     @Override
@@ -174,8 +182,10 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
      * Returns the oldest bitstream that in the set of bitstreams that are less
      * than the specified date. If no bitstreams are found -1 is returned.
      *
-     * @param lessThanDate
+     * @param context context
+     * @param lessThanDate date
      * @return id of olded bitstream or -1 if not bitstreams are found
+     * @throws SQLException if database error
      */
     @Override
     public MostRecentChecksum findOldestRecord(Context context, Date lessThanDate) throws SQLException

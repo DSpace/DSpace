@@ -883,6 +883,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest
                     Constants.REMOVE); result = null;
             authorizeService.authorizeAction((Context) any, (Item) any,
                     Constants.WRITE); result = null;
+            authorizeService.authorizeAction((Context) any, (Item) any,
+                    Constants.DELETE); result = null;
         }};
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);

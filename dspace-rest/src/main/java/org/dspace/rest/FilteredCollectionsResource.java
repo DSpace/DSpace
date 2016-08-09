@@ -84,7 +84,7 @@ public class FilteredCollectionsResource extends Resource {
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
                 context.turnOffAuthorisationSystem();            	
             }
@@ -170,7 +170,7 @@ public class FilteredCollectionsResource extends Resource {
         org.dspace.core.Context context = null;
         FilteredCollection retColl = new org.dspace.rest.common.FilteredCollection();
         try {
-            context = createContext(getUser(headers));
+            context = createContext();
             if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
                 context.turnOffAuthorisationSystem();            	
             }

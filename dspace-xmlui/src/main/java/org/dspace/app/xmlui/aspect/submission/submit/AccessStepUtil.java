@@ -129,7 +129,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
                     loadedGroups= uiGroup.getMemberGroups();
             }
             if(loadedGroups==null || loadedGroups.size() ==0){
-                loadedGroups = groupService.findAll(context, GroupService.NAME);
+                loadedGroups = groupService.findAll(context, null);
             }
 
             // if no group selected for default set anonymous

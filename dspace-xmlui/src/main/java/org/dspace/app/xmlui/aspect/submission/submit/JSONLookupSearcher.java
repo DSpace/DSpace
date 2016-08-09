@@ -65,7 +65,7 @@ public class JSONLookupSearcher extends AbstractGenerator {
         } catch (SQLException e) {
             log.error(e.getMessage(),e);
         }
-        importService = new DSpace().getServiceManager().getServiceByName(null, ImportService.class);
+        importService = new DSpace().getServiceManager().getServiceByName("importService", ImportService.class);
     }
 
     @Override
@@ -163,7 +163,7 @@ public class JSONLookupSearcher extends AbstractGenerator {
 
     public String getLookupURI() {
         if(lookupURI ==null){
-            lookupURI = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("publication-lookup.publication.url");
+            lookupURI = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("publication-lookup.url", "*");
         }
         return lookupURI;
     }

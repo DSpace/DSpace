@@ -7,17 +7,6 @@
  */
 package org.dspace.app.webui.servlet.admin;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -29,6 +18,13 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Servlet for editing groups
@@ -97,7 +93,7 @@ public class GroupEditServlet extends DSpaceServlet
 
                 if (!newName.equals(group.getName()))
                 {
-                    groupService.setName(c, group, newName);
+                    groupService.setName(group, newName);
                     groupService.update(c, group);
                 }
 
@@ -107,6 +103,13 @@ public class GroupEditServlet extends DSpaceServlet
 
                 // now get members, and add new ones and remove missing ones
                 List<EPerson> members = group.getMembers();
+                List<UUID> memberIdentifiers = new ArrayList<>();
+                // Store all the identifiers of our current members
+                for (EPerson member : members)
+                {
+                    memberIdentifiers.add(member.getID());
+                }
+
                 List<Group> membergroups = group.getMemberGroups();
 
                 if (eperson_ids != null)
@@ -139,11 +142,11 @@ public class GroupEditServlet extends DSpaceServlet
                     }
 
                     // process members, removing any that aren't in eperson_ids
-                    for (EPerson e : members)
+                    for (UUID personId : memberIdentifiers)
                     {
-                        if (!epersonIDSet.contains(e.getID()))
+                        if (!epersonIDSet.contains(personId))
                         {
-                            groupService.removeMember(c, group, e);
+                            groupService.removeMember(c, group, personService.find(c, personId));
                         }
                     }
                 }
@@ -151,9 +154,9 @@ public class GroupEditServlet extends DSpaceServlet
                 {
                     // no members found (ids == null), remove them all!
 
-                    for (EPerson e : members)
+                    for (UUID personId : memberIdentifiers)
                     {
-                        groupService.removeMember(c, group, e);
+                        groupService.removeMember(c, group, personService.find(c, personId));
                     }
                 }
 
@@ -257,7 +260,7 @@ public class GroupEditServlet extends DSpaceServlet
             {
                 group = groupService.create(c);
 
-                groupService.setName(c, group, "new group" + group.getID());
+                groupService.setName(group, "new group" + group.getID());
                 groupService.update(c, group);
 
                 request.setAttribute("group", group);
@@ -279,7 +282,7 @@ public class GroupEditServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        List<Group> groups = groupService.findAll(c, GroupService.NAME);
+        List<Group> groups = groupService.findAll(c, null);
 
         // if( groups == null ) { System.out.println("groups are null"); }
         // else System.out.println("# of groups: " + groups.length);

@@ -167,6 +167,15 @@
                 </xsl:if>
               </xsl:attribute>
             </meta>
+
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='ROBOTS'][not(@qualifier)]">
+                <meta name="ROBOTS">
+                    <xsl:attribute name="content">
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='ROBOTS']"/>
+                    </xsl:attribute>
+                </meta>
+            </xsl:if>
+
             <!-- Add stylesheets -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='stylesheet']">
                 <link rel="stylesheet" type="text/css">
@@ -271,15 +280,6 @@
 
                                 var runAfterJSImports = new FnArray();
             </script>
-
-            <!-- Modernizr enables HTML5 elements & feature detects -->
-            <script type="text/javascript">
-                <xsl:attribute name="src">
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                    <xsl:text>/themes/</xsl:text>
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                    <xsl:text>/lib/js/modernizr-1.7.min.js</xsl:text>
-                </xsl:attribute>&#160;</script>
 
             <!-- Add the title in -->
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
@@ -584,11 +584,11 @@
         <div id="ds-footer-wrapper">
             <div id="ds-footer">
                 <div id="ds-footer-left">
-                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2015&#160; <a href="http://www.duraspace.org/" target="_blank">DuraSpace</a>
+                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2016&#160; <a href="http://www.duraspace.org/" target="_blank">DuraSpace</a>
                 </div>
                 <div id="ds-footer-right">
                     <span class="theme-by">Theme by&#160;</span>
-                    <a title="@mire NV" target="_blank" href="http://atmire.com" id="ds-footer-logo-link">
+                    <a title="Atmire NV" target="_blank" href="http://atmire.com" id="ds-footer-logo-link">
                     <span id="ds-footer-logo">&#160;</span>
                     </a>
                 </div>
@@ -683,7 +683,7 @@
 
     <xsl:template name="addJavascript">
         <xsl:variable name="jqueryVersion">
-            <xsl:text>1.6.2</xsl:text>
+            <xsl:text>1.6.4</xsl:text>
         </xsl:variable>
 
 

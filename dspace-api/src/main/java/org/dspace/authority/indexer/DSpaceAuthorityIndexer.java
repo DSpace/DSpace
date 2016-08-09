@@ -26,15 +26,14 @@ import java.util.*;
 
 /**
  * DSpaceAuthorityIndexer is used in IndexClient, which is called by the AuthorityConsumer and the indexing-script.
- * <p/>
+ * <p>
  * An instance of DSpaceAuthorityIndexer is bound to a list of items.
  * This can be one item or all items too depending on the init() method.
- * <p/>
+ * <p>
  * DSpaceAuthorityIndexer lets you iterate over each metadata value
  * for each metadata field defined in dspace.cfg with 'authority.author.indexer.field'
  * for each item in the list.
- * <p/>
- * <p/>
+ * <p>
  *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -170,6 +169,8 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
      *
      * @param metadataField Is one of the fields defined in dspace.cfg to be indexed.
      * @param value         Is one of the values of the given metadataField in one of the items being indexed.
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     protected void prepareNextValue(String metadataField, MetadataValue value) throws SQLException, AuthorizeException {
 

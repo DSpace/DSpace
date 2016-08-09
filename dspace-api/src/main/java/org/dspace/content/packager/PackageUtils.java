@@ -130,6 +130,7 @@ public class PackageUtils
      * Used by all SIP processors as a common sanity test.
      *
      * @param item - item to test.
+     * @throws PackageValidationException if validation error
      */
     public static void checkItemMetadata(Item item)
         throws PackageValidationException
@@ -151,6 +152,9 @@ public class PackageUtils
      * @param license - license string to add, may be null to invoke default.
      * @param item - the item.
      * @param collection - get the default license from here.
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public static void addDepositLicense(Context context, String license,
                                        Item item, Collection collection)
@@ -194,6 +198,7 @@ public class PackageUtils
      * @param item Item whose bitstreams to search.
      * @param name Bitstream's name to match.
      * @return first bitstream found or null.
+     * @throws SQLException if database error
      */
     public static Bitstream getBitstreamByName(Item item, String name)
         throws SQLException
@@ -208,6 +213,7 @@ public class PackageUtils
      * @param bsName - name of bitstream to match.
      * @param bnName - bundle name to match, or null for all.
      * @return the format found or null if none found.
+     * @throws SQLException if database error
      */
     public static Bitstream getBitstreamByName(Item item, String bsName, String bnName)
         throws SQLException
@@ -239,10 +245,12 @@ public class PackageUtils
      * Find bitstream by its format, looking in a specific bundle.
      * Used to look for particularly-typed Package Manifest bitstreams.
      *
+     * @param context context
      * @param item - dspace item whose bundles to search.
      * @param bsf - BitstreamFormat object to match.
      * @param bnName - bundle name to match, or null for all.
      * @return the format found or null if none found.
+     * @throws SQLException if database error
      */
     public static Bitstream getBitstreamByFormat(Context context, Item item,
             BitstreamFormat bsf, String bnName)
@@ -328,6 +336,8 @@ public class PackageUtils
      * @param MIMEType - MIME content-type
      * @param desc - long description
      * @return BitstreamFormat object that was found or created.  Never null.
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
      public static BitstreamFormat findOrCreateBitstreamFormat(Context context,
             String shortDesc, String MIMEType, String desc)
@@ -349,8 +359,11 @@ public class PackageUtils
      * @param shortDesc - short descriptive name, used to locate existing format.
      * @param MIMEType - mime content-type
      * @param desc - long description
+     * @param supportLevel support level
      * @param internal value for the 'internal' flag of a new format if created.
      * @return BitstreamFormat object that was found or created.  Never null.
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
      public static BitstreamFormat findOrCreateBitstreamFormat(Context context,
             String shortDesc, String MIMEType, String desc, int supportLevel, boolean internal)
@@ -380,9 +393,9 @@ public class PackageUtils
      * @param item
      *            the item
      * @return the license bitstream or null
-     *
-     * @throws IOException
-     *             if the license bitstream can't be read
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if the license bitstream can't be read
      */
     public static Bitstream findDepositLicense(Context context, Item item)
             throws SQLException, IOException, AuthorizeException
@@ -440,9 +453,9 @@ public class PackageUtils
      * @param handle Handle of new Object (may be null)
      * @param params Properties-style list of options (interpreted by each packager).
      * @return newly created DSpace Object (or null)
-     * @throws AuthorizeException
-     * @throws SQLException
-     * @throws IOException
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     public static DSpaceObject createDSpaceObject(Context context, DSpaceObject parent, int type, String handle, PackageParameters params)
         throws AuthorizeException, SQLException, IOException
@@ -496,9 +509,10 @@ public class PackageUtils
      * @param handle Handle to assign to item (may be null)
      * @param params Properties-style list of options (interpreted by each packager).
      * @return finished Item
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws WorkflowException if workflow error
      */
     public static Item finishCreateItem(Context context, WorkspaceItem wsi, String handle, PackageParameters params)
             throws IOException, SQLException, AuthorizeException, WorkflowException {
@@ -538,7 +552,11 @@ public class PackageUtils
      * <p>
      * This method is necessary as there is no generic 'update()' on a DSpaceObject
      *
+     * @param context context
      * @param dso DSpaceObject to update
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     public static void updateDSpaceObject(Context context, DSpaceObject dso)
             throws AuthorizeException, SQLException, IOException
@@ -616,9 +634,9 @@ public class PackageUtils
      * Creates the specified file (along with all parent directories) if it doesn't already
      * exist.  If the file already exists, nothing happens.
      * 
-     * @param file
+     * @param file file
      * @return boolean true if succeeded, false otherwise
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public static boolean createFile(File file)
             throws IOException
@@ -645,12 +663,16 @@ public class PackageUtils
     /**
      * Remove all bitstreams (files) associated with a DSpace object.
      * <P>
-     * If this object is an Item, it removes all bundles & bitstreams.  If this
+     * If this object is an Item, it removes all bundles and bitstreams.  If this
      * object is a Community or Collection, it removes all logo bitstreams.
      * <P>
      * This method is useful for replace functionality.
      *
+     * @param context context
      * @param dso The object to remove all bitstreams from
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public static void removeAllBitstreams(Context context, DSpaceObject dso)
             throws SQLException, IOException, AuthorizeException
@@ -689,7 +711,11 @@ public class PackageUtils
      * <P>
      * This method is useful for replace functionality.
      *
+     * @param context context
      * @param dso The object to remove all metadata from
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public static void clearAllMetadata(Context context, DSpaceObject dso)
             throws SQLException, IOException, AuthorizeException
@@ -763,7 +789,7 @@ public class PackageUtils
      * (represented by [ID] above) becomes meaningless when content is exported
      * outside of DSpace.  In order to make these Group names meaningful outside
      * of DSpace, they must be translated into a different format:
-     * <li> COMMUNITY_[HANDLE]_ADMIN (e.g. COMMUNITY_hdl:123456789/10_ADMIN), etc.
+     * {@code COMMUNITY_[HANDLE]_ADMIN} (e.g. COMMUNITY_hdl:123456789/10_ADMIN), etc.
      * <p>
      * This format replaces the internal ID with an external Handle identifier
      * (which is expected to be more meaningful even when content is exported
@@ -786,16 +812,26 @@ public class PackageUtils
      * @param context current DSpace Context
      * @param groupName Group's name
      * @return the group name, with any internal IDs translated to Handles
+     * @throws PackageException if package error
      */
     public static String translateGroupNameForExport(Context context, String groupName)
             throws PackageException
     {
-        // See if this resembles a default Group name
+        Pattern defaultGroupNamePattern = Pattern.compile("^([^_]+)_([^_]+)_(.+)$");
+        // Check if this looks like a default Group name
+        Matcher matcher = defaultGroupNamePattern.matcher(groupName);
+        if(!matcher.matches())
+        {
+            //if this is not a valid default group name, just return group name as-is (no crosswalking necessary)
+            return groupName;
+        }
 
-        String objID = StringUtils.substringBetween(groupName, "_", "_");
-        int objType = StringUtils.startsWith(groupName, "COLLECTION_") ? Constants.COLLECTION : (StringUtils.startsWith(groupName, "COMMUNITY_") ? Constants.COMMUNITY : -1);
-        String groupType = StringUtils.substringAfterLast(groupName, "_");
-        if (objID == null && objType != -1)
+        String objTypeText = matcher.group(1);
+        String objID = matcher.group(2);
+        String groupType = matcher.group(3);
+
+        int objType = Constants.getTypeID(objTypeText);
+        if (objID == null || objType == -1)
             return groupName;
 
 
@@ -838,7 +874,7 @@ public class PackageUtils
 
             //Create an updated group name, using the Handle to replace the InternalID
             // Format: <DSpace-Obj-Type>_hdl:<Handle>_<Group-Type>
-            return objType + "_" + "hdl:" + dso.getHandle() + "_" + groupType;
+            return objTypeText + "_" + "hdl:" + dso.getHandle() + "_" + groupType;
         }
         catch (SQLException sqle)
         {
@@ -871,6 +907,7 @@ public class PackageUtils
      * @param context current DSpace Context
      * @param groupName Group's name
      * @return the group name, with any Handles translated to internal IDs
+     * @throws PackageException if package error
      */
     public static String translateGroupNameForImport(Context context, String groupName)
             throws PackageException

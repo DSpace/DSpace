@@ -9,11 +9,11 @@ package org.dspace.disseminate;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.dspace.authorize.AuthorizeException;
@@ -253,7 +253,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     /**
      * Should the citation page be the first page of the document, or the last page?
-     * default => true. true => first page, false => last page
+     * default = true. true = first page, false = last page
      * citation_as_first_page=true
      */
     protected Boolean citationAsFirstPage = null;
@@ -274,13 +274,13 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     @Override
     public File makeCitedDocument(Context context, Bitstream bitstream)
-            throws IOException, SQLException, AuthorizeException, COSVisitorException {
+            throws IOException, SQLException, AuthorizeException {
         PDDocument document = new PDDocument();
         PDDocument sourceDocument = new PDDocument();
         try {
             Item item = (Item) bitstreamService.getParentObject(context, bitstream);
             sourceDocument = sourceDocument.load(bitstreamService.retrieve(context, bitstream));
-            PDPage coverPage = new PDPage(PDPage.PAGE_SIZE_LETTER);
+            PDPage coverPage = new PDPage(PDRectangle.LETTER); // TODO: needs to be configurable
             generateCoverPage(context, document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);
 
@@ -292,7 +292,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         }
     }
 
-    protected void generateCoverPage(Context context, PDDocument document, PDPage coverPage, Item item) throws IOException, COSVisitorException {
+    protected void generateCoverPage(Context context, PDDocument document, PDPage coverPage, Item item) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, coverPage);
         try {
             int ypos = 760;
@@ -360,7 +360,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     }
 
     protected void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDPage coverPage) {
-        List<PDPage> sourcePageList = sourceDocument.getDocumentCatalog().getAllPages();
+        PDPageTree sourcePageList = sourceDocument.getDocumentCatalog().getPages();
 
         if (isCitationFirstPage()) {
             //citation as cover page
@@ -375,7 +375,6 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             }
             document.addPage(coverPage);
         }
-        sourcePageList.clear();
     }
 
     @Override
@@ -383,7 +382,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
                                     int startX, int startY, PDFont pdfFont, float fontSize) throws IOException {
         float leading = 1.5f * fontSize;
 
-        PDRectangle mediabox = page.findMediaBox();
+        PDRectangle mediabox = page.getMediaBox();
         float margin = 72;
         float width = mediabox.getWidth() - 2*margin;
 
@@ -474,7 +473,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         final int rows = content.length;
         final int cols = content[0].length;
         final float rowHeight = 20f;
-        final float tableWidth = page.findMediaBox().getWidth()-(2*margin);
+        final float tableWidth = page.getMediaBox().getWidth()-(2*margin);
         final float tableHeight = rowHeight * rows;
         final float colWidth = tableWidth/(float)cols;
         final float cellMargin=5f;

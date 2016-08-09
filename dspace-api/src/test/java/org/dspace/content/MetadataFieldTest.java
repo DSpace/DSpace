@@ -8,18 +8,21 @@
 package org.dspace.content;
 
 import mockit.NonStrictExpectations;
-import java.sql.SQLException;
-import java.util.List;
-
-import org.dspace.AbstractUnitTest;
 import org.apache.log4j.Logger;
+import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
-import org.junit.*;
-import static org.junit.Assert.* ;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.sql.SQLException;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * Unit Tests for class MetadataFieldTest
@@ -136,7 +139,7 @@ public class MetadataFieldTest extends AbstractUnitTest
     @Test
     public void testGetFieldID()
     {
-        assertTrue("testGetFieldID 0",mf.getFieldID() >= 0);
+        assertTrue("testGetFieldID 0",mf.getID() >= 0);
     }
 
     /**
@@ -221,7 +224,7 @@ public class MetadataFieldTest extends AbstractUnitTest
         MetadataField m = metadataFieldService.create(context, dcSchema, elem, qual, null);
 
         MetadataField found = metadataFieldService.findByElement(context, dcSchema, elem, qual);
-        assertThat("testCreateAuth 0",found.getFieldID(), equalTo(m.getFieldID()));
+        assertThat("testCreateAuth 0",found.getID(), equalTo(m.getID()));
     }
 
     /**
@@ -268,7 +271,7 @@ public class MetadataFieldTest extends AbstractUnitTest
     {
         MetadataField found = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, element, qualifier);
         assertThat("testFindByElement 0",found, notNullValue());
-        assertThat("testFindByElement 1",found.getFieldID(), equalTo(mf.getFieldID()));
+        assertThat("testFindByElement 1",found.getID(), equalTo(mf.getID()));
         assertThat("testFindByElement 2",found.getElement(), equalTo(mf.getElement()));
         assertThat("testFindByElement 3",found.getQualifier(), equalTo(mf.getQualifier()));        
     }
@@ -334,7 +337,7 @@ public class MetadataFieldTest extends AbstractUnitTest
         metadataFieldService.update(context, m);
 
         MetadataField found = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, elem, qual);
-        assertThat("testUpdateAuth 0",found.getFieldID(), equalTo(m.getFieldID()));
+        assertThat("testUpdateAuth 0",found.getID(), equalTo(m.getID()));
     }
 
     /**
@@ -426,11 +429,11 @@ public class MetadataFieldTest extends AbstractUnitTest
     @Test
     public void testFind() throws Exception
     {
-        int id = mf.getFieldID();
+        int id = mf.getID();
         
         MetadataField found = metadataFieldService.find(context, id);
         assertThat("testFind 0",found, notNullValue());
-        assertThat("testFind 1",found.getFieldID(), equalTo(mf.getFieldID()));
+        assertThat("testFind 1",found.getID(), equalTo(mf.getID()));
     }
 
 }

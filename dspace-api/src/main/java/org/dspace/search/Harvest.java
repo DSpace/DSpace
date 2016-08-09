@@ -84,7 +84,7 @@ public class Harvest
      * @param nonAnon
      *            If items without anonymous access should be included or not
      * @return List of <code>HarvestedItemInfo</code> objects
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      * @throws java.text.ParseException If the date is not in a supported format
      */
     public static List<HarvestedItemInfo> harvest(Context context, DSpaceObject scope,
@@ -203,7 +203,7 @@ public class Harvest
      *
      * @return <code>HarvestedItemInfo</code> object for the single item, or
      *         <code>null</code>
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     public static HarvestedItemInfo getSingle(Context context, String handle,
             boolean collections) throws SQLException
@@ -242,7 +242,7 @@ public class Harvest
      *            DSpace context
      * @param itemInfo
      *            HarvestedItemInfo object to fill out
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      */
     private static void fillCollections(Context context,
             HarvestedItemInfo itemInfo) throws SQLException

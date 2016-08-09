@@ -39,6 +39,7 @@ import org.xml.sax.SAXException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -49,7 +50,12 @@ import java.util.*;
 public class CSVOutputter extends AbstractReader implements Recyclable 
 {
     protected static final Logger log = Logger.getLogger(CSVOutputter.class);
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>(){
+                    @Override
+                    protected DateFormat initialValue() {
+                        return new SimpleDateFormat("yyyy-MM-dd");
+                    }
+                  };
 
     protected Response response;
     protected Request request;
@@ -228,7 +234,7 @@ public class CSVOutputter extends AbstractReader implements Recyclable
 
         for(DateHistogramFacet.Entry histogramEntry : monthlyFacetEntries) {
             Date facetDate = new Date(histogramEntry.getTime());
-            writer.writeNext(new String[]{dateFormat.format(facetDate), String.valueOf(histogramEntry.getCount())});
+            writer.writeNext(new String[]{dateFormat.get().format(facetDate), String.valueOf(histogramEntry.getCount())});
         }
     }
 
@@ -241,6 +247,9 @@ public class CSVOutputter extends AbstractReader implements Recyclable
     public void recycle() {
         this.request = null;
         this.response = null;
+        this.context = null;
+        this.writer = null;
+        super.recycle();
     }
     
 }

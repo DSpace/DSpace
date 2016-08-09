@@ -28,15 +28,19 @@ import org.dspace.eperson.EPerson;
  * Unauthenticate the current user. There is no way this action will fail, 
  * so any components inside the action will be executed.
  * 
- * This action will always send an HTTP redirect to the DSpace homepage.
- * 
- * Example: 
- * 
+ * <p>This action will always send an HTTP redirect to the DSpace home page.
+ *
+ * <p>Example:
+ *
+ * <pre>
+ * {@code
  * <map:action name="UnAuthenticateAction" src="org.dspace.app.xmlui.eperson.UnAuthenticateAction"/>
  * 
  * <map:act type="UnAuthenticateAction">
  *   <map:serialize type="xml"/>
  * </map:act>
+ * }
+ * </pre>
  * 
  * @author Scott Phillips
  */
@@ -47,13 +51,16 @@ public class UnAuthenticateAction extends AbstractAction
     /**
      * Logout the current user.
      * 
-     * @param redirector
-     * @param resolver
+     * @param redirector redirector.
+     * @param resolver source resolver.
      * @param objectModel
      *            Cocoon's object model
-     * @param source
-     * @param parameters
+     * @param source source.
+     * @param parameters sitemap parameters.
+     * @return result of the action.
+     * @throws java.lang.Exception passed through.
      */
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {

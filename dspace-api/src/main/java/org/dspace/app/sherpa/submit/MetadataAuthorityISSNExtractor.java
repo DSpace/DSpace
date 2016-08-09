@@ -37,7 +37,10 @@ public class MetadataAuthorityISSNExtractor implements ISSNItemExtractor
             List<MetadataValue> dcvalues = itemService.getMetadataByMetadataString(item, metadata);
             for (MetadataValue dcvalue : dcvalues)
             {
-                values.add(dcvalue.getAuthority());
+                String authority = dcvalue.getAuthority();
+                if(authority !=null){
+                    values.add(authority);
+                }
             }
         }
         return values;

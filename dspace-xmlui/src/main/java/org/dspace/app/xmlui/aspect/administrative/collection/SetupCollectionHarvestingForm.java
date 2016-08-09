@@ -215,13 +215,13 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 	
 	
 	    // Add an entry for each instance of ingestion crosswalks configured for harvesting 
-        String metaString = "harvester.oai.metadataformats.";
+        String metaString = "oai.harvester.metadataformats.";
         Enumeration pe = Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys("oai"));
         while (pe.hasMoreElements())
         {
             String key = (String)pe.nextElement();
             if (key.startsWith(metaString)) {
-            	String metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("oai." + key);
+            	String metadataString = (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key));
             	String metadataKey = key.substring(metaString.length());
             	String displayName;
 

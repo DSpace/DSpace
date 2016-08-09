@@ -7,40 +7,17 @@
  */
 package org.dspace.harvest;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.ConnectException;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TimeZone;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import ORG.oclc.oai.harvester2.verb.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
+import org.dspace.content.Collection;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.Utils;
+import org.dspace.core.*;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -56,6 +33,14 @@ import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.*;
+import java.net.ConnectException;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 /**
@@ -92,6 +77,7 @@ public class OAIHarvester {
     protected PluginService pluginService;
     protected ConfigurationService configurationService;
 
+
     //  The collection this harvester instance is dealing with
 	Collection targetCollection;
 	HarvestedCollection harvestRow;
@@ -111,7 +97,6 @@ public class OAIHarvester {
 
     // DOMbuilder class for the DOM -> JDOM conversions
     private static DOMBuilder db = new DOMBuilder();
-
     // The point at which this thread should terminate itself
 
     /* Initialize the harvester with a collection object */
@@ -129,6 +114,9 @@ public class OAIHarvester {
 
 		workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
         pluginService = CoreServiceFactory.getInstance().getPluginService();
+
+		configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
 
 		if (dso.getType() != Constants.COLLECTION)
         {
@@ -227,6 +215,9 @@ public class OAIHarvester {
      */
 	public void runHarvest() throws SQLException, IOException, AuthorizeException
 	{
+		boolean originalMode = ourContext.isBatchModeEnabled();
+		ourContext.enableBatchMode(true);
+
 		// figure out the relevant parameters
 		String oaiSource = harvestRow.getOaiSource();
 		String oaiSetId = harvestRow.getOaiSetId();
@@ -243,6 +234,8 @@ public class OAIHarvester {
             fromDate = processDate(harvestRow.getHarvestDate());
         }
 
+		long totalListSize = 0;
+		long currentRecord = 0;
 		Date startTime = new Date();
 		String toDate = processDate(startTime,0);
 
@@ -287,9 +280,10 @@ public class OAIHarvester {
 
 			// set the status indicating the collection is currently being processed
 			harvestRow.setHarvestStatus(HarvestedCollection.STATUS_BUSY);
-			harvestRow.setHarvestMessage("Collection is currently being harvested");
+			harvestRow.setHarvestMessage("Collection harvesting is initializing...");
 			harvestRow.setHarvestStartTime(startTime);
 			harvestedCollection.update(ourContext, harvestRow);
+			intermediateCommit();
 
 			// expiration timer starts
 			int expirationInterval = configurationService.getIntProperty("oai.harvester.threadTimeout");
@@ -313,6 +307,7 @@ public class OAIHarvester {
             {
                 log.info("HTTP Request: " + listRecords.getRequestURL());
             }
+
 			while (listRecords != null)
 			{
 				records = new ArrayList<Element>();
@@ -341,6 +336,14 @@ public class OAIHarvester {
 				{
 					root = oaiResponse.getRootElement();
 					records.addAll(root.getChild("ListRecords", OAI_NS).getChildren("record", OAI_NS));
+
+					Element resumptionElement = root.getChild("ListRecords", OAI_NS).getChild("resumptionToken", OAI_NS);
+					if(resumptionElement != null && resumptionElement.getAttribute("completeListSize") != null) {
+						String value = resumptionElement.getAttribute("completeListSize").getValue();
+						if(StringUtils.isNotBlank(value)) {
+							totalListSize = Long.parseLong(value);
+						}
+					}
 				}
 
 				// Process the obtained records
@@ -359,8 +362,12 @@ public class OAIHarvester {
                             throw new HarvestingException("runHarvest method timed out for collection " + targetCollection.getID());
                         }
 
-						processRecord(record,OREPrefix);
+						currentRecord++;
+
+						processRecord(record, OREPrefix, currentRecord, totalListSize);
 						ourContext.dispatchEvents();
+
+						intermediateCommit();
 					}
 				}
 
@@ -375,15 +382,20 @@ public class OAIHarvester {
                 ourContext.turnOffAuthorisationSystem();
                 try {
                     collectionService.update(ourContext, targetCollection);
+
+					harvestRow.setHarvestMessage(String.format("Collection is currently being harvested (item %d of %d)", currentRecord, totalListSize));
+					harvestedCollection.update(ourContext, harvestRow);
                 } finally {
                     //In case of an exception, make sure to restore our authentication state to the previous state
                     ourContext.restoreAuthSystemState();
                 }
+
 				ourContext.dispatchEvents();
+				intermediateCommit();
 			}
 		}
 		catch (HarvestingException hex) {
-			log.error("Harvesting error occurred while processing an OAI record: " + hex.getMessage());
+			log.error("Harvesting error occurred while processing an OAI record: " + hex.getMessage(), hex);
 			harvestRow.setHarvestMessage("Error occurred while processing an OAI record");
 
 			// if the last status is also an error, alert the admin
@@ -391,14 +403,17 @@ public class OAIHarvester {
 				alertAdmin(HarvestedCollection.STATUS_OAI_ERROR, hex);
 			}
 			harvestRow.setHarvestStatus(HarvestedCollection.STATUS_OAI_ERROR);
+			harvestedCollection.update(ourContext, harvestRow);
+			ourContext.complete();
 			return;
 		}
 		catch (Exception ex) {
 			harvestRow.setHarvestMessage("Unknown error occurred while generating an OAI response");
 			harvestRow.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
+			harvestedCollection.update(ourContext, harvestRow);
 			alertAdmin(HarvestedCollection.STATUS_UNKNOWN_ERROR, ex);
-			log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause());
-			ex.printStackTrace();
+			log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause(), ex);
+			ourContext.complete();
 			return;
 		}
 		finally {
@@ -414,16 +429,31 @@ public class OAIHarvester {
 		harvestRow.setHarvestStartTime(startTime);
 		harvestRow.setHarvestMessage("Harvest from " + oaiSource + " successful");
 		harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
-		log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds.");
+		log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested " + currentRecord + " items.");
 		harvestedCollection.update(ourContext, harvestRow);
+
+		ourContext.enableBatchMode(originalMode);
 	}
 
-    /**
+	private void intermediateCommit() throws SQLException {
+		ourContext.commit();
+		reloadRequiredEntities();
+	}
+
+	private void reloadRequiredEntities() throws SQLException {
+		//Reload our objects in our cache
+		targetCollection = ourContext.reloadEntity(targetCollection);
+		harvestRow = ourContext.reloadEntity(harvestRow);
+	}
+
+	/**
      * Process an individual PMH record, making (or updating) a corresponding DSpace Item.
-     * @param record a JDOM Element containing the actual PMH record with descriptive metadata.
+	 * @param record a JDOM Element containing the actual PMH record with descriptive metadata.
      * @param OREPrefix the metadataprefix value used by the remote PMH server to disseminate ORE. Only used for collections set up to harvest content.
-     */
-    protected void processRecord(Element record, String OREPrefix) throws SQLException, AuthorizeException, IOException, CrosswalkException, HarvestingException, ParserConfigurationException, SAXException, TransformerException
+	 * @param currentRecord
+	 * @param totalListSize The total number of records that this Harvest contains
+	 */
+    protected void processRecord(Element record, String OREPrefix, final long currentRecord, long totalListSize) throws SQLException, AuthorizeException, IOException, CrosswalkException, HarvestingException, ParserConfigurationException, SAXException, TransformerException
     {
     	WorkspaceItem wi = null;
     	Date timeStart = new Date();
@@ -476,7 +506,7 @@ public class OAIHarvester {
 			Date OAIDatestamp = Utils.parseISO8601Date(header.getChildText("datestamp", OAI_NS));
 			Date itemLastHarvest = hi.getHarvestDate();
 			if (itemLastHarvest != null && OAIDatestamp.before(itemLastHarvest)) {
-				log.info("Item " + item.getHandle() + " was harvested more recently than the last update time reporetd by the OAI server; skipping.");
+				log.info("Item " + item.getHandle() + " was harvested more recently than the last update time reported by the OAI server; skipping.");
 				return;
 			}
 
@@ -592,7 +622,8 @@ public class OAIHarvester {
 		itemService.update(ourContext, item);
 		harvestedItemService.update(ourContext, hi);
 		long timeTaken = new Date().getTime() - timeStart.getTime();
-		log.info("Item " + item.getHandle() + "(" + item.getID() + ")" + " has been ingested. The whole process took: " + timeTaken + " ms. ");
+		log.info(String.format("Item %s (%s) has been ingested (item %d of %d). The whole process took: %d ms.",
+				item.getHandle(), item.getID(), currentRecord, totalListSize, timeTaken));
 
     	// Stop ignoring authorization
     	ourContext.restoreAuthSystemState();
@@ -695,7 +726,7 @@ public class OAIHarvester {
      * @throws TransformerException
      * @throws SAXException
      * @throws ParserConfigurationException
-     * @throws IOException
+     * @throws IOException if IO error
      */
     private String oaiGetDateGranularity(String oaiSource) throws IOException, ParserConfigurationException, SAXException, TransformerException
     {

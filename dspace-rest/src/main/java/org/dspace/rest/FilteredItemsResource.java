@@ -113,7 +113,7 @@ public class FilteredItemsResource extends Resource {
         ItemFilterSet itemFilterSet = new ItemFilterSet(filters, true);
         ItemFilter result = itemFilterSet.getAllFiltersFilter();
         try {
-            context = createContext(getUser(headers));
+            context = createContext();
             if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
                 context.turnOffAuthorisationSystem();            	
             }

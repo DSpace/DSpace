@@ -27,7 +27,7 @@ public interface CurationTask
      * 
      * @param curator the Curator controlling this task
      * @param taskId identifier task should use in invoking services
-     * @throws IOException
+     * @throws IOException if error
      */
     void init(Curator curator, String taskId) throws IOException;
 
@@ -36,7 +36,7 @@ public interface CurationTask
      *
      * @param dso the DSpace object
      * @return status code
-     * @throws IOException
+     * @throws IOException if error
      */
     int perform(DSpaceObject dso) throws IOException;
 
@@ -46,7 +46,7 @@ public interface CurationTask
      * @param ctx DSpace context object
      * @param id persistent ID for DSpace object
      * @return status code
-     * @throws Exception
+     * @throws IOException if error
      */
     int perform(Context ctx, String id) throws IOException;
 }

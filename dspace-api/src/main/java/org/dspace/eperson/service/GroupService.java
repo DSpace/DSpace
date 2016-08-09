@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.MetadataField;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -33,20 +34,28 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      *
      * @param context
      *            DSpace context object
+     * @return group
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public Group create(Context context) throws SQLException, AuthorizeException;
 
     /**
      * set name of group
      *
+     * @param group DSpace group
      * @param name
      *            new group name
+     * @throws SQLException if database error
      */
-    public void setName(Context context, Group group, String name) throws SQLException;
+    public void setName(Group group, String name) throws SQLException;
 
     /**
      * add an eperson member
      *
+     * @param context
+     *            DSpace context object
+     * @param group DSpace group
      * @param e
      *            eperson
      */
@@ -55,13 +64,20 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     /**
      * add group to this group
      *
-     * @param groupParent
+     * @param context
+     *            DSpace context object
+     * @param groupParent parent group
+     * @param groupChild child group
+     * @throws SQLException if database error
      */
     public void addMember(Context context, Group groupParent, Group groupChild) throws SQLException;
 
     /**
      * remove an eperson from a group
      *
+     * @param context
+     *            DSpace context object
+     * @param group DSpace group
      * @param ePerson
      *            eperson
      */
@@ -71,7 +87,11 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     /**
      * remove group from this group
      *
-     * @param g
+     * @param context
+     *            DSpace context object
+     * @param groupParent parent group
+     * @param childGroup child group
+     * @throws SQLException if database error
      */
     public void removeMember(Context context, Group groupParent, Group childGroup) throws SQLException;
 
@@ -79,17 +99,20 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * check to see if an eperson is a direct member.
      * If the eperson is a member via a subgroup will be returned <code>false</code>
      *
-     * @param e
+     * @param group DSpace group
+     * @param ePerson
      *            eperson to check membership
+     * @return true or false
      */
     public boolean isDirectMember(Group group, EPerson ePerson);
 
     /**
-     * Check to see if g is a direct group member.
-     * If g is a subgroup via another group will be returned <code>false</code>
+     * Check to see if childGroup is a direct group member of owningGroup.
+     * If childGroup is a subgroup via another group will be returned <code>false</code>
      *
-     * @param g
-     *            group to check
+     * @param owningGroup parent group
+     * @param childGroup child group
+     * @return true or false
      */
     public boolean isMember(Group owningGroup, Group childGroup);
 
@@ -102,15 +125,32 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      *            context
      * @param group
      *            group to check
+     * @return true or false
+     * @throws SQLException if database error
      */
     public boolean isMember(Context context, Group group) throws SQLException;
 
     /**
-     * Get all of the groups that an eperson is a member of.
+     * fast check to see if an eperson is a member called with eperson id, does
+     * database lookup without instantiating all of the epeople objects and is
+     * thus a static method
      *
      * @param context
-     * @param ePerson
-     * @throws SQLException
+     *            context
+     * @param groupName
+     *            the name of the group to check
+     * @return true or false
+     * @throws SQLException if database error
+     */
+    public boolean isMember(Context context, String groupName) throws SQLException;
+
+    /**
+     * Get all of the groups that an eperson is a member of.
+     *
+     * @param context DSpace contenxt
+     * @param ePerson ePerson object
+     * @return list of Group objects
+     * @throws SQLException if database error
      */
     public List<Group> allMemberGroups(Context context, EPerson ePerson) throws SQLException;
 
@@ -123,8 +163,8 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      *          DSpace context
      * @param group
      *          Group object
-     * @return   Array of EPerson objects
-     * @throws SQLException
+     * @return List of EPerson objects
+     * @throws SQLException if error
      */
     public List<EPerson> allMembers(Context context, Group group) throws SQLException;
 
@@ -135,6 +175,7 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @param name
      *
      * @return the named Group, or null if not found
+     * @throws SQLException if error
      */
     public Group findByName(Context context, String name) throws SQLException;
 
@@ -143,41 +184,55 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      *
      * @param context
      *            DSpace context
-     * @param sortField
-     *            field to sort by -- Group.ID or Group.NAME
+     * @param metadataSortFields
+     *            metadata fields to sort by, leave empty to sort by Name
      *
-     * @return array of all groups in the site
+     * @return List of all groups in the site
+     * @throws SQLException if error
      */
+    public List<Group> findAll(Context context, List<MetadataField> metadataSortFields) throws SQLException;
+
+
+    /**
+     * DEPRECATED: Please use {@code findAll(Context context, List<MetadataField> metadataFieldsSort)} instead
+     * @param context DSpace context
+     * @param sortField sort field index
+     * @return List of all groups in the site
+     * @throws SQLException if error
+     * @deprecated
+     */
+    @Deprecated
     public List<Group> findAll(Context context, int sortField) throws SQLException;
 
-
     /**
      * Find the groups that match the search query across eperson_group_id or name
      *
      * @param context
      *            DSpace context
-     * @param query
-     *            The search string
+     * @param groupIdentifier
+     *            The group name or group ID
      *
      * @return array of Group objects
+     * @throws SQLException if error
      */
-    public List<Group> search(Context context, String query) throws SQLException;
+    public List<Group> search(Context context, String groupIdentifier) throws SQLException;
 
     /**
      * Find the groups that match the search query across eperson_group_id or name
      *
      * @param context
      *            DSpace context
-     * @param query
-     *            The search string
+     * @param groupIdentifier
+     *            The group name or group ID
      * @param offset
      *            Inclusive offset
      * @param limit
      *            Maximum number of matches returned
      *
      * @return array of Group objects
+     * @throws SQLException if error
      */
-    public List<Group> search(Context context, String query, int offset, int limit) throws SQLException;
+    public List<Group> search(Context context, String groupIdentifier, int offset, int limit) throws SQLException;
 
     /**
      * Returns the total number of groups returned by a specific query, without the overhead
@@ -189,11 +244,14 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      *            The search string
      *
      * @return the number of groups matching the query
+     * @throws SQLException if error
      */
     public int searchResultCount(Context context, String query)	throws SQLException;
 
     /**
      * Return true if group has no direct or indirect members
+     * @param group DSpace group
+     * @return true or false
      */
     public boolean isEmpty(Group group);
 
@@ -203,11 +261,33 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      *
      * @param context the DSpace context
      * @throws SQLException database exception
-     * @throws AuthorizeException
+     * @throws AuthorizeException authorization error
      */
     public void initDefaultGroupNames(Context context) throws SQLException, AuthorizeException;
 
+    /**
+     * Find all empty groups in DSpace
+     * @param context The DSpace context
+     * @return All empty groups
+     * @throws SQLException database exception
+     */
     List<Group> getEmptyGroups(Context context) throws SQLException;
 
+    /**
+     * Count the total number of groups in DSpace
+     * @param context The DSpace context
+     * @return The total number of groups
+     * @throws SQLException database exception
+     */
     int countTotal(Context context) throws SQLException;
+
+    /**
+     * Look up groups based on their value for a certain metadata field (NOTE: name is not stored as metadata)
+     * @param context The DSpace context
+     * @param searchValue The value to match
+     * @param metadataField The metadata field to search in
+     * @return The groups that have a matching value for specified metadata field
+     * @throws SQLException database exception
+     */
+    List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException;
 }

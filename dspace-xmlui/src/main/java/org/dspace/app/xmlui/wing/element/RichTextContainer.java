@@ -7,22 +7,20 @@
  */
 package org.dspace.app.xmlui.wing.element;
 
+import org.dspace.app.xmlui.wing.Message;
+import org.dspace.app.xmlui.wing.WingContext;
+import org.dspace.app.xmlui.wing.WingException;
+
 /**
  * A class representing a character container, such as "p", "hi", "item", or
- * "cell"
+ * "cell".
  * 
- * This class may not be instantiated on it's own instead you must use one of
+ * <p>This class may not be instantiated on its own; instead you must use one of
  * the extending classes listed above. This abstract class implements the
  * methods common to each of those elements.
  * 
  * @author Scott Phillips
  */
-
-
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.wing.WingContext;
-import org.dspace.app.xmlui.wing.WingException;
-
 public abstract class RichTextContainer extends TextContainer
 {
     /**
@@ -35,6 +33,7 @@ public abstract class RichTextContainer extends TextContainer
      * 
      * @param context
      *            (Required) The context this element is contained in.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected RichTextContainer(WingContext context) throws WingException
     {
@@ -48,6 +47,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return A new Highlight
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Highlight addHighlight(String rend) throws WingException
     {
@@ -57,13 +57,15 @@ public abstract class RichTextContainer extends TextContainer
     }
 
     /**
-     * Add a new reference to the character container. The xref element is a
+     * Add a new reference to the character container. The {@code xref} element is a
      * reference to an external document. The content will be used as part of
      * the link's visual body.
      * 
      * @param target
      *            (Required) A target URL for the references a destination for
-     *            the xref.
+     *            the {@code xref}.
+     * @return the new xref.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Xref addXref(String target) throws WingException
     {
@@ -73,15 +75,16 @@ public abstract class RichTextContainer extends TextContainer
     }
 
     /**
-     * Add a new reference to the character container. The xref element is a
+     * Add a new reference to the character container. The {@code xref} element is a
      * reference to an external document. The characters will be used as the
      * visual part of the link's body
      * 
      * @param target
      *            (Required) A target URL for the references a destination for
-     *            the xref.
+     *            the {@code xref}.
      * @param characters
      *            (May be null) The link's body
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addXref(String target, String characters) throws WingException
     {
@@ -90,17 +93,18 @@ public abstract class RichTextContainer extends TextContainer
     }
     
     /**
-     * Add a new reference to the character container. The xref element is a
+     * Add a new reference to the character container. The {@code xref} element is a
      * reference to an external document. The characters will be used as the
      * visual part of the link's body
      * 
      * @param target
      *            (Required) A target URL for the references a destination for
-     *            the xref.
+     *            the {@code xref}.
      * @param characters
      *            (May be null) The link's body
      * @param rend
      * 			  (May be null) Special rendering instructions.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addXref(String target, String characters, String rend) throws WingException
     {
@@ -110,19 +114,20 @@ public abstract class RichTextContainer extends TextContainer
     }
     
     /**
-     * Add a new reference to the character container. The xref element is a
+     * Add a new reference to the character container. The {@code xref} element is a
      * reference to an external document. The characters will be used as the
      * visual part of the link's body
      * 
      * @param target
      *            (Required) A target URL for the references a destination for
-     *            the xref.
+     *            the {@code xref}.
      * @param characters
      *            (May be null) The link's body
      * @param rend
      *            (May be null) Special rendering instructions.
      * @param name
      *            (May be null) local identifier
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addXref(String target, String characters, String rend, String name) throws WingException
     {
@@ -132,15 +137,16 @@ public abstract class RichTextContainer extends TextContainer
     }
 
     /**
-     * Add a new reference to the character container. The xref element is a
+     * Add a new reference to the character container. The {@code xref} element is a
      * reference to an external document. The translated i18n key will be used
      * as the visual part of the link's body
      * 
      * @param target
      *            (Required) A target URL for the references a destination for
-     *            the xref.
+     *            the {@code xref}.
      * @param key
      *            (Required) The link's body
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addXref(String target, Message key) throws WingException
     {
@@ -149,17 +155,18 @@ public abstract class RichTextContainer extends TextContainer
     }
     
     /**
-     * Add a new reference to the character container. The xref element is a
+     * Add a new reference to the character container. The {@code xref} element is a
      * reference to an external document. The translated i18n key will be used
      * as the visual part of the link's body
      * 
      * @param target
      *            (Required) A target URL for the references a destination for
-     *            the xref.
+     *            the {@code xref}.
      * @param key
      *            (Required) The link's body
      * @param rend
      *  		  (May be null) Special rendering instructions
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addXref(String target, Message key, String rend) throws WingException
     {
@@ -169,17 +176,20 @@ public abstract class RichTextContainer extends TextContainer
     }
 
     /**
-     * Add a new reference to the character container. The xref element is a
+     * Add a new reference to the character container. The {@code xref} element is a
      * reference to an external document. The translated i18n key will be used
      * as the visual part of the link's body
      *
      * @param target
      *            (Required) A target URL for the references a destination for
-     *            the xref.
+     *            the {@code xref}.
      * @param key
      *            (Required) The link's body
      * @param rend
      *  		  (May be null) Special rendering instructions
+     * @param name
+     *            Name of the link.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addXref(String target, Message key, String rend, String name) throws WingException
     {
@@ -204,6 +214,8 @@ public abstract class RichTextContainer extends TextContainer
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @return the new Figure.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Figure addFigure(String source, String target, String rend)
             throws WingException
@@ -227,9 +239,12 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) The target reference for the image if the image
      *            is to operate as a link.
      * @param title
+     *            Title for the figure.
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @return the new Figure.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Figure addFigure(String source, String target, String title, String rend)
             throws WingException
@@ -252,6 +267,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return A new button field.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Button addButton(String name, String rend) throws WingException
     {
@@ -270,6 +286,7 @@ public abstract class RichTextContainer extends TextContainer
      *            This is the name of the field use when data is submitted back
      *            to the server.
      * @return a new button field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Button addButton(String name) throws WingException
     {
@@ -291,6 +308,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return a new checkbox field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public CheckBox addCheckBox(String name, String rend) throws WingException
     {
@@ -311,6 +329,7 @@ public abstract class RichTextContainer extends TextContainer
      *            This is the name of the field use when data is submitted back
      *            to the server.
      * @return A new checkbox field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public CheckBox addCheckBox(String name) throws WingException
     {
@@ -331,6 +350,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return a new composite field.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Composite addComposite(String name, String rend) throws WingException
     {
@@ -350,6 +370,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (Required) a non-unique local identifier used to differentiate
      *            the element from its siblings within an interactive division.
      * @return a new composite field.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Composite addComposite(String name) throws WingException
     {
@@ -370,6 +391,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return A new file field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public File addFile(String name, String rend) throws WingException
     {
@@ -389,6 +411,7 @@ public abstract class RichTextContainer extends TextContainer
      *            This is the name of the field use when data is submitted back
      *            to the server.
      * @return a new file field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public File addFile(String name) throws WingException
     {
@@ -408,6 +431,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return a new hidden field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Hidden addHidden(String name, String rend) throws WingException
     {
@@ -427,6 +451,7 @@ public abstract class RichTextContainer extends TextContainer
      *            This is the name of the field use when data is submitted back
      *            to the server.
      * @return a new hidden field.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Hidden addHidden(String name) throws WingException
     {
@@ -446,6 +471,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return A new password field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Password addPassword(String name, String rend) throws WingException
     {
@@ -464,6 +490,7 @@ public abstract class RichTextContainer extends TextContainer
      *            This is the name of the field use when data is submitted back
      *            to the server.
      * @return a new password field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Password addPassword(String name) throws WingException
     {
@@ -485,6 +512,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return a new radio field.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Radio addRadio(String name, String rend) throws WingException
     {
@@ -506,6 +534,7 @@ public abstract class RichTextContainer extends TextContainer
      *            to the server.
      * 
      * @return a new radio field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Radio addRadio(String name) throws WingException
     {
@@ -525,6 +554,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return a new select field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Select addSelect(String name, String rend) throws WingException
     {
@@ -543,6 +573,7 @@ public abstract class RichTextContainer extends TextContainer
      *            This is the name of the field use when data is submitted back
      *            to the server.
      * @return a new select field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Select addSelect(String name) throws WingException
     {
@@ -561,6 +592,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return A new text field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Text addText(String name, String rend) throws WingException
     {
@@ -579,6 +611,7 @@ public abstract class RichTextContainer extends TextContainer
      *            This is the name of the field use when data is submitted back
      *            to the server.
      * @return a new text field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Text addText(String name) throws WingException
     {
@@ -597,6 +630,7 @@ public abstract class RichTextContainer extends TextContainer
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return a new text area field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public TextArea addTextArea(String name, String rend) throws WingException
     {
@@ -614,14 +648,10 @@ public abstract class RichTextContainer extends TextContainer
      *            This is the name of the field use when data is submitted back
      *            to the server.
      * @return a new text area field
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public TextArea addTextArea(String name) throws WingException
     {
         return addTextArea(name, null);
     }
-    
-    
-    
-    
-    
 }

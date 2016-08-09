@@ -43,10 +43,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param bitstream
      *            the bitstream that the policy refer to
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current context (current user) is not allowed to
      *             manage the bitstream's policies
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManageBitstreamPolicy(Context context,
@@ -64,10 +64,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param bundle
      *            the bundle that the policy refer to
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current context (current user) is not allowed to
      *             manage the bundle's policies
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManageBundlePolicy(Context context,
@@ -85,10 +85,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param item
      *            the item that the policy refer to
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current context (current user) is not allowed to
      *             manage the item's policies
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManageItemPolicy(Context context, Item item)
@@ -124,10 +124,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param collection
      *            the collection that the policy refer to
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current context (current user) is not allowed to
      *             manage the collection's policies
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManageCollectionPolicy(Context context,
@@ -159,10 +159,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param community
      *            the community that the policy refer to
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current context (current user) is not allowed to
      *             manage the community's policies
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManageCommunityPolicy(Context context,
@@ -185,9 +185,9 @@ public class AuthorizeUtil
      * 
      * @param context
      *            the DSpace Context Object
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current user is not a System Admin
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void requireAdminRole(Context context)
@@ -208,10 +208,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param item
      *            the item that the CC License refer to
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current user is not allowed to
      *             manage the item's CC License
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManageCCLicense(Context context, Item item)
@@ -254,10 +254,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param collection
      *            the collection
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current user is not allowed to manage the collection's
      *             template item
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManageTemplateItem(Context context,
@@ -296,10 +296,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param collection
      *            the collection
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current user is not allowed to manage the collection's
      *             submitters group
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManageSubmittersGroup(Context context,
@@ -331,10 +331,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param collection
      *            the collection
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current user is not allowed to manage the collection's
      *             workflow groups
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManageWorkflowsGroup(Context context,
@@ -368,10 +368,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param collection
      *            the collection
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current user is not allowed to create/edit the
      *             collection's admins group
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManageAdminGroup(Context context,
@@ -405,10 +405,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param collection
      *            the collection
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current user is not allowed to remove the
      *             collection's admins group
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeRemoveAdminGroup(Context context,
@@ -439,10 +439,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param community
      *            the community
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current user is not allowed to create/edit the
      *             community's admins group
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManageAdminGroup(Context context,
@@ -470,10 +470,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param community
      *            the community
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current user is not allowed to remove the
      *             collection's admins group
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeRemoveAdminGroup(Context context,
@@ -505,10 +505,10 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param rp
      *            a resource policy
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current context (current user) is not allowed to
      *             remove/edit the policy
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
      */
     public static void authorizeManagePolicy(Context c, ResourcePolicy rp)
@@ -546,9 +546,9 @@ public class AuthorizeUtil
      *            the DSpace Context Object
      * @param item
      *            the item
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a db error occur
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if the current user is not allowed to perform the item
      *             withdraw
      */
@@ -589,9 +589,9 @@ public class AuthorizeUtil
     *            the DSpace Context Object
     * @param item
     *            the item
-    * @throws SQLException
+    * @throws SQLException if database error
     *             if a db error occur
-    * @throws AuthorizeException
+    * @throws AuthorizeException if authorization error
     *             if the current user is not allowed to perform the item
     *             reinstatement
     */

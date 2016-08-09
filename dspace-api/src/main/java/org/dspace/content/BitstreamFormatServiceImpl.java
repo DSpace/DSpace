@@ -18,6 +18,7 @@ import org.dspace.core.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -59,7 +60,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
      *            ID of the bitstream format
      *
      * @return the bitstream format, or null if the ID is invalid.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     @Override
     public BitstreamFormat find(Context context, int id)
@@ -181,17 +182,25 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
 
     @Override
     public void update(Context context, BitstreamFormat bitstreamFormat) throws SQLException, AuthorizeException {
-        // Check authorisation - only administrators can change formats
-        if (!authorizeService.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "Only administrators can modify bitstream formats");
+        update(context, Collections.singletonList(bitstreamFormat));
+    }
+
+    @Override
+    public void update(Context context, List<BitstreamFormat> bitstreamFormats) throws SQLException, AuthorizeException {
+        if(CollectionUtils.isNotEmpty(bitstreamFormats)) {
+            // Check authorisation - only administrators can change formats
+            if (!authorizeService.isAdmin(context)) {
+                throw new AuthorizeException(
+                        "Only administrators can modify bitstream formats");
+            }
+
+            for (BitstreamFormat bitstreamFormat : bitstreamFormats) {
+                log.info(LogManager.getHeader(context, "update_bitstream_format",
+                        "bitstream_format_id=" + bitstreamFormat.getID()));
+
+                bitstreamFormatDAO.save(context, bitstreamFormat);
+            }
         }
-
-        log.info(LogManager.getHeader(context, "update_bitstream_format",
-                "bitstream_format_id=" + bitstreamFormat.getID()));
-
-        bitstreamFormatDAO.save(context, bitstreamFormat);
     }
 
     @Override

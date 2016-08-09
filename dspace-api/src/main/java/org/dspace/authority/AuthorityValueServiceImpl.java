@@ -113,6 +113,9 @@ public class AuthorityValueServiceImpl implements AuthorityValueService{
 
     /**
      * Item.ANY does not work here.
+     * @param context Context
+     * @param authorityID authority id
+     * @return AuthorityValue
      */
     @Override
     public AuthorityValue findByUID(Context context, String authorityID) {

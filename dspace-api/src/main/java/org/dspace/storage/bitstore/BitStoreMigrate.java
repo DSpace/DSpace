@@ -90,7 +90,7 @@ public class BitStoreMigrate {
                 Integer sourceAssetstore = Integer.valueOf(line.getOptionValue('a'));
                 Integer destinationAssetstore = Integer.valueOf(line.getOptionValue('b'));
 
-                //Safe default, commit every time. @TODO Performance Profile
+                //Safe default, commit every time. TODO Performance Profile
                 Integer batchCommitSize = 1;
                 if(line.hasOption('s')) {
                     batchCommitSize = Integer.parseInt(line.getOptionValue('s'));

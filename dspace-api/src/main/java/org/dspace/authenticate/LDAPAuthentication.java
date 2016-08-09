@@ -69,6 +69,7 @@ public class LDAPAuthentication
 
     /**
      * Let a real auth method return true if it wants.
+     * @throws SQLException if database error
      */
     @Override
     public boolean canSelfRegister(Context context,
@@ -81,7 +82,8 @@ public class LDAPAuthentication
     }
 
     /**
-     *  Nothing here, initialization is done when auto-registering.
+     * Nothing here, initialization is done when auto-registering.
+     * @throws SQLException if database error
      */
     @Override
     public void initEPerson(Context context, HttpServletRequest request,
@@ -94,6 +96,7 @@ public class LDAPAuthentication
 
     /**
      * Cannot change LDAP password through dspace, right?
+     * @throws SQLException if database error
      */
     @Override
     public boolean allowSetPassword(Context context,
@@ -478,15 +481,17 @@ public class LDAPAuthentication
                         env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
                         env.put(javax.naming.Context.SECURITY_PRINCIPAL, adminUser);
                         env.put(javax.naming.Context.SECURITY_CREDENTIALS, adminPassword);
-                        
-                        // Create initial context
-                        ctx = new InitialLdapContext(env, null);
                     }
                 }
                 else
                 {
                     // Use anonymous authentication
                     env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "none");
+                }
+                        
+                if (ctx == null) {
+                    // Create initial context
+                    ctx = new InitialLdapContext(env, null);
                 }
 
                 Attributes matchAttrs = new BasicAttributes(true);

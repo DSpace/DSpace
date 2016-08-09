@@ -7,6 +7,7 @@
  */
 package org.dspace.eperson;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.content.MetadataSchema;
@@ -48,6 +49,9 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     @Column
     private Boolean permanent = false;
 
+    @Column(length = 250, unique = true)
+    private String name;
+
     /** lists of epeople and groups in the group */
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -73,9 +77,6 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
 
     @Transient
     private boolean groupsChanged;
-
-    @Transient
-    private transient GroupService groupService;
 
     /**
      * Protected constructor, create object using:
@@ -197,14 +198,16 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     @Override
     public String getName()
     {
-        return getGroupService().getName(this);
+        return name;
     }
 
     /** Change the name of this Group. */
-    void setName(Context context, String name) throws SQLException
+    void setName(String name) throws SQLException
     {
-        getGroupService().setMetadataSingleValue(context, this,
-                MetadataSchema.DC_SCHEMA, "title", null, null, name);
+        if(!StringUtils.equals(this.name, name) && !isPermanent()) {
+            this.name = name;
+            groupsChanged = true;
+        }
     }
 
     public boolean isGroupsChanged() {
@@ -222,14 +225,6 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
 
     public List<WorkspaceItem> getSupervisedItems() {
         return supervisedItems;
-    }
-
-    private GroupService getGroupService() {
-        if(groupService == null)
-        {
-            groupService = EPersonServiceFactory.getInstance().getGroupService();
-        }
-        return groupService;
     }
 
     /**

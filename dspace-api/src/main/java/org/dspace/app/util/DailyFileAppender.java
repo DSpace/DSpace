@@ -235,7 +235,7 @@ public class DailyFileAppender extends FileAppender
     /**
      * This function is responsible for performing the actual file rollover.
      * @param pstrName The name of the new folder based on current system date.
-     * @throws IOException
+     * @throws IOException if IO error
      */
     private static boolean deletingFiles = false;
     private void cleanupOldFiles()

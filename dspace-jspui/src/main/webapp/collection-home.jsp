@@ -373,7 +373,7 @@
 <%  } %>
 
 <%
-	if (rs != null)
+	if (rs != null && rs.count() > 0)
 	{
 %>
 	<h3><fmt:message key="jsp.collection-home.recentsub"/></h3>

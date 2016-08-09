@@ -228,8 +228,9 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * Set the license for this collection. Passing in <code>null</code> means
      * that the site-wide default will be used.
      *
-     * @param license
-     *            the license, or <code>null</code>
+     * @param context context
+     * @param license the license, or <code>null</code>
+     * @throws SQLException if database error
      */
     public void setLicense(Context context, String license) throws SQLException {
         getCollectionService().setMetadata(context, this, "license", license);
@@ -242,6 +243,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * for a submission.
      *
      * @return the item template, or <code>null</code>
+     * @throws SQLException if database error
      */
     public Item getTemplateItem() throws SQLException
     {
@@ -257,7 +259,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * Get the communities this collection appears in
      *
      * @return array of <code>Community</code> objects
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public List<Community> getCommunities() throws SQLException
     {

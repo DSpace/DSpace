@@ -99,7 +99,7 @@ public interface BitstreamStorageService {
    	 * @return The ID of the registered bitstream
    	 * @exception SQLException
    	 *                If a problem occurs accessing the RDBMS
-   	 * @throws IOException
+   	 * @throws IOException if IO error
    	 */
    	public UUID register(Context context, Bitstream bitstream, int assetstore, String bitstreamPath)
             throws SQLException, IOException, AuthorizeException;
@@ -152,7 +152,7 @@ public interface BitstreamStorageService {
     /**
      * Print out (log/out) a listing of the assetstores configured, and how many assets they contain
      * @param context
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public void printStores(Context context) throws SQLException;
 

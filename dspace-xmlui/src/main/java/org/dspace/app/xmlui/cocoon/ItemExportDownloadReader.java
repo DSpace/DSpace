@@ -246,6 +246,7 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
             }
             out.flush();
         }
+        out.close();
     }
 
     /**
@@ -264,6 +265,8 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
         this.request = null;
         this.compressedExportInputStream = null;
         this.compressedExportSize = 0;
+        this.compressedExportName = null;
+        super.recycle();
         
     }
 

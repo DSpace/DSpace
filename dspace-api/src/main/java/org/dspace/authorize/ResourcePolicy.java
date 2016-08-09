@@ -10,8 +10,10 @@ package org.dspace.authorize;
 import org.apache.commons.lang.ObjectUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.annotations.Type;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -24,7 +26,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name="resourcepolicy")
-public class ResourcePolicy{
+public class ResourcePolicy implements ReloadableEntity<Integer> {
     public static String TYPE_SUBMISSION = "TYPE_SUBMISSION";
     public static String TYPE_WORKFLOW = "TYPE_WORKFLOW";
     public static String TYPE_CUSTOM= "TYPE_CUSTOM";
@@ -40,9 +42,15 @@ public class ResourcePolicy{
     @JoinColumn(name = "dspace_object")
     private DSpaceObject dSpaceObject;
 
+    /*
+     * {@see org.dspace.core.Constants#Constants Constants}
+     */
     @Column(name = "resource_type_id")
     private int resourceTypeId;
 
+    /*
+     * {@see org.dspace.core.Constants#Constants Constants}
+     */
     @Column(name="action_id")
     private int actionId;
 
@@ -70,7 +78,9 @@ public class ResourcePolicy{
     @Column(name="rptype", length = 30)
     private String rptype;
 
-    @Column(name="rpdescription", length = 100)
+    @Lob
+    @Type(type="org.hibernate.type.MaterializedClobType")
+    @Column(name="rpdescription")
     private String rpdescription;
 
     /**
@@ -200,6 +210,7 @@ public class ResourcePolicy{
 
     /**
      * assign an EPerson to this policy
+     * @param eperson Eperson
      */
     public void setEPerson(EPerson eperson)
     {
@@ -218,6 +229,7 @@ public class ResourcePolicy{
 
     /**
      * sets ID for Group referred to by this policy
+     * @param epersonGroup Group
      */
     public void setGroup(Group epersonGroup)
     {

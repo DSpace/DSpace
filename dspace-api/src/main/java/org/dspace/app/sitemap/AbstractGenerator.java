@@ -74,7 +74,7 @@ public abstract class AbstractGenerator
     /**
      * Start writing a new sitemap file.
      *
-     * @throws IOException
+     * @throws IOException if IO error
      *             if an error occurs creating the file
      */
     protected void startNewFile() throws IOException
@@ -102,7 +102,7 @@ public abstract class AbstractGenerator
      *            Full URL to add
      * @param lastMod
      *            Date URL was last modified, or {@code null}
-     * @throws IOException
+     * @throws IOException if IO error
      *             if an error occurs writing
      */
     public void addURL(String url, Date lastMod) throws IOException
@@ -130,7 +130,7 @@ public abstract class AbstractGenerator
     /**
      * Finish with the current sitemap file.
      *
-     * @throws IOException
+     * @throws IOException if IO error
      *             if an error occurs writing
      */
     protected void closeCurrentFile() throws IOException
@@ -147,7 +147,7 @@ public abstract class AbstractGenerator
      *
      * @return number of sitemap files written.
      *
-     * @throws IOException
+     * @throws IOException if IO error
      *             if an error occurs writing
      */
     public int finish() throws IOException
@@ -246,7 +246,7 @@ public abstract class AbstractGenerator
      *            stream to write the index to
      * @param sitemapCount
      *            number of sitemaps that were generated
-     * @throws IOException
+     * @throws IOException if IO error
      *             if an IO error occurs
      */
     public abstract void writeIndex(PrintStream output, int sitemapCount)

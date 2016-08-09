@@ -17,7 +17,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.importer.external.MetadataSourceException;
+import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.ImportService;
@@ -44,7 +44,8 @@ public class XMLUIStartSubmissionLookupStep extends AbstractProcessingStep {
         String publicationID = request.getParameter("publication_id");
 
         if (StringUtils.isNotBlank(publicationID)) {
-            ImportService importService = new DSpace().getServiceManager().getServiceByName(null, ImportService.class);
+            /* Get an instance of the ImportService to be able to retrieve records based on several factors, such as url, publicationID, etc*/
+            ImportService importService = new DSpace().getServiceManager().getServiceByName("importService", ImportService.class);
             Item item = subInfo.getSubmissionItem().getItem();
             try {
             ImportRecord   record = importService.getRecord(getPublicationUrl(), publicationID);
@@ -77,7 +78,7 @@ public class XMLUIStartSubmissionLookupStep extends AbstractProcessingStep {
 
     public String getPublicationUrl(){
         if(publicationUrl==null){
-            publicationUrl=configurationService.getProperty("publication-lookup.publication.url");
+            publicationUrl=configurationService.getProperty("publication-lookup.url", "*");
         }
         return publicationUrl;
     }

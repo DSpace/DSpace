@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The Legacy Plugin Service is a very simple component container (based on the
- * legacy PluginManager class from <=5.x). It reads defined "plugins" (interfaces)
- * from config file(s) and makes them available to the API. (@TODO: Someday, this
+ * legacy PluginManager class from 5.x or below). It reads defined "plugins" (interfaces)
+ * from config file(s) and makes them available to the API. (TODO: Someday, this
  * entire "plugin" framework needs to be replaced by Spring Beans.)
  * <p>
  * It creates and organizes components (plugins), and helps select a plugin in
@@ -90,7 +90,7 @@ public class LegacyPluginServiceImpl implements PluginService
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
-    private LegacyPluginServiceImpl() {
+    protected LegacyPluginServiceImpl() {
     }
 
     /**
@@ -548,6 +548,7 @@ public class LegacyPluginServiceImpl implements PluginService
      * <li>Implementations of named plugin have no name collisions.
      * <li>Named plugin entries lacking names.
      * </ul>
+     * @throws IOException if IO error
      */
     public void checkConfiguration()
         throws IOException
@@ -712,6 +713,8 @@ public class LegacyPluginServiceImpl implements PluginService
      * Invoking this class from the command line just runs
      * <code>checkConfiguration</code> and shows the results.
      * There are no command-line options.
+     * @param argv arguments
+     * @throws Exception if error
      */
     public void main(String[] argv) throws Exception
     {

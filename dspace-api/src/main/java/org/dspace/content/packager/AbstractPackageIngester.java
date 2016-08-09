@@ -53,7 +53,7 @@ import org.dspace.workflow.WorkflowException;
  *
  * @author Tim Donohue
  * @see PackageIngester
- * @see PluginService
+ * @see org.dspace.core.service.PluginService
  */
 public abstract class AbstractPackageIngester
         implements PackageIngester
@@ -114,6 +114,11 @@ public abstract class AbstractPackageIngester
      *          is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>ingestAll</code>
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws WorkflowException if workflow error
      */
     @Override
     public List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
@@ -254,6 +259,11 @@ public abstract class AbstractPackageIngester
      *          is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>replaceAll</code>
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws WorkflowException if workflow error
      */
     @Override
     public List<String> replaceAll(Context context, DSpaceObject dso,

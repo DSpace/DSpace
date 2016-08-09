@@ -97,7 +97,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             List<org.dspace.content.MetadataSchema> schemas = metadataSchemaService.findAll(context);
             metadataSchemas = new ArrayList<MetadataSchema>();
@@ -158,7 +158,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataSchema schema = metadataSchemaService.find(context, schemaPrefix);
             metadataSchema = new MetadataSchema(schema, expand, context);
@@ -258,7 +258,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataSchema schema = metadataSchemaService.find(context, schemaPrefix);
             
@@ -327,7 +327,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataField field = metadataFieldService.find(context, fieldId);
             if (field == null) {
@@ -391,7 +391,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             if (!authorizeService.isAdmin(context))
             {
@@ -479,7 +479,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             if (!authorizeService.isAdmin(context))
             {
@@ -570,7 +570,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataField dspaceField = metadataFieldService.find(context, fieldId);
             if (field == null) {
@@ -645,7 +645,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataField dspaceField = metadataFieldService.find(context, fieldId);
             if (dspaceField == null) {
@@ -711,7 +711,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataSchema dspaceSchema = metadataSchemaService.find(context, schemaId);
             if (dspaceSchema == null) {

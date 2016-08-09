@@ -50,12 +50,13 @@ import org.dspace.handle.service.HandleService;
  */
 public class SendItemRequestAction extends AbstractAction
 {
-    private static Logger log = Logger.getLogger(SendItemRequestAction.class);
+    private static final Logger log = Logger.getLogger(SendItemRequestAction.class);
 
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected RequestItemService requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
@@ -81,7 +82,7 @@ public class SendItemRequestAction extends AbstractAction
         {
             // Either the user did not fill out the form or this is the
             // first time they are visiting the page.
-            Map<String,String> map = new HashMap<String,String>();
+            Map<String,String> map = new HashMap<>();
             map.put("bitstreamId",bitstreamId);
 
             if (StringUtils.isEmpty(requesterEmail))
@@ -104,7 +105,10 @@ public class SendItemRequestAction extends AbstractAction
         }
         
         Item item = (Item) dso;
-        String title = "";
+        String title = item.getName();
+        
+        title = StringUtils.isNotBlank(title) ? title : I18nUtil
+                            .getMessage("jsp.general.untitled", context);
         Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamId));
 
         RequestItemAuthor requestItemAuthor = DSpaceServicesFactory.getInstance().getServiceManager()
@@ -141,19 +145,21 @@ public class SendItemRequestAction extends AbstractAction
 
     /**
      * Get the link to the author in RequestLink email.
-     * @param context
-     * @param requestItem
-     * @return
-     * @throws SQLException
+     * @param context DSpace session context.
+     * @param token token.
+     * @return the link.
+     * @throws SQLException passed through.
      */
     protected String getLinkTokenEmail(Context context, String token)
             throws SQLException
     {
         String base = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url");
 
-        String specialLink = (new StringBuffer()).append(base).append(
-                base.endsWith("/") ? "" : "/").append(
-                "itemRequestResponse/").append(token)
+        String specialLink = new StringBuffer()
+                .append(base)
+                .append(base.endsWith("/") ? "" : "/")
+                .append("itemRequestResponse/")
+                .append(token)
                 .toString()+"/";
 
         return specialLink;

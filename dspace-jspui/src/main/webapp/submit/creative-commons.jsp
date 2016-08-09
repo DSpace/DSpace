@@ -48,7 +48,7 @@
     Boolean lExists = (Boolean)request.getAttribute("cclicense.exists");
     boolean licenseExists = (lExists == null ? false : lExists.booleanValue());
 
-    String jurisdiction = ConfigurationManager.getProperty("webui.submit.cc-jurisdiction");
+    String jurisdiction = ConfigurationManager.getProperty("cc.license.jurisdiction");
     if ((jurisdiction != null) && (!"".equals(jurisdiction)))
     {
         jurisdiction = "&amp;jurisdiction=" + jurisdiction.trim();

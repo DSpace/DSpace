@@ -48,8 +48,13 @@ public class FlowMapperUtils
 	 * @param collectionID The collection to map items into.
 	 * @param itemIDs The items to map.
 	 * @return Flow result
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static FlowResult processMapItems(Context context, UUID collectionID, String[] itemIDs) throws SQLException, AuthorizeException, UIException, IOException
+	public static FlowResult processMapItems(Context context, UUID collectionID, String[] itemIDs)
+            throws SQLException, AuthorizeException, UIException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
@@ -85,8 +90,13 @@ public class FlowMapperUtils
 	 * @param collectionID The collection to unmap these items from.
 	 * @param itemIDs The items to be unmapped.
 	 * @return A flow result
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static FlowResult processUnmapItems(Context context, UUID collectionID, String[] itemIDs) throws SQLException, AuthorizeException, UIException, IOException
+	public static FlowResult processUnmapItems(Context context, UUID collectionID, String[] itemIDs)
+            throws SQLException, AuthorizeException, UIException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);

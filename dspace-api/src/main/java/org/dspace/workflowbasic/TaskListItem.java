@@ -8,6 +8,7 @@
 package org.dspace.workflowbasic;
 
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 
 import javax.persistence.*;
@@ -19,7 +20,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "tasklistitem")
-public class TaskListItem {
+public class TaskListItem implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name = "tasklist_id", unique = true, nullable = false)
@@ -63,5 +64,9 @@ public class TaskListItem {
 
     void setWorkflowItem(BasicWorkflowItem workflowItem) {
         this.workflowItem = workflowItem;
+    }
+
+    public Integer getID() {
+        return taskListItemId;
     }
 }

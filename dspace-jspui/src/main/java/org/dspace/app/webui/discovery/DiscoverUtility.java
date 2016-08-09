@@ -247,9 +247,13 @@ public class DiscoverUtility
         {
             try
             {
-            String newFilterQuery = SearchUtils.getSearchService()
-                    .toFilterQuery(context, f[0], f[1], f[2])
-                    .getFilterQuery();
+            String newFilterQuery = null;
+            if (StringUtils.isNotBlank(f[0]) && StringUtils.isNotBlank(f[2]))
+            {
+                newFilterQuery = SearchUtils.getSearchService()
+                        .toFilterQuery(context, f[0], f[1], f[2])
+                        .getFilterQuery();
+            }
             if (newFilterQuery != null)
             {
                 queryArgs.addFilterQueries(newFilterQuery);
@@ -583,7 +587,7 @@ public class DiscoverUtility
                             // filterquery
                             queryArgs.addFacetField(new DiscoverFacetField(
                                     facet.getIndexFieldName(), facet.getType(),
-                                    10, facet.getSortOrder()));
+                                    10, facet.getSortOrderSidebar()));
                         }
                         else
                         {
@@ -671,7 +675,7 @@ public class DiscoverUtility
                             .getIndexFieldName(),
                             DiscoveryConfigurationParameters.TYPE_TEXT,
                            limit, facet
-                                    .getSortOrder(), facetPage * facetLimit));
+                                    .getSortOrderSidebar(), facetPage * facetLimit));
                 }
             }
         }

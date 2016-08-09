@@ -20,6 +20,9 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.pdfparser.PDFParser;
+import org.apache.pdfbox.io.ScratchFile;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.io.RandomAccessBufferedFileInputStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.dspace.authorize.AuthorizeException;
@@ -103,8 +106,12 @@ public class PDFPackager
      * @param params  package parameters (none recognized)
      * @param license  may be null, which takes default license.
      * @return workspace item created by ingest.
-     * @throws PackageException if package is unacceptable or there is
-     *  a fatal error turning it into an Item.
+     * @throws PackageValidationException if package invalid
+     * @throws CrosswalkException if crosswalking fails
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws WorkflowException if workflow error
      */
     @Override
     public DSpaceObject ingest(Context context, DSpaceObject parent,
@@ -178,6 +185,12 @@ public class PDFPackager
 
     /**
      * IngestAll() cannot be implemented for a PDF ingester, because there's only one PDF to ingest
+     * @throws UnsupportedOperationException if unsupported operation
+     * @throws PackageException if package error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
      */
     @Override
     public List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
@@ -192,6 +205,12 @@ public class PDFPackager
 
     /**
      * Replace is not implemented.
+     * @throws UnsupportedOperationException if unsupported operation
+     * @throws PackageException if package error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
      */
     @Override
     public DSpaceObject replace(Context context, DSpaceObject dso,
@@ -205,6 +224,12 @@ public class PDFPackager
 
     /**
      * ReplaceAll() cannot be implemented for a PDF ingester, because there's only one PDF to ingest
+     * @throws UnsupportedOperationException if unsupported operation
+     * @throws PackageException if package error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
      */
     @Override
     public List<String> replaceAll(Context context, DSpaceObject dso,
@@ -220,6 +245,11 @@ public class PDFPackager
      * VERY crude dissemination: just look for the first
      * bitstream with the PDF package type, and toss it out.
      * Works on packages importer with this packager, and maybe some others.
+     * @param dso DSpaceObject
+     * @throws CrosswalkException if crosswalk error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     @Override
     public void disseminate(Context context, DSpaceObject dso,
@@ -270,6 +300,11 @@ public class PDFPackager
 
     /**
      * disseminateAll() cannot be implemented for a PDF disseminator, because there's only one PDF to disseminate
+     * @throws PackageException if package error
+     * @throws CrosswalkException if crosswalk error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     @Override
     public List<File> disseminateAll(Context context, DSpaceObject dso,
@@ -284,6 +319,7 @@ public class PDFPackager
     /**
      * Identifies the MIME-type of this package, i.e. "application/pdf".
      *
+     * @param params package params
      * @return the MIME type (content-type header) of the package to be returned
      */
     @Override
@@ -299,7 +335,18 @@ public class PDFPackager
 
         try
         {
-            PDFParser parser = new PDFParser(metadata);
+            ScratchFile scratchFile = null;
+            try
+            {
+                long useRAM = Runtime.getRuntime().freeMemory()*80/100; // use up to 80% of JVM free memory
+                scratchFile = new ScratchFile(MemoryUsageSetting.setupMixed(useRAM)); // then fallback to temp file (unlimited size)
+            }
+            catch (IOException ioe)
+            {
+                log.warn("Error initializing scratch file: " + ioe.getMessage());
+            }
+        
+            PDFParser parser = new PDFParser(new RandomAccessBufferedFileInputStream(metadata), scratchFile);
             parser.parse();
             cos = parser.getDocument();
 

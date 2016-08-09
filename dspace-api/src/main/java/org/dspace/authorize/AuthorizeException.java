@@ -59,6 +59,8 @@ public class AuthorizeException extends Exception
      * 
      * @param message
      *            the message
+     * @param o object
+     * @param a actionID
      */
     public AuthorizeException(String message, DSpaceObject o, int a)
     {

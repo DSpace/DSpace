@@ -136,7 +136,7 @@ public class DSpaceServlet extends HttpServlet
             // Also email an alert
             UIUtil.sendAlert(request, se);
 
-            context.abort();
+            abortContext(context);
             JSPManager.showInternalError(request, response);
         }
         catch (AuthorizeException ae)
@@ -158,6 +158,15 @@ public class DSpaceServlet extends HttpServlet
 
                 JSPManager.showAuthorizeError(request, response, ae);
             }
+            abortContext(context);
+        }
+        catch (Exception e)
+        {
+            log.warn(LogManager.getHeader(context, "general_jspui_error", e
+                    .toString()), e);
+
+            abortContext(context);
+            JSPManager.showInternalError(request, response);
         }
         finally
         {
@@ -172,6 +181,13 @@ public class DSpaceServlet extends HttpServlet
                     JSPManager.showInternalError(request, response);
                 }
             }
+        }
+    }
+
+    private void abortContext(Context context) {
+        if(context != null && context.isValid())
+        {
+            context.abort();
         }
     }
 

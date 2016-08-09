@@ -387,6 +387,7 @@ public class X509Authentication implements AuthenticationMethod
      * configuration value. You'll probably want this to be true to take
      * advantage of a Web certificate infrastructure with many more users than
      * are already known by DSpace.
+     * @throws SQLException if database error
      */
     @Override
     public boolean canSelfRegister(Context context, HttpServletRequest request,
@@ -398,6 +399,7 @@ public class X509Authentication implements AuthenticationMethod
 
     /**
      * Nothing extra to initialize.
+     * @throws SQLException if database error
      */
     @Override
     public void initEPerson(Context context, HttpServletRequest request,
@@ -407,6 +409,7 @@ public class X509Authentication implements AuthenticationMethod
 
     /**
      * We don't use EPerson password so there is no reason to change it.
+     * @throws SQLException if database error
      */
     @Override
     public boolean allowSetPassword(Context context,
@@ -486,11 +489,12 @@ public class X509Authentication implements AuthenticationMethod
      * Return special groups configured in dspace.cfg for X509 certificate
      * authentication.
      * 
-     * @param context
+     * @param context context
      * @param request
      *            object potentially containing the cert
      * 
      * @return An int array of group IDs
+     * @throws SQLException if database error
      * 
      */
     @Override
@@ -558,6 +562,7 @@ public class X509Authentication implements AuthenticationMethod
      * </ul>
      * 
      * @return One of: SUCCESS, BAD_CREDENTIALS, NO_SUCH_USER, BAD_ARGS
+     * @throws SQLException if database error
      */
     @Override
     public int authenticate(Context context, String username, String password,

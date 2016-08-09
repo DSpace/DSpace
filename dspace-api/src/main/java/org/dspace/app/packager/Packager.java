@@ -478,12 +478,12 @@ public class Packager
      * @param pkgParams Parameters to pass to individual packager instances
      * @param sourceFile location of the source package to ingest
      * @param parentObjs Parent DSpace object(s) to attach new object to
-     * @throws IOException
-     * @throws SQLException
-     * @throws FileNotFoundException
-     * @throws AuthorizeException
-     * @throws CrosswalkException
-     * @throws PackageException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws FileNotFoundException if file doesn't exist
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
+     * @throws PackageException if packaging error
      */
     protected void ingest(Context context, PackageIngester sip, PackageParameters pkgParams, String sourceFile, DSpaceObject parentObjs[])
             throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException, PackageException
@@ -617,12 +617,12 @@ public class Packager
      * @param dso DSpace Object to disseminate as a package
      * @param pkgParams Parameters to pass to individual packager instances
      * @param outputFile File where final package should be saved
-     * @throws IOException
-     * @throws SQLException
-     * @throws FileNotFoundException
-     * @throws AuthorizeException
-     * @throws CrosswalkException
-     * @throws PackageException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws FileNotFoundException if file doesn't exist
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
+     * @throws PackageException if packaging error
      */
     protected void disseminate(Context context, PackageDisseminator dip,
 			       DSpaceObject dso, PackageParameters pkgParams,
@@ -699,12 +699,12 @@ public class Packager
      * @param pkgParams Parameters to pass to individual packager instances
      * @param sourceFile location of the source package to ingest as the replacement
      * @param objToReplace DSpace object to replace (may be null if it will be specified in the package itself)
-     * @throws IOException
-     * @throws SQLException
-     * @throws FileNotFoundException
-     * @throws AuthorizeException
-     * @throws CrosswalkException
-     * @throws PackageException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws FileNotFoundException if file doesn't exist
+     * @throws AuthorizeException if authorization error
+     * @throws CrosswalkException if crosswalk error
+     * @throws PackageException if packaging error
      */
     protected void replace(Context context, PackageIngester sip, PackageParameters pkgParams, String sourceFile, DSpaceObject objToReplace)
             throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException, PackageException

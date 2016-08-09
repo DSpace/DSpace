@@ -15,12 +15,13 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.rdf.RDFConfiguration;
+import org.dspace.rdf.RDFUtil;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -29,14 +30,16 @@ import org.dspace.rdf.RDFConfiguration;
 public class LocalURIGenerator implements URIGenerator {
     private static final Logger log = Logger.getLogger(LocalURIGenerator.class);
 
-    protected final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
+    @Autowired(required=true)
+    protected SiteService siteService;
 
     @Override
     public String generateIdentifier(Context context, int type, UUID id,
             String handle, List<String> identifiers)
             throws SQLException
     {
-        String urlPrefix = RDFConfiguration.getDSpaceRDFModuleURI() + "/resource/";
+        String urlPrefix = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getProperty(RDFUtil.CONTEXT_PATH_KEY) + "/resource/";
         
         if (type == Constants.SITE)
         {

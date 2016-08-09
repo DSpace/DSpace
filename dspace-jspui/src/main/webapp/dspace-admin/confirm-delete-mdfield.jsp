@@ -58,7 +58,7 @@
             <%-- <P>This will result in an error if any items have values for this metadata field.</P> --%>
             <p class="alert alert-warning"><fmt:message key="jsp.dspace-admin.confirm-delete-mdfield.warning"/></p>
             <form method="post" action="">
-                <input type="hidden" name="dc_type_id" value="<%= type.getFieldID() %>">
+                <input type="hidden" name="dc_type_id" value="<%= type.getID() %>">
 						<div class="btn-group">
                                 <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
                                 <input class="btn btn-danger" type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />

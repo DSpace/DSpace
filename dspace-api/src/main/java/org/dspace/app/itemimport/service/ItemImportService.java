@@ -36,15 +36,53 @@ import java.util.List;
 public interface ItemImportService {
 
 
+    /**
+     * 
+     * @param c DSpace Context
+     * @param mycollections List of Collections
+     * @param sourceDir source location
+     * @param mapFile map file
+     * @param template whether to use template item
+     * @throws Exception if error 
+     */
     public void addItemsAtomic(Context c, List<Collection> mycollections, String sourceDir, String mapFile, boolean template) throws Exception;
 
+    /**
+     * Add items
+     * @param c DSpace Context
+     * @param mycollections List of Collections
+     * @param sourceDir source location
+     * @param mapFile map file
+     * @param template whether to use template item
+     * @throws Exception if error
+     */
     public void addItems(Context c, List<Collection> mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception;
 
+    /**
+     * Unzip a file
+     * @param zipfile file
+     * @return unzip location
+     * @throws IOException if error
+     */
     public String unzip(File zipfile) throws IOException;
 
+    /**
+     * Unzip a file to a destination
+     * @param zipfile file
+     * @param destDir destination directory
+     * @return unzip location
+     * @throws IOException if error
+     */
     public String unzip(File zipfile, String destDir) throws IOException;
 
+    /**
+     * Unzip a file in a specific source directory
+     * @param sourcedir source directory
+     * @param zipfilename file name
+     * @return unzip location
+     * @throws IOException if error
+     */
     public String unzip(String sourcedir, String zipfilename) throws IOException;
 
     /**
@@ -54,8 +92,10 @@ public interface ItemImportService {
      * @param owningCollection The owning collection the items will belong to
      * @param collections The collections the created items will be inserted to, apart from the owning one
      * @param resumeDir In case of a resume request, the directory that containsthe old mapfile and data
+     * @param inputType The input type of the data (bibtex, csv, etc.), in case of local file
      * @param context The context
-     * @throws Exception
+     * @param template whether to use template item
+     * @throws Exception if error
      */
     public void processUIImport(String url, Collection owningCollection, String[] collections, String resumeDir, String inputType, Context context, boolean template) throws Exception;
 
@@ -71,7 +111,7 @@ public interface ItemImportService {
      *            - eperson to send the email to
      * @param fileName
      *            - the filepath to the mapfile created by the batch import
-     * @throws javax.mail.MessagingException
+     * @throws MessagingException if error
      */
     public void emailSuccessMessage(Context context, EPerson eperson,
             String fileName) throws MessagingException;
@@ -86,39 +126,113 @@ public interface ItemImportService {
      *            - EPerson to send the error message to
      * @param error
      *            - the error message
-     * @throws MessagingException
+     * @throws MessagingException if error
      */
     public void emailErrorMessage(EPerson eperson, String error)
             throws MessagingException;
 
 
+    /**
+     * Get imports available for a person
+     * @param eperson EPerson object
+     * @return List of batch uploads
+     * @throws Exception if error
+     */
     public List<BatchUpload> getImportsAvailable(EPerson eperson)
             throws Exception;
 
+    /**
+     * Get import upload directory
+     * @param ePerson EPerson object
+     * @return directory
+     * @throws Exception if error 
+     */
     public String getImportUploadableDirectory(EPerson ePerson)
             throws Exception;
 
+    /**
+     * Delete a batch by ID
+     * @param c DSpace Context
+     * @param uploadId identifier
+     * @throws Exception if error
+     */
     public void deleteBatchUpload(Context c, String uploadId) throws Exception;
 
+    /**
+     * Replace items
+     * @param c DSpace Context
+     * @param mycollections List of Collections
+     * @param sourcedir source directory
+     * @param mapfile map file
+     * @param template whether to use template item
+     * @throws Exception if error
+     */
     public void replaceItems(Context c, List<Collection> mycollections, String sourcedir, String mapfile, boolean template) throws Exception;
 
+    /**
+     * Delete items via mapfile
+     * @param c DSpace Context
+     * @param mapfile map file
+     * @throws Exception if error
+     */
     public void deleteItems(Context c, String mapfile) throws Exception;
 
+    /**
+     * Add items
+     * @param c DSpace Context
+     * @param mycollections List of Collections
+     * @param sourcedir source directory
+     * @param mapfile map file
+     * @param template whether to use template item
+     * @param bteInputType The input type of the data (bibtex, csv, etc.), in case of local file
+     * @param workingDir working directory
+     * @throws Exception if error
+     */
     public void addBTEItems(Context c, List<Collection> mycollections, String sourcedir, String mapfile, boolean template, String bteInputType, String workingDir) throws Exception;
 
+    /**
+     * Get temporary work directory
+     * @return directory as string
+     */
     public String getTempWorkDir();
 
+    /**
+     * Get temporary work directory (as File)
+     * @return directory as File
+     */
     public File getTempWorkDirFile();
 
+    /**
+     * Cleanup
+     */
     public void cleanupZipTemp();
 
+    /**
+     * Set test flag
+     * @param isTest true or false 
+     */
     public void setTest(boolean isTest);
 
+    /**
+     * Set resume flag
+     * @param isResume true or false 
+     */
     public void setResume(boolean isResume);
 
+    /**
+     * Set use workflow
+     * @param useWorkflow whether to enable workflow
+     */
     public void setUseWorkflow(boolean useWorkflow);
 
-    public void setUseWorkflowSendEmail(boolean useWorkflow);
+    /**
+     * @param useWorkflowSendMail whether to send mail
+     */
+    public void setUseWorkflowSendEmail(boolean useWorkflowSendMail);
 
+    /**
+     * Set quiet flag
+     * @param isQuiet true or false
+     */
     public void setQuiet(boolean isQuiet);
 }

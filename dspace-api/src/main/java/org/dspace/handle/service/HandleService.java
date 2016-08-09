@@ -58,7 +58,8 @@ public interface HandleService {
             throws SQLException;
 
     /**
-     * Transforms handle into the canonical form <em>hdl:handle</em>.
+     * Transforms handle into a URI using http://hdl.handle.net if not 
+     * overridden by the configuration property handle.canonical.prefix.
      *
      * No attempt is made to verify that handle is in fact valid.
      *

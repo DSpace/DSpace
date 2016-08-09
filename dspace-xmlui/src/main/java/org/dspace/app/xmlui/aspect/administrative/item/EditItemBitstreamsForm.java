@@ -172,7 +172,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
                         cell.addXref(editURL, T_primary_label);
                     }
 
-                    row.addCell().addXref(editURL, description);
+                    row.addCell(null,null,"break-all").addXref(editURL, description);
                     row.addCell().addXref(editURL, format);
                 } else {
                     // The user can't edit the bitstream just show them it.
@@ -182,7 +182,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
                         cell.addContent(T_primary_label);
                     }
 
-                    row.addCell().addContent(description);
+                    row.addCell(null,null,"break-all").addContent(description);
                     row.addCell().addContent(format);
                 }
 

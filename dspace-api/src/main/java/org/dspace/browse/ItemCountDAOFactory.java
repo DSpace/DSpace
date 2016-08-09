@@ -24,8 +24,9 @@ public class ItemCountDAOFactory
      * Get an instance of ItemCountDAO which supports the correct storage backend
      * for the specific DSpace instance.
      * 
-     * @param context
-     * @throws ItemCountException
+     * @param context DSpace Context
+     * @return DAO
+     * @throws ItemCountException if count error
      */
     public static ItemCountDAO getInstance(Context context)
         throws ItemCountException

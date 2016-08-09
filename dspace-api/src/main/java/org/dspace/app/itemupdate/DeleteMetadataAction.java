@@ -28,12 +28,13 @@ public class DeleteMetadataAction extends UpdateMetadataAction {
 	/**
 	 *   Delete metadata from item
 	 * 
-	 *  @param context
-	 *  @param itarch
-	 *  @param isTest
-	 *  @param suppressUndo
-	 *  @throws ParseException
-	 *  @throws AuthorizeException
+	 * @param context DSpace Context
+	 * @param itarch Item Archive
+	 * @param isTest test flag
+	 * @param suppressUndo undo flag
+	 * @throws SQLException if database error
+         * @throws AuthorizeException if authorization error
+         * @throws ParseException if parse error
 	 */
 	@Override
     public void execute(Context context, ItemArchive itarch, boolean isTest,

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * Service implementation for the MetadataField object.
@@ -58,7 +59,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         if (hasElement(context, -1, metadataSchema, element, qualifier))
         {
             throw new NonUniqueMetadataException("Please make " + element + "."
-                    + qualifier + " unique within schema #" + metadataSchema.getSchemaID());
+                    + qualifier + " unique within schema #" + metadataSchema.getID());
         }
 
         // Create a table row and update it with the values
@@ -71,7 +72,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         metadataFieldDAO.save(context, metadataField);
 
         log.info(LogManager.getHeader(context, "create_metadata_field",
-                "metadata_field_id=" + metadataField.getFieldID()));
+                "metadata_field_id=" + metadataField.getID()));
         return metadataField;
     }
 
@@ -118,7 +119,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         }
 
         // Ensure the element and qualifier are unique within a given schema.
-        if (hasElement(context, metadataField.getFieldID(), metadataField.getMetadataSchema(), metadataField.getElement(), metadataField.getQualifier()))
+        if (hasElement(context, metadataField.getID(), metadataField.getMetadataSchema(), metadataField.getElement(), metadataField.getQualifier()))
         {
             throw new NonUniqueMetadataException("Please make " + metadataField.getMetadataSchema().getName() + "." + metadataField.getElement() + "."
                     + metadataField.getQualifier());
@@ -127,7 +128,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         metadataFieldDAO.save(context, metadataField);
 
         log.info(LogManager.getHeader(context, "update_metadatafieldregistry",
-                "metadata_field_id=" + metadataField.getFieldID() + "element=" + metadataField.getElement()
+                "metadata_field_id=" + metadataField.getID() + "element=" + metadataField.getElement()
                         + "qualifier=" + metadataField.getQualifier()));
     }
 
@@ -140,11 +141,29 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
                     "Only administrators may modify the metadata registry");
         }
 
-        log.info(LogManager.getHeader(context, "delete_metadata_field",
-                "metadata_field_id=" + metadataField.getFieldID()));
+        // Check for existing usages of this field
+        List<MetadataValue> values = null;
+        try
+        {
+           values = metadataValueService.findByField(context, metadataField);
+        }
+        catch(IOException io)
+        {
+            // ignore
+        }
 
-        metadataValueService.deleteByMetadataField(context, metadataField);
-        metadataFieldDAO.delete(context, metadataField);
+        // Only remove this field if it is NOT in use (as we don't want to bulk delete metadata values)
+        if(CollectionUtils.isEmpty(values))
+        {
+            metadataFieldDAO.delete(context, metadataField);
+        }
+        else
+        {
+            throw new IllegalStateException("Metadata field " + metadataField.toString() + " cannot be deleted as it is currently used by one or more objects.");
+        }
+
+        log.info(LogManager.getHeader(context, "delete_metadata_field",
+                "metadata_field_id=" + metadataField.getID()));
     }
 
     /**
@@ -153,11 +172,12 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
      * database constraint.
      *
      * @param context dspace context
+     * @param fieldId field id
      * @param metadataSchema metadataSchema
-     * @param element
-     * @param qualifier
+     * @param element element
+     * @param qualifier qualifier
      * @return true if unique
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean hasElement(Context context, int fieldId, MetadataSchema metadataSchema, String element, String qualifier) throws SQLException
     {

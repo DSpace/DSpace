@@ -382,7 +382,8 @@
             </list>
         </property>
         <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
 
     <bean id="searchFilterSubject" class="org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration">
@@ -393,7 +394,8 @@
             </list>
         </property>
         <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
         <property name="splitter" value="::"/>
     </bean>
 
@@ -405,7 +407,8 @@
             </list>
         </property>
         <property name="type" value="date"/>
-        <property name="sortOrder" value="VALUE"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
     
     <bean id="searchFilterContentInOriginalBundle" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -415,7 +418,8 @@
         </property>
         <property name="facetLimit" value="2"/>
         <property name="type" value="standard"/>
-        <property name="sortOrder" value="VALUE"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
 
     <!--Sort properties-->

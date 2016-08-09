@@ -7,6 +7,7 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -133,7 +135,16 @@ public class PoolTaskServiceImpl implements PoolTaskService {
 
     @Override
     public void update(Context context, PoolTask poolTask) throws SQLException, AuthorizeException {
-        poolTaskDAO.save(context, poolTask);
+        update(context, Collections.singletonList(poolTask));
+    }
+
+    @Override
+    public void update(Context context, List<PoolTask> poolTasks) throws SQLException, AuthorizeException {
+        if(CollectionUtils.isNotEmpty(poolTasks)) {
+            for (PoolTask poolTask : poolTasks) {
+                poolTaskDAO.save(context, poolTask);
+            }
+        }
     }
 
     @Override

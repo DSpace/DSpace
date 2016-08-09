@@ -28,33 +28,43 @@ import org.dspace.eperson.EPerson;
 
 /**
  * Attempt to authenticate the user based upon their presented credentials. 
- * This action uses the http parameters of login_email, login_password, and 
+ * This action uses the HTTP parameters of login_email, login_password, and
  * login_realm as credentials.
  * 
- * If the authentication attempt is successful then an HTTP redirect will be
+ * <p>If the authentication attempt is successful then an HTTP redirect will be
  * sent to the browser redirecting them to their original location in the 
  * system before authenticated or if none is supplied back to the DSpace 
- * homepage. The action will also return true, thus contents of the action will
- * be excuted.
- * 
- * If the authentication attempt fails, the action returns false.
- * 
- * Example use:
- * 
+ * home page. The action will also return true, thus contents of the action will
+ * be executed.
+ *
+ * <p>If the authentication attempt fails, the action returns false.
+ *
+ * <p>Example use:
+ *
+ * <pre>
+ * {@code
  * <map:act name="Authenticate">
  *   <map:serialize type="xml"/>
  * </map:act>
  * <map:transform type="try-to-login-again-transformer">
+ * }
+ * </pre>
  *
  * @author Scott Phillips
  */
-
 public class AuthenticateAction extends AbstractAction
 {
-
     /**
      * Attempt to authenticate the user. 
+     * @param redirector redirector.
+     * @param resolver source resolver.
+     * @param objectModel object model.
+     * @param source source
+     * @param parameters sitemap parameters.
+     * @return result of the action.
+     * @throws java.lang.Exception on error.
      */
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {

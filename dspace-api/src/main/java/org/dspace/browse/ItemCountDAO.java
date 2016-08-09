@@ -22,8 +22,8 @@ public interface ItemCountDAO
 	/**
 	 * Set the DSpace Context to use during data access
 	 * 
-	 * @param context
-	 * @throws ItemCountException
+	 * @param context DSpace Context
+	 * @throws ItemCountException if count error
 	 */
 	public void setContext(Context context) throws ItemCountException;
 	
@@ -32,8 +32,9 @@ public interface ItemCountDAO
 	 * only succeed if the DSpaceObject is an instance of either a Community or a
 	 * Collection.  Otherwise it will throw an exception.
 	 * 
-	 * @param dso
-	 * @throws ItemCountException
+	 * @param dso Dspace Object
+         * @return count
+	 * @throws ItemCountException if count error
 	 */
 	public int getCount(DSpaceObject dso) throws ItemCountException;
 }

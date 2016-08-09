@@ -30,7 +30,7 @@ public class JQueryLoaderReader extends AbstractReader {
     public void generate() throws IOException, SAXException, ProcessingException {
         String contextPath = ObjectModelHelper.getRequest(objectModel).getContextPath();
 
-        String script = "!window.jQuery && document.write('<script type=\"text/javascript\" src=\"" + contextPath + "/static/js/jquery-1.6.2.min.js\">&nbsp;</script>');";
+        String script = "!window.jQuery && document.write('<script type=\"text/javascript\" src=\"" + contextPath + "/static/js/jquery-1.6.4.min.js\">&nbsp;</script>');";
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(script.getBytes("UTF-8"));
 
@@ -45,6 +45,6 @@ public class JQueryLoaderReader extends AbstractReader {
             out.write(buffer, 0, length);
         }
         out.flush();
-
+        out.close();
     }
 }

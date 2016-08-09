@@ -25,12 +25,12 @@ interface SearchRequestProcessor
     /**
      * Search for Items to be mapped into a Collection.
      *
-     * @param context
+     * @param context session context.
      * @param query matches the interesting Items.
      * @param collection into which the found Items may be mapped.
      * @return found Items.
-     * @throws IOException
-     * @throws SQLException
+     * @throws IOException whenever.
+     * @throws SQLException whenever.
      */
     List<DSpaceObject> doItemMapSearch(Context context, String query, Collection collection)
             throws IOException, SQLException;

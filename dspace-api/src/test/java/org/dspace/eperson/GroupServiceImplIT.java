@@ -7,13 +7,14 @@
  */
 package org.dspace.eperson;
 
-import java.sql.SQLException;
 import org.dspace.AbstractUnitTest;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.sql.SQLException;
 
 /**
  * Test integration of GroupServiceImpl.
@@ -105,7 +106,7 @@ public class GroupServiceImplIT
         String name = "NOTANONYMOUS";
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group group = groupService.findByName(context, Group.ANONYMOUS);
-        groupService.setName(context, group, name);
+        groupService.setName(group, name);
     }
 
     /**

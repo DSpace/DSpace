@@ -844,7 +844,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         List<BasicWorkflowItem> pooledList = workflowService.getPooledTasks(context, currentUser);
 
         // User's WorkflowItems
-        List<BasicWorkflowItem> workflowItems = workflowItemService.findByOwner(context, currentUser);
+        List<BasicWorkflowItem> workflowItems = workflowItemService.findBySubmitter(context, currentUser);
 
         // User's PersonalWorkspace
         List<WorkspaceItem> workspaceItems = workspaceItemService.findByEPerson(context, currentUser);

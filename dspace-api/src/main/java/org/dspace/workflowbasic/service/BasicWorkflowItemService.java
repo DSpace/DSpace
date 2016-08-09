@@ -26,6 +26,13 @@ public interface BasicWorkflowItemService extends WorkflowItemService<BasicWorkf
 
     public List<BasicWorkflowItem> findPooledTasks(Context context, EPerson ePerson) throws SQLException;
 
+    /**
+     * Retrieve the list of BasicWorkflowItems that the given EPerson is owner of (owner == claimed for review)
+     * @param context the dspace context
+     * @param ePerson a DSpace EPerson
+     * @return a list of BasicWorkflowItem objects
+     * @throws SQLException
+     */
     public List<BasicWorkflowItem> findByOwner(Context context, EPerson ePerson) throws SQLException;
 
     int countTotal(Context context) throws SQLException;

@@ -28,22 +28,25 @@ public final class RequestInterceptorExample implements RequestInterceptor {
 	 * Constructor which will inject the instantiated 
 	 * Interceptor into a service handed to it.
 	 * 
-	 * @param service
+	 * @param service the service
 	 */
 	public RequestInterceptorExample(RequestService service)
 	{
 		service.registerRequestInterceptor(this);
 	}
 	
+        @Override
 	public void onEnd(String requestId, Session session, boolean succeeded,
 			Exception failure) {
 		log.info("Intercepting End of Request: id=" + requestId + ", session=" + session.getId() + ", succeeded=" + succeeded);
 	}
 
+        @Override
 	public void onStart(String requestId, Session session) {
 		log.info("Intercepting Start of Request: id=" + requestId + ", session=" + session.getId());
 	}
 
+        @Override
 	public int getOrder() {
 		// TODO Auto-generated method stub
 		return 0;

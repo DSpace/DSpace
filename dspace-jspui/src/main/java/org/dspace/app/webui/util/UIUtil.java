@@ -49,6 +49,12 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.identifier.DOI;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
+import org.dspace.identifier.service.DOIService;
+import org.dspace.identifier.service.IdentifierService;
 
 /**
  * Miscellaneous UI utility methods
@@ -69,17 +75,22 @@ public class UIUtil extends Util
 	 */
 	private static Pattern p = Pattern.compile("[^/]*$");
 	
-	   private static boolean initialized = false;
+        private static boolean initialized = false;
 	    
 	private static AuthenticationService authenticationService;
-
 	private static EPersonService personService;
+        private static IdentifierService identifierService;
+        private static DOIService doiService;
+        private static HandleService handleService;
 	
 	private static synchronized void initialize() {
 		if (initialized) {
 			return;
 		}
 		authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+                doiService = IdentifierServiceFactory.getInstance().getDOIService();
+                handleService = HandleServiceFactory.getInstance().getHandleService();
+                identifierService = IdentifierServiceFactory.getInstance().getIdentifierService();
 		personService = EPersonServiceFactory.getInstance().getEPersonService();
 	}
 
@@ -183,6 +194,71 @@ public class UIUtil extends Util
         c.setCurrentLocale(sessionLocale);
 
         return c;
+    }
+    
+     /**
+     * Returns a string array containing the URL to address this Item in DSpace,
+     * the official URL of its preferred identifier (example given
+     * http://dx.doi.org/10.5072/123) and the preferred identifier in canonical
+     * form (example given doi:10.5072/123). The configuration property 
+     * webui.preferred.identifier can be used to configure which identifier 
+     * should be preferred.
+     * If no identifier is found this method returns null. If no handle but a
+     * DOI is found the first value of the array is null.
+     * 
+     * @param ctx DSpace Context
+     * @param item the item
+     * @return string array containing URL or null if no ID found; string
+               array contains null if no handle, but a DOI is found
+     * @throws SQLException
+     */
+    public static String[] getItemIdentifier(Context ctx, Item item)
+            throws SQLException
+    {
+        initialize();
+        // look up the the version handle
+        String versionHandle = item.getHandle();
+
+        // lookup the version doi
+        String versionDOI = identifierService.lookup(ctx, item, DOI.class);
+        
+        // resolve identifiers
+        String[] handles = null;
+        if (versionHandle != null)
+        {
+            handles = new String[] {
+                handleService.resolveToURL(ctx, versionHandle),
+                handleService.getCanonicalForm(versionHandle),
+                versionHandle,
+                "hdl:" + versionHandle
+            };
+        }
+        String[] dois = null;
+        if (versionDOI != null)
+        {
+            try {
+                dois = new String[] {
+                    handleService.resolveToURL(ctx, versionHandle),
+                    doiService.DOIToExternalForm(versionDOI),
+                    doiService.formatIdentifier(versionDOI).substring(DOI.SCHEME.length()),
+                    doiService.formatIdentifier(versionDOI)
+                };
+            } catch (Exception ex) {
+                dois = null;
+                log.error("Unable to format DOI " + versionDOI 
+                        + ". " + ex.getClass().getName() + ": " + ex.getMessage());
+            }
+        }
+        
+        // do we prefer DOIs or handles?
+        if (dois != null
+                && ("doi".equalsIgnoreCase(ConfigurationManager.getProperty("webui.preferred.identifier")) 
+                    || handles == null))
+        {
+            return dois;
+        }
+        
+        return handles;
     }
 
     /**
@@ -517,7 +593,7 @@ public class UIUtil extends Util
 	
 	/**
 	 * Generate the (X)HTML required to show the item marking. Based on the markType it tries to find
-	 * the corresponding item marking Strategy on the iem_marking.xml Spring configuration file in order
+	 * the corresponding item marking Strategy on the item_marking.xml Spring configuration file in order
 	 * to apply it to the item.
 	 * This method is used in BrowseListTag and ItemListTag to du the actual item marking in browse
 	 * and search results
@@ -525,7 +601,7 @@ public class UIUtil extends Util
 	 * @param hrq The servlet request
 	 * @param dso The DSpaceObject to mark (it can be a BrowseItem or an Item)
 	 * @param markType the type of the mark.
-	 * @return
+	 * @return (X)HTML markup
 	 * @throws JspException
 	 */
     public static String getMarkingMarkup(HttpServletRequest hrq, DSpaceObject dso, String markType)
@@ -535,8 +611,8 @@ public class UIUtil extends Util
     	
     	try
     	{
-    		String contextPath = hrq.getContextPath();
-    		
+            String contextPath = hrq.getContextPath();
+
             Context c = UIUtil.obtainContext(hrq);
             
             Item item = (Item) dso;

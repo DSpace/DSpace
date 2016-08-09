@@ -15,7 +15,6 @@ import org.dspace.eperson.EPerson;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -193,7 +192,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      * Get the owning Collection for the item
      *
      * @return Collection that is the owner of the item
-     * @throws SQLException
      */
     public Collection getOwningCollection()
     {
@@ -229,7 +227,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      * Get the collections this item is in. The order is indeterminate.
      *
      * @return the collections this item is in, if any.
-     * @throws SQLException
      */
     public List<Collection> getCollections()
     {

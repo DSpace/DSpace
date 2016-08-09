@@ -50,24 +50,25 @@ BINDIR=`dirname $0`
 echo "Writing simple Handle server configuration"
 
 # Read parameters from DSpace config
-dshostname=`$BINDIR/dspace dsprop -property dspace.hostname`
-dsname=`$BINDIR/dspace dsprop -property dspace.name`
-handle=`$BINDIR/dspace dsprop -property handle.prefix`
-handledir=`$BINDIR/dspace dsprop -property handle.dir`
+dshostname=`$BINDIR/dspace dsprop --property dspace.hostname`
+dshostip=`host $dshostname | awk '/has address/ { print $4; exit }'`
+dsname=`$BINDIR/dspace dsprop --property dspace.name`
+handle=`$BINDIR/dspace dsprop --property handle.prefix`
+handledir=`$BINDIR/dspace dsprop --property handle.dir`
 tempfile=/tmp/handleconfig$$
-contactemail=`$BINDIR/dspace dsprop -property mail.admin`
+contactemail=`$BINDIR/dspace dsprop --property mail.admin`
 
 # Write the options to a file we can pipe into the setup tool
 echo "1" >$tempfile   # 1 = non-caching server, 2 = caching server
 echo "" >>$tempfile   # Primary server?  Default = y (n = mirror server)
-echo $dshostname >>$tempfile   # IP address
+echo $dshostip >>$tempfile   # IP address
 echo "" >>$tempfile   # Port to listen to (default=2641)
 echo "" >>$tempfile   # Port for HTTP i/f to listen to (default=8000)
 echo "" >>$tempfile   # Log all accesses?  ("y" or "n", default=n)
-echo "" >>$tempfile   # Rotate logs? (defulat=No)
+echo "" >>$tempfile   # Rotate logs? (default=No)
 echo "" >>$tempfile   # Version/serial no. of site (default=1)
 echo $dsname Handle Server >>$tempfile  # Server description
-echo $dsname >>$tempfile # Server desriptive name
+echo $dsname >>$tempfile # Server descriptive name
 echo "" >>$tempfile   # Contact name (default=none)
 echo "" >>$tempfile   # Contact telephone (default=none)
 echo $contactemail >>$tempfile   # Contact email

@@ -18,7 +18,7 @@ import java.io.Writer;
 
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 
@@ -68,10 +68,12 @@ public class PDFFilter extends MediaFilter
     }
 
     /**
-     * @param source
-     *            source input stream
+     * @param currentItem item
+     * @param source source input stream
+     * @param verbose verbose mode
      *
      * @return InputStream the resulting input stream
+     * @throws Exception if error
      */
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)

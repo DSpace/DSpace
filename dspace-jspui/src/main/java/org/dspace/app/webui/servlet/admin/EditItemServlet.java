@@ -7,27 +7,6 @@
  */
 package org.dspace.app.webui.servlet.admin;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.UUID;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
@@ -37,23 +16,11 @@ import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.BundleService;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.ItemService;
-import org.dspace.content.service.MetadataFieldService;
-import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -61,6 +28,13 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.license.factory.LicenseServiceFactory;
 import org.dspace.license.service.CreativeCommonsService;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Servlet for editing and deleting (expunging) items
@@ -102,6 +76,9 @@ public class EditItemServlet extends DSpaceServlet
 
     /** User confirms withdrawal of item */
     public static final int PUBLICIZE = 11;
+    
+    /** JSP to upload bitstream */
+    protected static final String UPLOAD_BITSTREAM_JSP = "/tools/upload-bitstream.jsp";
 
     /** Logger */
     private static final Logger log = Logger.getLogger(EditCommunitiesServlet.class);
@@ -476,7 +453,7 @@ public class EditItemServlet extends DSpaceServlet
             {
                 String displayName = "";
                 displayName = schemaName + "." + f.getElement() + (f.getQualifier() == null ? "" : "." + f.getQualifier());
-                metadataFields.put(f.getFieldID(), displayName);
+                metadataFields.put(f.getID(), displayName);
             }
         }
 
@@ -832,7 +809,7 @@ public class EditItemServlet extends DSpaceServlet
             // Show upload bitstream page
             request.setAttribute("item", item);
             JSPManager
-                    .showJSP(request, response, "/tools/upload-bitstream.jsp");
+                    .showJSP(request, response, UPLOAD_BITSTREAM_JSP);
         }else
         if(button.equals("submit_update_order") || button.startsWith("submit_order_"))
         {
@@ -908,7 +885,18 @@ public class EditItemServlet extends DSpaceServlet
             Bitstream b = null;
             Item item = itemService.find(context, UIUtil.getUUIDParameter(wrapper, "item_id"));
             File temp = wrapper.getFile("file");
-
+            
+            if(temp == null)
+            {
+                boolean noFileSelected = true;
+                
+                // Show upload bitstream page
+                request.setAttribute("noFileSelected", noFileSelected);
+                request.setAttribute("item", item);
+                JSPManager
+                        .showJSP(request, response, UPLOAD_BITSTREAM_JSP);
+                return;
+            }
             // Read the temp file as logo
             InputStream is = new BufferedInputStream(new FileInputStream(temp));
 

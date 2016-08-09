@@ -33,7 +33,7 @@ class, defined in this package, to select an event processing implementation.
 </p>
 
 <p>
-Three "stock" implementations are provided.
+Several "stock" implementations are provided.
 </p>
 <dl>
 	<dt>{@link org.dspace.usage.PassiveUsageEventListener PassiveUsageEventListener}</dt>
@@ -42,9 +42,12 @@ Three "stock" implementations are provided.
 		if no plugin is configured.</dd>
 	<dt>{@link org.dspace.usage.TabFileUsageEventListener TabFileUsageEventListener}</dt>
 	<dd>writes event records to a file in Tab Separated Values format.</dd>
-	<dt>{@link org.dspace.app.statistics.UsageEventXMLLogger UsageEventXMLLogger}</dt>
-	<dd>writes event records to a file in an XML format.  Suitable mainly for
-		testing.</dd>
+	<dt>{@link org.dspace.usage.LoggerUsageEventListener LoggerUsageEventListener}</dt>
+	<dd>writes event records to the Java logger.</dd>
+	<dt>{@link org.dspace.statistics.SolrLoggerUsageEventListener SolrLoggerUsageEventListener}</dt>
+	<dd>writes event records to Solr.</dd>
+	<dt>{@link org.dspace.google.GoogleRecorderEventListener GoogleRecorderEventListener}<.dt>
+	<dd>writes event records to Google Analytics.</dd>
 </dl>
 </body>
 </html>

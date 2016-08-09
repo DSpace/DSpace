@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Database Access Object interface class for the EPerson object.
  * The implementation of this class is responsible for all database calls for the EPerson object and is autowired by spring
- * This class should only be accessed from a single service & should never be exposed outside of the API
+ * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author kevinvandevelde at atmire.com
  */

@@ -40,8 +40,8 @@ public class PageMeta extends AbstractWingElement implements
      * metadata. Each of these types are separated so that 
      * we can search through each time as we merge documents.
      */
-    private List<Metadata> metadatum = new ArrayList<Metadata>();
-    private List<Trail> trails = new ArrayList<Trail>();
+    private List<Metadata> metadatum = new ArrayList<>();
+    private List<Trail> trails = new ArrayList<>();
 
     /**
      * Construct a new pageMeta
@@ -49,6 +49,7 @@ public class PageMeta extends AbstractWingElement implements
      * @param context
      *            (Required) The context this element is contained in, such as
      *            where to route SAX events and what i18n catalogue to use.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected PageMeta(WingContext context) throws WingException
     {
@@ -68,6 +69,7 @@ public class PageMeta extends AbstractWingElement implements
 	 *            (Required) determine if multiple metadata elements with the same
 	 *            element, qualifier and language are allowed.
 	 * @return A new metadata
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
 	 */
     public Metadata addMetadata(String element, String qualifier,
             String language, boolean allowMultiple) throws WingException
@@ -87,6 +89,7 @@ public class PageMeta extends AbstractWingElement implements
 	 * @param language
 	 *            (May be null) The metadata language
 	 * @return A new metadata
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
 	 */
     public Metadata addMetadata(String element, String qualifier, String language)
             throws WingException
@@ -102,6 +105,7 @@ public class PageMeta extends AbstractWingElement implements
      * @param qualifier
      *            (May be null) The metadata qualifier.
      * @return A new metadata
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Metadata addMetadata(String element, String qualifier)
             throws WingException
@@ -115,6 +119,7 @@ public class PageMeta extends AbstractWingElement implements
      * @param element
      *            (Required) The metadata element.
      * @return A new metadata
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Metadata addMetadata(String element) throws WingException
     {
@@ -129,6 +134,7 @@ public class PageMeta extends AbstractWingElement implements
      * @param rend
      *            (May be null) Special rendering instructions
      * @return a new trail
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Trail addTrail(String target, String rend)
             throws WingException
@@ -142,6 +148,7 @@ public class PageMeta extends AbstractWingElement implements
      * Add a new trail to the page without a link or render attribute.
      * 
      * @return a new trail
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Trail addTrail()
             throws WingException
@@ -156,6 +163,7 @@ public class PageMeta extends AbstractWingElement implements
      *            (May be null) The Target URL for this trail item.
      * @param characters
      *            (May be null) The textual contents of this trail item.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addTrailLink(String target, String characters)
             throws WingException
@@ -172,6 +180,7 @@ public class PageMeta extends AbstractWingElement implements
      * @param message
      *            (Required) The textual contents of this trail item to be
      *            translated
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addTrailLink(String target, Message message)
             throws WingException
@@ -193,6 +202,7 @@ public class PageMeta extends AbstractWingElement implements
      *            The element's attributes
      * @return True if this WingElement is equivalent to the given SAX Event.
      */
+    @Override
     public boolean mergeEqual(String namespace, String localName, String qName,
             Attributes attributes) throws SAXException, WingException
     {
@@ -202,17 +212,13 @@ public class PageMeta extends AbstractWingElement implements
             return false;
         }
 
-        if (!E_PAGE_META.equals(localName))
-        {
-            return false;
-        }
-        return true;
+        return E_PAGE_META.equals(localName);
     }
 
     /**
      * Since metadata can not be merged there are no mergeable children. This
-     * just return's null.
-     * 
+     * just returns null.
+     *
      * @param namespace
      *            The element's name space
      * @param localName
@@ -223,6 +229,7 @@ public class PageMeta extends AbstractWingElement implements
      *            The element's attributes
      * @return The child element
      */
+    @Override
     public WingMergeableElement mergeChild(String namespace, String localName,
             String qName, Attributes attributes) throws SAXException,
             WingException
@@ -245,7 +252,7 @@ public class PageMeta extends AbstractWingElement implements
     		String qualifier = attributes.getValue(Metadata.A_QUALIFIER);
     		String language = attributes.getValue(Metadata.A_LANGUAGE);
     		
-    		List<Metadata> remove = new ArrayList<Metadata>();
+    		List<Metadata> remove = new ArrayList<>();
     		for (Metadata metadata : metadatum)
     		{
     			if (metadata.equals(element,qualifier,language) && !metadata.allowMultiple())
@@ -268,6 +275,7 @@ public class PageMeta extends AbstractWingElement implements
     /**
      * Inform this element that it is being merged with an existing element.
      */
+    @Override
     public Attributes merge(Attributes attributes) throws SAXException,
             WingException
     {
@@ -288,6 +296,7 @@ public class PageMeta extends AbstractWingElement implements
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler, 
             NamespaceSupport namespaces) throws SAXException
     {
@@ -312,9 +321,7 @@ public class PageMeta extends AbstractWingElement implements
         }
     }
 
-    /**
-     * dispose
-     */
+    @Override
     public void dispose()
     {
     	for (Metadata metadata : metadatum)

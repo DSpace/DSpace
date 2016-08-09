@@ -334,7 +334,7 @@ public class HTMLReport implements Report
     
     /**
      * output the report block based on the passed mapping, where the mapping
-     * sould be "name of report element" => "value", where both sides of the
+     * should be "name of report element" to "value", where both sides of the
      * mapping should be Strings.  This class also assumes that the reference
      * is a linkable URL to the resource
      *

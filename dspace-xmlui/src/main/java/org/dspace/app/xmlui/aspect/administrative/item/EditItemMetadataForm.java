@@ -7,35 +7,15 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.UUID;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.CheckBox;
-import org.dspace.app.xmlui.wing.element.Composite;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.Params;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.app.xmlui.wing.element.TextArea;
-import org.dspace.app.xmlui.wing.element.Value;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.*;
+import org.dspace.content.Item;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -44,6 +24,12 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
+
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.UUID;
 
 /**
  * Display a list of all metadata available for this item and allow the user to
@@ -176,7 +162,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 java.util.List<MetadataField> fields = metadataFieldService.findAll(context);
                 for (MetadataField field : fields)
                 {
-                        int fieldID = field.getFieldID();
+                        int fieldID = field.getID();
                         MetadataSchema schema = field.getMetadataSchema();
                         String name = schema.getName() +"."+field.getElement();
                         if (field.getQualifier() != null)

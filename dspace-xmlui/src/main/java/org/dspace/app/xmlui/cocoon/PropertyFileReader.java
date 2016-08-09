@@ -18,15 +18,17 @@ import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.SourceResolver;
 
 /**
- * Class will read the the specified configuration file via the property-file parameter
+ * Class will read the the specified configuration file via the property-file parameter.
  * 
- * It accepts the name of the property file to read and the properties to set to the sitemap scope
- * For example:
+ * It accepts the name of the property file to read and the properties to set to
+ * the sitemap scope.  For example:
+ * <pre>{@code
  * 		<map:act type="PropertyFileReader">
  *  		<map:parameter name="property-file" value="/absolute/path/to/property/file />
  *			<map:parameter name="some.property" value="some_property" />
  *			...
  *		</map:act>
+ * }</pre>
  * Will place the value of the "some.property" property in the "some_property" variable to be
  * used in the sitemap using the {some_property} syntax.
  * 

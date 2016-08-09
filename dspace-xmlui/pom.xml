@@ -11,7 +11,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>6.0-SNAPSHOT</version>
+      <version>6.0-rc3-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -89,12 +89,8 @@
             <artifactId>dspace-api</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>jackson-core</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-databind</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -105,7 +101,7 @@
 
         <!-- Custom build DSpace cocoon -->
         <dependency>
-            <groupId>jdom</groupId>
+            <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
         </dependency>
         <dependency>
@@ -117,6 +113,14 @@
                     <groupId>net.sf.ehcache</groupId>
                     <artifactId>ehcache</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>commons-jxpath</groupId>
+                    <artifactId>commons-jxpath</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.excalibur.components</groupId>
+                    <artifactId>excalibur-sourceresolve</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -124,6 +128,12 @@
             <groupId>org.apache.cocoon</groupId>
             <artifactId>cocoon-template-impl</artifactId>
             <version>1.1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-jxpath</groupId>
+                    <artifactId>commons-jxpath</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.cocoon</groupId>
@@ -210,6 +220,12 @@
             <groupId>com.yahoo.platform.yui</groupId>
             <artifactId>yuicompressor</artifactId>
             <version>2.4.8</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>rhino</groupId>
+                    <artifactId>js</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!--Latest spring version requires an up to date jackson core -->
@@ -233,7 +249,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.5</version>
+            <version>2.6.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

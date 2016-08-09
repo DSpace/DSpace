@@ -139,6 +139,7 @@ public class Params extends AbstractWingElement implements StructuralElement
      * @param context
      *            (Required) The context this element is contained in, such as
      *            where to route SAX events and what i18n catalogue to use.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      *
      */
     protected Params(WingContext context) throws WingException
@@ -150,6 +151,7 @@ public class Params extends AbstractWingElement implements StructuralElement
      * Enable the add operation for this field set. When this is enabled the
      * front end will add a button to add more items to the field.
      *
+     * @throws org.dspace.app.xmlui.wing.WingException never.
      */
     public void enableAddOperation() throws WingException
     {
@@ -161,6 +163,7 @@ public class Params extends AbstractWingElement implements StructuralElement
      * the front end will provide a way for the user to select fields (probably
      * checkboxes) along with a submit button to delete the selected fields.
      *
+     * @throws org.dspace.app.xmlui.wing.WingException never.
      */
     public void enableDeleteOperation()throws WingException
     {
@@ -301,7 +304,7 @@ public class Params extends AbstractWingElement implements StructuralElement
     /**
      * Set the field's autofocus attribute, an HTML5 feature.
      * Valid input values to enable autofocus are: autofocus, and empty string.
-     * @param value
+     * @param value "autofocus" or empty.
      */
     public void setAutofocus(String value)
     {
@@ -322,6 +325,7 @@ public class Params extends AbstractWingElement implements StructuralElement
      * select vs. suggest.  Value must match one of the PRESENTATIONS.
      *
      * @param value pre-determined metadata field key
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setChoicesPresentation(String value)
         throws WingException
@@ -364,7 +368,9 @@ public class Params extends AbstractWingElement implements StructuralElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler,
             LexicalHandler lexicalHandler, NamespaceSupport namespaces)
             throws SAXException
@@ -400,8 +406,6 @@ public class Params extends AbstractWingElement implements StructuralElement
             attributes.put(A_OPERATIONS, operations);
         }
 
-        
-        
         if (this.returnValue != null)
         {
             attributes.put(A_RETURN_VALUE, this.returnValue);
@@ -411,7 +415,6 @@ public class Params extends AbstractWingElement implements StructuralElement
         {
             attributes.put(A_SIZE, this.size);
         }
-
 
         if (!this.evtBehavior.equals(""))
         {

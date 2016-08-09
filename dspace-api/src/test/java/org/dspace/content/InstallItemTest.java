@@ -7,27 +7,31 @@
  */
 package org.dspace.content;
 
-import mockit.*;
-
+import mockit.NonStrictExpectations;
+import org.apache.log4j.Logger;
+import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-
-import java.io.FileInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-
-import org.dspace.AbstractUnitTest;
-import org.apache.log4j.Logger;
-import org.junit.*;
-import static org.junit.Assert.* ;
-import static org.hamcrest.CoreMatchers.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Calendar;
+import java.util.TimeZone;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.*;
 
 /**
  * Unit Tests for class InstallItem
@@ -118,7 +122,7 @@ public class InstallItemTest extends AbstractUnitTest
     public void testInstallItem_validHandle() throws Exception
     {
         context.turnOffAuthorisationSystem();
-        String handle = "1345/567";
+        String handle = "123456789/567";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
       
         //Test assigning a specified handle to an item
@@ -145,7 +149,7 @@ public class InstallItemTest extends AbstractUnitTest
                 authorizeService.isAdmin((Context) any); result = true;
         }};
 
-        String handle = "1345/567";
+        String handle = "123456789/567";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
         WorkspaceItem is2 = workspaceItemService.create(context, collection, false);
         
@@ -166,7 +170,7 @@ public class InstallItemTest extends AbstractUnitTest
     public void testRestoreItem() throws Exception
     {
         context.turnOffAuthorisationSystem();
-        String handle = "1345/567";
+        String handle = "123456789/567";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
 
         //get current date
@@ -236,7 +240,7 @@ public class InstallItemTest extends AbstractUnitTest
     {
         //create a dummy WorkspaceItem
         context.turnOffAuthorisationSystem();
-        String handle = "1345/567";
+        String handle = "123456789/567";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
 
         // Set "today" as "dc.date.issued"
@@ -244,10 +248,13 @@ public class InstallItemTest extends AbstractUnitTest
         itemService.addMetadata(context, is.getItem(), "dc", "date", "issued", Item.ANY, "2011-01-01");
 
         //get current date
-        DCDate now = DCDate.getCurrent();
-        String dayAndTime = now.toString();
-        //parse out just the date, remove the time (format: yyyy-mm-ddT00:00:00Z)
-        String date = dayAndTime.substring(0, dayAndTime.indexOf("T"));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+       
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        String date = sdf.format(calendar.getTime());
 
         Item result = installItemService.installItem(context, is, handle);
         context.restoreAuthSystemState();
@@ -267,7 +274,7 @@ public class InstallItemTest extends AbstractUnitTest
     {
         //create a dummy WorkspaceItem with no dc.date.issued
         context.turnOffAuthorisationSystem();
-        String handle = "1345/567";
+        String handle = "123456789/567";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
 
         Item result = installItemService.installItem(context, is, handle);
@@ -286,7 +293,7 @@ public class InstallItemTest extends AbstractUnitTest
     {
         //create a dummy WorkspaceItem
         context.turnOffAuthorisationSystem();
-        String handle = "1345/567";
+        String handle = "123456789/567";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
 
         // Set "today" as "dc.date.issued"
@@ -294,10 +301,11 @@ public class InstallItemTest extends AbstractUnitTest
         itemService.addMetadata(context, is.getItem(), "dc", "date", "issued", Item.ANY, "2011-01-01");
 
         //get current date
-        DCDate now = DCDate.getCurrent();
-        String dayAndTime = now.toString();
-        //parse out just the date, remove the time (format: yyyy-mm-ddT00:00:00Z)
-        String date = dayAndTime.substring(0, dayAndTime.indexOf("T"));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String date = sdf.format(calendar.getTime());
 
         Item result = installItemService.restoreItem(context, is, handle);
         context.restoreAuthSystemState();
