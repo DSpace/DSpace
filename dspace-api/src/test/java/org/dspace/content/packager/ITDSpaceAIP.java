@@ -89,11 +89,15 @@ public class ITDSpaceAIP extends AbstractUnitTest
     private static String submitterEmail = "aip-test@dspace.org";
     private Context context;
     
-    /** Create a temporary folder which will be cleaned up automatically by JUnit.
-        NOTE: As a ClassRule, this temp folder is shared by ALL tests below.
-        Its AIP contents are initialized in init() below. **/
+    /** Create a global temporary upload folder which will be cleaned up automatically by JUnit.
+        NOTE: As a ClassRule, this temp folder is shared by ALL tests below. **/
     @ClassRule
-    public static final TemporaryFolder testFolder = new TemporaryFolder();
+    public static final TemporaryFolder uploadTempFolder = new TemporaryFolder();
+
+    /** Create another temporary folder for AIPs. As a Rule, this one is *recreated* for each
+        test, in order to ensure each test is standalone with respect to AIPs. **/
+    @Rule
+    public final TemporaryFolder aipTempFolder = new TemporaryFolder();
     
     /**
      * This method will be run during class initialization. It will initialize
@@ -272,7 +276,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
         // JUnit TemporaryFolder. This ensures Crosswalk classes like RoleCrosswalk
         // store their temp files in a place where JUnit can clean them up automatically.
         new NonStrictExpectations(configService.getClass()) {{
-            configService.getProperty("upload.temp.dir"); result = testFolder.getRoot().getAbsolutePath();
+            configService.getProperty("upload.temp.dir"); result = uploadTempFolder.getRoot().getAbsolutePath();
         }};
         
         try
@@ -1082,7 +1086,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
         else
         {
             // Export file (this is placed in JUnit's temporary folder, so that it can be cleaned up after tests complete)
-            File exportAIPFile = new File(testFolder.getRoot().getAbsolutePath() + File.separator + PackageUtils.getPackageName(dso, "zip"));
+            File exportAIPFile = new File(aipTempFolder.getRoot().getAbsolutePath() + File.separator + PackageUtils.getPackageName(dso, "zip"));
 
             // If unspecified, set default PackageParameters
             if (pkgParams==null)
@@ -1134,9 +1138,6 @@ public class ITDSpaceAIP extends AbstractUnitTest
                 sip.ingestAll(context, parent, aipFile, pkgParams, null);
             else
                 sip.ingest(context, parent, aipFile, pkgParams, null);
-
-            // Delete the AIP file as we are done with it
-            aipFile.delete();
         }
     }
     
@@ -1176,9 +1177,6 @@ public class ITDSpaceAIP extends AbstractUnitTest
                 sip.replaceAll(context, dso, aipFile, pkgParams);
             else
                 sip.replace(context, dso, aipFile, pkgParams);
-
-            // Delete the AIP file as we are done with it
-            aipFile.delete();
         }
     }
     
