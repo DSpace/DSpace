@@ -17,9 +17,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static org.junit.Assert.*;
 
@@ -41,33 +42,48 @@ public class HandleIdentifierProviderTest
     private static final String BEAN_NAME = "test-HandleIdentifierProvider";
 
     /** Spring application context. */
-    private static GenericApplicationContext applicationContext;
+    private static AnnotationConfigApplicationContext applicationContext;
 
     public HandleIdentifierProviderTest()
     {
     }
 
+    /**
+     * The special test bean for the target class is defined here.
+     */
     @BeforeClass
     public static void setUpClass()
     {
         ServiceManager serviceManager = kernelImpl.getServiceManager();
 
-        applicationContext
-                = (GenericApplicationContext) serviceManager.getServiceByName(
+        // Get the normal ApplicationContext
+        ApplicationContext parentApplicationContext
+                = (ApplicationContext) serviceManager.getServiceByName(
                         ApplicationContext.class.getName(),
                         ApplicationContext.class);
+
+        // Wrap it in a new empty context that we can configure.
+        applicationContext = new AnnotationConfigApplicationContext();
+        applicationContext.setParent(parentApplicationContext);
+        applicationContext.setId("TestingContext");
 
         // Define our special bean for testing the target class.
         GenericBeanDefinition bd = new GenericBeanDefinition();
         bd.setBeanClass(HandleIdentifierProvider.class);
+        bd.setAutowireMode(GenericBeanDefinition.AUTOWIRE_BY_TYPE);
+        bd.setScope(GenericBeanDefinition.SCOPE_PROTOTYPE);
         applicationContext.registerBeanDefinition(BEAN_NAME, bd); // Now our SUT is a Bean.
+        applicationContext.refresh();
     }
 
+    /**
+     * Clean up special test Spring stuff.
+     */
     @AfterClass
     public static void tearDownClass()
     {
-        // Clean up dynamic bean definitions from setup.
-        applicationContext.removeBeanDefinition(BEAN_NAME);
+        // Clean up testing ApplicationContext and any beans within.
+        applicationContext.close();
     }
 
     @Before
@@ -112,8 +128,9 @@ public class HandleIdentifierProviderTest
 
         // We have to get Spring to instantiate the provider as a Bean, because
         // the bean class has autowired fields.
-        HandleIdentifierProvider instance   // Make one to test.
-                = applicationContext.getBean(BEAN_NAME, HandleIdentifierProvider.class);
+        HandleIdentifierProvider instance = new HandleIdentifierProvider();
+        applicationContext.getAutowireCapableBeanFactory().autowireBeanProperties(
+                instance, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
 
         // Load the test cases
         Properties forms = new Properties();
