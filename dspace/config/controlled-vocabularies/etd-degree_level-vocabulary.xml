@@ -1,2 +1,11 @@
-Doctoral
-Master's
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- dc.degree.name for ETD collection -->
+<node id="etd-degree-name" label="degree name">
+  <isComposedBy>
+    <node id="01" label="Doctoral"/>
+  </isComposedBy>
+  
+  <isComposedBy>
+    <node id="02" label="Master's"/>
+  </isComposedBy>
+</node>
