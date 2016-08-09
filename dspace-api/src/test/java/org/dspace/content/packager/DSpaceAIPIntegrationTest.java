@@ -45,6 +45,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
@@ -68,11 +69,15 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     private static String testItemHandle = null;
     private static String testMappedItemHandle = null;
     
-    /** Create a temporary folder which will be cleaned up automatically by JUnit.
-        NOTE: As a ClassRule, this temp folder is shared by ALL tests below.
-        Its AIP contents are initialized in init() below. **/
+    /** Create a global temporary upload folder which will be cleaned up automatically by JUnit.
+        NOTE: As a ClassRule, this temp folder is shared by ALL tests below. **/
     @ClassRule
-    public static final TemporaryFolder testFolder = new TemporaryFolder();
+    public static final TemporaryFolder uploadTempFolder = new TemporaryFolder();
+
+    /** Create another temporary folder for AIPs. As a Rule, this one is *recreated* for each
+        test, in order to ensure each test is standalone with respect to AIPs. **/
+    @Rule
+    public final TemporaryFolder aipTempFolder = new TemporaryFolder();
     
     /**
      * This method will be run during class initialization. It will initialize
@@ -83,14 +88,14 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
      */
     @BeforeClass
     public static void setUpClass()
-    {      
+    {
         // Initialize MockConfigurationManager, and tell it to load properties by default
         new MockConfigurationManager(true);
 
         // Override default value of configured temp directory to point at our
         // JUnit TemporaryFolder. This ensures Crosswalk classes like RoleCrosswalk 
         // store their temp files in a place where JUnit can clean them up automatically.
-        MockConfigurationManager.setProperty("upload.temp.dir", testFolder.getRoot().getAbsolutePath());
+        MockConfigurationManager.setProperty("upload.temp.dir", uploadTempFolder.getRoot().getAbsolutePath());
         
         try
         {
@@ -1058,7 +1063,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         else
         {
             // Export file (this is placed in JUnit's temporary folder, so that it can be cleaned up after tests complete)
-            File exportAIPFile = new File(testFolder.getRoot().getAbsolutePath() + File.separator + PackageUtils.getPackageName(dso, "zip"));
+            File exportAIPFile = new File(aipTempFolder.getRoot().getAbsolutePath() + File.separator + PackageUtils.getPackageName(dso, "zip"));
 
             // If unspecified, set default PackageParameters
             if (pkgParams==null)
@@ -1111,9 +1116,6 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
                 sip.ingestAll(context, parent, aipFile, pkgParams, null);
             else
                 sip.ingest(context, parent, aipFile, pkgParams, null);
-
-            // Delete the AIP file as we are done with it
-            aipFile.delete();
         }
     }
     
@@ -1154,9 +1156,6 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
                 sip.replaceAll(context, dso, aipFile, pkgParams);
             else
                 sip.replace(context, dso, aipFile, pkgParams);
-
-            // Delete the AIP file as we are done with it
-            aipFile.delete();
         }
     }
     
