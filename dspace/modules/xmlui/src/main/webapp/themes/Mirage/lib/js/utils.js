@@ -257,8 +257,11 @@ function enableNextButton() {
 
         // Status: status_accepted ==> must have JOURNAL_ID
         else if (jQuery('input[name|="article_status"]:checked').val()=='1') {
-            jQuery("#aspect_submission_StepTransformer_field_submit_next").removeAttr("disabled");
-            return;
+            var journal = jQuery("#aspect_submission_StepTransformer_field_prism_publicationName").val();
+            if (journal != "") {
+                jQuery("#aspect_submission_StepTransformer_field_submit_next").removeAttr("disabled");
+                return;
+            }
         }
 
         // Status: status_in_review ==> must have JOURNAL_ID (MANUSCRIPT_NUMBER is optional)
