@@ -345,7 +345,7 @@ public class PublicationUpdater extends HttpServlet {
 
             email.send();
         } catch (Exception e) {
-            LOGGER.error("Error sending publication updater email for journal " + dryadJournalConcept.getFullName());
+            LOGGER.error("Error sending publication updater email for journal " + dryadJournalConcept.getFullName() + ": " + e.getMessage());
         }
     }
 
