@@ -132,8 +132,8 @@
         "embargo" : "Y",
         "hidden" : "Y",
         "integrated" : "Y",
-        "title" : "The Bone &amp; Joint Journal",
-        "sponsor" : "British Editorial Society of Bone &amp; Joint Surgery"
+        "title" : "The Bone & Joint Journal",
+        "sponsor" : "British Editorial Society of Bone & Joint Surgery"
      },
      {
         "integrated" : "Y",
@@ -141,8 +141,8 @@
         "submission" : "A",
         "issn" : "2046-3758",
         "embargo" : "Y",
-        "sponsor" : "British Editorial Society of Bone &amp; Joint Surgery",
-        "title" : "Bone &amp; Joint Research"
+        "sponsor" : "British Editorial Society of Bone & Joint Surgery",
+        "title" : "Bone & Joint Research"
      },
      {
         "hidden" : "Y",
@@ -150,8 +150,8 @@
         "embargo" : "Y",
         "submission" : "A",
         "integrated" : "Y",
-        "sponsor" : "British Editorial Society of Bone &amp; Joint Surgery",
-        "title" : "Bone &amp; Joint360"
+        "sponsor" : "British Editorial Society of Bone & Joint Surgery",
+        "title" : "Bone & Joint360"
      },
      {
         "sponsor" : "Pensoft",
@@ -186,7 +186,7 @@
         "submission" : "R",
         "embargo" : "N",
         "hidden" : "N",
-        "title" : "Disease Models &amp; Mechanisms",
+        "title" : "Disease Models & Mechanisms",
         "sponsor" : "$120"
      },
      {
