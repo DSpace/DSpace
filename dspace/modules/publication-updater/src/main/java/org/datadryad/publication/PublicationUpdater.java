@@ -13,6 +13,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.workflow.ClaimedTask;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 
@@ -148,6 +149,17 @@ public class PublicationUpdater extends HttpServlet {
         if (items.size() > 0) {
             for (WorkflowItem wfi : items) {
                 if (DryadWorkflowUtils.isDataPackage(wfi)) {
+                    // is this package in review?
+                    List<ClaimedTask> claimedTasks = null;
+                    boolean isInReview = false;
+                    try {
+                        claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
+                        if (claimedTasks != null && claimedTasks.size() > 0 && claimedTasks.get(0).getActionID().equals("reviewAction")) {
+                            isInReview = true;
+                        }
+                    } catch (SQLException e) {
+                        LOGGER.debug("couldn't find claimed task for item " + wfi.getItem().getID());
+                    }
                     String message = "";
                     Item item = wfi.getItem();
                     Manuscript queryManuscript = manuscriptFromItem(item, dryadJournalConcept);
@@ -161,9 +173,11 @@ public class PublicationUpdater extends HttpServlet {
                             databaseManuscripts = JournalUtils.getStoredManuscriptsMatchingManuscript(queryManuscript);
                             if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
                                 databaseManuscript = databaseManuscripts.get(0);
-                                message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
-                                databaseManuscript.optionalProperties.put("provenance", message);
-                                updateItemMetadataFromManuscript(item, databaseManuscript, context);
+                                if (isInReview) {     // only update the metadata if the item is in review.
+                                    message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
+                                    databaseManuscript.optionalProperties.put("provenance", message);
+                                    updateItemMetadataFromManuscript(item, databaseManuscript, context);
+                                }
                             }
                         }
                     } catch (ParseException e) {
