@@ -45,6 +45,10 @@ import java.util.List;
 /**
  * Usage Statistics viewer, powered by Elastic Search.
  * Allows for the user to dig deeper into the statistics for topDownloads, topCountries, etc.
+ *
+ * @deprecated  As of DSpace 6.0, ElasticSearch statistics are replaced by Solr statistics
+ * @see org.dspace.app.xmlui.aspect.statistics.StatisticsTransformer#StatisticsTransformer
+ *
  * @author Peter Dietz (pdietz84@gmail.com)
  */
 public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
