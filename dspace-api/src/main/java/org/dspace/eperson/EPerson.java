@@ -499,7 +499,7 @@ public class EPerson extends DSpaceObject
             break;
 
         case LANGUAGE:
-            s = "m_text_value";
+            s = "m.text_value";
             t = "language";
             break;
         case NETID:
@@ -507,23 +507,26 @@ public class EPerson extends DSpaceObject
             break;
 
         default:
-            s = "m_text_value";
+            s = "m.text_value";
             t = "lastname";
         }
 
         // NOTE: The use of 's' in the order by clause can not cause an SQL
         // injection because the string is derived from constant values above.
-        TableRowIterator rows = DatabaseManager.query(context, "SELECT * FROM eperson e ORDER BY ?",s);
+        TableRowIterator rows;
         if(!t.equals("")) {
             rows = DatabaseManager.query(context,
                     "SELECT * FROM eperson e " +
-                            "LEFT JOIN metadatavalue m on (m.resource_id = e.eperson_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
-                            "ORDER BY ?",
+                    "LEFT JOIN metadatavalue m on (m.resource_id = e.eperson_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
+                    "ORDER BY " + s,
                     Constants.EPERSON,
-                    MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), t, null).getFieldID(),
-                    s
+                    MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), t, null).getFieldID()
             );
         }
+        else {
+        	rows =  DatabaseManager.query(context, "SELECT * FROM eperson e ORDER BY " + s);
+        }
+        
 
 
 
