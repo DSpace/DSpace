@@ -169,12 +169,10 @@ public class PublicationUpdater extends HttpServlet {
                     List<Manuscript> databaseManuscripts = null;
                     Manuscript databaseManuscript = null;
                     try {
-                        if (!"".equals(queryManuscript.getManuscriptId())) {
-                            databaseManuscripts = JournalUtils.getStoredManuscriptsMatchingManuscript(queryManuscript);
-                            if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
-                                databaseManuscript = databaseManuscripts.get(0);
-                                if (isInReview) {     // only update the metadata if the item is in review.
-                                }
+                        databaseManuscripts = JournalUtils.getStoredManuscriptsMatchingManuscript(queryManuscript);
+                        if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
+                            databaseManuscript = databaseManuscripts.get(0);
+                            if (isInReview) {     // only update the metadata if the item is in review.
                                 message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
                                 updateItemMetadataFromManuscript(item, databaseManuscript, context, message);
                             }

@@ -192,7 +192,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
         TableRow existingRow = null;
         Integer journalConceptID = journalConcept.getConceptID();
-        if (manuscript.getManuscriptId() != null) {
+        if (!"".equals(manuscript.getManuscriptId())) {
             existingRow = getTableRowByManuscriptId(context, manuscript.getManuscriptId(), journalConcept.getJournalID());
             if (existingRow != null) {
                 finalRows.add(existingRow);
