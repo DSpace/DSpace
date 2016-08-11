@@ -23,10 +23,13 @@ import net.handle.hdllib.Util;
 import net.handle.util.StreamTable;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Extension to the CNRI Handle Server that translates requests to resolve
@@ -39,7 +42,7 @@ import org.dspace.handle.service.HandleService;
  * <p>
  * This class is intended to be embedded in the CNRI Handle Server. It conforms
  * to the HandleStorage interface that was delivered with Handle Server version
- * 5.2.0.
+ * 6.2.0.
  * </p>
  * 
  * @author Peter Breton
@@ -50,31 +53,62 @@ public class HandlePlugin implements HandleStorage
     /** log4j category */
     private static Logger log = Logger.getLogger(HandlePlugin.class);
 
-    protected HandleService handleService;
+    /** The DSpace service manager kernel **/
+    private static transient DSpaceKernelImpl kernelImpl;
 
-    /**
-     * Constructor
-     */
-    public HandlePlugin()
-    {
-        handleService = HandleServiceFactory.getInstance().getHandleService();
-    }
+    /** References to DSpace Services **/
+    protected HandleService handleService;
+    protected ConfigurationService configurationService;
 
     ////////////////////////////////////////
     // Non-Resolving methods -- unimplemented
     ////////////////////////////////////////
 
     /**
-     * HandleStorage interface method - not implemented.
+     * HandleStorage interface init method.
+     * <p>
+     * For DSpace, we have to startup the DSpace Kernel when HandlePlugin
+     * initializes, as the HandlePlugin relies on HandleService (and other services)
+     * which are loaded by the Kernel.
+     * @param st StreamTable
+     * @throws Exception if DSpace Kernel fails to startup
      */
     @Override
     public void init(StreamTable st) throws Exception
     {
-        // Not implemented
         if (log.isInfoEnabled())
         {
-            log.info("Called init (not implemented)");
+            log.info("Called init (Starting DSpace Kernel)");
         }
+
+        // Initialise the service manager kernel
+        try
+        {
+            kernelImpl = DSpaceKernelInit.getKernel(null);
+            if (!kernelImpl.isRunning())
+            {
+                kernelImpl.start();
+            }
+        } catch (Exception e)
+        {
+            // Failed to start so destroy it and log and throw an exception
+            try
+            {
+                kernelImpl.destroy();
+            }
+            catch (Exception e1)
+            {
+                // Nothing to do
+            }
+            String message = "Failed to startup DSpace Kernel: " + e.getMessage();
+            System.err.println(message);
+            e.printStackTrace();
+            throw new IllegalStateException(message, e);
+        }
+
+        // Get a reference to the HandleService & ConfigurationService
+        handleService = HandleServiceFactory.getInstance().getHandleService();
+        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     }
 
     /**
@@ -161,15 +195,23 @@ public class HandlePlugin implements HandleStorage
     }
 
     /**
-     * HandleStorage interface method - not implemented.
+     * HandleStorage interface shutdown() method.
+     * <P>
+     * For DSpace, we need to destroy the kernel created in init().
      */
     @Override
     public void shutdown()
     {
-        // Not implemented
         if (log.isInfoEnabled())
         {
-            log.info("Called shutdown (not implemented)");
+            log.info("Called shutdown (Destroying DSpace Kernel)");
+        }
+
+        // Destroy the DSpace kernel if it is still alive
+        if (kernelImpl != null)
+        {
+            kernelImpl.destroy();
+            kernelImpl = null;
         }
     }
 
@@ -342,7 +384,7 @@ public class HandlePlugin implements HandleStorage
         // with their own prefixes and have the one instance handle both prefixes. In this case
         // all new handle would be given a unified prefix but all old handles would still be 
         // resolvable.
-        if (ConfigurationManager.getBooleanProperty("handle.plugin.checknameauthority",true))
+        if (configurationService.getBooleanProperty("handle.plugin.checknameauthority",true))
         {
 	        // First, construct a string representing the naming authority Handle
 	        // we'd expect.
