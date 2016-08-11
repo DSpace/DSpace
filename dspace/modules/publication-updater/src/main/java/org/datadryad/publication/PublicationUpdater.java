@@ -174,25 +174,26 @@ public class PublicationUpdater extends HttpServlet {
                             if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
                                 databaseManuscript = databaseManuscripts.get(0);
                                 if (isInReview) {     // only update the metadata if the item is in review.
-                                    message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
-                                    databaseManuscript.optionalProperties.put("provenance", message);
-                                    updateItemMetadataFromManuscript(item, databaseManuscript, context);
+                                    if (updateItemMetadataFromManuscript(item, databaseManuscript, context)) {
+                                        message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
+                                        databaseManuscript.optionalProperties.put("provenance", message);
+                                    }
                                 }
                             }
                         }
                     } catch (ParseException e) {
                         // do we want to collect workflow items with faulty manuscript IDs?
-                        message = "Problem: Manuscript ID is incorrect. ";
+                        LOGGER.error("Problem updating item " + item.getID() + ": Manuscript ID is incorrect.");
                     }
                     // look for this item in crossref:
                     Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript);
                     if (matchedManuscript != null) {
                         // update the item's metadata
-                        String score = matchedManuscript.optionalProperties.get("crossref-score");
-                        message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
-                        matchedManuscript.optionalProperties.put("provenance", message);
-                        updateItemMetadataFromManuscript(item, matchedManuscript, context);
-
+                        if (updateItemMetadataFromManuscript(item, matchedManuscript, context)) {
+                            message = "Associated publication (match score " + matchedManuscript.optionalProperties.get("crossref-score") + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
+                            matchedManuscript.optionalProperties.put("provenance", message);
+                            updatedItems.add(buildItemSummary(item) + "\n\t" + message);
+                        }
                         // was there a manuscript record saved for this? If so, update it.
                         if (databaseManuscript != null) {
                             databaseManuscript.setPublicationDOI(matchedManuscript.getPublicationDOI());
@@ -205,9 +206,6 @@ public class PublicationUpdater extends HttpServlet {
                                 LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
                             }
                         }
-                    }
-                    if (!"".equals(message)) {
-                        updatedItems.add(buildItemSummary(item) + "\n\t" + message);
                     }
                 }
             }
