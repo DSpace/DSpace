@@ -174,11 +174,9 @@ public class PublicationUpdater extends HttpServlet {
                             if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
                                 databaseManuscript = databaseManuscripts.get(0);
                                 if (isInReview) {     // only update the metadata if the item is in review.
-                                    if (updateItemMetadataFromManuscript(item, databaseManuscript, context)) {
-                                        message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
-                                        databaseManuscript.optionalProperties.put("provenance", message);
-                                    }
                                 }
+                                message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
+                                updateItemMetadataFromManuscript(item, databaseManuscript, context, message);
                             }
                         }
                     } catch (ParseException e) {
@@ -189,9 +187,8 @@ public class PublicationUpdater extends HttpServlet {
                     Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript);
                     if (matchedManuscript != null) {
                         // update the item's metadata
-                        if (updateItemMetadataFromManuscript(item, matchedManuscript, context)) {
-                            message = "Associated publication (match score " + matchedManuscript.optionalProperties.get("crossref-score") + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
-                            matchedManuscript.optionalProperties.put("provenance", message);
+                        message = "Associated publication (match score " + matchedManuscript.optionalProperties.get("crossref-score") + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
+                        if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
                             updatedItems.add(buildItemSummary(item) + "\n\t" + message);
                         }
                         // was there a manuscript record saved for this? If so, update it.
@@ -229,8 +226,7 @@ public class PublicationUpdater extends HttpServlet {
                 // update the item's metadata
                 String score = matchedManuscript.optionalProperties.get("crossref-score");
                 message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
-                matchedManuscript.optionalProperties.put("provenance", message);
-                updateItemMetadataFromManuscript(item, matchedManuscript, context);
+                updateItemMetadataFromManuscript(item, matchedManuscript, context, message);
             }
 
             if (!"".equals(message)) {
@@ -393,7 +389,7 @@ public class PublicationUpdater extends HttpServlet {
         return queryManuscript;
     }
 
-    private boolean updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context) {
+    private boolean updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context, String provenance) {
         boolean changed = false;
         if (!"".equals(manuscript.getPublicationDOI()) && !item.hasMetadataEqualTo(PUBLICATION_DOI, manuscript.getPublicationDOI())) {
             changed = true;
@@ -425,8 +421,8 @@ public class PublicationUpdater extends HttpServlet {
             item.clearMetadata(CITATION_IN_PROGRESS);
             item.addMetadata(CITATION_IN_PROGRESS, null, "true", null, -1);
 
-            if (manuscript.optionalProperties.containsKey("provenance")) {
-                item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + manuscript.optionalProperties.get("provenance") + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
+            if (!"".equals(provenance)) {
+                item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + provenance + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
             }
 
             try {
