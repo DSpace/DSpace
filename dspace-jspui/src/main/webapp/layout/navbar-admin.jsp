@@ -44,6 +44,8 @@
     boolean crisModuleEnabled = ConfigurationManager.getBooleanProperty(CrisConstants.CFG_MODULE,"enabled");
     String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
     
+    boolean mintDoiToolEnabled = ConfigurationManager.getBooleanProperty("doi.admin.feature");
+    
     // E-mail may have to be truncated
     String navbarEmail = null;
     if (user != null)
@@ -79,7 +81,10 @@
                <li><a href="<%= request.getContextPath() %>/dspace-admin/privateitems"><fmt:message key="jsp.layout.navbar-admin.privateitems"/></a></li>
                <li><a href="<%= request.getContextPath() %>/dspace-admin/metadataimport"><fmt:message key="jsp.layout.navbar-admin.metadataimport"/></a></li>
                <li><a href="<%= request.getContextPath() %>/dspace-admin/batchimport"><fmt:message key="jsp.layout.navbar-admin.batchimport"/></a></li>               
-               <li><a href="<%= request.getContextPath() %>/dspace-admin/authority"><fmt:message key="jsp.layout.navbar-admin.authority"/></a></li>              
+               <li><a href="<%= request.getContextPath() %>/dspace-admin/authority"><fmt:message key="jsp.layout.navbar-admin.authority"/></a></li>
+               <% if(mintDoiToolEnabled) { %>
+               		<li><a href="<%= request.getContextPath() %>/dspace-admin/doi"><fmt:message key="jsp.layout.navbar-admin.doi"/></a></li>			
+               <% } %>              
             </ul>
           </li>
        <%
