@@ -7,13 +7,6 @@
 	<artifactId>dspace-cris</artifactId>
 	<name>DSpace CRIS</name>
 
-	<scm>
-		<connection>scm:git:https://github.com/Cineca/dspace-cris.git</connection>
-		<developerConnection>scm:git:https://github.com/Cineca/dspace-cris.git</developerConnection>
-		<url>https://github.com/Cineca/dspace-cris.git</url>
-		<tag>HEAD</tag>
-	</scm>
-   
 	<parent>
 		<artifactId>dspace-parent</artifactId>
 		<groupId>org.dspace</groupId>
@@ -49,25 +42,25 @@
 	<distributionManagement>
     	<repository>
         	<id>repo</id>
-        	<name>Cineca Maven Repository</name>
-        	<url>https://github.com/Cineca/mvn-repo/raw/master/releases</url>
+        	<name>4Science Maven Repository</name>
+        	<url>https://github.com/4Science/mvn-repo/raw/master/releases</url>
     	</repository>
     	<snapshotRepository>
         	<id>snapshot-repo</id>
-        	<name>Cineca Maven Repository</name>
-        	<url>https://github.com/Cineca/mvn-repo/raw/master/snapshots</url>
+        	<name>4Science Maven Repository</name>
+        	<url>https://github.com/4Science/mvn-repo/raw/master/snapshots</url>
     	</snapshotRepository>
     	<site>
             <id>website</id>
-            <url>http://cineca.github.io/dspace-cris/index.html</url>
+            <url>https://wiki.duraspace.org/display/DSPACECRIS/DSpace-CRIS+Home</url>
         </site>        
 	</distributionManagement>
 	
 	<repositories>		
 		<repository>
-			<id>cineca-repo</id>
-			<name>Cineca Maven Repository</name>
-			<url>https://github.com/Cineca/mvn-repo/raw/master/releases</url>
+			<id>4Science-repo</id>
+			<name>4Science Maven Repository</name>
+			<url>https://github.com/4Science/mvn-repo/raw/master/releases</url>
 			<releases>
 				<enabled>true</enabled>
 				<checksumPolicy>never</checksumPolicy>
@@ -79,9 +72,9 @@
 		</repository>
 		
 		<repository>
-			<id>cineca-repo-snapshot</id>
-			<name>Cineca Maven Repository</name>
-			<url>https://github.com/Cineca/mvn-repo/raw/master/snapshots</url>
+			<id>4Science-repo-snapshot</id>
+			<name>4Science Maven Repository</name>
+			<url>https://github.com/4Science/mvn-repo/raw/master/snapshots</url>
 			<releases>
 				<enabled>false</enabled>
 				<checksumPolicy>never</checksumPolicy>
@@ -166,17 +159,17 @@
 	<developers>
 		<developer>
 			<name>Andrea Bollini</name>
-			<email>a.bollini@cineca.it</email>
+			<email>andrea.bollini@4science.it</email>
 			<timezone>GMT +1</timezone>
 		</developer>
 		<developer>
 			<name>Luigi Andrea Pascarelli</name>
-			<email>l.pascarelli@cineca.it</email>
+			<email>luigiandrea.pascarelli@4science.it</email>
 			<timezone>GMT +1</timezone>
 		</developer>
 		<developer>
 			<name>Riccardo Fazio</name>
-			<email>r.fazio@cineca.it</email>
+			<email>riccardo.fazio@4science.it</email>
 			<timezone>GMT +1</timezone>
 		</developer>
 	</developers>

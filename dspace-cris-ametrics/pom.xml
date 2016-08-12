@@ -37,12 +37,17 @@
 	<developers>
 		<developer>
 			<name>Andrea Bollini</name>
-			<email>a.bollini@cineca.it</email>
+			<email>andrea.bollini@4science.it</email>
 			<timezone>GMT +1</timezone>
 		</developer>
 		<developer>
 			<name>Luigi Andrea Pascarelli</name>
-			<email>luigiandrea.pascarelli@cineca.it</email>
+			<email>luigiandrea.pascarelli@4science.it</email>
+			<timezone>GMT +1</timezone>
+		</developer>
+		<developer>
+			<name>Riccardo Fazio</name>
+			<email>riccardo.fazio@4science.it</email>
 			<timezone>GMT +1</timezone>
 		</developer>
 	</developers>

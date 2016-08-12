@@ -40,7 +40,7 @@
 		
 		
 		<org.jdyna.version>5.7-SNAPSHOT</org.jdyna.version>		
-		<it.cilea.ccommons.version>2.1</it.cilea.ccommons.version>
+		<it.cilea.ccommons.version>2.2-SNAPSHOT</it.cilea.ccommons.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.7</java.version>
         <lucene.version>4.10.2</lucene.version>
@@ -1741,17 +1741,17 @@
       snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:git:https://github.com/Cineca/DSpace.git</connection>
-      <developerConnection>scm:git:https://github.com/Cineca/DSpace.git</developerConnection>
-      <url>https://github.com/Cineca/DSpace.git</url>
+      <connection>scm:git:https://github.com/4Science/DSpace.git</connection>
+      <developerConnection>scm:git:https://github.com/4Science/DSpace.git</developerConnection>
+      <url>https://github.com/4Science/DSpace.git</url>
       <tag>dspace-cris-master</tag>
    </scm>
 
    <repositories>
        <repository>
-			<id>cineca-repo</id>
-			<name>Cineca Maven Repository</name>
-			<url>https://github.com/Cineca/mvn-repo/raw/master/releases</url>
+			<id>4science-repo</id>
+			<name>4Science Maven Repository</name>
+			<url>https://github.com/4Science/mvn-repo/raw/master/releases</url>
 			<releases>
 				<enabled>true</enabled>
 				<checksumPolicy>never</checksumPolicy>
@@ -1763,9 +1763,9 @@
 		</repository>
 		
 		<repository>
-			<id>cineca-repo-snapshot</id>
-			<name>Cineca Maven Repository</name>
-			<url>https://github.com/Cineca/mvn-repo/raw/master/snapshots</url>
+			<id>4science-repo-snapshot</id>
+			<name>4Science Maven Repository</name>
+			<url>https://github.com/4Science/mvn-repo/raw/master/snapshots</url>
 			<releases>
 				<enabled>false</enabled>
 				<checksumPolicy>never</checksumPolicy>
@@ -1786,9 +1786,9 @@
    
    <pluginRepositories>
         <pluginRepository>
-            <id>cineca-repo</id>
-			<name>Cineca Maven Repository</name>
-			<url>https://github.com/Cineca/mvn-repo/raw/master/releases</url>
+            <id>4science-repo</id>
+			<name>4Science Maven Repository</name>
+			<url>https://github.com/4Science/mvn-repo/raw/master/releases</url>
 			<releases>
 				<enabled>true</enabled>
 				<checksumPolicy>never</checksumPolicy>
@@ -1800,9 +1800,9 @@
         </pluginRepository>
         
         <pluginRepository>
-            <id>cineca-repo-snapshot</id>
-			<name>Cineca Maven Repository</name>
-			<url>https://github.com/Cineca/mvn-repo/raw/master/snapshots</url>
+            <id>4science-repo-snapshot</id>
+			<name>4Science Maven Repository</name>
+			<url>https://github.com/4Science/mvn-repo/raw/master/snapshots</url>
 			<releases>
 				<enabled>false</enabled>
 				<checksumPolicy>never</checksumPolicy>
@@ -1829,17 +1829,17 @@
    	<distributionManagement>
     	<repository>
         	<id>repo</id>
-        	<name>Cineca Maven Repository</name>
-        	<url>https://github.com/Cineca/mvn-repo/raw/master/releases</url>
+        	<name>4Science Maven Repository</name>
+        	<url>https://github.com/4Science/mvn-repo/raw/master/releases</url>
     	</repository>
     	<snapshotRepository>
         	<id>snapshot-repo</id>
-        	<name>Cineca Maven Repository</name>
-        	<url>https://github.com/Cineca/mvn-repo/raw/master/snapshots</url>
+        	<name>4Science Maven Repository</name>
+        	<url>https://github.com/4Science/mvn-repo/raw/master/snapshots</url>
     	</snapshotRepository>
     	<site>
             <id>website</id>
-            <url>http://cineca.github.io/dspace-cris/index.html</url>
+            <url>https://wiki.duraspace.org/display/DSPACECRIS/DSpace-CRIS+Home</url>
         </site>        
 	</distributionManagement>
 
