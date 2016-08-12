@@ -60,7 +60,7 @@ function sortBy(pos, ord){
     // create the URLs accessing the previous and next search result pages
     StringBuilder sb = new StringBuilder();
 	sb.append("<div><ul class=\"pagination\">");
-	sb.append("<li>Result pages:</li>");
+	sb.append("<li><span>Result pages:</span></li>");
 	
     String prevURL =  "?"
                     + "&amp;sort_by=" + (so != null ? so.getNumber() : 0)
@@ -94,7 +94,7 @@ for( int q = pageFirst; q <= pageLast; q++ )
 
     if( q == pageCurrent )
     {
-        myLink = "<li>" + q;
+        myLink = "<li><span>" + q + "</span>";
     }
     else
     {
@@ -177,8 +177,8 @@ j(document).ready(function() {
 	var ctrl = j('<th/>').attr({id:'t5'}).html('${messageproposeddoi}');
 	var ctrl2 = j('<th/>').attr({id:'t5'}).html('${messagenote}');
 				   
-	var table = j("html body table tbody tr td.text form table.miscTable tbody tr:first").append(ctrl);
-	var table2 = j("html body table tbody tr td.text form table.miscTable tbody tr:first").append(ctrl2);
+	var table = j("html body.undernavigation main#content div.container form table.table.table-hover tbody tr:first").append(ctrl);
+	var table2 = j("html body.undernavigation main#content div.container form table.table.table-hover tbody tr:first").append(ctrl2);
 });
 
 

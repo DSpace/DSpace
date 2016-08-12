@@ -1,0 +1,82 @@
+--
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
+--
+-- http://www.dspace.org/license/
+--
+DECLARE
+  VCOUNT   NUMBER (10);
+BEGIN
+   
+BEGIN
+	EXECUTE IMMEDIATE
+    'CREATE TABLE doi2item (
+	"ID" NUMBER(*,0) NOT NULL ENABLE,
+	item_id NUMBER(*,0),
+	eperson_id NUMBER(*,0),
+	request_date TIMESTAMP,
+	last_modified TIMESTAMP,
+	identifier_doi VARCHAR(4000),
+	criteria VARCHAR2(256),
+	response_code VARCHAR2(256),
+	service VARCHAR2(256),
+	note CLOB,
+	filename VARCHAR2(256),
+ 	CONSTRAINT doi2item_pkey PRIMARY KEY ("ID")	
+)';
+	EXCEPTION
+	WHEN OTHERS
+    THEN
+       NULL;
+END;
+
+BEGIN
+	EXECUTE IMMEDIATE
+    	'ALTER TABLE doi2item ADD CONSTRAINT "identifier_doi" UNIQUE (identifier_doi)';
+	EXCEPTION
+	WHEN OTHERS
+    THEN
+       NULL;
+END;
+
+
+BEGIN
+	EXECUTE IMMEDIATE
+    	'ALTER TABLE doi2item ADD CONSTRAINT "item_id" UNIQUE (item_id)';
+	EXCEPTION
+	WHEN OTHERS
+    THEN
+       NULL;
+END;
+
+BEGIN
+	EXECUTE IMMEDIATE
+    	'CREATE SEQUENCE doi2item_seq';
+	EXCEPTION
+	WHEN OTHERS
+    THEN
+       NULL;
+END;
+
+DECLARE
+    VCOUNT   NUMBER (10);
+BEGIN
+   SELECT COUNT (METADATA_FIELD_ID) INTO VCOUNT FROM METADATAFIELDREGISTRY WHERE ELEMENT = 'utils' AND QUALIFIER = 'nodoi';
+
+   IF (VCOUNT = 0) THEN
+      INSERT INTO METADATAFIELDREGISTRY (METADATA_FIELD_ID, METADATA_SCHEMA_ID, ELEMENT, QUALIFIER, SCOPE_NOTE) VALUES (METADATAFIELDREGISTRY_SEQ.NEXTVAL, 1, 'utils', 'nodoi', NULL);
+   END IF;
+END;
+
+DECLARE
+    VCOUNT   NUMBER (10);
+BEGIN
+   SELECT COUNT (METADATA_FIELD_ID) INTO VCOUNT FROM METADATAFIELDREGISTRY WHERE ELEMENT = 'utils' AND QUALIFIER = 'processdoi';
+
+   IF (VCOUNT = 0) THEN
+      INSERT INTO METADATAFIELDREGISTRY (METADATA_FIELD_ID, METADATA_SCHEMA_ID, ELEMENT, QUALIFIER, SCOPE_NOTE) VALUES (METADATAFIELDREGISTRY_SEQ.NEXTVAL, 1, 'utils', 'processdoi', NULL);
+   END IF;
+END;
+
+END;

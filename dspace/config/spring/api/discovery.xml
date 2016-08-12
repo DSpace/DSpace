@@ -77,6 +77,10 @@
 	<!--  Additional indexing plugin to serve the ScriptCrisSubscribe -->
 	<bean id="crisSubscribeSolrIndexer" class="org.dspace.app.cris.discovery.CrisSubscribeSolrIndexer">
 	</bean>
+	
+	<!--  Additional indexing plugin to show if the publications have a doi-->
+	<bean id="hasDoiIndexer" class="org.dspace.app.cris.discovery.HasDoiSolrIndexer">
+	</bean>	
 				
 	<!--Bean that is used for mapping communities/collections to certain discovery 
 		configurations. -->
@@ -1725,6 +1729,18 @@
 		<property name="metadataFields">
 			<list>
 				<value>item.fulltext</value>				
+			</list>
+		</property>
+		<property name="facetLimit" value="10" />
+		<property name="sortOrder" value="COUNT" />
+	</bean>
+	
+	<bean id="searchFilterPermissionFulltext"
+		class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+		<property name="indexFieldName" value="grantfulltext" />
+		<property name="metadataFields">
+			<list>
+				<value>item.grantfulltext</value>				
 			</list>
 		</property>
 		<property name="facetLimit" value="10" />

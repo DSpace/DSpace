@@ -91,9 +91,9 @@ public class ScriptDataCiteDOIActivate
         if (line.hasOption('h'))
         {
             HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("ScriptCrossrefSender \n", options);
+            myhelp.printHelp("ScriptDataCiteDOIActivate \n", options);
             System.out
-                    .println("\n\nUSAGE:\n ScriptCrossrefSender -a|-s <item_id>] \n");
+                    .println("\n\nUSAGE:\n ScriptDataCiteDOIActivate -a|-s <item_id>] \n");
 
             System.exit(0);
         }
@@ -101,7 +101,7 @@ public class ScriptDataCiteDOIActivate
         if (line.hasOption('s') && line.hasOption('a'))
         {
             System.out
-                    .println("\n\nUSAGE:\n ScriptCrossrefSender -a|-s <item_id>] \n");
+                    .println("\n\nUSAGE:\n ScriptDataCiteDOIActivate -a|-s <item_id>] \n");
             System.out.println("Insert either a or s like parameters");
             log.error("Either a or s like parameters");
             System.exit(1);
@@ -252,7 +252,7 @@ public class ScriptDataCiteDOIActivate
                 else
                 {
                     System.out
-                            .println("\n\nUSAGE:\n ScriptCrossrefSender -a|-s <item_id>] \n");
+                            .println("\n\nUSAGE:\n ScriptDataCiteDOIActivate -a|-s <item_id>] \n");
                     System.out.println("Option n or s is needed");
                     log.error("Option n or s is needed");
                     System.exit(1);

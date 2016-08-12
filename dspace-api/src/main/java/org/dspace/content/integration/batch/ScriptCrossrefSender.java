@@ -291,9 +291,9 @@ public class ScriptCrossrefSender
                 else
                 {
                     System.out
-                            .println("\n\nUSAGE:\n ScriptCrossrefSender -n|-s <item_id>] \n");
-                    System.out.println("Option n or s is needed");
-                    log.error("Option n or s is needed");
+                            .println("\n\nUSAGE:\n ScriptCrossrefSender -a|-s <item_id>] \n");
+                    System.out.println("Option a or s is needed");
+                    log.error("Option a or s is needed");
                     System.exit(1);
                 }
 

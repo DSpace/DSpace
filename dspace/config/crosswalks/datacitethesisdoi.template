@@ -1,7 +1,7 @@
 	
 	<identifier identifierType="DOI">@virtual.doi@</identifier>
 	<creators>
-		<creator><creatorName><![CDATA[@dc.authority.people@]]></creatorName></creator>
+		<creator><creatorName><![CDATA[@dc.contributor.author@]]></creatorName></creator>
 	</creators>
 	<titles>
 		<title><![CDATA[ @dc.title@ ]]></title>

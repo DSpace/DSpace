@@ -41,7 +41,7 @@ public class VirtualFieldCrossrefPhdDOI implements VirtualFieldDisseminator,
             }
             
             String result = ConfigurationManager.getProperty("doi.prefix");
-			Metadatum[] authors = item.getMetadata("dc", "authority", "people", Item.ANY);
+			Metadatum[] authors = item.getMetadata("dc", "contributor", "author", Item.ANY);
 			if (authors.length > 0) {
 				Metadatum md = authors[0];
 				String mdValue = md.value.toLowerCase();
@@ -63,7 +63,7 @@ public class VirtualFieldCrossrefPhdDOI implements VirtualFieldDisseminator,
                     result += "_" + item.getID();
                 }
             }
-            fieldCache.put("virtual.crossrefthesisdoi", result);
+            fieldCache.put("virtual.pgthesisdoi", result);
             // Return the value of the virtual field (if any)
             if (fieldCache.containsKey(fieldName))
             {

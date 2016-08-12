@@ -178,5 +178,20 @@
 		</property>
 	</bean>
 	
+	<bean class="org.dspace.content.ItemEnhancer">
+		<property name="alias" value="grantfulltext" />
+		<property name="metadata">
+			<list>
+				<value>placeholder.placeholder.placeholder</value>
+			</list>
+		</property>
+		<property name="generators">
+			<list>				
+			    <ref bean="enhancerPermissionFulltext"/>
+			</list>
+		</property>
+	</bean>
+	
 	<bean name="enhancerFulltext" class="org.dspace.content.integration.defaultvalues.FulltextInfoGenerator"/>
+	<bean name="enhancerPermissionFulltext" class="org.dspace.content.integration.defaultvalues.FulltextPermissionGenerator"/>
 </beans>

@@ -26,7 +26,7 @@
 		text-decoration: line-through;
 	}
 	
-	html body table tbody tr td.text div table.miscTable tbody tr td form table.miscTable tbody tr th#t5 {
+	html body.undernavigation main#content div.container div div div.col-md-12 form table.table.table-hover tbody tr th#t5 {
 		width: 15em;
 	} 
 	
@@ -79,7 +79,7 @@ function sortBy(pos, ord){
     // create the URLs accessing the previous and next search result pages
     StringBuilder sb = new StringBuilder();
 	sb.append("<div><ul class=\"pagination\">");
-	sb.append("<li>Result pages:</li>");
+	sb.append("<li><span>Result pages:</span></li>");
 	
     String prevURL =  "?"
                     + "&amp;sort_by=" + (so != null ? so.getNumber() : 0)
@@ -115,7 +115,7 @@ for( int q = pageFirst; q <= pageLast; q++ )
 
     if( q == pageCurrent )
     {
-        myLink = "<li>" + q;
+        myLink = "<li><span class=''>" + q + "</span>";
     }
     else
     {
@@ -211,7 +211,7 @@ if (pageTotal > 1)
 
 	jQuery(document).ready(function() {
 		var ctrl = jQuery('<th/>').attr({id:'t5'}).html('Proposed DOI');
-		var table = jQuery("html body table tbody tr td.text div table.miscTable tbody tr td form table.miscTable tbody tr:first").append(ctrl);;			
+		var table = jQuery("html body.undernavigation main#content div.container div div div.col-md-12 form table.table.table-hover tbody tr:first").append(ctrl);;			
 	});
 
 	

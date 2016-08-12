@@ -29,11 +29,11 @@ public class DoiFixUtilityCheckerServlet extends DSpaceServlet
 
     private static final String QUERY_PGSQL = "SELECT i2.item_id FROM item i2 INNER JOIN "
             + ScriptCrossrefSender.TABLE_NAME_DOI2ITEM
-            + " d2i ON d2i.item_id = i2.item_id LEFT JOIN metadatavalue mv2 ON i2.item_id = mv2.item_id LEFT JOIN metadatafieldregistry mfr2 ON mv2.metadata_field_id = mfr2.metadata_field_id WHERE mfr2.element = 'identifier' AND mfr2.qualifier = 'doi' AND mv2.text_value != d2i.identifier_doi AND d2i.last_modified is not null AND d2i.criteria = ?";
+            + " d2i ON d2i.item_id = i2.item_id LEFT JOIN metadatavalue mv2 ON i2.item_id = mv2.resource_id and mv2.resource_type_id = 2 LEFT JOIN metadatafieldregistry mfr2 ON mv2.metadata_field_id = mfr2.metadata_field_id WHERE mfr2.element = 'identifier' AND mfr2.qualifier = 'doi' AND mv2.text_value != d2i.identifier_doi AND d2i.last_modified is not null AND d2i.criteria = ?";
 
     private static final String QUERY_ORACLE = "SELECT i2.item_id FROM item i2 INNER JOIN "
         + ScriptCrossrefSender.TABLE_NAME_DOI2ITEM
-        + " d2i ON d2i.item_id = i2.item_id LEFT JOIN metadatavalue mv2 ON i2.item_id = mv2.item_id LEFT JOIN metadatafieldregistry mfr2 ON mv2.metadata_field_id = mfr2.metadata_field_id WHERE mfr2.element = 'identifier' AND mfr2.qualifier = 'doi' AND DBMS_LOB.SUBSTR(mv2.text_value,3000) != d2i.identifier_doi AND d2i.last_modified is not null AND d2i.criteria = ?";
+        + " d2i ON d2i.item_id = i2.item_id LEFT JOIN metadatavalue mv2 ON i2.item_id = mv2.resource_id and mv2.resource_type_id = 2 LEFT JOIN metadatafieldregistry mfr2 ON mv2.metadata_field_id = mfr2.metadata_field_id WHERE mfr2.element = 'identifier' AND mfr2.qualifier = 'doi' AND DBMS_LOB.SUBSTR(mv2.text_value,3000) != d2i.identifier_doi AND d2i.last_modified is not null AND d2i.criteria = ?";
     
     /** log4j category */
     private static Logger log = Logger
