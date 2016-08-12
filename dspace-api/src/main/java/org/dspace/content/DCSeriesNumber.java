@@ -81,7 +81,7 @@ public class DCSeriesNumber
         {
             return (null);
         }
-        else if (number == null)
+        else if (number == null || number.replaceAll("\\s","").length() == 0)
         {
             return (series);
         }
