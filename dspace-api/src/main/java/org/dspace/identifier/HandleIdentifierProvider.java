@@ -67,14 +67,14 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         {
             return true;
         }
-        // return true if base prefix matches in case of multi-instance deployment with derived prefixes demarcated by a dot "." 
-        if(prefix.contains(".")) {
-            String[] splitPrefix = prefix.split("\\.");
-            if(splitPrefix.length > 1 && identifier.startsWith(splitPrefix[0])) {
+        
+        //Check additional prefixes supported in the config file
+        String[] additionalPrefixes = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("handle.additional.prefixes");
+        for(String additionalPrefix: additionalPrefixes) {
+            if (identifier.startsWith(additionalPrefix)) {
                 return true;
             }
         }
-        // otherwise, assume invalid handle
         return false;
     }
 
