@@ -150,16 +150,17 @@ public class DSpaceCSVLine implements Serializable
      * Write this line out as a CSV formatted string, in the order given by the headings provided
      *
      * @param headings The headings which define the order the elements must be presented in
-     * @param fieldSeparator field separator
+     * @param fieldSeparator separator between metadata fields
+     * @param valueSeparator separator between metadata values (within a field)
      * @return The CSV formatted String
      */
-    protected String toCSV(List<String> headings, String fieldSeparator)
+    protected String toCSV(List<String> headings, String fieldSeparator, String valueSeparator)
     {
         StringBuilder bits = new StringBuilder();
 
         // Add the id
         bits.append("\"").append(id).append("\"").append(fieldSeparator);
-        bits.append(valueToCSV(items.get("collection"), fieldSeparator));
+        bits.append(valueToCSV(items.get("collection"),valueSeparator));
 
         // Add the rest of the elements
         for (String heading : headings)
@@ -168,7 +169,7 @@ public class DSpaceCSVLine implements Serializable
             List<String> values = items.get(heading);
             if (values != null && !"collection".equals(heading))
             {
-                bits.append(valueToCSV(values, fieldSeparator));
+                bits.append(valueToCSV(values, valueSeparator));
             }
         }
 
