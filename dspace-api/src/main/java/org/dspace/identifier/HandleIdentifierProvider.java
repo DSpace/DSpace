@@ -51,14 +51,14 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     @Override
     public boolean supports(String identifier)
     {
-    	String prefix = handleService.getPrefix();
+        String prefix = handleService.getPrefix();
         String canonicalPrefix = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("handle.canonical.prefix");
         if (identifier == null)
         {
             return false;
         }
         // return true if handle has valid starting pattern
-        if (identifier.startsWith(prefix)
+        if (identifier.startsWith(prefix + "/")
                 || identifier.startsWith(canonicalPrefix)
                 || identifier.startsWith("hdl:")
                 || identifier.startsWith("info:hdl")
@@ -71,10 +71,11 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         //Check additional prefixes supported in the config file
         String[] additionalPrefixes = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("handle.additional.prefixes");
         for(String additionalPrefix: additionalPrefixes) {
-            if (identifier.startsWith(additionalPrefix)) {
+            if (identifier.startsWith(additionalPrefix + "/")) {
                 return true;
             }
         }
+
         return false;
     }
 
