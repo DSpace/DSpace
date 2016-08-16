@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<dspace-dc-types>
+
+    <!-- The Funder schema reflects metadata specific to DryadFunderConcepts.
+    Metadata that applies to funders may also be found in the Organization schema.-->
+
+    <dc-schema>
+        <name>funder</name>
+        <namespace>http://purl.org/dspace/models/funder</namespace>
+    </dc-schema>
+
+    <!-- The identifier is the doi representing this funder in the Open Funder Registry-->
+    <dc-type>
+        <schema>funder</schema>
+        <element>identifier</element>
+    </dc-type>
+
+</dspace-dc-types>

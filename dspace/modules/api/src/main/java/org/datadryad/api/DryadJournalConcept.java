@@ -42,10 +42,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
 
     // Journal Concepts can also have the following fields:
     public static final String ISSN = "issn";
-    public static final String CUSTOMER_ID = "customerID";
-    public static final String DESCRIPTION = "description";
     public static final String MEMBERNAME = "memberName";
-    public static final String WEBSITE = "website";
     public static final String COVER_IMAGE = "coverImage";
 
     public static final String HASJOURNALPAGE = "hasJournalPage";
@@ -54,7 +51,6 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
 
     static {
         metadataProperties.setProperty(JOURNAL_ID, "journal.journalID");
-        metadataProperties.setProperty(FULLNAME, "journal.fullname");
         metadataProperties.setProperty(CANONICAL_MANUSCRIPT_NUMBER_PATTERN, "journal.canonicalManuscriptNumberPattern");
         metadataProperties.setProperty(SPONSOR_NAME, "journal.sponsorName");
         metadataProperties.setProperty(PARSING_SCHEME, "journal.parsingScheme");
@@ -76,7 +72,6 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         metadataProperties.setProperty(COVER_IMAGE, "journal.coverImage");
 
         defaultMetadataValues.setProperty(metadataProperties.getProperty(JOURNAL_ID), "");
-        defaultMetadataValues.setProperty(metadataProperties.getProperty(FULLNAME), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(CANONICAL_MANUSCRIPT_NUMBER_PATTERN), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(SPONSOR_NAME), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(PARSING_SCHEME), "");
@@ -88,12 +83,8 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         defaultMetadataValues.setProperty(metadataProperties.getProperty(NOTIFY_ON_REVIEW), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(NOTIFY_WEEKLY), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(PUBLICATION_BLACKOUT), "true");
-        defaultMetadataValues.setProperty(metadataProperties.getProperty(PAYMENT_PLAN), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(ISSN), "");
-        defaultMetadataValues.setProperty(metadataProperties.getProperty(CUSTOMER_ID), "");
-        defaultMetadataValues.setProperty(metadataProperties.getProperty(DESCRIPTION), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(MEMBERNAME), "");
-        defaultMetadataValues.setProperty(metadataProperties.getProperty(WEBSITE), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(COVER_IMAGE), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(HASJOURNALPAGE), "");
     }
@@ -133,6 +124,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         }
     }
 
+    @Override
     public void create(Context context) {
         try {
             context.turnOffAuthorisationSystem();
@@ -145,10 +137,6 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         } catch (Exception e) {
             log.error("Couldn't make new concept: " + e.getMessage());
         }
-    }
-
-    public void delete(Context context) throws SQLException, AuthorizeException {
-        this.getUnderlyingConcept(context).delete(context);
     }
 
     @JsonIgnore
@@ -219,29 +207,10 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         setConceptMetadataValue(metadataProperties.getProperty(ISSN), value);
     }
 
-    public String getCustomerID() {
-        return getConceptMetadataValue(metadataProperties.getProperty(CUSTOMER_ID));
-    }
-
+    @Override
     public void setCustomerID(String value) {
         setConceptMetadataValue(metadataProperties.getProperty(CUSTOMER_ID), value);
         JournalUtils.updateDryadJournalConcept(this);
-    }
-
-    public String getDescription() {
-        return getConceptMetadataValue(metadataProperties.getProperty(DESCRIPTION));
-    }
-
-    public void setDescription(String value) {
-        setConceptMetadataValue(metadataProperties.getProperty(DESCRIPTION), value);
-    }
-
-    public String getWebsite() {
-        return getConceptMetadataValue(metadataProperties.getProperty(WEBSITE));
-    }
-
-    public void setWebsite(String value) {
-        setConceptMetadataValue(metadataProperties.getProperty(WEBSITE), value);
     }
 
     public String getCoverImage() {
@@ -469,27 +438,6 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
             newSubscriptionPaid = true;
         }
         return newSubscriptionPaid;
-    }
-
-    public String getPaymentPlan() {
-        return getConceptMetadataValue(metadataProperties.getProperty(PAYMENT_PLAN));
-    }
-
-    public void setPaymentPlan(String paymentPlan) {
-        String paymentPlanType = "";
-        if (SUBSCRIPTION_PLAN.equals(paymentPlan)) {
-            paymentPlanType = SUBSCRIPTION_PLAN;
-        } else if (DEFERRED_PLAN.equals(paymentPlan)) {
-            paymentPlanType = DEFERRED_PLAN;
-        } else if (PREPAID_PLAN.equals(paymentPlan)) {
-            paymentPlanType = PREPAID_PLAN;
-        }
-        setConceptMetadataValue(metadataProperties.getProperty(PAYMENT_PLAN), paymentPlanType);
-    }
-
-    @JsonIgnore
-    public Boolean isValid() {
-        return (getFullName() != null);
     }
 
     @JsonIgnore

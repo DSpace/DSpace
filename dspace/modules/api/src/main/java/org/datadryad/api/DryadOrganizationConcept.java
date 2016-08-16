@@ -1,6 +1,7 @@
 package org.datadryad.api;
 
 import org.apache.log4j.Logger;
+import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.content.authority.Term;
@@ -21,6 +22,9 @@ import java.util.Set;
 
 import org.dspace.authorize.AuthorizeException;
 
+import static org.datadryad.api.DryadJournalConcept.PAYMENT_PLAN;
+import static org.datadryad.api.DryadJournalConcept.WEBSITE;
+
 /**
  *
  * @author Daisie Huang <daisieh@datadryad.org>
@@ -28,8 +32,10 @@ import org.dspace.authorize.AuthorizeException;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DryadOrganizationConcept implements Comparable<DryadOrganizationConcept> {
     // Organization Concepts can have the following metadata properties:
-    public static final String ORGANIZATION_ID = "organizationID";
     public static final String FULLNAME = "fullname";
+    public static final String CUSTOMER_ID = "customerID";
+    public static final String DESCRIPTION = "description";
+    public static final String WEBSITE = "website";
 
     public static final String SUBSCRIPTION_PLAN = "SUBSCRIPTION";
     public static final String PREPAID_PLAN = "PREPAID";
@@ -43,7 +49,18 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
 
     static {
         metadataProperties = new Properties();
+        metadataProperties.setProperty(FULLNAME, "organization.fullName");
+        metadataProperties.setProperty(PAYMENT_PLAN, "organization.paymentPlanType");
+        metadataProperties.setProperty(DESCRIPTION, "organization.description");
+        metadataProperties.setProperty(WEBSITE, "organization.website");
+        metadataProperties.setProperty(CUSTOMER_ID, "organization.customerID");
+
         defaultMetadataValues = new Properties();
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(FULLNAME), "");
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(PAYMENT_PLAN), "");
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(DESCRIPTION), "");
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(WEBSITE), "");
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(CUSTOMER_ID), "");
     }
 
     // these are mandatory elements
@@ -62,6 +79,23 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         } catch (Exception e) {
             log.error("exception " + e.getMessage());
         }
+    }
+
+    public void create(Context context) {
+        try {
+            context.turnOffAuthorisationSystem();
+            Scheme funderScheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.dryad_organization"));
+            Concept newConcept = funderScheme.createConcept(context);
+            this.setUnderlyingConcept(context, newConcept);
+            context.commit();
+            context.restoreAuthSystemState();
+        } catch (Exception e) {
+            log.error("Couldn't make new concept: " + e.getMessage());
+        }
+    }
+
+    public void delete(Context context) throws SQLException, AuthorizeException {
+        this.getUnderlyingConcept(context).delete(context);
     }
 
     @JsonIgnore
@@ -167,6 +201,51 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     @JsonIgnore
     public String getIdentifier() {
         return conceptIdentifier;
+    }
+
+    public String getCustomerID() {
+        return getConceptMetadataValue(metadataProperties.getProperty(CUSTOMER_ID));
+    }
+
+    public void setCustomerID(String value) {
+        setConceptMetadataValue(metadataProperties.getProperty(CUSTOMER_ID), value);
+    }
+
+    public String getDescription() {
+        return getConceptMetadataValue(metadataProperties.getProperty(DESCRIPTION));
+    }
+
+    public void setDescription(String value) {
+        setConceptMetadataValue(metadataProperties.getProperty(DESCRIPTION), value);
+    }
+
+    public String getWebsite() {
+        return getConceptMetadataValue(metadataProperties.getProperty(WEBSITE));
+    }
+
+    public void setWebsite(String value) {
+        setConceptMetadataValue(metadataProperties.getProperty(WEBSITE), value);
+    }
+
+    public String getPaymentPlan() {
+        return getConceptMetadataValue(metadataProperties.getProperty(PAYMENT_PLAN));
+    }
+
+    public void setPaymentPlan(String paymentPlan) {
+        String paymentPlanType = "";
+        if (SUBSCRIPTION_PLAN.equals(paymentPlan)) {
+            paymentPlanType = SUBSCRIPTION_PLAN;
+        } else if (DEFERRED_PLAN.equals(paymentPlan)) {
+            paymentPlanType = DEFERRED_PLAN;
+        } else if (PREPAID_PLAN.equals(paymentPlan)) {
+            paymentPlanType = PREPAID_PLAN;
+        }
+        setConceptMetadataValue(metadataProperties.getProperty(PAYMENT_PLAN), paymentPlanType);
+    }
+
+    @JsonIgnore
+    public Boolean isValid() {
+        return (getFullName() != null);
     }
 
     @Override
