@@ -171,10 +171,11 @@ public class IndexClient {
         count++;
         if (dso.getType() == Constants.COMMUNITY) {
             final Community community = (Community) dso;
+            final String communityHandle = community.getHandle();
             for (final Community subcommunity : community.getSubcommunities()) {
                 count += indexAll(indexingService, itemService, context, subcommunity);
             }
-            final Community reloadedCommunity = (Community) HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, community.getHandle());
+            final Community reloadedCommunity = (Community) HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, communityHandle);
             for (final Collection collection : reloadedCommunity.getCollections()) {
                 count++;
                 indexingService.indexContent(context, collection, true, true);
