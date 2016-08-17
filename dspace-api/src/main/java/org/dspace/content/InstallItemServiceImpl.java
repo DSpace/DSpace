@@ -62,6 +62,7 @@ public class InstallItemServiceImpl implements InstallItemService
             AuthorizeException
     {
         Item item = is.getItem();
+        Collection collection = is.getCollection();
         try {
             if(suppliedHandle == null)
             {
@@ -75,7 +76,15 @@ public class InstallItemServiceImpl implements InstallItemService
 
         populateMetadata(c, item);
 
-        return finishItem(c, item, is);
+        // Finish up / archive the item
+        item = finishItem(c, item, is);
+
+        // As this is a BRAND NEW item, as a final step we need to remove the
+        // submitter item policies created during deposit and replace them with
+        // the default policies from the collection.
+        itemService.inheritCollectionDefaultPolicies(c, item, collection);
+
+        return item;
     }
 
     @Override
@@ -102,7 +111,7 @@ public class InstallItemServiceImpl implements InstallItemService
         
         // If the item doesn't have a date.accessioned, set it to today
         List<MetadataValue> dateAccessioned = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "accessioned", Item.ANY);
-        if (dateAccessioned.size() == 0)
+        if (dateAccessioned.isEmpty())
         {
 	        itemService.addMetadata(c, item, MetadataSchema.DC_SCHEMA, "date", "accessioned", null, now.toString());
         }
@@ -174,7 +183,7 @@ public class InstallItemServiceImpl implements InstallItemService
 
         // If an issue date was passed in and it wasn't set to "today" (literal string)
         // then note this previous issue date in provenance message
-        if (currentDateIssued.size() != 0)
+        if (!currentDateIssued.isEmpty())
         {
             String previousDateIssued = currentDateIssued.get(0).getValue();
             if(previousDateIssued!=null && !previousDateIssued.equalsIgnoreCase("today"))
@@ -189,8 +198,18 @@ public class InstallItemServiceImpl implements InstallItemService
         itemService.addMetadata(c, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
     }
 
-    // final housekeeping when adding new Item to archive
-    // common between installing and "restoring" items.
+    /**
+     * Final housekeeping when adding a new Item into the archive.
+     * This method is used by *both* installItem() and restoreItem(),
+     * so all actions here will be run for a newly added item or a restored item.
+     *
+     * @param c DSpace Context
+     * @param item Item in question
+     * @param is InProgressSubmission object
+     * @return final "archived" Item
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     */
     protected Item finishItem(Context c, Item item, InProgressSubmission is)
         throws SQLException, AuthorizeException
     {
@@ -212,10 +231,6 @@ public class InstallItemServiceImpl implements InstallItemService
 
         // remove in-progress submission
         contentServiceFactory.getInProgressSubmissionService(is).deleteWrapper(c, is);
-
-        // remove the item's policies and replace them with
-        // the defaults from the collection
-        itemService.inheritCollectionDefaultPolicies(c, item, is.getCollection());
 
         // set embargo lift date and take away read access if indicated.
         embargoService.setEmbargo(c, item);
