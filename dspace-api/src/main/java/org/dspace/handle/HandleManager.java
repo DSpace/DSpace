@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -647,4 +648,23 @@ public class HandleManager
                 handlePrefix.endsWith("/") ? "" : "/").append(id).toString();
     }
 
+    public static boolean isDead(Context context, String handle) throws SQLException {
+        String baseHandle = stripPartIdentifier(handle);
+
+        TableRow dbhandle = findHandleInternal(context, baseHandle);
+
+        return dbhandle.getBooleanColumn("dead");
+
+    }
+
+    public static String getDeadSince(Context context, String handle) throws SQLException {
+        String baseHandle = stripPartIdentifier(handle);
+
+        TableRow dbhandle = findHandleInternal(context, baseHandle);
+
+        java.util.Date timestamptz = dbhandle.getDateColumn("dead_since");
+
+        return timestamptz != null ? DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(timestamptz) : null;
+
+    }
 }

@@ -298,6 +298,11 @@ public class HandlePlugin implements HandleStorage
                 rh = new ResolvedHandle(url, dso);
             }
             log.info(String.format("Handle [%s] resolved to [%s]", handle, url));
+            if(HandleManager.isDead(context, handle)){
+                //dead_since
+                String deadSince = HandleManager.getDeadSince(context, handle);
+                rh.setDead(handle, deadSince);
+            }
 
             return rh.toRawValue();
         }
@@ -603,4 +608,22 @@ class ResolvedHandle {
         return rawValues;
     }
 
+    public void setDead(String handle, String deadSince) {
+        //find URL field
+        for(HandleValue hv : values){
+            if(hv.hasType(Util.encodeString("URL"))){
+                //duplicate old url as last working URL
+                HandleValue deadURL = hv.duplicate();
+                deadURL.setType(Util.encodeString("ORIG_URL"));
+                deadURL.setIndex(idx++);
+                values.add(deadURL);
+                //change url to our display page
+                hv.setData(Util.encodeString("http://hdl.handle.net/11346/SHORTREF-PR6O#hdl=" + handle));
+                break;
+            }
+        }
+        if(deadSince != null){
+            setValue("DEAD_SINCE", deadSince);
+        }
+    }
 }
