@@ -157,4 +157,9 @@ public class HibernateDBConnection implements DBConnection<Session> {
             getSession().setFlushMode(FlushMode.AUTO);
         }
     }
+
+    @Override
+    public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
+        getSession().evict(entity);        
+    }
 }

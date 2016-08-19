@@ -714,6 +714,12 @@ public class Context
         return (E) dbConnection.reloadEntity(entity);
     }
 
+    @SuppressWarnings("unchecked")
+    public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
+        dbConnection.uncacheEntity(entity);
+    }
+
+    
     /**
      * Reload all entities related to this context.
      * @throws SQLException When reloading one of the entities fails.

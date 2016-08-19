@@ -53,4 +53,6 @@ public interface DBConnection<T> {
      * @param entity The DSpace object to reload
      */
     public <E extends ReloadableEntity> E reloadEntity(E entity) throws SQLException;
+
+    public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException ;
 }
