@@ -1614,6 +1614,35 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         assertTrue("testCanEditBooleanAuth3 0", it.canEdit());
     }
 
+	// testCanEditBooleanAuth5 was backported.
+    // testCanEditBooleanAuth4 is part of an later version of DSpace.
+
+	/**
+	 * Test of canEdit method, of class Item.
+     */
+    @Test
+    public void testCanEditBooleanAuth5() throws Exception
+    {
+        // Test Inheritance of permissions
+        new NonStrictExpectations()
+        {
+            AuthorizeManager authManager;
+            {
+                // Disallow Item WRITE perms
+                AuthorizeManager.authorizeAction((Context) any, (Item) any,
+                        Constants.WRITE); result = new AuthorizeException();
+                // Allow Collection WRITE perms
+                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                        Constants.WRITE, anyBoolean); result = null;
+            }
+        };
+
+        Collection c = Collection.create(context);
+        c.createTemplateItem();
+        c.update();
+        assertTrue("testCanEditBooleanNoAuth5 0", c.getTemplateItem().canEdit());
+    }
+
     /**
      * Test of canEditBoolean method, of class Collection.
      */
