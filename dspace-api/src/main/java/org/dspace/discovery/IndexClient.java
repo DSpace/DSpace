@@ -174,12 +174,14 @@ public class IndexClient {
             final String communityHandle = community.getHandle();
             for (final Community subcommunity : community.getSubcommunities()) {
                 count += indexAll(indexingService, itemService, context, subcommunity);
+                context.uncacheEntity(subcommunity);
             }
             final Community reloadedCommunity = (Community) HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, communityHandle);
             for (final Collection collection : reloadedCommunity.getCollections()) {
                 count++;
                 indexingService.indexContent(context, collection, true, true);
                 count += indexItems(indexingService, itemService, context, collection);
+                context.uncacheEntity(collection);
             }
         } else if (dso.getType() == Constants.COLLECTION) {
             count += indexItems(indexingService, itemService, context, (Collection) dso);
