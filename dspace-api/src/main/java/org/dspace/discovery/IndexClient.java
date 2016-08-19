@@ -200,7 +200,7 @@ public class IndexClient {
         final Iterator<Item> itemIterator = itemService.findByCollection(context, collection);
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
-            indexingService.indexContent(context, itemIterator.next(), true, false);
+            indexingService.indexContent(context, item, true, false);
             count++;
             context.uncacheEntity(item);
         }
