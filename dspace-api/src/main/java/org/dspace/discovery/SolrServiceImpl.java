@@ -392,7 +392,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
         try {
             Iterator<Item> items = null;
-            int itemCount = 0;
             for (items = itemService.findAllUnfiltered(context); items.hasNext();)
             {
                 Item item = items.next();
