@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.kernel.ServiceManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -126,6 +127,9 @@ public class HandleIdentifierProviderTest
     {
         System.out.println("supports(String)");
 
+        DSpaceServicesFactory.getInstance().getConfigurationService().setProperty("handle.prefix", "123456789");
+        DSpaceServicesFactory.getInstance().getConfigurationService().setProperty("handle.additional.prefixes", "123456789.1,123456789.2");
+        
         // We have to get Spring to instantiate the provider as a Bean, because
         // the bean class has autowired fields.
         HandleIdentifierProvider instance = new HandleIdentifierProvider();
