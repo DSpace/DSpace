@@ -396,6 +396,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             {
                 Item item = items.next();
                 indexContent(context, item, force);
+                //To prevent memory issues, discard an object from the cache after processing
                 context.uncacheEntity(item);
             }
 

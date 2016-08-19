@@ -52,5 +52,9 @@ public interface DBConnection<T> {
      */
     public <E extends ReloadableEntity> E reloadEntity(E entity) throws SQLException;
 
+    /**
+     * Remove a DSpace object from the cache when batch processing a large number of objects.
+     * @param entity The DSpace object to reload
+     */
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException ;
 }

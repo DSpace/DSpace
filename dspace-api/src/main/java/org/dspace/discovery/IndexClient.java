@@ -174,6 +174,7 @@ public class IndexClient {
             final String communityHandle = community.getHandle();
             for (final Community subcommunity : community.getSubcommunities()) {
                 count += indexAll(indexingService, itemService, context, subcommunity);
+                //To prevent memory issues, discard an object from the cache after processing
                 context.uncacheEntity(subcommunity);
             }
             final Community reloadedCommunity = (Community) HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, communityHandle);
@@ -181,6 +182,7 @@ public class IndexClient {
                 count++;
                 indexingService.indexContent(context, collection, true, true);
                 count += indexItems(indexingService, itemService, context, collection);
+                //To prevent memory issues, discard an object from the cache after processing
                 context.uncacheEntity(collection);
             }
         } else if (dso.getType() == Constants.COLLECTION) {
@@ -204,6 +206,7 @@ public class IndexClient {
             Item item = itemIterator.next();
             indexingService.indexContent(context, item, true, false);
             count++;
+            //To prevent memory issues, discard an object from the cache after processing
             context.uncacheEntity(item);
         }
         indexingService.commit();
