@@ -397,10 +397,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             {
                 Item item = items.next();
                 indexContent(context, item, force);
-                if (itemCount++ >= 1000) {
-                	context.clearCache();
-                	itemCount = 0;
-                }
+                context.uncacheEntity(item);
             }
 
             List<Collection> collections = collectionService.findAll(context);

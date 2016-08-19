@@ -116,11 +116,6 @@ public class HibernateDBConnection implements DBConnection<Session> {
         return databaseConfigVO;
     }
 
-	@Override
-	public void clearCache() throws SQLException {
-        getSession().flush();
-		getSession().clear();
-	}
 
     @Override
     public long getCacheSize() throws SQLException {
