@@ -1702,6 +1702,60 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     }
 
     /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmission() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = Collection.create(context);
+        WorkspaceItem wi = WorkspaceItem.create(context, c, true);
+    	context.restoreAuthSystemState();
+        assertTrue("testIsInProgressSubmission 0", wi.getItem().isInProgressSubmission());
+    }
+    
+    /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmissionFalse() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = Collection.create(context);
+        WorkspaceItem wi = WorkspaceItem.create(context, c, true);
+        Item item = InstallItem.installItem(context, wi);
+    	context.restoreAuthSystemState();
+        assertFalse("testIsInProgressSubmissionFalse 0", item.isInProgressSubmission());
+    }
+
+    /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmissionFalse2() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = Collection.create(context);
+        c.createTemplateItem();
+        c.update();
+        Item item = c.getTemplateItem();
+    	context.restoreAuthSystemState();
+        assertFalse("testIsInProgressSubmissionFalse2 0", item.isInProgressSubmission());
+    }
+
+    /**
      * Test of getName method, of class Item.
      */
     @Test
