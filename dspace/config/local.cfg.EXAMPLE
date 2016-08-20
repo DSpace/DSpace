@@ -1,21 +1,16 @@
-# local.cfg for DSpace
+# EXAMPLE "local.cfg" for DSpace.
 #
 # Any configurations added to this file will automatically OVERRIDE configurations
-# of the same name in any of the DSpace *.cfg files.
-#
-# While some sample configurations are provided below, you may also copy
-# ANY configuration from ANY DSpace *.cfg file into this "local.cfg" to OVERRIDE
-# its default value. This includes any of these files:
+# of the same name in any of the DSpace *.cfg files. This includes overriding
+# settings in any of these files:
 #    * [dspace]/config/dspace.cfg
-#    * Or any configuration file that is loaded into 'dspace.cfg'
-#     (see "include =" settings near the end of dspace.cfg for full list)
+#    * Or any configuration file that is included in 'dspace.cfg'
+#     (See "include = [filepath]" settings near the end of dspace.cfg.
+#      By default, it includes all [dspace]/config/modules/*.cfg files)
 #
-# You may also specify additional configuration files to load by simply adding:
-#
-# include = [file-path]
-#
-# The [file-path] should be relative to the [dspace]/config/ folder, e.g.
-# include = modules/authentication-ldap.cfg
+# By default, this EXAMPLE file includes a number of commonly overridden configurations.
+# * ADD configurations by simply copying them into this file from any existing *.cfg file.
+# * REMOVE configurations by simply commenting them out or deleting them below.
 #
 # Any commented out settings in this file are simply ignored. A configuration
 # will only override another configuration if it has the EXACT SAME key/name.
@@ -24,6 +19,7 @@
 # Similarly, including "oai.solr.url" in this local.cfg will override the
 # default value of "oai.solr.url" in the modules/oai.cfg file.
 #
+
 
 ##########################
 # SERVER CONFIGURATION   #

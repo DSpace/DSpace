@@ -79,6 +79,8 @@ public class JSPStartSubmissionLookupStep extends JSPStep
     
 	private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
+    private final String DEFAULT_COLLECTION_ID = "-1";
+
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
      * the UI for this step. This method should include the gathering and
@@ -124,13 +126,19 @@ public class JSPStartSubmissionLookupStep extends JSPStep
          * With no parameters, this servlet prepares for display of the Select
          * Collection JSP.
          */
-        UUID collection_id = UIUtil.getUUIDParameter(request, "collection");
-        UUID collectionID = UIUtil.getUUIDParameter(request, "collectionid");
+        UUID collection_id = null;
+        if(!DEFAULT_COLLECTION_ID.equals(request.getParameter("collection"))) {
+        collection_id = UIUtil.getUUIDParameter(request, "collection");
+    }
+
+        if(collection_id == null && !DEFAULT_COLLECTION_ID.equals(request.getParameter("collectionid"))) {
+            collection_id = UIUtil.getUUIDParameter(request, "collectionid");
+        }
         Collection col = null;
 
-        if (collectionID != null)
+        if (collection_id != null)
         {
-            col = collectionService.find(context, collectionID);
+            col = collectionService.find(context, collection_id);
         }
 
         // if we already have a valid collection, then we can forward directly
@@ -138,7 +146,7 @@ public class JSPStartSubmissionLookupStep extends JSPStep
         if (col != null)
         {
             log.debug("Select Collection page skipped, since a Collection ID was already found.  Collection ID="
-                    + collectionID);
+                    + collection_id);
         }
         else
         {
@@ -162,8 +170,14 @@ public class JSPStartSubmissionLookupStep extends JSPStep
 
             // save collections to request for JSP
             request.setAttribute("collections", collections);
-            request.setAttribute("collection_id", collection_id);
-            request.setAttribute("collectionID", collectionID);
+
+            if(collection_id!=null) {
+                request.setAttribute("collection_id", collection_id);
+            }
+            else {
+                request.setAttribute("collection_id", DEFAULT_COLLECTION_ID);
+            }
+            request.setAttribute("collectionID", collection_id);
 
             Map<String, List<String>> identifiers2providers = slService
                     .getProvidersIdentifiersMap();

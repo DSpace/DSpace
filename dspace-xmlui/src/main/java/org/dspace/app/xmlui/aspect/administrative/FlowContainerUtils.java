@@ -621,7 +621,14 @@ public class FlowContainerUtils
 
 		return itemGroup;
 	}
-	
+
+	/**
+	 * @see #getCollectionDefaultRead(Context, Collection)
+     */
+	public static UUID getCollectionDefaultRead(final Context context, final UUID collectionID) throws SQLException, AuthorizeException {
+		return getCollectionDefaultRead(context, collectionService.find(context,collectionID)).getID();
+	}
+
 	/**
 	 * Change default privileges from the anonymous group to a new group that will be created and
 	 * appropriate privileges assigned. The id of this new group will be returned.

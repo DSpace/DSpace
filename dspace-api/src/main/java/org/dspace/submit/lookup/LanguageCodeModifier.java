@@ -78,10 +78,10 @@ public class LanguageCodeModifier extends AbstractModifier implements Initializi
     /**
      * Covert ISO 639-2 alpha-3 code to ISO 639-1 alpha-2 code
      *
-     * @param lang
-     *            3char language code
+     * @param lang3
+     *            ISO 639-1 alpha-3 language code
      * 
-     * @return String 2char language code ("other" unless code has 2 char code)
+     * @return String ISO 639-1 alpha-2 language code ("other" if code is not alpha-2)
      * 
      */
     protected String getLang2(String lang3)

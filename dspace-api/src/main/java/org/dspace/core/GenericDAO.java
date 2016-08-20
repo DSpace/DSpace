@@ -34,7 +34,7 @@ public interface GenericDAO<T>
      *
      * @param context
      * @param clazz the desired type.
-     * @return
+     * @return list of DAOs of the same type as clazz
      * @throws SQLException if database error
      */
     public List<T> findAll(Context context, Class<T> clazz) throws SQLException;
@@ -43,8 +43,8 @@ public interface GenericDAO<T>
      * Execute a JPQL query returning a unique result.
      *
      * @param context
-     * @param query
-     * @return
+     * @param query JPQL query string
+     * @return a DAO specified by the query string
      * @throws SQLException if database error
      */
     public T findUnique(Context context, String query) throws SQLException;
@@ -57,8 +57,8 @@ public interface GenericDAO<T>
      * Execute a JPQL query and return a collection of results.
      *
      * @param context
-     * @param query
-     * @return
+     * @param query JPQL query string
+     * @return list of DAOs specified by the query string
      * @throws SQLException if database error
      */
     public List<T> findMany(Context context, String query) throws SQLException;

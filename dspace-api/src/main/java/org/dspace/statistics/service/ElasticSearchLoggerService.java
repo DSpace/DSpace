@@ -21,6 +21,9 @@ import java.util.HashMap;
 /**
  * Service interface class for the Elastic Search logging.
  * The implementation of this class is responsible for all business logic calls for the Elastic Search logging and is autowired by spring
+ * 
+ * @deprecated  As of DSpace 6.0, ElasticSearch statistics are replaced by Solr statistics
+ * @see org.dspace.statistics.service.SolrLoggerService#SolrLoggerService
  *
  * @author kevinvandevelde at atmire.com
  */

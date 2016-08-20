@@ -1721,7 +1721,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     
     /**
      * Generate a random filename based on current time
-     * @param hidden: add . as a prefix to make the file hidden
+     * @param hidden set to add . as a prefix to make the file hidden
      * @return the filename
      */
     protected String generateRandomFilename(boolean hidden)

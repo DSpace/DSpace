@@ -105,7 +105,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         select.setHelp(T_collection_help);
         
         select.addOption("",T_collection_default);
-	    CollectionDropDown.CollectionPathEntry[] collectionPaths = CollectionDropDown.annotateWithPaths(collections);
+	    CollectionDropDown.CollectionPathEntry[] collectionPaths = CollectionDropDown.annotateWithPaths(context, collections);
         for (CollectionDropDown.CollectionPathEntry entry : collectionPaths)
         {
             select.addOption(entry.collection.getHandle(), entry.path);

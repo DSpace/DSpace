@@ -118,7 +118,7 @@ public class RDFizer {
     /**
      * Returns whether all converted data is printed to stdout. Turtle will be
      * used as serialization.
-     * @return 
+     * @return {@code true} if print all generated data is to be printed to stdout
      */
     public boolean isStdout() {
         return stdout;
@@ -137,7 +137,7 @@ public class RDFizer {
     /**
      * Returns whether verbose information is printed to System.err. Probably 
      * this is helpful for CLI only.
-     * @return 
+     * @return {@code true} if verbose mode is on
      */
     public boolean isVerbose() {
         return verbose;
@@ -154,7 +154,7 @@ public class RDFizer {
 
     /**
      * Returns whether this is a dry run. Probably this is helpful for CLI only.
-     * @return 
+     * @return {@code true} if dry-run mode is on
      */
     public boolean isDryrun() {
         return dryrun;
@@ -214,7 +214,7 @@ public class RDFizer {
                     System.err.println("Cannot determine RDF URI for " 
                             + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() + "(handle " 
                             + dso.getHandle() + ")" + ", skipping. Please "
-                            + "delete it specifing the RDF URI.");
+                            + "delete it specifying the RDF URI.");
                     log.error("Cannot detgermine RDF URI for " 
                             + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() + "(handle "
                             + dso.getHandle() + ")" + ", skipping deletion.");
@@ -417,7 +417,7 @@ public class RDFizer {
             }
         }
 
-//        Currently Bundles and Bitsreams aren't supported as independent entities.
+//        Currently Bundles and Bitstreams aren't supported as independent entities.
 //        They should be converted as part of an item. So we do not need to make
 //        the recursive call for them. An item itself will be converted as part
 //        of the callback call below.

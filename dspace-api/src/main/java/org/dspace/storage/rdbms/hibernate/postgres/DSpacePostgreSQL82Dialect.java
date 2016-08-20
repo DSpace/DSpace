@@ -45,8 +45,8 @@ public class DSpacePostgreSQL82Dialect extends PostgreSQL82Dialect
 
     /**
      * Override is needed to properly support the CLOB on metadatavalue in postgres & oracle.
-     * @param sqlCode
-     * @return
+     * @param sqlCode {@linkplain java.sql.Types JDBC type-code} for the column mapped by this type.
+     * @return Descriptor for the SQL/JDBC side of a value mapping.
      */
     @Override
     public SqlTypeDescriptor getSqlTypeDescriptorOverride(int sqlCode) {

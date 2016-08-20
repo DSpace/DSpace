@@ -51,6 +51,10 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
 
+/*
+ * @deprecated  As of DSpace 6.0, ElasticSearch statistics are replaced by Solr statistics
+ * @see org.dspace.statistics.SolrLoggerServiceImpl#SolrLoggerServiceImpl
+ */
 public class ElasticSearchLoggerServiceImpl implements ElasticSearchLoggerService, InitializingBean {
 
     private static Logger log = Logger.getLogger(ElasticSearchLoggerServiceImpl.class);

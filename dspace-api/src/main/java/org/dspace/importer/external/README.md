@@ -10,7 +10,19 @@
 
 # Introduction <a name="Introduction"></a> #
 
-This documentation explains the features and the usage of the importer framework. 
+This documentation explains the features and the usage of the importer framework.
+Enabling the framework can be achieved by removing the comment block from the following step in item-submission.xml
+Implementation specific or additional configuration can be found in their related documentation, if any. (Some implementations use other submission steps altogether, so make sure to double check)
+
+```
+<step>
+   <heading>submit.progressbar.lookup</heading>
+   <processing-class>org.dspace.submit.step.XMLUIStartSubmissionLookupStep</processing-class>
+   <jspui-binding>org.dspace.app.webui.submit.step.JSPStartSubmissionLookupStep</jspui-binding>
+   <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.StartSubmissionLookupStep</xmlui-binding>
+   <workflow-editable>true</workflow-editable>
+</step>
+```
 
 ## Features <a name="Features"></a> ##
 
@@ -38,17 +50,17 @@ This modular design also allows it to be completely independent of the user inte
 
 # Implementation of an import source <a name="Example-implementation"></a> #
 
-Each importer implementation must at least implement interface *org.dspace.importer.external.service.other.Imports* and implement the inherited methods.
+Each importer implementation must at least implement interface *org.dspace.importer.external.service.components.MetadataSource* and implement the inherited methods.
 
-One can also choose to implement class *org.dspace.importer.external.service.other.Source* next to the Imports interface. This class contains functionality to handle request timeouts and to retry requests.
+One can also choose to implement class *org.dspace.importer.external.service.components.AbstractRemoteMetadataSource* next to the MetadataSource interface. This class contains functionality to handle request timeouts and to retry requests.
 
-A third option is to implement class *org.dspace.importer.external.service.AbstractImportSourceService*. This class already implements both the Imports interface and Source class. AbstractImportSourceService has a generic type set 'RecordType'. In the importer implementation this type set should be the class of the records received from the remote source's response (e.g. when using axiom to get the records from the remote source's XML response, the importer implementation's type set is *org.apache.axiom.om.OMElement*). 
+A third option is to implement class *org.dspace.importer.external.service.AbstractImportSourceService*. This class already implements both the MetadataSource interface and Source class. AbstractImportSourceService has a generic type set 'RecordType'. In the importer implementation this type set should be the class of the records received from the remote source's response (e.g. when using axiom to get the records from the remote source's XML response, the importer implementation's type set is *org.apache.axiom.om.OMElement*). 
 
 Implementing the AbstractImportSourceService allows the importer implementation to use the framework's build-in support to transform a record received from the remote source to an object of class *org.dspace.importer.external.datamodel.ImportRecord* containing DSpace metadata fields, as explained here: [Metadata mapping](#Mapping).
 
 ## Inherited methods <a name="Inherited-methods"></a> ##
 
-Method getImportSource() should return a unique identifier. Importer implementations should not be called directly, but class *org.dspace.importer.external.service.ImportService* should be called instead. This class contains the same methods as the importer implementatons, but with an extra parameter 'url'. This url parameter should contain the same identifier that is returned by the getImportSource() method of the importer implementation you want to use.
+Method getImportSource() should return a unique identifier. Importer implementations should not be called directly, but class *org.dspace.importer.external.service.ImportService* should be called instead. This class contains the same methods as the importer implementations, but with an extra parameter 'url'. This url parameter should contain the same identifier that is returned by the getImportSource() method of the importer implementation you want to use.
 
 The other inherited methods are used to query the remote source. 
 

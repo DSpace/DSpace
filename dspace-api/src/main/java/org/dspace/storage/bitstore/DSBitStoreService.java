@@ -108,8 +108,6 @@ public class DSBitStoreService implements BitStoreService
      *            The stream of bits to store
      * @exception java.io.IOException
      *             If a problem occurs while storing the bits
-     *
-     * @return Map containing technical metadata (size, checksum, etc)
      */
 	public void put(Bitstream bitstream, InputStream in) throws IOException
 	{

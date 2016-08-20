@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Attempt to parse date strings in a variety of formats.  This uses an external
  * list of regular expressions and associated SimpleDateFormat strings.  Inject
- * the list as pairs of strings using {@link setPatterns}.  {@link parse} walks
+ * the list as pairs of strings using {@link #setPatterns}.  {@link #parse} walks
  * the provided list in the order provided and tries each entry against a String.
  *
  * Dates are parsed as being in the UTC zone.

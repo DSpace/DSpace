@@ -247,9 +247,13 @@ public class DiscoverUtility
         {
             try
             {
-            String newFilterQuery = SearchUtils.getSearchService()
-                    .toFilterQuery(context, f[0], f[1], f[2])
-                    .getFilterQuery();
+            String newFilterQuery = null;
+            if (StringUtils.isNotBlank(f[0]) && StringUtils.isNotBlank(f[2]))
+            {
+                newFilterQuery = SearchUtils.getSearchService()
+                        .toFilterQuery(context, f[0], f[1], f[2])
+                        .getFilterQuery();
+            }
             if (newFilterQuery != null)
             {
                 queryArgs.addFilterQueries(newFilterQuery);

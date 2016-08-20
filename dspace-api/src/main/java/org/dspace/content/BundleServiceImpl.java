@@ -306,7 +306,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             collection = item.getOwningCollection();
             if (collection != null)
             {
-                community = collection.getCommunities().iterator().next();
+                community = collection.getCommunities().get(0);
             }
         }
         switch (action)

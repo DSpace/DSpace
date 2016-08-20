@@ -206,6 +206,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit) throws SQLException {
 
         MetadataField metadataField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "date", "accessioned");
+        if(metadataField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".date.accessioned' doesn't exist!");
+        }
+
         return itemDAO.findBySubmitter(context, eperson, metadataField, limit);
     }
 
@@ -250,11 +255,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         List<Community> result = new ArrayList<>();
         List<Collection> collections = item.getCollections();
         for (Collection collection : collections) {
-            List<Community> owningCommunities = collection.getCommunities();
-            for (Community community : owningCommunities) {
-                result.add(community);
-                result.addAll(communityService.getAllParents(context, community));
-            }
+            result.addAll(communityService.getAllParents(context, collection));
         }
 
         return result;
