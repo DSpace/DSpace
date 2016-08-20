@@ -28,6 +28,9 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.Choices;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -37,6 +40,7 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.event.Event;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
@@ -45,6 +49,8 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersioningService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Class representing an item in DSpace.
@@ -2505,7 +2511,12 @@ public class Item extends DSpaceObject
         // is this collection not yet created, and an item template is created
         if (getOwningCollection() == null)
         {
-            return true;
+        	if (!isInProgressSubmission()) {
+        		return true;
+        	}
+        	else {
+        		return false;
+        	}
         }
 
         // is this person an COLLECTION_EDITOR for the owning collection?
@@ -2515,6 +2526,20 @@ public class Item extends DSpaceObject
         }
 
         return false;
+    }
+    
+    /**
+     * Check if the item is an inprogress submission
+     * @param context
+     * @param item
+     * @return <code>true</code> if the item is an inprogress submission, i.e. a WorkspaceItem or WorkflowItem
+     * @throws SQLException
+     */
+    public boolean isInProgressSubmission() throws SQLException {
+		return WorkspaceItem.findByItem(ourContext, this) != null ||
+				((ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")
+						&& XmlWorkflowItem.findByItem(ourContext, this) != null)
+						|| WorkflowItem.findByItem(ourContext, this) != null);
     }
     
     public String getName()

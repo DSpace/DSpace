@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
@@ -1640,6 +1641,87 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         context.restoreAuthSystemState();
 
         assertFalse("testCanEditBooleanNoAuth 0", it.canEdit());
+    }
+
+    /**
+     * Test of canEdit method, of class Item.
+     */
+    @Test
+    public void testCanEditBooleanNoAuth2() throws Exception
+    {
+        // Test Inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow Item WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Item) any,
+                    Constants.WRITE); result = false;                
+            // Disallow parent Community WRITE and ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,anyBoolean); result = false;
+            // Allow parent Collection ADD perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.ADD); result = null;
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Collection) any,
+                    Constants.ADD); result = true;
+        }};
+
+        Collection c = Collection.create(context);
+        WorkspaceItem wi = WorkspaceItem.create(context, c, true);
+        assertFalse("testCanEditBooleanNoAuth2 0", wi.getItem().canEdit());
+    }
+
+    /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmission() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = Collection.create(context);
+        WorkspaceItem wi = WorkspaceItem.create(context, c, true);
+    	context.restoreAuthSystemState();
+        assertTrue("testIsInProgressSubmission 0", wi.getItem().isInProgressSubmission());
+    }
+    
+    /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmissionFalse() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = Collection.create(context);
+        WorkspaceItem wi = WorkspaceItem.create(context, c, true);
+        Item item = InstallItem.installItem(context, wi);
+    	context.restoreAuthSystemState();
+        assertFalse("testIsInProgressSubmissionFalse 0", item.isInProgressSubmission());
+    }
+
+    /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmissionFalse2() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = Collection.create(context);
+        c.createTemplateItem();
+        c.update();
+        Item item = c.getTemplateItem();
+    	context.restoreAuthSystemState();
+        assertFalse("testIsInProgressSubmissionFalse2 0", item.isInProgressSubmission());
     }
 
     /**
