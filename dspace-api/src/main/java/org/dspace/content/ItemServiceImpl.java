@@ -887,7 +887,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // is this collection not yet created, and an item template is created
         if (item.getOwningCollection() == null)
         {
-        	if (!isAnInprogressSubmission(context, item)) {
+        	if (!isInProgressSubmission(context, item)) {
         		return true;
         	}
         	else {
@@ -905,7 +905,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      * @return <code>true</code> if the item is an inprogress submission, i.e. a WorkspaceItem or WorkflowItem
      * @throws SQLException
      */
-    public boolean isAnInprogressSubmission(Context context, Item item) throws SQLException {
+    public boolean isInProgressSubmission(Context context, Item item) throws SQLException {
 		return workspaceItemService.findByItem(context, item) != null
 				|| workflowItemService.findByItem(context, item) != null;
     }
