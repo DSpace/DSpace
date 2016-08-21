@@ -395,7 +395,7 @@
             <Configuration>
                 <string name="field">dc.relation</string>
                 <string name="operator">starts_with</string>
-                <string name="value">info:eu-repo/grantAgreement/EC/FP</string>
+                <string name="value">info:eu-repo/grantAgreement/</string>
             </Configuration>
         </CustomCondition>
     </Filters>

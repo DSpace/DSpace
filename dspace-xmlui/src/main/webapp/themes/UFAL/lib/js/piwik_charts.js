@@ -88,6 +88,18 @@ ranges: {
                             total_visits += values0['nb_visits']||0;
                             total_unique_visits += values0['nb_uniq_visitors']||0;
 						}
+						var values2 = mapBitstreamCounts(data[2]);						
+						var bitwiseDownloads = "<div class='container' style='margin-top: 20px;'>";
+						bitwiseDownloads += "<table class='table table-striped'><thead><tr><th colspan='2'>Filewise Statistics</th></tr></thead><tbody>"
+						if("allzip" in values2) {
+							bitwiseDownloads += "<tr class='text-info'><td class='col-md-2 text-right'><strong>" + values2["allzip"] + "</strong></td><td>Download All files as zip <i class='fa fa-file-archive-o'></i></td></tr>";
+							delete values2["allzip"];
+						}
+						values2Array = sortMapByValue(values2);
+						for(i in values2Array) {
+							bitwiseDownloads += "<tr><td class='col-md-2 text-right'><strong>" + values2Array[i][1] + "</strong></td><td>" + values2Array[i][0] + "</td></tr>";
+						}
+						bitwiseDownloads += "</tbody></table>";
 		jQuery('#visits_summary_report .views').html("<strong>" + total_views + "</strong> pageviews, <strong>" + total_unique_views + "</strong> unique pageviews.");
 		jQuery('#visits_summary_report .visits').html("<strong>" + total_visits + "</strong> visits, <strong>" + total_unique_visits + "</strong> unique visitors.");
 		jQuery('#visits_summary_report .downloads').html("<strong>" + total_downloads + "</strong> downloads, <strong>" + total_unique_downloads + "</strong> unique downloads.");
@@ -234,6 +246,14 @@ ranges: {
                               		},
 
                               });
+                                  
+                                  
+                                  var bitwiseDownloadsDiv = jQuery('#bitwiseDownloads');
+                                  if(bitwiseDownloadsDiv.html()==null) {
+                                	  jQuery('#downloads').append('<div id="bitwiseDownloads"></div>');
+                                  }                                  
+                                  jQuery('#bitwiseDownloads').html(bitwiseDownloads);
+                                  
                         	  }
                         })
 
@@ -268,5 +288,32 @@ ranges: {
 		imgElem.css('display', 'block');
 		jQuery("#jqplot-save-as-picture").modal();
 	});
+	
+	function mapBitstreamCounts(counts) {
+		var result = {};
+		for(var i=0;i<counts.length;i++) {
+			var key = getBitstreamFromURL(counts[i]["url"]);
+			var count = counts[i]["nb_hits"];
+			if(result[key]==null) {
+				result[key] = count;
+			} else {
+				result[key] += count;
+			}
+		}
+		return result;
+	}
+	
+	function getBitstreamFromURL(url) {
+		var l = document.createElement("a");
+		l.href = url;
+		return decodeURI(l.pathname.substr(l.pathname.lastIndexOf('/') + 1));
+	}
+	
+	function sortMapByValue(map){
+	    var tupleArray = [];
+	    for (var key in map) tupleArray.push([key, map[key]]);
+	    tupleArray.sort(function (a, b) { return b[1] - a[1] });
+	    return tupleArray;
+	}	
 
 });

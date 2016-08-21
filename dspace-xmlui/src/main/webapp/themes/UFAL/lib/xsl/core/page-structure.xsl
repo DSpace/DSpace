@@ -23,15 +23,16 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:mods="http://www.loc.gov/mods/v3"
     xmlns:confman="org.dspace.core.ConfigurationManager"
+    xmlns:file="java.io.File"
     xmlns="http://www.w3.org/1999/xhtml"
-    exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods confman">
+    exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods confman file">
 
     <xsl:output indent="yes" />
 
     <xsl:variable name="aaiURL">
         <xsl:value-of select="confman:getProperty('lr', 'lr.aai.url')"/>
     </xsl:variable>
-                    
+
     <xsl:template match="dri:document">
     	<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
         <html>
@@ -543,10 +544,12 @@
                 <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
             </xsl:variable>
             <xsl:attribute name="src">
+                <xsl:variable name="localizedContextPath" select="concat($theme-path,'/lib/lindat/public/js/',$currentLocale,'/lindat-refbox.js')" />
+                <xsl:variable name="localizedDiskPath" select="concat($theme-path-on-disk,'/lib/lindat/public/js/',$currentLocale,'/lindat-refbox.js')" />
+                <xsl:variable name="path" select="file:new($localizedDiskPath)"/>
                 <xsl:choose>
-                    <xsl:when test='$currentLocale="cs"'>
-                        <xsl:value-of select="$theme-path" />
-                        <xsl:text>/lib/lindat/public/js/cs/lindat-refbox.js</xsl:text>
+                    <xsl:when test="file:isFile($path)">
+                        <xsl:value-of select="$localizedContextPath" />
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:value-of select="$theme-path" />

@@ -20,6 +20,8 @@ import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
+import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Metadatum;
@@ -28,6 +30,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 
 import cz.cuni.mff.ufal.dspace.IOUtils;
+import org.dspace.identifier.IdentifierException;
 
 /**
  * Create new version of existing archived submission. This action is used by the 
@@ -41,6 +44,7 @@ import cz.cuni.mff.ufal.dspace.IOUtils;
  */
 public class AddNewVersionAction extends AbstractAction
 {
+    private static Logger log = cz.cuni.mff.ufal.Logger.getLogger(AddNewVersionAction.class);
 
     private final static int SUBMISSION_THIRD_STEP = 3;
     
@@ -72,7 +76,7 @@ public class AddNewVersionAction extends AbstractAction
         	{        	    
     			Item item = Item.find(context, Integer.valueOf(itemID));
     			WorkspaceItem workspaceItem = WorkspaceItem.createByItem(context, item);
-    			fixMetadata(workspaceItem, item);
+    			fixMetadata(context,workspaceItem, item);
     			if(firstWorkspaceItem == null)
     			{
     			    firstWorkspaceItem = workspaceItem;
@@ -104,7 +108,7 @@ public class AddNewVersionAction extends AbstractAction
      * @throws AuthorizeException 
      * @throws SQLException 
      */
-    private void fixMetadata(WorkspaceItem workspaceItem, Item baseItem) throws SQLException, AuthorizeException, IOException 
+    private void fixMetadata(Context context, WorkspaceItem workspaceItem, Item baseItem) throws SQLException, AuthorizeException, IOException
     {
         Item item = workspaceItem.getItem();
         
@@ -122,8 +126,10 @@ public class AddNewVersionAction extends AbstractAction
         
         // clear dc.identifier.uri - will be created upon installation to the repository
         item.clearMetadata("dc", "identifier", "uri", Item.ANY);
-        
-        // add note about the base item         
+
+        //clear previous notes as note is non repeatable
+        item.clearMetadata("local", "submission", "note", Item.ANY);
+        // add note about the base item
         String note = String.format("This item was created as a new version of '%s' (%s)", baseItem.getName(), baseItem.getHandle());        
         item.addMetadata("local", "submission", "note", Item.ANY, note);
         
@@ -134,7 +140,14 @@ public class AddNewVersionAction extends AbstractAction
         //item.clearMetadata("local", "branding", Item.ANY, Item.ANY);
         //this is a new item; discard old provenance records
         item.clearMetadata("dc", "description", "provenance", Item.ANY);
-        
+
+        //add new PID if enabled
+        try {
+            FlowUtils.reservePID(context, String.valueOf(workspaceItem.getID()));
+        } catch (IdentifierException e) {
+            log.error(e.getLocalizedMessage());
+        }
+
         item.update();        
         workspaceItem.update();    
     }

@@ -28,6 +28,12 @@ public class BibtexUtil {
 		System.out.println(bibtexify("Příliš žluťoučký kůň úpěl ďábelské ódy")); 
 		System.out.println(bibtexify(""));
 		System.out.println(bibtexify("Add some \n\n\n\n new lines\n to the mix."));
+		for(String ch : BibtexString.accents){
+			String actual_ch = ch.substring(0, 1);
+			System.out.println(actual_ch.toUpperCase() + " : " +bibtexify(actual_ch.toUpperCase()));
+
+		}
+		System.out.println(bibtexify("Cătălina"));
 	}
 }
 
@@ -120,30 +126,36 @@ class BibtexString {
 	//CZ - Příliš žluťoučký kůň úpěl ďábelské ódy 
 	// lower case, will do uppercase automatically
 	public static final String[] accents = new String[] {
-			"à{\\`a}", "á{\\'a}", "â{\\^a}", "ã{\\~a}", "ā{\\=a}", "ä{\\\"a}",
-
-			"è{\\`e}", "é{\\'e}", "ê{\\^e}", "ẽ{\\~e}", "ē{\\=e}", "ë{\\\"e}", "ě{\\v e}",
-
+			//&aogon;               &aacute;   &acirc;                           &auml;     &abreve;
+			"ą{\\c a}", "à{\\`a}", "á{\\'a}", "â{\\^a}", "ã{\\~a}", "ā{\\=a}", "ä{\\\"a}", "ă{\\u a}",
+			//         acute                                       uml         caron       ogon
+			"è{\\`e}", "é{\\'e}", "ê{\\^e}", "ẽ{\\~e}", "ē{\\=e}", "ë{\\\"e}", "ě{\\v e}", "ȩ{\\c e}",
+			//         acute      circ
 			"ì{\\`i}", "í{\\'i}", "î{\\^i}", "ĩ{\\~i}", "ī{\\=i}", "ï{\\\"i}",
+			//         acute      circ                             uml                                           &odblac;
+			"ò{\\`o}", "ó{\\'o}", "ô{\\^o}", "õ{\\~o}", "ō{\\=o}", "ö{\\\"o}", "ø{\\o}", "ọ{\\d o}", "ŏ{\\v o}", "ő{\\H o}",
+			//&lacute; &lstrok;  &lcaron;
+			"ĺ{\\'l}", "ł{\\l}", "ľ{\\v l}",
+			//         acute                                       uml         uring       udblac
+			"ù{\\`u}", "ú{\\'u}", "û{\\^u}", "ũ{\\~u}", "ū{\\=u}", "ü{\\\"u}", "ů{\\r u}", "ű{\\H u}",
+			//acute
+			"ý{\\'y}", "ÿ{\\\"y}",
+			//         acute      caron
+			"ñ{\\~n}", "ń{\\'n}", "ň{\\v n}",
+			//acute   caron       cedil
+			"ś{\\'s}", "š{\\v s}", "ş{\\c s}",
+			//caron     cedil
+			"ť{\\v t}", "ţ{\\c t}",
+			//cedil     acute      caron
+			"ç{\\c c}", "ć{\\'c}", "č{\\v c}",
+			//acute     caron       dot
+			"ź{\\'z}", "ž{\\v z}", "ż{\\.z}",
+			//caron     strok
+			"ď{\\v d}", "đ{\\d}",
+			//caron     acute
+			"ř{\\v r}", "ŕ{\\'r}",
 
-			"ò{\\`o}", "ó{\\'o}", "ô{\\^o}", "õ{\\~o}", "ō{\\=o}", "ö{\\\"o}",
-
-			"ĺ{\\'l}",
-
-			"ù{\\`u}", "ú{\\'u}", "û{\\^u}", "ũ{\\~u}", "ū{\\=u}", "ü{\\\"u}", "ů{\\r u}",
-
-			"ý{\\'y}", "ÿ{\\\"y}", "ñ{\\~n}",
-
-			"ś{\\'s}", "ń{\\'n}", "ć{\\'c}",
-
-			"ç{\\c c}", "ȩ{\\c e}",
-
-			"ọ{\\d o}",
-
-			"ŏ{\\v o}", "č{\\v c}", "ž{\\v z}", "š{\\v s}", "ň{\\v n}", "ď{\\v d}",
-			"ť{\\v t}", "ľ{\\v l}", "ř{\\v r}",
-
-			"œ{\\oe}", "æ{\\ae}", "å{\\aa}", "ø{\\o}", "þ{\\t h}", "ł{\\l}", };
+			"œ{\\oe}", "æ{\\ae}", "å{\\aa}",  "þ{\\t h}", };
 
 	// without automatic uppercase
 	public static final String[] symbols_final = new String[] { "ß\\ss",

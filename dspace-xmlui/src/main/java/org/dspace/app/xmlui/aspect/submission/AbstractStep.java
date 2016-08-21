@@ -56,7 +56,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
         message("xmlui.Submission.general.submission.title");
     protected static final Message T_submission_trail = 
         message("xmlui.Submission.general.submission.trail");
-    protected static final Message T_submission_head = 
+    protected static Message T_submission_head =
         message("xmlui.Submission.general.submission.head");
     protected static final Message T_previous = 
         message("xmlui.Submission.general.submission.previous");
@@ -182,6 +182,9 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
                     throw new ProcessingException(e);
                 }
                 this.submission = submissionInfo.getSubmissionItem();
+				if(this.submission != null && this.submission.getItem() != null){
+					T_submission_head = T_submission_head.parameterize(submission.getItem().getHandle());
+				}
             }
 			
 			// Check required error conditions
@@ -228,7 +231,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 		if (submission instanceof WorkspaceItem)
 		{
 			pageMeta.addMetadata("title").addContent(T_submission_title);
-	
+
 			Collection collection = submission.getCollection();
 			
 	        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);

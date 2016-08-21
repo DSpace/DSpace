@@ -79,6 +79,8 @@
     		</xsl:choose>    		
     	</xsl:if>
     </xsl:variable>
-        
+
+	<xsl:variable name="theme-path-on-disk" select="concat(confman:getProperty('dspace.dir'),'/webapps/xmlui/themes/UFAL')" />
+
 
 </xsl:stylesheet>

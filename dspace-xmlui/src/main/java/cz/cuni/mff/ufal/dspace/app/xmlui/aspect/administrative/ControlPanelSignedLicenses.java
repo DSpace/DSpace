@@ -53,6 +53,8 @@ public class ControlPanelSignedLicenses extends AbstractControlPanelTab
 	private Table create_table(Division div) throws WingException 
 	{
 	    String baseURL = contextPath+"/admin/epeople?";
+
+		String base = ConfigurationManager.getProperty("dspace.url");
 		// table
 		Table wftable = div.addTable("workspace_items", 1, 4, "table-condensed");
 
@@ -116,24 +118,39 @@ public class ControlPanelSignedLicenses extends AbstractControlPanelTab
                 r.addCell().addXref(ld.getDefinition(), ld.getName());
                                 
                 Bitstream bitstream = Bitstream.find(context, bitstreamID);
-                Item item = (Item)bitstream.getParentObject();
+				String itemLink;
+				String itemLinkCaption;
+				String bitstreamLink;
+				String bitstreamLinkCaption;
+				if(bitstream == null || bitstream.isDeleted()){
+					bitstreamLink = itemLink = "#";
+					bitstreamLinkCaption = bitstreamID + " (deleted)";
+ 					itemLinkCaption = "No item, bitstream was deleted";
 
-                String base = ConfigurationManager.getProperty("dspace.url");
-    			StringBuffer itemLink = new StringBuffer().append(base)
-						  .append(base.endsWith("/") ? "" : "/")
-						  .append("/handle/")
-						  .append(item.getHandle());
+				}else {
+					Item item = (Item) bitstream.getParentObject();
+
+					StringBuffer sb = new StringBuffer().append(base)
+							.append(base.endsWith("/") ? "" : "/")
+							.append("/handle/")
+							.append(item.getHandle());
+					itemLink = sb.toString();
+					itemLinkCaption = Integer.toString(item.getID());
+
+					sb = new StringBuffer().append(base)
+							.append(base.endsWith("/") ? "" : "/")
+							.append("bitstream/handle/")
+							.append(item.getHandle())
+							.append("/")
+							.append(URLEncoder.encode(bitstream.getName(), "UTF8"))
+							.append("?sequence=").append(bitstream.getSequenceID());
+					bitstreamLink = sb.toString();
+					bitstreamLinkCaption = Integer.toString(bitstream.getID());
+				}
     			
-                r.addCell().addXref(itemLink.toString(), "" + item.getID());
+                r.addCell().addXref(itemLink, itemLinkCaption);
                 
-    			StringBuffer bitstreamLink = new StringBuffer().append(base)
-							  .append(base.endsWith("/") ? "" : "/")
-							  .append("bitstream/handle/")
-							  .append(item.getHandle())
-							  .append("/")
-							  .append(URLEncoder.encode(bitstream.getName(), "UTF8"))					
-							  .append("?sequence=").append(bitstream.getSequenceID());                
-                r.addCell().addXref(bitstreamLink.toString(), "" + bitstream.getID());
+                r.addCell().addXref(bitstreamLink, bitstreamLinkCaption);
                 
                 Cell c = r.addCell();
                 List<UserMetadata> extraMetaData = functionalityManager.getUserMetadata_License(ur.getEpersonId(), license.getTransactionId());

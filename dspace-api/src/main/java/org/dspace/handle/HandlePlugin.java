@@ -30,6 +30,8 @@ import org.dspace.core.Context;
 
 import cz.cuni.mff.ufal.dspace.handle.PIDConfiguration;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 /**
  * Extension to the CNRI Handle Server that translates requests to resolve
  * handles into DSpace API calls. The implementation simply stubs out most of
@@ -288,14 +290,19 @@ public class HandlePlugin implements HandleStorage
 
             ResolvedHandle rh = null;
             if (url.startsWith(magicBean)) {
-                String[] splits = url.split(magicBean, 6);
+                String[] splits = url.split(magicBean,10);
                 url = splits[splits.length - 1];
-                // EMPTY, String title, String repository, String submitdate, String reportemail
-                rh = new ResolvedHandle(url, splits[1], splits[2], splits[3], splits[4]);
+                    // EMPTY, String title, String repository, String submitdate, String reportemail, String dataset_name, String dataset_version, String query, token is splits[8] but don't show that
+                    rh = new ResolvedHandle(url, splits[1], splits[2], splits[3], splits[4], splits[5], splits[6], splits[7]);
             }else {
                 rh = new ResolvedHandle(url, dso);
             }
             log.info(String.format("Handle [%s] resolved to [%s]", handle, url));
+            if(HandleManager.isDead(context, handle)){
+                //dead_since
+                String deadSince = HandleManager.getDeadSince(context, handle);
+                rh.setDead(handle, deadSince);
+            }
 
             return rh.toRawValue();
         }
@@ -467,9 +474,10 @@ class ResolvedHandle {
     private int idx = -1;
     private int timestamp = 100;
 
-    public ResolvedHandle(String url, String title, String repository, String submitdate, String reportemail) {
-        init(url, title, repository, submitdate, reportemail);
+    public ResolvedHandle(String url, String title, String repository, String submitdate, String reportemail, String datasetName, String datasetVersion, String query) {
+        init(url, title, repository, submitdate, reportemail, datasetName, datasetVersion, query);
     }
+
 
     public ResolvedHandle(String url, DSpaceObject dso) {
         String title = null;
@@ -503,6 +511,10 @@ class ResolvedHandle {
     }
 
     private void init(String url, String title, String repository, String submitdate, String reportemail) {
+        init(url, title, repository, submitdate, reportemail, null, null, null);
+    }
+
+    private void init(String url, String title, String repository, String submitdate, String reportemail, String datasetName, String datasetVersion, String query) {
         idx = 11800;
         values = new LinkedList<>();
         //set timestamp, use submitdate for now
@@ -536,6 +548,18 @@ class ResolvedHandle {
         if (null != reportemail) {
             key = AbstractPIDService.HANDLE_FIELDS.REPORTEMAIL.toString();
             setValue(key, reportemail);
+        }
+        if (isNotBlank(datasetName)) {
+            key = AbstractPIDService.HANDLE_FIELDS.DATASETNAME.toString();
+            setValue(key, datasetName);
+        }
+        if (isNotBlank(datasetVersion)) {
+            key = AbstractPIDService.HANDLE_FIELDS.DATASETVERSION.toString();
+            setValue(key, datasetVersion);
+        }
+        if (isNotBlank(query)) {
+            key = AbstractPIDService.HANDLE_FIELDS.QUERY.toString();
+            setValue(key, query);
         }
     }
 
@@ -584,4 +608,22 @@ class ResolvedHandle {
         return rawValues;
     }
 
+    public void setDead(String handle, String deadSince) {
+        //find URL field
+        for(HandleValue hv : values){
+            if(hv.hasType(Util.encodeString("URL"))){
+                //duplicate old url as last working URL
+                HandleValue deadURL = hv.duplicate();
+                deadURL.setType(Util.encodeString("ORIG_URL"));
+                deadURL.setIndex(idx++);
+                values.add(deadURL);
+                //change url to our display page
+                hv.setData(Util.encodeString("http://hdl.handle.net/11346/SHORTREF-PR6O#hdl=" + handle));
+                break;
+            }
+        }
+        if(deadSince != null){
+            setValue("DEAD_SINCE", deadSince);
+        }
+    }
 }

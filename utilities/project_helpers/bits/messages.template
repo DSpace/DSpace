@@ -605,7 +605,7 @@
   <message key="xmlui.Submission.general.go_mydspace">Go to My Home</message>
   <message key="xmlui.Submission.general.submission.title">Item submission</message>
   <message key="xmlui.Submission.general.submission.trail">Item submission</message>
-  <message key="xmlui.Submission.general.submission.head">Item submission</message>
+  <message key="xmlui.Submission.general.submission.head">Item submission {0}</message>
   <message key="xmlui.Submission.general.submission.previous">&lt; Previous</message>
   <message key="xmlui.Submission.general.submission.save">Save &amp; Exit</message>
   <message key="xmlui.Submission.general.submission.next">Next &gt;</message>
@@ -3074,5 +3074,6 @@
   <message key="xmlui.ContractPage.trail">Distribution License Agreement</message>
   <message key="xmlui.ContractPage.head">Distribution License Agreement</message>
   <message key="xmlui.ContractPage.collection_name">{0}</message>
+  <!-- The following string says that what is in the english agreement goes, the translated agreement is for convenience only. see https://github.com/ufal/lindat-dspace/pull/491#issue-138531828 -->
   <message key="xmlui.ContractPage.explain_non_localized_license">Smlouva se uzav&#xED;r&#xE1; v angli&#x10D;tin&#x11B; a jej&#xED; pln&#xE9; zn&#x11B;n&#xED; naleznete n&#xED;&#x17E;     e. N&#xE1;sleduj&#xED;c&#xED; &#x10D;esk&#xFD; p&#x159;eklad je pouze orienta&#x10D;n&#xED;. V p&#x159;&#xED;pad&#x11B; rozpor&#x16F; plat&#xED; anglick&#xE1; verze. </message>
 </catalogue>

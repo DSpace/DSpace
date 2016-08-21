@@ -1864,7 +1864,10 @@ public class Item extends DSpaceObject
 		EPerson e = this.ourContext.getCurrentUser();
 		boolean canEditOwn = e != null && e.canEditSubmissionMetadata();
 		boolean isOwner = this.getSubmitter().equals(e);
-		boolean epersonIsReviewer = this.getOwningCollection().epersonIsReviewer();
+		boolean epersonIsReviewer = false;
+        if(this.getOwningCollection() != null ){
+            epersonIsReviewer = this.getOwningCollection().epersonIsReviewer();
+        }
 
         return (((ownersCanEditCollection || canEditOwn) && isOwner) || epersonIsReviewer);
 	}

@@ -12,10 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.MetadataExposure;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -74,7 +76,18 @@ public class ItemUtils
         
         // read all metadata into Metadata Object
         metadata = new Metadata();
-        Metadatum[] vals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        Metadatum[] allVals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        List<Metadatum> vals = new LinkedList<>();
+        for(Metadatum md : allVals){
+            try {
+                //null for context - pretend we are not admins
+                if(!MetadataExposure.isHidden(null, md.schema, md.element, md.qualifier)){
+                    vals.add(md);
+                }
+            } catch (SQLException e) {
+                log.error(e.getMessage());
+            }
+        }
         for (Metadatum val : vals)
         {
             Element valueElem = null;
