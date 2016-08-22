@@ -70,6 +70,8 @@ public class DSpaceXmluiApi {
 			}
 			Para para = div.addPara();
 			
+			String ourEntityId = ConfigurationManager.getProperty("authentication-shibboleth","spEntityId");
+			
 			String idp = find_idp(headers);
 			para.addContent(
 					String.format(
@@ -77,7 +79,8 @@ public class DSpaceXmluiApi {
 					"it is your home institution - %s) did provide neither your " +
 					"email, eppn (specific authentication id) nor targeted id (specific authentication id). " +
 					"We need at least one of the properties mentioned above so our service can work " +
-					"properly.\nTry to contact your identity provder and ask them for these attributes. If they ask for our entityID it is \"https://ufal-point.mff.cuni.cz/shibboleth/eduid/sp\". " +
+					"properly.\nTry to contact your identity provder and ask them for these attributes. If they ask for our entityID it is \"" + 
+					ourEntityId + "\". " +
 					"\n\nFor more information please contact us at ", idp));
 			para.addXref("mailto:"+feedback+"?subject=My IDP does not provide an email", feedback);
 			para.addContent(". We might arrange a local account for you or try to resolve the issue with your identity provider. " +
