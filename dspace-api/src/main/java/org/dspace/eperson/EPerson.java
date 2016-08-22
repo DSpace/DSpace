@@ -1355,6 +1355,8 @@ public class EPerson extends DSpaceObject
 
     private static final Option OPT_NEW_EMAIL = new Option("i", "newEmail", true, "new email address");
     private static final Option OPT_NEW_NETID = new Option("I", "newNetid", true, "new network ID");
+
+    private static final Option OPT_ORGANIZATION = new Option("o", "organization", true, "organization the user belongs to");
     
     /**
      * Tool for manipulating user accounts.
@@ -1436,6 +1438,7 @@ public class EPerson extends DSpaceObject
         options.addOption(OPT_PHONE);
         options.addOption(OPT_LANGUAGE);
         options.addOption(OPT_REQUIRE_CERTIFICATE);
+        options.addOption(OPT_ORGANIZATION);
 
         Option option = new Option("p", "password", true, "password to match the EPerson name");
         options.addOption(option);
@@ -1468,6 +1471,12 @@ public class EPerson extends DSpaceObject
         if (!command.hasOption('p'))
         {
             System.err.println("You must provide a password for the new user.");
+            return 1;
+        }
+
+        if (!command.hasOption('o'))
+        {
+            System.err.println("You must provide an organization for the new user.");
             return 1;
         }
 
@@ -1504,6 +1513,7 @@ public class EPerson extends DSpaceObject
         try {
             eperson.update();
             context.commit();
+            DSpaceApi.registerUser(command.getOptionValue(OPT_ORGANIZATION.getOpt()), eperson);
             System.out.printf("Created EPerson %d\n", eperson.getID());
         } catch (SQLException ex) {
             context.abort();
