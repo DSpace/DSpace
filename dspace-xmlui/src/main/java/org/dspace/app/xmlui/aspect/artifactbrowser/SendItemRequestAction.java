@@ -118,10 +118,6 @@ public class SendItemRequestAction extends AbstractAction
                 )
                 .getRequestItemAuthor(context, item);
 
-	// probably wrong -- Boolean.getBoolean() returns true if and only if
-	// the system property named by the argument exists and is equal to the
-	// string "true".
-        // RequestItem requestItem = new RequestItem(item.getID(), Integer.parseInt(bitstreamId), requesterEmail, requesterName, message, Boolean.getBoolean(allFiles));
         RequestItem requestItem = new RequestItem(item.getID(), Integer.parseInt(bitstreamId), requesterEmail, requesterName, message, Boolean.valueOf(allFiles));
 
         // All data is there, send the email
