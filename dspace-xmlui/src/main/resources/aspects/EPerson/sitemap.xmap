@@ -39,7 +39,8 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 			<map:transformer name="ProfileUpdated" src="org.dspace.app.xmlui.aspect.eperson.ProfileUpdated"/>
 			<map:transformer name="LoginChooser" src="org.dspace.app.xmlui.aspect.eperson.LoginChooser"/>
 			<map:transformer name="FailedAuthentication" src="org.dspace.app.xmlui.aspect.eperson.FailedAuthentication" />
-			
+			<map:transformer name="ShibFailedAuthentication" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.eperson.ShibFailedAuthentication" />
+
 			<map:transformer name="EditItemMetadataForm" src="cz.cuni.mff.ufal.administrative.EditItemMetadataForm"/>
 			<map:transformer name="NotAuthorized" src="org.dspace.app.xmlui.aspect.administrative.NotAuthorized"/>			
 			
@@ -193,7 +194,7 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 				</map:act>
 				
 				<!-- Login failed, try again. Show them static content from xml file --> 
-				<map:transform type="FailedAuthentication" />  
+				<map:transform type="ShibFailedAuthentication" />
 				<map:serialize type="xml"/>
 			</map:match>
 			

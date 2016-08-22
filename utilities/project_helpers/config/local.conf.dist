@@ -373,6 +373,9 @@ lr.link.checker.user.agent = "DSpace Link Validator"
 lr.link.checker.connect.timeout = 2000
 lr.link.checker.read.timeout = 3000
 
+### Entity ID of your shibboleth sp
+lr.spEntityId = http://example.com/sp/shibboleth
+
 #####
 #
 #  shortener
