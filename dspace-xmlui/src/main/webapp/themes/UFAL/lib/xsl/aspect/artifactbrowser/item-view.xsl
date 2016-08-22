@@ -400,6 +400,7 @@
 						<xsl:when test="dim:field[@element='language'][@qualifier='iso']">
 							<xsl:for-each
 								select="dim:field[@element='language'][@qualifier='iso']">
+								<xsl:sort select="isocodes:getLangForCode(node())" />
 								<a>
 									<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="isocodes:getLangForCode(node())" />&amp;type=language</xsl:attribute>
 									<span class="language-iso-code"><xsl:copy-of select="isocodes:getLangForCode(node())" /></span>									
