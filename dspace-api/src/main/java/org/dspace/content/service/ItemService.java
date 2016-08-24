@@ -563,4 +563,12 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException if database error
      */
     int countWithdrawnItems(Context context) throws SQLException;
+
+	/**
+	 * Check if the supplied item is an inprogress submission
+	 * @param context
+	 * @param item
+	 * @return <code>true</code> if the item is linked to a workspaceitem or workflowitem
+	 */
+    boolean isInProgressSubmission(Context context, Item item) throws SQLException;
 }

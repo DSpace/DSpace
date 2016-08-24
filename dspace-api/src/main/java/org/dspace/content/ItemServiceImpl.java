@@ -47,6 +47,7 @@ import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
+import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -93,6 +94,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired(required=true)
     protected ConfigurationService configurationService;
     
+    @Autowired(required=true)
+    protected WorkspaceItemService workspaceItemService;
+    @Autowired(required=true)
+    protected WorkflowItemService workflowItemService;
+    
+
     protected ItemServiceImpl()
     {
         super();
@@ -893,28 +900,37 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // is this collection not yet created, and an item template is created
         if (item.getOwningCollection() == null)
         {
-            return true;
+        	if (!isInProgressSubmission(context, item)) {
+        		return true;
+        	}
+        	else {
+        		return false;
+        	}
         }
 
         return collectionService.canEditBoolean(context, item.getOwningCollection(), false);
     }
 
-    @Override
-    public boolean canCreateNewVersion(Context context, Item item) throws SQLException{
-        if (authorizeService.isAdmin(context, item)) 
-        {
-            return true;
-        }
-
-        if (context.getCurrentUser() != null
-                && context.getCurrentUser().equals(item.getSubmitter())) 
-        {
-            return configurationService.getPropertyAsType(
-                    "versioning.submitterCanCreateNewVersion", false);
-        }
-
-        return false;
+    /**
+     * Check if the item is an inprogress submission
+     * @param context
+     * @param item
+     * @return <code>true</code> if the item is an inprogress submission, i.e. a WorkspaceItem or WorkflowItem
+     * @throws SQLException
+     */
+    public boolean isInProgressSubmission(Context context, Item item) throws SQLException {
+		return workspaceItemService.findByItem(context, item) != null
+				|| workflowItemService.findByItem(context, item) != null;
     }
+    
+    /*
+    With every finished submission a bunch of resource policy entries with have null value for the dspace_object column are generated in the database.
+prevent the generation of resource policy entry values with null dspace_object as value
+
+    */
+
+    @Override
+
 
     /**
      * Add the default policies, which have not been already added to the given DSpace object
@@ -1212,5 +1228,21 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public int countWithdrawnItems(Context context) throws SQLException {
        // return count of items that are not in archive and withdrawn
        return itemDAO.countItems(context, false, true);
+    }
+
+    public boolean canCreateNewVersion(Context context, Item item) throws SQLException{
+        if (authorizeService.isAdmin(context, item)) 
+        {
+            return true;
+        }
+
+        if (context.getCurrentUser() != null
+                && context.getCurrentUser().equals(item.getSubmitter())) 
+        {
+            return configurationService.getPropertyAsType(
+                    "versioning.submitterCanCreateNewVersion", false);
+        }
+
+        return false;
     }
 }

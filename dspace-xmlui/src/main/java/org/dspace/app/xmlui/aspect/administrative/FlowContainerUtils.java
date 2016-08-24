@@ -9,7 +9,6 @@ package org.dspace.app.xmlui.aspect.administrative;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
-import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
@@ -43,6 +42,7 @@ import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.WorkflowUtils;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.xml.sax.SAXException;
@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+
 
 /**
  * Utility methods to processes actions on Communities and Collections.
@@ -540,7 +541,7 @@ public class FlowContainerUtils
 			collectionService.removeSubmitters(context, collection);
 		}
         else{
-            if(StringUtils.equals(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("workflow.framework"), "xmlworkflow"))
+            if(WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService)
             {
                 WorkflowUtils.deleteRoleGroup(context, collection, roleName);
             }else{
