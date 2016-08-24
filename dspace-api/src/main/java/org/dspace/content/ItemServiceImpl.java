@@ -35,6 +35,7 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -929,9 +930,6 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     */
 
-    @Override
-
-
     /**
      * Add the default policies, which have not been already added to the given DSpace object
      * 
@@ -1230,6 +1228,7 @@ prevent the generation of resource policy entry values with null dspace_object a
        return itemDAO.countItems(context, false, true);
     }
 
+    @Override
     public boolean canCreateNewVersion(Context context, Item item) throws SQLException{
         if (authorizeService.isAdmin(context, item)) 
         {
