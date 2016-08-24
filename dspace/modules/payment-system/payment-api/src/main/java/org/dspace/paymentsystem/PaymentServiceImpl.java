@@ -424,7 +424,7 @@ public class PaymentServiceImpl implements PaymentService {
                     // set the error message; this will be passed in as a request parameter for the next round.
                     errorMessage = PAYMENT_ERROR_VOUCHER;
                 }
-                paymentSystemService.updateTotal(context, shoppingCart, null);
+                paymentSystemService.updateTotal(context, shoppingCart);
             }
 
             // similarly, check for existence of either dryad.fundingEntity metadata or a grant-info request parameter
@@ -482,7 +482,7 @@ public class PaymentServiceImpl implements PaymentService {
                 log.error("grant is -" + grantInfo + "-");
                 if (!"".equals(StringUtils.stripToEmpty(grantInfo))) {
                     log.debug("nsf pays");
-                    paymentSystemService.updateTotal(context, shoppingCart, "the US National Science Foundation");
+                    paymentSystemService.updateTotal(context, shoppingCart);
                     shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                     shoppingCart.update();
                     mainDiv.addPara(T_funding_valid);

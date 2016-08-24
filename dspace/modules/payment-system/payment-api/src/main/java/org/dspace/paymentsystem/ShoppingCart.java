@@ -8,6 +8,7 @@
 package org.dspace.paymentsystem;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadOrganizationConcept;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
@@ -887,7 +888,6 @@ public class ShoppingCart {
     {
         return myRow.getStringColumn("journal");
     }
-
 
     /**
      * Set the JOURNAL

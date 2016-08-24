@@ -7,7 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.shoppingcart;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
@@ -15,7 +14,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.wing.Message;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 
 import org.dspace.paymentsystem.*;
@@ -146,7 +144,7 @@ public class FlowShoppingcartUtils {
                         }
                     }
                 
-                paymentSystemService.updateTotal(context,shoppingCart,null);
+                paymentSystemService.updateTotal(context,shoppingCart);
                 context.commit();
                 
                 result.setContinue(true);
