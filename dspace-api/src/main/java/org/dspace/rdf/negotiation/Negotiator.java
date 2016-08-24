@@ -170,7 +170,6 @@ public class Negotiator {
      * equals! Caution should be exercised when using it to order a sorted set
      * or a sorted map. Take a look at the java.util.Comparator for further 
      * information.</p>
-     * @param mediaRangeRegex
      * @return A comparator that imposes orderings that are inconsistent with equals!
      */
     public static Comparator<MediaRange> getMediaRangeComparator() {

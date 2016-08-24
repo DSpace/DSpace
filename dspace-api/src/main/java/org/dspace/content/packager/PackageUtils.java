@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -815,12 +817,21 @@ public class PackageUtils
     public static String translateGroupNameForExport(Context context, String groupName)
             throws PackageException
     {
-        // See if this resembles a default Group name
+        Pattern defaultGroupNamePattern = Pattern.compile("^([^_]+)_([^_]+)_(.+)$");
+        // Check if this looks like a default Group name
+        Matcher matcher = defaultGroupNamePattern.matcher(groupName);
+        if(!matcher.matches())
+        {
+            //if this is not a valid default group name, just return group name as-is (no crosswalking necessary)
+            return groupName;
+        }
 
-        String objID = StringUtils.substringBetween(groupName, "_", "_");
-        int objType = StringUtils.startsWith(groupName, "COLLECTION_") ? Constants.COLLECTION : (StringUtils.startsWith(groupName, "COMMUNITY_") ? Constants.COMMUNITY : -1);
-        String groupType = StringUtils.substringAfterLast(groupName, "_");
-        if (objID == null && objType != -1)
+        String objTypeText = matcher.group(1);
+        String objID = matcher.group(2);
+        String groupType = matcher.group(3);
+
+        int objType = Constants.getTypeID(objTypeText);
+        if (objID == null || objType == -1)
             return groupName;
 
 
@@ -863,7 +874,7 @@ public class PackageUtils
 
             //Create an updated group name, using the Handle to replace the InternalID
             // Format: <DSpace-Obj-Type>_hdl:<Handle>_<Group-Type>
-            return objType + "_" + "hdl:" + dso.getHandle() + "_" + groupType;
+            return objTypeText + "_" + "hdl:" + dso.getHandle() + "_" + groupType;
         }
         catch (SQLException sqle)
         {

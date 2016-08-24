@@ -128,7 +128,7 @@ public class ItemCheck extends Check {
         return sb.toString();
     }
 
-    public  String getCollectionSizesInfo(Context context) throws SQLException {
+    public  String getCollectionSizesInfo(final Context context) throws SQLException {
         final StringBuffer ret = new StringBuffer();
         List<Map.Entry<Collection, Long>> colBitSizes = collectionService.getCollectionsWithBitstreamSizesTotal(context);
         long total_size = 0;
@@ -137,8 +137,8 @@ public class ItemCheck extends Check {
             @Override
             public int compare(Map.Entry<Collection, Long> o1, Map.Entry<Collection, Long> o2) {
                 try {
-                    return CollectionDropDown.collectionPath(o1.getKey()).compareTo(
-                            CollectionDropDown.collectionPath(o2.getKey())
+                    return CollectionDropDown.collectionPath(context, o1.getKey()).compareTo(
+                            CollectionDropDown.collectionPath(context, o2.getKey())
                     );
                 } catch (Exception e) {
                     ret.append(e.getMessage());
@@ -151,7 +151,7 @@ public class ItemCheck extends Check {
             total_size += size;
             Collection col = row.getKey();
             ret.append(String.format(
-                    "\t%s:  %s\n", CollectionDropDown.collectionPath(col), FileUtils.byteCountToDisplaySize((long) size)));
+                    "\t%s:  %s\n", CollectionDropDown.collectionPath(context, col), FileUtils.byteCountToDisplaySize((long) size)));
         }
         ret.append(String.format(
                 "Total size:              %s\n", FileUtils.byteCountToDisplaySize(total_size)));

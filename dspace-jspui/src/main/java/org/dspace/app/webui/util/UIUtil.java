@@ -208,7 +208,8 @@ public class UIUtil extends Util
      * 
      * @param ctx DSpace Context
      * @param item the item
-     * @return 
+     * @return string array containing URL or null if no ID found; string
+               array contains null if no handle, but a DOI is found
      * @throws SQLException
      */
     public static String[] getItemIdentifier(Context ctx, Item item)
@@ -600,7 +601,7 @@ public class UIUtil extends Util
 	 * @param hrq The servlet request
 	 * @param dso The DSpaceObject to mark (it can be a BrowseItem or an Item)
 	 * @param markType the type of the mark.
-	 * @return
+	 * @return (X)HTML markup
 	 * @throws JspException
 	 */
     public static String getMarkingMarkup(HttpServletRequest hrq, DSpaceObject dso, String markType)
@@ -610,8 +611,8 @@ public class UIUtil extends Util
     	
     	try
     	{
-    		String contextPath = hrq.getContextPath();
-    		
+            String contextPath = hrq.getContextPath();
+
             Context c = UIUtil.obtainContext(hrq);
             
             Item item = (Item) dso;

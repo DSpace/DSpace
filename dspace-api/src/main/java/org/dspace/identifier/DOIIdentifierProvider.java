@@ -144,7 +144,7 @@ public class DOIIdentifierProvider
      * This identifier provider supports identifiers of type
      * {@link org.dspace.identifier.DOI}.
      * @param identifier to check if it will be supported by this provider.
-     * @return 
+     * @return boolean
      */
     @Override
     public boolean supports(Class<? extends Identifier> identifier)
@@ -160,7 +160,7 @@ public class DOIIdentifierProvider
      *  <li>http://dx.doi.org/10.123/456</li>
      * </ul>
      * @param identifier to check if it is in a supported format.
-     * @return 
+     * @return boolean
      */
     @Override
     public boolean supports(String identifier)
@@ -231,7 +231,7 @@ public class DOIIdentifierProvider
      * @param dso DSpaceObject the DOI should be reserved for. Some metadata of
      *            this object will be send to the registration agency.
      * @param identifier DOI to register in a format that
-     *                   {@link FormatIdentifier(String)} accepts.
+     *                   {@link org.dspace.identifier.service.DOIService#formatIdentifier(String)} accepts.
      * @throws IdentifierException If the format of {@code identifier} was
      *                             unrecognized or if it was impossible to 
      *                             reserve the DOI (registration agency denied 
@@ -239,7 +239,7 @@ public class DOIIdentifierProvider
      * @throws IllegalArgumentException If {@code identifier} is a DOI already
      *                                  registered for another DSpaceObject then
      *                                  {@code dso}.
-     * @see IdentifierProvider.reserve(Context, DSpaceObject, String)
+     * @see org.dspace.identifier.IdentifierProvider#reserve(Context, DSpaceObject, String)
      */
     @Override
     public void reserve(Context context, DSpaceObject dso, String identifier)
@@ -696,7 +696,7 @@ public class DOIIdentifierProvider
      * Returns a DSpaceObject depending on its DOI.
      * @param context the context
      * @param identifier The DOI in a format that is accepted by
-     *                   {@link formatIdentifier(String)}.
+     *                   {@link org.dspace.identifier.service.DOIService#formatIdentifier(String)}.
      * @return Null if the DOI couldn't be found or the associated DSpaceObject.
      * @throws SQLException if database error
      * @throws IdentifierException If {@code identifier} is null or an empty string.

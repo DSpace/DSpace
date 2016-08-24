@@ -677,10 +677,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return locations;
     }
 
-    protected List<String> getCollectionLocations(Collection target) throws SQLException {
+    protected List<String> getCollectionLocations(Context context, Collection target) throws SQLException {
         List<String> locations = new Vector<String>();
         // build list of community ids
-        List<Community> communities = target.getCommunities();
+        List<Community> communities = communityService.getAllParents(context, target);
 
         // now put those into strings
         for (Community community : communities)
@@ -798,7 +798,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      */
     protected void buildDocument(Context context, Collection collection)
     throws SQLException, IOException {
-        List<String> locations = getCollectionLocations(collection);
+        List<String> locations = getCollectionLocations(context, collection);
 
         // Create Lucene Document
         SolrInputDocument doc = buildDocument(Constants.COLLECTION, collection.getID(),
@@ -1524,8 +1524,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     public String locationToName(Context context, String field, String value) throws SQLException {
         if("location.comm".equals(field) || "location.coll".equals(field))
         {
-            int type = field.equals("location.comm") ? Constants.COMMUNITY : Constants.COLLECTION;
-            DSpaceObject commColl = contentServiceFactory.getDSpaceObjectService(type).find(context, UUID.fromString(value));
+            int type = ("location.comm").equals(field) ? Constants.COMMUNITY : Constants.COLLECTION;
+            DSpaceObject commColl = null;
+            if (StringUtils.isNotBlank(value))
+            {
+                commColl = contentServiceFactory.getDSpaceObjectService(type).find(context, UUID.fromString(value));
+            }
             if(commColl != null)
             {
                 return commColl.getName();
@@ -2017,7 +2021,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         DiscoverFilterQuery result = new DiscoverFilterQuery();
 
         StringBuilder filterQuery = new StringBuilder();
-        if(StringUtils.isNotBlank(field))
+        if(StringUtils.isNotBlank(field) && StringUtils.isNotBlank(value))
         {
             filterQuery.append(field);
             if("equals".equals(operator))
@@ -2069,10 +2073,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
 
-
+            result.setDisplayedValue(transformDisplayedValue(context, field, value));
         }
 
-        result.setDisplayedValue(transformDisplayedValue(context, field, value));
         result.setFilterQuery(filterQuery.toString());
         return result;
     }

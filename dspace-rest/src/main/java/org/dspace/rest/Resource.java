@@ -61,14 +61,12 @@ public class Resource
 
     /**
      * Create context to work with DSpace database. It can create context
-     * with or without a logged in user (parameter user is null). Throws
+     * with or without a logged in user (retrieved from SecurityContextHolder). Throws
      * WebApplicationException caused by: SQLException if there was a problem
      * with reading from database. Throws AuthorizeException if there was
      * a problem with authorization to read from the database. Throws Exception
      * if there was a problem creating context.
      * 
-     * @param person
-     *            User which will be logged in context.
      * @return Newly created context with the logged in user unless the specified user was null.
      *         If user is null, create the context without a logged in user.
      * @throws ContextException

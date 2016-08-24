@@ -21,20 +21,20 @@ import java.util.Map;
 
 public interface BitStoreService
 {
-	/**
+    /**
      * Initialize the asset store
      *
      */
 	public void init() throws IOException;
 
-	/**
+    /**
      * Return an identifier unique to this asset store instance
      * 
      * @return a unique ID
      */
 	public String generateId();
 	
-	/**
+    /**
      * Retrieve the bits for bitstream
      * 
      * @param bitstream
@@ -56,13 +56,11 @@ public interface BitStoreService
      * </p>
      *
      * @param bitstream
-     *            The bitsream object
+     *            The bitstream object
      * @param inputStream
      *            The stream of bits
      * @exception java.io.IOException
      *             If a problem occurs while storing the bits
-     *
-     * @return Map containing technical metadata (size, checksum, etc)
      */
 	public void put(Bitstream bitstream, InputStream inputStream) throws IOException;
 

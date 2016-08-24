@@ -27,14 +27,16 @@
 
     </util:map>
 
-    <bean id="pubmedLanguageContrib" class="org.dspace.importer.external.pubmed.metadatamapping.PubmedLanguageMetadatumContributor">
+    <bean id="pubmedLanguageContrib" class="org.dspace.importer.external.pubmed.metadatamapping.contributor.PubmedLanguageMetadatumContributor">
         <property name="field" ref="dc.language.iso"/>
         <property name="language" ref="languageContrib"/>
     </bean>
-    <bean id="dateContrib" class="org.dspace.importer.external.pubmed.metadatamapping.PubmedDateMetadatumContributor">
+    <bean id="dateContrib" class="org.dspace.importer.external.pubmed.metadatamapping.contributor.PubmedDateMetadatumContributor">
         <property name="dateFormatsToAttempt">
+            <!-- The first format that is successful will be used and the rest will be skipped. Make sure to add the most specific at the top and add the more lenient at the bottom-->
             <list>
                 <value>yyyy-MMM-dd</value>
+                <value>yyyy-MMM</value>
                 <value>yyyy-MM-dd</value>
             </list>
         </property>
@@ -151,7 +153,7 @@
         <constructor-arg value="2"/>
     </bean>
 
-    <bean class="org.dspace.importer.external.pubmed.metadatamapping.service.GeneratePubmedQueryService" id="pubmedService">
+    <bean class="org.dspace.importer.external.pubmed.metadatamapping.transform.GeneratePubmedQueryService" id="pubmedService">
         <description>Defines how an org.dspace.content.Item is mapped to a query in scopus. Please note that exactly one of
             these must be present. If multiple are present the result is undefined.
         </description>

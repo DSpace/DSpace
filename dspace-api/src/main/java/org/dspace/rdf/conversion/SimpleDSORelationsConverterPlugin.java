@@ -377,7 +377,7 @@ implements ConverterPlugin
         }
         
         // add all parents
-        for (DSpaceObject parent : collection.getCommunities())
+        for (DSpaceObject parent : communityService.getAllParents(context, collection))
         {
             if (!RDFUtil.isPublicBoolean(context, parent))
             {

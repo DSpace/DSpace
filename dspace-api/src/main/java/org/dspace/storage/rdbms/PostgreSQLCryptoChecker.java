@@ -147,16 +147,6 @@ public class PostgreSQLCryptoChecker implements FlywayCallback
     }
 
     @Override
-    public void beforeInit(Connection connection) {
-
-    }
-
-    @Override
-    public void afterInit(Connection connection) {
-
-    }
-
-    @Override
     public void beforeBaseline(Connection connection) {
         // Before initializing database, check for pgcrypto
         checkPgCrypto(connection);

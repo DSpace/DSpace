@@ -15,22 +15,37 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by Roeland Dillen (roeland at atmire dot com)
- * Date: 17/09/12
- * Time: 14:03
+ * This class contains all MetadatumDTO objects from an imported item
+ *
+ * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class ImportRecord {
     private List<MetadatumDTO> valueList = null;
 
+    /**
+     * Retrieve an unmodifiableList of MetadatumDTO
+     * @return List of MetadatumDTO
+     */
     public List<MetadatumDTO> getValueList() {
         return Collections.unmodifiableList(valueList);
     }
 
+    /**
+     * Create an ImportRecord instance initialized with a List of MetadatumDTO objects
+     * @param valueList
+     */
     public ImportRecord(List<MetadatumDTO> valueList) {
         //don't want to alter the original list. Also now I can control the type of list
-        this.valueList = new LinkedList<MetadatumDTO>(valueList);
+        this.valueList = new LinkedList<>(valueList);
     }
 
+    /**
+     * Build a string based on the values in the valueList object
+     * The syntax will be
+     * Record{valueList={"schema"; "element" ; "qualifier"; "value"}}
+     *
+     * @return a concatenated string containing all values of the MetadatumDTO objects in valueList
+     */
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
@@ -55,6 +70,13 @@ public class ImportRecord {
         return sb.toString();
     }
 
+    /**
+     * Return the MetadatumDTO's that are related to a given schema/element/qualifier pair/triplet
+     * @param schema
+     * @param element
+     * @param qualifier
+     * @return the MetadatumDTO's that are related to a given schema/element/qualifier pair/triplet
+     */
     public Collection<MetadatumDTO> getValue(String schema, String element, String qualifier){
         List<MetadatumDTO> values=new LinkedList<MetadatumDTO>();
         for(MetadatumDTO value:valueList){
@@ -69,6 +91,10 @@ public class ImportRecord {
         return values;
     }
 
+    /**
+     * Add a value to the valueList
+     * @param value The MetadatumDTO to add to the valueList
+     */
     public void addValue(MetadatumDTO value){
         this.valueList.add(value);
     }

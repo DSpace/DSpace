@@ -105,7 +105,10 @@ public class SendItemRequestAction extends AbstractAction
         }
         
         Item item = (Item) dso;
-        String title = "";
+        String title = item.getName();
+        
+        title = StringUtils.isNotBlank(title) ? title : I18nUtil
+                            .getMessage("jsp.general.untitled", context);
         Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamId));
 
         RequestItemAuthor requestItemAuthor = DSpaceServicesFactory.getInstance().getServiceManager()

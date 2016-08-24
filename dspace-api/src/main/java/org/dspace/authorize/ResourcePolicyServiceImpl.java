@@ -118,15 +118,17 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
      */
     @Override
     public void delete(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException {
+        // FIXME: authorizations
+        // Remove ourself
+        resourcePolicyDAO.delete(context, resourcePolicy);
+        
+        context.turnOffAuthorisationSystem();
         if(resourcePolicy.getdSpaceObject() != null)
         {
             //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
             contentServiceFactory.getDSpaceObjectService(resourcePolicy.getdSpaceObject()).updateLastModified(context, resourcePolicy.getdSpaceObject());
         }
-
-        // FIXME: authorizations
-        // Remove ourself
-        resourcePolicyDAO.delete(context, resourcePolicy);
+        context.restoreAuthSystemState();
     }
 
 
@@ -203,26 +205,34 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
 
     @Override
     public void removeAllPolicies(Context c, DSpaceObject o) throws SQLException, AuthorizeException {
-        contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
         resourcePolicyDAO.deleteByDso(c, o);
+        c.turnOffAuthorisationSystem();
+        contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
+        c.restoreAuthSystemState();
     }
 
     @Override
     public void removePolicies(Context c, DSpaceObject o, String type) throws SQLException, AuthorizeException {
-        contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
         resourcePolicyDAO.deleteByDsoAndType(c, o, type);
+        c.turnOffAuthorisationSystem();
+        contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
+        c.restoreAuthSystemState();
     }
 
     @Override
     public void removeDsoGroupPolicies(Context context, DSpaceObject dso, Group group) throws SQLException, AuthorizeException {
-        contentServiceFactory.getDSpaceObjectService(dso).updateLastModified(context, dso);
         resourcePolicyDAO.deleteByDsoGroupPolicies(context, dso, group);
+        context.turnOffAuthorisationSystem();
+        contentServiceFactory.getDSpaceObjectService(dso).updateLastModified(context, dso);
+        context.restoreAuthSystemState();
     }
 
     @Override
     public void removeDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson) throws SQLException, AuthorizeException {
-        contentServiceFactory.getDSpaceObjectService(dso).updateLastModified(context, dso);
         resourcePolicyDAO.deleteByDsoEPersonPolicies(context, dso, ePerson);
+        context.turnOffAuthorisationSystem();
+        contentServiceFactory.getDSpaceObjectService(dso).updateLastModified(context, dso);
+        context.restoreAuthSystemState();
 
     }
 
@@ -237,15 +247,19 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
         {
             removeAllPolicies(c, o);
         }else{
-            contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
             resourcePolicyDAO.deleteByDsoAndAction(c, o, actionId);
+            c.turnOffAuthorisationSystem();
+            contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
+            c.restoreAuthSystemState();
         }
     }
 
     @Override
     public void removeDsoAndTypeNotEqualsToPolicies(Context c, DSpaceObject o, String type) throws SQLException, AuthorizeException {
-        contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
         resourcePolicyDAO.deleteByDsoAndTypeNotEqualsTo(c, o, type);
+        c.turnOffAuthorisationSystem();
+        contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
+        c.restoreAuthSystemState();
     }
 
 
@@ -279,10 +293,12 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
             }
 
             //Update the last modified timestamp of all related DSpace Objects
+            context.turnOffAuthorisationSystem();
             for (DSpaceObject dSpaceObject : relatedDSpaceObjects) {
                 //A policy for a DSpace Object has been modified, fire a modify event on the DSpace object
-                contentServiceFactory.getDSpaceObjectService(dSpaceObject).updateLastModified(context, dSpaceObject);
+            	contentServiceFactory.getDSpaceObjectService(dSpaceObject).updateLastModified(context, dSpaceObject);
             }
+            context.restoreAuthSystemState();
         }
     }
 }

@@ -31,6 +31,7 @@ import static org.junit.Assert.*;
 @RunWith(Parameterized.class)
 public class MultiFormatDateParserTest
 {
+	private static Locale vmLocale;
     private final String testMessage;
     private final String toParseDate;
     private final String expectedFormat;
@@ -82,6 +83,10 @@ public class MultiFormatDateParserTest
     @BeforeClass
     public static void setUpClass()
     {
+    	// store default locale of the environment
+    	vmLocale = Locale.getDefault();
+    	// set default locale to English just for the test of this class
+    	Locale.setDefault(Locale.ENGLISH);
         Map<String, String> formats = new HashMap<>(32);
         formats.put("\\d{8}" ,"yyyyMMdd");
         formats.put("\\d{1,2}-\\d{1,2}-\\d{4}", "dd-MM-yyyy");
@@ -119,6 +124,8 @@ public class MultiFormatDateParserTest
     @AfterClass
     public static void tearDownClass()
     {
+    	// restore locale
+    	Locale.setDefault(vmLocale);
     }
 
     @Before

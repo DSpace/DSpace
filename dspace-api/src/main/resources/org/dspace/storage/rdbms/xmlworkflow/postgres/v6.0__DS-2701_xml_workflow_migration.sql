@@ -17,7 +17,7 @@
 --
 -- This script is called automatically by the following
 -- Flyway Java migration class:
--- org.dspace.storage.rdbms.migration.V5_0_2014_01_01__XMLWorkflow_Migration
+-- org.dspace.storage.rdbms.xmlworkflow.V6_0_2015_09_01__DS_2701_Enable_XMLWorkflow_Migration
 ----------------------------------------------------
 
 CREATE SEQUENCE cwf_workflowitem_seq;

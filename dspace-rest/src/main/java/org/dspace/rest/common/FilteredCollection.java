@@ -77,7 +77,7 @@ public class FilteredCollection extends DSpaceObject {
         }
 
         if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
-            List<org.dspace.content.Community> parentCommunities = collection.getCommunities();
+            List<org.dspace.content.Community> parentCommunities = communityService.getAllParents(context, collection);
             List<Community> parentCommunityList = new ArrayList<Community>();
             for(org.dspace.content.Community parentCommunity : parentCommunities) {
                 parentCommunityList.add(new Community(parentCommunity, servletContext, null, context));
@@ -95,7 +95,7 @@ public class FilteredCollection extends DSpaceObject {
         }
 
         if(expandFields.contains("topCommunity") | expandFields.contains("all")) {
-            List<org.dspace.content.Community> parentCommunities = collection.getCommunities();
+            List<org.dspace.content.Community> parentCommunities = communityService.getAllParents(context, collection);
             if (parentCommunities.size() > 0) {
                 org.dspace.content.Community topCommunity = parentCommunities.get(parentCommunities.size()-1);
                 this.setTopCommunity(new Community(topCommunity, servletContext, null, context));

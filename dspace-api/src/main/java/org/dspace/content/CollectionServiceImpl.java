@@ -123,14 +123,23 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findAll(Context context) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, "dc", "title", null);
-        return collectionDAO.findAll(context, nameField);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        if(nameField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+        }
 
+        return collectionDAO.findAll(context, nameField);
     }
 
     @Override
     public List<Collection> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, "dc", "title", null);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        if(nameField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+        }
+
         return collectionDAO.findAll(context, nameField, limit, offset);
     }
 
@@ -551,17 +560,18 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void removeItem(Context context, Collection collection, Item item) throws SQLException, AuthorizeException, IOException {
-                // Check authorisation
+        // Check authorisation
         authorizeService.authorizeAction(context, collection, Constants.REMOVE);
 
-        //Remove the item from the collection
-        item.removeCollection(collection);
-
         //Check if we orphaned our poor item
-        if (item.getCollections().isEmpty())
+        if (item.getCollections().size() == 1)
         {
             // Orphan; delete it
             itemService.delete(context, item);
+        } else {
+            //Remove the item from the collection if we have multiple collections
+            item.removeCollection(collection);
+
         }
 
         context.addEvent(new Event(Event.REMOVE, Constants.COLLECTION,
@@ -618,7 +628,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void canEdit(Context context, Collection collection, boolean useInheritance) throws SQLException, AuthorizeException {
-        List<Community> parents = collection.getCommunities();
+        List<Community> parents = communityService.getAllParents(context, collection);
         for (Community parent : parents) {
             if (authorizeService.authorizeActionBoolean(context, parent,
                     Constants.WRITE, useInheritance)) {
@@ -677,9 +687,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         // Delete bitstream logo
         setLogo(context, collection, null);
-
-        // Remove all authorization policies
-        authorizeService.removeAllPolicies(context, collection);
 
         Iterator<WorkspaceItem> workspaceItems = workspaceItemService.findByCollection(context, collection).iterator();
         while (workspaceItems.hasNext()) {
@@ -796,7 +803,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         List<Community> communities = collection.getCommunities();
         if (CollectionUtils.isNotEmpty(communities))
         {
-            community = communities.iterator().next();
+            community = communities.get(0);
         }
 
         switch (action)
@@ -829,7 +836,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     public DSpaceObject getParentObject(Context context, Collection collection) throws SQLException {
         List<Community> communities = collection.getCommunities();
         if(CollectionUtils.isNotEmpty(communities)){
-            return communities.iterator().next();
+            return communities.get(0);
         }else{
             return null;
         }
