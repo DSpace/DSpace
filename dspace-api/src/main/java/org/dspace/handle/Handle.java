@@ -26,8 +26,8 @@ public class Handle implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name="handle_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="handle_seq")
-    @SequenceGenerator(name="handle_seq", sequenceName="handle_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="handle_id_seq")
+    @SequenceGenerator(name="handle_id_seq", sequenceName="handle_id_seq", allocationSize = 1)
     private Integer id;
 
     @Column(name = "handle", unique = true)
@@ -57,6 +57,7 @@ public class Handle implements ReloadableEntity<Integer> {
 
     }
 
+    @Override
     public Integer getID() {
         return id;
     }
@@ -91,6 +92,7 @@ public class Handle implements ReloadableEntity<Integer> {
         return resourceTypeId;
     }
 
+    @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
 
@@ -105,6 +107,7 @@ public class Handle implements ReloadableEntity<Integer> {
                 .isEquals();
     }
 
+    @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(id)
