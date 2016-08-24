@@ -191,13 +191,29 @@ public class DatabaseUtils
                         {
                             // Otherwise, we assume "argv[1]" is a valid migration version number
                             // This is only for testing! Never specify for Production!
-                            System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
+                            String migrationVersion = argv[1];
+                            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+
+                            System.out.println("You've specified to migrate your database ONLY to version " + migrationVersion + " ...");
                             System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
                             System.out.println("or Bitstream Format Registry auto-update. This is because you are attempting to");
-                            System.out.println("use an OLD version " + argv[1] + " Database with a newer DSpace API. NEVER do this in a");
+                            System.out.println("use an OLD version " + migrationVersion + " Database with a newer DSpace API. NEVER do this in a");
                             System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
-                            // Update the database, to the version specified.
-                            updateDatabase(dataSource, connection, argv[1], true);
+
+                            System.out.print("Are you SURE you only want to migrate your database to version " + migrationVersion + "? [y/n]: ");
+                            String choiceString = input.readLine();
+                            input.close();
+
+                            if (choiceString.equalsIgnoreCase("y"))
+                            {
+                                System.out.println("Migrating database ONLY to version " + migrationVersion + " ... (Check logs for details)");
+                                // Update the database, to the version specified.
+                                updateDatabase(dataSource, connection, migrationVersion, false);
+                            }
+                            else
+                            {
+                                System.out.println("No action performed.");
+                            }
                         }
                     }
                     else
@@ -306,6 +322,10 @@ public class DatabaseUtils
                         cleanDatabase(flyway, dataSource);
                         System.out.println("Done.");
                         System.exit(0);
+                    }
+                    else
+                    {
+                        System.out.println("No action performed.");
                     }
                 }
                 catch(SQLException e)
@@ -550,8 +570,8 @@ public class DatabaseUtils
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection)
             throws SQLException
     {
-        // By default, upgrade to the *latest* version and run migrations out-of-order
-        updateDatabase(datasource, connection, null, true);
+        // By default, upgrade to the *latest* version and never run migrations out-of-order
+        updateDatabase(datasource, connection, null, false);
     }
 
     /**
@@ -1373,13 +1393,28 @@ public class DatabaseUtils
         flywaydb = null;
     }
 
+    /**
+     * Returns the current Flyway schema_version being used by the given database.
+     * (i.e. the version of the highest numbered migration that this database has run)
+     * @param connection current DB Connection
+     * @return version as string
+     * @throws SQLException if database error occurs
+     */
     public static String getCurrentFlywayState(Connection connection) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT \"version\" FROM \"schema_version\" ORDER BY \"installed_rank\" desc");
+        PreparedStatement statement = connection.prepareStatement("SELECT \"version\" FROM \"schema_version\" ORDER BY \"version\" desc");
         ResultSet resultSet = statement.executeQuery();
         resultSet.next();
         return resultSet.getString("version");
     }
 
+    /**
+     * Return the DSpace version that this Flyway-enabled database reports to be compatible with.
+     * The version is retrieved from Flyway, and parsed into a Double to represent an actual
+     * DSpace version number (e.g. 5.0, 6.0, etc)
+     * @param connection current DB Connection
+     * @return reported DSpace version as a Double
+     * @throws SQLException if database error occurs
+     */
     public static Double getCurrentFlywayDSpaceState(Connection connection) throws SQLException
     {
         String flywayState = getCurrentFlywayState(connection);
