@@ -16,6 +16,8 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.*;
@@ -31,10 +33,14 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
+
+import javax.imageio.ImageIO;
+
 
 /**
  * The Citation Document produces a dissemination package (DIP) that is different that the archival package (AIP).
@@ -82,6 +88,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected String[] fields;
     protected String footer;
 
+    protected BufferedImage logo;
+    
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
@@ -194,6 +202,16 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
                 log.info("Unable to create temp directory at: " + tempDirString);
             }
         }
+
+	//Try to load logo, if specified
+	String logoString = configurationService.getProperty("citation-page.logo");
+	if (StringUtils.isNotBlank(logoString)) {
+	    try {
+		logo = ImageIO.read(new File(logoString));
+	    } catch (IOException e) {
+		log.info("Unable to load logo image: " + logoString);
+	    }
+	}
     }
 
 
@@ -324,6 +342,25 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             contentStream.closeAndStroke();
             ypos -=(ygap*2);
 
+	    // insert logo, if any
+	    if (logo != null) {
+		try {
+		    PDImageXObject img = LosslessFactory.createFromImage(document, logo);
+		    // logo is scaled to be maximum 60 x 60 pixels
+		    float scale = 1f;
+		    if (img.getWidth() > 60) {
+			scale = 60.0f / img.getWidth();
+		    }
+		    if ((img.getHeight() * scale) > 60) {
+			scale = scale * (60.0f / (img.getHeight() * scale));
+		    }
+		    // logo position is in upper right corner, on the level of header2
+		    contentStream.drawImage(img, 521, 723, img.getWidth() * scale, img.getHeight() * scale);
+		} catch (IOException e) {
+		    log.info("Cannot add logo to document.");
+		}
+	    }
+	    
             for(String field : fields) {
                 field = field.trim();
                 PDFont font = fontHelvetica;
