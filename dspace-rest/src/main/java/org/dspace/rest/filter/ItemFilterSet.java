@@ -40,12 +40,9 @@ public class ItemFilterSet {
      * 
      * @param filterList
      *        Comma separated list of filter names to include
-     *        @see ItemFilter.ALL to retrieve all filters
+     *        @see org.dspace.rest.common#ItemFilter.ALL to retrieve all filters
      * @param reportItems
      *        If true, return item details.  If false, return only counts of items.
-     *         
-     * @author Terry Brady, Georgetown University
-     * 
      */
     public ItemFilterSet(String filterList, boolean reportItems) {
     	log.debug(String.format("Create ItemFilterSet: %s", filterList));

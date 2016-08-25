@@ -91,7 +91,7 @@ public interface MetadataValueService {
      *
      * @param context
      * @param metadataFieldId unique identifier of the interesting field.
-     * @return
+     * @return the minimum value of the metadata field
      * @throws SQLException if database error
      */
     public MetadataValue getMinimum(Context context, int metadataFieldId)

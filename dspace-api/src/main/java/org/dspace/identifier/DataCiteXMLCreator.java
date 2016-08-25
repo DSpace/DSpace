@@ -54,8 +54,8 @@ public class DataCiteXMLCreator
 
     /**
      * DisseminationCrosswalk to map local metadata into DataCite metadata. The
-     * name of the crosswalk is set by {@link setDisseminationCrosswalk(String)
-     * setDisseminationCrosswalk} which instantiates the crosswalk.
+     * name of the crosswalk is set by {@link #setDisseminationCrosswalkName(String)
+     * setDisseminationCrosswalkName} which instantiates the crosswalk.
      */
     protected ParameterizedDisseminationCrosswalk xwalk;
 

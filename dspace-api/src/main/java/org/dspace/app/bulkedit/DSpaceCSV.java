@@ -631,7 +631,7 @@ public class DSpaceCSV implements Serializable
         int c = 1;
         while (i.hasNext())
         {
-            csvLines[c++] = i.next().toCSV(headingsCopy, fieldSeparator);
+            csvLines[c++] = i.next().toCSV(headingsCopy, fieldSeparator, valueSeparator);
         }
 
         return csvLines;

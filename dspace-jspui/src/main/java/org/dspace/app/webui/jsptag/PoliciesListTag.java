@@ -130,7 +130,7 @@ public class PoliciesListTag extends TagSupport
     /**
      * Set the policies to list
      *
-     * @param itemsIn
+     * @param policies
      *            the policies
      */
     public void setPolicies(List<ResourcePolicy> policies)

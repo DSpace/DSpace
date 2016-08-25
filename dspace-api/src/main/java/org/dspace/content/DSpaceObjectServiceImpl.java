@@ -207,7 +207,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, List<String> values) throws SQLException {
         MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
         if (metadataField == null) {
-            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier);
+            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not exist!");
         }
 
         addMetadata(context, dso, metadataField, lang, values);
@@ -219,7 +219,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         // until update() is called.
         MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
         if (metadataField == null) {
-            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier);
+            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not exist!");
         }
         addMetadata(context, dso, metadataField, lang, values, authorities, confidences);
     }
@@ -332,16 +332,15 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     @Override
     public void clearMetadata(Context context, T dso, String schema, String element, String qualifier, String lang) throws SQLException {
-        // We will build a list of values NOT matching the values to clear
         Iterator<MetadataValue> metadata = dso.getMetadata().iterator();
         while (metadata.hasNext())
         {
             MetadataValue metadataValue = metadata.next();
+            // If this value matches, delete it
             if (match(schema, element, qualifier, lang, metadataValue))
             {
-                metadataValue.setDSpaceObject(null);
                 metadata.remove();
-//                metadataValueService.delete(context, metadataValue);
+                metadataValueService.delete(context, metadataValue);
             }
         }
         dso.setMetadataModified();
@@ -355,7 +354,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             if(values.contains(metadataValue))
             {
                 metadata.remove();
-//                metadataValueService.delete(context, metadataValue);
+                metadataValueService.delete(context, metadataValue);
             }
         }
         dso.setMetadataModified();
@@ -364,11 +363,17 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     /**
      * Retrieve first metadata field value
      * @param dso
-     * @param language
-     * @param element
+     *            The DSpaceObject which we ask for metadata.
      * @param schema
+     *            the schema for the metadata field. <em>Must</em> match
+     *            the <code>name</code> of an existing metadata schema.
+     * @param element
+     *            the element to match, or <code>Item.ANY</code>
      * @param qualifier
-     * @return 
+     *            the qualifier to match, or <code>Item.ANY</code>
+     * @param language
+     *            the language to match, or <code>Item.ANY</code>
+     * @return the first metadata field value
      */
     @Override
     public String getMetadataFirstValue(T dso, String schema, String element, String qualifier, String language){

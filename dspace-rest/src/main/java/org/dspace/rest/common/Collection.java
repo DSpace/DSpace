@@ -10,6 +10,7 @@ package org.dspace.rest.common;
 import org.apache.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @XmlRootElement(name = "collection")
 public class Collection extends DSpaceObject {
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
@@ -69,7 +71,7 @@ public class Collection extends DSpaceObject {
         this.setSidebarText(collectionService.getMetadata(collection, org.dspace.content.Collection.SIDEBAR_TEXT));
         
         if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
-            List<org.dspace.content.Community> parentCommunities = collection.getCommunities();
+            List<org.dspace.content.Community> parentCommunities = communityService.getAllParents(context, collection);
             for(org.dspace.content.Community parentCommunity : parentCommunities) {
                 this.addParentCommunityList(new Community(parentCommunity, servletContext, null, context));
             }

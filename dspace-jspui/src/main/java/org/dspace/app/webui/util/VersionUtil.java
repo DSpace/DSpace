@@ -199,10 +199,11 @@ public class VersionUtil
         {
             Item item = itemService.find(context, itemId);
             VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
-
-            for (String id : versionIDs)
+            
+            for (String versionID : versionIDs)
             {
-                versioningService.removeVersion(context, item);
+            	Version version = versioningService.getVersion(context, Integer.parseInt(versionID));
+                versioningService.removeVersion(context, version);
             }
 
             // Retrieve the latest version of our history (IF any is even
@@ -324,7 +325,7 @@ public class VersionUtil
      * 
      * @param context
      * @param stringVersionID
-     * @return
+     * @return version summary string
      */
     public static String getSummary(Context context, String stringVersionID)
     {

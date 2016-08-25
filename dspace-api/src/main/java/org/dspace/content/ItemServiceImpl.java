@@ -7,6 +7,15 @@
  */
 package org.dspace.content;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -18,7 +27,15 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.dao.ItemDAO;
-import org.dspace.content.service.*;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -29,14 +46,10 @@ import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
-import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
+import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Service implementation for the Item object.
@@ -79,6 +92,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected VersioningService versioningService;
     @Autowired(required=true)
     protected HarvestedItemService harvestedItemService;
+    @Autowired(required=true)
+    protected ConfigurationService configurationService;
+    
+    @Autowired(required=true)
+    protected WorkspaceItemService workspaceItemService;
+    @Autowired(required=true)
+    protected WorkflowItemService workflowItemService;
+    
 
     protected ItemServiceImpl()
     {
@@ -193,6 +214,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit) throws SQLException {
 
         MetadataField metadataField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "date", "accessioned");
+        if(metadataField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".date.accessioned' doesn't exist!");
+        }
+
         return itemDAO.findBySubmitter(context, eperson, metadataField, limit);
     }
 
@@ -237,11 +263,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         List<Community> result = new ArrayList<>();
         List<Collection> collections = item.getCollections();
         for (Collection collection : collections) {
-            List<Community> owningCommunities = collection.getCommunities();
-            for (Community community : owningCommunities) {
-                result.add(community);
-                result.addAll(communityService.getAllParents(context, community));
-            }
+            result.addAll(communityService.getAllParents(context, collection));
         }
 
         return result;
@@ -596,6 +618,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Remove bundles
         removeAllBundles(context, item);
 
+        // Remove any Handle
+        handleService.unbindHandle(context, item);
+        
         // remove version attached to the item
         removeVersion(context, item);
 
@@ -610,10 +635,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         //Only clear collections after we have removed everything else from the item
         item.getCollections().clear();
         item.setOwningCollection(null);
-
-        // Remove any Handle
-        handleService.unbindHandle(context, item);
-
 
         // Finally remove item row
         itemDAO.delete(context, item);
@@ -880,28 +901,34 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // is this collection not yet created, and an item template is created
         if (item.getOwningCollection() == null)
         {
-            return true;
+        	if (!isInProgressSubmission(context, item)) {
+        		return true;
+        	}
+        	else {
+        		return false;
+        	}
         }
 
         return collectionService.canEditBoolean(context, item.getOwningCollection(), false);
     }
 
-    @Override
-    public boolean canCreateNewVersion(Context context, Item item) throws SQLException{
-        if (authorizeService.isAdmin(context, item)) 
-        {
-            return true;
-        }
-
-        if (context.getCurrentUser() != null
-                && context.getCurrentUser().equals(item.getSubmitter())) 
-        {
-            return DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyAsType(
-                    "versioning.submitterCanCreateNewVersion", false);
-        }
-
-        return false;
+    /**
+     * Check if the item is an inprogress submission
+     * @param context
+     * @param item
+     * @return <code>true</code> if the item is an inprogress submission, i.e. a WorkspaceItem or WorkflowItem
+     * @throws SQLException
+     */
+    public boolean isInProgressSubmission(Context context, Item item) throws SQLException {
+		return workspaceItemService.findByItem(context, item) != null
+				|| workflowItemService.findByItem(context, item) != null;
     }
+    
+    /*
+    With every finished submission a bunch of resource policy entries with have null value for the dspace_object column are generated in the database.
+prevent the generation of resource policy entry values with null dspace_object as value
+
+    */
 
     /**
      * Add the default policies, which have not been already added to the given DSpace object
@@ -1199,5 +1226,22 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public int countWithdrawnItems(Context context) throws SQLException {
        // return count of items that are not in archive and withdrawn
        return itemDAO.countItems(context, false, true);
+    }
+
+    @Override
+    public boolean canCreateNewVersion(Context context, Item item) throws SQLException{
+        if (authorizeService.isAdmin(context, item)) 
+        {
+            return true;
+        }
+
+        if (context.getCurrentUser() != null
+                && context.getCurrentUser().equals(item.getSubmitter())) 
+        {
+            return configurationService.getPropertyAsType(
+                    "versioning.submitterCanCreateNewVersion", false);
+        }
+
+        return false;
     }
 }

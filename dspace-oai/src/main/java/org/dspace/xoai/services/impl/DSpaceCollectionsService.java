@@ -10,6 +10,7 @@ package org.dspace.xoai.services.impl;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
 import org.dspace.xoai.services.api.CollectionsService;
@@ -96,14 +97,14 @@ public class DSpaceCollectionsService implements CollectionsService {
     }
 
     @Override
-    public List<Community> flatParentCommunities(Item c)
+    public List<Community> flatParentCommunities(Context context, Item c)
             throws SQLException
     {
         Queue<Community> queue = new LinkedList<>();
         List<Community> result = new ArrayList<>();
 
-        for (Collection com : c.getCollections())
-            queue.addAll(com.getCommunities());
+        for (Collection collection : c.getCollections())
+            queue.addAll(communityService.getAllParents(context, collection));
 
         while (!queue.isEmpty())
         {

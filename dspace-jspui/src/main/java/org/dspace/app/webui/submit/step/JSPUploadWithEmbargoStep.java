@@ -67,7 +67,7 @@ import com.google.gson.Gson;
  *
  * @see org.dspace.app.webui.servlet.SubmissionController
  * @see org.dspace.app.webui.submit.JSPStep
- * @see org.dspace.app.webui.submit.JSPUploadStep
+ * @see org.dspace.app.webui.submit.step.JSPUploadStep
  * @see org.dspace.submit.step.UploadStep
  *
  * @author Tim Donohue

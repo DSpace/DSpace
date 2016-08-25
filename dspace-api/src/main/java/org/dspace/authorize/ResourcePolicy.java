@@ -42,9 +42,15 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     @JoinColumn(name = "dspace_object")
     private DSpaceObject dSpaceObject;
 
+    /*
+     * {@see org.dspace.core.Constants#Constants Constants}
+     */
     @Column(name = "resource_type_id")
     private int resourceTypeId;
 
+    /*
+     * {@see org.dspace.core.Constants#Constants Constants}
+     */
     @Column(name="action_id")
     private int actionId;
 

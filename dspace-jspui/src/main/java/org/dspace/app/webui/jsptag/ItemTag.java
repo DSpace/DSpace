@@ -1040,7 +1040,7 @@ public class ItemTag extends TagSupport
                                     // won't have a big problem here
                                     rp = policy;
                                     // if we found a policy allowing anonymous
-                                    // group to read the bitsream, mark it as
+                                    // group to read the bitstream, mark it as
                                     // being anoymous readable and leave the loop
                                     if (resourcePolicyService.isDateValid(policy))
                                     {

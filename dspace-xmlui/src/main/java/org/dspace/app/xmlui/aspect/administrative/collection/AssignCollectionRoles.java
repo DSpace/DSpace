@@ -25,10 +25,11 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.WorkflowUtils;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -247,7 +248,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
         tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_default_read);
 
 
-		if(StringUtils.equals(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("workflow.framework"), "xmlworkflow")) {
+		if(WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService) {
              try{
                  HashMap<String, Role> roles = WorkflowUtils.getAllExternalRoles(thisCollection);
                  addXMLWorkflowRoles(thisCollection, baseURL, roles, rolesTable);

@@ -1518,7 +1518,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of canEditBoolean method, of class Collection.
+     * Test of canEdit method, of class Item.
      */
     @Test
     public void testCanEditBooleanAuth() throws Exception
@@ -1543,7 +1543,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of canEditBoolean method, of class Collection.
+     * Test of canEdit method, of class Item.
      */
     @Test
     public void testCanEditBooleanAuth2() throws Exception
@@ -1568,7 +1568,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of canEditBoolean method, of class Collection.
+     * Test of canEdit method, of class Item.
      */
     @Test
     public void testCanEditBooleanAuth3() throws Exception
@@ -1595,7 +1595,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of canEditBoolean method, of class Collection.
+     * Test of canEdit method, of class Item.
      */
     @Test
     public void testCanEditBooleanAuth4() throws Exception
@@ -1617,11 +1617,33 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         }};
 
         // Ensure person with WRITE perms on the Collection can edit item
-        assertTrue("testCanEditBooleanAuth43 0", itemService.canEdit(context, it));
+        assertTrue("testCanEditBooleanAuth4 0", itemService.canEdit(context, it));
     }
 
     /**
-     * Test of canEditBoolean method, of class Collection.
+     * Test of canEdit method, of class Item.
+     */
+    @Test
+    public void testCanEditBooleanAuth5() throws Exception
+    {
+        // Test Inheritance of permissions
+        new NonStrictExpectations(authorizeService.getClass())
+        {{
+            // Disallow Item WRITE perms
+        	authorizeService.authorizeAction((Context) any, (Item) any,
+                    Constants.WRITE); result = new AuthorizeException();
+            // Allow Collection WRITE perms
+            authorizeService.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,anyBoolean); result = null;
+        }};
+
+        collectionService.createTemplateItem(context, collection);
+        collectionService.update(context, collection);
+        assertTrue("testCanEditBooleanNoAuth5 0", itemService.canEdit(context, collection.getTemplateItem()));
+    }
+
+    /**
+     * Test of canEdit method, of class Item.
      */
     @Test
     public void testCanEditBooleanNoAuth() throws Exception
@@ -1650,6 +1672,79 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         assertFalse("testCanEditBooleanNoAuth 0", itemService.canEdit(context, it));
     }
 
+    /**
+     * Test of canEdit method, of class Item.
+     */
+    @Test
+    public void testCanEditBooleanNoAuth2() throws Exception
+    {
+        context.turnOffAuthorisationSystem();
+        WorkspaceItem wi = workspaceItemService.create(context, collection, true);
+        context.restoreAuthSystemState();
+        // Test Inheritance of permissions
+        new NonStrictExpectations(authorizeService.getClass())
+        {{
+            // Disallow Item WRITE perms
+        	authorizeService.authorizeAction((Context) any, (Item) any,
+                    Constants.WRITE, anyBoolean); result = new AuthorizeException();
+        }};
+        assertFalse("testCanEditBooleanNoAuth2 0", itemService.canEdit(context, wi.getItem()));
+    }
+
+    /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmission() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = createCollection();
+        WorkspaceItem wi = workspaceItemService.create(context, c, true);
+    	context.restoreAuthSystemState();
+        assertTrue("testIsInProgressSubmission 0", itemService.isInProgressSubmission(context, wi.getItem()));
+    }
+    
+    /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmissionFalse() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = createCollection();
+        WorkspaceItem wi = workspaceItemService.create(context, c, true);
+        Item item = installItemService.installItem(context, wi);
+    	context.restoreAuthSystemState();
+        assertFalse("testIsInProgressSubmissionFalse 0", itemService.isInProgressSubmission(context, item));
+    }
+
+    /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmissionFalse2() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = createCollection();
+        collectionService.createTemplateItem(context, c);
+        collectionService.update(context, c);
+        Item item = c.getTemplateItem();
+    	context.restoreAuthSystemState();
+        assertFalse("testIsInProgressSubmissionFalse2 0", itemService.isInProgressSubmission(context, item));
+    }
+    
     /**
      * Test of getName method, of class Item.
      */

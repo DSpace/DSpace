@@ -6,13 +6,8 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.importer.external.service.other;
-
 /**
- * Created by Roeland Dillen (roeland at atmire dot com)
- * Date: 26/09/12
- * Time: 11:09
+ * Main import framework services.
+ * @author Roeland Dillen (roeland at atmire dot com)
  */
-public interface Destroyable {
-    public void destroy() throws Exception;
-}
+package org.dspace.importer.external.service;

@@ -203,14 +203,11 @@ public class MetadataImport
                             }
 
                             // Remove the item
-                            List<Collection> owners = item.getCollections();
-                            for (Collection owner : owners)
-                            {
-                                if (change)
-                                {
-                                    collectionService.removeItem(c, owner, item);
-                                }
-                            }
+
+							if (change) {
+								itemService.delete(c, item);
+							}
+                            
                             whatHasChanged.setDeleted();
                         }
                         else if ("withdraw".equals(action))

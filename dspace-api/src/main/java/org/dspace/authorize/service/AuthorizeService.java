@@ -107,7 +107,7 @@ public interface AuthorizeService {
      * @param o DSpaceObject
      * @param a action being attempted, from
      *         <code>org.dspace.core.Constants</code>
-     * @return <code>true</code> if the current user in the context is
+     * @return {@code true} if the current user in the context is
      *         authorized to perform the given action on the given object
      * @throws SQLException if database error
      */
@@ -124,7 +124,7 @@ public interface AuthorizeService {
      * @param useInheritance
      *         flag to say if ADMIN action on the current object or parent
      *         object can be used
-     * @return <code>true</code> if the current user in the context is
+     * @return {@code true} if the current user in the context is
      *         authorized to perform the given action on the given object
      * @throws SQLException if database error
      */
@@ -142,7 +142,7 @@ public interface AuthorizeService {
      * @param useInheritance
      *         flag to say if ADMIN action on the current object or parent
      *         object can be used
-     * @return <code>true</code> if the requested user is
+     * @return {@code true} if the requested user is
      *         authorized to perform the given action on the given object
      * @throws SQLException if database error
      */
@@ -154,14 +154,14 @@ public interface AuthorizeService {
 
     /**
      * Check to see if the current user is an Administrator of a given object
-     * within DSpace. Always return <code>true</code> if the user is a System
+     * within DSpace. Always return {@code true} if the user is a System
      * Admin
      *
      * @param c current context
      * @param o current DSpace Object, if <code>null</code> the call will be
      *         equivalent to a call to the <code>isAdmin(Context c)</code>
      *         method
-     * @return <code>true</code> if user has administrative privileges on the
+     * @return {@code true} if user has administrative privileges on the
      *         given DSpace object
      * @throws SQLException if database error
      */
@@ -170,11 +170,11 @@ public interface AuthorizeService {
 
     /**
      * Check to see if the current user is a System Admin. Always return
-     * <code>true</code> if c.ignoreAuthorization is set. Anonymous users
+     * {@code true} if c.ignoreAuthorization is set. Anonymous users
      * can't be Admins (EPerson set to NULL)
      *
      * @param c current context
-     * @return <code>true</code> if user is an admin or ignore authorization
+     * @return {@code true} if user is an admin or ignore authorization
      *         flag set
      * @throws SQLException if database error
      */
@@ -240,7 +240,7 @@ public interface AuthorizeService {
      *
      * @param c current context
      * @param o object to retrieve policies for
-     * @return List of <code>ResourcePolicy</code> objects
+     * @return List of {@code ResourcePolicy} objects
      * @throws SQLException if database error
      */
     public List<ResourcePolicy> getPolicies(Context c, DSpaceObject o) throws SQLException;
@@ -251,7 +251,7 @@ public interface AuthorizeService {
      * @param c  current context
      * @param o object to retrieve policies for
      * @param type type
-     * @return List of <code>ResourcePolicy</code> objects
+     * @return List of {@code ResourcePolicy} objects
      * @throws SQLException if database error
      */
     public List<ResourcePolicy> findPoliciesByDSOAndType(Context c, DSpaceObject o, String type) throws SQLException;
@@ -261,8 +261,8 @@ public interface AuthorizeService {
      *
      * @param c current context
      * @param g group to retrieve policies for
-     * @return List of <code>ResourcePolicy</code> objects
-     * @@throws SQLException if database error
+     * @return List of {@code ResourcePolicy} objects
+     * @throws SQLException if database error
      */
     public List<ResourcePolicy> getPoliciesForGroup(Context c, Group g) throws SQLException;
 
@@ -338,7 +338,7 @@ public interface AuthorizeService {
      * @param context current context
      * @param dso object to remove policies from
      * @param actionID ID of action to match from
-     *         <code>org.dspace.core.Constants</code>, or -1=all
+     *         {@link org.dspace.core.Constants#Constants Constants}, or -1=all
      * @throws SQLException  if there's a database problem
      * @throws AuthorizeException if authorization error
      */
@@ -384,8 +384,8 @@ public interface AuthorizeService {
      *
      * @param c current context
      * @param o object
-     * @param actionID ID of action from <code>org.dspace.core.Constants</code>
-     * @return array of <code>Group</code>s that can perform the specified
+     * @param actionID ID of action from {@link org.dspace.core.Constants#Constants Constants}
+     * @return array of {@link org.dspace.eperson.Group#Group Groups} that can perform the specified
      *         action on the specified object
      * @throws SQLException if there's a database problem
      */
@@ -400,7 +400,7 @@ public interface AuthorizeService {
      * @param c current context
      * @param o object
      * @param group group
-     * @param actionID ID of action from <code>org.dspace.core.Constants</code>
+     * @param actionID ID of action from {@link org.dspace.core.Constants#Constants Constants}
      * @param policyID ID of an existing policy. If -1 is specified, this parameter will be ignored
      * @return true if such a policy exists, false otherwise
      * @throws SQLException if there's a database problem
