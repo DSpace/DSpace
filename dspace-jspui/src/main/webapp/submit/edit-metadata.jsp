@@ -52,6 +52,7 @@
 <%@ page import="org.dspace.content.authority.Choices" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="java.util.Calendar"%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -373,6 +374,43 @@
       out.write(sb.toString());
     }
 
+    
+    void doYear(boolean allowInPrint, javax.servlet.jsp.JspWriter out, Item item,
+            String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required,
+            boolean readonly, int fieldCountIncr, String label, PageContext pageContext, HttpServletRequest request)
+			throws java.io.IOException {
+    	List<String> valuePair = new ArrayList<String>();
+    	// display value
+    	valuePair.add(LocaleSupport.getLocalizedMessage(
+				pageContext, "jsp.submit.edit-metadata.year.select"));
+    	// store value
+		valuePair.add("");
+		
+    	if (allowInPrint) {
+	    	// display value
+	    	valuePair.add(LocaleSupport.getLocalizedMessage(
+					pageContext, "jsp.submit.edit-metadata.year.unpublished"));
+	    	// store value
+			valuePair.add("9999");
+    	}
+    	
+		int minYear = ConfigurationManager.getIntProperty("submission.date.min-year", 1950);
+		
+		int maxYear = Calendar.getInstance().get(Calendar.YEAR) 
+				+ ConfigurationManager.getIntProperty("submission.date.new-years", 0);
+		
+    	for (int i=maxYear; i >= minYear; i--)
+    	{
+    		// display value
+    		valuePair.add(String.valueOf(i));
+    		// store value
+    		valuePair.add(String.valueOf(i));
+    	}
+    	
+    	doDropDown(out, item, fieldName, schema, element, qualifier, repeatable,
+	  	      required, readonly, valuePair, label);
+	}
+    
     void doDate(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required,
       boolean readonly, int fieldCountIncr, String label, PageContext pageContext, HttpServletRequest request)
@@ -1359,6 +1397,16 @@
        {
            doDate(out, item, fieldName, dcSchema, dcElement, dcQualifier,
                           repeatable, required, readonly, fieldCountIncr, label, pageContext, request);
+       }
+       else if (inputType.equals("year")) 
+       {
+    	   doYear(true, out, item, fieldName, dcSchema, dcElement, dcQualifier,
+                   repeatable, required, readonly, fieldCountIncr, label, pageContext, request);
+       }
+       else if (inputType.equals("year_noinprint")) 
+       {
+    	   doYear(false, out, item, fieldName, dcSchema, dcElement, dcQualifier,
+                   repeatable, required, readonly, fieldCountIncr, label, pageContext, request);
        }
        else if (inputType.equals("series"))
        {
