@@ -2,10 +2,9 @@ package org.datadryad.api;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
-import org.dspace.content.authority.Term;
-import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.datadryad.rest.models.Journal;
@@ -13,24 +12,18 @@ import org.datadryad.rest.storage.StorageException;
 import org.dspace.JournalUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.lang.*;
 import java.lang.Exception;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
-import java.util.Set;
-
-import org.dspace.authorize.AuthorizeException;
 
 /**
  *
  * @author Daisie Huang <daisieh@datadryad.org>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
+public class DryadJournalConcept extends DryadOrganizationConcept {
     // Journal Concepts can have the following metadata properties defined in the old properties file:
     public static final String JOURNAL_ID = "journalID";
     public static final String FULLNAME = "fullname";
@@ -57,19 +50,9 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     public static final String HASJOURNALPAGE = "hasJournalPage";
 
-    public static final String SUBSCRIPTION_PLAN = "SUBSCRIPTION";
-    public static final String PREPAID_PLAN = "PREPAID";
-    public static final String DEFERRED_PLAN = "DEFERRED";
-    public static final String NO_PLAN = "NONE";
-
-    private static Properties metadataProperties;
-    private static Properties defaultMetadataValues;
-
     private static Logger log = Logger.getLogger(DryadJournalConcept.class);
 
     static {
-        metadataProperties = new Properties();
-
         metadataProperties.setProperty(JOURNAL_ID, "journal.journalID");
         metadataProperties.setProperty(FULLNAME, "journal.fullname");
         metadataProperties.setProperty(CANONICAL_MANUSCRIPT_NUMBER_PATTERN, "journal.canonicalManuscriptNumberPattern");
@@ -92,7 +75,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
         metadataProperties.setProperty(WEBSITE, "journal.website");
         metadataProperties.setProperty(COVER_IMAGE, "journal.coverImage");
 
-        defaultMetadataValues = new Properties();
         defaultMetadataValues.setProperty(metadataProperties.getProperty(JOURNAL_ID), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(FULLNAME), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(CANONICAL_MANUSCRIPT_NUMBER_PATTERN), "");
@@ -117,9 +99,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     }
 
     // these are mandatory elements
-    private Concept underlyingConcept;
-    private String conceptIdentifier;
-    private String fullName;
 
     public DryadJournalConcept() {
         Context context = null;
@@ -140,12 +119,12 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     } // JAXB needs this
 
     public DryadJournalConcept(Context context, Concept concept) {
+        super();
         setUnderlyingConcept(context, concept);
         fullName = getConceptMetadataValue(metadataProperties.getProperty(FULLNAME));
     }
 
     public DryadJournalConcept(Context context, String fullName) throws StorageException {
-        this();
         this.setFullName(fullName);
         try {
             context.commit();
@@ -173,86 +152,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     }
 
     @JsonIgnore
-    public Concept getUnderlyingConcept() {
-        return getUnderlyingConcept(null);
-    }
-
-    @JsonIgnore
-    public Concept getUnderlyingConcept(Context context) {
-        return underlyingConcept;
-    }
-
-    @JsonIgnore
-    public void setUnderlyingConcept(Context context, Concept concept) {
-        this.underlyingConcept = concept;
-        this.conceptIdentifier = concept.getIdentifier();
-    }
-
-    @Override
-    public int compareTo(DryadJournalConcept journalConcept) {
-//        a negative number if our object comes before the one passed in;
-//        a positive number if our object comes after the one passed in;
-//        otherwise, zero (meaning they're equal in terms of ordering).
-        if ("".equals(this.getFullName())) {
-            return -1;
-        } else if ("".equals(journalConcept.getFullName())) {
-            return 1;
-        }
-        return this.getFullName().toUpperCase().compareTo(journalConcept.getFullName().toUpperCase());
-    }
-
-    @JsonIgnore
-    private String getConceptMetadataValue(String mdString) {
-        AuthorityMetadataValue authorityValue = getUnderlyingConcept().getSingleMetadata(mdString);
-        String result = null;
-        if (authorityValue != null) {
-            result = authorityValue.getValue();
-            return result;
-        } else {
-            result = defaultMetadataValues.getProperty(mdString);
-        }
-        if (result == null) {
-            result = "";
-        }
-        return result;
-    }
-
-    @JsonIgnore
-    private void setConceptMetadataValue(String mdString, String value) {
-        Context context = null;
-        try {
-            context = new Context();
-            context.turnOffAuthorisationSystem();
-            Concept underlyingConcept = getUnderlyingConcept(context);
-            AuthorityMetadataValue[] metadataValues = underlyingConcept.getMetadata(mdString);
-            if (metadataValues == null || metadataValues.length == 0) {
-                underlyingConcept.addMetadata(context, mdString, value);
-            } else {
-                for (AuthorityMetadataValue authorityMetadataValue : metadataValues) {
-                    if (!authorityMetadataValue.value.equals(value)) {
-                        underlyingConcept.clearMetadata(context, mdString);
-                        underlyingConcept.addMetadata(context, mdString, value);
-                        break;
-                    }
-                }
-            }
-            context.restoreAuthSystemState();
-            context.commit();
-            context.complete();
-        } catch (Exception e) {
-            log.error("Couldn't set metadata for " + fullName + ", " + e.getMessage());
-            if (context != null) {
-                context.abort();
-            }
-        }
-    }
-
-    @JsonIgnore
-    public static Set<String> getMetadataPropertyNames() {
-        return metadataProperties.stringPropertyNames();
-    }
-
-    @JsonIgnore
     public void transferFromJournalConcept(Context context, DryadJournalConcept source) throws StorageException {
         // if FULLNAME isn't the same, this probably shouldn't be transferred
         if (!source.getFullName().equals(fullName)) {
@@ -265,41 +164,10 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
         }
     }
 
-    public String getFullName() {
-        if (fullName == null) {
-            return "";
-        }
-        return fullName;
-    }
-
     public void setFullName(String value) throws StorageException {
-        Context context = null;
-        if (value == null) {
-            value = "";
-        }
-        try {
-            setConceptMetadataValue(metadataProperties.getProperty(FULLNAME), value);
-            // update JournalUtils with this new concept
-            JournalUtils.updateDryadJournalConcept(this);
-
-            context = new Context();
-            context.turnOffAuthorisationSystem();
-
-            // add the new Term
-            Term newTerm = getUnderlyingConcept(context).createTerm(context, value, Term.prefer_term);
-            context.restoreAuthSystemState();
-            context.complete();
-        } catch (Exception e) {
-            if (context != null) {
-                context.abort();
-            }
-            throw new StorageException ("Couldn't set fullname for " + fullName + ", " + e.getMessage());
-        }
-        fullName = value;
-    }
-
-    public int getConceptID() {
-        return this.getUnderlyingConcept().getID();
+        super.setFullName(value);
+        // update JournalUtils with this new concept
+        JournalUtils.updateDryadJournalConcept(this);
     }
 
     public String getJournalID() {
@@ -374,7 +242,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     public void setWebsite(String value) {
         setConceptMetadataValue(metadataProperties.getProperty(WEBSITE), value);
-        JournalUtils.updateDryadJournalConcept(this);
     }
 
     public String getCoverImage() {
@@ -383,7 +250,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     public void setCoverImage(String value) {
         setConceptMetadataValue(metadataProperties.getProperty(COVER_IMAGE), value);
-        JournalUtils.updateDryadJournalConcept(this);
     }
 
     public String getMemberName() {
@@ -410,11 +276,6 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
     @JsonIgnore
     public void setBooleanHasJournalPage(Boolean value) {
         setHasJournalPage(value.toString());
-    }
-
-    @JsonIgnore
-    public String getIdentifier() {
-        return conceptIdentifier;
     }
 
     public String getStatus() {
@@ -616,15 +477,11 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
 
     public void setPaymentPlan(String paymentPlan) {
         String paymentPlanType = "";
-        Boolean newSubscriptionPaid = false;
         if (SUBSCRIPTION_PLAN.equals(paymentPlan)) {
-            newSubscriptionPaid = true;
             paymentPlanType = SUBSCRIPTION_PLAN;
         } else if (DEFERRED_PLAN.equals(paymentPlan)) {
-            newSubscriptionPaid = true;
             paymentPlanType = DEFERRED_PLAN;
         } else if (PREPAID_PLAN.equals(paymentPlan)) {
-            newSubscriptionPaid = true;
             paymentPlanType = PREPAID_PLAN;
         }
         setConceptMetadataValue(metadataProperties.getProperty(PAYMENT_PLAN), paymentPlanType);
@@ -659,17 +516,4 @@ public class DryadJournalConcept implements Comparable<DryadJournalConcept> {
         journal.issn = getISSN();
         return journal;
     }
-
-    @Override
-    public String toString() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
 }
