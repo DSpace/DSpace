@@ -25,8 +25,6 @@ import java.util.Set;
 
 import org.dspace.authorize.AuthorizeException;
 
-import javax.ws.rs.HEAD;
-
 /**
  *
  * @author Daisie Huang <daisieh@datadryad.org>
