@@ -8,6 +8,7 @@
 package org.dspace.disseminate;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.imageio.ImageIO;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -30,9 +32,10 @@ import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -93,6 +96,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected String[] header2;
     protected String[] fields;
     protected String footer;
+
+    protected BufferedImage logo;
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -206,8 +211,17 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
                 log.info("Unable to create temp directory at: " + tempDirString);
             }
         }
-    }
 
+        //Try to load logo, if specified
+        String logoString = configurationService.getProperty("citation-page.logo");
+        if (StringUtils.isNotBlank(logoString)) {
+            try {
+                logo = ImageIO.read(new File(logoString));
+            } catch (IOException e) {
+                log.info("Unable to load logo image: " + logoString);
+            }
+        }
+    }
 
     protected CitationDocumentServiceImpl() {
     }
@@ -282,7 +296,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     @Override
     public Pair<InputStream, Long> makeCitedDocument(Context context, Bitstream bitstream)
-            throws IOException, SQLException, AuthorizeException {
+        throws IOException, SQLException, AuthorizeException {
         PDDocument document = new PDDocument();
         PDDocument sourceDocument = new PDDocument();
         try {
@@ -340,6 +354,25 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             ypos -= (ygap * 2);
 
             for (String field : fields) {
+                // insert logo, if any
+                if (logo != null) {
+                    try {
+                        PDImageXObject img = LosslessFactory.createFromImage(document, logo);
+                        // logo is scaled to be maximum 60 x 60 pixels
+                        float scale = 1f;
+                        if (img.getWidth() > 60) {
+                            scale = 60.0f / img.getWidth();
+                        }
+                        if ((img.getHeight() * scale) > 60) {
+                            scale = scale * (60.0f / (img.getHeight() * scale));
+                        }
+                        // logo position is in upper right corner, on the level of header2
+                        contentStream.drawImage(img, 521, 723, img.getWidth() * scale, img.getHeight() * scale);
+                    } catch (IOException e) {
+                        log.info("Cannot add logo to document.");
+                    }
+                }
+
                 field = field.trim();
                 PDFont font = fontHelvetica;
                 int fontSize = 11;
@@ -357,7 +390,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
                 } else if (StringUtils.isNotEmpty(itemService.getMetadata(item, field))) {
                     ypos = drawStringWordWrap(coverPage, contentStream, itemService.getMetadata(item, field), xpos,
-                                              ypos, font, fontSize);
+                        ypos, font, fontSize);
                 }
 
                 if (field.contains("title")) {
