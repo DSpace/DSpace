@@ -184,7 +184,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         }
 
         //Ensure a temp directory is available
-        String tempDirString = configurationService.getProperty("dspace.dir") + File.pathSeparator + "temp";
+        String tempDirString = configurationService.getProperty("dspace.dir") + File.separator + "temp";
         tempDir = new File(tempDirString);
         if(!tempDir.exists()) {
             boolean success = tempDir.mkdir();
