@@ -862,12 +862,19 @@ public class ShoppingCart {
         return myRow.getDoubleColumn("surcharge");
     }
 
+    public void setOrganizationConcept(DryadOrganizationConcept organizationConcept) {
+        if (organizationConcept != null) {
+            setJournal(organizationConcept.getFullName());
+            setJournalSub(organizationConcept.getSubscriptionPaid());
+        }
+    }
+
     /**
      * Set the JOURNAL
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    public void setJournal(String journal)
+    private void setJournal(String journal)
     {
         if(journal==null)
         {
@@ -894,7 +901,7 @@ public class ShoppingCart {
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    public void setJournalSub(boolean journal_sub)
+    private void setJournalSub(boolean journal_sub)
     {
         myRow.setColumn("journal_sub",journal_sub);
         modified = true;
