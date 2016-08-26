@@ -22,6 +22,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.utils.DSpace;
 
 /**
  * Created with IntelliJ IDEA.
@@ -74,7 +75,8 @@ public class Bitstream extends DSpaceObject {
         description = bitstream.getDescription();
         format = bitstreamService.getFormatDescription(context, bitstream);
         sizeBytes = bitstream.getSize();
-        retrieveLink = "/bitstreams/" + bitstream.getID() + "/retrieve";
+        String path = new DSpace().getRequestService().getCurrentRequest().getHttpServletRequest().getContextPath();
+        retrieveLink = path + "/bitstreams/" + bitstream.getID() + "/retrieve";
         mimeType = bitstreamService.getFormat(context, bitstream).getMIMEType();
         sequenceId = bitstream.getSequenceID();
         CheckSum checkSum = new CheckSum();
