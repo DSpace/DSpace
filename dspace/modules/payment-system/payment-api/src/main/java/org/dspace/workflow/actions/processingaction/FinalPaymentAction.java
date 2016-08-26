@@ -87,7 +87,7 @@ public class FinalPaymentAction extends ProcessingAction {
 	    Scheme scheme = Scheme.findByIdentifier(c,ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
 	    Concept[] concepts = Concept.findByPreferredLabel(c,shoppingCart.getJournal(),scheme.getID());
 	    if(concepts!=null&&concepts.length!=0){
-		AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("journal", "customerID", null, Item.ANY);
+		AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("organization", "customerID", null, Item.ANY);
             if (metadataValues!=null&&metadataValues.length>0) {
                 try {
                     String packageDOI = DOIIdentifierProvider.getDoiValue(wfi.getItem());
