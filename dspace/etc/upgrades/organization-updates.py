@@ -73,15 +73,18 @@ def main():
         update_field_id(organization_field_id, journal_field_id)
         delete_field_id(journal_field_id)
 
-    # update the organization view:
+    # update the journal view:
     sql = "CREATE OR REPLACE VIEW journal_name_view AS SELECT journal_id.parent_id as organization_id, journal_id.text_value as name FROM conceptmetadatavalue as journal_id, metadataschemaregistry journalschema INNER JOIN metadatafieldregistry jid on journalschema.short_id='organization' and jid.metadata_schema_id=journalschema.metadata_schema_id and jid.element = 'fullName' WHERE jid.metadata_field_id = journal_id.field_id"
     cmd = "psql -U dryad_app dryad_repo -c \"%s\"" % sql
     print os.popen(cmd).read()
 
-    sql = "CREATE or replace VIEW organization AS SELECT journal_code_view.organization_id, code, name, issn from journal_code_view inner join journal_name_view on journal_name_view.organization_id = journal_code_view.organization_id left join journal_issn_view on journal_issn_view.organization_id = journal_code_view.organization_id"
+    sql = "CREATE or replace VIEW journal AS SELECT journal_code_view.organization_id as concept_id, code, name, issn from journal_code_view inner join journal_name_view on journal_name_view.organization_id = journal_code_view.organization_id left join journal_issn_view on journal_issn_view.organization_id = journal_code_view.organization_id"
     cmd = "psql -U dryad_app dryad_repo -c \"%s\"" % sql
     print os.popen(cmd).read()
 
+    sql = "DROP VIEW organization"
+    cmd = "psql -U dryad_app dryad_repo -c \"%s\"" % sql
+    print os.popen(cmd).read()
 if __name__ == '__main__':
     main()
 

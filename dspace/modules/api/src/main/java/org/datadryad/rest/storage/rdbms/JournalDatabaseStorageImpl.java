@@ -28,10 +28,9 @@ import org.dspace.JournalUtils;
 public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
     private static Logger log = Logger.getLogger(JournalDatabaseStorageImpl.class);
 
-    // Database objects: still named organization, even though we've refactored to journal in the codebase
-    static final String JOURNAL_TABLE = "organization";
+    static final String JOURNAL_TABLE = "journal";
 
-    static final String COLUMN_ID = "organization_id";
+    static final String COLUMN_ID = "concept_id";
     static final String COLUMN_CODE = "code";
     static final String COLUMN_NAME = "name";
     static final String COLUMN_ISSN = "issn";
@@ -219,7 +218,6 @@ public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
             context = getContext();
             context.turnOffAuthorisationSystem();
             String name = journalConcept.getFullName();
-            String status = journalConcept.getStatus();
             context.commit();
             DryadJournalConcept conceptToUpdate = JournalUtils.getJournalConceptByJournalName(name);
             conceptToUpdate.transferFromJournalConcept(context, journalConcept);
