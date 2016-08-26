@@ -482,9 +482,10 @@ public class PaymentServiceImpl implements PaymentService {
                 log.error("grant is -" + grantInfo + "-");
                 if (!"".equals(StringUtils.stripToEmpty(grantInfo))) {
                     log.debug("nsf pays");
-                    paymentSystemService.updateTotal(context, shoppingCart);
+                    shoppingCart.setJournal("the US National Science Foundation");
                     shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                     shoppingCart.update();
+                    paymentSystemService.updateTotal(context, shoppingCart);
                     mainDiv.addPara(T_funding_valid);
                     mainDiv.addHidden("show_button").setValue(T_button_finalize);
                     List buttons = mainDiv.addList("paypal-form-buttons");
