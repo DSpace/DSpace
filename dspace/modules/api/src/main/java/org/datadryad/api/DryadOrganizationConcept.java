@@ -244,6 +244,20 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     }
 
     @JsonIgnore
+    public Boolean getSubscriptionPaid() {
+        String paymentPlan = getConceptMetadataValue(metadataProperties.getProperty(PAYMENT_PLAN));
+        Boolean newSubscriptionPaid = false;
+        if (SUBSCRIPTION_PLAN.equals(paymentPlan)) {
+            newSubscriptionPaid = true;
+        } else if (DEFERRED_PLAN.equals(paymentPlan)) {
+            newSubscriptionPaid = true;
+        } else if (PREPAID_PLAN.equals(paymentPlan)) {
+            newSubscriptionPaid = true;
+        }
+        return newSubscriptionPaid;
+    }
+
+    @JsonIgnore
     public Boolean isValid() {
         return (getFullName() != null);
     }
