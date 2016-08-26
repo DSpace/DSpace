@@ -866,6 +866,9 @@ public class ShoppingCart {
         if (organizationConcept != null) {
             setJournal(organizationConcept.getFullName());
             setJournalSub(organizationConcept.getSubscriptionPaid());
+        } else {
+            setJournal(null);
+            setJournalSub(false);
         }
     }
 

@@ -114,8 +114,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         newShoppingcart.setStatus(status);
         newShoppingcart.setVoucher(null);
         newShoppingcart.setTransactionId(null);
-        newShoppingcart.setJournal(null);
-        newShoppingcart.setJournalSub(false);
+        newShoppingcart.setOrganizationConcept(null);
         newShoppingcart.setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
         newShoppingcart.setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
         Double totalPrice = calculateShoppingCartTotal(context, newShoppingcart);
@@ -417,8 +416,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
                 if (journalConcept != null) {
                     Boolean subscription = journalConcept.getSubscriptionPaid();
-                    shoppingCart.setJournal(journal);
-                    shoppingCart.setJournalSub(subscription);
+                    shoppingCart.setOrganizationConcept(journalConcept);
                 }
             }
 
