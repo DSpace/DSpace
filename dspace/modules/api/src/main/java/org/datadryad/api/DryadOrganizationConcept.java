@@ -81,6 +81,35 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         }
     }
 
+    public DryadOrganizationConcept(Context context, Concept concept) {
+        this();
+        setUnderlyingConcept(context, concept);
+        try {
+            AuthorityMetadataValue[] amvs = concept.getMetadata(metadataProperties.getProperty(FULLNAME));
+            if (amvs.length > 0) {
+                this.setFullName(amvs[0].getValue());
+            }
+            amvs = concept.getMetadata(metadataProperties.getProperty(PAYMENT_PLAN));
+            if (amvs.length > 0) {
+                this.setPaymentPlan(amvs[0].getValue());
+            }
+            amvs = concept.getMetadata(metadataProperties.getProperty(DESCRIPTION));
+            if (amvs.length > 0) {
+                this.setDescription(amvs[0].getValue());
+            }
+            amvs = concept.getMetadata(metadataProperties.getProperty(WEBSITE));
+            if (amvs.length > 0) {
+                this.setWebsite(amvs[0].getValue());
+            }
+            amvs = concept.getMetadata(metadataProperties.getProperty(CUSTOMER_ID));
+            if (amvs.length > 0) {
+                this.setCustomerID(amvs[0].getValue());
+            }
+        } catch (StorageException e) {
+            log.error("couldn't create DryadOrganizationConcept from concept " + concept.getID() + ": " + e.getMessage());
+        }
+    }
+
     public void create(Context context) {
         try {
             context.turnOffAuthorisationSystem();
