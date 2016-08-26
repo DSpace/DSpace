@@ -421,6 +421,28 @@ public class Concept extends AuthorityObject
         return search(context, query, -1, -1,null);
     }
 
+    public static Concept[] searchByMetadata(Context context, String metadatafield) {
+        ArrayList<Concept> conceptArrayList = new ArrayList<Concept>();
+        // find the metadata field id from the registry:
+        try {
+            MetadataField mdf = MetadataField.findByElement(context, metadatafield);
+            TableRowIterator tri = DatabaseManager.queryTable(context, "conceptmetadatavalue", "SELECT * FROM ? where field_id = ?", mdf.getFieldID());
+            while (tri.hasNext()) {
+                TableRow row = tri.next();
+                int conceptID = row.getIntColumn("parent_id");
+                Concept concept = find(context, conceptID);
+                if (concept != null) {
+                    conceptArrayList.add(concept);
+                }
+            }
+            tri.close();
+        } catch (SQLException e) {
+            log.error("couldn't find metadata field " + metadatafield);
+        }
+
+        return conceptArrayList.toArray(new Concept[conceptArrayList.size()]);
+    }
+
     /**
      * Find the concepts that match the search query across term_concept_id or name
      *
