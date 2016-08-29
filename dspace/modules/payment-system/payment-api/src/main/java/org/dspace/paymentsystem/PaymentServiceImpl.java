@@ -12,6 +12,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadOrganizationConcept;
 import org.dspace.JournalUtils;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -482,7 +483,8 @@ public class PaymentServiceImpl implements PaymentService {
                 log.error("grant is -" + grantInfo + "-");
                 if (!"".equals(StringUtils.stripToEmpty(grantInfo))) {
                     log.debug("nsf pays");
-                    shoppingCart.setJournal("the US National Science Foundation");
+                    DryadOrganizationConcept organizationConcept = DryadOrganizationConcept.getOrganizationConceptMatchingCustomerID(context, "1292407");
+                    shoppingCart.setOrganizationConcept(organizationConcept);
                     shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                     shoppingCart.update();
                     paymentSystemService.updateTotal(context, shoppingCart);
