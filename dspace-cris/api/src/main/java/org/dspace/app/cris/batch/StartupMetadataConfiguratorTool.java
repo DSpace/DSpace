@@ -735,8 +735,8 @@ public class StartupMetadataConfiguratorTool
 				}
 			}
 
-            int fieldIndex;
-            if (widget.equals("nested"))  fieldIndex=11; else fieldIndex=10;
+            int fieldIndex = 10;
+//            if (widget.equals("nested"))  fieldIndex=11; else fieldIndex=10;
             
             
             String displayFormat = list.get(fieldIndex++);
