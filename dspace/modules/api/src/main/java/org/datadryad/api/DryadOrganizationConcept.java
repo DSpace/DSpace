@@ -192,7 +192,7 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
             context.commit();
             context.complete();
         } catch (Exception e) {
-            log.error("Couldn't set metadata for " + fullName + ", " + e.getMessage());
+            log.error("Couldn't set metadata for " + fullName + ": " + mdString + ", " + value + " - " + e.getMessage());
             if (context != null) {
                 context.abort();
             }
@@ -303,4 +303,22 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         }
     }
 
+    public static DryadOrganizationConcept getOrganizationConceptMatchingName(Context context, String fullName) {
+        DryadOrganizationConcept organizationConcept = null;
+        Concept[] concepts = Concept.searchByMetadata(context, metadataProperties.getProperty(FULLNAME), fullName);
+        if (concepts.length > 0) {
+            organizationConcept = new DryadOrganizationConcept(context, concepts[0]);
+        }
+        return organizationConcept;
+    }
+
+    public static DryadOrganizationConcept getOrganizationConceptMatchingCustomerID(Context context, String customerID) {
+        DryadOrganizationConcept organizationConcept = null;
+        Concept[] concepts = Concept.searchByMetadata(context, metadataProperties.getProperty(CUSTOMER_ID), customerID);
+        if (concepts.length > 0) {
+            organizationConcept = new DryadOrganizationConcept(context, concepts[0]);
+        }
+        log.error("found concept named " + organizationConcept.getFullName() + " with customerID " + customerID);
+        return organizationConcept;
+    }
 }
