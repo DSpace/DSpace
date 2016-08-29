@@ -247,8 +247,10 @@ public class DescribeStep extends AbstractProcessingStep
             }
             // choice-controlled input with "select" presentation type is
             // always rendered as a dropdown menu
-            else if (inputType.equals("dropdown") || inputType.equals("list") ||
-                     (cmgr.isChoicesConfigured(fieldKey) &&
+            else if (inputType.equals("dropdown") || inputType.equals("list") 
+                    || inputType.equals("year")
+                    || inputType.equals("year_noinprint") 
+                    || (cmgr.isChoicesConfigured(fieldKey) &&
                       "select".equals(cmgr.getPresentation(fieldKey))))
             {
                 String[] vals = request.getParameterValues(fieldName);
