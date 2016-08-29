@@ -62,13 +62,9 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         metadataProperties.setProperty(NOTIFY_ON_REVIEW, "journal.notifyOnReview");
         metadataProperties.setProperty(NOTIFY_WEEKLY, "journal.notifyWeekly");
         metadataProperties.setProperty(PUBLICATION_BLACKOUT, "journal.publicationBlackout");
-        metadataProperties.setProperty(PAYMENT_PLAN, "journal.paymentPlanType");
         metadataProperties.setProperty(ISSN, "journal.issn");
-        metadataProperties.setProperty(CUSTOMER_ID, "journal.customerID");
-        metadataProperties.setProperty(DESCRIPTION, "journal.description");
         metadataProperties.setProperty(MEMBERNAME, "journal.memberName");
         metadataProperties.setProperty(HASJOURNALPAGE, "journal.hasJournalPage");
-        metadataProperties.setProperty(WEBSITE, "journal.website");
         metadataProperties.setProperty(COVER_IMAGE, "journal.coverImage");
 
         defaultMetadataValues.setProperty(metadataProperties.getProperty(JOURNAL_ID), "");
@@ -116,6 +112,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     }
 
     public DryadJournalConcept(Context context, String fullName) throws StorageException {
+        create(context);
         this.setFullName(fullName);
         try {
             context.commit();
