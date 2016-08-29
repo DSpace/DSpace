@@ -135,7 +135,6 @@ public class PaymentServiceImpl implements PaymentService {
             queryParams.add(new BasicNameValuePair("AMT", amount));
             queryParams.add(new BasicNameValuePair("CURRENCY", shoppingCart.getCurrency()));
             String urlParameters = URLEncodedUtils.format(queryParams, "UTF-8");
-            log.error("urlParams are " + urlParameters);
 
             // Send post request
             con.setDoOutput(true);
