@@ -866,10 +866,29 @@ public class ShoppingCart {
         if (organizationConcept != null) {
             setJournal(organizationConcept.getFullName());
             setJournalSub(organizationConcept.getSubscriptionPaid());
+            setSponsorID(organizationConcept.getConceptID());
         } else {
             setJournal(null);
             setJournalSub(false);
+            setSponsorID(-1);
         }
+    }
+
+    public DryadOrganizationConcept getSponsoringOrganization() {
+        int concept_id = getSponsorID();
+        if (concept_id > 0) {
+            return DryadOrganizationConcept.getOrganizationConceptMatchingConceptID(myContext, concept_id);
+        }
+        return null;
+    }
+
+    private void setSponsorID(int concept_id) {
+        myRow.setColumn("sponsor_id", concept_id);
+        modified = true;
+    }
+
+    private int getSponsorID() {
+        return myRow.getIntColumn("sponsor_id");
     }
 
     /**

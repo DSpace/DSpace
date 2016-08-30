@@ -318,7 +318,17 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         if (concepts.length > 0) {
             organizationConcept = new DryadOrganizationConcept(context, concepts[0]);
         }
-        log.error("found concept named " + organizationConcept.getFullName() + " with customerID " + customerID);
+        return organizationConcept;
+    }
+
+    public static DryadOrganizationConcept getOrganizationConceptMatchingConceptID(Context context, int conceptID) {
+        DryadOrganizationConcept organizationConcept = null;
+        try {
+            Concept concept = Concept.find(context, conceptID);
+            organizationConcept = new DryadOrganizationConcept(context, concept);
+        } catch (SQLException e) {
+            log.error("couldn't find a concept: " + e.getMessage());
+        }
         return organizationConcept;
     }
 }
