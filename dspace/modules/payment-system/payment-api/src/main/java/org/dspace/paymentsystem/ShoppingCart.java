@@ -862,7 +862,7 @@ public class ShoppingCart {
         return myRow.getDoubleColumn("surcharge");
     }
 
-    public void setOrganizationConcept(DryadOrganizationConcept organizationConcept) {
+    public void setSponsoringOrganization(DryadOrganizationConcept organizationConcept) {
         if (organizationConcept != null) {
             setJournal(organizationConcept.getFullName());
             setJournalSub(organizationConcept.getSubscriptionPaid());
