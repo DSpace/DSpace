@@ -874,10 +874,10 @@ public class ShoppingCart {
         }
     }
 
-    public DryadOrganizationConcept getSponsoringOrganization() {
+    public DryadOrganizationConcept getSponsoringOrganization(Context context) {
         int concept_id = getSponsorID();
         if (concept_id > 0) {
-            return DryadOrganizationConcept.getOrganizationConceptMatchingConceptID(myContext, concept_id);
+            return DryadOrganizationConcept.getOrganizationConceptMatchingConceptID(context, concept_id);
         }
         return null;
     }
