@@ -286,10 +286,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Text journalField = addJournalAuthorityControlled("prism_publicationName", optionsList, "prism_publicationName");
 	    journalField.setHelp(T_asterisk_explanation);
 
-        // CHECKBOX: CONFIRM MANUSCRIPT NUMBER ACCEPTANCE
-        CheckBox checkBox = newItem.addCheckBox("manu_accepted-cb");
-        checkBox.addOption(String.valueOf(Boolean.TRUE), T_MANU_ACC_LABEL);
-
         if (manuscript!=null && manuscript.isAccepted()) {
             journalField.setValue(manuscript.getJournalName());
         } else {

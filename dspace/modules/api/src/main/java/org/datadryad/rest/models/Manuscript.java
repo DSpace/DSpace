@@ -122,7 +122,7 @@ public class Manuscript {
     private CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
     private String dryadDataDOI;
     private String manuscriptId = "";
-    private String status = STATUS_ACCEPTED; // STATUS_ACCEPTED is the default
+    private String status = "";
     private String title = "";
     private String publicationDOI = "";
     private Date publicationDate;
