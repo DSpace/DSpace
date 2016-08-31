@@ -16,4 +16,14 @@
         <element>identifier</element>
     </dc-type>
 
+    <dc-type>
+        <schema>funder</schema>
+        <element>altLabel</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>funder</schema>
+        <element>country</element>
+    </dc-type>
+
 </dspace-dc-types>
