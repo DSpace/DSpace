@@ -42,7 +42,7 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     public static final String DEFERRED_PLAN = "DEFERRED";
     public static final String NO_PLAN = "NONE";
 
-    protected static Properties metadataProperties;
+    public static Properties metadataProperties;
     protected static Properties defaultMetadataValues;
 
     private static Logger log = Logger.getLogger(DryadOrganizationConcept.class);
@@ -193,6 +193,25 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
             context.complete();
         } catch (Exception e) {
             log.error("Couldn't set metadata for " + fullName + ": " + mdString + ", " + value + " - " + e.getMessage());
+            if (context != null) {
+                context.abort();
+            }
+        }
+    }
+
+    @JsonIgnore
+    protected void addConceptMetadataValue(String mdString, String value) {
+        Context context = null;
+        try {
+            context = new Context();
+            context.turnOffAuthorisationSystem();
+            Concept underlyingConcept = getUnderlyingConcept(context);
+            underlyingConcept.addMetadata(context, mdString, value);
+            context.restoreAuthSystemState();
+            context.commit();
+            context.complete();
+        } catch (Exception e) {
+            log.error("Couldn't add metadata for " + fullName + ": " + mdString + ", " + value + " - " + e.getMessage());
             if (context != null) {
                 context.abort();
             }

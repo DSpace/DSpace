@@ -26,7 +26,6 @@ import java.util.ArrayList;
 public class DryadJournalConcept extends DryadOrganizationConcept {
     // Journal Concepts can have the following metadata properties defined in the old properties file:
     public static final String JOURNAL_ID = "journalID";
-    public static final String FULLNAME = "fullname";
     public static final String CANONICAL_MANUSCRIPT_NUMBER_PATTERN = "canonicalManuscriptNumberPattern";
     public static final String SPONSOR_NAME = "sponsorName";
     public static final String PARSING_SCHEME = "parsingScheme";
