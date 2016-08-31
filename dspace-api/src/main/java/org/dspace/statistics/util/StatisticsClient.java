@@ -57,6 +57,7 @@ public class StatisticsClient
                         DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir") + "/config/spiders");
 
         options.addOption("m", "mark-spiders", false, "Update isBot Flag in Solr");
+        options.addOption("a", "mark-spiders by user agent", false, "Update isBot Flag in Solr");
         options.addOption("f", "delete-spiders-by-flag", false, "Delete Spiders in Solr By isBot Flag");
         options.addOption("i", "delete-spiders-by-ip", false, "Delete Spiders in Solr By IP Address");
         options.addOption("o", "optimize", false, "Run maintenance on the SOLR index");
@@ -106,6 +107,10 @@ public class StatisticsClient
         else if(line.hasOption('s'))
         {
             solrLoggerService.shardSolrIndex();
+        }
+        else if(line.hasOption('a'))
+        {
+            solrLoggerService.markRobotsByUserAgent();
         }
         else
         {

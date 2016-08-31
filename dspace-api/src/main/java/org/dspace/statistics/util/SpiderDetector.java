@@ -144,6 +144,42 @@ public class SpiderDetector {
         }
 
     }
+    
+    /**
+     * Return the patterns specified into agent files
+     * 
+     * @return
+     */
+    public static Set<String> getSpiderAgents() {
+    	Set<String> agentList = new HashSet<String>();
+    	
+        String filePath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir");
+
+        try 
+        {
+            File agentsDir = new File(filePath, "config/spiders/agents");
+            
+            if (agentsDir.exists() && agentsDir.isDirectory()) {
+                for (File file : agentsDir.listFiles()) {
+                    if (file.isFile())
+                    {
+                        for (String agent : readPatterns(file)) 
+                        {
+                            agentList.add(agent);
+                        }
+                    }
+                }
+            } else {
+                log.info("No spider file loaded");
+            }
+        }
+        catch (IOException e)
+        {
+        	log.error("Error Loading Spiders:" + e.getMessage(), e);
+        }
+
+    	return agentList;
+    }
 
     /**
      * Load agent name patterns from all files in a single subdirectory of config/spiders.
