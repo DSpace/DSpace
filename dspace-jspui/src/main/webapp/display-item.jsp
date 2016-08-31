@@ -22,6 +22,7 @@
   -                  appear yet.  If this is omitted, the item display won't
   -                  display any collections.
   -    admin_button - Boolean, show admin 'edit' button
+  -    submitter_button - Boolean, show submitter "new version" button
   --%>
 <%@page contentType="text/html;charset=UTF-8" %>
 
@@ -64,7 +65,8 @@
     List<Collection> collections = (List<Collection>) request.getAttribute("collections");
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
-    
+    Boolean submitter_b = (Boolean) request.getAttribute("submitter_button");
+    boolean submitter_button = (submitter_b == null ? false : submitter_b.booleanValue());
     // get the workspace id if one has been passed
     Integer workspace_id = (Integer) request.getAttribute("workspace_id");
 
@@ -198,6 +200,22 @@
 <%      } %>
 
 <%
+        // submitter create new version button
+        if (submitter_button && hasVersionButton) {
+%>
+        <dspace:sidebar>
+            <div class="panel panel-warning">
+                <div class="panel-heading"><fmt:message key="jsp.submittertools"/></div>
+                <div class="panel-body">
+                    <form method="get" action="<%= request.getContextPath()%>/tools/version">
+                        <input type="hidden" name="itemID" value="<%= item.getID()%>" />
+                        <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.button"/>" />
+                    </form>
+                </div>
+            </div>
+        </dspace:sidebar>
+<%
+        }
     }
 
     String displayStyle = (displayAll ? "full" : "");
