@@ -208,9 +208,9 @@
         "sponsor" : "$120"
      },
      {
-        "sponsor" : "Ecological Society of America",
+        "sponsor" : "$120",
         "title" : "Ecological Monographs",
-        "hidden" : "N",
+        "hidden" : "Y",
         "issn" : "0012-9615",
         "submission" : "A",
         "embargo" : "Y",
