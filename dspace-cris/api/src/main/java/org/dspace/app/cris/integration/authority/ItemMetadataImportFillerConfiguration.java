@@ -1,5 +1,6 @@
 package org.dspace.app.cris.integration.authority;
 
+import java.util.Date;
 import java.util.Map;
 
 public class ItemMetadataImportFillerConfiguration {
@@ -32,6 +33,9 @@ public class ItemMetadataImportFillerConfiguration {
 		
 		private boolean formatAsDate;
 		
+		private String startDate;
+		private String endDate;
+		
 		public void setFormatAsDate(boolean isDate) {
 			this.formatAsDate = isDate;
 		}
@@ -57,6 +61,54 @@ public class ItemMetadataImportFillerConfiguration {
 		public boolean formatAsDate() {
 			return formatAsDate;
 		}
+
+        public String getStartDate()
+        {
+            return startDate;
+        }
+
+        public void setStartDate(String startDate)
+        {
+            this.startDate = startDate;
+        }
+
+        public String getEndDate()
+        {
+            return endDate;
+        }
+
+        public void setEndDate(String endDate)
+        {
+            this.endDate = endDate;
+        }
 	}
 
+	   
+    public static class MetricsMappingDetails extends MappingDetails {
+        
+        private String operator;
+        
+        private String rangeByYear;
+                
+        public String getOperator()
+        {
+            return operator;
+        }
+
+        public void setOperator(String operator)
+        {
+            this.operator = operator;
+        }
+
+        public String getRangeByYear()
+        {
+            return rangeByYear;
+        }
+
+        public void setRangeByYear(String rangeByYear)
+        {
+            this.rangeByYear = rangeByYear;
+        }
+
+    }
 }

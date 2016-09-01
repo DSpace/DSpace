@@ -346,7 +346,7 @@ public class CrisConsumer implements Consumer
             fillerAuthority(ctx, item, toBuild, toBuildType, createdObjects,
                     referencedObjects);
 
-            fillerMetrics(ctx, item, createdObjects, referencedObjects);
+            fillerMetrics(ctx, item, toBuildMetadata, createdObjects, referencedObjects);
 
             ctx.restoreAuthSystemState();
         }
@@ -402,7 +402,7 @@ public class CrisConsumer implements Consumer
         }
     }
 
-    private void fillerMetrics(Context ctx, Item item,
+    private void fillerMetrics(Context ctx, Item item, Map<String, String> toBuildMetadata,
             Map<String, ACrisObject> createdObjects,
             Map<String, ACrisObject> referencedObjects)
     {
@@ -419,7 +419,7 @@ public class CrisConsumer implements Consumer
                     .getMetadataValueInDCFormat(metadataMetric);
             if(metadata!=null && metadata.length>0) {
                 TargetMetricFillerPlugin plugin = plugins.get(metadataMetric);
-                plugin.buildMetric(ctx, item, metadata[0], applicationService,
+                plugin.buildMetric(ctx, item, metadata[0], toBuildMetadata, createdObjects, referencedObjects, applicationService,
                         metricService);                
             }
         }
