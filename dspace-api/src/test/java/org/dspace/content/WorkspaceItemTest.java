@@ -304,7 +304,7 @@ public class WorkspaceItemTest extends AbstractUnitTest
         workspaceItemService.update(context, wi);
         context.commit();
         // force to read the data from the database
-        context.clearCache();
+        context.uncacheEntity(wi);
         // read all our test attributes objects from the fresh session 
         // to avoid duplicate object in session issue
         wi = workspaceItemService.find(context, wi.getID());

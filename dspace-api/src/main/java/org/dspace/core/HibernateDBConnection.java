@@ -116,11 +116,6 @@ public class HibernateDBConnection implements DBConnection<Session> {
         return databaseConfigVO;
     }
 
-	@Override
-	public void clearCache() throws SQLException {
-        getSession().flush();
-		getSession().clear();
-	}
 
     @Override
     public long getCacheSize() throws SQLException {
@@ -156,5 +151,17 @@ public class HibernateDBConnection implements DBConnection<Session> {
         } else {
             getSession().setFlushMode(FlushMode.AUTO);
         }
+    }
+
+    /**
+     * Evict an entity from the hibernate cache. This is necessary when batch processing a large number of items.
+     *
+     * @param entity The entity to reload
+     * @param <E> The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @throws SQLException When reloading the entity from the database fails.
+     */
+    @Override
+    public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
+        getSession().evict(entity);        
     }
 }

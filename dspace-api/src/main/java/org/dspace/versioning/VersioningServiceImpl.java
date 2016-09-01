@@ -7,21 +7,24 @@
  */
 package org.dspace.versioning;
 
-import org.apache.commons.collections.CollectionUtils;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+
 import org.dspace.content.DCDate;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.versioning.dao.VersionDAO;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
-
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -39,6 +42,11 @@ public class VersioningServiceImpl implements VersioningService {
     protected VersionDAO versionDAO;
     @Autowired(required = true)
     private ItemService itemService;
+    @Autowired(required = true)
+    private WorkspaceItemService workspaceItemService;
+    @Autowired(required = true)
+    protected WorkflowItemService workflowItemService;
+    
     private DefaultItemVersionProvider provider;
 
     @Required
@@ -129,7 +137,24 @@ public class VersioningServiceImpl implements VersioningService {
             
             // Completely delete the item
             if (item != null) {
-                itemService.delete(c, item);
+                // DS-1814 introduce the possibility that submitter can create
+                // new versions. To avoid authorithation problems we need to
+                // check whether a corresponding workspaceItem exists.
+                if (!item.isArchived())
+                {
+                	WorkspaceItem wsi = workspaceItemService.findByItem(c, item);
+        			if(wsi != null) {
+                        workspaceItemService.deleteAll(c, wsi);
+                	} else {
+        				WorkflowItem wfi = workflowItemService.findByItem(c, item);
+        				if (wfi != null) {
+        					workflowItemService.delete(c, wfi);
+        				}
+        			}
+                }
+            	else {
+                    itemService.delete(c, item);
+                }
             }
         }catch (Exception e) {
             c.abort();

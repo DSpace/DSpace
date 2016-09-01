@@ -643,27 +643,6 @@ public class Context
         dbConnection.shutdown();
     }
 
-    /**
-     * Clear the cache of all object that have been read from the database so far. This will also free up
-     * (heap space) memory. You should use this method when processing a large number of records.
-     *
-     * <b>WARNING: After calling this method all previously fetched entities are "detached" (pending
-     * changes are not tracked anymore). You have to reload all entities you still want to work with
-     * manually after this method call (see {@link Context#reloadEntity(ReloadableEntity)}).</b>
-     *
-     * This method will take care of reloading the current user.
-     *
-     * @throws SQLException When clearing the entity cache fails
-     */
-	public void clearCache() throws SQLException {
-        if(log.isDebugEnabled()) {
-            log.debug("Cache size before clear cache is " + getCacheSize());
-        }
-
-		this.getDBConnection().clearCache();
-
-        reloadContextBoundEntities();
-    }
 
     /**
      * Returns the size of the cache of all object that have been read from the database so far. A larger number
@@ -714,6 +693,19 @@ public class Context
         return (E) dbConnection.reloadEntity(entity);
     }
 
+    /**
+     * Remove an entity from the cache. This is necessary when batch processing a large number of items.
+     *
+     * @param entity The entity to reload
+     * @param <E> The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @throws SQLException When reloading the entity from the database fails.
+     */
+    @SuppressWarnings("unchecked")
+    public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
+        dbConnection.uncacheEntity(entity);
+    }
+
+    
     /**
      * Reload all entities related to this context.
      * @throws SQLException When reloading one of the entities fails.

@@ -7,6 +7,15 @@
  */
 package org.dspace.content;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -18,7 +27,15 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.dao.ItemDAO;
-import org.dspace.content.service.*;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -29,14 +46,10 @@ import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Service implementation for the Item object.
@@ -79,6 +92,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected VersioningService versioningService;
     @Autowired(required=true)
     protected HarvestedItemService harvestedItemService;
+    @Autowired(required=true)
+    protected ConfigurationService configurationService;
+    
     @Autowired(required=true)
     protected WorkspaceItemService workspaceItemService;
     @Autowired(required=true)
@@ -596,13 +612,15 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
                 item.getHandle(), getIdentifiers(context, item)));
 
-
         log.info(LogManager.getHeader(context, "delete_item", "item_id="
                 + item.getID()));
 
         // Remove bundles
         removeAllBundles(context, item);
 
+        // Remove any Handle
+        handleService.unbindHandle(context, item);
+        
         // remove version attached to the item
         removeVersion(context, item);
 
@@ -617,10 +635,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         //Only clear collections after we have removed everything else from the item
         item.getCollections().clear();
         item.setOwningCollection(null);
-
-        // Remove any Handle
-        handleService.unbindHandle(context, item);
-
 
         // Finally remove item row
         itemDAO.delete(context, item);
@@ -1212,5 +1226,22 @@ prevent the generation of resource policy entry values with null dspace_object a
     public int countWithdrawnItems(Context context) throws SQLException {
        // return count of items that are not in archive and withdrawn
        return itemDAO.countItems(context, false, true);
+    }
+
+    @Override
+    public boolean canCreateNewVersion(Context context, Item item) throws SQLException{
+        if (authorizeService.isAdmin(context, item)) 
+        {
+            return true;
+        }
+
+        if (context.getCurrentUser() != null
+                && context.getCurrentUser().equals(item.getSubmitter())) 
+        {
+            return configurationService.getPropertyAsType(
+                    "versioning.submitterCanCreateNewVersion", false);
+        }
+
+        return false;
     }
 }

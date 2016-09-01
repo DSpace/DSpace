@@ -389,8 +389,14 @@ public class HandleServlet extends DSpaceServlet
         {
             // set a variable to create an edit button
             request.setAttribute("admin_button", Boolean.TRUE);
+        } 
+        // show submitters a button to create a new item version
+        else if (itemService.canCreateNewVersion(context, item))
+        {
+            // set a variable to create a button to create a new item version
+            request.setAttribute("submitter_button", Boolean.TRUE);
         }
-
+  		  
         // Get the collections
         List<Collection> collections = item.getCollections();
 

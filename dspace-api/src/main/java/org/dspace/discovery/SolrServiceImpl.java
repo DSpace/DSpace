@@ -392,15 +392,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
         try {
             Iterator<Item> items = null;
-            int itemCount = 0;
             for (items = itemService.findAllUnfiltered(context); items.hasNext();)
             {
                 Item item = items.next();
                 indexContent(context, item, force);
-                if (itemCount++ >= 1000) {
-                	context.clearCache();
-                	itemCount = 0;
-                }
+                //To prevent memory issues, discard an object from the cache after processing
+                context.uncacheEntity(item);
             }
 
             List<Collection> collections = collectionService.findAll(context);
