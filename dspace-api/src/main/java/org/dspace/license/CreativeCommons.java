@@ -439,8 +439,12 @@ public class CreativeCommons
             URL url = new URL(url_string);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            String userAgent = "DSpace/" + Util.getSourceVersion() + "(+" + ConfigurationManager.getProperty("dspace.url")
-                    + "; " + ConfigurationManager.getProperty("mail.admin") + ")";
+            String mailAdmin = ConfigurationManager.getProperty("mail.admin");
+            String userAgent = "DSpace/" + Util.getSourceVersion() + "(+" + ConfigurationManager.getProperty("dspace.url");
+            if (StringUtils.isNotBlank(mailAdmin)) {
+                userAgent = userAgent + "; " + mailAdmin;
+            }
+            userAgent += ")";
             connection.addRequestProperty("User-Agent", userAgent);
             connection.setConnectTimeout(2000);
             connection.setReadTimeout(2000);
