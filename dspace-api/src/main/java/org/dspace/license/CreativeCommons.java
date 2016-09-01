@@ -8,10 +8,11 @@
 package org.dspace.license;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
@@ -22,6 +23,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -34,6 +36,10 @@ import org.dspace.core.Utils;
 
 public class CreativeCommons
 {
+    // HTTP RFC says do not automatically follow more than 5 redirects, it indicates a probable loop
+    // http://www.freesoft.org/CIE/RFC/1945/46.htm
+    private static final int MAX_REDIRECTS = 5;
+
     /** log4j category */
     private static Logger log = Logger.getLogger(CreativeCommons.class);
 
@@ -305,10 +311,9 @@ public class CreativeCommons
      */
     public static String fetchLicenseText(String license_url)
     {
-        String text_url = license_url;
-        byte[] urlBytes = fetchURL(text_url);
+        String text = fetchURL(license_url, 0);
 
-        return (urlBytes != null) ? new String(urlBytes) : "";
+        return Objects.toString(text, "");
     }
     
     public static String fetchLicenseRDF(String license_url)
@@ -421,33 +426,70 @@ public class CreativeCommons
         return baos.toByteArray();
     }
 
-    /**
-     * Fetch the contents of a URL
-     */
-    private static byte[] fetchURL(String url_string)
+    private static String fetchURL(String url_string, int numRedirects)
     {
+        if (numRedirects > MAX_REDIRECTS)
+        {
+            log.error("Could not retrieve Creative Commons license, maximum number of redirects reached (" + numRedirects + ")");
+            return null;
+        }
+
         try
         {
-            String line = "";
             URL url = new URL(url_string);
-            URLConnection connection = url.openConnection();
-            InputStream inputStream = connection.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder sb = new StringBuilder();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            while ((line = reader.readLine()) != null)
+            String userAgent = "DSpace/" + Util.getSourceVersion() + "(+" + ConfigurationManager.getProperty("dspace.url")
+                    + "; " + ConfigurationManager.getProperty("mail.admin") + ")";
+            connection.addRequestProperty("User-Agent", userAgent);
+            connection.setConnectTimeout(2000);
+            connection.setReadTimeout(2000);
+            connection.setInstanceFollowRedirects(false); // we're handling redirects ourselves
+
+            int code = connection.getResponseCode();
+            if (code == HttpURLConnection.HTTP_MOVED_PERM || code == HttpURLConnection.HTTP_MOVED_TEMP)
             {
-                sb.append(line);
+                // recursively follow redirects
+                String locationHeader = connection.getHeaderField("Location");
+                log.debug("Following redirect to " + locationHeader);
+                InputStream inputStream = connection.getInputStream();
+                if (inputStream != null)
+                {
+                    inputStream.close();
+                }
+                return fetchURL(locationHeader, numRedirects + 1);
             }
+            else if (code == HttpURLConnection.HTTP_OK)
+            {
+                InputStream inputStream = connection.getInputStream();
+                if (inputStream != null)
+                {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder sb = new StringBuilder();
 
-            return sb.toString().getBytes();
+                    String line;
+                    while ((line = reader.readLine()) != null)
+                    {
+                        sb.append(line);
+                    }
+                    inputStream.close();
+                    return sb.toString();
+                }
+            }
+            else
+            {
+                log.error("Could not retrieve Creative Commons license from URL " + url.toString()
+                        + "; response was " + connection.getResponseCode() + ": " + connection.getResponseMessage());
+            }
         }
         catch (Exception exc)
         {
-            log.error(exc.getMessage());
-            return null;
+            log.error("Caught exception while trying to obtain Creative Commons license: " + exc.getMessage(), exc);
         }
+        log.warn("Could not retrieve license");
+        return null;
     }
+
     /**
      * Returns a metadata field handle for given field Id
      */
@@ -472,10 +514,7 @@ public class CreativeCommons
     		if (fieldName != null && fieldName.length() > 0)
     		{
     			String[] fParams = fieldName.split("\\.");
-    			for (int i = 0; i < fParams.length; i++)
-    			{
-    				params[i] = fParams[i];
-    			}
+                System.arraycopy(fParams, 0, params, 0, fParams.length);
     			params[3] = Item.ANY;
     		}
     	}
@@ -493,7 +532,7 @@ public class CreativeCommons
             Metadatum[] dcvalues = item.getMetadata(params[0], params[1], params[2], params[3]);
             for (Metadatum dcvalue : dcvalues)
             {
-                if ((dcvalue.value).indexOf(ccShib) != -1) 
+                if ((dcvalue.value).contains(ccShib))
                 {
                 	// return first value that matches the shib
                 	return dcvalue.value;
@@ -539,7 +578,7 @@ public class CreativeCommons
     		if (value != null)
     		{
     			 Metadatum[] dcvalues  = item.getMetadata(params[0], params[1], params[2], params[3]);
-                 ArrayList<String> arrayList = new ArrayList<String>();
+                 ArrayList<String> arrayList = new ArrayList<>();
                  for (Metadatum dcvalue : dcvalues)
                  {
                      if (! dcvalue.value.equals(value))
@@ -547,7 +586,7 @@ public class CreativeCommons
                          arrayList.add(dcvalue.value);
                      }
                   }
-                  String[] values = (String[])arrayList.toArray(new String[arrayList.size()]);
+                  String[] values = arrayList.toArray(new String[0]);
                   item.clearMetadata(params[0], params[1], params[2], params[3]);
                   item.addMetadata(params[0], params[1], params[2], params[3], values);
     		}
