@@ -531,8 +531,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
                 "WITHDRAW", getIdentifiers(context, item)));
 
-        // remove all authorization policies, saving the custom ones
-        authorizeService.removeAllPoliciesByDSOAndTypeNotEqualsTo(context, item, ResourcePolicy.TYPE_CUSTOM);
+        // switch all READ authorization policies to WITHDRAWN_READ
+        authorizeService.switchPoliciesAction(context, item, Constants.READ, Constants.WITHDRAWN_READ);
+        for (Bundle bnd : item.getBundles()) {
+        	authorizeService.switchPoliciesAction(context, bnd, Constants.READ, Constants.WITHDRAWN_READ);
+        	for (Bitstream bs : bnd.getBitstreams()) {
+        		authorizeService.switchPoliciesAction(context, bs, Constants.READ, Constants.WITHDRAWN_READ);
+        	}
+        }
 
         // Write log
         log.info(LogManager.getHeader(context, "withdraw_item", "user="
@@ -580,16 +586,28 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
                 "REINSTATE", getIdentifiers(context, item)));
 
-        // authorization policies
-        if (colls.size() > 0)
-        {
-            // FIXME: not multiple inclusion friendly - just apply access
-            // policies from first collection
-            // remove the item's policies and replace them with
-            // the defaults from the collection
-            inheritCollectionDefaultPolicies(context, item, colls.iterator().next());
-        }
+		// restore all WITHDRAWN_READ authorization policies back to READ
+		for (Bundle bnd : item.getBundles()) {
+			authorizeService.switchPoliciesAction(context, bnd, Constants.WITHDRAWN_READ, Constants.READ);
+			for (Bitstream bs : bnd.getBitstreams()) {
+				authorizeService.switchPoliciesAction(context, bs, Constants.WITHDRAWN_READ, Constants.READ);
+			}
+		}
 
+        // check if the item was withdrawn before the fix DS-3097
+        if (authorizeService.getPoliciesActionFilter(context, item, Constants.WITHDRAWN_READ).size() != 0) {
+        	authorizeService.switchPoliciesAction(context, item, Constants.WITHDRAWN_READ, Constants.READ);
+        }
+        else {
+	        // authorization policies
+	        if (colls.size() > 0)
+	        {
+	            // remove the item's policies and replace them with
+	            // the defaults from the collection
+	        	adjustItemPolicies(context, item, item.getOwningCollection());
+	        }
+        }
+        
         // Write log
         log.info(LogManager.getHeader(context, "reinstate_item", "user="
                 + e.getEmail() + ",item_id=" + item.getID()));

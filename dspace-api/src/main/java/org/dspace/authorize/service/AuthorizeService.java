@@ -428,4 +428,21 @@ public interface AuthorizeService {
 
     public ResourcePolicy createOrModifyPolicy(ResourcePolicy policy, Context context, String name, Group group, EPerson ePerson, Date embargoDate, int action, String reason, DSpaceObject dso) throws AuthorizeException, SQLException;
 
+	/**
+	 * Change all the policies related to the action (fromPolicy) of the
+	 * specified object to the new action (toPolicy)
+	 * 
+	 * @param context
+	 * @param dso
+	 *            the dspace object
+	 * @param fromAction
+	 *            the action to change
+	 * @param toAction
+	 *            the new action to set
+	 * @throws SQLException
+	 * @throws AuthorizeException
+	 */
+	void switchPoliciesAction(Context context, DSpaceObject dso, int fromAction, int toAction)
+			throws SQLException, AuthorizeException;
+
 }
