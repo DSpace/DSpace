@@ -45,6 +45,9 @@
     			<entry key="submitter">
     				<bean class="org.dspace.content.generator.SubmitterValueGenerator" />
     			</entry>
+    			<entry key="date">
+    				<bean class="org.dspace.content.generator.DateValueGenerator" />
+    			</entry>
     		</map>
     	</property>
     </bean>
