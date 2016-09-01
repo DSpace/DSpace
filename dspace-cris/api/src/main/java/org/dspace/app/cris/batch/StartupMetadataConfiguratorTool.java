@@ -24,6 +24,7 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.BoxDynamicObject;
 import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.BoxProject;
@@ -568,6 +569,10 @@ public class StartupMetadataConfiguratorTool
                 tabRP.setPriority(Integer.parseInt(priority));
                 tabRP.setTitle(label);
                 tabRP.setVisibility(accessLevel);
+                if(TabDynamicObject.class.isAssignableFrom(clazzTab)) {
+                    TabDynamicObject tabDynamicObject = (TabDynamicObject)tabRP;
+                    tabDynamicObject.setTypeDef(applicationService.findTypoByShortName(DynamicObjectType.class, row.get(0)));
+                }
                 applicationService.saveOrUpdate(clazzTab, tabRP);
             }
         }
@@ -615,6 +620,10 @@ public class StartupMetadataConfiguratorTool
                 box.setTitle(label);
                 box.setUnrelevant(unrelevant);
                 box.setVisibility(accessLevel);
+                if(BoxDynamicObject.class.isAssignableFrom(clazzBox)) {
+                    BoxDynamicObject boxDynamicObject = (BoxDynamicObject)box;
+                    boxDynamicObject.setTypeDef(applicationService.findTypoByShortName(DynamicObjectType.class, row.get(0)));
+                }
                 applicationService.saveOrUpdate(clazzBox, box);
             }
         }
