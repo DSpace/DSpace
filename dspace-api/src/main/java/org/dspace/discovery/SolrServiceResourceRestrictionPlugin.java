@@ -72,7 +72,12 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 //Retrieve all the groups the current user is a member of !
                 Set<Integer> groupIds = Group.allMemberGroupIDs(context, currentUser);
                 for (Integer groupId : groupIds) {
-                    resourceQuery.append(" OR g").append(groupId);
+                    Group group = Group.find(context, groupId);
+                    if(group!=null) {
+                        if(group.isNotRelevant()) {
+                            resourceQuery.append(" OR g").append(groupId);        
+                        }
+                    }                    
                 }
 
                 resourceQuery.append(")");

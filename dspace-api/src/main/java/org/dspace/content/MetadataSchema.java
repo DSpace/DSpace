@@ -49,6 +49,9 @@ public class MetadataSchema
     /** Short Name of built-in Dublin Core schema. */
     public static final String DC_SCHEMA = "dc";
 
+    /** Short Name of built-in Group schema. */
+    public static final String GROUP_SCHEMA = "group";
+    
     /** The row in the table representing this type */
     private TableRow row;
 
