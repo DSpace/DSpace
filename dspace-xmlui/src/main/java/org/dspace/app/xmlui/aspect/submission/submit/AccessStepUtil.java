@@ -15,6 +15,7 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
@@ -199,13 +200,11 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
     }
 
     private void populateEmbargoDetail(final DSpaceObject dso, final Text text) throws SQLException, WingException {
-        final java.util.List<ResourcePolicy> policies = authorizeService.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
-        if (policies.size() > 0) {
-            final ResourcePolicy firstCustomPolicy = policies.get(0);
-            if (firstCustomPolicy.getStartDate() != null) {
-                final String dateString = DateFormatUtils.format(firstCustomPolicy.getStartDate(), "yyyy-MM-dd");
+        for (final ResourcePolicy readPolicy : authorizeService.getPoliciesActionFilter(context, dso, Constants.READ)) {
+            if (Group.ANONYMOUS.equals(readPolicy.getGroup().getName()) && readPolicy.getStartDate() != null) {
+                final String dateString = DateFormatUtils.format(readPolicy.getStartDate(), "yyyy-MM-dd");
                 text.setValue(dateString);
-                globalReason = firstCustomPolicy.getRpDescription();
+                globalReason = readPolicy.getRpDescription();
             }
         }
     }
