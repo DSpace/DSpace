@@ -23,6 +23,8 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 
 import org.dspace.app.util.CollectionDropDown;
+import org.dspace.app.util.CollectionUtils;
+import org.dspace.app.util.CollectionsTree;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -49,6 +51,8 @@ public class SelectCollectionTag extends TagSupport
     /** the collection id */
     private int collection = -1;
 
+    
+
     public SelectCollectionTag()
     {
         super();
@@ -64,6 +68,8 @@ public class SelectCollectionTag extends TagSupport
             HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
             Context context = UIUtil.obtainContext(hrq);
             Collection[] collections = (Collection[]) hrq.getAttribute("collections");
+            
+            CollectionsTree tree= CollectionUtils.getCollectionsTree(collections, false);
 
             sb.append("<select");
             if (name != null)
@@ -82,23 +88,15 @@ public class SelectCollectionTag extends TagSupport
 
             ResourceBundle msgs = ResourceBundle.getBundle("Messages", context.getCurrentLocale());
             String firstOption = msgs.getString("jsp.submit.start-lookup-submission.select.collection.defaultoption");
-            sb.append("<option value=\"-1\"");
+         
             if (collection == -1) sb.append(" selected=\"selected\"");
             sb.append(">").append(firstOption).append("</option>\n");
 
-            for (Collection coll : collections)
-            {
-                sb.append("<option value=\"").append(coll.getID()).append("\"");
-                if (collection == coll.getID())
-                {
-                    sb.append(" selected=\"selected\"");
-                }
-                sb.append(">").append(CollectionDropDown.collectionPath(coll)).append("</option>\n");
-            }
-
-            sb.append("</select>\n");
-
             out.print(sb.toString());
+            collectionSelect(out, tree);
+   
+            out.print("</select>\n");
+
         }
         catch (IOException e)
         {
@@ -111,6 +109,37 @@ public class SelectCollectionTag extends TagSupport
         
         return SKIP_BODY;
     }
+    
+    
+	private void collectionSelect(JspWriter out, CollectionsTree tree ) throws IOException 
+	{
+		
+		if(tree==null){
+			return;
+		}
+		if (tree.getCurrent() != null)
+		{
+			out.print("<optgroup label=\""+tree.getCurrent().getName()+"\">");
+		}
+		if (tree.getCollections() != null){
+			for (Collection col : tree.getCollections())
+			{
+				out.print("<option value=\""+col.getID()+"\">"+col.getName()+"</option>");	
+			}
+		}
+		if (tree.getSubTree() != null)
+		{
+			for (CollectionsTree subTree: tree.getSubTree())
+			{
+				collectionSelect(out, subTree);
+			}
+		}
+		if (tree.getCurrent() != null)
+		{
+			out.print("</optgroup>");
+		}
+		
+	}    
 
     public String getKlass()
     {
@@ -151,6 +180,7 @@ public class SelectCollectionTag extends TagSupport
     {
         this.collection = collection;
     }
+
 
     public void release()
     {
