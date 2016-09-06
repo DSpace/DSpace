@@ -74,7 +74,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 for (Integer groupId : groupIds) {
                     Group group = Group.find(context, groupId);
                     if(group!=null) {
-                        if(group.isNotRelevant()) {
+                        if(!group.isNotRelevant()) {
                             resourceQuery.append(" OR g").append(groupId);        
                         }
                     }                    
