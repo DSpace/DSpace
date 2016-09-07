@@ -192,7 +192,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
         TableRow existingRow = null;
         Integer journalConceptID = journalConcept.getConceptID();
-        if (manuscript.getManuscriptId() != null) {
+        if (!"".equals(manuscript.getManuscriptId())) {
             existingRow = getTableRowByManuscriptId(context, manuscript.getManuscriptId(), journalConcept.getJournalID());
             if (existingRow != null) {
                 finalRows.add(existingRow);
@@ -203,7 +203,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                 String pubDOI = manuscript.getPublicationDOI();
                 if (!"".equals(pubDOI)) {
                     log.debug("Looking for a manuscript with publication DOI like " + pubDOI + " and " + COLUMN_JOURNAL_ID + " like " + journalConceptID);
-                    String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? and " + COLUMN_JSON_DATA + " like '%\"publicationDOI\" : \"" + pubDOI + "\"%'";
+                    String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? and " + COLUMN_JSON_DATA + " like '%\"publicationDOI\"%:%\"" + pubDOI + "\"%'";
                     existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE);
                 }
             }
@@ -216,7 +216,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                 List<Author> authorList = manuscript.getAuthorList();
                 StringBuilder authorString = new StringBuilder();
                 for (Author author : authorList) {
-                    authorString.append(" and " + COLUMN_JSON_DATA + " like '%\"familyName\" : \"" + StringEscapeUtils.escapeSql(author.familyName) + "\"%' ");
+                    authorString.append(" and " + COLUMN_JSON_DATA + " like '%\"familyName\"%:%\"" + StringEscapeUtils.escapeSql(author.familyName) + "\"%' ");
                 }
                 if (!"".equals(authorString.toString())) {
                     String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? " + authorString.toString();
