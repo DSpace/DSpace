@@ -90,6 +90,7 @@ public class SelectCollectionTag extends TagSupport
             String firstOption = msgs.getString("jsp.submit.start-lookup-submission.select.collection.defaultoption");
          
             if (collection == -1) sb.append(" selected=\"selected\"");
+            sb.append("<option value=\"-1\"");
             sb.append(">").append(firstOption).append("</option>\n");
 
             out.print(sb.toString());
@@ -124,7 +125,8 @@ public class SelectCollectionTag extends TagSupport
 		if (tree.getCollections() != null){
 			for (Collection col : tree.getCollections())
 			{
-				out.print("<option value=\""+col.getID()+"\">"+col.getName()+"</option>");	
+				String selected= col.getID()==collection ? "selected":"";
+				out.print("<option value=\""+col.getID()+"\" "+ selected + ">"+col.getName()+"</option>");	
 			}
 		}
 		if (tree.getSubTree() != null)
