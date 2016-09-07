@@ -118,6 +118,7 @@ public class CrisConsumer implements Consumer
                             String authority = dcval.authority;
                             if (StringUtils.isNotBlank(authority))
                             {
+                                String type = null, info = null;
                                 if (authority.startsWith(
                                         AuthorityValueGenerator.GENERATE))
                                 {
@@ -125,7 +126,6 @@ public class CrisConsumer implements Consumer
                                     String[] split = StringUtils.split(
                                             authority,
                                             AuthorityValueGenerator.SPLIT);
-                                    String type = null, info = null;
                                     if (split.length > 0)
                                     {
                                         type = split[1];
@@ -134,24 +134,27 @@ public class CrisConsumer implements Consumer
                                             info = split[2];
                                         }
                                     }
-
-                                    toBuildType.put(info, type);
-
-                                    List<Metadatum> list = new ArrayList<Metadatum>();
-                                    if (toBuild.containsKey(info))
-                                    {
-                                        list = toBuild.get(info);
-                                        list.add(dcval);
-                                    }
-                                    else
-                                    {
-                                        list.add(dcval);
-                                    }
-                                    toBuild.put(info, list);
-                                    toBuildChoice.put(info,
-                                            (CRISAuthority) choiceAuthority);
-                                    toBuildMetadata.put(info, metadata);
                                 }
+                                else {
+                                    type = SOURCE_INTERNAL;
+                                    info = dcval.authority;
+                                }
+                                toBuildType.put(info, type);
+
+                                List<Metadatum> list = new ArrayList<Metadatum>();
+                                if (toBuild.containsKey(info))
+                                {
+                                    list = toBuild.get(info);
+                                    list.add(dcval);
+                                }
+                                else
+                                {
+                                    list.add(dcval);
+                                }
+                                toBuild.put(info, list);
+                                toBuildChoice.put(info,
+                                        (CRISAuthority) choiceAuthority);
+                                toBuildMetadata.put(info, metadata);
                             }
                             else
                             {
@@ -202,12 +205,17 @@ public class CrisConsumer implements Consumer
 
                 Class<ACrisObject> crisTargetClass = choiceAuthorityObject
                         .getCRISTargetClass();
+                
                 ACrisObject rp = applicationService.getEntityBySourceId(
                         typeAuthority, authorityKey, crisTargetClass);
+                if(rp==null) {
+                    rp = applicationService.getEntityByCrisId(authorityKey, crisTargetClass);
+                }
 
                 if (rp != null)
                 {
                     rpKey = rp.getCrisID();
+                    referencedObjects.put(rpKey, rp);
                 }
                 else
                 {

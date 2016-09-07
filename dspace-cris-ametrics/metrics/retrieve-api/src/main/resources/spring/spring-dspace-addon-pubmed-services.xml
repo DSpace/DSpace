@@ -15,6 +15,8 @@
            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
     
+    <alias name="org.dspace.app.cris.metrics.common.services.MetricsPersistenceService" alias="org.dspace.app.cris.metrics.common.services.MetricsPersistenceService"/>
+    
 	<bean id="org.dspace.app.cris.metrics.common.services.MetricsPersistenceService" parent="txProxyTemplateMetrics">
 		<property name="target">
 			<bean class="org.dspace.app.cris.metrics.common.services.MetricsPersistenceService"

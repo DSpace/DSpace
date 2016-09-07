@@ -15,6 +15,7 @@ import org.dspace.app.cris.integration.CrisComponentsService;
 import org.dspace.app.cris.integration.ICRISComponent;
 import org.dspace.app.cris.integration.statistics.CrisStatComponentsService;
 import org.dspace.app.cris.integration.statistics.StatComponentsService;
+import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.app.cris.service.ApplicationService;
@@ -34,6 +35,12 @@ public class Researcher implements EPersonCRISIntegration
     {
         return dspace.getServiceManager().getServiceByName(
                 "applicationService", ApplicationService.class);
+    }
+
+    public MetricsPersistenceService getMetricsPersistenceService()
+    {
+        return dspace.getServiceManager().getServiceByName(
+                "org.dspace.app.cris.metrics.common.services.MetricsPersistenceService", MetricsPersistenceService.class);
     }
     
     public CrisSubscribeService getCrisSubscribeService()

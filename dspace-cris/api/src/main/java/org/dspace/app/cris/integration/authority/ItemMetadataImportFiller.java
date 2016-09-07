@@ -24,6 +24,7 @@ import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.service.ApplicationService;
+import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
@@ -43,7 +44,7 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
 
     private ApplicationService applicationService;
 
-    private MetricsPersistenceService metricService;
+    private MetricsPersistenceService metricsPersistenceService;
 
     public void setApplicationService(ApplicationService applicationService)
     {
@@ -108,7 +109,7 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
                     {
                         
                         MetricsMappingDetails mmd = (MetricsMappingDetails)details;
-                        buildMetric(context, item, crisObject, m, mdInput, mmd, metricService);
+                        buildMetric(context, item, crisObject, m, mdInput, mmd, metricsPersistenceService);
                     }
                     log.debug("fillRecord -> conf -> " + mdInput);
                     log.debug(
@@ -172,16 +173,28 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
             Metadatum m, String mdInput, MetricsMappingDetails mmd, MetricsPersistenceService metricService)
     {
         CrisMetrics metric = new CrisMetrics();
-        metric.setMetricType(m.qualifier);
         
-        if("count".equals(mmd.getOperator())) {                  
-            Metadatum[] mm = item.getMetadataByMetadataString(
-                    mdInput);
-            metric.setMetricCount(mm.length);
+        Metadatum[] mm = item.getMetadataByMetadataString(mdInput);
+        Metadatum metricValue = null;
+        if(mm.length>0) {
+            metricValue = mm[0];
         }
-        else
+        
+        metric.setMetricType(metricValue.qualifier);
+        
+        try
         {
-            metric.setMetricCount(Double.parseDouble(m.value));
+            if("count".equals(mmd.getOperator())) {                  
+                metric.setMetricCount(mm.length);
+            }
+            else
+            {
+                metric.setMetricCount(Double.parseDouble(metricValue.value));
+            }
+        }
+        catch (NumberFormatException e)
+        {
+            metric.setMetricCount(0);
         }
         
         if(crisObject!=null) {
@@ -304,8 +317,8 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
         return false;
     }
 
-    public void setMetricService(MetricsPersistenceService metricService)
+    public void setMetricsPersistenceService(MetricsPersistenceService metricsPersistenceService)
     {
-        this.metricService = metricService;
+        this.metricsPersistenceService = metricsPersistenceService;
     }
 }
