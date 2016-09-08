@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataSchema;
 
 /**
@@ -73,6 +74,12 @@ public class DCInput
      * view during workflow processing. 
      */
     public static final String WORKFLOW_SCOPE = "workflow";
+    
+    public static final String WORKFLOW_STEP1_SCOPE = "workflow-step1";
+    
+    public static final String WORKFLOW_STEP2_SCOPE = "workflow-step2";
+    
+    public static final String WORKFLOW_STEP3_SCOPE = "workflow-step3";
 
     /** 
      * The scope of the input sets, this restricts hidden metadata fields from 
@@ -147,7 +154,13 @@ public class DCInput
      */
     public boolean isVisible(String scope)
     {
-        return (visibility == null || visibility.equals(scope));
+    	boolean visible = false;
+    	if(StringUtils.contains(scope,"workflow")){
+    		visible = StringUtils.equals(visibility,scope) || StringUtils.equals(visibility,WORKFLOW_SCOPE);
+    	}else{
+    		visible = StringUtils.equals(visibility,scope);
+    	}
+        return (visibility == null ||visible);
     }
     
     /**

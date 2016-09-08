@@ -38,6 +38,8 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowManager;
 
 /**
  * Describe step for DSpace submission process. Handles the gathering of
@@ -169,6 +171,24 @@ public class DescribeStep extends AbstractProcessingStep
             documentType = item.getMetadataByMetadataString("dc.type")[0].value;
         }
         
+        String scope ="";
+        if(subInfo.isInWorkflow()){
+        	WorkflowItem wfi = (WorkflowItem)subInfo.getSubmissionItem();
+        	int wfState = wfi.getState();
+        	switch (wfState){
+        		case WorkflowManager.WFSTATE_STEP1:
+        			scope = DCInput.WORKFLOW_STEP1_SCOPE;
+        		case WorkflowManager.WFSTATE_STEP2:
+        			scope = DCInput.WORKFLOW_STEP2_SCOPE;
+        		case WorkflowManager.WFSTATE_STEP3:
+            			scope = DCInput.WORKFLOW_STEP3_SCOPE;
+                default:
+                	scope = DCInput.WORKFLOW_SCOPE;
+        	}
+        	
+        }else{
+        	scope = DCInput.SUBMISSION_SCOPE;
+        }
         // Step 1:
         // clear out all item metadata defined on this page
         for (int i = 0; i < inputs.length; i++)
@@ -176,8 +196,7 @@ public class DescribeStep extends AbstractProcessingStep
 
         	// Allow the clearing out of the metadata defined for other document types, provided it can change anytime
             if (!subInfo.isEditing() && !inputs[i]
-                    .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
-                            : DCInput.SUBMISSION_SCOPE))
+                    .isVisible(scope))
             {
                 continue;
             }
@@ -216,8 +235,7 @@ public class DescribeStep extends AbstractProcessingStep
             }
 
             if (!subInfo.isEditing() && !inputs[j]
-                        .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
-                                : DCInput.SUBMISSION_SCOPE))
+                        .isVisible(scope))
             {
                 continue;
             }
@@ -333,7 +351,7 @@ public class DescribeStep extends AbstractProcessingStep
             for (int i = 0; i < inputs.length; i++)
             {
             	// Do not check the required attribute if it is not visible or not allowed for the document type
-            	String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
+
                 if (!subInfo.isEditing() && !( inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType) ) )
                 {
                 	continue;
@@ -349,7 +367,7 @@ public class DescribeStep extends AbstractProcessingStep
                         inputs[i].getElement(), qualifier, Item.ANY);
 
                 if ((inputs[i].isRequired() && values.length == 0) &&
-                     inputs[i].isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE))
+                     inputs[i].isVisible(scope))
                 {
                     // since this field is missing add to list of error fields
                     addErrorField(request, getFieldName(inputs[i]));

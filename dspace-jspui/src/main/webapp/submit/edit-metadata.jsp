@@ -52,6 +52,8 @@
 <%@ page import="org.dspace.content.authority.Choices" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.workflow.WorkflowManager" %>
+<%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="java.util.Calendar"%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -1224,8 +1226,24 @@
     int pageNum = pageNumStr.intValue();
     
     // for later use, determine whether we are in submit or workflow mode
-    String scope = si.isInWorkflow() ? "workflow" : "submit";
-
+    String scope = "";
+    int wfState=-1;
+    if(si.isInWorkflow()){
+       	WorkflowItem wfi = (WorkflowItem) si.getSubmissionItem();
+    	wfState = wfi.getState();   
+        if(wfState== WorkflowManager.WFSTATE_STEP1){
+        	scope = DCInput.WORKFLOW_STEP1_SCOPE;
+        }else if(wfState== WorkflowManager.WFSTATE_STEP2){
+        	scope = DCInput.WORKFLOW_STEP2_SCOPE;
+        }else if(wfState== WorkflowManager.WFSTATE_STEP3){
+        	scope = DCInput.WORKFLOW_STEP3_SCOPE;
+        }else{
+        	scope = "workflow";
+        }
+    }
+    else{
+    	scope = "submit";
+    }
     // owning Collection ID for choice authority calls
     int collectionID = si.getSubmissionItem().getCollection().getID();
 
@@ -1290,7 +1308,10 @@
  
 	 int pageIdx = pageNum - 1;
      DCInput[] inputs = inputSet.getPageRows(pageIdx, si.getSubmissionItem().hasMultipleTitles(),
-                                                si.getSubmissionItem().isPublishedBefore() );
+
+    		 si.getSubmissionItem().isPublishedBefore() );
+     
+  
      for (int z = 0; z < inputs.length; z++)
      {
        boolean readonly = false;
