@@ -7,10 +7,6 @@
  */
 package org.dspace.app.webui.cris.controller;
 
-import it.cilea.osd.jdyna.components.IBeanSubComponent;
-import it.cilea.osd.jdyna.components.IComponent;
-import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +33,7 @@ import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
 import org.dspace.app.cris.util.ICrisHomeProcessor;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.app.webui.cris.metrics.ItemMetricsDTO;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -52,6 +49,10 @@ import org.dspace.statistics.SolrLogger;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.springframework.web.servlet.ModelAndView;
+
+import it.cilea.osd.jdyna.components.IBeanSubComponent;
+import it.cilea.osd.jdyna.components.IComponent;
+import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
 
 /**
  * This SpringMVC controller is used to build the ResearcherPage details page.
@@ -202,13 +203,25 @@ public class ResearcherPageDetailsController
         mvc.getModel().putAll(model);
         
         List<ICrisHomeProcessor<ResearcherPage>> resultProcessors = new ArrayList<ICrisHomeProcessor<ResearcherPage>>();
+        Map<String, Object> extraTotal = new HashMap<String, Object>();
+        Map<String, ItemMetricsDTO> metricsTotal = new HashMap<String, ItemMetricsDTO>();
+        List<String> metricsTypeTotal = new ArrayList<String>();
         for (ICrisHomeProcessor processor : processors)
         {
             if (ResearcherPage.class.isAssignableFrom(processor.getClazz()))
             {
                 processor.process(context, request, response, researcher);
+                Map<String, Object> extra = (Map<String, Object>)request.getAttribute("extra");
+                Map<String, ItemMetricsDTO> metrics = (Map<String, ItemMetricsDTO>)extra.get("metrics");
+                List<String> metricTypes = (List<String>)extra.get("metricTypes");
+                metricsTotal.putAll(metrics);
+                metricsTypeTotal.addAll(metricTypes);
             }
         }
+        extraTotal.put("metricTypes", metricsTypeTotal);
+        extraTotal.put("metrics", metricsTotal);
+        request.setAttribute("extra", extraTotal);  
+        
         mvc.getModel().put("researcher", researcher);
         mvc.getModel().put("exportscitations",
                 ConfigurationManager.getProperty("exportcitation.options"));

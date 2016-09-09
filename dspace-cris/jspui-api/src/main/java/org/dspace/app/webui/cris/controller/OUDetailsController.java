@@ -33,6 +33,7 @@ import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
 import org.dspace.app.cris.util.ICrisHomeProcessor;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.app.webui.cris.metrics.ItemMetricsDTO;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -146,14 +147,24 @@ public class OUDetailsController
         }
         
         List<ICrisHomeProcessor<OrganizationUnit>> resultProcessors = new ArrayList<ICrisHomeProcessor<OrganizationUnit>>();
+        Map<String, Object> extraTotal = new HashMap<String, Object>();
+        Map<String, ItemMetricsDTO> metricsTotal = new HashMap<String, ItemMetricsDTO>();
+        List<String> metricsTypeTotal = new ArrayList<String>();
         for (ICrisHomeProcessor processor : processors)
         {
             if (OrganizationUnit.class.isAssignableFrom(processor.getClazz()))
             {
                 processor.process(context, request, response, ou);
+                Map<String, Object> extra = (Map<String, Object>)request.getAttribute("extra");
+                Map<String, ItemMetricsDTO> metrics = (Map<String, ItemMetricsDTO>)extra.get("metrics");
+                List<String> metricTypes = (List<String>)extra.get("metricTypes");
+                metricsTotal.putAll(metrics);
+                metricsTypeTotal.addAll(metricTypes);
             }
         }
-        
+        extraTotal.put("metricTypes", metricsTypeTotal);
+        extraTotal.put("metrics", metricsTotal);
+        request.setAttribute("extra", extraTotal);        
         request.setAttribute("sectionid", StatsConfig.DETAILS_SECTION);
         new DSpace().getEventService().fireEvent(
                 new UsageEvent(
