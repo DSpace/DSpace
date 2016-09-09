@@ -169,92 +169,108 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
         }
     }
 
-    public static void buildMetric(Context context, Item item, ACrisObject crisObject,
-            Metadatum m, String mdInput, MetricsMappingDetails mmd, MetricsPersistenceService metricService)
+    public static void buildMetric(Context context, Item item,
+            ACrisObject crisObject, Metadatum m, String mdInput,
+            MetricsMappingDetails mmd, MetricsPersistenceService metricService)
     {
-        CrisMetrics metric = new CrisMetrics();
-        
+
         Metadatum[] mm = item.getMetadataByMetadataString(mdInput);
-        Metadatum metricValue = null;
-        if(mm.length>0) {
-            metricValue = mm[0];
-        }
-        
-        metric.setMetricType(metricValue.qualifier);
-        
-        try
+        if (mm != null && mm.length > 0)
         {
-            if("count".equals(mmd.getOperator())) {                  
-                metric.setMetricCount(mm.length);
-            }
-            else
+            try
             {
-                metric.setMetricCount(Double.parseDouble(metricValue.value));
-            }
-        }
-        catch (NumberFormatException e)
-        {
-            metric.setMetricCount(0);
-        }
-        
-        if(crisObject!=null) {
-            metric.setResourceId(crisObject.getID());
-            metric.setResourceTypeId(crisObject.getType());
-            metric.setUuid(crisObject.getHandle());
-        }
-        else {
-            metric.setResourceId(item.getID());
-            metric.setResourceTypeId(item.getType());
-            metric.setUuid(item.getHandle());
-        }
-        
-        Date start = null;
-        Date end = null;
-        if (StringUtils.isNotBlank(mmd.getRangeByYear()))
-        {
-            String acquisitionYear = item.getMetadata(mmd.getRangeByYear());
+                CrisMetrics metric = new CrisMetrics();
+                Metadatum metricValue = null;
+                if (mm.length > 0)
+                {
+                    metricValue = mm[0];
+                }
 
-            int year = -1;
-            if (StringUtils.isNotBlank(acquisitionYear))
-            {
-                year = Integer.parseInt(acquisitionYear);
-            }
-            else
-            {
-                // get a calendar using the default time zone
-                // and
-                // locale.
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(new Date());
-                year = calendar.get(Calendar.YEAR);
-            }
+                metric.setMetricType(metricValue.qualifier);
 
-            Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.YEAR, year);
-            cal.set(Calendar.DAY_OF_YEAR, 1);
-            start = cal.getTime();
+                try
+                {
+                    if ("count".equals(mmd.getOperator()))
+                    {
+                        metric.setMetricCount(mm.length);
+                    }
+                    else
+                    {
+                        metric.setMetricCount(
+                                Double.parseDouble(metricValue.value));
+                    }
+                }
+                catch (NumberFormatException e)
+                {
+                    metric.setMetricCount(0);
+                }
 
-            // set date to last day of year
-            cal.set(Calendar.YEAR, year);
-            cal.set(Calendar.MONTH, 11); // 11 = december
-            cal.set(Calendar.DAY_OF_MONTH, 31); // new years eve
-            end = cal.getTime();
+                if (crisObject != null)
+                {
+                    metric.setResourceId(crisObject.getID());
+                    metric.setResourceTypeId(crisObject.getType());
+                    metric.setUuid(crisObject.getHandle());
+                }
+                else
+                {
+                    metric.setResourceId(item.getID());
+                    metric.setResourceTypeId(item.getType());
+                    metric.setUuid(item.getHandle());
+                }
+
+                Date start = null;
+                Date end = null;
+                if (StringUtils.isNotBlank(mmd.getRangeByYear()))
+                {
+                    String acquisitionYear = item.getMetadata(mmd.getRangeByYear());
+
+                    int year = -1;
+                    if (StringUtils.isNotBlank(acquisitionYear))
+                    {
+                        year = Integer.parseInt(acquisitionYear);
+                    }
+                    else
+                    {
+                        // get a calendar using the default time zone
+                        // and
+                        // locale.
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(new Date());
+                        year = calendar.get(Calendar.YEAR);
+                    }
+
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(Calendar.YEAR, year);
+                    cal.set(Calendar.DAY_OF_YEAR, 1);
+                    start = cal.getTime();
+
+                    // set date to last day of year
+                    cal.set(Calendar.YEAR, year);
+                    cal.set(Calendar.MONTH, 11); // 11 = december
+                    cal.set(Calendar.DAY_OF_MONTH, 31); // new years eve
+                    end = cal.getTime();
+                }
+                else
+                {
+                    if (StringUtils.isNotBlank(mmd.getStartDate())
+                            && StringUtils.isNotBlank(mmd.getEndDate()))
+                    {
+                        start = (Date) formatAsDate(context, item,
+                                item.getMetadataByMetadataString(
+                                        mmd.getStartDate())[0]);
+                        end = (Date) formatAsDate(context, item, item
+                                .getMetadataByMetadataString(mmd.getEndDate())[0]);
+                    }
+                }
+                metric.setStartDate(start);
+                metric.setEndDate(end);
+                metricService.saveOrUpdate(CrisMetrics.class, metric);
+            }
+            catch (Exception e)
+            {
+                log.warn("Errors in creation of CRIS_METRICS for " + mdInput, e);
+            }
         }
-        else {
-            if (StringUtils.isNotBlank(mmd.getStartDate())
-                    && StringUtils.isNotBlank(mmd.getEndDate()))
-            {
-                start = (Date) formatAsDate(context, item,
-                        item.getMetadataByMetadataString(
-                                mmd.getStartDate())[0]);
-                end = (Date) formatAsDate(context, item,
-                        item.getMetadataByMetadataString(
-                                mmd.getEndDate())[0]);
-            }
-        }                        
-        metric.setStartDate(start);
-        metric.setEndDate(end);
-        metricService.saveOrUpdate(CrisMetrics.class, metric);
     }
 
     private Object buildGenericValue(Context context, Item item,
