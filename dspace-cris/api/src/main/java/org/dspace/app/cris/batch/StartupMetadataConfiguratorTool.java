@@ -569,11 +569,38 @@ public class StartupMetadataConfiguratorTool
                 tabRP.setPriority(Integer.parseInt(priority));
                 tabRP.setTitle(label);
                 tabRP.setVisibility(accessLevel);
-                if(TabDynamicObject.class.isAssignableFrom(clazzTab)) {
-                    TabDynamicObject tabDynamicObject = (TabDynamicObject)tabRP;
-                    tabDynamicObject.setTypeDef(applicationService.findTypoByShortName(DynamicObjectType.class, row.get(0)));
+                if (TabDynamicObject.class.isAssignableFrom(clazzTab))
+                {
+                    TabDynamicObject tabDynamicObject = (TabDynamicObject) tabRP;
+                    tabDynamicObject
+                            .setTypeDef(applicationService.findTypoByShortName(
+                                    DynamicObjectType.class, row.get(0)));
+                }
+                if (EditTabDynamicObject.class.isAssignableFrom(clazzTab))
+                {
+                    EditTabDynamicObject tabDynamicObject = (EditTabDynamicObject) tabRP;
+                    tabDynamicObject
+                            .setTypeDef(applicationService.findTypoByShortName(
+                                    DynamicObjectType.class, row.get(0)));
                 }
                 applicationService.saveOrUpdate(clazzTab, tabRP);
+            }
+            else
+            {
+                if (TabDynamicObject.class.isAssignableFrom(clazzTab))
+                {
+                    TabDynamicObject tabDynamicObject = (TabDynamicObject) tabRP;
+                    tabDynamicObject
+                            .setTypeDef(applicationService.findTypoByShortName(
+                                    DynamicObjectType.class, row.get(0)));
+                }
+                if (EditTabDynamicObject.class.isAssignableFrom(clazzTab))
+                {
+                    EditTabDynamicObject tabDynamicObject = (EditTabDynamicObject) tabRP;
+                    tabDynamicObject
+                            .setTypeDef(applicationService.findTypoByShortName(
+                                    DynamicObjectType.class, row.get(0)));
+                }
             }
         }
     }
