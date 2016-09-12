@@ -157,10 +157,16 @@ public class ProjectDetailsController
             {
                 processor.process(context, request, response, grant);
                 Map<String, Object> extra = (Map<String, Object>)request.getAttribute("extra");
-                Map<String, ItemMetricsDTO> metrics = (Map<String, ItemMetricsDTO>)extra.get("metrics");
-                List<String> metricTypes = (List<String>)extra.get("metricTypes");
-                metricsTotal.putAll(metrics);
-                metricsTypeTotal.addAll(metricTypes);
+                if(extra!=null && !extra.isEmpty()) {
+                    Map<String, ItemMetricsDTO> metrics = (Map<String, ItemMetricsDTO>)extra.get("metrics");
+                    List<String> metricTypes = (List<String>)extra.get("metricTypes");
+                    if(metrics!=null && !metrics.isEmpty()) {
+                        metricsTotal.putAll(metrics);
+                    }
+                    if(metricTypes!=null && !metricTypes.isEmpty()) {
+                        metricsTypeTotal.addAll(metricTypes);
+                    }
+                }
             }
         }
         extraTotal.put("metricTypes", metricsTypeTotal);
