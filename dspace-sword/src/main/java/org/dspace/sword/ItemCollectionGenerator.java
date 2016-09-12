@@ -32,11 +32,11 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
     }
 
     /**
-     * Build the collection around the give DSpaceObject.  If the object
+     * Build the collection around the given DSpaceObject.  If the object
      * is not an instance of a DSpace Item this method will throw an
      * exception.
      *
-     * @param dso the dso for which the collection should be build
+     * @param dso the dso for which the collection should be built
      * @throws DSpaceSWORDException if the dso is not an instance of Item
      */
     public Collection buildCollection(DSpaceObject dso)
@@ -95,7 +95,7 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
             scol.setAbstract(dcAbstract);
         }
 
-        // do we suppot mediated deposit
+        // do we support mediated deposit
         scol.setMediation(swordConfig.isMediated());
 
         // the list of mime types that we accept, which we take from the
