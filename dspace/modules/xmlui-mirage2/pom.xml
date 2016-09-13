@@ -89,6 +89,7 @@
                                         <include>**/*.ttf</include>
                                         <include>**/*.woff</include>
                                         <include>**/*.eot</include>
+                                        <include>**/*.xsl</include>
                                     </excludes>
                                     <filtering>true</filtering>
                                 </resource>
@@ -105,6 +106,7 @@
                                         <include>**/*.ttf</include>
                                         <include>**/*.woff</include>
                                         <include>**/*.eot</include>
+                                        <include>**/*.xsl</include>
                                     </includes>
                                     <filtering>false</filtering>
                                 </resource>
