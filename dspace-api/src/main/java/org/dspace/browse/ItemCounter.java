@@ -49,7 +49,7 @@ public class ItemCounter
     protected ConfigurationService configurationService;
 	
     /**
-     * Construct a new item counter which will use the give DSpace Context
+     * Construct a new item counter which will use the given DSpace Context
      * 
      * @param context current context
      * @throws ItemCountException if count error

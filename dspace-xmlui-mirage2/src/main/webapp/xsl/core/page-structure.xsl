@@ -237,12 +237,12 @@
             <!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
             <!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
             <script>
-                //Clear default text of emty text areas on focus
+                //Clear default text of empty text areas on focus
                 function tFocus(element)
                 {
                 if (element.value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){element.value='';}
                 }
-                //Clear default text of emty text areas on submit
+                //Clear default text of empty text areas on submit
                 function tSubmit(form)
                 {
                 var defaultedElements = document.getElementsByTagName("textarea");
