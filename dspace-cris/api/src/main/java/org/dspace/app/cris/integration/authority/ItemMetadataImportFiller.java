@@ -242,12 +242,20 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
                     Calendar cal = Calendar.getInstance();
                     cal.set(Calendar.YEAR, year);
                     cal.set(Calendar.DAY_OF_YEAR, 1);
+                    cal.set(Calendar.HOUR_OF_DAY, 0);
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.SECOND, 0);
+                    cal.set(Calendar.MILLISECOND, 0);
                     start = cal.getTime();
 
                     // set date to last day of year
                     cal.set(Calendar.YEAR, year);
                     cal.set(Calendar.MONTH, 11); // 11 = december
                     cal.set(Calendar.DAY_OF_MONTH, 31); // new years eve
+                    cal.set(Calendar.HOUR_OF_DAY, 23);
+                    cal.set(Calendar.MINUTE, 59);
+                    cal.set(Calendar.SECOND, 59);
+                    cal.set(Calendar.MILLISECOND, 999);
                     end = cal.getTime();
                 }
                 else
