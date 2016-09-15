@@ -330,6 +330,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
 
             pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(item));
 
+            for (DCValue metadata : item.getMetadata("dryad.fundingEntity")) {
+                pageMeta.addMetadata("dryad", "fundingEntity").addContent(metadata.value);
+            }
             // Data file metadata included on data package items (integrated view)
             for (DCValue metadata : item.getMetadata("dc.relation.haspart")) {
                 int skip = 0;
