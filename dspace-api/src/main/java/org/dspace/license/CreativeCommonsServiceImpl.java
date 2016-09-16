@@ -8,10 +8,12 @@
 package org.dspace.license;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
@@ -22,6 +24,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -35,6 +38,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.license.service.CreativeCommonsService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,6 +47,10 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(CreativeCommonsServiceImpl.class);
+
+    // HTTP RFC says do not automatically follow more than 5 redirects, it indicates a probable loop
+    // http://www.freesoft.org/CIE/RFC/1945/46.htm
+    private static final int MAX_REDIRECTS = 5;
 
     /**
      * The Bundle Name
@@ -79,8 +88,9 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     {
         // if defined, set a proxy server for http requests to Creative
         // Commons site
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
 
         if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort))
         {
@@ -175,10 +185,10 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
      // set the format
         BitstreamFormat bs_format;
-        if (mimeType.equalsIgnoreCase("text/xml"))
+        if ("text/xml".equalsIgnoreCase(mimeType))
         {
         	bs_format = bitstreamFormatService.findByShortDescription(context, "CC License");
-        } else if (mimeType.equalsIgnoreCase("text/rdf")) {
+        } else if ("text/rdf".equalsIgnoreCase(mimeType)) {
             bs_format = bitstreamFormatService.findByShortDescription(context, "RDF XML");
         } else {
         	bs_format = bitstreamFormatService.findByShortDescription(context, "License");
@@ -186,9 +196,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
         Bitstream bs = bitstreamService.create(context, bundle, licenseStm);
         bs.setSource(context, CC_BS_SOURCE);
-        bs.setName(context, (mimeType != null &&
-                    (mimeType.equalsIgnoreCase("text/xml") ||
-                     mimeType.equalsIgnoreCase("text/rdf"))) ?
+        bs.setName(context, "text/xml".equalsIgnoreCase(mimeType) || "text/rdf".equalsIgnoreCase(mimeType) ?
                    BSN_LICENSE_RDF : BSN_LICENSE_TEXT);
         bs.setFormat(context, bs_format);
         bitstreamService.update(context, bs);
@@ -274,7 +282,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     @Override
     public String fetchLicenseRdf(String ccResult) {
-    	StringWriter result 			= new StringWriter();
+        StringWriter result = new StringWriter();
         try {
     		InputStream inputstream = new ByteArrayInputStream(ccResult.getBytes("UTF-8"));
     		templates.newTransformer().transform(new StreamSource(inputstream), new StreamResult(result));
@@ -291,10 +299,9 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     @Override
     public String fetchLicenseText(String license_url)
     {
-        String text_url = license_url;
-        byte[] urlBytes = fetchURL(text_url);
+        String text = fetchURL(license_url, 0);
 
-        return (urlBytes != null) ? new String(urlBytes) : "";
+        return Objects.toString(text, "");
     }
 
     @Override
@@ -411,29 +418,73 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * Fetch the contents of a URL
      */
-    protected byte[] fetchURL(String url_string)
+    private String fetchURL(String url_string, int numRedirects)
     {
+        if (numRedirects > MAX_REDIRECTS)
+        {
+            log.error("Could not retrieve Creative Commons license, maximum number of redirects reached (" + numRedirects + ")");
+            return null;
+        }
+
         try
         {
-            String line = "";
             URL url = new URL(url_string);
-            URLConnection connection = url.openConnection();
-            InputStream inputStream = connection.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder sb = new StringBuilder();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            while ((line = reader.readLine()) != null)
-            {
-                sb.append(line);
+            ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String mailAdmin = configurationService.getProperty("mail.admin");
+            String userAgent = "DSpace/" + Util.getSourceVersion() + "(+" + configurationService.getProperty("dspace.url");
+            if (StringUtils.isNotBlank(mailAdmin)) {
+                userAgent = userAgent + "; " + mailAdmin;
             }
+            userAgent += ")";
+            connection.addRequestProperty("User-Agent", userAgent);
+            connection.setConnectTimeout(2000);
+            connection.setReadTimeout(2000);
+            connection.setInstanceFollowRedirects(false); // we're handling redirects ourselves
 
-            return sb.toString().getBytes();
+            int code = connection.getResponseCode();
+            if (code == HttpURLConnection.HTTP_MOVED_PERM || code == HttpURLConnection.HTTP_MOVED_TEMP)
+            {
+                // recursively follow redirects
+                String locationHeader = connection.getHeaderField("Location");
+                log.debug("Following redirect to " + locationHeader);
+                InputStream inputStream = connection.getInputStream();
+                if (inputStream != null)
+                {
+                    inputStream.close();
+                }
+                return fetchURL(locationHeader, numRedirects + 1);
+            }
+            else if (code == HttpURLConnection.HTTP_OK)
+            {
+                InputStream inputStream = connection.getInputStream();
+                if (inputStream != null)
+                {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder sb = new StringBuilder();
+
+                    String line;
+                    while ((line = reader.readLine()) != null)
+                    {
+                        sb.append(line);
+                    }
+                    inputStream.close();
+                    return sb.toString();
+                }
+            }
+            else
+            {
+                log.error("Could not retrieve Creative Commons license from URL " + url.toString()
+                        + "; response was " + connection.getResponseCode() + ": " + connection.getResponseMessage());
+            }
         }
         catch (Exception exc)
         {
-            log.error(exc.getMessage());
-            return null;
+            log.error("Caught exception while trying to obtain Creative Commons license: " + exc.getMessage(), exc);
         }
+        log.warn("Could not retrieve license");
+        return null;
     }
     /**
      * Returns a metadata field handle for given field Id
@@ -441,7 +492,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     @Override
     public LicenseMetadataValue getCCField(String fieldId)
     {
-    	return new LicenseMetadataValue(ConfigurationManager.getProperty("cc.license." + fieldId));
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        return new LicenseMetadataValue(configurationService.getProperty("cc.license." + fieldId));
     }
     
 }
