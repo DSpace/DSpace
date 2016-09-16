@@ -312,7 +312,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         try
         {
             templates.newTransformer().transform(
-                    new StreamSource(license_url + "rdf"),
+                    new StreamSource(ConfigurationManager.getProperty("cc.api.rooturl") + "/details?license-uri=" + license_url),
                     new StreamResult(result)
                     );
         }
