@@ -1737,19 +1737,14 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testDeleteNoAuth2() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authUtil;
-            AuthorizeManager authManager;
-            {
-                AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
-                 result = null;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE, anyBoolean); result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class, AuthorizeManager.class)
+        {{
+            AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
+             result = new AuthorizeException();
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE, anyBoolean); result = null;
+        }};
 
-        int id = c.getID();
         c.delete();
         fail("Exception expected");
     }
