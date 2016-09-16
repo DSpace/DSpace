@@ -22,7 +22,8 @@
 
 	<!-- process incoming RDF, copy everything add our own statements for cc:Work -->
 	<xsl:template match="result/rdf/rdf:RDF">
-		<rdf:RDF>
+		<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            xmlns:cc="http://creativecommons.org/ns#">
 			<xsl:copy-of select="@*" />
 			<xsl:apply-templates select="cc:License" />
 		</rdf:RDF>
