@@ -28,10 +28,10 @@ import org.dspace.content.Item;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DryadFunderConcept extends DryadOrganizationConcept {
     public static final String FUNDER_ID = "identifier";
-    public static final String PREFERRED_LABEL = "fullname";
     public static final String ALT_LABEL = "altLabel";
     public static final String COUNTRY = "country";
 
+    public static final String NSF_ID = "http://dx.doi.org/10.13039/100000001";
 
     private static Logger log = Logger.getLogger(DryadFunderConcept.class);
 

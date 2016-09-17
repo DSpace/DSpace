@@ -415,7 +415,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 //update shoppingcart journal
                 DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
                 if (journalConcept != null) {
-                    Boolean subscription = journalConcept.getSubscriptionPaid();
                     shoppingCart.setSponsoringOrganization(journalConcept);
                 }
             }

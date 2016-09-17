@@ -1,6 +1,7 @@
 package org.dspace.submit.step;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadFunderConcept;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
@@ -86,7 +87,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 log.error("valid grant");
                 confidence = Choices.CF_ACCEPTED;
             }
-            item.addMetadata("dryad.fundingEntity", null, grantInfo, "NSF", confidence);
+            DryadFunderConcept nsfConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, DryadFunderConcept.NSF_ID);
+            item.addMetadata(DryadFunderConcept.createFundingEntityMetadata(nsfConcept, grantInfo, confidence));
             item.update();
         }
         EventLogger.log(context, "submission-select-publication", "status=complete");
