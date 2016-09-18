@@ -101,6 +101,28 @@ on names with last name first (comma delimited). -->
         <datetime:month>31</datetime:month>
     </datetime:month-lengths>
 
+
+    <xsl:template name="format-date">
+        <xsl:param name="datetime"/>
+        <xsl:value-of select="datetime:month-name($datetime)"/><xsl:text> </xsl:text><xsl:value-of select="datetime:day-in-month($datetime)"/>, <xsl:value-of select="datetime:year($datetime)"/>
+    </xsl:template>
+
+    <xsl:template name="package-doi">
+        <xsl:param name="id"/>
+        <xsl:choose>
+            <xsl:when test="starts-with($id, 'doi')">
+                <xsl:value-of
+                        select="concat('http://dx.doi.org/', substring-after($id, 'doi:'))"/>
+            </xsl:when>
+            <xsl:when test="starts-with($id,'http://dx.doi')">
+                <xsl:value-of select="$id"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="concat('http://hdl.handle.net/', $id)"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <!--  This template can return differences between supplied start and end
    datetimes -->
     <xsl:template name="datetime:difference">
