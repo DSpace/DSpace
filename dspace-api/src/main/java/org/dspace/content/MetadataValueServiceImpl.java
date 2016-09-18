@@ -12,6 +12,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.MetadataValueDAO;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -80,7 +81,10 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     public void update(Context context, MetadataValue metadataValue, boolean updateLastModified) throws SQLException, AuthorizeException {
         if(updateLastModified){
             authorizeService.authorizeAction(context, metadataValue.getDSpaceObject(), Constants.WRITE);
-            contentServiceFactory.getDSpaceObjectService(metadataValue.getDSpaceObject()).updateLastModified(context, metadataValue.getDSpaceObject());
+            DSpaceObjectService<DSpaceObject> dSpaceObjectService = contentServiceFactory.getDSpaceObjectService(metadataValue.getDSpaceObject());
+			// get the right class for our dspaceobject not the DSpaceObject lazy proxy
+            DSpaceObject dso = dSpaceObjectService.find(context, metadataValue.getDSpaceObject().getID());
+            dSpaceObjectService.updateLastModified(context, dso);
         }
         update(context, metadataValue);
     }
