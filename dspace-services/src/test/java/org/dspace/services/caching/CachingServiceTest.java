@@ -44,6 +44,7 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
     @After
     public void tearDown() {
         cachingService = null;
+        requestService = null;
     }
 
     /**
@@ -79,6 +80,9 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
         EhcacheCache cache2 = cachingService.instantiateEhCache("aaronz-eh", null);
         assertNotNull(cache2);
         assertEquals(cache2, cache);
+        
+        //trash the references
+        cache = cache2 = null;
     }
 
     /**
@@ -101,6 +105,9 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
         assertEquals(cache2, cache);
 
         requestService.endRequest(null);
+        
+        //trash the references
+        cache = cache2 = null;
     }
 
     /**
@@ -140,6 +147,9 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
         assertNotNull(c2);
         assertEquals(c1, c2);
 
+        //trash the references
+        cache = sampleCache = c1 = rc1 = c2 = null;
+
     }
 
     /**
@@ -156,13 +166,18 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
         assertNotNull(memCache);
         assertTrue(caches.contains(memCache));
 
-        Cache c1 = cachingService.getCache("org.dspace.aztest.new", null);
+        // This should create a new cache (as cache name is unique)
+        Cache c1 = cachingService.getCache("org.dspace.timtest.newcache", null);
         assertNotNull(c1);
 
+        // Test that new cache was created and total caches increases by one 
         caches = cachingService.getCaches();
         assertNotNull(caches);
         assertEquals(curSize+1, caches.size());
         assertTrue(caches.contains(c1));
+        
+        //trash the references
+        memCache = c1 = null;
     }
 
     /**
@@ -198,6 +213,8 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
 
         assertEquals(null, c1.get("AZ"));
         assertEquals(0, c1.size());
+        
+        c1 = null;
     }
 
     /**
@@ -227,6 +244,9 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
         Cache cb = cachingService.getCache("org.dspace.aztest", null);
         assertNotNull(cb);
         assertNotSame(ca, cb);
+        
+        //trash the references
+        cache = c2 = ca = cb = null;
     }
 
 }
