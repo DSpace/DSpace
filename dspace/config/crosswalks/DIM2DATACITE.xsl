@@ -58,10 +58,16 @@
 				<xsl:choose>
 		            <xsl:when test="dspace:field[@element ='contributor' and @qualifier='author']">
 						<xsl:for-each select="dspace:field[@element ='contributor' and @qualifier='author']">
+							<xsl:variable name="orcid" select="substring-after(./@authority, 'orcid::')"/>
 							<creator>
 								<creatorName>
 								  <xsl:value-of select="."/>
 								</creatorName>
+								<xsl:if test="$orcid">
+									<nameIdentifier nameIdentifierScheme="ORCID">
+										<xsl:value-of select="$orcid"/>
+									</nameIdentifier>
+								</xsl:if>
 							</creator>
 						</xsl:for-each>
 		            </xsl:when>
