@@ -105,7 +105,23 @@ public interface SearchService {
      */
     DiscoverFilterQuery toFilterQuery(Context context, String field, String operator, String value) throws SQLException;
 
-	List<Item> getRelatedItems(Context context, Item item, DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration);
+    List<Item> getRelatedItems(Context context, Item item, DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration);
+    
+    /**
+     * Method to create a  Query that includes all 
+     * communities and collections a user may administrate.
+     * If a user has the appropriate rights to administrate communities and/or
+     * collections we want to look up all contents of those communities and/or
+     * collections, ignoring the read policies of the items (e.g. to list all
+     * private items of communities/collections the user administrate). This
+     * method returns a query to filter for items that belongs to those
+     * communities/collections only.
+     *
+     * @param context
+     * @return
+     * @throws SQLException
+     */
+    String createLocationQueryForAdministrableItems(Context context) throws SQLException;
 
     /**
      * Transforms the metadata field of the given sort configuration into the indexed field which we can then use in our solr queries

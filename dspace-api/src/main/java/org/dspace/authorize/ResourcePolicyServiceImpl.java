@@ -107,6 +107,10 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
     public List<ResourcePolicy> find(Context c, DSpaceObject dso, Group group, int action, int notPolicyID) throws SQLException {
         return resourcePolicyDAO.findByTypeIdGroupAction(c, dso, group, action, notPolicyID);
     }
+    
+    public List<ResourcePolicy> find(Context c, EPerson e, List<Group> groups, int action, int type_id) throws SQLException{
+        return resourcePolicyDAO.findByEPersonGroupTypeIdAction(c, e, groups, action, type_id);
+    }
 
     /**
      * Delete an ResourcePolicy

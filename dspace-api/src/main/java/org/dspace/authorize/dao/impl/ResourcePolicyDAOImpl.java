@@ -92,6 +92,19 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
 
         return list(criteria);
     }
+     public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups, int action, int type_id) throws SQLException
+     {
+         Criteria criteria = createCriteria(context, ResourcePolicy.class);
+         criteria.add(Restrictions.and(
+                  Restrictions.eq("resourceTypeId", type_id),
+                  Restrictions.eq("actionId", action),
+                  (Restrictions.or(
+                    Restrictions.eq("eperson", e),
+                    Restrictions.in("epersonGroup", groups)
+                    ))
+                 ));
+         return list(criteria);
+     }
 
     @Override
     public void deleteByDso(Context context, DSpaceObject dso) throws SQLException

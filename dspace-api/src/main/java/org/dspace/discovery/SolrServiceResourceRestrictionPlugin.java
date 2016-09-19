@@ -7,11 +7,18 @@
  */
 package org.dspace.discovery;
 
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -22,7 +29,11 @@ import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Restriction plugin that ensures that indexes all the resource policies.
@@ -39,7 +50,13 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
+    protected CommunityService communityService;
+    @Autowired(required = true)
+    protected CollectionService collectionService;
+    @Autowired(required = true)
     protected GroupService groupService;
+    @Autowired(required = true)
+    protected ResourcePolicyService resourcePolicyService;
 
     @Override
     public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
@@ -86,7 +103,16 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                     resourceQuery.append(" OR g").append(group.getID());
                 }
 
-                resourceQuery.append(")");
+                resourceQuery.append(")"); 
+                
+                if(authorizeService.isCommunityAdmin(context) 
+                        || authorizeService.isCollectionAdmin(context))
+                {
+                    resourceQuery.append(" OR ");
+                    resourceQuery.append(DSpaceServicesFactory.getInstance()
+                            .getServiceManager().getServiceByName(SearchService.class.getName(), SearchService.class)
+                            .createLocationQueryForAdministrableItems(context));
+                }
                 
                 solrQuery.addFilterQuery(resourceQuery.toString());
             }

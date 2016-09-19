@@ -63,6 +63,10 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 
 /**
  * SolrIndexer contains the methods that index Items and their metadata,
@@ -686,6 +690,72 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
 
         return locations;
+    }
+    
+    @Override
+    public String createLocationQueryForAdministrableItems(Context context)
+            throws SQLException
+    {
+        StringBuilder locationQuery = new StringBuilder();
+        
+        if (context.getCurrentUser() != null) 
+        {
+            List<Group> groupList = EPersonServiceFactory.getInstance().getGroupService()
+                    .allMemberGroups(context, context.getCurrentUser());
+            
+            List<ResourcePolicy> communitiesPolicies = AuthorizeServiceFactory.getInstance().getResourcePolicyService()
+                    .find(context, context.getCurrentUser(), groupList, Constants.ADMIN, Constants.COMMUNITY);
+
+            List<ResourcePolicy> collectionsPolicies = AuthorizeServiceFactory.getInstance().getResourcePolicyService()
+                    .find(context, context.getCurrentUser(), groupList, Constants.ADMIN, Constants.COLLECTION);
+
+            List<Collection> allCollections = new ArrayList<>();
+            
+            for( ResourcePolicy rp: collectionsPolicies){
+                Collection collection = ContentServiceFactory.getInstance().getCollectionService()
+                        .find(context, rp.getdSpaceObject().getID());
+                allCollections.add(collection);
+            }
+
+            if (CollectionUtils.isNotEmpty(communitiesPolicies) || CollectionUtils.isNotEmpty(allCollections)) 
+            {
+                locationQuery.append("location:( ");
+
+                for (int i = 0; i< communitiesPolicies.size(); i++) 
+                {
+                    ResourcePolicy rp = communitiesPolicies.get(i);
+                    Community community = ContentServiceFactory.getInstance().getCommunityService()
+                            .find(context, rp.getdSpaceObject().getID());
+                
+                    locationQuery.append("m").append(community.getID());
+
+                    if (i != (communitiesPolicies.size() - 1)) {
+                        locationQuery.append(" OR ");
+                    }
+                    allCollections.addAll(ContentServiceFactory.getInstance().getCommunityService()
+                            .getAllCollections(context, community));
+                }
+
+                Iterator<Collection> collIter = allCollections.iterator();
+
+                if (communitiesPolicies.size() > 0 && allCollections.size() > 0) {
+                    locationQuery.append(" OR ");
+                }
+
+                while (collIter.hasNext()) {
+                    locationQuery.append("l").append(collIter.next().getID());
+
+                    if (collIter.hasNext()) {
+                        locationQuery.append(" OR ");
+                    }
+                }
+                locationQuery.append(")");
+            } else {
+                log.warn("We have a collection or community admin with ID: " + context.getCurrentUser().getID()
+                        + " without any administrable collection or community!");
+            }
+        }
+        return locationQuery.toString();
     }
 
     /**
