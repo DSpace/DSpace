@@ -143,6 +143,7 @@
                                 <browser name="spider" useragent="Ultraseek"/>
                                 <browser name="spider" useragent="Baiduspider"/>
                                 <browser name="spider" useragent="yacybot"/>
+                                <browser name="spider" useragent="gsa-crawler"/>
 
                                 <!-- Interactive browsers -->
                                 <browser name="opera" useragent="Opera"/>

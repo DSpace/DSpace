@@ -248,8 +248,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
                 String.valueOf(bitstream.getSequenceID()), getIdentifiers(context, bitstream)));
 
-        bitstream.getBundles().clear();
-
+        //Remove our bitstream from all our bundles
+        final List<Bundle> bundles = bitstream.getBundles();
+        for (Bundle bundle : bundles) {
+            bundle.getBitstreams().remove(bitstream);
+        }
 
         // Remove policies
         authorizeService.removeAllPolicies(context, bitstream);
@@ -257,8 +260,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // Remove bitstream itself
         bitstream.setDeleted(true);
         update(context, bitstream);
-        // Remove policies from the file, we do this at the end since the methods above still require write rights.
-        authorizeService.removeAllPolicies(context, bitstream);
+
+        //Remove all bundles from the bitstream object, clearing the connection in 2 ways
+        bundles.clear();
     }
 
     @Override

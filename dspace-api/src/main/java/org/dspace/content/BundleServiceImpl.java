@@ -170,8 +170,6 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         log.info(LogManager.getHeader(context, "remove_bitstream",
                 "bundle_id=" + bundle.getID() + ",bitstream_id=" + bitstream.getID()));
 
-        bundle.getBitstreams().remove(bitstream);
-        bitstream.getBundles().remove(bundle);
 
         context.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, bundle.getID(),
                 Constants.BITSTREAM, bitstream.getID(), String.valueOf(bitstream.getSequenceID()),
@@ -193,7 +191,16 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             bundle.unsetPrimaryBitstreamID();
         }
 
-        bitstreamService.delete(context, bitstream);
+        // Check if we our bitstream is part of a single bundle:
+        // If so delete it, if not then remove the link between bundle & bitstream
+        if(bitstream.getBundles().size() == 1)
+        {
+            // We don't need to remove the link between bundle & bitstream, this will be handled in the delete() method.
+            bitstreamService.delete(context, bitstream);
+        }else{
+            bundle.getBitstreams().remove(bitstream);
+            bitstream.getBundles().remove(bundle);
+        }
     }
 
     @Override
@@ -299,7 +306,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             collection = item.getOwningCollection();
             if (collection != null)
             {
-                community = collection.getCommunities().iterator().next();
+                community = collection.getCommunities().get(0);
             }
         }
         switch (action)
@@ -404,10 +411,6 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             Item item = items.next();
             item.removeBundle(bundle);
         }
-
-
-        // remove our authorization policies
-        authorizeService.removeAllPolicies(context, bundle);
 
         // Remove ourself
         bundleDAO.delete(context, bundle);

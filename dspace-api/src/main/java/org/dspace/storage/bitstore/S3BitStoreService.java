@@ -160,8 +160,6 @@ public class S3BitStoreService implements BitStoreService
      *            The stream of bits to store
      * @exception java.io.IOException
      *             If a problem occurs while storing the bits
-     *
-     * @return Map containing technical metadata (size, checksum, etc)
      */
 	public void put(Bitstream bitstream, InputStream in) throws IOException
 	{
@@ -260,7 +258,7 @@ public class S3BitStoreService implements BitStoreService
     /**
      * Utility Method: Prefix the key with a subfolder, if this instance assets are stored within subfolder
      * @param id
-     * @return
+     * @return full key prefixed with a subfolder, if applicable
      */
     public String getFullKey(String id) {
         if(StringUtils.isNotEmpty(subfolder)) {

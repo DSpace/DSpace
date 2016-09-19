@@ -18,6 +18,7 @@
                     DSpace.templates[name] = Handlebars.compile(data);
                 },
                 dataType :'text',
+                mimeType :'text/plain',
                 async : false
             });
         }

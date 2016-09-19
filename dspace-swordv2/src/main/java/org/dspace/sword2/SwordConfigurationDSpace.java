@@ -284,9 +284,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
     }
 
     /**
-     * Get the bundle name that sword will store its original deposit packages in, when
+     * Get the bundle name that SWORD will store its original deposit packages in, when
      * storing them inside an item
-     * @return
+     * @return SWORD bundle name
      */
     public String getSwordBundle()
     {
@@ -294,9 +294,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
     }
 
     /**
-     * Set the bundle name that sword will store its original deposit packages in, when
+     * Set the bundle name that SWORD will store its original deposit packages in, when
      * storing them inside an item
-     * @param swordBundle
+     * @param swordBundle SWORD bundle name
      */
     public void setSwordBundle(String swordBundle)
     {

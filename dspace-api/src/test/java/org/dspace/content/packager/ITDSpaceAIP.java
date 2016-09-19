@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +20,10 @@ import mockit.NonStrictExpectations;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -31,8 +36,10 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -61,11 +68,15 @@ public class ITDSpaceAIP extends AbstractUnitTest
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
     protected ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     /** InfoMap multiple value separator (see saveObjectInfo() and assertObject* methods) **/
     private static final String valueseparator = "::";
@@ -78,11 +89,15 @@ public class ITDSpaceAIP extends AbstractUnitTest
     private static String submitterEmail = "aip-test@dspace.org";
     private Context context;
     
-    /** Create a temporary folder which will be cleaned up automatically by JUnit.
-        NOTE: As a ClassRule, this temp folder is shared by ALL tests below.
-        Its AIP contents are initialized in init() below. **/
+    /** Create a global temporary upload folder which will be cleaned up automatically by JUnit.
+        NOTE: As a ClassRule, this temp folder is shared by ALL tests below. **/
     @ClassRule
-    public static final TemporaryFolder testFolder = new TemporaryFolder();
+    public static final TemporaryFolder uploadTempFolder = new TemporaryFolder();
+
+    /** Create another temporary folder for AIPs. As a Rule, this one is *recreated* for each
+        test, in order to ensure each test is standalone with respect to AIPs. **/
+    @Rule
+    public final TemporaryFolder aipTempFolder = new TemporaryFolder();
     
     /**
      * This method will be run during class initialization. It will initialize
@@ -215,7 +230,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
             CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
             HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
             Community topCommunity = (Community) handleService.resolveToObject(context, topCommunityHandle);
-            
+
             // Delete top level test community and test hierarchy under it
             if(topCommunity!=null)
             {
@@ -223,11 +238,21 @@ public class ITDSpaceAIP extends AbstractUnitTest
                 context.turnOffAuthorisationSystem();
                 communityService.delete(context, topCommunity);
                 context.restoreAuthSystemState();
-                context.complete();
+                context.commit();
             }
+
+            // Delete the Eperson created to submit test items
             EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-            ePersonService.delete(context, ePersonService.findByEmail(context, submitterEmail));
-          
+            EPerson eperson = ePersonService.findByEmail(context, submitterEmail);
+            if(eperson!=null)
+            {
+                log.info("tearDownClass() - DESTROY TEST EPERSON");
+                context.turnOffAuthorisationSystem();
+                ePersonService.delete(context, eperson);
+                context.restoreAuthSystemState();
+                context.commit();
+            }
+
             if(context.isValid())
                 context.abort();
         }
@@ -251,37 +276,13 @@ public class ITDSpaceAIP extends AbstractUnitTest
         // JUnit TemporaryFolder. This ensures Crosswalk classes like RoleCrosswalk
         // store their temp files in a place where JUnit can clean them up automatically.
         new NonStrictExpectations(configService.getClass()) {{
-            configService.getProperty("upload.temp.dir"); result = testFolder.getRoot().getAbsolutePath();
+            configService.getProperty("upload.temp.dir"); result = uploadTempFolder.getRoot().getAbsolutePath();
         }};
         
         try
         {
             context = new Context();
             context.setCurrentUser(EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, submitterEmail));
-            // Locate the top level community (from our test data)
-            Community topCommunity = (Community) handleService.resolveToObject(context, topCommunityHandle);
-
-            log.info("init() - CREATE TEST AIPS");
-            // NOTE: This will not overwrite the AIPs if they already exist.
-            // But, it does ensure they are created PRIOR to running any of the below tests.
-            // (So, essentially, this runs ONCE...after that, it'll be ignored since AIPs already exist)
-            // While ideally, you don't want to share data between tests, generating AIPs is VERY timeconsuming.
-            createAIP(topCommunity, null, true, false);
-        }
-        catch(PackageException|CrosswalkException ex)
-        {
-            log.error("Packaging Error in init()", ex);
-            fail("Packaging Error in init(): " + ex.getMessage());
-        }
-        catch (AuthorizeException ex)
-        {
-            log.error("Authorization Error in init()", ex);
-            fail("Authorization Error in init(): " + ex.getMessage());
-        }
-        catch (IOException ex)
-        {
-            log.error("IO Error in init()", ex);
-            fail("IO Error in init(): " + ex.getMessage());
         }
         catch (SQLException ex)
         {
@@ -322,9 +323,9 @@ public class ITDSpaceAIP extends AbstractUnitTest
         HashMap<String,String> infoMap = new HashMap<String,String>();
         saveObjectInfo(topCommunity, infoMap);
 
-        // Ensure community & child AIPs are exported (but don't overwrite)
+        // Export community & child AIPs
         log.info("testRestoreCommunityHierarchy() - CREATE AIPs");
-        File aipFile = createAIP(topCommunity, null, true, false);
+        File aipFile = createAIP(topCommunity, null, true);
 
         // Delete everything from parent community on down
         log.info("testRestoreCommunityHierarchy() - DELETE Community Hierarchy");
@@ -354,6 +355,80 @@ public class ITDSpaceAIP extends AbstractUnitTest
     }
     
     /**
+     * Test restoration from AIP of an access restricted Community
+     */
+    @Test
+    public void testRestoreRestrictedCommunity() throws Exception
+    {
+        new NonStrictExpectations(authorizeService.getClass())
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
+            authorizeService.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testRestoreRestrictedCommunity() - BEGIN");
+
+        // Locate the top-level Community (as a parent)
+        Community parent = (Community) handleService.resolveToObject(context, topCommunityHandle);
+
+        // Create a brand new (empty) Community to test with
+        Community community = communityService.createSubcommunity(context, parent);
+        communityService.addMetadata(context, community, "dc", "title", null, null, "Restricted Community");
+        communityService.update(context, community);
+        String communityHandle = community.getHandle();
+
+        // Create a new Group to access restrict to
+        Group group = groupService.create(context);
+        groupService.setName(group, "Special Users");
+        groupService.update(context, group);
+
+        // Create a custom resource policy for this community
+        List<ResourcePolicy> policies = new ArrayList<>();
+        ResourcePolicy policy = resourcePolicyService.create(context);
+        policy.setRpName("Special Read Only");
+        policy.setGroup(group);
+        policy.setAction(Constants.READ);
+        policies.add(policy);
+
+        // Replace default community policies with this new one
+        authorizeService.removeAllPolicies(context, community);
+        authorizeService.addPolicies(context, policies, community);
+
+        // Export collection AIP
+        log.info("testRestoreRestrictedCommunity() - CREATE Community AIP");
+        File aipFile = createAIP(community, null, false);
+
+        // Now, delete that Collection
+        log.info("testRestoreRestrictedCommunity() - DELETE Community");
+        communityService.removeSubcommunity(context, parent, community);
+
+        // Assert the deleted collection no longer exists
+        DSpaceObject obj = handleService.resolveToObject(context, communityHandle);
+        assertThat("testRestoreRestrictedCommunity() Community " + communityHandle + " doesn't exist", obj, nullValue());
+
+        // Restore Collection from AIP (non-recursive)
+        log.info("testRestoreRestrictedCommunity() - RESTORE Community");
+        restoreFromAIP(parent, aipFile, null, false);
+
+        // Assert the deleted Collection is RESTORED
+        DSpaceObject objRestored = handleService.resolveToObject(context, communityHandle);
+        assertThat("testRestoreRestrictedCommunity() Community " + communityHandle + " exists", objRestored, notNullValue());
+
+        // Assert the number of restored policies is equal
+        List<ResourcePolicy> policiesRestored = authorizeService.getPolicies(context, objRestored);
+        assertEquals("testRestoreRestrictedCommunity() restored policy count equal", policies.size(), policiesRestored.size());
+
+        // Assert the restored policy has same name, group and permission settings
+        ResourcePolicy restoredPolicy = policiesRestored.get(0);
+        assertEquals("testRestoreRestrictedCommunity() restored policy group successfully", policy.getGroup().getName(), restoredPolicy.getGroup().getName());
+        assertEquals("testRestoreRestrictedCommunity() restored policy action successfully", policy.getAction(), restoredPolicy.getAction());
+        assertEquals("testRestoreRestrictedCommunity() restored policy name successfully", policy.getRpName(), restoredPolicy.getRpName());
+
+        log.info("testRestoreRestrictedCommunity() - END");
+    }
+    
+    /**
      * Test replacement from AIP of entire Community Hierarchy
      */
     @Test
@@ -374,9 +449,9 @@ public class ITDSpaceAIP extends AbstractUnitTest
         // Get the count of collections under our Community or any Sub-Communities
         int numberOfCollections = communityService.getAllCollections(context, topCommunity).size();
         
-        // Ensure community & child AIPs are exported (but don't overwrite)
+        // Export community & child AIPs
         log.info("testReplaceCommunityHierarchy() - CREATE AIPs");
-        File aipFile = createAIP(topCommunity, null, true, false);
+        File aipFile = createAIP(topCommunity, null, true);
         
         // Get some basic info about Collection to be deleted
         // In this scenario, we'll delete the test "Grandchild Collection" 
@@ -448,9 +523,9 @@ public class ITDSpaceAIP extends AbstractUnitTest
         // Get its current name / title
         String oldName = topCommunity.getName();
         
-        // Ensure only community AIP is exported (but don't overwrite)
+        // Export only community AIP
         log.info("testReplaceCommunityOnly() - CREATE Community AIP");
-        File aipFile = createAIP(topCommunity, null, false, false);
+        File aipFile = createAIP(topCommunity, null, false);
         
         // Change the Community name
         String newName = "This is NOT my Community name!";
@@ -492,9 +567,9 @@ public class ITDSpaceAIP extends AbstractUnitTest
         HashMap<String,String> infoMap = new HashMap<String,String>();
         saveObjectInfo(testCollection, infoMap);
 
-        // Ensure collection & child AIPs are exported (but don't overwrite)
+        // Export collection & child AIPs
         log.info("testRestoreCollectionHierarchy() - CREATE AIPs");
-        File aipFile = createAIP(testCollection, null, true, false);
+        File aipFile = createAIP(testCollection, null, true);
 
         // Delete everything from collection on down
         log.info("testRestoreCollectionHierarchy() - DELETE Collection Hierarchy");
@@ -511,6 +586,80 @@ public class ITDSpaceAIP extends AbstractUnitTest
         assertObjectsExist(infoMap);
         
         log.info("testRestoreCollectionHierarchy() - END");
+    }
+    
+    /**
+     * Test restoration from AIP of an access restricted Collection
+     */
+    @Test
+    public void testRestoreRestrictedCollection() throws Exception
+    {
+        new NonStrictExpectations(authorizeService.getClass())
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
+            authorizeService.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testRestoreRestrictedCollection() - BEGIN");
+
+        // Locate the top-level Community (as a parent)
+        Community parent = (Community) handleService.resolveToObject(context, topCommunityHandle);
+
+        // Create a brand new (empty) Collection to test with
+        Collection collection = collectionService.create(context, parent);
+        collectionService.addMetadata(context, collection, "dc", "title", null, null, "Restricted Collection");
+        collectionService.update(context, collection);
+        String collectionHandle = collection.getHandle();
+
+        // Create a new Group to access restrict to
+        Group group = groupService.create(context);
+        groupService.setName(group, "Special Users");
+        groupService.update(context, group);
+
+        // Create a custom resource policy for this Collection
+        List<ResourcePolicy> policies = new ArrayList<>();
+        ResourcePolicy policy = resourcePolicyService.create(context);
+        policy.setRpName("Special Read Only");
+        policy.setGroup(group);
+        policy.setAction(Constants.READ);
+        policies.add(policy);
+
+        // Replace default Collection policies with this new one
+        authorizeService.removeAllPolicies(context, collection);
+        authorizeService.addPolicies(context, policies, collection);
+
+        // Export collection AIP
+        log.info("testRestoreRestrictedCollection() - CREATE Collection AIP");
+        File aipFile = createAIP(collection, null, false);
+
+        // Now, delete that Collection
+        log.info("testRestoreRestrictedCollection() - DELETE Collection");
+        communityService.removeCollection(context, parent, collection);
+
+        // Assert the deleted collection no longer exists
+        DSpaceObject obj = handleService.resolveToObject(context, collectionHandle);
+        assertThat("testRestoreRestrictedCollection() Collection " + collectionHandle + " doesn't exist", obj, nullValue());
+
+        // Restore Collection from AIP (non-recursive)
+        log.info("testRestoreRestrictedCollection() - RESTORE Collection");
+        restoreFromAIP(parent, aipFile, null, false);
+
+        // Assert the deleted Collection is RESTORED
+        DSpaceObject objRestored = handleService.resolveToObject(context, collectionHandle);
+        assertThat("testRestoreRestrictedCollection() Collection " + collectionHandle + " exists", objRestored, notNullValue());
+
+        // Assert the number of restored policies is equal
+        List<ResourcePolicy> policiesRestored = authorizeService.getPolicies(context, objRestored);
+        assertEquals("testRestoreRestrictedCollection() restored policy count equal", policies.size(), policiesRestored.size());
+
+        // Assert the restored policy has same name, group and permission settings
+        ResourcePolicy restoredPolicy = policiesRestored.get(0);
+        assertEquals("testRestoreRestrictedCollection() restored policy group successfully", policy.getGroup().getName(), restoredPolicy.getGroup().getName());
+        assertEquals("testRestoreRestrictedCollection() restored policy action successfully", policy.getAction(), restoredPolicy.getAction());
+        assertEquals("testRestoreRestrictedCollection() restored policy name successfully", policy.getRpName(), restoredPolicy.getRpName());
+
+        log.info("testRestoreRestrictedCollection() - END");
     }
     
     /**
@@ -534,9 +683,9 @@ public class ITDSpaceAIP extends AbstractUnitTest
         // How many items are in this Collection?
         int numberOfItems = itemService.countItems(context, testCollection);
         
-        // Ensure collection & child AIPs are exported (but don't overwrite)
+        // Export collection & child AIPs
         log.info("testReplaceCollectionHierarchy() - CREATE AIPs");
-        File aipFile = createAIP(testCollection, null, true, false);
+        File aipFile = createAIP(testCollection, null, true);
         
         // Get some basic info about Item to be deleted
         // In this scenario, we'll delete the test "Grandchild Collection Item #1" 
@@ -592,9 +741,9 @@ public class ITDSpaceAIP extends AbstractUnitTest
         // Get its current name / title
         String oldName = testCollection.getName();
         
-        // Ensure only collection AIP is exported (but don't overwrite)
+        // Export only collection AIP
         log.info("testReplaceCollectionOnly() - CREATE Collection AIP");
-        File aipFile = createAIP(testCollection, null, false, false);
+        File aipFile = createAIP(testCollection, null, false);
         
         // Change the Collection name
         String newName = "This is NOT my Collection name!";
@@ -651,13 +800,13 @@ public class ITDSpaceAIP extends AbstractUnitTest
         if(bitstreamCount<=0)
             fail("No test bitstream found for Item in testRestoreItem()!");
 
-        // Ensure item AIP is exported (but don't overwrite)
+        // Export item AIP
         log.info("testRestoreItem() - CREATE Item AIP");
-        File aipFile = createAIP(testItem, null, false, false);
+        File aipFile = createAIP(testItem, null, false);
         
         // Get parent, so we can restore under the same parent
         Collection parent = (Collection) itemService.getParentObject(context, testItem);
-         
+        
         // Now, delete that item
         log.info("testRestoreItem() - DELETE Item");
         collectionService.removeItem(context, parent, testItem);
@@ -684,6 +833,143 @@ public class ITDSpaceAIP extends AbstractUnitTest
     }
     
     /**
+     * Test restoration from AIP of an access restricted Item
+     */
+    @Test
+    public void testRestoreRestrictedItem() throws Exception
+    {
+        new NonStrictExpectations(authorizeService.getClass())
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
+            authorizeService.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testRestoreRestrictedItem() - BEGIN");
+
+        // Locate the test Collection (as a parent)
+        Collection parent = (Collection) handleService.resolveToObject(context, testCollectionHandle);
+
+        // Create a brand new Item to test with (since we will be changing policies)
+        WorkspaceItem wsItem = workspaceItemService.create(context, parent, false);
+        Item item = installItemService.installItem(context, wsItem);
+        itemService.addMetadata(context, item, "dc", "title", null, null, "Test Restricted Item");
+        // Create a test Bitstream in the ORIGINAL bundle
+        File f = new File(testProps.get("test.bitstream").toString());
+        Bitstream b = itemService.createSingleBitstream(context, new FileInputStream(f), item);
+        b.setName(context, "Test Bitstream");
+        bitstreamService.update(context, b);
+        itemService.update(context, item);
+
+        // Create a custom resource policy for this Item
+        List<ResourcePolicy> policies = new ArrayList<>();
+        ResourcePolicy admin_policy = resourcePolicyService.create(context);
+        admin_policy.setRpName("Admin Read-Only");
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        admin_policy.setGroup(adminGroup);
+        admin_policy.setAction(Constants.READ);
+        policies.add(admin_policy);
+        itemService.replaceAllItemPolicies(context, item, policies);
+
+        // Export item AIP
+        log.info("testRestoreRestrictedItem() - CREATE Item AIP");
+        File aipFile = createAIP(item, null, false);
+
+        // Get item handle, so we can check that it is later restored properly
+        String itemHandle = item.getHandle();
+
+        // Now, delete that item
+        log.info("testRestoreRestrictedItem() - DELETE Item");
+        collectionService.removeItem(context, parent, item);
+
+        // Assert the deleted item no longer exists
+        DSpaceObject obj = handleService.resolveToObject(context, itemHandle);
+        assertThat("testRestoreRestrictedItem() item " + itemHandle + " doesn't exist", obj, nullValue());
+
+        // Restore Item from AIP (non-recursive)
+        log.info("testRestoreRestrictedItem() - RESTORE Item");
+        restoreFromAIP(parent, aipFile, null, false);
+
+        // Assert the deleted item is RESTORED
+        DSpaceObject objRestored = handleService.resolveToObject(context, itemHandle);
+        assertThat("testRestoreRestrictedItem() item " + itemHandle + " exists", objRestored, notNullValue());
+
+        // Assert the number of restored policies is equal
+        List<ResourcePolicy> policiesRestored = authorizeService.getPolicies(context, objRestored);
+        assertEquals("testRestoreRestrictedItem() restored policy count equal", policies.size(), policiesRestored.size());
+
+        // Assert the restored policy has same name, group and permission settings
+        ResourcePolicy restoredPolicy = policiesRestored.get(0);
+        assertEquals("testRestoreRestrictedItem() restored policy group successfully", admin_policy.getGroup().getName(), restoredPolicy.getGroup().getName());
+        assertEquals("testRestoreRestrictedItem() restored policy action successfully", admin_policy.getAction(), restoredPolicy.getAction());
+        assertEquals("testRestoreRestrictedItem() restored policy name successfully", admin_policy.getRpName(), restoredPolicy.getRpName());
+
+        log.info("testRestoreRestrictedItem() - END");
+    }
+
+    /**
+     * Test restoration from AIP of an Item that has no access policies associated with it.
+     */
+    @Test
+    public void testRestoreItemNoPolicies() throws Exception
+    {
+        new NonStrictExpectations(authorizeService.getClass())
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
+            authorizeService.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testRestoreItemNoPolicies() - BEGIN");
+
+        // Locate the test Collection (as a parent)
+        Collection parent = (Collection) handleService.resolveToObject(context, testCollectionHandle);
+
+        // Create a brand new Item to test with (since we will be changing policies)
+        WorkspaceItem wsItem = workspaceItemService.create(context, parent, false);
+        Item item = installItemService.installItem(context, wsItem);
+        itemService.addMetadata(context, item, "dc", "title", null, null, "Test No Policies Item");
+        // Create a test Bitstream in the ORIGINAL bundle
+        File f = new File(testProps.get("test.bitstream").toString());
+        Bitstream b = itemService.createSingleBitstream(context, new FileInputStream(f), item);
+        b.setName(context, "Test Bitstream");
+        bitstreamService.update(context, b);
+        itemService.update(context, item);
+
+        // Remove all existing policies from the Item
+        authorizeService.removeAllPolicies(context, item);
+
+        // Export item AIP
+        log.info("testRestoreItemNoPolicies() - CREATE Item AIP");
+        File aipFile = createAIP(item, null, false);
+
+        // Get item handle, so we can check that it is later restored properly
+        String itemHandle = item.getHandle();
+
+        // Now, delete that item
+        log.info("testRestoreItemNoPolicies() - DELETE Item");
+        collectionService.removeItem(context, parent, item);
+
+        // Assert the deleted item no longer exists
+        DSpaceObject obj = handleService.resolveToObject(context, itemHandle);
+        assertThat("testRestoreItemNoPolicies() item " + itemHandle + " doesn't exist", obj, nullValue());
+
+        // Restore Item from AIP (non-recursive)
+        log.info("testRestoreItemNoPolicies() - RESTORE Item");
+        restoreFromAIP(parent, aipFile, null, false);
+
+        // Assert the deleted item is RESTORED
+        DSpaceObject objRestored = handleService.resolveToObject(context, itemHandle);
+        assertThat("testRestoreItemNoPolicies() item " + itemHandle + " exists", objRestored, notNullValue());
+
+        // Assert the restored item also has ZERO policies
+        List<ResourcePolicy> policiesRestored = authorizeService.getPolicies(context, objRestored);
+        assertEquals("testRestoreItemNoPolicies() restored policy count is zero", 0, policiesRestored.size());
+
+        log.info("testRestoreItemNoPolicies() - END");
+    }
+
+    /**
      * Test replacement from AIP of an Item object
      */
     @Test
@@ -704,9 +990,9 @@ public class ITDSpaceAIP extends AbstractUnitTest
         // Get its current name / title
         String oldName = testItem.getName();
         
-        // Ensure item AIP is exported (but don't overwrite)
+        // Export item AIP
         log.info("testReplaceItem() - CREATE Item AIP");
-        File aipFile = createAIP(testItem, null, false, false);
+        File aipFile = createAIP(testItem, null, false);
         
         // Change the Item name
         String newName = "This is NOT my Item name!";
@@ -750,9 +1036,9 @@ public class ITDSpaceAIP extends AbstractUnitTest
         List<Collection> mappedCollections = item.getCollections();
         assertEquals("testRestoreMappedItem() item " + testMappedItemHandle + " is mapped to multiple collections", 2, mappedCollections.size());
         
-        // Ensure mapped item AIP is exported (but don't overwrite)
+        // Export mapped item AIP
         log.info("testRestoreMappedItem() - CREATE Mapped Item AIP");
-        File aipFile = createAIP(item, null, false, false);
+        File aipFile = createAIP(item, null, false);
         
         // Now, delete that item (must be removed from BOTH collections to delete it)
         log.info("testRestoreMappedItem() - DELETE Item");
@@ -784,10 +1070,9 @@ public class ITDSpaceAIP extends AbstractUnitTest
      * @param dso DSpaceObject to create AIP(s) for
      * @param pkParams any special PackageParameters to pass (if any)
      * @param recursive whether to recursively create AIPs or just a single AIP
-     * @param overwrite whether to overwrite the local AIP file if it is found
      * @return exported root AIP file
      */
-    private File createAIP(DSpaceObject dso, PackageParameters pkgParams, boolean recursive, boolean overwrite)
+    private File createAIP(DSpaceObject dso, PackageParameters pkgParams, boolean recursive)
             throws PackageException, CrosswalkException, AuthorizeException, SQLException, IOException
     {
         // Get a reference to the configured "AIP" package disseminator
@@ -796,14 +1081,13 @@ public class ITDSpaceAIP extends AbstractUnitTest
         if (dip == null)
         {
             fail("Could not find a disseminator for type 'AIP'");
+            return null;
         }
-        
-        // Export file (this is placed in JUnit's temporary folder, so that it can be cleaned up after tests complete)
-        File exportAIPFile = new File(testFolder.getRoot().getAbsolutePath() + File.separator + PackageUtils.getPackageName(dso, "zip"));
-        
-        // To save time, we'll skip re-exporting AIPs, unless overwrite == true
-        if(!exportAIPFile.exists() || overwrite)
+        else
         {
+            // Export file (this is placed in JUnit's temporary folder, so that it can be cleaned up after tests complete)
+            File exportAIPFile = new File(aipTempFolder.getRoot().getAbsolutePath() + File.separator + PackageUtils.getPackageName(dso, "zip"));
+
             // If unspecified, set default PackageParameters
             if (pkgParams==null)
                 pkgParams = new PackageParameters();
@@ -813,9 +1097,9 @@ public class ITDSpaceAIP extends AbstractUnitTest
                 dip.disseminateAll(context, dso, pkgParams, exportAIPFile);
             else
                 dip.disseminate(context, dso, pkgParams, exportAIPFile);
+
+            return exportAIPFile;
         }
-        
-        return exportAIPFile;
     }
     
     /**
@@ -835,24 +1119,26 @@ public class ITDSpaceAIP extends AbstractUnitTest
         {
             fail("Could not find a ingestor for type 'AIP'");
         }
-        
-        if(!aipFile.exists())
-        {
-            fail("AIP Package File does NOT exist: " + aipFile.getAbsolutePath());
-        }
-        
-        // If unspecified, set default PackageParameters
-        if(pkgParams==null)
-            pkgParams = new PackageParameters();
-        
-        // Ensure restore mode is enabled
-        pkgParams.setRestoreModeEnabled(true);
-        
-        // Actually ingest the object(s) from AIPs
-        if(recursive)
-            sip.ingestAll(context, parent, aipFile, pkgParams, null);
         else
-            sip.ingest(context, parent, aipFile, pkgParams, null);
+        {
+            if(!aipFile.exists())
+            {
+                fail("AIP Package File does NOT exist: " + aipFile.getAbsolutePath());
+            }
+
+            // If unspecified, set default PackageParameters
+            if(pkgParams==null)
+                pkgParams = new PackageParameters();
+
+            // Ensure restore mode is enabled
+            pkgParams.setRestoreModeEnabled(true);
+
+            // Actually ingest the object(s) from AIPs
+            if(recursive)
+                sip.ingestAll(context, parent, aipFile, pkgParams, null);
+            else
+                sip.ingest(context, parent, aipFile, pkgParams, null);
+        }
     }
     
     /**
@@ -872,24 +1158,26 @@ public class ITDSpaceAIP extends AbstractUnitTest
         {
             fail("Could not find a ingestor for type 'AIP'");
         }
-        
-        if(!aipFile.exists())
-        {
-            fail("AIP Package File does NOT exist: " + aipFile.getAbsolutePath());
-        }
-        
-        // If unspecified, set default PackageParameters
-        if (pkgParams==null)
-            pkgParams = new PackageParameters();
-        
-        // Ensure restore mode is enabled
-        pkgParams.setRestoreModeEnabled(true);
-        
-        // Actually replace the object(s) from AIPs
-        if(recursive)
-            sip.replaceAll(context, dso, aipFile, pkgParams);
         else
-            sip.replace(context, dso, aipFile, pkgParams);
+        {
+            if(!aipFile.exists())
+            {
+                fail("AIP Package File does NOT exist: " + aipFile.getAbsolutePath());
+            }
+
+            // If unspecified, set default PackageParameters
+            if (pkgParams==null)
+                pkgParams = new PackageParameters();
+
+            // Ensure restore mode is enabled
+            pkgParams.setRestoreModeEnabled(true);
+
+            // Actually replace the object(s) from AIPs
+            if(recursive)
+                sip.replaceAll(context, dso, aipFile, pkgParams);
+            else
+                sip.replace(context, dso, aipFile, pkgParams);
+        }
     }
     
     /**

@@ -25,6 +25,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
+import org.apache.commons.lang.ArrayUtils;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
@@ -430,11 +431,11 @@ public class ItemTag extends TagSupport
         HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
         Context context = UIUtil.obtainContext(request);
         Locale sessionLocale = UIUtil.getSessionLocale(request);
-        String configLine = styleSelection.getConfigurationForStyle(style);
+        String[] metadataFields = styleSelection.getConfigurationForStyle(style);
 
-        if (configLine == null)
+        if (ArrayUtils.isEmpty(metadataFields))
         {
-            configLine = defaultFields;
+            metadataFields = defaultFields.split(",");
         }
 
         out.println("<table class=\"table itemDisplayTable\">");
@@ -446,11 +447,9 @@ public class ItemTag extends TagSupport
          * to a more efficient intermediate class, but then it would become more
          * difficult to reload the configuration "on the fly".
          */
-        StringTokenizer st = new StringTokenizer(configLine, ",");
-
-        while (st.hasMoreTokens())
+        for (String field : metadataFields)
         {
-        	String field = st.nextToken().trim();
+            field = field.trim();
             boolean isDate = false;
             boolean isLink = false;
             boolean isResolver = false;
@@ -1041,7 +1040,7 @@ public class ItemTag extends TagSupport
                                     // won't have a big problem here
                                     rp = policy;
                                     // if we found a policy allowing anonymous
-                                    // group to read the bitsream, mark it as
+                                    // group to read the bitstream, mark it as
                                     // being anoymous readable and leave the loop
                                     if (resourcePolicyService.isDateValid(policy))
                                     {

@@ -35,14 +35,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     private static final Message T_context_swordclient_head = message("xmlui.swordclient.Navigation.context_head");
     private static final Message T_swordclient_copy = message("xmlui.swordclient.Navigation.context_copy");
-        
-    /** Cached validity object */
-    private SourceValidity validity;
-    
+
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-
-    
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.

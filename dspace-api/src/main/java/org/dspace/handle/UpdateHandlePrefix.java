@@ -81,6 +81,7 @@ public class UpdateHandlePrefix
 
                 if (choiceString.equalsIgnoreCase("y"))
                 {
+                	context.turnOffAuthorisationSystem();
                     try {
                         log.info("Updating handle prefix from " + oldH + " to " + newH);
 
@@ -146,6 +147,7 @@ public class UpdateHandlePrefix
                         );
                         throw e;
                     }
+                    context.restoreAuthSystemState();
                 }
                 else
                 {

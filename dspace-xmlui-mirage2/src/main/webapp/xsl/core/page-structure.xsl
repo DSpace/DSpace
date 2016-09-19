@@ -237,12 +237,12 @@
             <!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
             <!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
             <script>
-                //Clear default text of emty text areas on focus
+                //Clear default text of empty text areas on focus
                 function tFocus(element)
                 {
                 if (element.value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){element.value='';}
                 }
-                //Clear default text of emty text areas on submit
+                //Clear default text of empty text areas on submit
                 function tSubmit(form)
                 {
                 var defaultedElements = document.getElementsByTagName("textarea");
@@ -703,7 +703,7 @@
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
                         <div>
-                            <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2015&#160; <a href="http://www.duraspace.org/" target="_blank">DuraSpace</a>
+                            <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2016&#160; <a href="http://www.duraspace.org/" target="_blank">DuraSpace</a>
                         </div>
                         <div class="hidden-print">
                             <a>
@@ -729,8 +729,8 @@
                         <div class="pull-right">
                             <span class="theme-by">Theme by&#160;</span>
                             <br/>
-                            <a title="@mire NV" target="_blank" href="http://atmire.com">
-                                <img alt="@mire NV" src="{concat($theme-path, '/images/@mirelogo-small.png')}"/>
+                            <a title="Atmire NV" target="_blank" href="http://atmire.com">
+                                <img alt="Atmire NV" src="{concat($theme-path, '/images/atmire-logo-small.svg')}"/>
                             </a>
                         </div>
 
@@ -764,7 +764,7 @@
     <xsl:template match="dri:body">
         <div>
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
-                <div class="alert">
+                <div class="alert alert-warning">
                     <button type="button" class="close" data-dismiss="alert">&#215;</button>
                     <xsl:copy-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']/node()"/>
                 </div>

@@ -58,7 +58,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * {@code My descriptor $td=ruby|rubytask.rb|LinkChecker.new}
  * 
  * For portability, the {@code <relFilePath>} component may be omitted in this context.
- * Thus, {@code$td=ruby||LinkChecker.new} will be expanded to a descriptor
+ * Thus, {@code $td=ruby||LinkChecker.new} will be expanded to a descriptor
  * with the name of the embedding file.
  * 
  * @author richardrodgers

@@ -13,7 +13,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang.StringUtils;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.VersionUtil;
@@ -21,7 +20,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
@@ -32,6 +30,8 @@ import org.dspace.identifier.service.DOIService;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.plugin.ItemHomeProcessor;
 import org.dspace.plugin.PluginException;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -48,7 +48,8 @@ public class VersioningItemHome implements ItemHomeProcessor {
     private IdentifierService identifierService;
     private VersionHistoryService versionHistoryService;
     private VersioningService versioningService;
-    private ItemService itemService;
+    private ItemService itemService;    
+    private ConfigurationService configurationService;
 	
     public VersioningItemHome() {
         doiService = IdentifierServiceFactory.getInstance().getDOIService();
@@ -57,6 +58,7 @@ public class VersioningItemHome implements ItemHomeProcessor {
         itemService = ContentServiceFactory.getInstance().getItemService();
         versioningService = VersionServiceFactory.getInstance().getVersionService();
         versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
+        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     }
 	
 
@@ -64,8 +66,10 @@ public class VersioningItemHome implements ItemHomeProcessor {
     public void process(Context context, HttpServletRequest request,
             HttpServletResponse response, Item item) throws PluginException,
             AuthorizeException {
-        boolean versioningEnabled = ConfigurationManager.getBooleanProperty(
-                "versioning", "enabled");
+        boolean versioningEnabled = configurationService
+                .getPropertyAsType("versioning.enabled", false);
+        boolean submitterCanCreateNewVersion = configurationService
+            .getPropertyAsType("versioning.submitterCanCreateNewVersion", false);
         boolean newVersionAvailable = false;
         boolean showVersionWorkflowAvailable = false;
         boolean hasVersionButton = false;
@@ -81,7 +85,17 @@ public class VersioningItemHome implements ItemHomeProcessor {
                     if (versionHistoryService.isLastVersion(context, item) 
                             && item.isArchived()) {
                         hasVersionButton = true;
-                    }
+                    } 
+                }
+                else if (submitterCanCreateNewVersion) 
+                {
+                    if (versionHistoryService.isLastVersion(context, item) 
+                            && item.isArchived() 
+                            && itemService.canCreateNewVersion(context, item)) 
+                        {
+                            hasVersionButton = true;
+                        }
+                    
                 }
                 if (versionHistoryService.hasVersionHistory(context, item)) {
                     hasVersionHistory = true;
@@ -139,7 +153,7 @@ public class VersioningItemHome implements ItemHomeProcessor {
                     }
 
                     // do we prefer to use handle or DOIs?
-                    if ("doi".equalsIgnoreCase(ConfigurationManager.getProperty("webui.preferred.identifier")))
+                    if ("doi".equalsIgnoreCase(configurationService.getProperty("webui.preferred.identifier")))
                     {
                         if (latestVersionDOI != null)
                         {

@@ -48,7 +48,7 @@ public interface IdentifierService {
      * @return the matching identifiers, or the site identifier if the object
      *  is a Site, or an empty array if no matching identifier is found.
      */
-    List<String> lookup(Context contex, DSpaceObject dso);
+    List<String> lookup(Context context, DSpaceObject dso);
 
     /**
      *

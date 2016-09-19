@@ -16,6 +16,10 @@ import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/*
+ * @deprecated  As of DSpace 6.0, ElasticSearch statistics are replaced by Solr statistics
+ * @see org.dspace.statistics.service.SolrLoggerUsageEventListener#SolrLoggerUsageEventListener
+ */
 public class ElasticSearchLoggerEventListener extends AbstractUsageEventListener {
 
     private static Logger log = Logger.getLogger(ElasticSearchLoggerEventListener.class);

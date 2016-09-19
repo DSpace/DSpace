@@ -24,6 +24,8 @@ import java.util.List;
  */
 public interface HandleDAO extends GenericDAO<Handle> {
 
+    public Long getNextHandleSuffix(Context context) throws SQLException;
+
     public List<Handle> getHandlesByDSpaceObject(Context context, DSpaceObject dso) throws SQLException;
 
     public Handle findByHandle(Context context, String handle)throws SQLException;

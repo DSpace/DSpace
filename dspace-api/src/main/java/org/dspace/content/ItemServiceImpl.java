@@ -7,6 +7,15 @@
  */
 package org.dspace.content;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -18,7 +27,15 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.dao.ItemDAO;
-import org.dspace.content.service.*;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -29,13 +46,10 @@ import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
+import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Service implementation for the Item object.
@@ -78,6 +92,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected VersioningService versioningService;
     @Autowired(required=true)
     protected HarvestedItemService harvestedItemService;
+    @Autowired(required=true)
+    protected ConfigurationService configurationService;
+    
+    @Autowired(required=true)
+    protected WorkspaceItemService workspaceItemService;
+    @Autowired(required=true)
+    protected WorkflowItemService workflowItemService;
+    
 
     protected ItemServiceImpl()
     {
@@ -192,6 +214,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit) throws SQLException {
 
         MetadataField metadataField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "date", "accessioned");
+        if(metadataField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".date.accessioned' doesn't exist!");
+        }
+
         return itemDAO.findBySubmitter(context, eperson, metadataField, limit);
     }
 
@@ -236,11 +263,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         List<Community> result = new ArrayList<>();
         List<Collection> collections = item.getCollections();
         for (Collection collection : collections) {
-            List<Community> owningCommunities = collection.getCommunities();
-            for (Community community : owningCommunities) {
-                result.add(community);
-                result.addAll(communityService.getAllParents(context, community));
-            }
+            result.addAll(communityService.getAllParents(context, collection));
         }
 
         return result;
@@ -294,17 +317,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogManager.getHeader(context, "remove_bundle", "item_id="
                 + item.getID() + ",bundle_id=" + bundle.getID()));
 
-
-        item.removeBundle(bundle);
-        bundle.removeItem(item);
-
-
         context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
                 Constants.BUNDLE, bundle.getID(), bundle.getName(), getIdentifiers(context, item)));
 
-        if (CollectionUtils.isEmpty(bundle.getItems())) {
             bundleService.delete(context, bundle);
-        }
     }
 
     @Override
@@ -515,8 +531,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
                 "WITHDRAW", getIdentifiers(context, item)));
 
-        // remove all authorization policies, saving the custom ones
-        authorizeService.removeAllPoliciesByDSOAndTypeNotEqualsTo(context, item, ResourcePolicy.TYPE_CUSTOM);
+        // switch all READ authorization policies to WITHDRAWN_READ
+        authorizeService.switchPoliciesAction(context, item, Constants.READ, Constants.WITHDRAWN_READ);
+        for (Bundle bnd : item.getBundles()) {
+        	authorizeService.switchPoliciesAction(context, bnd, Constants.READ, Constants.WITHDRAWN_READ);
+        	for (Bitstream bs : bnd.getBitstreams()) {
+        		authorizeService.switchPoliciesAction(context, bs, Constants.READ, Constants.WITHDRAWN_READ);
+        	}
+        }
 
         // Write log
         log.info(LogManager.getHeader(context, "withdraw_item", "user="
@@ -564,16 +586,28 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(),
                 "REINSTATE", getIdentifiers(context, item)));
 
-        // authorization policies
-        if (colls.size() > 0)
-        {
-            // FIXME: not multiple inclusion friendly - just apply access
-            // policies from first collection
-            // remove the item's policies and replace them with
-            // the defaults from the collection
-            inheritCollectionDefaultPolicies(context, item, colls.iterator().next());
-        }
+		// restore all WITHDRAWN_READ authorization policies back to READ
+		for (Bundle bnd : item.getBundles()) {
+			authorizeService.switchPoliciesAction(context, bnd, Constants.WITHDRAWN_READ, Constants.READ);
+			for (Bitstream bs : bnd.getBitstreams()) {
+				authorizeService.switchPoliciesAction(context, bs, Constants.WITHDRAWN_READ, Constants.READ);
+			}
+		}
 
+        // check if the item was withdrawn before the fix DS-3097
+        if (authorizeService.getPoliciesActionFilter(context, item, Constants.WITHDRAWN_READ).size() != 0) {
+        	authorizeService.switchPoliciesAction(context, item, Constants.WITHDRAWN_READ, Constants.READ);
+        }
+        else {
+	        // authorization policies
+	        if (colls.size() > 0)
+	        {
+	            // remove the item's policies and replace them with
+	            // the defaults from the collection
+	        	adjustItemPolicies(context, item, item.getOwningCollection());
+	        }
+        }
+        
         // Write log
         log.info(LogManager.getHeader(context, "reinstate_item", "user="
                 + e.getEmail() + ",item_id=" + item.getID()));
@@ -582,18 +616,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public void delete(Context context, Item item) throws SQLException, AuthorizeException, IOException {
         authorizeService.authorizeAction(context, item, Constants.DELETE);
-
-        // Also delete the item if it appears in a harvested collection.
-        HarvestedItem hi = harvestedItemService.find(context, item);
-
-        if(hi!=null)
-        {
-            harvestedItemService.delete(context, hi);
-        }
-        
-        item.getCollections().clear();
-        item.setOwningCollection(null);
-        rawDelete(context,item);
+        rawDelete(context,  item);
     }
 
     @Override
@@ -607,7 +630,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
                 item.getHandle(), getIdentifiers(context, item)));
 
-
         log.info(LogManager.getHeader(context, "delete_item", "item_id="
                 + item.getID()));
 
@@ -616,9 +638,21 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // Remove any Handle
         handleService.unbindHandle(context, item);
-
+        
         // remove version attached to the item
         removeVersion(context, item);
+
+        // Also delete the item if it appears in a harvested collection.
+        HarvestedItem hi = harvestedItemService.find(context, item);
+
+        if(hi!=null)
+        {
+            harvestedItemService.delete(context, hi);
+        }
+
+        //Only clear collections after we have removed everything else from the item
+        item.getCollections().clear();
+        item.setOwningCollection(null);
 
         // Finally remove item row
         itemDAO.delete(context, item);
@@ -732,18 +766,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             // if come from InstallItem: remove all submission/workflow policies
             authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_SUBMISSION);
             authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_WORKFLOW);
-
-            List<ResourcePolicy> policiesBundleToAdd = filterPoliciesToAdd(context, defaultCollectionPolicies, mybundle);
-            authorizeService.addPolicies(context, policiesBundleToAdd, mybundle);
+            addDefaultPoliciesNotInPlace(context, mybundle, defaultCollectionPolicies);
 
             for(Bitstream bitstream : mybundle.getBitstreams())
             {
                 // if come from InstallItem: remove all submission/workflow policies
                 authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_SUBMISSION);
                 authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_WORKFLOW);
-
-                List<ResourcePolicy> policiesBitstreamToAdd = filterPoliciesToAdd(context, defaultCollectionPolicies, bitstream);
-                authorizeService.addPolicies(context, policiesBitstreamToAdd, bitstream);
+                addDefaultPoliciesNotInPlace(context, bitstream, defaultCollectionPolicies);
             }
         }
     }
@@ -770,9 +800,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_WORKFLOW);
 
             // add default policies only if not already in place
-            List<ResourcePolicy> policiesToAdd = filterPoliciesToAdd(context, defaultCollectionPolicies, item);
-            authorizeService.addPolicies(context, policiesToAdd, item);
-        } finally {
+            addDefaultPoliciesNotInPlace(context, item, defaultCollectionPolicies);
+        } 
+        finally 
+        {
             context.restoreAuthSystemState();
         }
     }
@@ -888,28 +919,57 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // is this collection not yet created, and an item template is created
         if (item.getOwningCollection() == null)
         {
-            return true;
+        	if (!isInProgressSubmission(context, item)) {
+        		return true;
+        	}
+        	else {
+        		return false;
+        	}
         }
 
         return collectionService.canEditBoolean(context, item.getOwningCollection(), false);
     }
 
+    /**
+     * Check if the item is an inprogress submission
+     * @param context
+     * @param item
+     * @return <code>true</code> if the item is an inprogress submission, i.e. a WorkspaceItem or WorkflowItem
+     * @throws SQLException
+     */
+    public boolean isInProgressSubmission(Context context, Item item) throws SQLException {
+		return workspaceItemService.findByItem(context, item) != null
+				|| workflowItemService.findByItem(context, item) != null;
+    }
+    
+    /*
+    With every finished submission a bunch of resource policy entries with have null value for the dspace_object column are generated in the database.
+prevent the generation of resource policy entry values with null dspace_object as value
 
+    */
 
-    protected List<ResourcePolicy> filterPoliciesToAdd(Context context, List<ResourcePolicy> defaultCollectionPolicies, DSpaceObject dso) throws SQLException, AuthorizeException {
-        List<ResourcePolicy> policiesToAdd = new ArrayList<>();
-        for (ResourcePolicy defaultCollectionPolicy : defaultCollectionPolicies){
-            //We do NOT alter the defaultCollectionPolicy since we would lose it if we do, instead clone it
-            ResourcePolicy rp = (ResourcePolicy) resourcePolicyService.clone(context, defaultCollectionPolicy);
-
-            rp.setAction(Constants.READ);
-            // if an identical policy is already in place don't add it
-            if(!authorizeService.isAnIdenticalPolicyAlreadyInPlace(context, dso, rp)){
-                rp.setRpType(ResourcePolicy.TYPE_INHERITED);
-                policiesToAdd.add(rp);
+    /**
+     * Add the default policies, which have not been already added to the given DSpace object
+     * 
+     * @param context
+     * @param dso
+     * @param defaultCollectionPolicies
+     * @throws SQLException
+     * @throws AuthorizeException 
+     */
+    protected void addDefaultPoliciesNotInPlace(Context context, DSpaceObject dso, List<ResourcePolicy> defaultCollectionPolicies) throws SQLException, AuthorizeException
+    {
+            for (ResourcePolicy defaultPolicy : defaultCollectionPolicies)
+            {
+                if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(context, dso, defaultPolicy.getGroup(), Constants.READ, defaultPolicy.getID()))
+                {
+                    ResourcePolicy newPolicy = resourcePolicyService.clone(context, defaultPolicy);
+                    newPolicy.setdSpaceObject(dso);
+                    newPolicy.setAction(Constants.READ);
+                    newPolicy.setRpType(ResourcePolicy.TYPE_INHERITED);
+                    resourcePolicyService.update(context, newPolicy);
+                }
             }
-        }
-        return policiesToAdd;
     }
 
     /**
@@ -1184,5 +1244,22 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public int countWithdrawnItems(Context context) throws SQLException {
        // return count of items that are not in archive and withdrawn
        return itemDAO.countItems(context, false, true);
+    }
+
+    @Override
+    public boolean canCreateNewVersion(Context context, Item item) throws SQLException{
+        if (authorizeService.isAdmin(context, item)) 
+        {
+            return true;
+        }
+
+        if (context.getCurrentUser() != null
+                && context.getCurrentUser().equals(item.getSubmitter())) 
+        {
+            return configurationService.getPropertyAsType(
+                    "versioning.submitterCanCreateNewVersion", false);
+        }
+
+        return false;
     }
 }

@@ -105,7 +105,10 @@ public class SendItemRequestAction extends AbstractAction
         }
         
         Item item = (Item) dso;
-        String title = "";
+        String title = item.getName();
+        
+        title = StringUtils.isNotBlank(title) ? title : I18nUtil
+                            .getMessage("jsp.general.untitled", context);
         Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamId));
 
         RequestItemAuthor requestItemAuthor = DSpaceServicesFactory.getInstance().getServiceManager()
@@ -115,7 +118,7 @@ public class SendItemRequestAction extends AbstractAction
                 )
                 .getRequestItemAuthor(context, item);
 
-        String token = requestItemService.createRequest(context, bitstream, item, Boolean.getBoolean(allFiles), requesterEmail, requesterName, message);
+        String token = requestItemService.createRequest(context, bitstream, item, Boolean.valueOf(allFiles), requesterEmail, requesterName, message);
 
         // All data is there, send the email
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.author"));

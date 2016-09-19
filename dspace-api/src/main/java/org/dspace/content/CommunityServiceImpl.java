@@ -137,12 +137,22 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     @Override
     public List<Community> findAll(Context context) throws SQLException {
         MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        if(sortField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+        }
+
         return communityDAO.findAll(context, sortField);
     }
 
     @Override
     public List<Community> findAll(Context context, Integer limit, Integer offset) throws SQLException {
         MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        if(nameField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+        }
+
         return communityDAO.findAll(context, nameField, limit, offset);
     }
 
@@ -151,6 +161,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     {
         // get all communities that are not children
         MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        if(sortField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+        }
+
         return communityDAO.findAllNoParent(context, sortField);
     }
 
@@ -309,6 +324,17 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     }
 
     @Override
+    public List<Community> getAllParents(Context context, Collection collection) throws SQLException {
+        List<Community> result = new ArrayList<>();
+        List<Community> communities = collection.getCommunities();
+        result.addAll(communities);
+        for (Community community : communities) {
+            result.addAll(getAllParents(context, community));
+        }
+        return result;
+    }
+
+    @Override
     public List<Collection> getAllCollections(Context context, Community community) throws SQLException {
         List<Collection> collectionList = new ArrayList<Collection>();
         List<Community> subCommunities = community.getSubcommunities();
@@ -398,15 +424,16 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // Check authorisation
         authorizeService.authorizeAction(context, community, Constants.REMOVE);
 
-        community.removeCollection(collection);
         ArrayList<String> removedIdentifiers = collectionService.getIdentifiers(context, collection);
         String removedHandle = collection.getHandle();
         UUID removedId = collection.getID();
 
-
-        collection.removeCommunity(community);
-        if(CollectionUtils.isEmpty(collection.getCommunities())){
+        if(collection.getCommunities().size() == 1)
+        {
             collectionService.delete(context, collection);
+        }else{
+            community.removeCollection(collection);
+            collection.removeCommunity(community);
         }
 
         log.info(LogManager.getHeader(context, "remove_collection",
@@ -426,13 +453,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         String removedHandle = childCommunity.getHandle();
         UUID removedId = childCommunity.getID();
 
+        rawDelete(context, childCommunity);
 
-        parentCommunity.removeSubCommunity(childCommunity);
         childCommunity.getParentCommunities().remove(parentCommunity);
-        if(CollectionUtils.isEmpty(childCommunity.getParentCommunities()))
-        {
-            rawDelete(context, childCommunity);
-        }
+        parentCommunity.removeSubCommunity(childCommunity);
+
         log.info(LogManager.getHeader(context, "remove_subcommunity",
                 "parent_comm_id=" + parentCommunity.getID() + ",child_comm_id=" + childCommunity.getID()));
 
@@ -525,9 +550,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         // Remove the logo
         setLogo(context, community, null);
-
-        // Remove all authorization policies
-        authorizeService.removeAllPolicies(context, community);
 
         // Remove any Handle
         handleService.unbindHandle(context, community);

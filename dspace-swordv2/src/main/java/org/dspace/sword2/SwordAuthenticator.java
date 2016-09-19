@@ -110,7 +110,7 @@ public class SwordAuthenticator
      * method
      *
      * @param auth
-     * @return
+     * @return SWORD context
      * @throws DSpaceSwordException
      * @throws SwordError
      * @throws SwordAuthException

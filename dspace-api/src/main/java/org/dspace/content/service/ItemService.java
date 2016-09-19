@@ -95,11 +95,11 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
             throws SQLException;
 
     /**
-     * Retrieve the list of Items submitted by eperson, ordered by recently submitted, optionally limitable
+     * Retrieve the list of items submitted by eperson, ordered by recently submitted, optionally limitable
      * @param context context
      * @param eperson eperson
      * @param limit a positive integer to limit, -1 or null for unlimited
-     * @return
+     * @return an iterator over the items submitted by eperson
      * @throws SQLException if database error
      */
     public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit) throws SQLException;
@@ -444,7 +444,15 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException if database error
      */
     public boolean canEdit(Context context, Item item) throws java.sql.SQLException;
-
+  
+    /**
+     * return TRUE if context's user can create new version of the item, false
+     * otherwise.
+     * @return boolean true = current user can create new version of the item
+     * @throws SQLException
+     */
+    public boolean canCreateNewVersion(Context context, Item item) throws SQLException;
+     
     /**
      * Returns an iterator of Items possessing the passed metadata field, or only
      * those matching the passed value, if value is not Item.ANY
@@ -555,4 +563,12 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException if database error
      */
     int countWithdrawnItems(Context context) throws SQLException;
+
+	/**
+	 * Check if the supplied item is an inprogress submission
+	 * @param context
+	 * @param item
+	 * @return <code>true</code> if the item is linked to a workspaceitem or workflowitem
+	 */
+    boolean isInProgressSubmission(Context context, Item item) throws SQLException;
 }

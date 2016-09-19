@@ -76,7 +76,7 @@ public class PubmedService
         if (StringUtils.isNotBlank(title))
         {
             query.append("((").append(title).append("[TI]) OR (");
-            // [TI] non funziona sempre, titolo di capitoli di libro
+            // [TI] does not always work, book chapter title
             query.append("(").append(title).append("[book]))");
         }
         if (StringUtils.isNotBlank(author))

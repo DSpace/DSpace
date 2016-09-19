@@ -248,7 +248,9 @@ public class RestIndex {
      * epersonEMAIL: user@example.com
      * epersonNAME: John Doe
      * @param headers
-     * @return
+     *            Request header which contains the header named
+     *            "rest-dspace-token" containing the token as value.
+     * @return status
      */
     @GET
     @Path("/status")

@@ -16,7 +16,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 /**
  * Schema for DSpace Metadata RDF Mappings.
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
- * @see http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0
+ * @see <a href="http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0">http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0</a>
  */
 public class DMRM {
     /** <p>The RDF model that holds the vocabulary terms</p> */

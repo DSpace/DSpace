@@ -56,10 +56,10 @@ public class VersionHistory implements ReloadableEntity<Integer> {
     }
 
     /**
-     * Please use {@link VersioningService#getVersionsByHistory(Context, VersionHistory)} instead.
+     * Please use {@link org.dspace.versioning.service.VersioningService#getVersionsByHistory(Context, VersionHistory)} instead.
      * 
      * To keep version number stables we keep information about deleted Versions.
-     * {@code VersioningService.getVersionsByHistory(Context, VersionHistory)} filters
+     * {@code org.dspace.versioning.service.VersioningService#getVersionsByHistory(Context, VersionHistory) VersioningService#getVersionsByHistory} filters
      * such versions and returns only active versions.
      */
     protected List<Version> getVersions() {

@@ -15,6 +15,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -51,20 +52,30 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     public boolean supports(String identifier)
     {
         String prefix = handleService.getPrefix();
-        String handleResolver = ConfigurationManager.getProperty("handle.canonical.prefix");
+        String canonicalPrefix = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("handle.canonical.prefix");
         if (identifier == null)
         {
             return false;
         }
-        if (identifier.startsWith(prefix)
-                || identifier.startsWith(handleResolver)
-                || identifier.startsWith("http://hdl.handle.net/")
+        // return true if handle has valid starting pattern
+        if (identifier.startsWith(prefix + "/")
+                || identifier.startsWith(canonicalPrefix)
                 || identifier.startsWith("hdl:")
-                || identifier.startsWith("info:hdl"))
+                || identifier.startsWith("info:hdl")
+                || identifier.matches("^https?://hdl\\.handle\\.net/.*")
+                || identifier.matches("^https?://.+/handle/.*"))
         {
             return true;
         }
         
+        //Check additional prefixes supported in the config file
+        String[] additionalPrefixes = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("handle.additional.prefixes");
+        for(String additionalPrefix: additionalPrefixes) {
+            if (identifier.startsWith(additionalPrefix + "/")) {
+                return true;
+            }
+        }
+
         return false;
     }
 

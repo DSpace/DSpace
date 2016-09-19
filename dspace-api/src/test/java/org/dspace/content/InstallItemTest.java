@@ -25,11 +25,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
-
 
 /**
  * Unit Tests for class InstallItem
@@ -246,10 +248,13 @@ public class InstallItemTest extends AbstractUnitTest
         itemService.addMetadata(context, is.getItem(), "dc", "date", "issued", Item.ANY, "2011-01-01");
 
         //get current date
-        DCDate now = DCDate.getCurrent();
-        String dayAndTime = now.toString();
-        //parse out just the date, remove the time (format: yyyy-mm-ddT00:00:00Z)
-        String date = dayAndTime.substring(0, dayAndTime.indexOf("T"));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+       
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        String date = sdf.format(calendar.getTime());
 
         Item result = installItemService.installItem(context, is, handle);
         context.restoreAuthSystemState();
@@ -296,10 +301,11 @@ public class InstallItemTest extends AbstractUnitTest
         itemService.addMetadata(context, is.getItem(), "dc", "date", "issued", Item.ANY, "2011-01-01");
 
         //get current date
-        DCDate now = DCDate.getCurrent();
-        String dayAndTime = now.toString();
-        //parse out just the date, remove the time (format: yyyy-mm-ddT00:00:00Z)
-        String date = dayAndTime.substring(0, dayAndTime.indexOf("T"));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String date = sdf.format(calendar.getTime());
 
         Item result = installItemService.restoreItem(context, is, handle);
         context.restoreAuthSystemState();

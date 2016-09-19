@@ -37,6 +37,7 @@ import java.util.List;
  * 
  * @author Alexey Maslov
  * @author Scott Phillips
+ * @author Oriol Olivé - DS-3205
  */
 public class EditGroupForm extends AbstractDSpaceTransformer   
 {
@@ -477,8 +478,10 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	
 			results.setSimplePagination(resultCount,firstIndex,lastIndex,prevURL, nextURL);
 		}
-		
-        Table table = results.addTable("roup-edit-search-group",groups.size() + 1, 1);
+
+// DS-3205 fix		
+//        Table table = results.addTable("roup-edit-search-group",groups.size() + 1, 1);
+        Table table = results.addTable("group-edit-search-group",groups.size() + 1, 1);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_groups_column1);
         header.addCell().addContent(T_groups_column2);

@@ -132,6 +132,8 @@ public class SitemapReader extends AbstractReader implements Recyclable
         String fileStem = (param == null ? "sitemap_index" : "sitemap" + param);
 
         sendFile(fileStem + ext, this.forSitemapsOrg);
+
+        out.close();
     }
 
     /**
@@ -206,5 +208,6 @@ public class SitemapReader extends AbstractReader implements Recyclable
         this.request = null;
         this.sitemapMimeType = null;
         this.forSitemapsOrg = false;
+        super.recycle();
     }
 }

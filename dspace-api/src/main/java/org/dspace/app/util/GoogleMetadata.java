@@ -229,7 +229,7 @@ public class GoogleMetadata
      * first-encountered instance of the field for this Item.
      * 
      * @param fieldName
-     * @return
+     * @return successful?
      */
     protected boolean addSingleField(String fieldName)
     {
@@ -445,7 +445,7 @@ public class GoogleMetadata
      * configuration.
      * 
      * @param configFilter
-     * @return
+     * @return array of parsed options or null
      */
     protected ArrayList<ArrayList<String>> parseOptions(String configFilter)
     {
@@ -1046,7 +1046,7 @@ public class GoogleMetadata
 	 * </ul>
 	 * Additionally, this bitstream must be publicly viewable.
 	 * @param item
-	 * @return
+	 * @return a linkable bitstream or null if none found
 	 * @throws SQLException if database error
 	 */
 	protected Bitstream findLinkableFulltext(Item item) throws SQLException {
@@ -1201,7 +1201,7 @@ public class GoogleMetadata
      * metadata practice.
      * 
      * @param dConfig
-     * @return
+     * @return item matches configuration
      */
     protected boolean identifyItemType(String dConfig)
     {

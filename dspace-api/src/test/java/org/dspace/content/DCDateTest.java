@@ -397,7 +397,10 @@ public class DCDateTest
     @Test
     public void testGetCurrent()
     {
-        assertTrue("testGetCurrent 0", DateUtils.isSameDay(DCDate.getCurrent().toDate(), new Date()));
+     Calendar calendar = Calendar.getInstance();
+         calendar.setTimeInMillis(System.currentTimeMillis());
+         calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+         assertTrue("testGetCurrent 0", DateUtils.isSameDay(DCDate.getCurrent().toDate(), calendar.getTime())); 
     }
 
 

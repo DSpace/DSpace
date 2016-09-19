@@ -228,18 +228,9 @@ public class EditItemServlet extends DSpaceServlet
         case CONFIRM_DELETE:
 
             // Delete the item - if "cancel" was pressed this would be
-            // picked up above
-            // FIXME: Don't know if this does all it should - remove Handle?
-            Iterator<Collection> collIter = item.getCollections().iterator();
+            // picked up above            
+            itemService.delete(context, item);
             
-            // Remove item from all the collections it's in
-            while(collIter.hasNext())
-            {
-                Collection c = collIter.next();
-                collIter.remove();
-                collectionService.removeItem(context, c, item);
-            }
-
             JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             context.complete();
 

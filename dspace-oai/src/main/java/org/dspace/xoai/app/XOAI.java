@@ -237,7 +237,7 @@ public class XOAI {
         for (Collection col : item.getCollections())
             doc.addField("item.collections",
                     "col_" + col.getHandle().replace("/", "_"));
-        for (Community com : collectionsService.flatParentCommunities(item))
+        for (Community com : collectionsService.flatParentCommunities(context, item))
             doc.addField("item.communities",
                     "com_" + com.getHandle().replace("/", "_"));
 
