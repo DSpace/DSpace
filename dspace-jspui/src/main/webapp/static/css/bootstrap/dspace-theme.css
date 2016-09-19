@@ -11,7 +11,7 @@
 #user-top-menu, #userloggedin-top-menu {margin-right: 15px;}
 footer {padding-top: 1em;}
 footer.navbar-inverse *:not(.panel > *) {color: white;}
-footer .extra-footer{background-color: black;}
+footer .extra-footer{background-color: black; color:white;}
 #designedby img {margin-right: 5px;}
 #formsearch-top-menu {width: 310px;}
 div.panel.panel-primary ul.list-group li.list-group-item.active {border-left: 3px solid #428bca; background: white;}

@@ -81,9 +81,9 @@
                 </div>
 	           	<div id="designedby" class="col-sm-8 text-right">
             	 	<fmt:message key="jsp.layout.footer-default.text"/> - 
-            	 	<fmt:message key="jsp.layout.footer-default.theme-by"/> 
-            	 	<a href="http://www.cineca.it">
-            	 		<img src="<%= request.getContextPath() %>/image/logo-cineca-small.png"
+            	 	<fmt:message key="jsp.layout.footer-default.version-by"/> 
+            	 	<a href="http://www.4science.it/en/dspace-and-dspace-cris-services/">
+            	 		<img src="<%= request.getContextPath() %>/image/logo-4science-small.png"
                                     alt="Logo CINECA" height="32px"/></a>
 				</div>
 			</div>
