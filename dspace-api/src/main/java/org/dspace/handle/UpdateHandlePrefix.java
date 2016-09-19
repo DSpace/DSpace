@@ -97,7 +97,7 @@ public class UpdateHandlePrefix
                         List<MetadataValue> metadataValues = metadataValueService.findByValueLike(context, "http://hdl.handle.net/");
                         int updMeta = metadataValues.size();
                         for (MetadataValue metadataValue : metadataValues) {
-                            metadataValue.setValue("http://hdl.handle.net/" + newH);
+                        	metadataValue.setValue(metadataValue.getValue().replace("http://hdl.handle.net/" + oldH, "http://hdl.handle.net/" + newH));
                             metadataValueService.update(context, metadataValue, true);
                         }
                         System.out.println(
