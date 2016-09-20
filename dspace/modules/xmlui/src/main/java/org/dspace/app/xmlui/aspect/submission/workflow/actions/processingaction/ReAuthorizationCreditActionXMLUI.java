@@ -115,7 +115,7 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
                             paymentSystemService.sendPaymentApprovedEmail(context, workflowItem, shoppingCart);
                         }catch (Exception e)
                         {
-                            paymentSystemService.sendPaymentErrorEmail(context, workflowItem, shoppingCart,"problem: credit not tallied successfully. \\n \\n " + e.getMessage());
+                            paymentSystemService.sendPaymentErrorEmail(context, workflowItem, shoppingCart,"problem: credit not tallied successfully. \n \n " + e.getMessage());
                             log.error(e.getMessage());
                             return e.getMessage();
                         }
