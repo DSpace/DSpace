@@ -1022,7 +1022,7 @@ public class ItemsResource extends Resource
                 TableRow row = iterator.next();
                 org.dspace.content.Item dspaceItem = this.findItem(context, row.getIntColumn("RESOURCE_ID"),
                         org.dspace.core.Constants.READ);
-                Item item = new Item(dspaceItem, "", context);
+                Item item = new Item(dspaceItem, expand, context);
                 writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                         request, context);
                 items.add(item);
