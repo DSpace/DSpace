@@ -430,7 +430,9 @@ if (dedupEnabled && admin_button) { %>
 <div class="col-lg-12 col-md-4 col-sm-6">
 <div class="media google">
 	<div class="media-left">
-		<fmt:message key="jsp.display-item.citation.google.icon"/>
+		<fmt:message key="jsp.display-item.citation.google.icon">
+			<fmt:param value="<%=request.getContextPath()%>" />
+		</fmt:message>
 	</div>
 	<div id="googleCitedResult" class="media-body text-center">
 		<h4 class="media-heading"><fmt:message key="jsp.display-item.citation.google"/></h4>
