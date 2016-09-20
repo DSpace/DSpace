@@ -42,9 +42,8 @@
 		<xsl:variable name="dateAccepted" select="dspace:field[@element='date' and @qualifier='issued']"/>
 
 
-        <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
-                  lastMetadataUpdate="2006-05-04" metadataVersionNumber="1">
+        <resource xmlns="http://datacite.org/schema/kernel-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
 
 			<!-- ********** Identifiers ********** -->
 			<identifier identifierType="DOI">
@@ -202,7 +201,7 @@
 			<xsl:if test="dspace:field[@element='format' and @qualifier='extent']">
 				<sizes>
 					<xsl:for-each select="dspace:field[@element='format' and @qualifier='extent']">
-						<size xmlns="http://datacite.org/schema/kernel-2.2">
+						<size xmlns="http://datacite.org/schema/kernel-4">
 							<xsl:value-of select="."/>
 							<xsl:text> bytes</xsl:text>
 						</size>
@@ -213,12 +212,17 @@
 			<!-- ************ Rights *************** -->
 			<xsl:if test="$datatype='DataPackage'">
 				<!--  All data package DOIs include a CC0 statement. -->
+				<rightsList>
 				<rights>
-					<xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
+					<xsl:attribute name="rightsURI">
+						<xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
+					</xsl:attribute>
 				</rights>
+				</rightsList>
 			</xsl:if>
 
 			<xsl:if test="$datatype='DataFile'">
+				<rightsList>
 				<rights>
 					<xsl:variable name="embargoType" select="dspace:field[@element='type' and @qualifier='embargo']"/>
 
@@ -247,10 +251,13 @@
 		                    </xsl:choose>
 		                </xsl:when>
 		                <xsl:otherwise>
+							<xsl:attribute name="rightsURI">
 		                    <xsl:value-of select="dspace:field[@element='rights']"/>
+							</xsl:attribute>
 		                </xsl:otherwise>
 		            </xsl:choose>
 				</rights>
+				</rightsList>
 			</xsl:if>
 
 			<!-- *********** Description - Only for data files ********* -->
