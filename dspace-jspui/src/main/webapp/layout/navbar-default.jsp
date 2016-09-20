@@ -39,6 +39,12 @@
     Boolean admin = (Boolean)request.getAttribute("is.admin");
     boolean isAdmin = (admin == null ? false : admin.booleanValue());
 
+    Boolean communityAdmin = (Boolean)request.getAttribute("is.communityAdmin");
+    boolean isCommunityAdmin = (communityAdmin == null ? false : communityAdmin.booleanValue());
+    
+    Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
+    boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
+
     // Get the current page, minus query string
     String currentPage = UIUtil.getOriginalURL(request);
     int c = currentPage.indexOf( '?' );
@@ -165,13 +171,19 @@
                <li><a href="<%= request.getContextPath() %>/profile"><fmt:message key="jsp.layout.navbar-default.edit"/></a></li>
 
 		<%
-		  if (isAdmin)
-		  {
-		%>
-			   <li class="divider"></li>  
-               <li><a href="<%= request.getContextPath() %>/dspace-admin"><fmt:message key="jsp.administer"/></a></li>
-		<%
-		  }
+                if (isAdmin || isCommunityAdmin || isCollectionAdmin) {
+                %>
+			   <li class="divider"></li>
+                           <% if (isAdmin) {%>
+                    
+                                <li><a href="<%= request.getContextPath()%>/dspace-admin">
+                           <% } else if (isCommunityAdmin || isCollectionAdmin) {%>
+                        
+                                <li><a href="<%= request.getContextPath()%>/tools">
+                <% } %>
+                <fmt:message key="jsp.administer"/></a></li>
+                <%
+                    }
 		  if (user != null) {
 		%>
 		<li><a href="<%= request.getContextPath() %>/logout"><span class="glyphicon glyphicon-log-out"></span> <fmt:message key="jsp.layout.navbar-default.logout"/></a></li>

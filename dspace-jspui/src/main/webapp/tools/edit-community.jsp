@@ -37,9 +37,25 @@
     Community community = (Community) request.getAttribute("community");
 	Community parentCommunity = (Community) request.getAttribute("parent");
     UUID parentID = (parentCommunity != null ? parentCommunity.getID() : null);
-    // Is the logged in user a sys admin
+    
+    // Is the logged in user an admin or community admin or cllection admin
     Boolean admin = (Boolean)request.getAttribute("is.admin");
     boolean isAdmin = (admin == null ? false : admin.booleanValue());
+    
+    Boolean communityAdmin = (Boolean)request.getAttribute("is.communityAdmin");
+    boolean isCommunityAdmin = (communityAdmin == null ? false : communityAdmin.booleanValue());
+    
+    Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
+    boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
+    
+    String naviAdmin = "admin";
+    String link = "/dspace-admin";
+    
+    if(!isAdmin && (isCommunityAdmin || isCollectionAdmin))
+    {
+        naviAdmin = "community-or-collection-admin";
+        link = "/tools";
+    }
     
     Boolean adminCreateGroup = (Boolean)request.getAttribute("admin_create_button");
     boolean bAdminCreateGroup = (adminCreateGroup == null ? false : adminCreateGroup.booleanValue());
@@ -77,9 +93,9 @@
 %>
 
 <dspace:layout style="submission" titlekey="jsp.tools.edit-community.title"
-		       navbar="admin"
+		       navbar="<%= naviAdmin %>"
 		       locbar="link"
-		       parentlink="/dspace-admin"
+		       parentlink="<%= link %>"
 		       parenttitlekey="jsp.administer" nocache="true">
 
 <div class="row">
