@@ -86,10 +86,10 @@
                                         <exclude>**/*.png</exclude>
                                         <exclude>**/*.ico</exclude>
                                         <exclude>**/*.svg</exclude>
-                                        <include>**/*.ttf</include>
-                                        <include>**/*.woff</include>
-                                        <include>**/*.eot</include>
-                                        <include>**/*.xsl</include>
+                                        <exclude>**/*.ttf</exclude>
+                                        <exclude>**/*.woff</exclude>
+                                        <exclude>**/*.eot</exclude>
+                                        <exclude>**/*.xsl</exclude>
                                     </excludes>
                                     <filtering>true</filtering>
                                 </resource>
