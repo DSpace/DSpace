@@ -180,7 +180,7 @@ public class CCLicenseStep extends AbstractProcessingStep
     	LicenseMetadataValue nameField = creativeCommonsService.getCCField("name");
 
     	Item item = subInfo.getSubmissionItem().getItem();
-    	if (licenseclass.equals("webui.Submission.submit.CCLicenseStep.no_license")) 
+    	if ("webui.Submission.submit.CCLicenseStep.no_license".equals(licenseclass) || "xmlui.Submission.submit.CCLicenseStep.no_license".equals(licenseclass)) 
     	{
     		creativeCommonsService.removeLicense(context, uriField, nameField, item);
     		
@@ -189,7 +189,7 @@ public class CCLicenseStep extends AbstractProcessingStep
 			removeRequiredAttributes(session);
 			
     		return STATUS_COMPLETE;
-    	} else if (StringUtils.isBlank(licenseclass) || licenseclass.equals("webui.Submission.submit.CCLicenseStep.select_change"))
+    	} else if (StringUtils.isBlank(licenseclass) || "webui.Submission.submit.CCLicenseStep.select_change".equals(licenseclass) || "xmlui.Submission.submit.CCLicenseStep.select_change".equals(licenseclass))
     	{
     		removeRequiredAttributes(session);    
     		return STATUS_COMPLETE;
