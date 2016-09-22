@@ -407,7 +407,7 @@ public class MetadataRegistryResource extends Resource
 
             log.debug(String.format("Admin user creating schema with namespace %s and prefix %s", schema.getNamespace(), schema.getPrefix()));
 
-            org.dspace.content.MetadataSchema dspaceSchema = metadataSchemaService.create(context, schema.getNamespace(), schema.getPrefix());
+            org.dspace.content.MetadataSchema dspaceSchema = metadataSchemaService.create(context, schema.getPrefix(), schema.getNamespace());
             log.debug("Creating return object.");
             retSchema = new MetadataSchema(dspaceSchema, "", context);
             
