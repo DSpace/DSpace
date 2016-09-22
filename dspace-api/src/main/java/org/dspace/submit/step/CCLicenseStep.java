@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
@@ -170,12 +171,11 @@ public class CCLicenseStep extends AbstractProcessingStep
     		map.put("sampling", request.getParameter("sampling_chooser"));
     	}
     	map.put("jurisdiction", jurisdiction);
-    	CCLookup ccLookup = new CCLookup();
+    	
     	CreativeCommons.MdField uriField = CreativeCommons.getCCField("uri");
     	CreativeCommons.MdField nameField = CreativeCommons.getCCField("name");
-    	ccLookup.issue(licenseclass, map, ConfigurationManager.getProperty("cc.license.locale"));
     	Item item = subInfo.getSubmissionItem().getItem();
-    	if (licenseclass.equals("webui.Submission.submit.CCLicenseStep.no_license")) 
+    	if ("webui.Submission.submit.CCLicenseStep.no_license".equals(licenseclass) || "xmlui.Submission.submit.CCLicenseStep.no_license".equals(licenseclass))  
     	{
     		CreativeCommons.removeLicense(context, uriField, nameField, item);
     		
@@ -185,12 +185,15 @@ public class CCLicenseStep extends AbstractProcessingStep
 			
     		return STATUS_COMPLETE;
     	}
-    	else if (licenseclass.equals("webui.Submission.submit.CCLicenseStep.select_change"))
+    	else if (StringUtils.isBlank(licenseclass) || "webui.Submission.submit.CCLicenseStep.select_change".equals(licenseclass) || "xmlui.Submission.submit.CCLicenseStep.select_change".equals(licenseclass))
     	{
     		removeRequiredAttributes(session);    
     		return STATUS_COMPLETE;
     	}
-    	else if (ccLookup.isSuccess()) 
+    	
+    	CCLookup ccLookup = new CCLookup();
+    	ccLookup.issue(licenseclass, map, ConfigurationManager.getProperty("cc.license.locale"));
+    	if (ccLookup.isSuccess()) 
     	{
     		CreativeCommons.removeLicense(context, uriField, nameField, item);
     		
