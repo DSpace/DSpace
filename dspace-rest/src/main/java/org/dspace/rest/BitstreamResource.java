@@ -755,7 +755,7 @@ public class BitstreamResource extends Resource
     }
 
     /**
-     * Find bitstream from DSpace database. This encapsulates the
+     * Find bitstream from DSpace database. This encapsulatets the
      * org.dspace.content.Bitstream.find method with a check whether the item exists and
      * whether the user logged into the context has permission to preform the requested action.
      *
