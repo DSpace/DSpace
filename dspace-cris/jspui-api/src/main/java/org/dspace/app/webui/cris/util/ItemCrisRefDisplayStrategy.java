@@ -10,6 +10,7 @@ package org.dspace.app.webui.cris.util;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.MissingResourceException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.webui.util.ASimpleDisplayStrategy;
+import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authority.AuthorityValueGenerator;
 import org.dspace.content.Metadatum;
 import org.dspace.content.authority.ChoiceAuthority;
@@ -52,7 +54,7 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit,
 			boolean viewFull, String browseType, int colIdx, int itemId,
 			String field, Metadatum[] metadataArray, boolean disableCrossLinks,
-			boolean emph, PageContext pageContext) throws JspException {
+			boolean emph) throws JspException {
     	String publicPath = null;
     	int minConfidence = -1;
 		if (metadataArray.length > 0) {
@@ -111,8 +113,8 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
         }
         if (truncated)
         {
-            String etal = LocaleSupport.getLocalizedMessage(pageContext,
-                    "itemlist.et-al");
+            Locale locale = UIUtil.getSessionLocale(hrq);
+        	String etal = I18nUtil.getMessage("itemlist.et-al", locale);
             sb.append(", " + etal);
         }
 

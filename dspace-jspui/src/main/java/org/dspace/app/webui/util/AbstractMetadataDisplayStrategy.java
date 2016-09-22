@@ -22,8 +22,7 @@ public class AbstractMetadataDisplayStrategy extends ASimpleDisplayStrategy
 {
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType,int itemid, int colIdx, String field,
-            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph,
-            PageContext pageContext)
+            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph)
     {	
         String metadataDisplay = "-";
         boolean found = false;

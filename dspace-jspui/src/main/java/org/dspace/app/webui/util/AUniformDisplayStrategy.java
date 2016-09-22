@@ -20,8 +20,7 @@ public abstract class AUniformDisplayStrategy extends ASimpleDisplayStrategy
     
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, int itemid, String field,
-            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph,
-            PageContext pageContext)
+            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph)
     {
         String metadata;
         // limit the number of records if this is the author field (if

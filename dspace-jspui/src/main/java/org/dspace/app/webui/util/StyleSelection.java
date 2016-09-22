@@ -34,4 +34,11 @@ public interface StyleSelection
      * @param style
      */
     public String getConfigurationForStyle(String style);
+    
+    /**
+     * Return true if the requested configuration is defined, it doesn't fallback to default configuration
+     * @param style
+     * @return
+     */
+    public boolean isConfigurationDefinedForStyle(String style);
 }

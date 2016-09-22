@@ -22,14 +22,14 @@ public class TitleDisplayStrategy implements IDisplayMetadataValueStrategy
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
-            Metadatum[] metadataArray, BrowseItem item, boolean disableCrossLinks, boolean emph, PageContext pageContext)
+            Metadatum[] metadataArray, BrowseItem item, boolean disableCrossLinks, boolean emph)
     {
         return getDisplay(hrq, metadataArray, item.isWithdrawn(), item.getHandle(), emph);
     }
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
-            Metadatum[] metadataArray, Item item, boolean disableCrossLinks, boolean emph, PageContext pageContext)
+            Metadatum[] metadataArray, Item item, boolean disableCrossLinks, boolean emph)
     {
         return getDisplay(hrq, metadataArray, item.isWithdrawn(), item.getHandle(), emph);
     }
@@ -60,7 +60,7 @@ public class TitleDisplayStrategy implements IDisplayMetadataValueStrategy
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String string, int colIdx, String field,
             Metadatum[] metadataArray, BrowseItem browseItem,
-            boolean disableCrossLinks, boolean emph, PageContext pageContext)
+            boolean disableCrossLinks, boolean emph)
     {
         return null;
     }
@@ -68,7 +68,7 @@ public class TitleDisplayStrategy implements IDisplayMetadataValueStrategy
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
-            boolean emph, PageContext pageContext) throws JspException
+            boolean emph) throws JspException
     {
         return null;
     }
@@ -76,7 +76,7 @@ public class TitleDisplayStrategy implements IDisplayMetadataValueStrategy
 	@Override
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
 			int colIdx, String field, Metadatum[] metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
-			boolean emph, PageContext pageContext) throws JspException {
+			boolean emph) throws JspException {
         String metadata = "-";
         if (metadataArray.length > 0)
         {

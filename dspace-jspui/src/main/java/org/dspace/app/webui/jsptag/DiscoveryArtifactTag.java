@@ -266,7 +266,7 @@ public class DiscoveryArtifactTag extends BodyTagSupport {
 				metadata = strategy.getMetadataDisplay(request, -1, viewFull,
                         browseIndex, 0, field,
                         arrayDcMetadataValue, artifact,
-                        false, false, pageContext);
+                        false, false);
 			} else {
 				if (!founded) {
                     metadataValue = artifact.getMetadataValue(field);
@@ -341,7 +341,7 @@ public class DiscoveryArtifactTag extends BodyTagSupport {
 		}
 
 		String metadata = strategy.getMetadataDisplay(request, -1, viewFull, browseIndex, 0, field,
-				artifact.getMetadataValueInDCFormat(field), artifact, false, false, pageContext);
+				artifact.getMetadataValueInDCFormat(field), artifact, false, false);
 
 		String label = null;
 		try {

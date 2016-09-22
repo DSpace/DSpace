@@ -21,7 +21,7 @@ public abstract class AKeyBasedStyleSelection implements StyleSelection
         return ConfigurationManager.getProperty("webui.itemdisplay." + style);
     }
     
-    protected boolean isConfigurationDefinedForStyle(String style)
+    public boolean isConfigurationDefinedForStyle(String style)
     {
         return ConfigurationManager.getProperty("webui.itemdisplay." + style) == null;
     }

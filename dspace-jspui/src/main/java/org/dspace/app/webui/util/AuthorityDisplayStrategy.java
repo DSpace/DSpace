@@ -23,8 +23,7 @@ public class AuthorityDisplayStrategy extends ASimpleDisplayStrategy
     @Override
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, int itemid, String field,
-            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph,
-            PageContext pageContext) throws JspException
+            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph) throws JspException
     {
         String metadata;
         // limit the number of records if this is the author field (if

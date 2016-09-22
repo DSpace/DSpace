@@ -500,7 +500,7 @@ public class ItemTag extends TagSupport
                             }
 
                 String metadata = strategy.getMetadataDisplay(request, -1, viewFull, browseIndex, 
-                        -1, field, values, item, false, false, pageContext);
+                        -1, field, values, item, false, false);
 
                 out.print(metadata);
                 out.println("</td></tr>");

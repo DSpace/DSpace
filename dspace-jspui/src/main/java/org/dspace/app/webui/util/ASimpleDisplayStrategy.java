@@ -25,12 +25,11 @@ public abstract class ASimpleDisplayStrategy extends SelfNamedPlugin implements
     public abstract String getMetadataDisplay(HttpServletRequest hrq,
             int limit, boolean viewFull, String browseType, int colIdx,int itemid,
             String field, Metadatum[] metadataArray, boolean disableCrossLinks,
-            boolean emph, PageContext pageContext) throws JspException;
+            boolean emph) throws JspException;
 
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
-            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph,
-            PageContext pageContext) throws JspException
+            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph) throws JspException
     {
         return null;
     }
@@ -38,54 +37,54 @@ public abstract class ASimpleDisplayStrategy extends SelfNamedPlugin implements
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, BrowseItem browseItem,
-            boolean disableCrossLinks, boolean emph, PageContext pageContext)
+            boolean disableCrossLinks, boolean emph)
             throws JspException
     {
         return getExtraCssDisplay(hrq, limit, b, browseType, colIdx, field,
-                metadataArray, disableCrossLinks, emph, pageContext);
+                metadataArray, disableCrossLinks, emph);
     }
 
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
-            boolean emph, PageContext pageContext) throws JspException
+            boolean emph) throws JspException
     {
         return getExtraCssDisplay(hrq, limit, b, browseType, colIdx, field,
-                metadataArray, disableCrossLinks, emph, pageContext);
+                metadataArray, disableCrossLinks, emph);
     }
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, BrowseItem item,
-            boolean disableCrossLinks, boolean emph, PageContext pageContext)
+            boolean disableCrossLinks, boolean emph)
             throws JspException
     {
         return getMetadataDisplay(hrq, limit, viewFull, browseType, colIdx,item.getID(),
-                field, metadataArray, disableCrossLinks, emph, pageContext);
+                field, metadataArray, disableCrossLinks, emph);
     }
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
-            boolean emph, PageContext pageContext) throws JspException
+            boolean emph) throws JspException
     {
         return getMetadataDisplay(hrq, limit, viewFull, browseType, colIdx,item.getID(),
-                field, metadataArray, disableCrossLinks, emph, pageContext);
+                field, metadataArray, disableCrossLinks, emph);
     }
 
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
 			int colIdx, String field, List<String> metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
-			boolean emph, PageContext pageContext) throws JspException 
+			boolean emph) throws JspException 
 	{		
         return getMetadataDisplay(hrq, limit, viewFull, browseType, colIdx, item.getID(),
-                field, item.getMetadataValueInDCFormat(field), disableCrossLinks, emph, pageContext);
+                field, item.getMetadataValueInDCFormat(field), disableCrossLinks, emph);
 	}
 	
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
 			int colIdx, String field, Metadatum[] metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
-			boolean emph, PageContext pageContext) throws JspException 
+			boolean emph) throws JspException 
 	{		
         return getMetadataDisplay(hrq, limit, viewFull, browseType, colIdx, item.getID(),
-                field, metadataArray, disableCrossLinks, emph, pageContext);
+                field, metadataArray, disableCrossLinks, emph);
 	}
 }

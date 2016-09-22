@@ -34,7 +34,7 @@ public class CrisAfferenzaDisplayStrategy implements
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, BrowseItem item,
-            boolean disableCrossLinks, boolean emph, PageContext pageContext)
+            boolean disableCrossLinks, boolean emph)
     {
         ACrisObject crisObject = (ACrisObject) ((BrowseDSpaceObject) item)
                 .getBrowsableDSpaceObject();
@@ -64,7 +64,7 @@ public class CrisAfferenzaDisplayStrategy implements
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
-            boolean emph, PageContext pageContext)
+            boolean emph)
     {
         // not used
         return null;
@@ -73,7 +73,7 @@ public class CrisAfferenzaDisplayStrategy implements
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
-            boolean emph, PageContext pageContext) throws JspException
+            boolean emph) throws JspException
     {
         return null;
     }
@@ -82,7 +82,7 @@ public class CrisAfferenzaDisplayStrategy implements
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, BrowseItem browseItem,
-            boolean disableCrossLinks, boolean emph, PageContext pageContext)
+            boolean disableCrossLinks, boolean emph)
             throws JspException
     {
         return null;
@@ -91,7 +91,7 @@ public class CrisAfferenzaDisplayStrategy implements
 	@Override
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
 			int colIdx, String field, Metadatum[] metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
-			boolean emph, PageContext pageContext) throws JspException {
+			boolean emph) throws JspException {
         ACrisObject crisObject = (ACrisObject)item;
         return internalDisplay(field, crisObject);
 	}

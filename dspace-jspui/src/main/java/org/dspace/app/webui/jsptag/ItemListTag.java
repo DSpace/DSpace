@@ -546,7 +546,7 @@ public class ItemListTag extends TagSupport {
                     String extras = strategy.getExtraCssDisplay(hrq, limit,
 							viewFull[colIdx], browseType[colIdx], colIdx,
 							field, metadataArray, items[i], disableCrossLinks,
-							emph[colIdx], pageContext);
+							emph[colIdx]);
 
                     String markClass = "";
                     if (field.startsWith("mark_"))
@@ -624,7 +624,7 @@ public class ItemListTag extends TagSupport {
 			metadata = strategy.getMetadataDisplay(hrq, limit,
 					viewFull[colIdx], browseType[colIdx], colIdx,
 					field, metadataArray, items[i],
-					disableCrossLinks, emph[colIdx], pageContext);
+					disableCrossLinks, emph[colIdx]);
 		} catch (Exception e) {
 			log.error("Error getMetadataDisplay on "
 					+ items[i].getHandle());

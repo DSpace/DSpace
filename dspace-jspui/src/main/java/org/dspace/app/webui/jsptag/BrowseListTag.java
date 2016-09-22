@@ -799,13 +799,13 @@ public class BrowseListTag extends TagSupport
                     String metadata = strategy.getMetadataDisplay(hrq, limit,
                             viewFull[colIdx], browseType[colIdx], colIdx,
                             field, metadataArray, items[i], disableCrossLinks,
-                            emph[colIdx], pageContext);
+                            emph[colIdx]);
 
                     // prepare extra special layout requirements for dates
                     String extras = strategy.getExtraCssDisplay(hrq, limit,
                             viewFull[colIdx], browseType[colIdx], colIdx,
                             field, metadataArray, items[i], disableCrossLinks,
-                            emph[colIdx], pageContext);
+                            emph[colIdx]);
                     
                     String markClass = "";
                     if (field.startsWith("mark_"))

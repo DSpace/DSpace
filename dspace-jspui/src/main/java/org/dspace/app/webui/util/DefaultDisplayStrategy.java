@@ -9,6 +9,7 @@ package org.dspace.app.webui.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -19,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Metadatum;
 import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 
 public class DefaultDisplayStrategy extends ASimpleDisplayStrategy
@@ -29,8 +31,7 @@ public class DefaultDisplayStrategy extends ASimpleDisplayStrategy
     @Override
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, int itemid, String field,
-            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph,
-            PageContext pageContext) throws JspException
+            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph) throws JspException
     {
         String metadata;
         // limit the number of records if this is the author field (if
@@ -124,8 +125,8 @@ public class DefaultDisplayStrategy extends ASimpleDisplayStrategy
         }
         if (truncated)
         {
-            String etal = LocaleSupport.getLocalizedMessage(pageContext,
-                    "itemlist.et-al");
+        	Locale locale = UIUtil.getSessionLocale(hrq); 
+            String etal = I18nUtil.getMessage("itemlist.et-al", locale);
             sb.append(", " + etal);
         }
         
