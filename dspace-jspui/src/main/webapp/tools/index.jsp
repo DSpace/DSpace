@@ -46,7 +46,7 @@
  
     Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
     boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
-
+    
     try
     {
         context = UIUtil.obtainContext(request);
@@ -56,7 +56,7 @@
         }
 %>
 <dspace:layout style="submission" locbar="link" navbar="<%= naviAdmin %>" titlekey="jsp.administer">
-
+    
     <%-- <h1>Administration Tools</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.index.heading"/></h1>
     
@@ -77,6 +77,9 @@
         UIUtil.sendAlert(request, se);
 
         JSPManager.showInternalError(request, response);
+    }
+    finally {
+      context.abort();
     }
 %>
 

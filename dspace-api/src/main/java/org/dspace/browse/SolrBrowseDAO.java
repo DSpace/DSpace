@@ -8,9 +8,12 @@
 package org.dspace.browse;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.*;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -124,7 +127,9 @@ public class SolrBrowseDAO implements BrowseDAO
     private boolean distinct = false;
 
     private String facetField;
-
+    
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    
     // administrative attributes for this class
 
 
@@ -207,6 +212,21 @@ public class SolrBrowseDAO implements BrowseDAO
         else if (!itemsDiscoverable)
         {
             query.addFilterQueries("discoverable:false");
+            // TODO
+
+            try 
+            {
+                if (!authorizeService.isAdmin(context)
+                        && (authorizeService.isCommunityAdmin(context)
+                        || authorizeService.isCollectionAdmin(context))) 
+                {
+                        query.addFilterQueries(searcher.createLocationQueryForAdministrableItems(context));
+                }
+            } 
+            catch (SQLException ex) 
+            {
+                log.error(ex);
+            }
         }
     }
 

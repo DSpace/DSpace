@@ -418,6 +418,44 @@ public class AuthorizeServiceImpl implements AuthorizeService
             return groupService.isMember(c, Group.ADMIN);
         }
     }
+    
+    public boolean isCommunityAdmin(Context c) throws SQLException 
+    {
+        EPerson e = c.getCurrentUser();
+        
+        if (e != null) 
+        {
+            List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
+                    groupService.allMemberGroups(c, e),
+                    Constants.ADMIN, Constants.COMMUNITY);
+
+            if (CollectionUtils.isNotEmpty(policies)) 
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public boolean isCollectionAdmin(Context c) throws SQLException 
+    {
+        EPerson e = c.getCurrentUser();
+        
+        if (e != null) 
+        {
+            List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
+                    groupService.allMemberGroups(c, e),
+                    Constants.ADMIN, Constants.COLLECTION);
+
+            if (CollectionUtils.isNotEmpty(policies)) 
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 
     ///////////////////////////////////////////////
     // policy manipulation methods
