@@ -7,9 +7,12 @@ env:
 
 # Install prerequisites for building Mirage2 more rapidly
 before_install:
-  # Install latest Node.js 0.10.x & print version info
-  - nvm install 0.10
+  # Install Node.js 6.5.0 & print version info
+  - nvm install 6.5.0
   - node --version
+  # Install npm 3.10.8 & print version info
+  - npm install -g npm@3.10.8
+  - npm --version
   # Install Bower
   - npm install -g bower
   # Install Grunt & print version info
