@@ -24,14 +24,7 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import javax.naming.InitialContext;
@@ -39,9 +32,10 @@ import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Level;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+
+import static java.lang.Thread.currentThread;
 
 /**
  * Executes SQL queries.
@@ -62,6 +56,8 @@ public class DatabaseManager
 
     private static boolean isOracle = false;
     private static boolean isPostgres = false;
+
+    private static int connection_count = 0;
 
     static
     {
@@ -547,6 +543,7 @@ public class DatabaseManager
                     }
 	        	}
         	}
+            log.debug("opened connection " + conn.hashCode() + " (" + ++connection_count + " open): \n    " + StringUtils.join(Arrays.copyOf(currentThread().getStackTrace(), 15), "\n    "));
 
         	return conn;
         }
@@ -580,6 +577,7 @@ public class DatabaseManager
         {
             if (c != null)
             {
+                log.debug("closed connection " + c.hashCode() + " (" + connection_count-- + " open): \n    " + StringUtils.join(Arrays.copyOf(currentThread().getStackTrace(), 15), "\n    "));
                 c.close();
             }
         }
