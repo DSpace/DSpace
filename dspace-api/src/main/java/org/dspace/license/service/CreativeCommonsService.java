@@ -12,6 +12,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.license.LicenseMetadataValue;
+import org.jdom.Document;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,12 +40,6 @@ public interface CreativeCommonsService {
     */
     public void setLicenseRDF(Context context, Item item, String licenseRdf) throws SQLException, IOException, AuthorizeException;
 
-    /**
-     * This is a bit of the "do-the-right-thing" method for CC stuff in an item
-     */
-    public void setLicense(Context context, Item item,
-            String cc_license_url) throws SQLException, IOException,
-            AuthorizeException;
 
     /**
      * Used by DSpaceMetsIngester
@@ -72,9 +67,6 @@ public interface CreativeCommonsService {
     public String getLicenseURL(Context context, Item item) throws SQLException,
             IOException, AuthorizeException;
 
-    public String getLicenseText(Context context, Item item) throws SQLException,
-            IOException, AuthorizeException;
-
     public String getLicenseRDF(Context context, Item item) throws SQLException,
             IOException, AuthorizeException;
 
@@ -87,27 +79,20 @@ public interface CreativeCommonsService {
 
     /**
      * Get Creative Commons license Text, returning Bitstream object.
+     * @Deprecated
      * @return bitstream or null.
      */
     public Bitstream getLicenseTextBitstream(Item item) throws SQLException,
             IOException, AuthorizeException;
 
-    public String fetchLicenseRdf(String ccResult);
-
-    /**
-    *
-    *  The next two methods are old CC.
-    * Remains until prev. usages are eliminated.
-    * @Deprecated
-    *
-    */
     /**
      * Get a few license-specific properties. We expect these to be cached at
      * least per server run.
      */
-    public String fetchLicenseText(String license_url);
-
-    public String fetchLicenseRDF(String license_url);
 
     public LicenseMetadataValue getCCField(String fieldId);
+    
+    public String fetchLicenseRDF(Document license);
+	public void removeLicense(Context context, LicenseMetadataValue uriField,
+			LicenseMetadataValue nameField, Item item) throws AuthorizeException, IOException, SQLException;
 }
