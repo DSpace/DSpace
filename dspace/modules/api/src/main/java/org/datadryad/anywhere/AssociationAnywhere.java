@@ -180,6 +180,27 @@ public class AssociationAnywhere {
 		+ "/CENSSAWEBSVCLIB.GET_CUST_INFO_XML?p_input_xml_doc="
 		+ URLEncoder.encode(createRequest(context, customerId,"load customer info", "customer-info"));
 	    log.debug("AA URL is " + requestUrl);
+
+            Process p = Runtime.getRuntime().exec("curl " + requestUrl);
+            p.waitFor();
+            BufferedReader reader =
+                new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            String line = "";
+            StringBuffer sb = new StringBuffer();
+            while ((line = reader.readLine())!= null) {
+                sb.append(line + "\n");
+            }
+
+            Document doc = getResponseAsDocument(sb.toString());
+
+            if(getStringValue(doc, "//status").equals("SUCCESS")) {
+                    return doc;
+            }
+                    
+            /*
+              // This code is not working due to InvalidAlgorithmParameterException when generating the ssl keys in client.executeMethod()
+              // Ryan is investigating ways to restore it to avoid using the above system call to curl
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
             client.executeMethod(get);
@@ -188,6 +209,7 @@ public class AssociationAnywhere {
             {
                 return getResponseAsDocument(get.getResponseBodyAsString());
             }
+            */
         }
         catch (Exception e) {
             log.error("errors when loading customer information:" + e.getMessage(), e);
@@ -226,6 +248,28 @@ public class AssociationAnywhere {
 		+ "/CENCREDWEBSVCLIB.INS_CREDIT_XML?p_input_xml_doc="
 		+ URLEncoder.encode(createRequest(context, customerId, dataPackageDOI, "update-credit"));
 	    log.debug("AA URL is " + requestUrl);
+
+            Process p = Runtime.getRuntime().exec("curl " + requestUrl);
+            p.waitFor();
+            BufferedReader reader =
+                new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            String line = "";
+            StringBuffer sb = new StringBuffer();
+            while ((line = reader.readLine())!= null) {
+                sb.append(line + "\n");
+            }
+
+            Document doc = getResponseAsDocument(sb.toString());
+            
+            status = getStringValue(doc, "//status");
+
+            return status;
+                
+            /*
+              // This code is not working due to InvalidAlgorithmParameterException when generating the ssl keys in client.executeMethod()
+              // Ryan is investigating ways to restore it to avoid using the above system call to curl
+
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
             client.executeMethod(get);
@@ -235,14 +279,15 @@ public class AssociationAnywhere {
                 Document result = getResponseAsDocument(get.getResponseBodyAsString());
                 log.debug("Response body : " + get.getResponseBodyAsString());
                 status = getStringValue(result, "//credit-update-status/status");
-                
+
                 if("FAILURE".equals(status))
                 {
                     throw new AssociationAnywhereException(get.getResponseBodyAsString());
                 }
             }
-
+            
             return status;
+            */
         }
         catch (Exception e)
         {
