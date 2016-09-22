@@ -149,8 +149,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
         if(!isAdvancedFormEnabled){
             AccessStepUtil asu = new AccessStepUtil(context);
             // if the item is embargoed default value will be displayed.
-            asu.addEmbargoDateSimpleForm(bitstream, edit, -1);
-            asu.addReason(null, edit, -1);
+            asu.addEmbargoDateDisplayOnly(bitstream, edit);
         }
 
 		edit.addItem(T_para1);
