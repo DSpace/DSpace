@@ -412,37 +412,43 @@ public class EditItemServlet extends DSpaceServlet
         		map.put("sampling", request.getParameter("sampling_chooser"));
         	}
         	map.put("jurisdiction", jurisdiction);
-        	CCLookup ccLookup = new CCLookup();
+        	
         	LicenseMetadataValue uriField = creativeCommonsService.getCCField("uri");
         	LicenseMetadataValue nameField = creativeCommonsService.getCCField("name");
-        	ccLookup.issue(licenseclass, map, configurationService.getProperty("cc.license.locale"));
+        	
+        	boolean exit = false;
 			if (licenseclass.equals("webui.Submission.submit.CCLicenseStep.no_license")) 
         	{
 				creativeCommonsService.removeLicense(context, uriField, nameField, item);
 				
 				itemService.update(context, item);
 	            context.dispatchEvents();
-    			
+    			exit = true;
         	}
         	else if (licenseclass.equals("webui.Submission.submit.CCLicenseStep.select_change")) {
         		//none
+        		exit = true;
 			}
-        	else if (ccLookup.isSuccess()) 
-        	{
-        		creativeCommonsService.removeLicense(context, uriField, nameField, item);
-        		
-        		uriField.addItemValue(context, item, ccLookup.getLicenseUrl());
-        		if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
-        			creativeCommonsService.setLicenseRDF(context, item, ccLookup.getRdf());
-        		}	
-        		if (configurationService.getBooleanProperty("cc.submit.setname")) {
-        			nameField.addItemValue(context, item, ccLookup.getLicenseName());
-        		}
-        		
-        		itemService.update(context, item);
-	            context.dispatchEvents();
-    			
-        	} 
+        	
+			if (!exit) {
+				CCLookup ccLookup = new CCLookup();
+				ccLookup.issue(licenseclass, map, configurationService.getProperty("cc.license.locale"));
+				if (ccLookup.isSuccess()) {
+					creativeCommonsService.removeLicense(context, uriField, nameField, item);
+
+					uriField.addItemValue(context, item, ccLookup.getLicenseUrl());
+					if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
+						creativeCommonsService.setLicenseRDF(context, item, ccLookup.getRdf());
+					}
+					if (configurationService.getBooleanProperty("cc.submit.setname")) {
+						nameField.addItemValue(context, item, ccLookup.getLicenseName());
+					}
+
+					itemService.update(context, item);
+					context.dispatchEvents();
+
+				}
+			}
             showEditForm(context, request, response, item);
             context.complete();
 

@@ -16,6 +16,8 @@
   -    cclicense.exists   - boolean to indicate CC license already exists
   --%>
 
+<%@page import="org.dspace.core.Context"%>
+<%@page import="org.dspace.app.webui.util.UIUtil"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@page import="org.dspace.app.webui.servlet.admin.EditItemServlet"%>
@@ -36,10 +38,11 @@
 	boolean licenseExists = (lExists == null ? false : lExists.booleanValue());
 
 	Collection<CCLicense> cclicenses = (Collection<CCLicense>) request.getAttribute("cclicense.licenses");
-
+	
+	Context context = UIUtil.obtainContext(request);
 	String licenseURL = "";
 	if (licenseExists)
-		licenseURL = LicenseServiceFactory.getInstance().getCreativeCommonsService().getLicenseURL(context, subInfo.getSubmissionItem().getItem());
+		licenseURL = LicenseServiceFactory.getInstance().getCreativeCommonsService().getLicenseURL(context, item);
 %>
 
 <dspace:layout navbar="admin"

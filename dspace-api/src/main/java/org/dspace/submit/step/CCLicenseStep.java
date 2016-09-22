@@ -175,10 +175,10 @@ public class CCLicenseStep extends AbstractProcessingStep
     		map.put("sampling", request.getParameter("sampling_chooser"));
     	}
     	map.put("jurisdiction", jurisdiction);
-    	CCLookup ccLookup = new CCLookup();
+    	
     	LicenseMetadataValue uriField = creativeCommonsService.getCCField("uri");
     	LicenseMetadataValue nameField = creativeCommonsService.getCCField("name");
-    	ccLookup.issue(licenseclass, map, configurationService.getProperty("cc.license.locale"));
+
     	Item item = subInfo.getSubmissionItem().getItem();
     	if (licenseclass.equals("webui.Submission.submit.CCLicenseStep.no_license")) 
     	{
@@ -189,13 +189,16 @@ public class CCLicenseStep extends AbstractProcessingStep
 			removeRequiredAttributes(session);
 			
     		return STATUS_COMPLETE;
-    	}
-    	else if (StringUtils.isBlank(licenseclass) || licenseclass.equals("webui.Submission.submit.CCLicenseStep.select_change"))
+    	} else if (StringUtils.isBlank(licenseclass) || licenseclass.equals("webui.Submission.submit.CCLicenseStep.select_change"))
     	{
     		removeRequiredAttributes(session);    
     		return STATUS_COMPLETE;
     	}
-    	else if (ccLookup.isSuccess()) 
+    	
+    	CCLookup ccLookup = new CCLookup();
+    	ccLookup.issue(licenseclass, map, configurationService.getProperty("cc.license.locale"));
+
+    	if (ccLookup.isSuccess()) 
     	{
     		creativeCommonsService.removeLicense(context, uriField, nameField, item);
     		
