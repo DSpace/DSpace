@@ -45,8 +45,7 @@ While we've provided a few example deposits below. These examples do not make us
 This is an example of depositing one of the `example.zip` packages (or a similarly structured package). In this example, the `example.zip` file is assumed to be located in the current directory. We are depositing it into a Collection with handle `10673/2` as the Demo Administrator account.
 
 ```
-curl -i http://demo.dspace.org/swordv2/collection/10673/2 --data-binary "@example.zip" -H "Content-Disposition: file
-name=example.zip" -H "Content-Type: application/zip" -H "Packaging: http://purl.org/net/sword/package/METSDSpaceSIP" --user "dspacedemo+admin@gmail.com"
+curl -i http://demo.dspace.org/swordv2/collection/10673/2 --data-binary "@example.zip" -H "Content-Disposition: filename=example.zip" -H "Content-Type: application/zip" -H "Packaging: http://purl.org/net/sword/package/METSDSpaceSIP" --user "dspacedemo+admin@gmail.com"
 ```
 
 #### Depositing via an Atom entry
