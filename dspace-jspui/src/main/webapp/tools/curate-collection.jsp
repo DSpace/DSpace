@@ -47,7 +47,7 @@
     String title = (collection != null ? collection.getName() : "Unknown Collection");
     String groupOptions = (String)request.getAttribute("curate_group_options");
     String taskOptions = (String)request.getAttribute("curate_task_options");
-    // Is the logged in user an admin or community admin or cllection admin
+    // Is the logged in user an admin or community admin or collection admin
     Boolean admin = (Boolean)request.getAttribute("is.admin");
     boolean isAdmin = (admin == null ? false : admin.booleanValue());
     

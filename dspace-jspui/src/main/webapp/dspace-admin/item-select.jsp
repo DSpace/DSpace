@@ -27,7 +27,7 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <% 
-    // Is the logged in user an admin or community admin or cllection admin
+    // Is the logged in user an admin or community admin or collection admin
     Boolean admin = (Boolean)request.getAttribute("is.admin");
     boolean isAdmin = (admin == null ? false : admin.booleanValue());
     

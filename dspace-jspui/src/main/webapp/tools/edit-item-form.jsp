@@ -61,7 +61,7 @@
     Boolean itemAdmin = (Boolean)request.getAttribute("admin_button");
     boolean isItemAdmin = (itemAdmin == null ? false : itemAdmin.booleanValue());
 
-    // Is the logged in user an admin or community admin or cllection admin
+    // Is the logged in user an admin or community admin or collection admin
     Boolean admin = (Boolean)request.getAttribute("is.admin");
     boolean isAdmin = (admin == null ? false : admin.booleanValue());
     
