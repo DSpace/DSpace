@@ -245,6 +245,21 @@ public class CreativeCommons
         return getBitstream(item, BSN_LICENSE_TEXT);
     }
     
+	/**
+	 * Retrieve the license text
+	 * 
+	 * @param item - the item 
+	 * @return the license in textual format
+	 * @throws SQLException
+	 * @throws IOException
+	 * @throws AuthorizeException
+	 * 
+     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
+	 */
+	public static String getLicenseText(Item item) throws SQLException, IOException, AuthorizeException {
+		return getStringFromBitstream(item, BSN_LICENSE_TEXT);
+	}
+    
 	public static String getLicenseURL(Item item) throws SQLException, IOException, AuthorizeException {
 		String licenseUri = CreativeCommons.getCCField("uri").ccItemValue(item);
 		if (StringUtils.isNotBlank(licenseUri)) {
