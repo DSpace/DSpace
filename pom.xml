@@ -24,6 +24,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
         <java.version>1.7</java.version>
+        <postgresql.driver.version>9.4.1211</postgresql.driver.version>
         <solr.version>4.10.4</solr.version>
         <jena.version>2.13.0</jena.version>
         <slf4j.version>1.7.14</slf4j.version>
@@ -510,6 +511,42 @@
                 <!-- Note: ${javadoc.opts} is passed to maven-javadoc-plugin below -->
                 <javadoc.opts>-Xdoclint:none</javadoc.opts>
             </properties>
+        </profile>
+        
+        <!-- PostgreSQL ships different JDBC drivers based on the version of Java
+             you are running. See https://jdbc.postgresql.org/download.html
+             These next two profiles handle pulling in the correct PostgreSQL JDBC driver. -->
+        <!-- Default PostgreSQL driver is only for Java 8 -->
+        <profile>
+            <id>postgresql-jdbc-default</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgresql.driver.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+        <!-- If running Java 7, use JRE7 PostgreSQL driver -->
+        <profile>
+            <id>postgresql-jdbc-jre7</id>
+            <activation>
+                <jdk>[1.7,1.8)</jdk>
+            </activation>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgresql.driver.version}.jre7</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
         </profile>
 
         <!--
@@ -1234,11 +1271,6 @@
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
                 <version>56.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>9.4-1206-jdbc41</version>
             </dependency>
             <dependency>
                 <groupId>com.oracle</groupId>
