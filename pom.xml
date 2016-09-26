@@ -776,7 +776,8 @@
                                  MUST be specified for server 'ossrh' -->
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <!-- Require manual verification / release to Maven Central -->
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
                     <!-- For new releases, generate Source JAR files -->
@@ -1506,9 +1507,7 @@
     </contributors>
 
     <!--
-      The SCM repository location is used by Continuum to update against
-      when changes have occurred.  This spawns a new build cycle and releases
-      snapshots into the snapshot repository below.
+      Information about the SCM repository where source code exists.
     -->
     <scm>
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
