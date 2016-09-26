@@ -21,6 +21,7 @@
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.app.util.Util" %>
+<%@ page import="org.dspace.app.webui.util.LocaleUIHelper" %>
 <%@ page import="javax.servlet.jsp.jstl.core.*" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 
@@ -116,6 +117,32 @@
 			  $('i[data-toggle="tooltip"]').tooltip();
 		});
 	</script>
+	<% if(StringUtils.isNotBlank(LocaleUIHelper.ifLtr(request, "","rtl"))) { %>
+    <script type="text/javascript"> 
+    jQuery(document).ready(function() {
+    	var sxLayout = jQuery('#sx-layout');
+    	var dxLayout = jQuery('#dx-layout');
+    	var sxLayoutContent = sxLayout.html();
+    	var dxLayoutContent = "";
+    	jQuery('.badge').css('float','none');
+    	jQuery.each(jQuery('.badge'),function (index, value) {
+    		jQuery(value).appendTo(jQuery(value).parent());
+    	});
+    	if (dxLayout.size() == 0) {
+    		sxLayout.insertAfter(jQuery('#central-layout'));
+    		sxLayout.addClass('hidden-xs');
+        	sxLayout.children('.list-group').css('margin-right','-50px');
+    	}
+    	else {
+    		dxLayoutContent = dxLayout.html();
+    		sxLayout.html(dxLayoutContent);
+    		dxLayout.html(sxLayoutContent);
+    		sxLayout.removeClass('hidden-xs');
+        	dxLayout.addClass('hidden-xs');
+        	dxLayout.children('.list-group').css('margin-right','-50px');
+    	}
+    });
+    </script>
     <%--Gooogle Analytics recording.--%>
     <%
     if (analyticsKey != null && analyticsKey.length() > 0)
@@ -153,7 +180,7 @@
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
-    <body class="undernavigation">
+    <body class="undernavigation" dir="<%= LocaleUIHelper.ifLtr(request, "ltr","rtl") %>">
 <a class="sr-only" href="#content">Skip navigation</a>
 <header class="navbar navbar-inverse navbar-square">    
     <%

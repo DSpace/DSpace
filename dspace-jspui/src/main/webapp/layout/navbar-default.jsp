@@ -25,6 +25,7 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.app.webui.util.LocaleUIHelper" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
@@ -77,6 +78,7 @@
  // get the locale languages
     Locale[] supportedLocales = I18nUtil.getSupportedLocales();
     Locale sessionLocale = UIUtil.getSessionLocale(request);
+    boolean isRtl = StringUtils.isNotBlank(LocaleUIHelper.ifLtr(request, "","rtl"));    
 
     String[] mlinks = new String[0];
     String mlinksConf = ConfigurationManager.getProperty("cris", "navbar.cris-entities");
@@ -140,8 +142,8 @@
  <% if (supportedLocales != null && supportedLocales.length > 1)
      {
  %>
-    <div class="nav navbar-nav navbar-right">
-	 <ul class="nav navbar-nav navbar-right">
+    <div class="nav navbar-nav navbar-<%= isRtl ? "left" : "right" %>">
+	 <ul class="nav navbar-nav navbar-<%= isRtl ? "left" : "right" %>">
       <li id="language-top-menu" class="dropdown">
        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><fmt:message key="jsp.layout.navbar-default.language"/><b class="caret"></b></a>
         <ul class="dropdown-menu">
@@ -166,14 +168,14 @@
    }
  %>
  
-       <div class="nav navbar-nav navbar-right">
-		<ul class="nav navbar-nav navbar-right">
+       <div class="nav navbar-nav navbar-<%= isRtl ? "left" : "right" %>">
+		<ul class="nav navbar-nav navbar-<%= isRtl ? "left" : "right" %>">
                     <li id="search-top-menu" class="dropdown">
            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span><b class="caret"></b></a>
           <div class="dropdown-menu">
           
 	<%-- Search Box --%>
-	<form id="formsearch-top-menu" method="get" action="<%= request.getContextPath() %>/global-search" class="navbar-form navbar-right" scope="search">		
+	<form id="formsearch-top-menu" method="get" action="<%= request.getContextPath() %>/global-search" class="navbar-form navbar-<%= isRtl ? "left" : "right" %>" scope="search">		
 	    <div class="form-group">
           <input type="text" class="form-control" placeholder="<fmt:message key="jsp.layout.navbar-default.search"/>" name="query" id="tequery" size="25"/>
         </div>
@@ -196,7 +198,7 @@
     {
 		%>
 		<li id="userloggedin-top-menu" class="dropdown">
-		<a href="#" class="dropdown-toggle text-right" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.loggedin">
+		<a href="#" class="dropdown-toggle <%= isRtl ? "" : "text-right" %>" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.loggedin">
 		      <fmt:param><%= StringUtils.abbreviate(navbarEmail, 20) %></fmt:param>
 		  </fmt:message> <b class="caret"></b></a>
 		<%

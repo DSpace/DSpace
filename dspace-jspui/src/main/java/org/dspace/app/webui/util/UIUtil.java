@@ -7,6 +7,7 @@
  */
 package org.dspace.app.webui.util;
 
+import java.awt.ComponentOrientation;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -662,4 +663,26 @@ public class UIUtil extends Util
         }
         return sortInfo;
     }
+    
+    /**
+     * Checks whether current locale is LTR or RTL
+     *
+     * @param request http request
+     * @return true if current locale is LTR, false if RTL
+     */
+    public static boolean isLtrLanguage(HttpServletRequest request) {
+        Locale locale = getSessionLocale(request);
+        return isLtrLanguage(locale);
+    }
+
+    /**
+     * Checks whether current locale is LTR or RTL
+     *
+     * @param locale locale
+     * @return true if current locale is LTR, false if RTL
+     */
+    public static boolean isLtrLanguage(Locale locale) {
+        return ComponentOrientation.getOrientation(locale).isLeftToRight();
+    }
+    
 }
