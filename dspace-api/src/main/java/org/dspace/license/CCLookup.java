@@ -259,7 +259,7 @@ public class CCLookup {
 		throws IOException{
 
 		// Determine the issue URL
-		String issueUrl = this.cc_root + "/license/" + licenseId + "/issue";
+		String issueUrl = cc_root + "/license/" + licenseId + "/issue";
 		// Assemble the "answers" document
 		String answer_doc = "<answers>\n<locale>" + lang + "</locale>\n" + "<license-" + licenseId + ">\n";
 		Iterator keys = answers.keySet().iterator();
@@ -411,31 +411,18 @@ public class CCLookup {
 
 	public String getRdf()
 		throws IOException {
-		String myString = null;
-		java.io.ByteArrayOutputStream outputstream = new java.io.ByteArrayOutputStream();
+		String result = ""; 
 		try {
-			outputstream.write("<result>\n".getBytes()); 
-			JDOMXPath xpathRdf 				= new JDOMXPath("//result/rdf");
-			JDOMXPath xpathLicenseRdf 				= new JDOMXPath("//result/licenserdf");
-			XMLOutputter xmloutputter 	= new XMLOutputter();
-			Element rdfParent     				= ((Element)xpathRdf.selectSingleNode(this.license_doc));
-			xmloutputter.output(rdfParent, outputstream);
-			Element licenseRdfParent       = ((Element)xpathLicenseRdf.selectSingleNode(this.license_doc));
-			outputstream.write("\n".getBytes());
-			xmloutputter.output(licenseRdfParent, outputstream);
-			outputstream.write("\n</result>\n".getBytes());
+			result = CreativeCommons.fetchLicenseRDF(license_doc);
 		} catch (Exception e) {
 			log.warn("An error occurred getting the rdf . . ." + e.getMessage() );
 			setSuccess(false);
-		} finally {
-			outputstream.close();
-			return outputstream.toString();
-		}
+		} 
+		return result;
 	}
 
 	public boolean isSuccess() {
 		setSuccess(false);
-		java.io.ByteArrayOutputStream outputstream = new java.io.ByteArrayOutputStream();
 		JDOMXPath xp_Success = null;
 		String text = null;
 		try {
