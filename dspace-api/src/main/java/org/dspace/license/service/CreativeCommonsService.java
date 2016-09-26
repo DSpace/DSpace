@@ -79,8 +79,9 @@ public interface CreativeCommonsService {
 
     /**
      * Get Creative Commons license Text, returning Bitstream object.
-     * @Deprecated
+     * 
      * @return bitstream or null.
+	 * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
      */
     public Bitstream getLicenseTextBitstream(Item item) throws SQLException,
             IOException, AuthorizeException;
@@ -92,7 +93,33 @@ public interface CreativeCommonsService {
 
     public LicenseMetadataValue getCCField(String fieldId);
     
+	/**
+	 * Apply same transformation on the document to retrieve only the most
+	 * relevant part of the document passed as parameter. If no transformation
+	 * is needed then take in consideration to empty the CreativeCommons.xml
+	 * 
+	 * @param license
+	 *            - an element that could be contains as part of your content
+	 *            the license rdf
+	 * @return the document license in textual format after the transformation
+	 */
     public String fetchLicenseRDF(Document license);
+    
+	/**
+	 * Remove license information, delete also the bitstream
+	 * 
+	 * @param context
+	 *            - DSpace Context
+	 * @param uriField
+	 *            - the metadata field for license uri
+	 * @param nameField
+	 *            - the metadata field for license name
+	 * @param item
+	 *            - the item
+	 * @throws AuthorizeException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
 	public void removeLicense(Context context, LicenseMetadataValue uriField,
 			LicenseMetadataValue nameField, Item item) throws AuthorizeException, IOException, SQLException;
 }

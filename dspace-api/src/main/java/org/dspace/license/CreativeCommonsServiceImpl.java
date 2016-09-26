@@ -57,10 +57,15 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     /**
      * Some BitStream Names (BSN)
+     * 
+     * @deprecated use the metadata retrieved at {@link CreativeCommonsService#getCCField(String)} (see https://jira.duraspace.org/browse/DS-2604)
      */
     @Deprecated
     protected static final String BSN_LICENSE_URL = "license_url";
 
+    /**
+     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
+     */
     @Deprecated
     protected static final String BSN_LICENSE_TEXT = "license_text";
 
@@ -244,7 +249,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 			return licenseUri;
 		}
 		
-		//backward compatibility
+		// JSPUI backward compatibility see https://jira.duraspace.org/browse/DS-2604
 		return getStringFromBitstream(context, item, BSN_LICENSE_URL);
 	}
 
