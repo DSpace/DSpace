@@ -113,8 +113,8 @@ public interface SearchService {
      * If a user has the appropriate rights to administrate communities and/or
      * collections we want to look up all contents of those communities and/or
      * collections, ignoring the read policies of the items (e.g. to list all
-     * private items of communities/collections the user administrate). This
-     * method returns a query to filter for items that belongs to those
+     * private items of communities/collections the user administrates). This
+     * method returns a query to filter for items that belong to those
      * communities/collections only.
      *
      * @param context
