@@ -52,10 +52,16 @@ public class CreativeCommons
 
     /**
      * Some BitStream Names (BSN)
+     * 
+     * @deprecated use the metadata retrieved at {@link CreativeCommons#getCCField(String)} (see https://jira.duraspace.org/browse/DS-2604)
      */
     @Deprecated
     private static final String BSN_LICENSE_URL = "license_url";
 
+    /**
+     * 
+     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
+     */
     @Deprecated
     private static final String BSN_LICENSE_TEXT = "license_text";
 
@@ -229,6 +235,8 @@ public class CreativeCommons
     /**
      * Get Creative Commons license Text, returning Bitstream object.
      * @return bitstream or null.
+     * 
+     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
      */
     @Deprecated
     public static Bitstream getLicenseTextBitstream(Item item) throws SQLException,
@@ -242,9 +250,17 @@ public class CreativeCommons
 		if (StringUtils.isNotBlank(licenseUri)) {
 			return licenseUri;
 		}
+		// JSPUI backward compatibility see https://jira.duraspace.org/browse/DS-2604
 		return getStringFromBitstream(item, BSN_LICENSE_URL);
 	}
 
+    /**
+     * Apply same transformation on the document to retrieve only the most relevant part of the document passed as parameter.
+     * If no transformation is needed then take in consideration to empty the CreativeCommons.xml
+     * 
+     * @param license - an element that could be contains as part of your content the license rdf
+     * @return the document license in textual format after the transformation
+     */
     public static String fetchLicenseRDF(Document license)
     {
         StringWriter result = new StringWriter();
@@ -472,6 +488,17 @@ public class CreativeCommons
     	}
     }
 
+	/**
+	 * Remove license information, delete also the bitstream
+	 * 
+	 * @param context - DSpace Context
+	 * @param uriField - the metadata field for license uri 
+	 * @param nameField - the metadata field for license name
+	 * @param item - the item
+	 * @throws AuthorizeException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
 	public static void removeLicense(Context context, MdField uriField,
 			MdField nameField, Item item) throws AuthorizeException, IOException, SQLException {
 		// only remove any previous licenses
