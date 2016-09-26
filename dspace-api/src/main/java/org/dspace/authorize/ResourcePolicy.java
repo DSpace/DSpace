@@ -151,7 +151,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
             hash = 19 * hash + -1;
         }
 
-        if(this.epersonGroup != null)
+        if(this.getEPerson() != null)
         {
             hash = 19 * hash + this.getEPerson().hashCode();
         }else{
