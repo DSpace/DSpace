@@ -330,6 +330,14 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
 
             pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(item));
 
+            DCValue[] values;
+
+            if ((values = item.getMetadata("prism.publicationName")).length != 0) {
+                pageMeta.addMetadata("publicationName").addContent(values[0].value);
+                pageMeta.addMetadata("journal", "cover").addContent(JournalUtils.getJournalConceptByJournalName(values[0].value).getCoverImage());
+                pageMeta.addMetadata("journal", "website").addContent(JournalUtils.getJournalConceptByJournalName(values[0].value).getWebsite());
+            }
+
             // Data file metadata included on data package items (integrated view)
             for (DCValue metadata : item.getMetadata("dc.relation.haspart")) {
                 int skip = 0;
