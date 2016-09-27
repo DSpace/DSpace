@@ -118,7 +118,7 @@ public class SendItemRequestAction extends AbstractAction
                 )
                 .getRequestItemAuthor(context, item);
 
-        RequestItem requestItem = new RequestItem(item.getID(), Integer.parseInt(bitstreamId), requesterEmail, requesterName, message, Boolean.getBoolean(allFiles));
+        RequestItem requestItem = new RequestItem(item.getID(), Integer.parseInt(bitstreamId), requesterEmail, requesterName, message, Boolean.valueOf(allFiles));
 
         // All data is there, send the email
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.author"));
