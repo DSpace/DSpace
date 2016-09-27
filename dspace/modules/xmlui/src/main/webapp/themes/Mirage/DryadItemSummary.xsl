@@ -106,7 +106,7 @@
                 <xsl:with-param name="fullname" select=".//dim:field[@element='publicationName']"/>
                 <xsl:with-param name="article-doi"
                                 select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi:')]"/>
-                <xsl:with-param name="coverimage" select="$meta[@element='journal'][@qualifier='cover']"/>
+                <xsl:with-param name="cover" select="$meta[@element='journal'][@qualifier='cover']"/>
                 <xsl:with-param name="website" select="$meta[@element='journal'][@qualifier='website']"/>
             </xsl:call-template>
               <p class="pub-title">
@@ -1308,7 +1308,7 @@
 
     <xsl:template name="journal-lookup">
         <xsl:param name="fullname"/>
-        <xsl:param name="coverimage"/>
+        <xsl:param name="cover"/>
         <xsl:param name="website"/>
         <xsl:param name="article-doi"/>
         <a target="_blank">
@@ -1324,9 +1324,9 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
-            <xsl:if test="$coverimage">
+            <xsl:if test="$cover">
                 <img class="pub-cover" id="journal-logo">
-                    <xsl:attribute name="src"><xsl:value-of select="$coverimage"/></xsl:attribute>
+                    <xsl:attribute name="src"><xsl:value-of select="$cover"/></xsl:attribute>
                     <xsl:attribute name="alt"><xsl:value-of select="$fullname"/></xsl:attribute>
                 </img>
             </xsl:if>
