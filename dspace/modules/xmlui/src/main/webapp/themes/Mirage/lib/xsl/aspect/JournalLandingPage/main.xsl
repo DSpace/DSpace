@@ -33,6 +33,7 @@
         <xsl:variable name="journal-name" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalName'])"/>
         <xsl:variable name="alt" select="concat($journal-name, ' cover')"/>
         <xsl:variable name="cover" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalCover'])"/>
+        <xsl:variable name="website" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalWebsite'])"/>
 
         <div id="{translate(string(@id), '.', '_')}" class="ds-static-div primary clearfix">
             <table width="100%">
@@ -44,11 +45,13 @@
                         <xsl:apply-templates/>
                     </td>
                     <td>
+                        <a href="{$website}">
                         <img alt="{$alt}"
                             src="{$cover}"
                             id="journal-logo"
                             class="pub-cover"
                             onerror="this.src='{$default-image}'"/>
+                        </a>
                     </td>
                 </tr>
             </table>
