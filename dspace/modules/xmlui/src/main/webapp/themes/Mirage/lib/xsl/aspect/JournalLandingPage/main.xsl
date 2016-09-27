@@ -31,9 +31,8 @@
     <xsl:template match="dri:p[@id='aspect.journal.landing.JournalStats.p.hidden-fields']"/>
     <xsl:template match="//dri:document/dri:body/dri:div[@n='journal-landing-banner-outer']">
         <xsl:variable name="journal-name" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalName'])"/>
-        <xsl:variable name="journal-abbr" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalAbbr'])"/>
         <xsl:variable name="alt" select="concat($journal-name, ' cover')"/>
-        <xsl:variable name="cover" select="concat('/themes/Dryad/images/coverimages/', $journal-abbr, '.png')"/>
+        <xsl:variable name="cover" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalCover'])"/>
 
         <div id="{translate(string(@id), '.', '_')}" class="ds-static-div primary clearfix">
             <table width="100%">
@@ -49,7 +48,7 @@
                             src="{$cover}"
                             id="journal-logo"
                             class="pub-cover"
-                            onerror="this.src='{$default-image}'"></img>
+                            onerror="this.src='{$default-image}'"/>
                     </td>
                 </tr>
             </table>

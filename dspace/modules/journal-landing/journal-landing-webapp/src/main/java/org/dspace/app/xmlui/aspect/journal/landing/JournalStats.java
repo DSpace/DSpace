@@ -305,6 +305,7 @@ public class JournalStats extends AbstractDSpaceTransformer
         pageMeta.addMetadata("request","journalISSN").addContent(journalISSN);
         pageMeta.addMetadata("request","journalName").addContent(journalName);
         pageMeta.addMetadata("request","journalAbbr").addContent(journalAbbr);
+        pageMeta.addMetadata("request","journalCover").addContent(journalConcept.getCoverImage());
 
     }
 
