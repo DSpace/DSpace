@@ -78,12 +78,15 @@ public class Const {
     public static final String archivedPackageCountCol   =               "archivedpackagecountbyjournal";
 
     public static final Message T_div_head         = message("xmlui.JournalLandingPage.JournalStats.panel_head");
-    public static final Message T_mostRecent       = message("xmlui.JournalLandingPage.JournalStats.empty");
     public static final Message T_date             = message("xmlui.JournalLandingPage.JournalStats.date");
     public static final Message T_btnRecPub        = message("xmlui.JournalLandingPage.JournalStats.rec_pub");
+    public static final Message T_desc_RecPub        = message("xmlui.JournalLandingPage.JournalStats.rec_pub");
     public static final Message T_btn_month        = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.month");
     public static final Message T_btn_year         = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year");
     public static final Message T_btn_alltime      = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime");
+    public static final Message T_desc_month        = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.month_desc");
+    public static final Message T_desc_year         = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year_desc");
+    public static final Message T_desc_alltime      = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime_desc");
     public static final Message T_ref_head         = message("xmlui.JournalLandingPage.JournalStats.val_head");
     public static final Message T_empty            = message("xmlui.JournalLandingPage.JournalStats.empty");
 }
