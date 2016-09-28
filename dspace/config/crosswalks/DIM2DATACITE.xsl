@@ -52,6 +52,15 @@
 				</xsl:variable>
 				<xsl:value-of select="translate(substring-after($doi,'doi:'), $smallcase, $uppercase)"/>
 			</identifier>
+
+			<!-- ********** Version ********** -->
+			<xsl:variable name="version">
+				<xsl:call-template name="version-number"><xsl:with-param name="working" select="dspace:field[@element='identifier'][@mdschema='dc']"/></xsl:call-template>
+			</xsl:variable>
+			<version>
+				<xsl:value-of select="$version"/>
+			</version>
+
 		    <!-- ********** Creators ************* -->
 		    <creators>
 				<xsl:choose>
@@ -270,5 +279,28 @@
 				</descriptions>
 			</xsl:if>
         </resource>
+	</xsl:template>
+
+	<xsl:template name="version-number">
+		<xsl:param name="working"/>
+		<xsl:variable name="remnant" select="substring-after($working, '.')"/>
+		<xsl:choose>
+			<xsl:when test="string-length($remnant)=0">
+				<!-- if $working is just a number, that's the version. Otherwise, version is 1.-->
+				<xsl:choose>
+					<xsl:when test="string(number($working))=$working">
+						<xsl:value-of select="$working"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>1</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="version-number">
+					<xsl:with-param name="working" select="$remnant"/>
+				</xsl:call-template>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 </xsl:stylesheet>
