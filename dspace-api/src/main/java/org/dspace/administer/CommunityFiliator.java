@@ -132,8 +132,8 @@ public class CommunityFiliator
         CommunityFiliator filiator = new CommunityFiliator();
         Context c = new Context();
 
-        // ve are superuser!
-        c.setIgnoreAuthorization(true);
+        // we are superuser!
+        c.turnOffAuthorisationSystem();
 
         try
         {

@@ -42,7 +42,7 @@ public class FixDefaultPolicies
         Context c = new Context();
 
         // turn off authorization
-        c.setIgnoreAuthorization(true);
+        c.turnOffAuthorisationSystem();
 
         //////////////////////
         // carnage begins here

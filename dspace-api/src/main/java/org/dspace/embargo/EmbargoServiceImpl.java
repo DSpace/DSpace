@@ -93,10 +93,9 @@ public class EmbargoServiceImpl implements EmbargoService
              }
         }
         String slift = myLift.toString();
-        boolean ignoreAuth = context.ignoreAuthorization();
         try
         {
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
             itemService.clearMetadata(context, item, lift_schema, lift_element, lift_qualifier, Item.ANY);
             itemService.addMetadata(context, item, lift_schema, lift_element, lift_qualifier, null, slift);
             log.info("Set embargo on Item "+item.getHandle()+", expires on: "+slift);
@@ -107,7 +106,7 @@ public class EmbargoServiceImpl implements EmbargoService
         }
         finally
         {
-            context.setIgnoreAuthorization(ignoreAuth);
+            context.restoreAuthSystemState();
         }
     }
 

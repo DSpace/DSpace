@@ -115,7 +115,7 @@ public class EmbargoCLITool {
         try
         {
             context = new Context();
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
             Date now = new Date();
 
             // scan items under embargo
