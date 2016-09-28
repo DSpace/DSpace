@@ -45,12 +45,15 @@
         <resource xmlns="http://datacite.org/schema/kernel-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
 
+			<xsl:variable name="doi">
+				<xsl:call-template name="get_identifier"/>
+			</xsl:variable>
+
+			<xsl:variable name="identifier" select="translate(substring-after($doi,'doi:'), $smallcase, $uppercase)"/>
+
 			<!-- ********** Identifiers ********** -->
 			<identifier identifierType="DOI">
-				<xsl:variable name="doi">
-					<xsl:call-template name="get_identifier"/>
-				</xsl:variable>
-				<xsl:value-of select="translate(substring-after($doi,'doi:'), $smallcase, $uppercase)"/>
+				<xsl:value-of select="$identifier"/>
 			</identifier>
 
 			<!-- ********** Version ********** -->
