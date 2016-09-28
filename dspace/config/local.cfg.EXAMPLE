@@ -138,25 +138,23 @@ db.schema = public
 ########################
 # HANDLE CONFIGURATION #
 ########################
-
+#
 # Canonical Handle URL prefix
 #
-# By default, DSpace is configured to use http://hdl.handle.net/
-# as the canonical URL prefix when generating dc.identifier.uri
-# during submission, and in the 'identifier' displayed in JSPUI
-# item record pages.
-#
-# If you do not subscribe to CNRI's handle service, you can change this
-# to match the persistent URL service you use, or you can force DSpace
-# to use your site's URL, eg.
-#handle.canonical.prefix = ${dspace.url}/handle/
+# Items in DSpace receive a unique URL, stored in dc.identifier.uri
+# after it is generated during the submission process.
+# 
+# If you register with CNRI's handle service at http://www.handle.net/,
+# these links can be generated as permalinks using http://hdl.handle.net/
+# as canonical prefix. Please make sure to change handle.canonical.prefix
+# after registering with handle.net by uncommenting one of the following
+# lines, depending if you prefer to use http or https:
+# handle.canonical.prefix = http://hdl.handle.net/
+# handle.canonical.prefix = https://hdl.handle.net/
 #
 # Note that this will not alter dc.identifer.uri metadata for existing
-# items (only for subsequent submissions), but it will alter the URL 
+# items (only for subsequent submissions), but it will alter the URL
 # in JSPUI's 'identifier' message on item record pages for existing items.
-#
-# If omitted, the canonical URL prefix will be http://hdl.handle.net/
-#handle.canonical.prefix = http://hdl.handle.net/
 
 # CNRI Handle prefix
 # (Defaults to a dummy/fake prefix of 123456789)
