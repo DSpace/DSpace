@@ -205,6 +205,16 @@
 							</xsl:if>
 						</relatedIdentifier>
 				    </xsl:for-each>
+					<xsl:if test="$version > 1">
+						<xsl:variable name="canonical-doi">
+							<xsl:call-template name="canonical-doi"><xsl:with-param name="working" select="$identifier"/></xsl:call-template>
+						</xsl:variable>
+
+						<xsl:call-template name="related-identifiers">
+							<xsl:with-param name="canonical-doi" select="$canonical-doi"/>
+							<xsl:with-param name="current-version" select="$version - 1"/>
+						</xsl:call-template>
+					</xsl:if>
 				</relatedIdentifiers>
 			</xsl:if>
 			
@@ -306,4 +316,79 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
+
+	<xsl:template name="canonical-doi">
+		<xsl:param name="working"/>
+		<xsl:variable name="prefix" select="concat(substring-before($working, 'DRYAD.'),'DRYAD.')"/>
+		<xsl:variable name="suffix" select="substring-after($working, 'DRYAD.')"/>
+
+		<!-- if it's a file, there will still be a slash in the suffix -->
+		<xsl:choose>
+			<xsl:when test="contains($suffix, '/')">
+				<xsl:variable name="file-suffix" select="substring-after($suffix, '/')"/>
+				<xsl:variable name="package-suffix" select="substring-before($suffix, '/')"/>
+				<!-- look for a dot in the file suffix -->
+				<xsl:choose>
+					<xsl:when test="contains($file-suffix, '.')">
+						<!-- both the file and package suffixes need to be canonicalized -->
+						<xsl:value-of select="concat($prefix, substring-before($package-suffix, '.'), '.1', '/', substring-before($file-suffix, '.'), '.1')"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$working"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- look for a dot in the package suffix -->
+				<xsl:choose>
+					<xsl:when test="contains($suffix, '.')">
+						<!-- the package suffix needs to be canonicalized -->
+						<xsl:value-of select="concat($prefix, substring-before($suffix, '.'), '.1')"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$working"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="versioned-doi">
+		<xsl:param name="canonical-doi"/>
+		<xsl:param name="version"/>
+		<xsl:variable name="prefix" select="concat(substring-before($canonical-doi, 'DRYAD.'),'DRYAD.')"/>
+		<xsl:variable name="suffix" select="substring-after($canonical-doi, 'DRYAD.')"/>
+
+		<!-- if it's a file, there will still be a slash in the suffix -->
+		<xsl:choose>
+			<xsl:when test="contains($suffix, '/')">
+				<xsl:variable name="file-suffix" select="substring-after($suffix, '/')"/>
+				<xsl:variable name="package-suffix" select="substring-before($suffix, '/')"/>
+				<!-- both the file and package suffixes need to be versioned -->
+				<xsl:value-of select="concat($prefix, substring-before($package-suffix, '.'), '.', $version, '/', substring-before($file-suffix, '.'), '.', $version)"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- the package suffix needs to be versioned -->
+				<xsl:value-of select="concat($prefix, substring-before($suffix, '.'), '.', $version)"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="related-identifiers">
+		<xsl:param name="canonical-doi"/>
+		<xsl:param name="current-version"/>
+		<xsl:if test="$current-version &gt; 0">
+			<relatedIdentifier xmlns="http://datacite.org/schema/kernel-4" relatedIdentifierType="DOI" relationType="IsNewVersionOf">
+				<xsl:call-template name="versioned-doi">
+					<xsl:with-param name="canonical-doi" select="$canonical-doi"/>
+					<xsl:with-param name="version" select="$current-version"/>
+				</xsl:call-template>
+			</relatedIdentifier>
+			<xsl:call-template name="related-identifiers">
+				<xsl:with-param name="canonical-doi" select="$canonical-doi"/>
+				<xsl:with-param name="current-version" select="$current-version - 1"/>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template>
+
 </xsl:stylesheet>
