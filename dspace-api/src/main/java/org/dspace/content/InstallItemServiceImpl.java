@@ -22,6 +22,8 @@ import org.dspace.embargo.service.EmbargoService;
 import org.dspace.event.Event;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -43,6 +45,8 @@ public class InstallItemServiceImpl implements InstallItemService
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected ItemService itemService;
+
+    private static final Logger log = LoggerFactory.getLogger(InstallItemServiceImpl.class);
 
     protected InstallItemServiceImpl()
     {
@@ -154,9 +158,14 @@ public class InstallItemServiceImpl implements InstallItemService
         // be set when the embargo is lifted.
         // this will flush out fatal embargo metadata
         // problems before we set inArchive.
-        if (embargoService.getEmbargoTermsAsDate(c, item) == null)
-        {
-            itemService.addMetadata(c, item, MetadataSchema.DC_SCHEMA, "date", "available", null, now.toString());
+        try {
+            if (embargoService.getEmbargoTermsAsDate(c, item) == null)
+            {
+                itemService.addMetadata(c, item, MetadataSchema.DC_SCHEMA, "date", "available", null, now.toString());
+            }            
+        } catch (IllegalArgumentException e) {
+            //DS-3321, do not cancel an import due to a lift date in the past
+            log.info("Ignoring invalid lift date for item", e);
         }
 
         // If issue date is set as "today" (literal string), then set it to current date
