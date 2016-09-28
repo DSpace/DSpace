@@ -142,9 +142,9 @@ public class EmbargoServiceImpl implements EmbargoService
         // sanity check: do not allow an embargo lift date in the past.
         if (liftDate.before(new Date()))
         {
-            throw new IllegalArgumentException(
-                    "Embargo lift date must be in the future, but this is in the past: "
-                            + result.toString());
+            log.info("Embargo lift date must be in the future, but this is in the past");
+            //DS-3321, existing code assumes a null lift date when in the past
+            return null;
         }
         return result;
     }
