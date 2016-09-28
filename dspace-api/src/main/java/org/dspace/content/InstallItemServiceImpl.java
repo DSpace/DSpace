@@ -158,10 +158,15 @@ public class InstallItemServiceImpl implements InstallItemService
         // be set when the embargo is lifted.
         // this will flush out fatal embargo metadata
         // problems before we set inArchive.
-        if (embargoService.getEmbargoTermsAsDate(c, item) == null)
-        {
-            itemService.addMetadata(c, item, MetadataSchema.DC_SCHEMA, "date", "available", null, now.toString());
-        }            
+        try {
+            if (embargoService.getEmbargoTermsAsDate(c, item) == null)
+            {
+                itemService.addMetadata(c, item, MetadataSchema.DC_SCHEMA, "date", "available", null, now.toString());
+            }            
+        } catch (IllegalArgumentException e) {
+            //DS-3321, do not cancel an import due to a lift date in the past
+            log.info("Ignoring invalid lift date for item", e);
+        }
 
         // If issue date is set as "today" (literal string), then set it to current date
         // In the below loop, we temporarily clear all issued dates and re-add, one-by-one,
@@ -237,12 +242,7 @@ public class InstallItemServiceImpl implements InstallItemService
         contentServiceFactory.getInProgressSubmissionService(is).deleteWrapper(c, is);
 
         // set embargo lift date and take away read access if indicated.
-        try {
-            embargoService.setEmbargo(c, item);            
-        } catch (IllegalArgumentException e) {
-            //DS-3321, do not cancel an import due to a lift date in the past
-            log.info("Ignoring invalid lift date for item", e);
-        }
+        embargoService.setEmbargo(c, item);
 
         return item;
     }
