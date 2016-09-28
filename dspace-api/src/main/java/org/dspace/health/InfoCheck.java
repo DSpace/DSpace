@@ -43,30 +43,31 @@ public class InfoCheck extends Check {
         sb.append("\n");
 
         DSBitStoreService localStore = new DSpace().getServiceManager().getServicesByType(DSBitStoreService.class).get(0);
-
         for (String[] ss : new String[][] {
             new String[] {
                 localStore.getBaseDir().toString(),
                 "Assetstore size", },
             new String[] {
-                    configurationService.getProperty("search.dir"),
-                "Search dir size", },
-            new String[] {
                     configurationService.getProperty("log.report.dir"),
                 "Log dir size", }, })
         {
-            try {
-                File dir = new File(ss[0]);
-                if (dir.exists()) {
-                    long dir_size = FileUtils.sizeOfDirectory(dir);
-                    sb.append(String.format("%-20s: %s\n", ss[1],
-                            FileUtils.byteCountToDisplaySize(dir_size))
-                    );
-                } else {
-                    sb.append(String.format("Directory [%s] does not exist!\n", ss[0]));
+            if (ss[0] != null) {   
+                try {
+                    File dir = new File(ss[0]);
+                    if (dir.exists()) {
+                        long dir_size = FileUtils.sizeOfDirectory(dir);
+                        sb.append(String.format("%-20s: %s\n", ss[1],
+                                FileUtils.byteCountToDisplaySize(dir_size))
+                        );
+                    } else {
+                        sb.append(String.format("Directory [%s] does not exist!\n", ss[0]));
+                    }
+                } catch(Exception e) {
+                    error(e, "directory - " + ss[0]);
                 }
-            }catch(Exception e) {
-                error(e, "directory - " + ss[0]);
+            }
+            else { // cannot read property for some reason
+                    sb.append(String.format("Could not get information for %s!\n", ss[1]));
             }
         }
 

@@ -35,6 +35,8 @@ public class EmbargoCheck extends Check {
                 item_iter = embargoService.findItemsByLiftMetadata(context);
             } catch (IllegalArgumentException e) {
                 error(e, "No embargoed items found");
+		ret += "Note: This check is for pre-3.0 embargo functionality.\n";
+		ret += "If you aren't using it, you can ignore this error.\n";
             } catch (Exception e) {
                 error(e);
             }
