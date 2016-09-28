@@ -38,19 +38,19 @@ We recommend using [nvm](https://github.com/creationix/nvm) (Node Version Manage
 First download and install nvm:
 
 ```bash
-    curl https://raw.githubusercontent.com/creationix/nvm/v0.5.1/install.sh | sh 
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash 
 ```
 
-Then, close and reopen your terminal, and install a node version. We’ve been using v0.10.31 during the development of the theme, but it may very well work on other versions
+Then, close and reopen your terminal, and install a node version. We’ve been using v6.5.0 during the development of the theme, but it may very well work on other versions
 
 ```bash
-    nvm install 0.10.31 
+    nvm install 6.5.0 
 ```
 
 Set the node version you installed as the default version.
 
 ```bash
-    nvm alias default 0.10.31
+    nvm alias default 6.5.0
 ```
 
 
