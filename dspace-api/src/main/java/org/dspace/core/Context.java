@@ -304,21 +304,6 @@ public class Context
     }
 
     /**
-     * Specify whether the authorisation system should be ignored for this
-     * context. This should be used sparingly.
-     * 
-     * @deprecated use turnOffAuthorisationSystem() for make the change and
-     *             restoreAuthSystemState() when change are not more required
-     * @param b
-     *            if <code>true</code>, authorisation should be ignored for this
-     *            session.
-     */
-    public void setIgnoreAuthorization(boolean b)
-    {
-        ignoreAuth = b;
-    }
-
-    /**
      * Set extra information that should be added to any message logged in the
      * scope of this context. An example of this might be the session ID of the
      * current Web user's session:

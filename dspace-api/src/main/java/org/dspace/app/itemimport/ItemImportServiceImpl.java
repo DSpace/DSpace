@@ -1779,7 +1779,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 					context = new Context();
 					eperson = ePersonService.find(context, oldEPerson.getID());
 					context.setCurrentUser(eperson);
-					context.setIgnoreAuthorization(true);
+					context.turnOffAuthorisationSystem();
 					
 					boolean isResume = theResumeDir!=null;
 					

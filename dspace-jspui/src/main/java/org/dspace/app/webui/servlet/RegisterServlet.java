@@ -487,7 +487,7 @@ public class RegisterServlet extends EditProfileServlet
             // Need to create new eperson
             // FIXME: TEMPORARILY need to turn off authentication, as usually
             // only site admins can create e-people
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
             eperson = personService.create(context);
             eperson.setEmail(email);
             if (netid!=null)
@@ -495,7 +495,7 @@ public class RegisterServlet extends EditProfileServlet
                 eperson.setNetid(netid.toLowerCase());
             }
             personService.update(context, eperson);
-            context.setIgnoreAuthorization(false);
+            context.restoreAuthSystemState();
         }
 
         // Now set the current user of the context

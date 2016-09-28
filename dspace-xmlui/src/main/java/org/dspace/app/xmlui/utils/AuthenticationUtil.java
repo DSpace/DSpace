@@ -472,13 +472,13 @@ public class AuthenticationUtil
         // Need to create new eperson
         // FIXME: TEMPORARILY need to turn off authentication, as usually
         // only site admins can create e-people
-        context.setIgnoreAuthorization(true);
+        context.turnOffAuthorisationSystem();
         EPerson eperson = ePersonService.create(context);
         eperson.setEmail(email);
         eperson.setCanLogIn(true);
         eperson.setSelfRegistered(true);
         ePersonService.update(context, eperson);
-        context.setIgnoreAuthorization(false);
+        context.restoreAuthSystemState();
         
         // Give site auth a chance to set/override appropriate fields
         authenticationService.initEPerson(context, request, eperson);
