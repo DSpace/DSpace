@@ -252,27 +252,43 @@ public class PublicationUpdater extends HttpServlet {
             return items;
         }
 
-        // Query for packages in archive (owning_collection = 2) that don't have a metadatavalue for publication doi (dc.relation.isreferencedby)
-        MetadataField pubDoiField = null;
+        // Find metadata field for citation:
+        MetadataField citationField = null;
         try {
-            pubDoiField = MetadataField.findByElement(context, PUBLICATION_DOI);
+            citationField = MetadataField.findByElement(context, FULL_CITATION);
         } catch (SQLException e) {
-            LOGGER.error("couldn't find " + PUBLICATION_DOI);
+            LOGGER.error("couldn't find " + FULL_CITATION);
             return items;
         }
-        if (pubDoiField != null) {
+
+        // The items that have incomplete citations are of the following types:
+        //   1) items without a FULL_CITATION:
+        //       a) if these match to a reference, we will set CITATION_IN_PROGRESS to TRUE and add a citation
+        //       b) if these don't match, leave them alone
+        //   2) items with a FULL_CITATION && CITATION_IN_PROGRESS exists && CITATION_IN_PROGRESS == TRUE
+        //       a) if these match to a reference, we will set CITATION_IN_PROGRESS to TRUE and update the citation
+        //       b) if these don't match, leave them alone
+        //   3) items with a FULL_CITATION && no CITATION_IN_PROGRESS: these are done
+        //   4) items with a FULL CITATION && CITATION_IN_PROGRESS == FALSE: these are done
+
+        // Look for items without a full citation
+        if (citationField != null) {
             try {
-                String query = "SELECT item_id FROM item WHERE in_archive = 't' AND owning_collection = 2 AND NOT EXISTS (SELECT * FROM metadatavalue WHERE metadata_field_id = ? AND metadatavalue.item_id = item.item_id) AND EXISTS (SELECT * from metadatavalue where metadata_field_id = ? and text_value = ? AND metadatavalue.item_id = item.item_id)";
-                TableRowIterator noPubDOIRows = DatabaseManager.query(context, query, pubDoiField.getFieldID(), pubNameField.getFieldID(), dryadJournalConcept.getFullName());
+                String query = "SELECT item_id FROM item WHERE in_archive = 't' AND owning_collection = 2 AND EXISTS (SELECT * from metadatavalue where metadata_field_id = ? and text_value = ? AND metadatavalue.item_id = item.item_id) " +
+                        "AND NOT EXISTS (SELECT * FROM metadatavalue WHERE metadata_field_id = ? AND metadatavalue.item_id = item.item_id)";
+                TableRowIterator noPubDOIRows = DatabaseManager.query(context, query, pubNameField.getFieldID(), dryadJournalConcept.getFullName(), citationField.getFieldID());
                 if (noPubDOIRows != null) {
                     rows.addAll(noPubDOIRows.toList());
                 }
             } catch (SQLException e) {
-                LOGGER.error("couldn't find items without pub DOIs");
-                return items;
+                LOGGER.error("couldn't find items without citations");
             }
+        } else {
+            LOGGER.error("no metadata field for FULL_CITATION");
+            return items;
         }
 
+        // Add these items to the incomplete list
         try {
             for (TableRow row : rows) {
                 int itemID = row.getIntColumn("item_id");
@@ -283,7 +299,7 @@ public class PublicationUpdater extends HttpServlet {
             LOGGER.error("couldn't find item");
         }
 
-        // Query for packages in archive (owning_collection = 2) that have citations in progress (dryad.citationInProgress exists)
+        // Look for items with a FULL_CITATION && CITATION_IN_PROGRESS exists && CITATION_IN_PROGRESS == TRUE
         MetadataField citationInProgressField = null;
         try {
             citationInProgressField = MetadataField.findByElement(context, CITATION_IN_PROGRESS);
@@ -292,8 +308,13 @@ public class PublicationUpdater extends HttpServlet {
         }
         if (citationInProgressField != null) {
             try {
-                String query = "SELECT item_id FROM item WHERE in_archive = 't' AND owning_collection = 2 AND EXISTS (SELECT * FROM metadatavalue WHERE metadata_field_id = ? AND metadatavalue.item_id = item.item_id) AND EXISTS (SELECT * from metadatavalue where metadata_field_id = ? and text_value = ? AND metadatavalue.item_id = item.item_id)";
-                TableRowIterator inProgressRows = DatabaseManager.query(context, query, citationInProgressField.getFieldID(), pubNameField.getFieldID(), dryadJournalConcept.getFullName());
+                String query = "SELECT item_id FROM item WHERE in_archive = 't' AND owning_collection = 2 AND EXISTS (SELECT * from metadatavalue where metadata_field_id = ? and text_value = ? AND metadatavalue.item_id = item.item_id) " +
+                        "AND EXISTS (SELECT * FROM metadatavalue WHERE metadata_field_id = ? AND metadatavalue.item_id = item.item_id) " +  // has a FULL_CITATION
+                        "AND EXISTS (SELECT * FROM metadatavalue WHERE metadata_field_id = ? AND text_value like '%rue' AND metadatavalue.item_id = item.item_id)";  // has a TRUE CITATION_IN_PROGRESS field
+                TableRowIterator inProgressRows = DatabaseManager.query(context, query, pubNameField.getFieldID(), dryadJournalConcept.getFullName(),
+                        citationField.getFieldID(),
+                        citationInProgressField.getFieldID()
+                );
                 if (inProgressRows != null) {
                     rows.addAll(inProgressRows.toList());
                 }
