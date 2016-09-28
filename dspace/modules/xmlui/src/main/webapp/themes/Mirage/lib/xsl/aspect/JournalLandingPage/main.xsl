@@ -77,19 +77,24 @@
 
         <xsl:apply-templates select="dri:head"/>
         <form id="{translate(string(@id), '.', '_')}" class="ds-interactive-div primary"
-              action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
-            <input type="hidden" name="fq" value="{$fq}"></input>
-            <p class="ds-paragraph" style="overflow; hidden; margin-bottom: 0px;">
-                <label for="aspect_discovery_SiteViewer_field_query" class="accessibly-hidden">
-                    <xsl:value-of select="$label"/>
-                </label>
-                <input id="aspect_journal_landing_JournalSearch_field_query" class="ds-text-field" name="query"
-                    placeholder="{$placeholder}" title="{$placeholder}"
-                    type="text" value="" style="width: 80%;"/><!-- no whitespace between these!
-                     --><input id="aspect_journal_landing_JournalSearch_field_submit" class="ds-button-field" name="submit"
-                    type="submit" value="Go" style="margin-right: -4px;"/>
-            </p>
-        </form>
+	      action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
+	  <p class="ds-paragraph" style="overflow; hidden;
+					 margin-bottom: 0px;"> 
+	    <input type="hidden" name="fq" value="{$fq}"></input> 
+	    <input id="aspect_journal_landing_JournalSearch_field_submit" class="ds-button-field" name="submit"
+		   type="submit" value="{concat('View all data from ', $journal-name)}" style="margin-right: -4px;"/> 
+	    <br/> 
+	    <br/>
+	    <label for="aspect_discovery_SiteViewer_field_query" class="accessibly-hidden"> 
+	      <xsl:value-of select="$label"/> 
+	    </label>
+	    <input id="aspect_journal_landing_JournalSearch_field_query" class="ds-text-field" name="query"
+		   placeholder="{$placeholder}" title="{$placeholder}"
+		   type="text" value="" style="width: 60%;"/><!-- no whitespace between these!
+		   --><input id="aspect_journal_landing_JournalSearch_field_submit" class="ds-button-field" name="submit"
+		   type="submit" value="Search" style="margin-right:-4px;"/>
+	  </p>
+	</form>    
     </xsl:template>
 
     <!--
