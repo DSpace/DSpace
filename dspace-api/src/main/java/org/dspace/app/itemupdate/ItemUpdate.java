@@ -351,7 +351,7 @@ public class ItemUpdate {
 	               	
 	        context = new Context();  
 	        iu.setEPerson(context, iu.eperson);	
-	        context.setIgnoreAuthorization(true);
+	        context.turnOffAuthorisationSystem();
 	        
 	    	HANDLE_PREFIX = ConfigurationManager.getProperty("handle.canonical.prefix");
 	    	if (HANDLE_PREFIX == null || HANDLE_PREFIX.length() == 0)
@@ -362,18 +362,19 @@ public class ItemUpdate {
         	iu.processArchive(context, sourcedir, itemField, metadataIndexName, alterProvenance, isTest);		        	            
 
 	        context.complete();  // complete all transactions
-	        context.setIgnoreAuthorization(false);
         }
         catch (Exception e)
         {
             if (context != null && context.isValid())
             {
                 context.abort();
-            	context.setIgnoreAuthorization(false);
             }
             e.printStackTrace();
             pr(e.toString());
             status = 1;
+        }
+        finally {
+        	context.restoreAuthSystemState();
         }
 
         if (isTest)

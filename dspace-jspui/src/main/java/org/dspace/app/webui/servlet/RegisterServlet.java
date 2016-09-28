@@ -471,7 +471,7 @@ public class RegisterServlet extends DSpaceServlet
             // Need to create new eperson
             // FIXME: TEMPORARILY need to turn off authentication, as usually
             // only site admins can create e-people
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
             eperson = EPerson.create(context);
             eperson.setEmail(email);
             if (netid!=null)
@@ -479,7 +479,7 @@ public class RegisterServlet extends DSpaceServlet
                 eperson.setNetid(netid.toLowerCase());
             }
             eperson.update();
-            context.setIgnoreAuthorization(false);
+            context.restoreAuthSystemState();
         }
 
         // Now set the current user of the context
