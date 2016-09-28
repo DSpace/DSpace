@@ -84,15 +84,7 @@ public class EmbargoServiceImpl implements EmbargoService
         throws SQLException, AuthorizeException
     {
         // if lift is null, we might be restoring an item from an AIP
-        DCDate myLift = null;
-
-        try {
-            myLift = getEmbargoTermsAsDate(context, item);
-        } catch (IllegalArgumentException e) {
-            //DS-3321, handle lift dates in the past
-            log.info("Invalid lift date found for item, setting to null", e);
-        }
-
+        DCDate myLift = getEmbargoTermsAsDate(context, item);
         if (myLift == null)
         {
              if ((myLift = recoverEmbargoDate(item)) == null)
