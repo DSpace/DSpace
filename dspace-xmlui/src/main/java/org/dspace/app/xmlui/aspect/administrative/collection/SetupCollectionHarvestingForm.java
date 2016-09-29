@@ -148,57 +148,53 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
             {
                 harvestLevelValue = Integer.parseInt(harvestLevelString);
             }
-        }
-
-        // DIVISION: main
-        Division main = body.addInteractiveDivision("collection-harvesting-setup",
-            contextPath + "/admin/collection", Division.METHOD_MULTIPART,
-            "primary administrative collection");
-        main.setHead(T_main_head.parameterize(thisCollection.getName()));
-
-        List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-        options.addItem().addXref(baseURL+"&submit_metadata",T_options_metadata);
-        options.addItem().addXref(baseURL+"&submit_roles",T_options_roles);
-        options.addItem().addHighlight("bold").addXref(baseURL+"&submit_harvesting",T_options_harvest);
-        options.addItem().addXref(baseURL+"&submit_curate",T_options_curate);
-
-
-        // The top-level, all-setting, countent source radio button
-        List harvestSource = main.addList("harvestSource", "form");
-
-        harvestSource.addLabel(T_label_source);
-        Radio source = harvestSource.addItem().addRadio("source");
-        source.addOption(hc == null || harvestLevelValue == -1, "source_normal", T_source_normal);
-        source.addOption(hc != null, "source_harvested", T_source_harvested);
-
-        List settings = main.addList("harvestSettings", "form");
-        settings.setHead(T_main_settings_head);
-
-        settings.addLabel(T_label_oai_provider);
-        Text oaiProvider = settings.addItem().addText("oai_provider");
-        oaiProvider.setSize(40);
-        oaiProvider.setValue(oaiProviderValue);
-        oaiProvider.setHelp(T_help_oaiurl);
-
-        if (errorMap.containsKey(OAIHarvester.OAI_ADDRESS_ERROR))
-        {
-            oaiProvider.addError(errorMap.get(OAIHarvester.OAI_ADDRESS_ERROR));
-        }
-        if (errorMap.containsKey("oai_provider"))
-        {
-            oaiProvider.addError(T_error_oaiurl);
-            //oaiProvider.addError("You must provide a set id of the target collection.");
-        }
-
-        settings.addLabel(T_label_setid);
+		}
+		
+		// DIVISION: main
+	    Division main = body.addInteractiveDivision("collection-harvesting-setup",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
+	    main.setHead(T_main_head.parameterize(thisCollection.getName()));
+	    
+	    List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
+	    options.addItem().addXref(baseURL+"&submit_metadata",T_options_metadata);
+	    options.addItem().addXref(baseURL+"&submit_roles",T_options_roles);
+	    options.addItem().addHighlight("bold").addXref(baseURL+"&submit_harvesting",T_options_harvest);
+            options.addItem().addXref(baseURL+"&submit_curate",T_options_curate);
+	    
+	    
+	    // The top-level, all-setting, countent source radio button
+	    List harvestSource = main.addList("harvestSource", "form");
+	    
+	    harvestSource.addLabel(T_label_source);
+	    Radio source = harvestSource.addItem().addRadio("source");
+    	source.addOption(hc == null || harvestLevelValue == -1, "source_normal", T_source_normal);
+    	source.addOption(hc != null, "source_harvested", T_source_harvested);
+	    
+	    List settings = main.addList("harvestSettings", "form");
+	    settings.setHead(T_main_settings_head);
+	    
+	    settings.addLabel(T_label_oai_provider);
+	    Text oaiProvider = settings.addItem().addText("oai_provider");
+	    oaiProvider.setSize(40);
+	    oaiProvider.setValue(oaiProviderValue);
+	    oaiProvider.setHelp(T_help_oaiurl);
+	    
+	    if (errorMap.containsKey(OAIHarvester.OAI_ADDRESS_ERROR)) {
+	    	oaiProvider.addError(errorMap.get(OAIHarvester.OAI_ADDRESS_ERROR));
+	    }
+	    if (errorMap.containsKey("oai_provider")) {
+	    	oaiProvider.addError(T_error_oaiurl);
+	    	//oaiProvider.addError("You must provide a set id of the target collection.");
+	    }
+	    
         Composite oaiSetComp = settings.addItem().addComposite("oai-set-comp");
         Radio oaiSetSettingRadio = oaiSetComp.addRadio("oai-set-setting");
         oaiSetSettingRadio.addOption("all".equals(oaiSetIdValue) || oaiSetIdValue == null, "all", "All sets");
         oaiSetSettingRadio.addOption(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null, "specific", "Specific sets");
 
         Text oaiSetId = oaiSetComp.addText("oai_setid");
-        oaiSetId.setSize(40);
-        if (!"all".equals(oaiSetIdValue) && oaiSetIdValue != null)
+        oaiSetId.setLabel(T_label_setid);
+	    oaiSetId.setSize(40);
+        if(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null)
         {
             oaiSetId.setValue(oaiSetIdValue);
         }
