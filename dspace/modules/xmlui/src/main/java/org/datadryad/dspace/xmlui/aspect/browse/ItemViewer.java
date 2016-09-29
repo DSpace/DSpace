@@ -337,6 +337,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                 pageMeta.addMetadata("publicationName").addContent(values[0].value);
                 pageMeta.addMetadata("journal", "cover").addContent(JournalUtils.getJournalConceptByJournalName(values[0].value).getCoverImage());
                 pageMeta.addMetadata("journal", "website").addContent(JournalUtils.getJournalConceptByJournalName(values[0].value).getWebsite());
+                pageMeta.addMetadata("journal", "issn").addContent(JournalUtils.getJournalConceptByJournalName(values[0].value).getISSN());
             }
 
             // Data file metadata included on data package items (integrated view)
