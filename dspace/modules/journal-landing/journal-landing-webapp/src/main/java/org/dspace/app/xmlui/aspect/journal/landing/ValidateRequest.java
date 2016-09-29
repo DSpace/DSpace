@@ -44,7 +44,7 @@ public class ValidateRequest extends AbstractAction
             return null;
         }
         DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByISSN(journalISSN);
-        if (journalConcept != null && journalConcept.getIntegrated()) {
+        if (journalConcept != null && (journalConcept.getIntegrated() || journalConcept.getHasJournalPage())) {
             Map map = new HashMap();
             map.put(Const.PARAM_JOURNAL_NAME, journalConcept.getFullName());
             map.put(Const.PARAM_JOURNAL_ISSN, journalISSN);
