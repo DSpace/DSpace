@@ -338,9 +338,15 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                 pageMeta.addMetadata("publicationName").addContent(values[0].value);
                 DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(values[0].value);
                 if (journalConcept != null) {
-                    pageMeta.addMetadata("journal", "cover").addContent(JournalUtils.getJournalConceptByJournalName(values[0].value).getCoverImage());
-                    pageMeta.addMetadata("journal", "website").addContent(JournalUtils.getJournalConceptByJournalName(values[0].value).getWebsite());
-                    pageMeta.addMetadata("journal", "issn").addContent(JournalUtils.getJournalConceptByJournalName(values[0].value).getISSN());
+                    if (!"".equals(journalConcept.getCoverImage())) {
+                        pageMeta.addMetadata("journal", "cover").addContent(journalConcept.getCoverImage());
+                    }
+                    if (!"".equals(journalConcept.getWebsite())) {
+                        pageMeta.addMetadata("journal", "website").addContent(journalConcept.getWebsite());
+                    }
+                    if (!"".equals(journalConcept.getISSN())) {
+                        pageMeta.addMetadata("journal", "issn").addContent(journalConcept.getISSN());
+                    }
                 }
             }
 
