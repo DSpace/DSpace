@@ -138,13 +138,11 @@ public class EmbargoServiceImpl implements EmbargoService
                             + result.toString());
         }
 
-        // sanity check: do not allow an embargo lift date in the past.
-        if (liftDate.before(new Date()))
-        {
-            throw new IllegalArgumentException(
-                    "Embargo lift date must be in the future, but this is in the past: "
-                            + result.toString());
-        }
+        /*
+         *  DS-3348 In DSpace 5x and prior, this method returned an IllegalArgumentException if the lift date was in the past.
+         *  This exception was being triggered when performing an AIP restored which is not desirable.
+         *  In XMLUI, the date check (if needed) should be performed in the EmbargoSetter
+         */
         return result;
     }
 
