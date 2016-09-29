@@ -1320,27 +1320,28 @@
         <xsl:param name="cover"/>
         <xsl:param name="website"/>
         <xsl:param name="article-doi"/>
-        <a target="_blank">
-            <xsl:attribute name="href">
-                <xsl:choose>
-                    <xsl:when test="contains($article-doi,'doi:')">
-                        <xsl:value-of
-                                select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of
-                                select="$website"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:attribute>
-            <xsl:if test="$cover">
-                <img class="pub-cover" id="journal-logo">
-                    <xsl:attribute name="src"><xsl:value-of select="$cover"/></xsl:attribute>
-                    <xsl:attribute name="alt"><xsl:value-of select="$fullname"/></xsl:attribute>
-                </img>
-            </xsl:if>
-        </a>
-
+        <xsl:if test="$cover">
+            <a target="_blank">
+                <xsl:attribute name="href">
+                    <xsl:choose>
+                        <xsl:when test="contains($article-doi,'doi:')">
+                            <xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of
+                                    select="$website"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+                <xsl:if test="$cover">
+                    <img class="pub-cover" id="journal-logo">
+                        <xsl:attribute name="src"><xsl:value-of select="$cover"/></xsl:attribute>
+                        <xsl:attribute name="alt"><xsl:value-of select="$fullname"/></xsl:attribute>
+                    </img>
+                </xsl:if>
+            </a>
+        </xsl:if>
     </xsl:template>
     <!-- Override metadata field rendering to hide manuscript number -->
     <xsl:template match="dim:field" mode="itemDetailView-DIM">
