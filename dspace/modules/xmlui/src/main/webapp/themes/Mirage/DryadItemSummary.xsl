@@ -1033,15 +1033,6 @@
             </div>
         </xsl:if>
 
-	<!-- Link to journal pages -->
-        <xsl:variable name="issn" select="$meta[@element='journal'][@qualifier='issn']" />
-	<xsl:variable name="fullname" select=".//dim:field[@element='publicationName']" />
-        <xsl:if test="$issn">
-	  <div style="padding: 10px; margin-top: 5px; margin-bottom: 5px;">
-            <a href="/journal/{$issn}">More about <xsl:value-of select="$fullname"/></a>
-	  </div>
-	</xsl:if>
-	
         <xsl:variable name="embargoedDate"
                       select=".//dim:field[@element='date' and @qualifier='embargoedUntil']"/>
         <xsl:variable name="embargoType">
