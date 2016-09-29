@@ -23,7 +23,7 @@
     <message key="xmlui.JournalLandingPage.JournalStats.empty"></message>
     <message key="xmlui.JournalLandingPage.JournalStats.val_head">Downloads</message>
 
-    <message key="xmlui.JournalLandingPage.JournalSearch.panel_head">Search data in Dryad associated with {0}</message>
+    <message key="xmlui.JournalLandingPage.JournalSearch.panel_head">Find data in Dryad associated with {0}</message>
 
     <message key="xmlui.JournalLandingPage.Banner.mem">Member</message>
     <message key="xmlui.JournalLandingPage.Banner.spo">Sponsorship</message>

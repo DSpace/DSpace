@@ -57,7 +57,7 @@
     </xsl:template>
 
     <!--
-        Search data in Dryad associated with ...
+        Find data in Dryad associated with ...
     -->
     <xsl:template match="//dri:document/dri:body/dri:div[@n='journal-landing-search']">
         <xsl:variable name="label" select="'Enter keyword, author, title, DOI.'"/>
