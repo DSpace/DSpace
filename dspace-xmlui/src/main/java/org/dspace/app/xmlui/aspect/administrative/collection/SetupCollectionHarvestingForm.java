@@ -192,7 +192,6 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
         oaiSetSettingRadio.addOption("all".equals(oaiSetIdValue) || oaiSetIdValue == null, "all", "All sets");
         oaiSetSettingRadio.addOption(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null, "specific", "Specific sets");
 
-        settings.addLabel(T_label_setid);
         Text oaiSetId = settings.addItem().addText("oai_setid");
         oaiSetId.setSize(40);
         if(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null)
