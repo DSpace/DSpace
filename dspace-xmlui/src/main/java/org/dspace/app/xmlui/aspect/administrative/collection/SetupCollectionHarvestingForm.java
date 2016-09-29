@@ -184,13 +184,13 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 	    	//oaiProvider.addError("You must provide a set id of the target collection.");
 	    }
 	    
-	    settings.addLabel(T_label_setid);
         Composite oaiSetComp = settings.addItem().addComposite("oai-set-comp");
         Radio oaiSetSettingRadio = oaiSetComp.addRadio("oai-set-setting");
         oaiSetSettingRadio.addOption("all".equals(oaiSetIdValue) || oaiSetIdValue == null, "all", "All sets");
         oaiSetSettingRadio.addOption(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null, "specific", "Specific sets");
 
         Text oaiSetId = oaiSetComp.addText("oai_setid");
+        oaiSetId.setLabel(T_label_setid);
 	    oaiSetId.setSize(40);
         if(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null)
         {
