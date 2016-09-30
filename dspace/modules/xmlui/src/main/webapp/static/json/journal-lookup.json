@@ -892,6 +892,15 @@
         "sponsor" : "American Society of Plant Taxonomists"
      },
      {
+        "issn" : "0737-8211",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "N",
+        "title" : "Systematic Botany Monographs",
+        "sponsor" : "American Society of Plant Taxonomists"
+     },
+     {
         "sponsor" : "Toxicological Sciences",
         "title" : "Toxicological Sciences",
         "integrated" : "Y",
