@@ -559,6 +559,15 @@
         "integrated" : "Y"
      },
      {
+        "issn" : "1674-4918",
+        "embargo" : "Y",
+        "submission" : "R",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Journal of Systematics and Evolution",
+        "sponsor" : "Journal of Systematics and Evolution"
+     },  
+     {
         "hidden" : "Y",
         "submission" : "A",
         "issn" : "1742-5662",
@@ -649,15 +658,6 @@
         "submission" : "A"
      },
      {
-        "title" : "Oikos",
-        "sponsor" : "Nordic Society Oikos",
-        "integrated" : "Y",
-        "embargo" : "Y",
-        "issn" : "0030-1299",
-        "submission" : "A",
-        "hidden" : "N"
-     },
-     {
         "integrated" : "N",
         "embargo" : "N",
         "issn" : "0078-1304",
@@ -665,6 +665,15 @@
         "hidden" : "N",
         "title" : "North American Fauna",
         "sponsor" : "US Fish & Wildlife Service"
+     },
+     {
+        "title" : "Oikos",
+        "sponsor" : "Nordic Society Oikos",
+        "integrated" : "Y",
+        "embargo" : "Y",
+        "issn" : "0030-1299",
+        "submission" : "A",
+        "hidden" : "N"
      },
      {
         "title" : "Open Biology",
@@ -889,6 +898,15 @@
         "hidden" : "Y",
         "integrated" : "N",
         "title" : "Systematic Botany",
+        "sponsor" : "American Society of Plant Taxonomists"
+     },
+     {
+        "issn" : "0737-8211",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : “N”,
+        "integrated" : "N",
+        "title" : "Systematic Botany Monographs",
         "sponsor" : "American Society of Plant Taxonomists"
      },
      {
