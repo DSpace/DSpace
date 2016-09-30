@@ -649,15 +649,6 @@
         "integrated" : "Y"
      },
      {
-        "sponsor" : "Pensoft",
-        "title" : "Nota Lepidopterologica",
-        "integrated" : "Y",
-        "hidden" : "Y",
-        "embargo" : "N",
-        "issn" : "0342-7536",
-        "submission" : "A"
-     },
-     {
         "integrated" : "N",
         "embargo" : "N",
         "issn" : "0078-1304",
@@ -665,6 +656,15 @@
         "hidden" : "N",
         "title" : "North American Fauna",
         "sponsor" : "US Fish & Wildlife Service"
+     },
+     {
+        "sponsor" : "Pensoft",
+        "title" : "Nota Lepidopterologica",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "embargo" : "N",
+        "issn" : "0342-7536",
+        "submission" : "A"
      },
      {
         "title" : "Oikos",
