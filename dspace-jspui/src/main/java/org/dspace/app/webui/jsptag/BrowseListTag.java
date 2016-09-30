@@ -532,24 +532,26 @@ public class BrowseListTag extends TagSupport
                             	{
                                     String argument;
                                     String value;
+                                    String authorityArgument = null;
+                                    String authorityValue = null;
                                     if (metadataArray[j].authority != null &&
                                             metadataArray[j].confidence >= MetadataAuthorityManager.getManager()
                                                 .getMinConfidence(metadataArray[j].schema, metadataArray[j].element, metadataArray[j].qualifier))
                                     {
-                                        argument = "authority";
-                                        value = metadataArray[j].authority;
+                                        authorityArgument = "authority";
+                                        authorityValue = metadataArray[j].authority;
                                     }
-                                    else
-                                    {
                                         argument = "value";
                                         value = metadataArray[j].value;
-                                    }
                             		if (viewFull[colIdx])
                             		{
                             			argument = "vfocus";
                             		}
                             		startLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + browseType[colIdx] + "&amp;" +
                                         argument + "=" + URLEncoder.encode(value,"UTF-8");
+                                        if (authorityArgument != null && authorityValue != null) {
+                                            startLink += "&amp;" + authorityArgument + "=" + URLEncoder.encode(authorityValue,"UTF-8");
+                                        }
 
                                     if (metadataArray[j].language != null)
                                     {

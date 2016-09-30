@@ -96,6 +96,7 @@
 	String direction = (bi.isAscending() ? "ASC" : "DESC");
 	
 	String argument = null;
+        String displayValue = bi.getValue();
 	if (bi.hasAuthority())
     {
         value = bi.getAuthority();
@@ -177,7 +178,7 @@
 
 	<%-- Build the header (careful use of spacing) --%>
 	<h2>
-		<fmt:message key="browse.full.header"><fmt:param value="<%= scope %>"/></fmt:message> <fmt:message key="<%= typeKey %>"/> <%= value %>
+		<fmt:message key="browse.full.header"><fmt:param value="<%= scope %>"/></fmt:message> <fmt:message key="<%= typeKey %>"/> <%= displayValue %>
 	</h2>
 
 	<%-- Include the main navigation for all the browse pages --%>

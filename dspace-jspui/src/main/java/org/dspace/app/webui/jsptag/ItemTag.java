@@ -594,22 +594,26 @@ public class ItemTag extends TagSupport
                         else if (browseIndex != null)
                         {
 	                        String argument, value;
+                                String authorityArgument = null;
+                                String authorityValue = null;
 	                        if ( values[j].authority != null &&
 	                                            values[j].confidence >= MetadataAuthorityManager.getManager()
 	                                                .getMinConfidence( values[j].schema,  values[j].element,  values[j].qualifier))
 	                        {
-	                            argument = "authority";
-	                            value = values[j].authority;
+                                    authorityArgument = "authority";
+	                            authorityValue = values[j].authority;
 	                        }
-	                        else
-	                        {
-	                            argument = "value";
-	                            value = values[j].value;
-	                        }
-	                    	out.print("<a class=\"" + ("authority".equals(argument)?"authority ":"") + browseIndex + "\""
+                                argument = "value";
+                                value = values[j].value;
+	                        String linkString = "<a class=\"" + ("authority".equals(argument)?"authority ":"") + browseIndex + "\""
 	                                                + "href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;" + argument + "="
-	                    				+ URLEncoder.encode(value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
-	                    				+ "</a>");
+	                    				+ URLEncoder.encode(value, "UTF-8");
+                                if (authorityArgument != null && authorityValue != null) {
+                                    linkString += "&amp;" + authorityArgument + "=" + URLEncoder.encode(authorityValue,"UTF-8");
+                                }
+                                linkString += "\">" + Utils.addEntities(values[j].value)
+	                    				+ "</a>";
+                                out.print(linkString);
 	                    }
                         else
                         {
