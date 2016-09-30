@@ -559,6 +559,15 @@
         "integrated" : "Y"
      },
      {
+        "title" : "Journal of Systematics and Evolution",
+        "sponsor" : "Journal of Systematics and Evolution",
+        "submission" : "R",
+        "issn" : "1674-4918",
+        "embargo" : "Y",
+        "hidden" : "N",
+        "integrated" : "Y"
+     },
+     {
         "hidden" : "Y",
         "submission" : "A",
         "issn" : "1742-5662",
