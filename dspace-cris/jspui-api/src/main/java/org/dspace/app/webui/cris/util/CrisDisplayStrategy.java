@@ -9,16 +9,16 @@ package org.dspace.app.webui.cris.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
+import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authority.AuthorityValueGenerator;
 import org.dspace.browse.BrowseDSpaceObject;
 import org.dspace.browse.BrowseItem;
@@ -26,14 +26,16 @@ import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 import org.dspace.discovery.IGlobalSearchResult;
 
 public class CrisDisplayStrategy implements IDisplayMetadataValueStrategy {
 
+    @Override
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
 			int colIdx, String field, Metadatum[] metadataArray, BrowseItem item, boolean disableCrossLinks,
-			boolean emph, PageContext pageContext) {
+			boolean emph) {
 		ACrisObject crisObject = (ACrisObject) ((BrowseDSpaceObject) item).getBrowsableDSpaceObject();
 		String metadata = "-";
 		if (metadataArray.length > 0) {
@@ -45,9 +47,9 @@ public class CrisDisplayStrategy implements IDisplayMetadataValueStrategy {
 		return metadata;
 	}
 
+	@Override
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
-			int colIdx, String field, Metadatum[] metadataArray, Item item, boolean disableCrossLinks, boolean emph,
-			PageContext pageContext) {
+			int colIdx, String field, Metadatum[] metadataArray, Item item, boolean disableCrossLinks, boolean emph) {
 		String metadata;
 		// limit the number of records if this is the author field (if
 		// -1, then the limit is the full list)
@@ -77,7 +79,9 @@ public class CrisDisplayStrategy implements IDisplayMetadataValueStrategy {
 			}
 		}
 		if (truncated) {
-			String etal = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.et-al");
+            Locale locale = UIUtil.getSessionLocale(hrq); 
+            String etal = I18nUtil.getMessage("itemlist.et-al", locale);
+
 			sb.append(", " + etal);
 		}
 
@@ -177,23 +181,17 @@ public class CrisDisplayStrategy implements IDisplayMetadataValueStrategy {
 		
     }
 
-	public String getExtraCssDisplay(HttpServletRequest hrq, int limit, boolean b, String browseType, int colIdx,
-			String field, Metadatum[] metadataArray, Item item, boolean disableCrossLinks, boolean emph,
-			PageContext pageContext) throws JspException {
-		return null;
-	}
 
 	@Override
 	public String getExtraCssDisplay(HttpServletRequest hrq, int limit, boolean b, String browseType, int colIdx,
-			String field, Metadatum[] metadataArray, BrowseItem browseItem, boolean disableCrossLinks, boolean emph,
-			PageContext pageContext) throws JspException {
+			String field, Metadatum[] metadataArray, BrowseItem browseItem, boolean disableCrossLinks, boolean emph) throws JspException {
 		return null;
 	}
 
 	@Override
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
 			int colIdx, String field, Metadatum[] metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
-			boolean emph, PageContext pageContext) throws JspException {
+			boolean emph) throws JspException {
 		ACrisObject crisObject = (ACrisObject) item;
 		String metadata = "-";
 		if (metadataArray.length > 0) {
@@ -204,5 +202,14 @@ public class CrisDisplayStrategy implements IDisplayMetadataValueStrategy {
 		metadata = (emph ? "<strong>" : "") + metadata + (emph ? "</strong>" : "");
 		return metadata;
 	}
+
+    @Override
+    public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
+            boolean b, String browseType, int colIdx, String field,
+            Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
+            boolean emph) throws JspException
+    {
+        return null;
+    }
 
 }

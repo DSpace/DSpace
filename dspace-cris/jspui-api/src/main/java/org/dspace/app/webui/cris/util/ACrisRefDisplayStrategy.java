@@ -12,12 +12,10 @@ import java.util.MissingResourceException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dspace.app.cris.model.ACrisObject;
-import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
@@ -49,47 +47,50 @@ public abstract class ACrisRefDisplayStrategy<P extends Property<TP>, TP extends
             .getServiceManager()
             .getServiceByName("applicationService", ApplicationService.class);
 
+    @Override
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, BrowseItem item,
-            boolean disableCrossLinks, boolean emph, PageContext pageContext)
+            boolean disableCrossLinks, boolean emph)
     {
         String metadata = "N/A";
         metadata = internalDisplay(hrq, metadataArray, metadata);
         return metadata;
     }
 
+    @Override
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
-            boolean emph, PageContext pageContext)
+            boolean emph)
     {
         // not used
-        return null;
-    }
-
-    public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
-            boolean b, String browseType, int colIdx, String field,
-            Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
-            boolean emph, PageContext pageContext) throws JspException
-    {
         return null;
     }
 
     @Override
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
+            Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
+            boolean emph) throws JspException
+    {
+        return null;
+    }
+    
+    @Override
+    public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
+            boolean b, String browseType, int colIdx, String field,
             Metadatum[] metadataArray, BrowseItem browseItem,
-            boolean disableCrossLinks, boolean emph, PageContext pageContext)
+            boolean disableCrossLinks, boolean emph)
                     throws JspException
     {
         return null;
     }
 
-
+    @Override
     public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
             int colIdx, String field, Metadatum[] metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
-            boolean emph, PageContext pageContext) throws JspException 
+            boolean emph) throws JspException 
     {       
         String metadata = "N/A";
         metadata = internalDisplay(hrq, metadataArray, metadata);
