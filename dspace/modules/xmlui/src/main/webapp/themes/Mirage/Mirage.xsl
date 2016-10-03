@@ -378,7 +378,7 @@
                 <div id="file_news_div_mailing_list" class="ds-static-div primary" style="height: 100px;">
                     <!--This form is modified from the iContact sign-up form for Announcements -->
                     <form id="ic_signupform" method="POST" action="https://app.icontact.com/icp/core/mycontacts/signup/designer/form/?id=96&amp;cid=1548100&amp;lid=23049">
-                        <p class="ds-paragraph">Sign up for announcements:</p>
+                        <p style="margin-bottom: 5px;">Sign up for announcements:</p>
                         <div class="formEl fieldtype-input required" data-validation-type="1" data-label="Email" style="display: inline-block; width: 100%;">
                             <input type="text" placeholder="Your e-mail" title="Your e-mail" name="data[email]" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email"/>
                         </div>
