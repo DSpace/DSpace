@@ -453,6 +453,10 @@
                             %>
                                 query:{workflow_id:'<%= subInfo.getSubmissionItem().getID()%>'}
                             <%
+            				} else if (subInfo.isEditing()) {
+				            %>
+                				query:{edit_item:'<%= subInfo.getSubmissionItem().getID()%>'}
+				            <%
                             } else {
                             %>
                                 query:{workspace_item_id:'<%= subInfo.getSubmissionItem().getID()%>'}
