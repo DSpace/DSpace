@@ -14,10 +14,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,6 +72,23 @@ public class UIUtil extends Util
 	 */
 	private static Pattern p = Pattern.compile("[^/]*$");
 
+	private static final Set<String> RTL;
+
+	static {
+	  Set<String> lang = new HashSet<String>();
+	  lang.add("ar");
+	  lang.add("dv");
+	  lang.add("fa");
+	  lang.add("ha");
+	  lang.add("he");
+	  lang.add("iw");
+	  lang.add("ji");
+	  lang.add("ps");
+	  lang.add("ur");
+	  lang.add("yi");
+	  RTL = Collections.unmodifiableSet(lang);
+	}
+	
     /**
      * Obtain a new context object. If a context object has already been created
      * for this HTTP request, it is re-used, otherwise it is created. If a user
@@ -682,7 +702,21 @@ public class UIUtil extends Util
      * @return true if current locale is LTR, false if RTL
      */
     public static boolean isLtrLanguage(Locale locale) {
+        if(isTextRTL(locale)) {            
+            return false;
+        }
         return ComponentOrientation.getOrientation(locale).isLeftToRight();
+    }
+    
+    /**
+     * Check if the text have orientation from RTL to LTR for ComponentOrientation-method missed languages
+     * contained into {@link #RTL} custom list
+     * 
+     * @param locale locale
+     * @return true if the locale is into additional list
+     */
+    private static boolean isTextRTL(Locale locale) {
+        return RTL.contains(locale.getLanguage());
     }
     
 }
