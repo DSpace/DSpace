@@ -88,7 +88,7 @@ public class MetadataExporter
     {
         // create a context
         Context context = new Context();
-        context.setIgnoreAuthorization(true);
+        context.turnOffAuthorisationSystem();
 
         OutputFormat xmlFormat = new OutputFormat(Method.XML, "UTF-8", true);
         xmlFormat.setLineWidth(120);
