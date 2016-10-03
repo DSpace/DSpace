@@ -27,6 +27,7 @@
 <%@ page import="org.dspace.app.webui.util.LocaleUIHelper" %>
 <%@ page import="javax.servlet.jsp.jstl.core.*" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
 
 <%
     String title = (String) request.getAttribute("dspace.layout.title");
@@ -151,6 +152,7 @@
     	}
     });
     </script>
+    <% } %>
     <%--Gooogle Analytics recording.--%>
     <%
     if (analyticsKey != null && analyticsKey.length() > 0)
