@@ -54,14 +54,14 @@ public class BrowseEngine
      * @param context       the DSpace context
      * @throws BrowseException
      */
-    public BrowseEngine(Context context)
-        throws BrowseException
+    public BrowseEngine(Context context, String userLocale)
+            throws BrowseException
     {
         // set the context
         this.context = context;
 
         // prepare the data access object
-        dao = BrowseDAOFactory.getInstance(context);
+        dao = BrowseDAOFactory.getInstance(context, userLocale);
     }
 
     /**

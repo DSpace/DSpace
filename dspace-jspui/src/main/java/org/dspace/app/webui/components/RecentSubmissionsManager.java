@@ -19,6 +19,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
+import org.dspace.utils.DSpace;
 
 /**
  * Class that obtains recent submissions to DSpace containers.
@@ -66,9 +67,9 @@ public class RecentSubmissionsManager
 			String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
 			String count = ConfigurationManager.getProperty("recent.submissions.count");
 			
-			// prep our engine and scope
-			BrowseEngine be = new BrowseEngine(context);
+			// prep our engine and scope			
 			BrowserScope bs = new BrowserScope(context);
+			bs.setUserLocale(context.getCurrentLocale().getLanguage());
 			BrowseIndex bi = null; 
 			if("bi_item".equals(this.indexName)) {        
 			    bi = BrowseIndex.getItemBrowseIndex();
@@ -76,6 +77,22 @@ public class RecentSubmissionsManager
 			else {
 			    bi = BrowseIndex.getBrowseIndex(indexName);
 			}
+			
+            boolean isMultilanguage = new DSpace()
+                    .getConfigurationService()
+                    .getPropertyAsType(
+                            "discovery.browse.authority.multilanguage."
+                                    + bi.getName(),
+                            new DSpace()
+                                    .getConfigurationService()
+                                    .getPropertyAsType(
+                                            "discovery.browse.authority.multilanguage",
+                                            new Boolean(false)),
+                            false);
+            
+            // gather & add items to the feed.
+            BrowseEngine be = new BrowseEngine(context, isMultilanguage? 
+                    bs.getUserLocale():null);
 			
 			// fill in the scope with the relevant gubbins
 			bs.setBrowseIndex(bi);

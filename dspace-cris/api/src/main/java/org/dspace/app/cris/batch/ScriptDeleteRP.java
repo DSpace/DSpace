@@ -116,13 +116,22 @@ public class ScriptDeleteRP
                 log.info("Use browse indexing");
 
                 BrowseIndex bi = BrowseIndex.getBrowseIndex(plugInBrowserIndex);
-                // now start up a browse engine and get it to do the work for us
-                BrowseEngine be = new BrowseEngine(dspaceContext);
 
+                boolean isMultilanguage = new DSpace().getConfigurationService()
+                        .getPropertyAsType(
+                                "discovery.browse.authority.multilanguage."
+                                        + bi.getName(),
+                                new DSpace().getConfigurationService()
+                                        .getPropertyAsType(
+                                                "discovery.browse.authority.multilanguage",
+                                                new Boolean(false)),
+                                false);
+                    
                 String authKey = ResearcherPageUtils.getPersistentIdentifier(rp);
 
                 // set up a BrowseScope and start loading the values into it
                 BrowserScope scope = new BrowserScope(dspaceContext);
+                scope.setUserLocale(dspaceContext.getCurrentLocale().getLanguage());
                 scope.setBrowseIndex(bi);
                 // scope.setOrder(order);
                 scope.setFilterValue(authKey);
@@ -130,6 +139,9 @@ public class ScriptDeleteRP
                 scope.setResultsPerPage(Integer.MAX_VALUE);
                 scope.setBrowseLevel(1);
 
+                // now start up a browse engine and get it to do the work for us
+                BrowseEngine be = new BrowseEngine(dspaceContext, isMultilanguage? 
+                        scope.getUserLocale():null);
                 BrowseInfo binfo = be.browse(scope);
                 log.debug("Find " + binfo.getResultCount()
                         + "item(s) for the reseracher " + authKey);

@@ -79,6 +79,8 @@ public class BrowserScope
     private int offset = 0;
 
     private String authority = null;
+    
+    private String userLocale = null;
 
     /**
      * Construct a new BrowserScope using the given Context
@@ -628,5 +630,13 @@ public class BrowserScope
 
     public void setAuthorityValue(String value) {
         authority = value;
+    }
+    
+    public void setUserLocale(String userLocale) {
+        this.userLocale = userLocale;
+    }
+    
+    public String getUserLocale() {
+        return userLocale;
     }
 }

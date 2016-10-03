@@ -48,6 +48,8 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
             .getLogger(SolrBrowseCreateDAO.class);
 
     private BrowseIndex[] bis;
+    
+    private String[] supportedLocales = StringUtils.split(ConfigurationManager.getProperty("webui.supported.locales"),",");
 
     public SolrBrowseCreateDAO()
     {
@@ -111,221 +113,259 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
 
             if (bi.isMetadataIndex())
             {
-                // values to show in the browse list
-                Set<String> distFValues = new HashSet<String>();
-                // value for lookup without authority
-                Set<String> distFVal = new HashSet<String>();
-                // value for lookup with authority
-                Set<String> distFAuths = new HashSet<String>();
-                // value for lookup when partial search (the item mapper tool use it)
-                Set<String> distValuesForAC = new HashSet<String>();
-
-                // now index the new details - but only if it's archived or
-                // withdrawn
-                if (item.isArchived() || item.isWithdrawn())
+                boolean isMultilanguage = new DSpace().getConfigurationService()
+                        .getPropertyAsType(
+                                "discovery.browse.authority.multilanguage."
+                                        + bi.getName(),
+                                new DSpace().getConfigurationService()
+                                        .getPropertyAsType(
+                                                "discovery.browse.authority.multilanguage",
+                                                new Boolean(false)),
+                                false);
+                String[] langToIndex = new String[] { null };
+                if (isMultilanguage)
                 {
-                    // get the metadata from the item
-                    for (int mdIdx = 0; mdIdx < bi.getMetadataCount(); mdIdx++)
+                    langToIndex = supportedLocales;
+                }
+                for (String lang : langToIndex)
+                {
+                    // values to show in the browse list
+                    Set<String> distFValues = new HashSet<String>();
+                    // value for lookup without authority
+                    Set<String> distFVal = new HashSet<String>();
+                    // value for lookup with authority
+                    Set<String> distFAuths = new HashSet<String>();
+                    // value for lookup when partial search (the item mapper
+                    // tool use it)
+                    Set<String> distValuesForAC = new HashSet<String>();
+
+                    // now index the new details - but only if it's archived or
+                    // withdrawn
+                    if (item.isArchived() || item.isWithdrawn())
                     {
-                        String[] md = bi.getMdBits(mdIdx);
-                        Metadatum[] values = item.getMetadata(md[0], md[1],
-                                md[2], Item.ANY);
-
-                        // if we have values to index on, then do so
-                        if (values != null && values.length > 0)
+                        // get the metadata from the item
+                        for (int mdIdx = 0; mdIdx < bi
+                                .getMetadataCount(); mdIdx++)
                         {
-                            int minConfidence = MetadataAuthorityManager
-                                    .getManager().getMinConfidence(
-                                            values[0].schema,
-                                            values[0].element,
-                                            values[0].qualifier);
+                            String[] md = bi.getMdBits(mdIdx);
+                            Metadatum[] values = item.getMetadata(md[0], md[1],
+                                    md[2], Item.ANY);
 
-                            boolean ignoreAuthority = new DSpace()
-                                    .getConfigurationService()
-                                    .getPropertyAsType(
-                                            "discovery.browse.authority.ignore."
-                                                    + bi.getName(),
-                                            new DSpace()
-                                                    .getConfigurationService()
-                                                    .getPropertyAsType(
-                                                            "discovery.browse.authority.ignore",
-                                                            new Boolean(false)),
-                                            true);
-                            for (int x = 0; x < values.length; x++)
+                            // if we have values to index on, then do so
+                            if (values != null && values.length > 0)
                             {
-                                // Ensure that there is a value to index before
-                                // inserting it
-                                if (StringUtils.isEmpty(values[x].value))
+                                int minConfidence = MetadataAuthorityManager
+                                        .getManager()
+                                        .getMinConfidence(values[0].schema,
+                                                values[0].element,
+                                                values[0].qualifier);
+
+                                boolean ignoreAuthority = new DSpace()
+                                        .getConfigurationService()
+                                        .getPropertyAsType(
+                                                "discovery.browse.authority.ignore."
+                                                        + bi.getName(),
+                                                new DSpace()
+                                                        .getConfigurationService()
+                                                        .getPropertyAsType(
+                                                                "discovery.browse.authority.ignore",
+                                                                new Boolean(
+                                                                        false)),
+                                                true);
+                                for (int x = 0; x < values.length; x++)
                                 {
-                                    log.error("Null metadata value for item "
-                                            + item.getID()
-                                            + ", field: "
-                                            + values[x].schema
-                                            + "."
-                                            + values[x].element
-                                            + (values[x].qualifier == null ? ""
-                                                    : "." + values[x].qualifier));
-                                }
-                                else
-                                {
-                                    if (bi.isAuthorityIndex()
-                                            && (values[x].authority == null || values[x].confidence < minConfidence))
+                                    // Ensure that there is a value to index
+                                    // before
+                                    // inserting it
+                                    if (StringUtils.isEmpty(values[x].value))
                                     {
-                                        // if we have an authority index only
-                                        // authored metadata will go here!
-                                        log.debug("Skipping item="
-                                                + item.getID() + ", field="
-                                                + values[x].schema + "."
-                                                + values[x].element + "."
-                                                + values[x].qualifier
-                                                + ", value=" + values[x].value
-                                                + ", authority="
-                                                + values[x].authority
-                                                + ", confidence="
-                                                + values[x].confidence
-                                                + " (BAD AUTHORITY)");
-                                        continue;
-                                    }
-
-                                    // is there any valid (with appropriate
-                                    // confidence) authority key?
-                                    if ((ignoreAuthority && !bi.isAuthorityIndex())
-                                            || (values[x].authority != null && values[x].confidence >= minConfidence))
-                                    {
-                                        distFAuths.add(values[x].authority);
-                                        distValuesForAC.add(values[x].value);
-
-                                        String preferedLabel = null;
-                                        boolean ignorePrefered = new DSpace()
-                                                .getConfigurationService()
-                                                .getPropertyAsType(
-                                                        "discovery.browse.authority.ignore-prefered."
-                                                                + bi.getName(),
-                                                        new DSpace()
-                                                                .getConfigurationService()
-                                                                .getPropertyAsType(
-                                                                        "discovery.browse.authority.ignore-prefered",
-                                                                        new Boolean(
-                                                                                false)),
-                                                        true);
-                                        if (!ignorePrefered)
-                                        {
-                                            preferedLabel = ChoiceAuthorityManager
-                                                    .getManager()
-                                                    .getLabel(
-                                                            values[x].schema,
-                                                            values[x].element,
-                                                            values[x].qualifier,
-                                                            values[x].authority,
-                                                            values[x].language);
-                                        }
-                                        else
-                                        {
-                                            preferedLabel = values[x].value;
-                                        }
-                                        
-                                        List<String> variants = null;
-
-                                        boolean ignoreVariants = new DSpace()
-                                                .getConfigurationService()
-                                                .getPropertyAsType(
-                                                        "discovery.browse.authority.ignore-variants."
-                                                                + bi.getName(),
-                                                        new DSpace()
-                                                                .getConfigurationService()
-                                                                .getPropertyAsType(
-                                                                        "discovery.browse.authority.ignore-variants",
-                                                                        new Boolean(
-                                                                                false)),
-                                                        true);
-                                        if (!ignoreVariants)
-                                        {
-                                            variants = ChoiceAuthorityManager
-                                                    .getManager()
-                                                    .getVariants(
-                                                            values[x].schema,
-                                                            values[x].element,
-                                                            values[x].qualifier,
-                                                            values[x].authority,
-                                                            values[x].language);
-                                        }
-
-                                        if (StringUtils
-                                                .isNotBlank(preferedLabel))
-                                        {
-                                            String nLabel = OrderFormat
-                                                    .makeSortString(
-                                                            preferedLabel,
-                                                            values[x].language,
-                                                            bi.getDataType());
-                                            distFValues
-                                                    .add(nLabel
-                                                            + SolrServiceImpl.FILTER_SEPARATOR
-                                                            + preferedLabel
-                                                            + SolrServiceImpl.AUTHORITY_SEPARATOR
-                                                            + values[x].authority);
-                                            distValuesForAC.add(preferedLabel);
-                                        }
-
-                                        if (variants != null)
-                                        {
-                                            for (String var : variants)
-                                            {
-                                                String nVal = OrderFormat
-                                                        .makeSortString(
-                                                                var,
-                                                                values[x].language,
-                                                                bi.getDataType());
-                                                distFValues
-                                                        .add(nVal
-                                                                + SolrServiceImpl.FILTER_SEPARATOR
-                                                                + var
-                                                                + SolrServiceImpl.AUTHORITY_SEPARATOR
-                                                                + values[x].authority);
-                                                distValuesForAC.add(var);
-                                            }
-                                        }
+                                        log.error(
+                                                "Null metadata value for item "
+                                                        + item.getID()
+                                                        + ", field: "
+                                                        + values[x].schema + "."
+                                                        + values[x].element
+                                                        + (values[x].qualifier == null
+                                                                ? ""
+                                                                : "." + values[x].qualifier));
                                     }
                                     else
-                                    // put it in the browse index as if it
-                                    // hasn't have an authority key
                                     {
-                                        // get the normalised version of the
-                                        // value
-                                        String nVal = OrderFormat
-                                                .makeSortString(
-                                                        values[x].value,
-                                                        values[x].language,
-                                                        bi.getDataType());
-                                        distFValues
-                                                .add(nVal
+                                        String language = lang!=null?StringUtils.trim(lang):values[x].language;
+                                        
+                                        if (bi.isAuthorityIndex()
+                                                && (values[x].authority == null
+                                                        || values[x].confidence < minConfidence))
+                                        {
+                                            // if we have an authority index
+                                            // only
+                                            // authored metadata will go here!
+                                            log.debug("Skipping item="
+                                                    + item.getID() + ", field="
+                                                    + values[x].schema + "."
+                                                    + values[x].element + "."
+                                                    + values[x].qualifier
+                                                    + ", value="
+                                                    + values[x].value
+                                                    + ", authority="
+                                                    + values[x].authority
+                                                    + ", confidence="
+                                                    + values[x].confidence
+                                                    + " (BAD AUTHORITY)");
+                                            continue;
+                                        }
+
+                                        // is there any valid (with appropriate
+                                        // confidence) authority key?
+                                        if ((ignoreAuthority
+                                                && !bi.isAuthorityIndex())
+                                                || (values[x].authority != null
+                                                        && values[x].confidence >= minConfidence))
+                                        {
+                                            distFAuths.add(values[x].authority);
+                                            if (!isMultilanguage) {
+                                                distValuesForAC.add(values[x].value);
+                                            }    
+
+                                            String preferedLabel = null;
+                                            boolean ignorePrefered = new DSpace()
+                                                    .getConfigurationService()
+                                                    .getPropertyAsType(
+                                                            "discovery.browse.authority.ignore-prefered."
+                                                                    + bi.getName(),
+                                                            new DSpace()
+                                                                    .getConfigurationService()
+                                                                    .getPropertyAsType(
+                                                                            "discovery.browse.authority.ignore-prefered",
+                                                                            new Boolean(
+                                                                                    false)),
+                                                            true);
+                                            if (!ignorePrefered || isMultilanguage)
+                                            {
+                                                preferedLabel = ChoiceAuthorityManager
+                                                        .getManager().getLabel(
+                                                                values[x].schema,
+                                                                values[x].element,
+                                                                values[x].qualifier,
+                                                                values[x].authority,
+                                                                language);
+                                            }
+                                            else
+                                            {
+                                                preferedLabel = values[x].value;
+                                            }
+
+                                            List<String> variants = null;
+
+                                            boolean ignoreVariants = new DSpace()
+                                                    .getConfigurationService()
+                                                    .getPropertyAsType(
+                                                            "discovery.browse.authority.ignore-variants."
+                                                                    + bi.getName(),
+                                                            new DSpace()
+                                                                    .getConfigurationService()
+                                                                    .getPropertyAsType(
+                                                                            "discovery.browse.authority.ignore-variants",
+                                                                            new Boolean(
+                                                                                    false)),
+                                                            true);
+                                            if (!ignoreVariants)
+                                            {
+                                                variants = ChoiceAuthorityManager
+                                                        .getManager()
+                                                        .getVariants(
+                                                                values[x].schema,
+                                                                values[x].element,
+                                                                values[x].qualifier,
+                                                                values[x].authority,
+                                                                language);
+                                            }
+
+                                            if (StringUtils
+                                                    .isNotBlank(preferedLabel))
+                                            {
+                                                String nLabel = OrderFormat
+                                                        .makeSortString(
+                                                                preferedLabel,
+                                                                language,
+                                                                bi.getDataType());
+                                                distFValues.add(nLabel
                                                         + SolrServiceImpl.FILTER_SEPARATOR
-                                                        + values[x].value);
-                                        distFVal.add(values[x].value);
-                                        distValuesForAC.add(values[x].value);
+                                                        + preferedLabel
+                                                        + SolrServiceImpl.AUTHORITY_SEPARATOR
+                                                        + values[x].authority);
+                                                distValuesForAC
+                                                        .add(preferedLabel);
+                                            }
+
+                                            if (variants != null)
+                                            {
+                                                for (String var : variants)
+                                                {
+                                                    String nVal = OrderFormat
+                                                            .makeSortString(var,
+                                                                    language,
+                                                                    bi.getDataType());
+                                                    distFValues.add(nVal
+                                                            + SolrServiceImpl.FILTER_SEPARATOR
+                                                            + var
+                                                            + SolrServiceImpl.AUTHORITY_SEPARATOR
+                                                            + values[x].authority);
+                                                    distValuesForAC.add(var);
+                                                }
+                                            }
+                                        }
+                                        else
+                                        // put it in the browse index as if it
+                                        // hasn't have an authority key
+                                        {
+                                            // get the normalised version of the
+                                            // value
+                                            String nVal = OrderFormat
+                                                    .makeSortString(
+                                                            values[x].value,
+                                                            language,
+                                                            bi.getDataType());
+                                            distFValues.add(
+                                                    nVal + SolrServiceImpl.FILTER_SEPARATOR
+                                                            + values[x].value);
+                                            distFVal.add(values[x].value);
+                                            distValuesForAC
+                                                    .add(values[x].value);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                for (String facet : distFValues)
-                {
-                    doc.addField(bi.getDistinctTableName() + "_filter", facet);
-                }
-                for (String facet : distFAuths)
-                {
-                    doc.addField(bi.getDistinctTableName()
-                            + "_authority_filter", facet);
-                }
-                for (String facet : distValuesForAC)
-                {
-                    doc.addField(bi.getDistinctTableName() + "_partial", facet);
-                }
-                for (String facet : distFVal)
-                {
-                    doc.addField(bi.getDistinctTableName()+"_value_filter", facet);
+                    String distinctTableName = bi.getDistinctTableName();
+                    if (lang != null) {
+                        distinctTableName += "_" + StringUtils.trim(lang);                  
+                    }
+                    
+                    for (String facet : distFValues)
+                    {
+                        doc.addField(bi.getDistinctTableName() + "_filter",
+                                facet);
+                    }
+                    for (String facet : distFAuths)
+                    {
+                        doc.addField(
+                                bi.getDistinctTableName() + "_authority_filter",
+                                facet);
+                    }
+                    for (String facet : distValuesForAC)
+                    {
+                        doc.addField(bi.getDistinctTableName() + "_partial",
+                                facet);
+                    }
+                    for (String facet : distFVal)
+                    {
+                        doc.addField(
+                                bi.getDistinctTableName() + "_value_filter",
+                                facet);
+                    }
                 }
             }
         }

@@ -81,7 +81,10 @@
 	<!--  Additional indexing plugin to show if the publications have a doi-->
 	<bean id="hasDoiIndexer" class="org.dspace.app.cris.discovery.HasDoiSolrIndexer">
 	</bean>	
-				
+
+	<!--  Additional indexing plugin to index multilanguage for authority field -->
+	<bean id="multiLanguageAuthorityIndexer" class="org.dspace.app.cris.discovery.MultilanguageAuthorityIndexer"/>
+					
 	<!--Bean that is used for mapping communities/collections to certain discovery 
 		configurations. -->
 	<bean

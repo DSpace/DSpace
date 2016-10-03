@@ -199,8 +199,16 @@ public class ScriptUpdateRPItemSearchIndex
             context = new Context();
             context.setIgnoreAuthorization(true);
             BrowseIndex bi = BrowseIndex.getBrowseIndex(plugInBrowserIndex);
-            // now start up a browse engine and get it to do the work for us
-            BrowseEngine be = new BrowseEngine(context);
+            
+            boolean isMultilanguage = new DSpace().getConfigurationService()
+                    .getPropertyAsType(
+                            "discovery.browse.authority.multilanguage."
+                                    + bi.getName(),
+                            new DSpace().getConfigurationService()
+                                    .getPropertyAsType(
+                                            "discovery.browse.authority.multilanguage",
+                                            new Boolean(false)),
+                            false);
             
             // we need to assure that the right names will be present in the browse
             IndexBrowse ib = new IndexBrowse(context);
@@ -214,6 +222,7 @@ public class ScriptUpdateRPItemSearchIndex
                         + " (" + count + " of " + rps.size() + ")");
                 // set up a BrowseScope and start loading the values into it
                 BrowserScope scope = new BrowserScope(context);
+                scope.setUserLocale(context.getCurrentLocale().getLanguage());
                 scope.setBrowseIndex(bi);
                 // scope.setOrder(order);
                 scope.setFilterValue(authKey);
@@ -221,6 +230,9 @@ public class ScriptUpdateRPItemSearchIndex
                 scope.setResultsPerPage(Integer.MAX_VALUE);
                 scope.setBrowseLevel(1);
 
+                // now start up a browse engine and get it to do the work for us
+                BrowseEngine be = new BrowseEngine(context, isMultilanguage? 
+                        scope.getUserLocale():null);
                 BrowseInfo binfo = be.browse(scope);
                 log.debug("Find " + binfo.getResultCount()
                         + "item(s) for the reseracher " + authKey);

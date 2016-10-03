@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
@@ -33,6 +35,7 @@ import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.utils.DSpace;
 
 /**
  * Servlet for browsing through indices, as they are defined in 
@@ -180,7 +183,13 @@ public class BrowserServlet extends AbstractBrowserServlet
 				String[] browseMetadata = bInfo.getBrowseIndex().getMetadata().split(",");
 				for (String auth : authorities) {
 					if (match(auth, browseMetadata)) {
-						humanValue = cam.getLabel(auth.replaceAll("\\.", "_"), bInfo.getAuthority(), null);
+                        String language = null;
+                        Locale sessionLocale = UIUtil.getSessionLocale(request);
+                        if (sessionLocale != null)
+                        {
+                            language = sessionLocale.getLanguage();
+                        }
+						humanValue = cam.getLabel(auth.replaceAll("\\.", "_"), bInfo.getAuthority(), language);
 						break;
 					}
 				}
@@ -214,8 +223,22 @@ public class BrowserServlet extends AbstractBrowserServlet
             scope.setOffset(0);
             scope.setResultsPerPage(Integer.MAX_VALUE);
 
+            BrowseIndex bidx = scope.getBrowseIndex();
             // Export a browse view
-            BrowseEngine be = new BrowseEngine(context);
+            boolean isMultilanguage = new DSpace()
+            .getConfigurationService()
+            .getPropertyAsType(
+                    "discovery.browse.authority.multilanguage."
+                            + bidx.getName(),
+                    new DSpace()
+                            .getConfigurationService()
+                            .getPropertyAsType(
+                                    "discovery.browse.authority.multilanguage",
+                                    new Boolean(false)),
+                    false);
+            // now start up a browse engine and get it to do the work for us
+            BrowseEngine be = new BrowseEngine(context, isMultilanguage? 
+                    scope.getUserLocale():null);
             BrowseInfo binfo = be.browse(scope);
             List<Integer> iids = new ArrayList<Integer>();
             for (BrowseItem bi : binfo.getBrowseItemResults())

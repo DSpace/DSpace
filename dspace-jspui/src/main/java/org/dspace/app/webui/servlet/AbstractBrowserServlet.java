@@ -280,6 +280,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
 
             // set up a BrowseScope and start loading the values into it
             BrowserScope scope = new BrowserScope(context);
+            scope.setUserLocale(context.getCurrentLocale().getLanguage());
             scope.setBrowseIndex(bi);
             scope.setOrder(order);
             scope.setFilterValue(value != null?value:authority);
@@ -337,8 +338,21 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
         {
             BrowseIndex bi = scope.getBrowseIndex();
 
+            boolean isMultilanguage = new DSpace()
+            .getConfigurationService()
+            .getPropertyAsType(
+                    "discovery.browse.authority.multilanguage."
+                            + bi.getName(),
+                    new DSpace()
+                            .getConfigurationService()
+                            .getPropertyAsType(
+                                    "discovery.browse.authority.multilanguage",
+                                    new Boolean(false)),
+                    false);
             // now start up a browse engine and get it to do the work for us
-            BrowseEngine be = new BrowseEngine(context);
+            BrowseEngine be = new BrowseEngine(context, isMultilanguage? 
+                    scope.getUserLocale():null);
+            
             BrowseInfo binfo = be.browse(scope);
             
             request.setAttribute("browse.info", binfo);

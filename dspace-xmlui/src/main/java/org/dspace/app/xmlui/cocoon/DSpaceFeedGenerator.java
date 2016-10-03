@@ -264,6 +264,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
         String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
         BrowserScope scope = new BrowserScope(context);
+        scope.setUserLocale(context.getCurrentLocale().getLanguage());
         if (dso instanceof Collection)
         {
             scope.setCollection((Collection) dso);
@@ -287,7 +288,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                 }
             }
 
-            BrowseEngine be = new BrowseEngine(context);
+            BrowseEngine be = new BrowseEngine(context, scope.getUserLocale());
             this.recentSubmissionItems = be.browseMini(scope).getItemResults(context);
 
             // filter out Items that are not world-readable

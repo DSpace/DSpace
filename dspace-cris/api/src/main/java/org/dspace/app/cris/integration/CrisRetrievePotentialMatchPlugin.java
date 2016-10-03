@@ -27,6 +27,7 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.utils.DSpace;
 
 public class CrisRetrievePotentialMatchPlugin implements
         IRetrievePotentialMatchPlugin
@@ -55,8 +56,18 @@ public class CrisRetrievePotentialMatchPlugin implements
                     .getProperty(CrisConstants.CFG_MODULE, "researcherpage.browseindex");
             BrowseIndex bi = BrowseIndex
                     .getBrowseIndex(researcherPotentialMatchLookupBrowserIndex);
-            // now start up a browse engine and get it to do the work for us
-            BrowseEngine be = new BrowseEngine(context);
+            boolean isMultilanguage = new DSpace()
+            .getConfigurationService()
+            .getPropertyAsType(
+                    "discovery.browse.authority.multilanguage."
+                            + bi.getName(),
+                    new DSpace()
+                            .getConfigurationService()
+                            .getPropertyAsType(
+                                    "discovery.browse.authority.multilanguage",
+                                    new Boolean(false)),
+                    false);
+            
             int count = 1;
 
             for (NameResearcherPage tempName : names)
@@ -66,6 +77,7 @@ public class CrisRetrievePotentialMatchPlugin implements
                         + " of " + names.size() + ")");
                 // set up a BrowseScope and start loading the values into it
                 BrowserScope scope = new BrowserScope(context);
+                scope.setUserLocale(context.getCurrentLocale().getLanguage());
                 scope.setBrowseIndex(bi);
                 // scope.setOrder(order);
                 scope.setFilterValue(tempName.getName());
@@ -79,6 +91,10 @@ public class CrisRetrievePotentialMatchPlugin implements
                 // scope.setSortBy(sortBy);
                 scope.setBrowseLevel(1);
                 // scope.setEtAl(etAl);
+                
+                // now start up a browse engine and get it to do the work for us
+                BrowseEngine be = new BrowseEngine(context, isMultilanguage? 
+                        scope.getUserLocale():null);
 
                 BrowseInfo binfo = be.browse(scope);
                 log.debug("Find " + binfo.getResultCount()
@@ -107,7 +123,6 @@ public class CrisRetrievePotentialMatchPlugin implements
     public Map<NameResearcherPage, Item[]> retrieveGroupByName(Context context,
             Map<String, Set<Integer>> mapInvalids, List<ResearcherPage> rps)
     {
-        
       
         Map<NameResearcherPage, Item[]> result = new HashMap<NameResearcherPage, Item[]>();
 
@@ -122,9 +137,17 @@ public class CrisRetrievePotentialMatchPlugin implements
                         .getProperty(CrisConstants.CFG_MODULE, "researcherpage.browseindex");
                 bi = BrowseIndex
                         .getBrowseIndex(researcherPotentialMatchLookupBrowserIndex);
-
-                // now start up a browse engine and get it to do the work for us
-                BrowseEngine be = new BrowseEngine(context);
+                boolean isMultilanguage = new DSpace()
+                        .getConfigurationService()
+                        .getPropertyAsType(
+                                "discovery.browse.authority.multilanguage."
+                                        + bi.getName(),
+                                new DSpace()
+                                        .getConfigurationService()
+                                        .getPropertyAsType(
+                                                "discovery.browse.authority.multilanguage",
+                                                new Boolean(false)),
+                                false);
                 int count = 1;
                 List<NameResearcherPage> names = ResearcherPageUtils.getAllVariantsName(mapInvalids.get(authority),
                         researcher);
@@ -136,6 +159,7 @@ public class CrisRetrievePotentialMatchPlugin implements
                             + " of " + names.size() + ")");
                     // set up a BrowseScope and start loading the values into it
                     BrowserScope scope = new BrowserScope(context);
+                    scope.setUserLocale(context.getCurrentLocale().getLanguage());
                     scope.setBrowseIndex(bi);
                     // scope.setOrder(order);
                     scope.setFilterValue(tempName.getName());
@@ -150,6 +174,10 @@ public class CrisRetrievePotentialMatchPlugin implements
                     scope.setBrowseLevel(1);
                     // scope.setEtAl(etAl);
 
+                    // now start up a browse engine and get it to do the work for us
+                    BrowseEngine be = new BrowseEngine(context, isMultilanguage? 
+                            scope.getUserLocale():null);
+                    
                     BrowseInfo binfo = be.browse(scope);
                     log.info("Find " + binfo.getResultCount()
                             + "item(s) in browsing...");

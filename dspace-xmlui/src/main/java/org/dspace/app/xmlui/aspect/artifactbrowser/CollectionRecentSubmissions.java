@@ -7,6 +7,11 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
@@ -21,18 +26,18 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.*;
+import org.dspace.browse.BrowseEngine;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.BrowseItem;
+import org.dspace.browse.BrowserScope;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
+import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * Renders a list of recently submitted items for the collection by using the dspace browse
@@ -184,6 +189,7 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
             return new ArrayList<BrowseItem>();
         }
         BrowserScope scope = new BrowserScope(context);
+        scope.setUserLocale(context.getCurrentLocale().getLanguage());
         scope.setCollection(collection);
         scope.setResultsPerPage(numRecentSubmissions);
 
@@ -200,7 +206,8 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
                 }
             }
 
-        	BrowseEngine be = new BrowseEngine(context);
+            BrowseEngine be = new BrowseEngine(context, scope.getUserLocale());
+
         	this.recentSubmissionItems = be.browse(scope).getResults();
         }
         catch (SortException se)

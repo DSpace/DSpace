@@ -39,9 +39,13 @@ import org.dspace.utils.DSpace;
  */
 public class SolrBrowseDAO implements BrowseDAO
 {
-    public SolrBrowseDAO(Context context)
+    
+    private String userLocale;
+    
+    public SolrBrowseDAO(Context context, String userLocale)
     {
         this.context = context;
+        this.userLocale = userLocale;
     }
 
     static private class FacetValueComparator implements Comparator
@@ -728,6 +732,9 @@ public class SolrBrowseDAO implements BrowseDAO
         }
         this.table = table;
         facetField = table;
+        if (userLocale != null) {
+            facetField += "_"+userLocale;
+        }
     }
 
     public void setFilterMappingTables(String tableDis, String tableMap)
@@ -735,6 +742,9 @@ public class SolrBrowseDAO implements BrowseDAO
         if (tableDis != null)
         {
             this.facetField = tableDis;
+            if (userLocale != null) {
+                facetField += "_"+userLocale;
+            }
         }
         // this.fields = tableDis;
         // this.tableMap = tableMap;

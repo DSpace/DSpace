@@ -8,17 +8,15 @@
 package org.dspace.app.cris.integration;
 
 
-import it.cilea.osd.jdyna.util.AnagraficaUtils;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.cris.model.ACrisObject;
-import org.dspace.app.cris.model.CrisConstants;
-import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.dto.CrisAnagraficaObjectDTO;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
@@ -34,6 +32,8 @@ import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
+
+import it.cilea.osd.jdyna.util.AnagraficaUtils;
 
 /**
  * This class is the main point of integration beetween the Projects and DSpace.
@@ -311,6 +311,13 @@ public abstract class CRISAuthority<T extends ACrisObject> implements ChoiceAuth
         T cris = applicationService.get(getCRISTargetClass(), id);
         if (cris != null)
         {
+            if(StringUtils.isNotBlank(locale)) {
+                String metadata = cris.getMetadataFieldName(new Locale(locale));
+                String value = cris.getMetadata(metadata);
+                if(StringUtils.isNotBlank(value)) {
+                    return value;
+                }
+            }
             return cris.getName();
         }
         return null;

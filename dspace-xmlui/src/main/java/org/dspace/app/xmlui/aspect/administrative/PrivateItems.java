@@ -572,7 +572,7 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         params.etAl = RequestUtils.getIntParameter(request, BrowseParams.ETAL);
 
         params.scope = new BrowserScope(context);
-
+        params.scope.setUserLocale(context.getCurrentLocale().getLanguage());
         // Are we in a community or collection?
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso instanceof Community)
@@ -698,7 +698,7 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         try
         {
             // Create a new browse engine, and perform the browse
-            BrowseEngine be = new BrowseEngine(context);
+            BrowseEngine be = new BrowseEngine(context, params.scope.getUserLocale());
             this.browseInfo = be.browse(params.scope);
 
             // figure out the setting for author list truncation

@@ -10,20 +10,21 @@ package org.dspace.app.webui.components;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.BrowseEngine;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.BrowseInfo;
+import org.dspace.browse.BrowserScope;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.PluginException;
-import org.dspace.browse.BrowseEngine;
-import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowserScope;
-import org.dspace.browse.BrowseException;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
+import org.dspace.utils.DSpace;
 
 
 /**
@@ -106,6 +107,7 @@ public class CollectionItemList implements CollectionHomeProcessor
             }
 
             BrowserScope scope = new BrowserScope(context);
+            scope.setUserLocale(context.getCurrentLocale().getLanguage());
             scope.setBrowseContainer(collection);
             scope.setBrowseIndex(bi);
             scope.setEtAl(etal);
@@ -116,7 +118,21 @@ public class CollectionItemList implements CollectionHomeProcessor
                 scope.setSortBy(number);
                 scope.setOrder(SortOption.DESCENDING);
             }
-            BrowseEngine be = new BrowseEngine(context);
+            boolean isMultilanguage = new DSpace()
+            .getConfigurationService()
+            .getPropertyAsType(
+                    "discovery.browse.authority.multilanguage."
+                            + bi.getName(),
+                    new DSpace()
+                            .getConfigurationService()
+                            .getPropertyAsType(
+                                    "discovery.browse.authority.multilanguage",
+                                    new Boolean(false)),
+                    false);
+            // now start up a browse engine and get it to do the work for us
+            BrowseEngine be = new BrowseEngine(context, isMultilanguage? 
+                    scope.getUserLocale():null);
+
             BrowseInfo binfo = be.browse(scope);
             request.setAttribute("browse.info", binfo);
 

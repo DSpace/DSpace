@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -31,6 +32,13 @@ import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
 import org.dspace.content.authority.Choices;
 import org.dspace.eperson.EPerson;
+
+import it.cilea.osd.common.core.TimeStampInfo;
+import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ANestedProperty;
+import it.cilea.osd.jdyna.model.ATypeNestedObject;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.model.Property;
 
 import it.cilea.osd.common.core.TimeStampInfo;
 import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
@@ -438,5 +446,9 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
 
 	public ACrisObject<P, TP, NP, NTP, ACNO, ATNO> clone() throws CloneNotSupportedException {
 		return (ACrisObject<P, TP, NP, NTP, ACNO, ATNO>) super.clone();
+	}
+	
+	public String getMetadataFieldName(Locale locale) {
+	    return getTypeText()+ "name" + locale.getLanguage();
 	}
 }

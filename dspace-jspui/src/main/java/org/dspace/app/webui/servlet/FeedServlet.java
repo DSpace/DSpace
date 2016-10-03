@@ -35,6 +35,7 @@ import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortOption;
+import org.dspace.utils.DSpace;
 import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -290,6 +291,7 @@ public class FeedServlet extends DSpaceServlet
     		}
     		
     		BrowserScope scope = new BrowserScope(context);
+    		scope.setUserLocale(context.getCurrentLocale().getLanguage());
     		scope.setBrowseIndex(bix);
                 if (dso != null)
                 {
@@ -306,9 +308,25 @@ public class FeedServlet extends DSpaceServlet
             scope.setOrder(SortOption.DESCENDING);
     		scope.setResultsPerPage(itemCount);
     		
+            
+            boolean isMultilanguage = new DSpace()
+                    .getConfigurationService()
+                    .getPropertyAsType(
+                            "discovery.browse.authority.multilanguage."
+                                    + bix.getName(),
+                            new DSpace()
+                                    .getConfigurationService()
+                                    .getPropertyAsType(
+                                            "discovery.browse.authority.multilanguage",
+                                            new Boolean(false)),
+                            false);
+            
             // gather & add items to the feed.
-    		BrowseEngine be = new BrowseEngine(context);
+            BrowseEngine be = new BrowseEngine(context, isMultilanguage? 
+                    scope.getUserLocale():null);
     		BrowseInfo bi = be.browseMini(scope);
+
+            
     		Item[] results = bi.getItemResults(context);
 
             if (includeAll)

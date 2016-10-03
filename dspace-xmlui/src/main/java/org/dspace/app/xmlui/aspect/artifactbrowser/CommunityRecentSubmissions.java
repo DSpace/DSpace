@@ -170,6 +170,7 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
             return new ArrayList<BrowseItem>();
         }
         BrowserScope scope = new BrowserScope(context);
+        scope.setUserLocale(context.getCurrentLocale().getLanguage());
         scope.setCommunity(community);
         scope.setResultsPerPage(numRecentSubmissions);
 
@@ -186,7 +187,7 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
                 }
             }
 
-        	BrowseEngine be = new BrowseEngine(context);
+            BrowseEngine be = new BrowseEngine(context, scope.getUserLocale());
         	this.recentSubmittedItems = be.browse(scope).getResults();
         }
         catch (SortException se)
