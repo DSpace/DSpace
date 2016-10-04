@@ -293,8 +293,7 @@ public abstract class CRISAuthority<T extends ACrisObject> implements ChoiceAuth
      * 
      * @param key
      *            the identifier (i.e. 00024)
-     * @param locale
-     *            (not used by this Authority)
+     * @param locale     *            
      * 
      * @return the rp fullname
      */
@@ -311,11 +310,23 @@ public abstract class CRISAuthority<T extends ACrisObject> implements ChoiceAuth
         T cris = applicationService.get(getCRISTargetClass(), id);
         if (cris != null)
         {
-            if(StringUtils.isNotBlank(locale)) {
-                String metadata = cris.getMetadataFieldName(new Locale(locale));
-                String value = cris.getMetadata(metadata);
-                if(StringUtils.isNotBlank(value)) {
-                    return value;
+
+            boolean isMultilanguage = new DSpace()
+                    .getConfigurationService().getPropertyAsType(
+                            "discovery.authority.multilanguage." + field,
+                            false);
+
+            if (isMultilanguage)
+            {
+                if (StringUtils.isNotBlank(locale))
+                {
+                    String metadata = cris
+                            .getMetadataFieldName(new Locale(locale));
+                    String value = cris.getMetadata(metadata);
+                    if (StringUtils.isNotBlank(value))
+                    {
+                        return value;
+                    }
                 }
             }
             return cris.getName();
