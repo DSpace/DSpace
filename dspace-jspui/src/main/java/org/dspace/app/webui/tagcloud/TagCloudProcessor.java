@@ -21,6 +21,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchServiceException;
@@ -88,6 +89,10 @@ public class TagCloudProcessor implements CollectionHomeProcessor,
     {
         DiscoverQuery queryArgs = DiscoverUtility.getTagCloudDiscoverQuery(context,
                 request, scope, true);
+        //FIXME tmp setLimit to show tagcloud
+        for(DiscoverFacetField discoverFacetField : queryArgs.getFacetFields()) {
+            discoverFacetField.setLimit(50);
+        }
         queryArgs.setMaxResults(0);
         DiscoverResult qResults;
         try

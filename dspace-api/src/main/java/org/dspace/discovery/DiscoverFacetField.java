@@ -98,4 +98,9 @@ public class DiscoverFacetField {
 	public void setExclude(boolean exclude) {
 		this.exclude = exclude;
 	}
+
+    public void setLimit(int limit)
+    {
+        this.limit = limit;
+    }
 }
