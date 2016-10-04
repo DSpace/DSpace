@@ -45,7 +45,7 @@ public class MultilanguageAuthorityIndexer implements SolrServiceIndexPlugin
                         boolean isMultilanguage = new DSpace()
                                 .getConfigurationService().getPropertyAsType(
                                         "discovery.authority.multilanguage."
-                                                + fieldKey,
+                                                + makeFieldKey,
                                         false);
 
                         if (isMultilanguage)
