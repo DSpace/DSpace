@@ -11,6 +11,7 @@ import it.cilea.osd.common.core.TimeStampInfo;
 import it.cilea.osd.jdyna.model.AType;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.persistence.Embedded;
@@ -309,4 +310,8 @@ public class ResearchObject extends ACrisObjectWithTypeSupport<DynamicProperty, 
         return false;
     }
 
+    
+    public String getMetadataFieldName(Locale locale) {
+        return getAuthorityPrefix()+ getMetadataFieldTitle() + locale.getLanguage();
+    }
 }

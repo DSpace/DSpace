@@ -448,7 +448,8 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
 		return (ACrisObject<P, TP, NP, NTP, ACNO, ATNO>) super.clone();
 	}
 	
-	public String getMetadataFieldName(Locale locale) {
-	    return getTypeText()+ "name" + locale.getLanguage();
-	}
+    public String getMetadataFieldName(Locale locale) {
+        return getMetadataFieldTitle() + locale.getLanguage();
+    }
+	    
 }
