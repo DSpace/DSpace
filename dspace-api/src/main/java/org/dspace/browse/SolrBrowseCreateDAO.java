@@ -346,24 +346,24 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                     
                     for (String facet : distFValues)
                     {
-                        doc.addField(bi.getDistinctTableName() + "_filter",
+                        doc.addField(distinctTableName + "_filter",
                                 facet);
                     }
                     for (String facet : distFAuths)
                     {
                         doc.addField(
-                                bi.getDistinctTableName() + "_authority_filter",
+                                distinctTableName + "_authority_filter",
                                 facet);
                     }
                     for (String facet : distValuesForAC)
                     {
-                        doc.addField(bi.getDistinctTableName() + "_partial",
+                        doc.addField(distinctTableName + "_partial",
                                 facet);
                     }
                     for (String facet : distFVal)
                     {
                         doc.addField(
-                                bi.getDistinctTableName() + "_value_filter",
+                                distinctTableName + "_value_filter",
                                 facet);
                     }
                 }
