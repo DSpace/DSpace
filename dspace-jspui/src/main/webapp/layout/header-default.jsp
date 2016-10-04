@@ -17,9 +17,12 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.List"%>
+<%@ page import="java.util.Locale"%>
 <%@ page import="java.util.Enumeration"%>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.core.I18nUtil" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.app.util.Util" %>
 <%@ page import="org.dspace.app.webui.util.LocaleUIHelper" %>
 <%@ page import="javax.servlet.jsp.jstl.core.*" %>
@@ -41,6 +44,11 @@
     String dsVersion = Util.getSourceVersion();
     String generator = dsVersion == null ? "DSpace" : "DSpace "+dsVersion;
     String analyticsKey = ConfigurationManager.getProperty("jspui.google.analytics.key");
+
+    // get the locale languages
+    Locale[] supportedLocales = I18nUtil.getSupportedLocales();
+    Locale sessionLocale = UIUtil.getSessionLocale(request);
+    boolean isRtl = StringUtils.isNotBlank(LocaleUIHelper.ifLtr(request, "","rtl"));    
 %>
 
 <!DOCTYPE html>
@@ -206,11 +214,36 @@
 <main id="content" role="main">
 <div class="container banner">
 	<div class="row">
-		<div class="col-sm-9 brand">
+		<div class="col-sm-12">
+<% if (supportedLocales != null && supportedLocales.length > 1)
+     {
+ %>
+	 <ul class="nav navbar-nav navbar-<%= isRtl ? "left" : "right" %>">
+      
+ <%
+    for (int i = supportedLocales.length-1; i >= 0; i--)
+     {
+ %>
+        <li><a onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';
+                  document.repost.submit();" href="?locale=<%=supportedLocales[i].toString()%>">
+          <%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.layout.navbar-default.language."+supportedLocales[i].toString()) %>                  
+       </a></li>
+ <%
+     }
+ %>
+     </ul>
+ <%
+   }
+ %>		
+		
+		
+		
+		</div>
+		  <div class="col-sm-4 brand pull-<%= isRtl ?"right" :"left" %>">
 		<h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
         <fmt:message key="jsp.layout.header-default.brand.description" /> 
         </div>
-        <div class="col-sm-3 hidden-xs"><img class="pull-right" src="<%= request.getContextPath() %>/image/logo.gif" alt="DSpace logo" />
+        <div class="col-sm-8 hidden-xs pull-<%= isRtl ?"left" :"right" %>"><img class="img-responsive" src="<%= request.getContextPath() %>/image/logo-trasparent.png" alt="DSpace logo" />
         </div>
 	</div>
 </div>	
@@ -226,6 +259,7 @@
 <%
     }
 %>
+
 
 
         <%-- Page contents --%>

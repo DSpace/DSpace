@@ -95,11 +95,11 @@
            <span class="icon-bar"></span>
            <span class="icon-bar"></span>
          </button>
-         <a class="navbar-brand" href="<%= request.getContextPath() %>/"><img height="25" src="<%= request.getContextPath() %>/image/dspace-logo-only.png" alt="DSpace logo" /></a>
        </div>
        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
-         <ul id="top-menu" class="nav navbar-nav">
-           <li id="home-top-menu" class="<%= currentPage.endsWith("/home.jsp")? 
+         <ul id="top-menu" class="nav navbar-nav navbar-<%= isRtl ? "right":"left"%>">
+           <li class="pull-<%= isRtl ? "right":"left"%>"><a class="navbar-brand" href="<%= request.getContextPath() %>/"><img height="25" src="<%= request.getContextPath() %>/image/dspace-logo-only.png" alt="DSpace logo" /></a></li>
+           <li id="home-top-menu" class="pull-<%= isRtl ? "right":"left"%>   <%= currentPage.endsWith("/home.jsp")? 
         		   "active" : "" %>"><a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.layout.navbar-default.home"/></a></li>
 		  <% if(showCommList){ %>
 		   <li id="communitylist-top-menu" class="<%= currentPage.endsWith("/community-list")? 
@@ -139,9 +139,9 @@
           <li id="help-top-menu" class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") %>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup></li>
        </ul>
 
- <% if (supportedLocales != null && supportedLocales.length > 1)
+ <%-- if (supportedLocales != null && supportedLocales.length > 1)
      {
- %>
+ 
     <div class="nav navbar-nav navbar-<%= isRtl ? "left" : "right" %>">
 	 <ul class="nav navbar-nav navbar-<%= isRtl ? "left" : "right" %>">
       <li id="language-top-menu" class="dropdown">
@@ -153,8 +153,9 @@
  %>
       <li>
         <a onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';
-                  document.repost.submit();" href="<%= request.getContextPath() %>?locale=<%=supportedLocales[i].toString()%>">
-         <%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>
+                  document.repost.submit();" href="?locale=<%=supportedLocales[i].toString()%>">
+          <%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.layout.navbar-default.language."+supportedLocales[i].toString()) %>                  
+     
        </a>
       </li>
  <%
@@ -167,7 +168,7 @@
  <%
    }
  %>
- 
+ --%>
        <div class="nav navbar-nav navbar-<%= isRtl ? "left" : "right" %>">
 		<ul class="nav navbar-nav navbar-<%= isRtl ? "left" : "right" %>">
                     <li id="search-top-menu" class="dropdown">
