@@ -35,7 +35,7 @@
 	  #map_canvas { height: 100% }
 	</style>
 	<script type="text/javascript"
-	    src="http://maps.google.com/maps/api/js?sensor=true&v=3">
+	    src="//maps.google.com/maps/api/js?sensor=true&v=3">
 	</script>	
 	
 	<script type="text/javascript">
