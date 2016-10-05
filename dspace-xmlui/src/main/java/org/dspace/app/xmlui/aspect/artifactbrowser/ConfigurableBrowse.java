@@ -694,7 +694,14 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             BrowseIndex bi = BrowseIndex.getBrowseIndex(type);
             if (bi == null)
             {
-                throw new ResourceNotFoundException("Browse index " + type + " not found");
+                if (sortBy > 0)
+                {
+                    bi = BrowseIndex.getBrowseIndex(SortOption.getSortOption(sortBy));
+                }
+                else
+                {
+                    bi = BrowseIndex.getBrowseIndex(SortOption.getDefaultSortOption());
+                }
             }
             
             // If we don't have a sort column
@@ -741,10 +748,10 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             updateOffset(request, params);
             params.scope.setResultsPerPage(RequestUtils.getIntParameter(request, BrowseParams.RESULTS_PER_PAGE));
             params.scope.setStartsWith(decodeFromURL(request.getParameter(BrowseParams.STARTS_WITH)));
-            String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
+            String filterValue = (bi.isItemIndex() ? null : request.getParameter(BrowseParams.FILTER_VALUE[0]));
             if (filterValue == null)
             {
-                filterValue = request.getParameter(BrowseParams.FILTER_VALUE[1]);
+                filterValue = (bi.isItemIndex() ? null : request.getParameter(BrowseParams.FILTER_VALUE[1]));
                 params.scope.setAuthorityValue(filterValue);
             }
             
@@ -791,6 +798,10 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
                 params.scope.setStartsWith(startsWith);
             }
+        }
+        catch (SortException se)
+        {
+            throw new UIException("Unable to create browse parameters", se);
         }
         catch (BrowseException bex)
         {
