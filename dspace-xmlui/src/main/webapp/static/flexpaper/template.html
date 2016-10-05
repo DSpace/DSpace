@@ -1,0 +1,134 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!doctype html>
+    <html>
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <meta name="viewport" content="initial-scale=1,user-scalable=0,maximum-scale=1,width=device-width" />
+            <style type="text/css" media="screen">
+                html, body  { height:100%; }
+                body { margin:0; padding:0; overflow:auto; }
+                #flashContent { display:none; }
+                #bookview-message {text-align: center;}
+                #close {text-align: center;}
+                #close a {font-size: 14px; background-color: #EFEFEF;}
+            </style>
+            <title>DSpace Book View</title>
+            <link rel="stylesheet" type="text/css" href="css/flexpaper.css?r57627" />
+            <script type="text/javascript" src="js/jquery.min.js?r57627"></script>
+            <script type="text/javascript" src="js/jquery.extensions.min.js?r57627"></script>
+            <script type="text/javascript" src="js/flexpaper.js?r57627"></script>
+            <script type="text/javascript" src="js/flexpaper_handlers.js?r57627"></script>
+            <!-- Create sharable banner for static and dynamic compile bookview assets -->
+            <script type="text/javascript" src="bookview-banner.js"></script>
+            <script type="text/javascript">
+            $(document).ready(function(){
+            	var loc = document.location.search;
+            	
+            	//Pull the path attribute from the URL
+            	loc = loc.replace(/.*path=/,"");
+            	
+                //Load the dynamic html5 viewer from FlexPaper.
+                //The full pdf must be downloaded to the browser before the document will be rendered
+                $('#documentViewer').FlexPaperViewer(
+                    { config : {
+                            PDFFile : loc,
+                            RenderingOrder : 'html5',
+                            key : '$$$YOUR_KEY_HERE$$',
+                    }}
+                );                          
+
+                //define a callback to be run once the document viewer has loaded
+                $('#documentViewer').bind('onDocumentLoaded',function(e,totalPages){
+                    //this callback is executed before the rendering has completed
+                    //therefore insert a short time delay before hiding the message at the top of the screen
+                    setTimeout(function(){
+                        $("#bookview-message").hide();
+                    }, 1000);
+                });
+
+            	/*
+            	------------------------------------------------------------------------------------------------
+            	The FlexPaper dynamic viewer may not be suitable in all instances.  This code offers a possible
+            	path for handling staticly pre-compiled assets (large PDF's, inconsistent page dimensions)
+            	------------------------------------------------------------------------------------------------
+                function itemToPath(item) {
+                    var item9 = ("000000000" + item).substr(-9);
+                    return item9.substr(0,3) + "/" + item9.substr(3,3) + "/" + item;
+                }
+
+            	//Isolate the handle and sequence number from the bitstream path
+            	var matchArr = /\/bitstream\/handle\/([\d\.]+)\/([\d\.]+)\/.+\.pdf\?sequence=(\d+)/.exec(loc);
+
+            	if (matchArr != null) {
+            	    if (matchArr.length > 3) {
+            	    	//pre-compiled assets must conform to the following structure in order to be opened as an 
+            	    	//alternative
+            		    var precomp = "/bookview/" + matchArr[1] + "/" + itemToPath(matchArr[2]) + "/" +
+            		            matchArr[3] + "/index.html";
+                        var precompZine = "/bookview/" + matchArr[1] + "/" + itemToPath(matchArr[2]) + "/" +
+                                matchArr[3] + "/UI_Zine.xml";
+
+            		    //make ajax call to determine if a pre-compiled asset exists.  
+            		    //If so, redirect to that page (which will terminate the load of the dynamic viewer)  
+            		    //Otherwise the client-side html5 viewer will load as normal.
+                        $.get(precomp, function(){
+                        	//if the precompile folder is found, check if the folder contains a flash resource 
+                        	$.get(precompZine, function(){
+                        		var v = $("#documentViewer");
+                        		var i = $("<iframe>");
+                        		i.attr("style", v.attr("style"));
+                        		i.attr("src", precomp);
+                        		v.hide();
+                        		$("body").append(i);
+                        		
+                        		//give time for the flash resource to load
+                                setTimeout(function(){
+                                    $("#bookview-message").hide();
+                                }, 3000);
+                        	}).fail(function(){
+                        		//if it is not a flash resource, redirect to the precompiled page
+                        		//the flexpaper html5 viewer does not allow full scree from within an iframe
+                                document.location = precomp;                        		
+                        	});
+                        }).fail(function(){
+                            //Load the dynamic html5 viewer from FlexPaper.
+                            //The full pdf must be downloaded to the browser before the document will be rendered
+                            $('#documentViewer').FlexPaperViewer(
+                                { config : {
+                                        PDFFile : loc,
+                                        RenderingOrder : 'html5',
+                                        key : '$$$YOUR_KEY_HERE$$',
+                                }}
+                            );                        	
+
+                            //define a callback to be run once the document viewer has loaded
+                            $('#documentViewer').bind('onDocumentLoaded',function(e,totalPages){
+                                //this callback is executed before the rendering has completed
+                                //therefore insert a short time delay before hiding the message at the top of the screen
+                                setTimeout(function(){
+                                    $("#bookview-message").hide();
+                                }, 1000);
+                            });
+                        });
+            	    }
+            	    */
+            	}
+            	
+            	
+            });
+            
+            </script>
+        </head>
+        <body>
+        <div id="bookview-banner"></div>
+        <div id="documentViewer" class="flexpaper_viewer" style="position:absolute;;width:100%;height:100%;background-color:#222222;;"></div>
+        </body>
+    </html>

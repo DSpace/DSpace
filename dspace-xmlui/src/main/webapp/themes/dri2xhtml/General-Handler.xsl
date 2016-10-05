@@ -192,6 +192,30 @@
 	        </td>
 	    </xsl:if>
 
+        <!-- TODO: What is the proper way to activate this feature from a setting?  How should the row header behave? -->
+        <xsl:if test="@MIMETYPE='application/pdf'">
+            <xsl:variable name="bitstreamurl" select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+            <xsl:variable name="bitstreamid" select="@ID"/>
+            
+            <td>
+                <xsl:choose>
+                    <xsl:when test="contains($bitstreamurl, 'isAllowed=n')">
+                        <xsl:text>Restricted Access</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <a target="bookView">
+                            <xsl:attribute name="href">
+                                <xsl:text>/static/flexpaper/template.html?path=</xsl:text>
+                                <xsl:value-of select="$bitstreamurl"/>
+                            </xsl:attribute>
+                            <!-- TODO: internationalize the image label -->
+                            <img src="/static/flexpaper/book-viewer-icon.png" title="Book View"/>
+                        </a>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:text>&#160;</xsl:text>
+            </td>
+        </xsl:if>
         </tr>
     </xsl:template>
     

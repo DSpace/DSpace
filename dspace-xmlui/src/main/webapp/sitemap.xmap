@@ -619,6 +619,16 @@
                     </map:match>
 
                     <!-- handle static js and css -->
+                    <map:match pattern="static/**.pdf">
+                            <map:read type="ConcatenationReader" src="static/{1}.pdf">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+                    <map:match pattern="static/**.jpg">
+                            <map:read type="ConcatenationReader" src="static/{1}.jpg">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
                     <map:match pattern="static/**.js">
                             <map:read type="ConcatenationReader" src="static/{1}.js">
                                 <map:parameter name="requestQueryString" value="{request:queryString}"/>
@@ -631,6 +641,11 @@
                     </map:match>
                     <map:match pattern="static/**.json">
                             <map:read type="ConcatenationReader" src="static/{1}.json">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+                    <map:match pattern="static/**.txt">
+                            <map:read type="ConcatenationReader" src="static/{1}.txt">
                                 <map:parameter name="requestQueryString" value="{request:queryString}"/>
                             </map:read>
                     </map:match>
