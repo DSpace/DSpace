@@ -126,12 +126,22 @@ public class PDFFilter extends MediaFilter
 
             if (useTemporaryFile)
             {
-                return new FileInputStream(tempTextFile);
+            	if (tempTextFile.getTotalSpace() > 0) {
+            		return new FileInputStream(tempTextFile);
+            	}
+            	else {
+            		return null;
+            	}
             }
             else
             {
                 byte[] bytes = byteStream.toByteArray();
-                return new ByteArrayInputStream(bytes);
+                if (bytes != null && bytes.length > 0) {
+                	return new ByteArrayInputStream(bytes);
+                }
+                else {
+                	return null;
+                }
             }
         }
         catch (OutOfMemoryError oome)
