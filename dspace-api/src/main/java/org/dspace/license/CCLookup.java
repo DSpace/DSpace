@@ -35,12 +35,18 @@ import org.jdom.output.XMLOutputter;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
-
 /**
- *  A wrapper around Creative Commons REST web services.
- *
- * @author Wendy Bossons
- */
+*  A wrapper around Creative Commons REST web services.
+*
+*  Original work: http://cctools.svn.sourceforge.net/viewvc/cctools/api_client/trunk/java/org/creativecommons/api/CcRest.java?revision=9464&view=markup
+*
+*  CcRest.java
+*    @author Nathan R. Yergler
+*    @author Creative Commons
+*    @version 0.0.1
+*
+* @author Wendy Bossons
+*/
 public class CCLookup {
 
         /** log4j logger */
@@ -266,21 +272,20 @@ public class CCLookup {
 		String answer_doc = "<answers>\n<locale>" + lang + "</locale>\n" + "<license-" + licenseId + ">\n";
 		Iterator keys = answers.keySet().iterator();
 
-		try {
-			String current = (String)keys.next();
+          	// To force CC 4.0 without these changes, comment out 'cc.license.jurisdiction = us' from dspace.cfg
+		// CC 4.0 is currently for international license only, no jurisdictions
+		// The following removes any jurisdictions while composing answers to submit request to CC API
+		while(keys.hasNext()) {
+            		String current = (String)keys.next();
+            		if(current.equals("jurisdiction")) {
+                  		answer_doc += "<" + current + "></" + current + ">\n";
+            		}
+            		else {
+                  		answer_doc += "<" + current + ">" + (String)answers.get(current) + "</" + current + ">\n";
+            		}
+          	}
 
-			while (true) {
-				answer_doc += "<" + current + ">" + (String)answers.get(current) + "</" + current + ">\n";
-				current = (String)keys.next();
-			}
-
-
-		} catch (NoSuchElementException e) {
-			// exception indicates we've iterated through the
-			// entire collection; just swallow and continue
-		}
-		// answer_doc +=	"<jurisdiction></jurisidiction>\n";  FAILS with jurisdiction argument
-		answer_doc +=						"</license-" + licenseId + ">\n</answers>\n";
+		answer_doc += "</license-" + licenseId + ">\n</answers>\n";
 		String post_data;
 
 		try {
