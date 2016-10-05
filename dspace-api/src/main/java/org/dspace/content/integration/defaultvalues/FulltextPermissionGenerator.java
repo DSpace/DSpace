@@ -89,8 +89,7 @@ public class FulltextPermissionGenerator implements EnhancedValuesGenerator
             {
                 count++;
                 List<ResourcePolicy> rps = AuthorizeManager
-                        .findPoliciesByDSOAndType(context, b,
-                                ResourcePolicy.TYPE_CUSTOM);
+                        .getPoliciesActionFilter(context, b, Constants.READ);
                 boolean bRestricted = true;
                 if (rps != null)
                 {
