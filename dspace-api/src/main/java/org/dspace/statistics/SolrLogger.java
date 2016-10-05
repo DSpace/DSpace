@@ -154,29 +154,28 @@ public class SolrLogger
                     SolrQuery solrQuery = new SolrQuery()
                             .setQuery("type:2 AND id:1");
                     server.query(solrQuery);
-                    if(ConfigurationManager.getBooleanProperty("enable.statistics.year.cores.shard", false)) {
-                        //Attempt to retrieve all the statistic year cores
-                        File solrDir = new File(ConfigurationManager.getProperty("dspace.dir") + "/solr/");
-                        File[] solrCoreFiles = solrDir.listFiles(new FileFilter() {
-    
-                            @Override
-                            public boolean accept(File file) {
-                                //Core name example: statistics-2008
-                                return file.getName().matches("statistics-\\d\\d\\d\\d");
-                            }
-                        });
-                        //Base url should like : http://localhost:{port.number}/solr
-                        String baseSolrUrl = server.getBaseURL().replace(pcore, "");
-                        for (File solrCoreFile : solrCoreFiles) {
-                            log.info("Loading core with name: " + solrCoreFile.getName());
-    
-                            createCore(server, solrCoreFile.getName());
-                            //Add it to our cores list so we can query it !
-                            statisticYearCores.add(baseSolrUrl.replace("http://", "").replace("https://", "") + solrCoreFile.getName());
+                    
+                    //Attempt to retrieve all the statistic year cores
+                    File solrDir = new File(ConfigurationManager.getProperty("dspace.dir") + "/solr/");
+                    File[] solrCoreFiles = solrDir.listFiles(new FileFilter() {
+
+                        @Override
+                        public boolean accept(File file) {
+                            //Core name example: statistics-2008
+                            return file.getName().matches("statistics-\\d\\d\\d\\d");
                         }
-                        //Also add the core containing the current year !
-                        statisticYearCores.add(server.getBaseURL().replace("http://", "").replace("https://", ""));
+                    });
+                    //Base url should like : http://localhost:{port.number}/solr
+                    String baseSolrUrl = server.getBaseURL().replace("statistics", "");
+                    for (File solrCoreFile : solrCoreFiles) {
+                        log.info("Loading core with name: " + solrCoreFile.getName());
+
+                        createCore(server, solrCoreFile.getName());
+                        //Add it to our cores list so we can query it !
+                        statisticYearCores.add(baseSolrUrl.replace("http://", "").replace("https://", "") + solrCoreFile.getName());
                     }
+                    //Also add the core containing the current year !
+                    statisticYearCores.add(server.getBaseURL().replace("http://", "").replace("https://", ""));
                 }
                 catch (Exception e)
                 {
