@@ -112,94 +112,113 @@ public class CrisI18nLabel implements IDisplayMetadataValueStrategy
         
         Locale locale = UIUtil.getSessionLocale(hrq); 
 
-        String metadata = "N/A";
+        String metadata = "";
         if (metadataArray != null && metadataArray.length > 0)
         {
-			try 
-			{
-				String publicPath = crisObject.getAuthorityPrefix();
-				String authority = crisObject.getCrisID();
-
-				String target = ConfigurationManager.getBooleanProperty("cris",
-						publicPath + ".ref.display.strategy.target.blank", false)
-								? "target=\"_blank\" " : "";
-				String startLink = "<a " + target + "href=\"" + hrq.getContextPath() + "/cris/" + publicPath + "/"
-						+ authority;
-				startLink += "\" class=\"authority\">";
-				String endLink = "</a>";
-            
-                // perhaps this is to avoid a lazyloader exception?
-                ACrisObject cris = applicationService.getEntityByCrisId(authority, crisObject.getClass());
-                
-                String icon = "";
+            String publicPath = crisObject.getAuthorityPrefix();
+            for (Metadatum metadatum : metadataArray)
+            {
                 try
                 {
-                    String type = cris.getMetadata(ConfigurationManager
-                            .getProperty("cris", publicPath
-                                    + ".ref.display.strategy.metadata.icon"));
+                    String authority = "";
+                    if(metadataArray.length==1) {
+                        authority = crisObject.getCrisID();
+                    }
+                    else {
+                        authority = metadatum.authority;
+                    }
 
-                    if(!cris.getStatus()) {
-                        startLink = "&nbsp;";
-                        endLink = "";
-                   }
-                    String title = I18nUtil
-                            .getMessage("CrisI18nLabel."
-                                    + publicPath + "." + type + ".title");
-                    icon = MessageFormat.format(
-                            I18nUtil.getMessage("CrisI18nLabel."
-                                    + publicPath + "." + type + ".icon"),
-                            title);
-                }
-                catch (Exception e)
-                {
-                    log.error(
-                            "Error when build icon (perhaps missing this configuration: on cris module key:"
-                                    + publicPath
-                                    + ".ref.display.strategy.metadata.icon)",
-                            e);
-                    
-                    String title;
-                    try {
-                        title = I18nUtil
-                                .getMessage("CrisI18nLabel." + publicPath + "." + ".title", true);
-                    }
-                    catch (MissingResourceException e2)
+                    String target = ConfigurationManager
+                            .getBooleanProperty("cris",
+                                    publicPath
+                                            + ".ref.display.strategy.target.blank",
+                                    false) ? "target=\"_blank\" " : "";
+                    String startLink = "<a " + target + "href=\""
+                            + hrq.getContextPath() + "/cris/" + publicPath + "/"
+                            + authority;
+                    startLink += "\" class=\"authority\">";
+                    String endLink = "</a>";
+
+                    // perhaps this is to avoid a lazyloader exception?
+                    ACrisObject cris = applicationService.getEntityByCrisId(
+                            authority, crisObject.getClass());
+
+                    String icon = "";
+                    try
                     {
-                        title = I18nUtil
-                                .getMessage("CrisI18nLabel." + publicPath + ".title");
-                    }
-                    
-                    try {
+                        String type = cris.getMetadata(ConfigurationManager
+                                .getProperty("cris", publicPath
+                                        + ".ref.display.strategy.metadata.icon"));
+
+                        if (!cris.getStatus())
+                        {
+                            startLink = "&nbsp;";
+                            endLink = "";
+                        }
+                        String title = I18nUtil.getMessage("CrisI18nLabel."
+                                + publicPath + "." + type + ".title");
                         icon = MessageFormat.format(
-                                I18nUtil.getMessage("CrisI18nLabel." + publicPath + ".icon", true),
+                                I18nUtil.getMessage("CrisI18nLabel."
+                                        + publicPath + "." + type + ".icon"),
                                 title);
                     }
-                    catch (MissingResourceException e2)
+                    catch (Exception e)
                     {
-                        icon = I18nUtil.getMessage(
-                                "CrisI18nLabel.default.icon");
+                        log.error(
+                                "Error when build icon (perhaps missing this configuration: on cris module key:"
+                                        + publicPath
+                                        + ".ref.display.strategy.metadata.icon)",
+                                e);
+
+                        String title;
+                        try
+                        {
+                            title = I18nUtil.getMessage("CrisI18nLabel."
+                                    + publicPath + "." + ".title", true);
+                        }
+                        catch (MissingResourceException e2)
+                        {
+                            title = I18nUtil.getMessage(
+                                    "CrisI18nLabel." + publicPath + ".title");
+                        }
+
+                        try
+                        {
+                            icon = MessageFormat.format(
+                                    I18nUtil.getMessage("CrisI18nLabel."
+                                            + publicPath + ".icon", true),
+                                    title);
+                        }
+                        catch (MissingResourceException e2)
+                        {
+                            icon = I18nUtil
+                                    .getMessage("CrisI18nLabel.default.icon");
+                        }
+
                     }
-                    
+
+                    metadata += startLink;
+
+                    String metadataLocale = cris.getMetadataFieldName(locale);
+                    String value = cris.getMetadata(metadataLocale);
+                    if (StringUtils.isNotBlank(value))
+                    {
+                        metadata += Utils.addEntities(value);
+                    }
+                    else
+                    {
+                        metadata += Utils.addEntities(cris.getName());
+                    }
+
+                    metadata += "&nbsp;";
+                    metadata += icon;
+                    metadata += endLink;
+                    metadata += "&nbsp;";
                 }
-                
-                metadata = startLink;
-                
-                String metadataLocale = cris.getMetadataFieldName(locale);
-                String value = cris.getMetadata(metadataLocale);
-                if(StringUtils.isNotBlank(value)) {
-                    metadata += Utils.addEntities(value);
+                catch (Exception ex)
+                {
+                    log.error(ex.getMessage(), ex);
                 }
-                else {
-                    metadata += Utils.addEntities(cris.getName());
-                }
-                
-                metadata += "&nbsp;";
-                metadata += icon;
-                metadata += endLink;
-            }
-            catch (Exception ex)
-            {
-                log.error(ex.getMessage(), ex);
             }
         }
         return metadata;
