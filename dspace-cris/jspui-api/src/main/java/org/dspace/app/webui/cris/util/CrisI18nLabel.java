@@ -153,20 +153,33 @@ public class CrisI18nLabel implements IDisplayMetadataValueStrategy
                 catch (Exception e)
                 {
                     log.error(
-                            "Error when build icon (perhaps missing this configuration: on cris module key:researcher.cris."
+                            "Error when build icon (perhaps missing this configuration: on cris module key:"
                                     + publicPath
                                     + ".ref.display.strategy.metadata.icon)",
                             e);
-                    try
+                    
+                    String title;
+                    try {
+                        title = I18nUtil
+                                .getMessage("CrisI18nLabel." + publicPath + "." + ".title", true);
+                    }
+                    catch (MissingResourceException e2)
                     {
-                        icon = I18nUtil.getMessage("CrisI18nLabel."
-                                + publicPath + ".icon");
+                        title = I18nUtil
+                                .getMessage("CrisI18nLabel." + publicPath + ".title");
+                    }
+                    
+                    try {
+                        icon = MessageFormat.format(
+                                I18nUtil.getMessage("CrisI18nLabel." + publicPath + ".icon", true),
+                                title);
                     }
                     catch (MissingResourceException e2)
                     {
                         icon = I18nUtil.getMessage(
                                 "CrisI18nLabel.default.icon");
                     }
+                    
                 }
                 
                 metadata = startLink;
