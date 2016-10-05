@@ -277,11 +277,11 @@
                     }
                     if (!changed)
                     {
-                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.add"/> (<%= md %>)</td><td bgcolor="#4E9258" style="font-size:10pt"><%= dcv.value %></td></tr><%
+                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.add"/> (<%= md %>)</td><td bgcolor="#4E9258" style="font-size:10pt"><%= dcv.getValue() %></td></tr><%
                     }
                     else
                     {
-                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.added"/> (<%= md %>)</td><td bgcolor="#4E9258" style="font-size:10pt"><%= dcv.value %></td></tr><%
+                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.added"/> (<%= md %>)</td><td bgcolor="#4E9258" style="font-size:10pt"><%= dcv.getValue() %></td></tr><%
                     }
                 }
 
@@ -307,11 +307,11 @@
                     }
                     if (!changed)
                     {
-                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.remove"/> (<%= md %>)</td><td bgcolor="#98AFC7" style="font-size:10pt"><%= dcv.value %></td></tr><%
+                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.remove"/> (<%= md %>)</td><td bgcolor="#98AFC7" style="font-size:10pt"><%= dcv.getValue() %></td></tr><%
                     }
                     else
                     {
-                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removed"/> (<%= md %>)</td><td bgcolor="#98AFC7" style="font-size:10pt"><%= dcv.value %></td></tr><%
+                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removed"/> (<%= md %>)</td><td bgcolor="#98AFC7" style="font-size:10pt"><%= dcv.getValue() %></td></tr><%
                     }
                 }
             }
