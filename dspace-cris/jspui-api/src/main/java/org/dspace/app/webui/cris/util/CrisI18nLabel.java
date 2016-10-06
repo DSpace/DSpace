@@ -164,7 +164,7 @@ public class CrisI18nLabel implements IDisplayMetadataValueStrategy
                     }
                     catch (Exception e)
                     {
-                        log.error(
+                        log.debug(
                                 "Error when build icon (perhaps missing this configuration: on cris module key:"
                                         + publicPath
                                         + ".ref.display.strategy.metadata.icon)",
