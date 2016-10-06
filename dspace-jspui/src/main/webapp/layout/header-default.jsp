@@ -266,5 +266,5 @@
 <div class="container">
 <% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
 	<div class="row">
-		<div class="col-md-9">
+		<div class="col-md-9 <%= isRtl ? "pull-right":"" %>">
 <% } %>		

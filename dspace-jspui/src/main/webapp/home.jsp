@@ -43,6 +43,7 @@
 <%@page import="org.dspace.discovery.IGlobalSearchResult"%>
 <%@page import="org.dspace.core.Utils"%>
 <%@page import="org.dspace.content.Bitstream"%>
+<%@ page import="org.dspace.app.webui.util.LocaleUIHelper" %>
 
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
@@ -65,12 +66,12 @@
     MostViewedBean mostViewedItem = (MostViewedBean) request.getAttribute("mostViewedItem");
     MostViewedBean mostCitedItem = (MostViewedBean) request.getAttribute("mostCitedItem");
     MostViewedBean mostViewedBitstream = (MostViewedBean) request.getAttribute("mostDownloadedItem");
-
+    boolean isRtl = StringUtils.isNotBlank(LocaleUIHelper.ifLtr(request, "","rtl"));
 %>
 
 <dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
 <div class="row">
-	<div class="col-md-8 sm-12">
+	<div class="col-md-8 sm-12 pull-<%= isRtl? "right":"left" %>">
         <%= topNews %>
 
 	<%
@@ -86,19 +87,20 @@
 	<%@ include file="discovery/static-globalsearch-component-facet.jsp" %>
 	<% } %>        
 		  </div>
-	<div class="col-md-4 sm-12">
+	<div class="col-md-4 sm-12 pull-<%= isRtl? "left":"right" %>">
     <%@ include file="components/recent-submissions.jsp" %>
 	</div>
 </div>
 <div class="row">
-	<div class="col-md-4">
+	<div class="col-md-4 <%= isRtl ? "pull-right":""%>">
 		<%@ include file="components/most-viewed.jsp" %>	
 	</div>
-	<div class="col-md-4">
+	<div class="col-md-4 <%= isRtl ? "pull-right":""%>">
 		<%@ include file="components/most-downloaded.jsp" %>
 	</div>
-	<div class="col-md-4">
+	<div class="col-md-4 <%= isRtl ? "pull-left":""%>">
 	<%= sideNews %>
+	<%-- <%@ include file="discovery/static-tagcloud-facet.jsp" %> --%>
 	<%-- <%@ include file="components/most-cited.jsp" %> --%>
 	</div>
 </div>

@@ -22,6 +22,7 @@
 <%@ page import="org.dspace.core.NewsManager" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.app.webui.util.LocaleUIHelper" %>
 
 <%
 	String footerNews = NewsManager.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-footer.html"));
@@ -33,6 +34,7 @@
 	}
 	
 	boolean showCommList = ConfigurationManager.getBooleanProperty("community-list.show.all",true);
+	boolean isRtl = StringUtils.isNotBlank(LocaleUIHelper.ifLtr(request, "","rtl"));
 %>
 
             <%-- Right-hand side bar if appropriate --%>
@@ -81,10 +83,10 @@
 	            </div> 
 	         </div>   
 			<div class="extra-footer row">
-      			<div id="footer_feedback" class="col-sm-4">                                    
+      			<div id="footer_feedback" class="col-sm-4 pull-<%= isRtl ? "right":"left" %>">                                    
                      <a href="<%= request.getContextPath() %>/feedback"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
                 </div>
-	           	<div id="designedby" class="col-sm-8 text-right">
+	           	<div id="designedby" class="col-sm-8 text-<%= isRtl ? "left": "right" %>">
             	 	<fmt:message key="jsp.layout.footer-default.text"/> - 
             	 	<fmt:message key="jsp.layout.footer-default.version-by"/> 
             	 	<a href="http://www.4science.it/en/dspace-and-dspace-cris-services/">
