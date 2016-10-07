@@ -11,7 +11,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class VisibilityTabConstant {
-	
+
+    /**
+     * Show only to satisfy certain rule
+     */
+    public final static Integer POLICY = 4;
+    
 	/**
 	 * Show to all
 	 */
@@ -34,6 +39,7 @@ public class VisibilityTabConstant {
 	
 	public static List<Integer> getValues() {
 		List<Integer> values = new LinkedList<Integer>();
+		values.add(POLICY);
 		values.add(HIGH);
 		values.add(STANDARD);
 		values.add(ADMIN);
@@ -43,6 +49,7 @@ public class VisibilityTabConstant {
 	
 	public static List<Integer> getEditValues() {
 		List<Integer> values = new LinkedList<Integer>();
+		values.add(POLICY);
 		values.add(STANDARD);
 		values.add(ADMIN);
 		values.add(LOW);		
