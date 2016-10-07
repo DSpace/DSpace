@@ -18,6 +18,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.util.List"            %>
+<%@ page import="java.util.UUID"            %>
 <%@ page import="java.util.ArrayList"            %>
 <%@ page import="org.dspace.content.Collection"            %>
 
@@ -37,9 +38,9 @@
 		otherCollections = (List<String>)request.getAttribute("otherCollections");
 	}
 		
-	Integer owningCollectionID = null;
+	UUID owningCollectionID = null;
 	if (request.getAttribute("owningCollection")!=null){
-		owningCollectionID = (Integer)request.getAttribute("owningCollection");
+		owningCollectionID = (UUID)request.getAttribute("owningCollection");
 	}
 	
 	String selectedInputType = null;
