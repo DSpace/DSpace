@@ -1304,7 +1304,7 @@ public class DatabaseUtils
                     try
                     {
                         context = new Context();
-
+                        context.turnOffAuthorisationSystem();
                         log.info("Post database migration, reindexing all content in Discovery search and browse engine");
 
                         // Reindex Discovery completely
