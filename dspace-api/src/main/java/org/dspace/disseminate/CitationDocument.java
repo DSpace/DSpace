@@ -312,7 +312,25 @@ public class CitationDocument {
         try {
             Item item = (Item) bitstream.getParentObject();
             sourceDocument = sourceDocument.load(bitstream.retrieve());
-            PDPage coverPage = new PDPage(PDPage.PAGE_SIZE_LETTER);
+            // Page format can be either LETTER (default) or A4
+            String pageformat_cfg = ConfigurationManager.getProperty("disseminate-citation", "page_format");
+            PDRectangle pageformat = PDPage.PAGE_SIZE_LETTER; // The default (1/2)
+            if (pageformat_cfg != null)
+            {
+                String pf = pageformat_cfg.toUpperCase();
+                if (pf.equals("A4"))
+                {
+                    pageformat = PDPage.PAGE_SIZE_A4;
+                } else if (pf.equals("LETTER"))
+                {
+                    pageformat = PDPage.PAGE_SIZE_LETTER;
+                } else
+                {
+                    log.info("Disseminate-citation: Unknown page format ' " + pageformat_cfg +
+                             "', using LETTER."); // The default (1/2)
+                }
+            }
+            PDPage coverPage = new PDPage(pageformat);
             generateCoverPage(document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);
 
