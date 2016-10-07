@@ -12,12 +12,14 @@ import java.beans.PropertyEditor;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.dspace.app.cris.model.jdyna.editor.DSpaceObjectPropertyEditor;
 import org.dspace.app.cris.model.jdyna.value.EPersonValue;
+import org.dspace.eperson.EPerson;
 
+import it.cilea.osd.jdyna.editor.AdvancedPropertyEditorSupport;
 import it.cilea.osd.jdyna.model.AWidget;
 import it.cilea.osd.jdyna.service.IPersistenceDynaService;
 import it.cilea.osd.jdyna.util.ValidationMessage;
-import it.cilea.osd.jdyna.value.PointerValue;
 
 @Entity
 @Table(name = "cris_weperson")
@@ -46,21 +48,19 @@ public class WidgetEPerson extends AWidget<EPersonValue>
     public PropertyEditor getPropertyEditor(
             IPersistenceDynaService applicationService)
     {
-        // TODO Auto-generated method stub
-        return null;
+        DSpaceObjectPropertyEditor pe = new DSpaceObjectPropertyEditor(EPerson.class, AdvancedPropertyEditorSupport.MODE_VIEW);
+        return pe;
     }
 
     @Override
     public Class<EPersonValue> getValoreClass()
     {
-        // TODO Auto-generated method stub
-        return null;
+       return EPersonValue.class;
     }
 
     @Override
     public ValidationMessage valida(Object valore)
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
