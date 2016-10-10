@@ -526,6 +526,10 @@ public class SubmissionController extends DSpaceServlet
                 context.complete();
             }
         }
+        catch (AuthorizeException ae)
+        {
+        	throw ae;
+        }
         catch (Exception e)
         {
             log.error("Error loading step class'" + currentStepConfig.getProcessingClassName() + "':", e);
