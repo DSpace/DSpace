@@ -935,6 +935,29 @@ public class AuthorizeManager
     }
 
     /**
+    * Change all the policies related to the action (fromPolicy) of the
+    * specified object to the new action (toPolicy)
+    * 
+    * @param context
+    * @param dso
+    *            the dspace object
+    * @param fromAction
+    *            the action to change
+    * @param toAction
+    *            the new action to set
+    * @throws SQLException
+    * @throws AuthorizeException
+    */
+	public static void switchPoliciesAction(Context context, DSpaceObject dso, int fromAction, int toAction)
+			throws SQLException, AuthorizeException {
+		List<ResourcePolicy> rps = getPoliciesActionFilter(context, dso, fromAction);
+		for (ResourcePolicy rp : rps) {
+			rp.setAction(toAction);
+			rp.update();
+		}
+	}
+    
+    /**
      * Removes all policies from an eperson for a particular object that belong to
      * an EPerson. FIXME doesn't check authorization
      *

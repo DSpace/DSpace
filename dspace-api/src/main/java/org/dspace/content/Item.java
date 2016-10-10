@@ -1904,8 +1904,14 @@ public class Item extends DSpaceObject
 
         ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "WITHDRAW"));
 
-        // remove all authorization policies, saving the custom ones
-        AuthorizeManager.removeAllPoliciesByDSOAndTypeNotEqualsTo(ourContext, this, ResourcePolicy.TYPE_CUSTOM);
+        // switch all READ authorization policies to WITHDRAWN_READ
+		AuthorizeManager.switchPoliciesAction(ourContext, this, Constants.READ, Constants.WITHDRAWN_READ);
+		for (Bundle bnd : this.getBundles()) {
+			AuthorizeManager.switchPoliciesAction(ourContext, bnd, Constants.READ, Constants.WITHDRAWN_READ);
+			for (Bitstream bs : bnd.getBitstreams()) {
+				AuthorizeManager.switchPoliciesAction(ourContext, bs, Constants.READ, Constants.WITHDRAWN_READ);
+			}
+		}
 
         // Write log
         log.info(LogManager.getHeader(ourContext, "withdraw_item", "user="
@@ -1961,15 +1967,25 @@ public class Item extends DSpaceObject
 
         ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "REINSTATE"));
 
-        // authorization policies
-        if (colls.length > 0)
-        {
-            // FIXME: not multiple inclusion friendly - just apply access
-            // policies from first collection
-            // remove the item's policies and replace them with
-            // the defaults from the collection
-            inheritCollectionDefaultPolicies(colls[0]);
-        }
+        // restore all WITHDRAWN_READ authorization policies back to READ
+		for (Bundle bnd : this.getBundles()) {
+			AuthorizeManager.switchPoliciesAction(ourContext, bnd, Constants.WITHDRAWN_READ, Constants.READ);
+			for (Bitstream bs : bnd.getBitstreams()) {
+				AuthorizeManager.switchPoliciesAction(ourContext, bs, Constants.WITHDRAWN_READ, Constants.READ);
+			}
+		}
+
+		// check if the item was withdrawn before the fix DS-3097
+		if (AuthorizeManager.getPoliciesActionFilter(ourContext, this, Constants.WITHDRAWN_READ).size() != 0) {
+			AuthorizeManager.switchPoliciesAction(ourContext, this, Constants.WITHDRAWN_READ, Constants.READ);
+		} else {
+			// authorization policies
+			if (colls.length > 0) {
+				// remove the item's policies and replace them with
+				// the defaults from the collection
+				adjustItemPolicies(getOwningCollection());
+			}
+		}
 
         // Write log
         log.info(LogManager.getHeader(ourContext, "reinstate_item", "user="
