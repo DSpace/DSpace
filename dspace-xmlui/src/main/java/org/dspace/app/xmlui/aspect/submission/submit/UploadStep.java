@@ -402,7 +402,7 @@ public class UploadStep extends AbstractSubmissionStep
                     java.util.List<SHERPAJournal> journals = shresp.getJournals();
                     java.util.List<SHERPAPublisher> publishers = shresp.getPublishers();
 
-                    if (CollectionUtils.isNotEmpty(journals)) {
+                    if (CollectionUtils.isNotEmpty(journals) && CollectionUtils.isNotEmpty(publishers)) {
                         for (SHERPAJournal journ : journals) {
 
                             List sherpaList = div.addList("sherpaList" + (i + 1), "simple", "sherpaList");
