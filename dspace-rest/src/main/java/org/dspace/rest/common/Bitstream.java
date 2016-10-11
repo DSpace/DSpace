@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.log4j.Logger;
@@ -54,7 +55,7 @@ public class Bitstream extends DSpaceObject {
 
     }
 
-    public Bitstream(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context) throws SQLException{
+    public Bitstream(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context ) throws SQLException{
         super(bitstream, servletContext);
         setup(bitstream, servletContext, expand, context);
     }
