@@ -7,9 +7,11 @@
  */
 package org.dspace.license;
 
-import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -35,6 +37,10 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.license.service.CreativeCommonsService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.jdom.Document;
+import org.jdom.transform.JDOMSource;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -51,9 +57,16 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     /**
      * Some BitStream Names (BSN)
+     * 
+     * @deprecated use the metadata retrieved at {@link CreativeCommonsService#getCCField(String)} (see https://jira.duraspace.org/browse/DS-2604)
      */
+    @Deprecated
     protected static final String BSN_LICENSE_URL = "license_url";
 
+    /**
+     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
+     */
+    @Deprecated
     protected static final String BSN_LICENSE_TEXT = "license_text";
 
     protected static final String BSN_LICENSE_RDF = "license_rdf";
@@ -68,10 +81,12 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     protected BundleService bundleService;
     @Autowired(required = true)
     protected ItemService itemService;
-
+    
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    
     protected CreativeCommonsServiceImpl()
     {
-
+    	
     }
 
     @Override
@@ -79,8 +94,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     {
         // if defined, set a proxy server for http requests to Creative
         // Commons site
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
 
         if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort))
         {
@@ -134,37 +149,6 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         setBitstreamFromBytes(context, item, bundle, BSN_LICENSE_RDF, bs_rdf_format, licenseRdf.getBytes());
     }
     
-    @Override
-    public void setLicense(Context context, Item item,
-            String cc_license_url) throws SQLException, IOException,
-            AuthorizeException
-    {
-        Bundle bundle = getCcBundle(context, item);
-
-        // get some more information
-        String license_text = fetchLicenseText(cc_license_url);
-        String license_rdf = fetchLicenseRDF(cc_license_url);
-        
-        // set the formats
-        BitstreamFormat bs_url_format = bitstreamFormatService.findByShortDescription(
-                context, "License");
-        BitstreamFormat bs_text_format = bitstreamFormatService.findByShortDescription(
-                context, "CC License");
-        BitstreamFormat bs_rdf_format = bitstreamFormatService.findByShortDescription(
-                context, "RDF XML");
-
-        // set the URL bitstream
-        setBitstreamFromBytes(context, item, bundle, BSN_LICENSE_URL, bs_url_format,
-                cc_license_url.getBytes());
-
-        // set the license text bitstream
-        setBitstreamFromBytes(context, item, bundle, BSN_LICENSE_TEXT, bs_text_format,
-                license_text.getBytes());
-
-        // set the RDF bitstream
-        setBitstreamFromBytes(context, item, bundle, BSN_LICENSE_RDF, bs_rdf_format,
-                license_rdf.getBytes());
-    }
 
     @Override
     public void setLicense(Context context, Item item,
@@ -223,8 +207,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         // verify it has correct contents
         try
         {
-            if ((getLicenseURL(context, item) == null) || (getLicenseText(context, item) == null)
-                    || (getLicenseRDF(context, item) == null))
+            if ((getLicenseURL(context, item) == null))
             {
                 return false;
             }
@@ -235,20 +218,6 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         }
 
         return true;
-    }
-
-    @Override
-    public String getLicenseURL(Context context, Item item) throws SQLException,
-            IOException, AuthorizeException
-    {
-        return getStringFromBitstream(context, item, BSN_LICENSE_URL);
-    }
-
-    @Override
-    public String getLicenseText(Context context, Item item) throws SQLException,
-            IOException, AuthorizeException
-    {
-        return getStringFromBitstream(context, item, BSN_LICENSE_TEXT);
     }
 
     @Override
@@ -265,6 +234,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         return getBitstream(item, BSN_LICENSE_RDF);
     }
 
+    @Deprecated
     @Override
     public Bitstream getLicenseTextBitstream(Item item) throws SQLException,
             IOException, AuthorizeException
@@ -273,39 +243,25 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     }
 
     @Override
-    public String fetchLicenseRdf(String ccResult) {
-    	StringWriter result 			= new StringWriter();
-        try {
-    		InputStream inputstream = new ByteArrayInputStream(ccResult.getBytes("UTF-8"));
-    		templates.newTransformer().transform(new StreamSource(inputstream), new StreamResult(result));
-    	} catch (TransformerException te) {
-    		throw new RuntimeException("Transformer exception " + te.getMessage(), te);
-    	} catch (IOException ioe) {
-    		throw new RuntimeException("IOexception " + ioe.getCause().toString(), ioe);
-    	} finally {
-    		return result.getBuffer().toString();
-    	}
-    }
-    
+	public String getLicenseURL(Context context, Item item) throws SQLException, IOException, AuthorizeException {
+		String licenseUri = getCCField("uri").ccItemValue(item);
+		if (StringUtils.isNotBlank(licenseUri)) {
+			return licenseUri;
+		}
+		
+		// JSPUI backward compatibility see https://jira.duraspace.org/browse/DS-2604
+		return getStringFromBitstream(context, item, BSN_LICENSE_URL);
+	}
 
     @Override
-    public String fetchLicenseText(String license_url)
-    {
-        String text_url = license_url;
-        byte[] urlBytes = fetchURL(text_url);
-
-        return (urlBytes != null) ? new String(urlBytes) : "";
-    }
-
-    @Override
-    public String fetchLicenseRDF(String license_url)
+    public String fetchLicenseRDF(Document license)
     {
         StringWriter result = new StringWriter();
         
         try
         {
             templates.newTransformer().transform(
-                    new StreamSource(license_url + "rdf"),
+                    new JDOMSource(license),
                     new StreamResult(result)
                     );
         }
@@ -409,39 +365,31 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     }
 
     /**
-     * Fetch the contents of a URL
-     */
-    protected byte[] fetchURL(String url_string)
-    {
-        try
-        {
-            String line = "";
-            URL url = new URL(url_string);
-            URLConnection connection = url.openConnection();
-            InputStream inputStream = connection.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder sb = new StringBuilder();
-
-            while ((line = reader.readLine()) != null)
-            {
-                sb.append(line);
-            }
-
-            return sb.toString().getBytes();
-        }
-        catch (Exception exc)
-        {
-            log.error(exc.getMessage());
-            return null;
-        }
-    }
-    /**
      * Returns a metadata field handle for given field Id
      */
     @Override
     public LicenseMetadataValue getCCField(String fieldId)
     {
-    	return new LicenseMetadataValue(ConfigurationManager.getProperty("cc.license." + fieldId));
+    	return new LicenseMetadataValue(configurationService.getProperty("cc.license." + fieldId));
     }
     
+    @Override
+	public void removeLicense(Context context, LicenseMetadataValue uriField,
+			LicenseMetadataValue nameField, Item item) throws AuthorizeException, IOException, SQLException {
+		// only remove any previous licenses
+		String licenseUri = uriField.ccItemValue(item);
+		if (licenseUri != null) {
+			uriField.removeItemValue(context, item, licenseUri);
+			if (configurationService.getBooleanProperty("cc.submit.setname"))
+		    {
+		    	String licenseName = nameField.keyedItemValue(item, licenseUri);
+		    	nameField.removeItemValue(context, item, licenseName);
+		    }
+		    if (configurationService.getBooleanProperty("cc.submit.addbitstream"))
+		    {
+		    	removeLicense(context, item);
+		    }
+		}
+	}
+
 }
