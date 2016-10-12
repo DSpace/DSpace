@@ -375,19 +375,21 @@
             <!-- START MAILING LIST-->
             <div class="home-col-2">
                 <h1 class="ds-div-head">Mailing list</h1>
-                <div id="file_news_div_mailing_list" class="ds-static-div primary" style="height: 100px; overflow: hidden;">
-                    <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-                          id="aspect_discovery_SiteViewer_div_front-page-file_news_div_mailing_list"
-                          class="ds-interactive-div primary" action="/subscribe"
-                          style="margin-bottom: 0px;"
-                          onsubmit="return subscribeMailingList(this);">
-                        <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
-                            <xsl:text>Sign up for announcements.</xsl:text>
-                            <label for="file_news_div_mailing_list_input_email" class="accessibly-hidden">Your email address</label>
-                            <input placeholder="Your e-mail" title="Your e-mail" type="text" name="email" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email" />
-                        </p>
+                <div id="file_news_div_mailing_list" class="ds-static-div primary" style="height: 100px;">
+                    <!--This form is modified from the iContact sign-up form for Announcements -->
+                    <form id="ic_signupform" method="POST" action="https://app.icontact.com/icp/core/mycontacts/signup/designer/form/?id=96&amp;cid=1548100&amp;lid=23049">
+                        <p style="margin-bottom: 0px;">Sign up for announcements:</p>
+                        <div class="formEl fieldtype-input required" data-validation-type="1" data-label="Email" style="display: inline-block; width: 100%;">
+                            <input type="text" placeholder="Your e-mail" title="Your e-mail" name="data[email]" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email"/>
+                        </div>
+                        <div class="formEl fieldtype-checkbox required" dataname="listGroups" data-validation-type="1" data-label="Lists" style="display: none;">
+                            <label class="checkbox"><input type="checkbox" alt="" name="data[listGroups][]" value="42588" checked="checked"/>
+                                Dryad-announce
+                            </label>
+                        </div>
                         <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="file_news_div_mailing_list_input_subscribe" />
                     </form>
+                    <img src="//app.icontact.com/icp/core/signup/tracking.gif?id=96&amp;cid=1548100&amp;lid=23049"/>
                 </div>
             </div>
 
