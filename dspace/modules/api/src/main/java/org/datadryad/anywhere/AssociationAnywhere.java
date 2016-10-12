@@ -55,7 +55,7 @@ public class AssociationAnywhere {
         Options options = new Options();
 
         options.addOption("i", "customer id", true, "customer id");
-        options.addOption("p", "data package id", false, "package id");
+        options.addOption("p", "data package DOI", true, "data package DOI, in the form doi:10.5016/dryad.abc123");
         options.addOption("u", "update customer settings", false, "update customer settings");
         options.addOption("t", "tally credit", false, "tally credit");
         options.addOption("l", "list customer", false, "list customer");
