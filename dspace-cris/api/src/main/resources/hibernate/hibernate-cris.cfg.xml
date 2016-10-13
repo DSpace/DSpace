@@ -184,7 +184,9 @@
 		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetPointerPJ" />
 		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetPointerRP" />
 		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetPointerDO" />
-
+		
+		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetEPerson" />
+		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetGroup" />
 
 		<mapping class="org.dspace.app.cris.model.StatSubscription" />
 		<mapping class="org.dspace.app.cris.model.ws.User" />

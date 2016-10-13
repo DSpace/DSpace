@@ -7,11 +7,15 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
+import it.cilea.osd.jdyna.web.ITabService;
 import it.cilea.osd.jdyna.web.TypedAbstractEditTab;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -62,6 +66,22 @@ public class EditTabDynamicObject extends
 	@ManyToOne
 	private DynamicObjectType typeDef;
 	
+    @ElementCollection
+    @CollectionTable(
+          name="cris_do_etab2policysingle",
+          joinColumns=@JoinColumn(name="etab_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedSingle;
+    
+    @ElementCollection
+    @CollectionTable(
+          name="cris_do_etab2policygroup",
+          joinColumns=@JoinColumn(name="etab_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedGroup;
+    
 	public EditTabDynamicObject() {
 		this.visibility = VisibilityTabConstant.ADMIN;
 	}
@@ -107,5 +127,55 @@ public class EditTabDynamicObject extends
     public void setTypeDef(DynamicObjectType typeDef)
     {
         this.typeDef = typeDef;
+    }
+    
+    @Override
+    public List<String> getAuthorizedSingle()
+    {
+        return authorizedSingle;
+    }
+
+    @Override
+    public void setAuthorizedSingle(List<String> authorizedSingle)
+    {
+        this.authorizedSingle = authorizedSingle; 
+    }
+
+    @Override
+    public List<String> getAuthorizedGroup()
+    {
+        return authorizedGroup;
+    }
+
+    @Override
+    public void setAuthorizedGroup(List<String> authorizedGroup)
+    {
+        this.authorizedGroup = authorizedGroup;
+    }
+    
+    @Override
+    public List<String> getMetadataWithPolicySingle(ITabService tabService)
+    {        
+        List<String> results = new ArrayList<String>();
+        for(DynamicPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
+            String shortName = pd.getShortName();
+            if(shortName.startsWith(getTypeDef().getShortName())) {
+                results.add(shortName);
+            }
+        }
+        return results;
+    }
+
+    @Override
+    public List<String> getMetadataWithPolicyGroup(ITabService tabService)
+    {
+        List<String> results = new ArrayList<String>();
+        for(DynamicPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
+            String shortName = pd.getShortName();
+            if(shortName.startsWith(getTypeDef().getShortName())) {
+                results.add(shortName);
+            }
+        }
+        return results;
     }
 }

@@ -7,13 +7,12 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
-import it.cilea.osd.jdyna.model.Containable;
-import it.cilea.osd.jdyna.web.Box;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -24,6 +23,9 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import it.cilea.osd.jdyna.model.Containable;
+import it.cilea.osd.jdyna.web.Box;
 
 @Entity
 @Table(name = "cris_pj_box")
@@ -42,6 +44,22 @@ public class BoxProject extends Box<Containable> {
 	@Cache(usage=CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private List<Containable> mask;
 
+    @ElementCollection
+    @CollectionTable(
+          name="cris_pj_box2policysingle",
+          joinColumns=@JoinColumn(name="box_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedSingle;
+    
+    @ElementCollection
+    @CollectionTable(
+          name="cris_pj_box2policygroup",
+          joinColumns=@JoinColumn(name="box_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedGroup;
+	
 	public BoxProject() {
 		this.visibility = VisibilityTabConstant.ADMIN;
 	}
@@ -62,5 +80,28 @@ public class BoxProject extends Box<Containable> {
 		this.mask = mask;
 	}
 
+    @Override
+    public List<String> getAuthorizedSingle()
+    {
+        return authorizedSingle;
+    }
+
+    @Override
+    public void setAuthorizedSingle(List<String> authorizedSingle)
+    {
+        this.authorizedSingle = authorizedSingle; 
+    }
+
+    @Override
+    public List<String> getAuthorizedGroup()
+    {
+        return authorizedGroup;
+    }
+
+    @Override
+    public void setAuthorizedGroup(List<String> authorizedGroup)
+    {
+        this.authorizedGroup = authorizedGroup;
+    }
 	
 }

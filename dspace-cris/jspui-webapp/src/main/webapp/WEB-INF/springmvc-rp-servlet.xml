@@ -787,6 +787,76 @@
 		<property name="validator" ref="rpDynamicFieldValidator" />
 	</bean>
 	
+	<bean id="editRPEPersonDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetEPerson</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxResearcherPage
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/rp/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>rp</value>
+		</property>
+		<property name="validator" ref="rpDynamicFieldValidator" />
+	</bean>
+	
+	<bean id="editRPGroupDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetGroup</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxResearcherPage
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/rp/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>rp</value>
+		</property>
+		<property name="validator" ref="rpDynamicFieldValidator" />
+	</bean>
+	
 	<bean id="editRPNestedDynamicFieldController" parent="baseFormController"
 		class="org.dspace.app.webui.cris.controller.admin.FormExtendedNestedObjectDefinitionController">
 		<property name="applicationService">
@@ -2236,7 +2306,77 @@
 		</property>
 		<property name="validator" ref="grantDynamicFieldValidator" />
 	</bean>
+
+	<bean id="editProjectEPersonDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetEPerson</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxProject
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/project/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorProjectPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>project</value>
+		</property>
+		<property name="validator" ref="grantDynamicFieldValidator" />
+	</bean>
 	
+	<bean id="editProjectGroupDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetGroup</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxProject
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/project/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorProjectPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>project</value>
+		</property>
+		<property name="validator" ref="grantDynamicFieldValidator" />
+	</bean>
+		
 	<bean id="editProjectPointerRPDynamicFieldController" parent="baseFormController"
 		class="org.dspace.app.webui.cris.controller.admin.FormWidgetPointerDODecoratorPDController">
 		<property name="applicationService">
@@ -3732,7 +3872,77 @@
 		</property>
 		<property name="validator" ref="ouDynamicFieldValidator" />
 	</bean>
+
+	<bean id="editOUEPersonDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetEPerson</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxOrganizationUnit
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/ou/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorOUPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>ou</value>
+		</property>
+		<property name="validator" ref="ouDynamicFieldValidator" />
+	</bean>
 	
+	<bean id="editOUGroupDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetGroup</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxOrganizationUnit
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/ou/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorOUPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>ou</value>
+		</property>
+		<property name="validator" ref="ouDynamicFieldValidator" />
+	</bean>
+		
 	<bean id="editOUPointerRPDynamicFieldController" parent="baseFormController"
 		class="org.dspace.app.webui.cris.controller.admin.FormWidgetPointerDODecoratorPDController">
 		<property name="applicationService">
@@ -5490,7 +5700,80 @@
 		</property>		
 		<property name="validator" ref="doDynamicFieldValidator" />
 	</bean>
+
+	<bean id="editDOEPersonDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetEPerson</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxDynamicObject
+			</value>
+		</constructor-arg>
+		<property name="typoModel">
+			<value>org.dspace.app.cris.model.jdyna.DynamicObjectType</value>
+		</property>		
+		<property name="successView">
+			<value>redirect:/cris/administrator/other/2ndlevel/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorDynamicPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="validator" ref="doDynamicFieldValidator" />
+	</bean>
 	
+	<bean id="editDOGroupDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetGroup</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxDynamicObject
+			</value>
+		</constructor-arg>
+		<property name="typoModel">
+			<value>org.dspace.app.cris.model.jdyna.DynamicObjectType</value>
+		</property>		
+		<property name="successView">
+			<value>redirect:/cris/administrator/other/2ndlevel/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorDynamicPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>project</value>
+		</property>
+		<property name="validator" ref="doDynamicFieldValidator" />
+	</bean>
+		
 	<bean id="deleteDONestedFieldController"
 		class="it.cilea.osd.jdyna.controller.DecoratorATypeNestedController">
 		<constructor-arg index="0">			
@@ -6710,6 +6993,10 @@
 				<prop key="/administrator/rp/editDateDynamicField.htm">editRPDateDynamicFieldController</prop>
 				<prop key="/administrator/rp/createTextDynamicField.htm">editRPTextDynamicFieldController</prop>				
 				<prop key="/administrator/rp/editTextDynamicField.htm">editRPTextDynamicFieldController</prop>
+				<prop key="/administrator/rp/createEPersonDynamicField.htm">editRPEPersonDynamicFieldController</prop>				
+				<prop key="/administrator/rp/editEPersonDynamicField.htm">editRPEPersonDynamicFieldController</prop>
+				<prop key="/administrator/rp/createGroupDynamicField.htm">editRPGroupDynamicFieldController</prop>				
+				<prop key="/administrator/rp/editGroupDynamicField.htm">editRPGroupDynamicFieldController</prop>
 				<prop key="/administrator/rp/createBooleanDynamicField.htm">editRPBooleanDynamicFieldController</prop>
 				<prop key="/administrator/rp/editBooleanDynamicField.htm">editRPBooleanDynamicFieldController</prop>
 				<prop key="/administrator/rp/createClassificationTreeDynamicField.htm">editRPClassificationTreeDynamicFieldController</prop>
@@ -6781,6 +7068,10 @@
 				<prop key="/administrator/project/editDateDynamicField.htm">editProjectDateDynamicFieldController</prop>
 				<prop key="/administrator/project/createTextDynamicField.htm">editProjectTextDynamicFieldController</prop>
 				<prop key="/administrator/project/editTextDynamicField.htm">editProjectTextDynamicFieldController</prop>
+				<prop key="/administrator/project/createEPersonDynamicField.htm">editProjectEPersonDynamicFieldController</prop>				
+				<prop key="/administrator/project/editEPersonDynamicField.htm">editProjectEPersonDynamicFieldController</prop>
+				<prop key="/administrator/project/createGroupDynamicField.htm">editProjectGroupDynamicFieldController</prop>				
+				<prop key="/administrator/project/editGroupDynamicField.htm">editProjectGroupDynamicFieldController</prop>
 				<prop key="/administrator/project/createBooleanDynamicField.htm">editProjectBooleanDynamicFieldController</prop>
 				<prop key="/administrator/project/editBooleanDynamicField.htm">editProjectBooleanDynamicFieldController</prop>
 				<prop key="/administrator/project/createClassificationTreeDynamicField.htm">editProjectClassificationTreeDynamicFieldController</prop>
@@ -6845,6 +7136,10 @@
 				<prop key="/administrator/ou/editDateDynamicField.htm">editOUDateDynamicFieldController</prop>
 				<prop key="/administrator/ou/createTextDynamicField.htm">editOUTextDynamicFieldController</prop>
 				<prop key="/administrator/ou/editTextDynamicField.htm">editOUTextDynamicFieldController</prop>
+				<prop key="/administrator/ou/createEPersonDynamicField.htm">editOUEPersonDynamicFieldController</prop>				
+				<prop key="/administrator/ou/editEPersonDynamicField.htm">editOUEPersonDynamicFieldController</prop>
+				<prop key="/administrator/ou/createGroupDynamicField.htm">editOUGroupDynamicFieldController</prop>				
+				<prop key="/administrator/ou/editGroupDynamicField.htm">editOUGroupDynamicFieldController</prop>				
 				<prop key="/administrator/ou/createBooleanDynamicField.htm">editOUBooleanDynamicFieldController</prop>
 				<prop key="/administrator/ou/editBooleanDynamicField.htm">editOUBooleanDynamicFieldController</prop>
 				<prop key="/administrator/ou/createClassificationTreeDynamicField.htm">editOUClassificationTreeDynamicFieldController</prop>
@@ -6916,6 +7211,10 @@
 				<prop key="/administrator/*/editDateDynamicField.htm">editDODateDynamicFieldController</prop>
 				<prop key="/administrator/*/createTextDynamicField.htm">editDOTextDynamicFieldController</prop>
 				<prop key="/administrator/*/editTextDynamicField.htm">editDOTextDynamicFieldController</prop>
+				<prop key="/administrator/*/createEPersonDynamicField.htm">editDOEPersonDynamicFieldController</prop>				
+				<prop key="/administrator/*/editEPersonDynamicField.htm">editDOEPersonDynamicFieldController</prop>
+				<prop key="/administrator/*/createGroupDynamicField.htm">editDOGroupDynamicFieldController</prop>				
+				<prop key="/administrator/*/editGroupDynamicField.htm">editDOGroupDynamicFieldController</prop>
 				<prop key="/administrator/*/createBooleanDynamicField.htm">editDOBooleanDynamicFieldController</prop>
 				<prop key="/administrator/*/editBooleanDynamicField.htm">editDOBooleanDynamicFieldController</prop>
 				<prop key="/administrator/*/createClassificationTreeDynamicField.htm">editDOClassificationTreeDynamicFieldController</prop>

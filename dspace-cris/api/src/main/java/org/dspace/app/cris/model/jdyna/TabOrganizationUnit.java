@@ -8,10 +8,14 @@
 package org.dspace.app.cris.model.jdyna;
 
 import it.cilea.osd.jdyna.web.AbstractTab;
+import it.cilea.osd.jdyna.web.ITabService;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -49,6 +53,22 @@ public class TabOrganizationUnit extends AbstractTab<BoxOrganizationUnit>
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<BoxOrganizationUnit> mask;
 
+    @ElementCollection
+    @CollectionTable(
+          name="cris_ou_tab2policysingle",
+          joinColumns=@JoinColumn(name="tab_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedSingle;
+    
+    @ElementCollection
+    @CollectionTable(
+          name="cris_ou_tab2policygroup",
+          joinColumns=@JoinColumn(name="tab_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedGroup;
+    
     public TabOrganizationUnit()
     {
         this.visibility = VisibilityTabConstant.ADMIN;
@@ -73,5 +93,49 @@ public class TabOrganizationUnit extends AbstractTab<BoxOrganizationUnit>
     public String getFileSystemPath()
     {
         return ConfigurationManager.getProperty(CrisConstants.CFG_MODULE,"organizationunit.file.path");
+    }
+
+    @Override
+    public List<String> getAuthorizedSingle()
+    {
+        return authorizedSingle;
+    }
+
+    @Override
+    public void setAuthorizedSingle(List<String> authorizedSingle)
+    {
+        this.authorizedSingle = authorizedSingle; 
+    }
+
+    @Override
+    public List<String> getAuthorizedGroup()
+    {
+        return authorizedGroup;
+    }
+
+    @Override
+    public void setAuthorizedGroup(List<String> authorizedGroup)
+    {
+        this.authorizedGroup = authorizedGroup;
+    }
+
+    @Override
+    public List<String> getMetadataWithPolicySingle(ITabService tabService)
+    {        
+        List<String> results = new ArrayList<String>();
+        for(OUPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicySingle(OUPropertiesDefinition.class)) {
+            results.add(pd.getShortName());
+        }
+        return results;
+    }
+
+    @Override
+    public List<String> getMetadataWithPolicyGroup(ITabService tabService)
+    {
+        List<String> results = new ArrayList<String>();
+        for(OUPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicyGroup(OUPropertiesDefinition.class)) {
+            results.add(pd.getShortName());
+        }
+        return results;
     }
 }

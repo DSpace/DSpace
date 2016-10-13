@@ -513,7 +513,41 @@
 						</fieldset>											
 					</c:when>
 					<c:otherwise>
+					<c:choose>
+					<c:when test="${propertiesdefinition.rendering.triview eq 'eperson'}">
+						<fieldset>
+						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.widget.eperson" /></legend>
+							
+						<dyna:text propertyPath="real.rendering.groupName"  visibility="false"
+							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.eperson.groupName" helpKey="help.jdyna.message.rendering.eperson.groupName"/>
+																			
+						<div class="dynaClear">
+							&nbsp;
+						</div>						
+						
+						</fieldset>											
+					</c:when>
+					<c:otherwise>
+					<c:choose>
+					<c:when test="${propertiesdefinition.rendering.triview eq 'group'}">
+						<fieldset>
+						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.widget.group" /></legend>
+					
+						<dyna:text propertyPath="real.rendering.regex"  visibility="false"
+							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.group.regex" helpKey="help.jdyna.message.rendering.group.regex"/>
+																			
+						<div class="dynaClear">
+							&nbsp;
+						</div>						
+						
+						</fieldset>											
+					</c:when>
+					<c:otherwise>
 						<%-- nothing --%>
+					</c:otherwise>
+					</c:choose>
+					</c:otherwise>
+					</c:choose>
 					</c:otherwise>
 					</c:choose>					
 					</c:otherwise>

@@ -7,14 +7,12 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
-import it.cilea.osd.jdyna.model.Containable;
-import it.cilea.osd.jdyna.web.Box;
-import it.cilea.osd.jdyna.web.TypedBox;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -24,6 +22,9 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import it.cilea.osd.jdyna.model.Containable;
+import it.cilea.osd.jdyna.web.TypedBox;
 
 @Entity
 @Table(name = "cris_do_box")
@@ -47,6 +48,22 @@ public class BoxDynamicObject extends TypedBox<Containable, DynamicObjectType, D
     @ManyToOne
     private DynamicObjectType typeDef;
 
+    @ElementCollection
+    @CollectionTable(
+          name="cris_do_box2policysingle",
+          joinColumns=@JoinColumn(name="box_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedSingle;
+    
+    @ElementCollection
+    @CollectionTable(
+          name="cris_do_box2policygroup",
+          joinColumns=@JoinColumn(name="box_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedGroup;
+    
     public BoxDynamicObject()
     {
         setVisibility(VisibilityTabConstant.ADMIN);
@@ -82,6 +99,29 @@ public class BoxDynamicObject extends TypedBox<Containable, DynamicObjectType, D
         this.typeDef = typeDef;
     }
 
-  
+
+    @Override
+    public List<String> getAuthorizedSingle()
+    {
+        return authorizedSingle;
+    }
+
+    @Override
+    public void setAuthorizedSingle(List<String> authorizedSingle)
+    {
+        this.authorizedSingle = authorizedSingle; 
+    }
+
+    @Override
+    public List<String> getAuthorizedGroup()
+    {
+        return authorizedGroup;
+    }
+
+    @Override
+    public void setAuthorizedGroup(List<String> authorizedGroup)
+    {
+        this.authorizedGroup = authorizedGroup;
+    }  
 
 }

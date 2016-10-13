@@ -20,7 +20,29 @@
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@page import="java.net.URL"%>
 <%@page import="org.dspace.app.cris.model.jdyna.VisibilityTabConstant"%>
-
+<c:set var="dspace.layout.head.last" scope="request">
+    <link href="<%= request.getContextPath() %>/css/select2/select2.css" type="text/css" rel="stylesheet" />
+    <link href="<%= request.getContextPath() %>/css/select2/select2-bootstrap.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/select2/select2.min.js"></script>
+	<script type="text/javascript">
+	<!--
+	jQuery(document).ready(function(){
+		jQuery(".policydropdown").select2({"dropdownAutoWidth": true});
+		
+	    jQuery('#visibility').click(function(){
+	        if(jQuery(this).attr("value")=="<%= VisibilityTabConstant.POLICY %>"){
+	            jQuery("#chooserpolicymetadata").show();
+	            
+	        }
+	        else {
+	        	jQuery("#chooserpolicymetadata").hide();
+	        	
+	        }
+	    });
+	});
+	-->
+	</script>
+</c:set>
 <dspace:layout locbar="link" style="submission" navbar="admin"
 	titlekey="jsp.dspace-admin.researchers-list">
 <h1><fmt:message key="jsp.dspace-admin.edit-box" />
@@ -163,10 +185,57 @@
 			</div>
 			</div>
 		</spring:bind>
+
+		<div id="chooserpolicymetadata" style="display: none;">
+		<spring:bind path="authorizedSingle">
+			<c:set var="inputValue">
+				<c:out value="${status.value}" escapeXml="true"></c:out>
+			</c:set>
+			<c:set var="inputName">
+				<c:out value="${status.expression}" escapeXml="false"></c:out>
+			</c:set>
+
+			<div class="dynaField"><span class="dynaLabel"><label for="${inputName}"><fmt:message
+				key="jsp.layout.hku.label.authorized.eperson" /></label></span>
+
+			<div class="dynaFieldValue">
+				<select class="policydropdown" id="${inputName}" name="${inputName}">
+					<c:if test="${!empty metadataWithPolicySingle}">
+					    <c:forEach var="option" items="${metadataWithPolicySingle}" varStatus="loop">	    	
+				            <option value="${option}"<c:if test="${!empty inputValue && option eq inputValue}"> selected="selected"</c:if>>${option}</option>     	
+				        </c:forEach>        
+				    </c:if>
+				</select>
+			</div>
+			</div>
+		</spring:bind>
+		
+		<spring:bind path="authorizedGroup">
+			<c:set var="inputValue">
+				<c:out value="${status.value}" escapeXml="true"></c:out>
+			</c:set>
+			<c:set var="inputName">
+				<c:out value="${status.expression}" escapeXml="false"></c:out>
+			</c:set>
+
+			<div class="dynaField"><span class="dynaLabel"><label for="${inputName}"><fmt:message
+				key="jsp.layout.hku.label.authorized.group" /></label></span>
+
+			<div class="dynaFieldValue">
+				<select class="policydropdown" id="${inputName}" name="${inputName}">
+					<c:if test="${!empty metadataWithPolicyGroup}">
+					    <c:forEach var="option" items="${metadataWithPolicyGroup}" varStatus="loop">	    	
+				            <option value="${option}"<c:if test="${!empty inputValue && option eq inputValue}"> selected="selected"</c:if>>${option}</option>     	
+				        </c:forEach>        
+				    </c:if>
+				</select>
+			</div>
+			</div>
+		</spring:bind>
+		</div>
 		<div class="dynaClear">
 			&nbsp;
 		</div>
-		
 		<dyna:text propertyPath="box.externalJSP"  helpKey="help.jdyna.message.box.externalJSP"
 			labelKey="jdyna.message.box.externalJSP" visibility="false"/>
 		<div class="dynaClear">
@@ -225,6 +294,12 @@
 					<c:if test="${boxed.real.rendering.triview == 'checkradio'}">
 						<c:set var="controller" value="CheckRadio" />
 					</c:if>
+					<c:if test="${boxed.real.rendering.triview == 'eperson'}">
+						<c:set var="controller" value="EPerson" />
+					</c:if>
+					<c:if test="${boxed.real.rendering.triview == 'group'}">
+						<c:set var="controller" value="Group" />
+					</c:if>					
 					<c:if test="${boxed.real.rendering.triview == 'pointer'}">
 						<c:set var="controller" value="${boxed.real.rendering.valoreClass.simpleName}" />
 					</c:if>
@@ -485,6 +560,16 @@
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createClassificationTreeDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newclassificationtreedynamicfield" />
+			</a></li><li>
+			<a 
+				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createEPersonDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
+			<fmt:message
+				key="jsp.dspace-admin.hku.jdyna-configuration.newepersonwidget" />
+			</a></li><li>
+			<a 
+				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createGroupDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
+			<fmt:message
+				key="jsp.dspace-admin.hku.jdyna-configuration.newgroupwidget" />
 			</a></li>
         
       	</ul>

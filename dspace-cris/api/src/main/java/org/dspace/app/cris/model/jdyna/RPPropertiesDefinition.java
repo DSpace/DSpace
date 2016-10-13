@@ -25,6 +25,8 @@ import javax.persistence.Transient;
     @NamedQuery(name = "RPPropertiesDefinition.uniqueIdByShortName", query = "select id from RPPropertiesDefinition where shortName = ?", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") }),
     @NamedQuery(name = "RPPropertiesDefinition.uniqueByShortName", query = "from RPPropertiesDefinition where shortName = ?", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") }),
     @NamedQuery(name = "RPPropertiesDefinition.findValoriDaMostrare", query = "from RPPropertiesDefinition where showInList = true", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") }),
+    @NamedQuery(name = "RPPropertiesDefinition.findAllWithPolicySingle", query = "from RPPropertiesDefinition where rendering in (from WidgetEPerson)"),
+    @NamedQuery(name = "RPPropertiesDefinition.findAllWithPolicyGroup", query = "from RPPropertiesDefinition where rendering in (from WidgetGroup)"),
     @NamedQuery(name = "RPPropertiesDefinition.likeByShortName", query = "from RPPropertiesDefinition where shortName LIKE :par0", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") })
 })
 public class RPPropertiesDefinition extends PropertiesDefinition {

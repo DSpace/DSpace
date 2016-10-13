@@ -14,7 +14,9 @@ import javax.persistence.Table;
 
 import org.dspace.app.cris.model.jdyna.editor.DSpaceObjectPropertyEditor;
 import org.dspace.app.cris.model.jdyna.value.EPersonValue;
+import org.dspace.app.cris.model.jdyna.value.GroupValue;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 import it.cilea.osd.jdyna.editor.AdvancedPropertyEditorSupport;
 import it.cilea.osd.jdyna.model.AWidget;
@@ -22,23 +24,23 @@ import it.cilea.osd.jdyna.service.IPersistenceDynaService;
 import it.cilea.osd.jdyna.util.ValidationMessage;
 
 @Entity
-@Table(name = "cris_weperson")
-public class WidgetEPerson extends AWidget<EPersonValue>
+@Table(name = "cris_wgroup")
+public class WidgetGroup extends AWidget<GroupValue>
 {
-    
-    private String groupName;
+
+    private String regex;
     
     @Override
     public String getTriview()
     {
-        return "eperson";
+        return "group";
     }
 
     @Override
-    public EPersonValue getInstanceValore()
+    public GroupValue getInstanceValore()
     {
         try {
-            EPersonValue pointer = getValoreClass().newInstance();
+            GroupValue pointer = getValoreClass().newInstance();
             return pointer;
         } catch (Exception e) {
             log.error(e);
@@ -50,14 +52,14 @@ public class WidgetEPerson extends AWidget<EPersonValue>
     public PropertyEditor getPropertyEditor(
             IPersistenceDynaService applicationService)
     {
-        DSpaceObjectPropertyEditor pe = new DSpaceObjectPropertyEditor(EPerson.class, AdvancedPropertyEditorSupport.MODE_VIEW);
+        DSpaceObjectPropertyEditor pe = new DSpaceObjectPropertyEditor(Group.class, AdvancedPropertyEditorSupport.MODE_VIEW);
         return pe;
     }
 
     @Override
-    public Class<EPersonValue> getValoreClass()
+    public Class<GroupValue> getValoreClass()
     {
-       return EPersonValue.class;
+       return GroupValue.class;
     }
 
     @Override
@@ -66,14 +68,14 @@ public class WidgetEPerson extends AWidget<EPersonValue>
         return null;
     }
 
-    public String getGroupName()
+    public String getRegex()
     {
-        return groupName;
+        return regex;
     }
 
-    public void setGroupName(String groupName)
+    public void setRegex(String regex)
     {
-        this.groupName = groupName;
+        this.regex = regex;
     }
 
 }
