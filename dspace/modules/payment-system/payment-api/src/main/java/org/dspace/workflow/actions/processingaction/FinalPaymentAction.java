@@ -57,6 +57,11 @@ public class FinalPaymentAction extends ProcessingAction {
         try {
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(c, itemID);
+            // if cart is marked as completed, don't process this again
+            if (shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
+                log.info("no additional payment processed for item " + itemID + ", cart already marked as complete");
+                return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+            }
 
             // if fee waiver is in place, transaction is paid
             if (shoppingCart.getCountry() != null && shoppingCart.getCountry().length() > 0) {
