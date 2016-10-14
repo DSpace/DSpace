@@ -435,6 +435,7 @@
 			
 			activeTab();
 			activePointer();
+			activeCustomPointer();
 			activeTree();
 			
 		});
@@ -690,7 +691,7 @@
 			}
         }
 		
-		var activeEPersonPointer = function() {
+		var activeCustomPointer = function() {
  			
 			 j(".custompointerinfo").each(function(){
 				 var id = j(this).html();
@@ -715,7 +716,7 @@
 		                        response( j.map( data.pointers, function( item ) {
 		                            return {
 		                                label: item.display,
-		                                value: item.id
+		                                identifier: item.identifyingValue
 		                            }
 		                        }));
 		                    }
@@ -725,7 +726,7 @@
 		            select: function( event, ui ) {
 		            	if (ui == null || ui.item == null) return false;
 		            	updateSelectedCustomPointer( id, j('#custompointer_'+id+'_tot').html(), repeatable, 
-		                		ui.item.label, ui.item.value);
+		                		ui.item.label, ui.item.identifier);
 		            	j('#searchboxcustompointer_'+id).val('');
 		            	return false;
 		            },

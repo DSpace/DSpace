@@ -514,7 +514,7 @@
 					</c:when>
 					<c:otherwise>
 					<c:choose>
-					<c:when test="${propertiesdefinition.rendering.triview eq 'eperson'}">
+					<c:when test="${propertiesdefinition.rendering.type == 7}">
 						<fieldset>
 						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.widget.eperson" /></legend>
 							
@@ -529,7 +529,7 @@
 					</c:when>
 					<c:otherwise>
 					<c:choose>
-					<c:when test="${propertiesdefinition.rendering.triview eq 'group'}">
+					<c:when test="${propertiesdefinition.rendering.type == 6}">
  						<fieldset>
 						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.widget.group" /></legend>
 					

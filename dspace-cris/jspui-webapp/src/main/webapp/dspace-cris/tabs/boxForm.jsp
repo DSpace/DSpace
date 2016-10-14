@@ -295,11 +295,13 @@
 					<c:if test="${boxed.real.rendering.triview == 'checkradio'}">
 						<c:set var="controller" value="CheckRadio" />
 					</c:if>
-					<c:if test="${boxed.real.rendering.triview == 'eperson'}">
-						<c:set var="controller" value="EPerson" />
-					</c:if>
-					<c:if test="${boxed.real.rendering.triview == 'group'}">
-						<c:set var="controller" value="Group" />
+					<c:if test="${boxed.real.rendering.triview == 'custompointer'}">
+						<c:if test="${boxed.real.rendering.type == 7}">
+							<c:set var="controller" value="EPerson" />
+						</c:if>
+						<c:if test="${boxed.real.rendering.type == 6}">
+							<c:set var="controller" value="Group" />
+						</c:if>
 					</c:if>					
 					<c:if test="${boxed.real.rendering.triview == 'pointer'}">
 						<c:set var="controller" value="${boxed.real.rendering.valoreClass.simpleName}" />
@@ -414,6 +416,14 @@
 					</c:if>
 					<c:if test="${boxed.real.rendering.triview == 'pointer'}">
 						<c:set var="controller" value="${boxed.real.rendering.valoreClass.simpleName}" />
+					</c:if>
+					<c:if test="${boxed.real.rendering.triview == 'custompointer'}">
+						<c:if test="${boxed.real.rendering.type == 7}">
+							<c:set var="controller" value="EPerson" />
+						</c:if>
+						<c:if test="${boxed.real.rendering.type == 6}">
+							<c:set var="controller" value="Group" />
+						</c:if>
 					</c:if>
 					<a class="jdynaremovebutton"
 						title="<fmt:message

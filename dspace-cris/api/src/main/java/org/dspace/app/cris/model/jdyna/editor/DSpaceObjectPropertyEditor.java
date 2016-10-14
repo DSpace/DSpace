@@ -24,6 +24,7 @@ public class DSpaceObjectPropertyEditor extends AdvancedPropertyEditorSupport
 
     /** Model Class */
     private Class clazz;
+
     private Integer type;
 
     /** The logger */
@@ -35,14 +36,13 @@ public class DSpaceObjectPropertyEditor extends AdvancedPropertyEditorSupport
         this.clazz = model;
         setMode(service);
     }
-    
+
     public DSpaceObjectPropertyEditor(Integer type, Class model, String service)
     {
         this.type = type;
         this.clazz = model;
         setMode(service);
     }
-
 
     @Override
     public void setAsText(String text) throws IllegalArgumentException
@@ -89,12 +89,13 @@ public class DSpaceObjectPropertyEditor extends AdvancedPropertyEditorSupport
             try
             {
                 context = getContext();
-                displayValue = DSpaceObject.find(context, type,
-                        valore).getName();
+                displayValue = DSpaceObject.find(context, type, valore)
+                        .getName();
             }
             catch (Exception ex)
             {
-                log.debug("error DSpaceObjectPropertyEditor - getAsText" + ex.getMessage());
+                log.debug("error DSpaceObjectPropertyEditor - getAsText"
+                        + ex.getMessage());
             }
             finally
             {
@@ -103,9 +104,47 @@ public class DSpaceObjectPropertyEditor extends AdvancedPropertyEditorSupport
                     context.abort();
                 }
             }
-            return valore == null ? "" : "[ID=" + valore+ "]" + displayValue;
+            return valore == null ? "" : "[ID=" + valore + "]" + displayValue;
         }
         return (valore == null ? "" : "" + valore);
     }
 
+    @Override
+    public void setValue(Object value)
+    {
+        if (value != null && value instanceof String)
+        {
+            super.setValue(Integer.parseInt((String) value));
+        }
+        else
+        {
+            super.setValue(value);
+        }
+    }
+
+    public String getCustomText()
+    {
+        Integer valore = (Integer) getValue();
+        String displayValue = "";
+        Context context = null;
+        try
+        {
+            context = getContext();
+            displayValue = DSpaceObject.find(context, type, valore).getName();
+        }
+        catch (Exception ex)
+        {
+            log.debug("error DSpaceObjectPropertyEditor - getAsText"
+                    + ex.getMessage());
+        }
+        finally
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+        }
+        return valore == null ? "" : displayValue;
+
+    }
 }
