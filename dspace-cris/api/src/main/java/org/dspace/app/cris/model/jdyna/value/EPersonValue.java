@@ -9,46 +9,55 @@ package org.dspace.app.cris.model.jdyna.value;
 
 import java.sql.SQLException;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import it.cilea.osd.jdyna.model.AValue;
 
 @Entity
 @DiscriminatorValue(value="eperson")
-public class EPersonValue extends AValue<EPerson>
+public class EPersonValue extends AValue<Integer>
 {
 
-    @ManyToOne
-    @LazyCollection(LazyCollectionOption.TRUE)
-    @JoinColumn(name="eperson")
-    private EPerson real;
+    @Basic
+    @Column(name="customPointer")
+    private Integer real;
 
     @Override
-    public EPerson getObject()
+    public Integer getObject()
     {
         return real;
     }
 
     @Override
-    protected void setReal(EPerson oggetto)
+    protected void setReal(Integer oggetto)
     {
         this.real = oggetto;
         if(oggetto != null) {
-            sortValue = real.getFullName().toLowerCase();
+            Context context = null;
+            try {
+                context = new Context();
+                sortValue = EPerson.find(context, oggetto).getFullName().toLowerCase();
+            }
+            catch(Exception ex) {
+                log.error(ex.getMessage(), ex);
+            }
+            finally {
+                if(context!=null) {
+                    context.abort();
+                }
+            }
         }   
     }
 
     @Override
-    public EPerson getDefaultValue()
+    public Integer getDefaultValue()
     {
         Context context = null;
         EPerson eperson = null;
@@ -60,21 +69,21 @@ public class EPersonValue extends AValue<EPerson>
         }
         catch (SQLException | AuthorizeException e)
         {
-           //NONE
+            //NONE
         }
         finally {            
             if(context!=null && context.isValid()) {
                 context.abort();
             }
         }
-        return eperson;
+        return eperson.getID();
     }
 
     @Override
     public String[] getUntokenizedValue()
     {
         return getObject() != null?
-                new String[]{String.valueOf(((EPerson)getObject()).getID())}:null;
+                new String[]{String.valueOf((getObject()))}:null;
     }
 
     @Override

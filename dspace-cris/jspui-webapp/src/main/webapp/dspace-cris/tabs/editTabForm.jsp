@@ -111,7 +111,7 @@
 				key="jsp.layout.hku.label.visibility" /></label></span>
 
 			<div class="dynaFieldValue">
-			<c:forEach items="<%= VisibilityTabConstant.getValues() %>" var="item">
+			<c:forEach items="<%= VisibilityTabConstant.getEditValues() %>" var="item">
 				<input ${disabled} id="${inputName}" name="${inputName}"
 					type="radio" value="${item}"
 					<c:if test="${inputValue==item}">checked="checked"</c:if> />

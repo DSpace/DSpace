@@ -143,7 +143,9 @@
 		<mapping class="it.cilea.osd.jdyna.value.FileValue" />
 		<mapping class="it.cilea.osd.jdyna.value.NumberValue" />
 		<mapping class="it.cilea.osd.jdyna.value.BooleanValue" />
-
+		<mapping class="org.dspace.app.cris.model.jdyna.value.EPersonValue" />
+		<mapping class="org.dspace.app.cris.model.jdyna.value.GroupValue" />
+				
 		<mapping class="org.dspace.app.cris.model.jdyna.value.RPPointer" />
 
 		<mapping class="org.dspace.app.cris.model.jdyna.value.ProjectPointer" />
@@ -160,6 +162,7 @@
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetDate" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetFile" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetPointer" />
+		<mapping class="it.cilea.osd.jdyna.widget.WidgetCustomPointer" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetNumero" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetBoolean" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetCheckRadio" />

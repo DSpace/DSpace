@@ -518,29 +518,29 @@
 						<fieldset>
 						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.widget.eperson" /></legend>
 							
-						<dyna:text propertyPath="real.rendering.groupName"  visibility="false"
+<%-- 						<dyna:text propertyPath="real.rendering.groupName"  visibility="false"
 							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.eperson.groupName" helpKey="help.jdyna.message.rendering.eperson.groupName"/>
 																			
 						<div class="dynaClear">
 							&nbsp;
-						</div>						
+						</div>				 --%>		
 						
 						</fieldset>											
 					</c:when>
 					<c:otherwise>
 					<c:choose>
 					<c:when test="${propertiesdefinition.rendering.triview eq 'group'}">
-						<fieldset>
+ 						<fieldset>
 						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.widget.group" /></legend>
 					
-						<dyna:text propertyPath="real.rendering.regex"  visibility="false"
+<%-- 						<dyna:text propertyPath="real.rendering.regex"  visibility="false"
 							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.group.regex" helpKey="help.jdyna.message.rendering.group.regex"/>
 																			
 						<div class="dynaClear">
 							&nbsp;
-						</div>						
+						</div>		 --%>				
 						
-						</fieldset>											
+						</fieldset>									
 					</c:when>
 					<c:otherwise>
 						<%-- nothing --%>

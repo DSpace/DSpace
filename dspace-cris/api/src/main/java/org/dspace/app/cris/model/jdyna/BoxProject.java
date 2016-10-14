@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import it.cilea.osd.jdyna.model.Containable;
 import it.cilea.osd.jdyna.web.Box;
+import it.cilea.osd.jdyna.web.ITabService;
 
 @Entity
 @Table(name = "cris_pj_box")
@@ -104,4 +106,23 @@ public class BoxProject extends Box<Containable> {
         this.authorizedGroup = authorizedGroup;
     }
 	
+    @Override
+    public List<String> getMetadataWithPolicySingle(ITabService tabService)
+    {        
+        List<String> results = new ArrayList<String>();
+        for(ProjectPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicySingle(ProjectPropertiesDefinition.class)) {
+            results.add(pd.getShortName());
+        }
+        return results;
+    }
+
+    @Override
+    public List<String> getMetadataWithPolicyGroup(ITabService tabService)
+    {
+        List<String> results = new ArrayList<String>();
+        for(ProjectPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicyGroup(ProjectPropertiesDefinition.class)) {
+            results.add(pd.getShortName());
+        }
+        return results;
+    }
 }

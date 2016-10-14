@@ -7,13 +7,16 @@
  */
 package org.dspace.app.webui.cris.validator;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
+import org.springframework.validation.Errors;
+
 import it.cilea.osd.common.validation.BaseValidator;
 import it.cilea.osd.jdyna.service.ValidatorService.ValidationResult;
 import it.cilea.osd.jdyna.web.Tab;
-
-import java.util.List;
-
-import org.springframework.validation.Errors;
 
 public class TabValidator extends BaseValidator {
 	
@@ -54,6 +57,23 @@ public class TabValidator extends BaseValidator {
 		} else {
 			errors.rejectValue("shortName",
 					"error.message.validation.shortname.pattern");
+		}
+		
+		if(VisibilityTabConstant.POLICY == metadato.getVisibility()) {
+		    boolean authS = false;
+		    boolean authG = false;
+		    metadato.getAuthorizedSingle().removeAll(Collections.singleton(null));
+		    if(CollectionUtils.isEmpty(metadato.getAuthorizedSingle())) {
+		        authS = true;
+		    }
+	        metadato.getAuthorizedGroup().removeAll(Collections.singleton(null));
+	        if(CollectionUtils.isEmpty(metadato.getAuthorizedGroup())) {
+		        authG = true;
+		    }
+		    if(authS && authG) {
+                errors.rejectValue("visibility",
+                        "error.message.validation.policy.mandatory");
+		    }
 		}
 	}
 

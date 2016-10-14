@@ -85,7 +85,7 @@
 		
 		<spring:bind path="tab.*">
 		<c:if test="${not empty status.errorMessages}">
-			<div class="error"><c:forEach var="error"
+			<div class="alert alert-danger"><c:forEach var="error"
 				items="${status.errorMessages}">
 	               ${error}<br />
 			</c:forEach></div>
@@ -93,7 +93,7 @@
 		</spring:bind>
 
 		<c:if test="${not empty status.errorMessages}">
-		<div class="error"><c:forEach var="error"
+		<div class="alert alert-danger"><c:forEach var="error"
 			items="${status.errorMessages}">
                  ${error}<br />
 		</c:forEach></div>
@@ -162,7 +162,7 @@
 				key="jsp.layout.hku.label.authorized.eperson" /></label></span>
 
 			<div class="dynaFieldValue">
-				<select class="policydropdown" id="${inputName}" name="${inputName}">
+				<select class="form-control policydropdown" id="${inputName}" name="${inputName}">
 					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.eperson.select" /></option>
 					<c:if test="${!empty metadataWithPolicySingle}">
 					    <c:forEach var="option" items="${metadataWithPolicySingle}" varStatus="loop">	    	
@@ -186,7 +186,7 @@
 				key="jsp.layout.hku.label.authorized.group" /></label></span>
 
 			<div class="dynaFieldValue">
-				<select class="policydropdown" id="${inputName}" name="${inputName}">
+				<select class="form-control policydropdown" id="${inputName}" name="${inputName}">
 					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.group.select" /></option>
 					<c:if test="${!empty metadataWithPolicyGroup}">
 					    <c:forEach var="option" items="${metadataWithPolicyGroup}" varStatus="loop">	    	
@@ -315,18 +315,18 @@
 		</fieldset>
 
 
-		<input type="submit"
+		<input type="submit" class="btn btn-primary pull-right"
 			value="<fmt:message key="jsp.layout.hku.researcher.button.save" />" />
 
 	</form:form>
 	<c:if test="${!empty tab.id}">
-	<div style="padding: 0; margin: 0 10px;"><a
+	<div style="padding: 0; margin: 0 10px;"><a class="btn btn-default pull-right"
 		href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createBox.htm?tabId=${tab.id}">
 	<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.newbox" />
 	</a></div>
 	</c:if>
 	<c:if test="${!empty edittabid}">
-	<div style="padding: 0; margin: 0 10px;"><a
+	<div style="padding: 0; margin: 0 10px;"><a class="btn btn-default pull-right"
 		href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/editEditTabs.htm?id=${edittabid}">
 	<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.tabtoedit" />
 	</a></div>

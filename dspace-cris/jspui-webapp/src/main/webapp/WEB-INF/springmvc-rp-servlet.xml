@@ -5122,6 +5122,60 @@
 		</property>		
 	</bean>
 
+	<bean id="searchRPCustomPointer"
+		class="org.dspace.app.webui.cris.controller.jdyna.CrisSearchCustomPointerController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<property name="clazzPD">
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition</value>
+		</property>				
+		<property name="viewName">
+			<value>resultSearchPointer</value>
+		</property>		
+	</bean>
+		
+	<bean id="searchProjectCustomPointer"
+		class="org.dspace.app.webui.cris.controller.jdyna.CrisSearchCustomPointerController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<property name="clazzPD">
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
+			</value>
+		</property>				
+		<property name="viewName">
+			<value>resultSearchPointer</value>
+		</property>		
+	</bean>
+	
+	<bean id="searchOUCustomPointer"
+		class="org.dspace.app.webui.cris.controller.jdyna.CrisSearchCustomPointerController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<property name="clazzPD">
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition</value>
+		</property>				
+		<property name="viewName">
+			<value>resultSearchPointer</value>
+		</property>		
+	</bean>
+	
+	<bean id="searchDOCustomPointer"
+		class="org.dspace.app.webui.cris.controller.jdyna.CrisSearchCustomPointerController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<property name="clazzPD">
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition</value>
+		</property>				
+		<property name="viewName">
+			<value>resultSearchPointer</value>
+		</property>		
+	</bean>
+
+
 	<bean id="buildClassificationTree"
 		class="org.dspace.app.webui.cris.controller.jdyna.CrisClassificationTreeController">
 		<property name="applicationService">
@@ -6914,6 +6968,12 @@
 				<prop key="/tools/project/searchPointer.htm">searchProjectPointer</prop>
 				<prop key="/tools/ou/searchPointer.htm">searchOUPointer</prop>
 				<prop key="/tools/*/searchPointer.htm">searchDOPointer</prop>
+				
+				<!-- autocomplete custom pointer -->
+				<prop key="/tools/rp/searchCustomPointer.htm">searchRPCustomPointer</prop>
+				<prop key="/tools/project/searchCustomPointer.htm">searchProjectCustomPointer</prop>
+				<prop key="/tools/ou/searchCustomPointer.htm">searchOUCustomPointer</prop>
+				<prop key="/tools/*/searchCustomPointer.htm">searchDOCustomPointer</prop>
 				
 				<!-- show dialog classification tree -->
 				<prop key="/tools/*/buildClassificationTree.htm">buildClassificationTree</prop>

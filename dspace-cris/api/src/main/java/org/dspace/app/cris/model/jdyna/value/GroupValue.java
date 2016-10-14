@@ -9,6 +9,8 @@ package org.dspace.app.cris.model.jdyna.value;
 
 import java.sql.SQLException;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -25,38 +27,49 @@ import it.cilea.osd.jdyna.model.AValue;
 
 @Entity
 @DiscriminatorValue(value="group")
-public class GroupValue extends AValue<Group>
+public class GroupValue extends AValue<Integer>
 {
 
-    @ManyToOne
-    @LazyCollection(LazyCollectionOption.TRUE)
-    @JoinColumn(name="group")
-    private Group real;
+    @Basic
+    @Column(name="customPointer")
+    private Integer real;
 
     @Override
-    public Group getObject()
+    public Integer getObject()
     {
         return real;
     }
 
     @Override
-    protected void setReal(Group oggetto)
+    protected void setReal(Integer oggetto)
     {
         this.real = oggetto;
         if(oggetto != null) {
-            sortValue = real.getName().toLowerCase();
+            Context context = null;
+            try {
+                context = new Context();
+                sortValue = Group.find(context, oggetto).getName().toLowerCase();
+            }
+            catch(Exception ex) {
+                log.error(ex.getMessage(), ex);
+            }
+            finally {
+                if(context!=null) {
+                    context.abort();
+                }
+            }
         }   
     }
 
     @Override
-    public Group getDefaultValue()
+    public Integer getDefaultValue()
     {
         Context context = null;
-        Group eperson = null;
+        Group group = null;
         try {
             context = new Context();
             context.turnOffAuthorisationSystem();
-            eperson = Group.create(context);
+            group = Group.create(context);
             context.restoreAuthSystemState();
         }
         catch (SQLException | AuthorizeException e)
@@ -68,14 +81,14 @@ public class GroupValue extends AValue<Group>
                 context.abort();
             }
         }
-        return eperson;
+        return group.getID();
     }
 
     @Override
     public String[] getUntokenizedValue()
     {
         return getObject() != null?
-                new String[]{String.valueOf(((Group)getObject()).getID())}:null;
+                new String[]{String.valueOf((getObject()))}:null;
     }
 
     @Override

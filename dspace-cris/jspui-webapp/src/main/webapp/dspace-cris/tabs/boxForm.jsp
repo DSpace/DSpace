@@ -21,22 +21,17 @@
 <%@page import="java.net.URL"%>
 <%@page import="org.dspace.app.cris.model.jdyna.VisibilityTabConstant"%>
 <c:set var="dspace.layout.head.last" scope="request">
-    <link href="<%= request.getContextPath() %>/css/select2/select2.css" type="text/css" rel="stylesheet" />
-    <link href="<%= request.getContextPath() %>/css/select2/select2-bootstrap.css" type="text/css" rel="stylesheet" />
-	<script type="text/javascript" src="<%=request.getContextPath()%>/js/select2/select2.min.js"></script>
 	<script type="text/javascript">
 	<!--
 	jQuery(document).ready(function(){
-		jQuery(".policydropdown").select2({"dropdownAutoWidth": true});
 		
-	    jQuery('#visibility').click(function(){
+	    jQuery('.visibility').click(function(){
 	        if(jQuery(this).attr("value")=="<%= VisibilityTabConstant.POLICY %>"){
 	            jQuery("#chooserpolicymetadata").show();
-	            
 	        }
 	        else {
 	        	jQuery("#chooserpolicymetadata").hide();
-	        	
+	        	jQuery(".policydropdown").val("");
 	        }
 	    });
 	});
@@ -172,8 +167,8 @@
 				key="jsp.layout.hku.label.visibility" /></label></span>
 
 			<div class="dynaFieldValue">
-			<c:forEach items="<%= VisibilityTabConstant.getValues() %>" var="item">
-				<input ${disabled} id="${inputName}" name="${inputName}"
+			<c:forEach items="<%= VisibilityTabConstant.getValues() %>" var="item" varStatus="count">
+				<input ${disabled} id="${inputName}_${count.count}" name="${inputName}" class="${inputName}"
 					type="radio" value="${item}"
 					<c:if test="${inputValue==item}">checked="checked"</c:if> />
 				<fmt:message
@@ -186,7 +181,11 @@
 			</div>
 		</spring:bind>
 
-		<div id="chooserpolicymetadata" style="display: none;">
+		<c:if test="${box.visibility!=4}">
+			<c:set var="chooservisibilityelement" value="style=\"display: none;\""/>
+		</c:if>		
+		<div id="chooserpolicymetadata" ${chooservisibilityelement}>
+		
 		<spring:bind path="authorizedSingle">
 			<c:set var="inputValue">
 				<c:out value="${status.value}" escapeXml="true"></c:out>
@@ -199,10 +198,11 @@
 				key="jsp.layout.hku.label.authorized.eperson" /></label></span>
 
 			<div class="dynaFieldValue">
-				<select class="policydropdown" id="${inputName}" name="${inputName}">
+				<select class="form-control policydropdown" id="${inputName}" name="${inputName}">
+					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.eperson.select" /></option>
 					<c:if test="${!empty metadataWithPolicySingle}">
 					    <c:forEach var="option" items="${metadataWithPolicySingle}" varStatus="loop">	    	
-				            <option value="${option}"<c:if test="${!empty inputValue && option eq inputValue}"> selected="selected"</c:if>>${option}</option>     	
+				            <option value="${option}"<c:if test="${!empty inputValue && fn:contains(inputValue, option)}"> selected="selected"</c:if>>${option}</option>     	
 				        </c:forEach>        
 				    </c:if>
 				</select>
@@ -222,16 +222,17 @@
 				key="jsp.layout.hku.label.authorized.group" /></label></span>
 
 			<div class="dynaFieldValue">
-				<select class="policydropdown" id="${inputName}" name="${inputName}">
+				<select class="form-control policydropdown" id="${inputName}" name="${inputName}">
+					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.group.select" /></option>
 					<c:if test="${!empty metadataWithPolicyGroup}">
 					    <c:forEach var="option" items="${metadataWithPolicyGroup}" varStatus="loop">	    	
-				            <option value="${option}"<c:if test="${!empty inputValue && option eq inputValue}"> selected="selected"</c:if>>${option}</option>     	
+				            <option value="${option}"<c:if test="${!empty inputValue && fn:contains(inputValue, option)}"> selected="selected"</c:if>>${option}</option>     	
 				        </c:forEach>        
 				    </c:if>
 				</select>
 			</div>
 			</div>
-		</spring:bind>
+		</spring:bind>		
 		</div>
 		<div class="dynaClear">
 			&nbsp;

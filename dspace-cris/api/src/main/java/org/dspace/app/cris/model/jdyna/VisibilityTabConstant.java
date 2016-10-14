@@ -49,7 +49,6 @@ public class VisibilityTabConstant {
 	
 	public static List<Integer> getEditValues() {
 		List<Integer> values = new LinkedList<Integer>();
-		values.add(POLICY);
 		values.add(STANDARD);
 		values.add(ADMIN);
 		values.add(LOW);		

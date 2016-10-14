@@ -8,33 +8,29 @@
 package org.dspace.app.cris.model.jdyna.widget;
 
 import java.beans.PropertyEditor;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.dspace.app.cris.model.jdyna.editor.DSpaceObjectPropertyEditor;
-import org.dspace.app.cris.model.jdyna.value.EPersonValue;
 import org.dspace.app.cris.model.jdyna.value.GroupValue;
-import org.dspace.eperson.EPerson;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
+import it.cilea.osd.common.model.Selectable;
 import it.cilea.osd.jdyna.editor.AdvancedPropertyEditorSupport;
-import it.cilea.osd.jdyna.model.AWidget;
 import it.cilea.osd.jdyna.service.IPersistenceDynaService;
 import it.cilea.osd.jdyna.util.ValidationMessage;
+import it.cilea.osd.jdyna.utils.SelectableDTO;
+import it.cilea.osd.jdyna.widget.WidgetCustomPointer;
 
 @Entity
 @Table(name = "cris_wgroup")
-public class WidgetGroup extends AWidget<GroupValue>
+public class WidgetGroup extends WidgetCustomPointer<GroupValue>
 {
-
-    private String regex;
-    
-    @Override
-    public String getTriview()
-    {
-        return "group";
-    }
 
     @Override
     public GroupValue getInstanceValore()
@@ -52,7 +48,7 @@ public class WidgetGroup extends AWidget<GroupValue>
     public PropertyEditor getPropertyEditor(
             IPersistenceDynaService applicationService)
     {
-        DSpaceObjectPropertyEditor pe = new DSpaceObjectPropertyEditor(Group.class, AdvancedPropertyEditorSupport.MODE_VIEW);
+        DSpaceObjectPropertyEditor pe = new DSpaceObjectPropertyEditor(Constants.GROUP, Group.class, AdvancedPropertyEditorSupport.MODE_VIEW);
         return pe;
     }
 
@@ -68,14 +64,43 @@ public class WidgetGroup extends AWidget<GroupValue>
         return null;
     }
 
-    public String getRegex()
-    {
-        return regex;
+    @Override
+    public Integer getType()
+    {        
+        return Constants.GROUP;
     }
-
-    public void setRegex(String regex)
+    
+    @Override
+    public List<Selectable> search(String query, String expression, String... filtro)
     {
-        this.regex = regex;
-    }
+        Context context = null;
+        List<Selectable> results = new ArrayList<Selectable>();
+        try
+        {
+            context = new Context();
 
+            Group[] objects = Group.search(context, query);
+            for (Group obj : objects)
+            {
+                String display = obj.getName();
+                SelectableDTO dto = new SelectableDTO(
+                        obj.getID(), display);
+                results.add(dto);
+            }
+
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        finally
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+        }
+        
+        return results;
+    }
 }

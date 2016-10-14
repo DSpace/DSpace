@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import it.cilea.osd.jdyna.model.Containable;
+import it.cilea.osd.jdyna.web.ITabService;
 import it.cilea.osd.jdyna.web.TypedBox;
 
 @Entity
@@ -124,4 +126,29 @@ public class BoxDynamicObject extends TypedBox<Containable, DynamicObjectType, D
         this.authorizedGroup = authorizedGroup;
     }  
 
+    @Override
+    public List<String> getMetadataWithPolicySingle(ITabService tabService)
+    {        
+        List<String> results = new ArrayList<String>();
+        for(DynamicPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
+            String shortName = pd.getShortName();
+            if(shortName.startsWith(getTypeDef().getShortName())) {
+                results.add(shortName);
+            }
+        }
+        return results;
+    }
+
+    @Override
+    public List<String> getMetadataWithPolicyGroup(ITabService tabService)
+    {
+        List<String> results = new ArrayList<String>();
+        for(DynamicPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
+            String shortName = pd.getShortName();
+            if(shortName.startsWith(getTypeDef().getShortName())) {
+                results.add(shortName);
+            }
+        }
+        return results;
+    }
 }

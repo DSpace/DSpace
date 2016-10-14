@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import it.cilea.osd.jdyna.model.Containable;
 import it.cilea.osd.jdyna.web.Box;
+import it.cilea.osd.jdyna.web.ITabService;
 
 @Entity
 @Table(name = "cris_rp_box")
@@ -106,6 +108,26 @@ public class BoxResearcherPage extends Box<Containable>
     public void setAuthorizedGroup(List<String> authorizedGroup)
     {
         this.authorizedGroup = authorizedGroup;
+    }
+    
+    @Override
+    public List<String> getMetadataWithPolicySingle(ITabService tabService)
+    {        
+        List<String> results = new ArrayList<String>();
+        for(RPPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicySingle(RPPropertiesDefinition.class)) {
+            results.add(pd.getShortName());
+        }
+        return results;
+    }
+
+    @Override
+    public List<String> getMetadataWithPolicyGroup(ITabService tabService)
+    {
+        List<String> results = new ArrayList<String>();
+        for(RPPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicyGroup(RPPropertiesDefinition.class)) {
+            results.add(pd.getShortName());
+        }
+        return results;
     }
 
 }

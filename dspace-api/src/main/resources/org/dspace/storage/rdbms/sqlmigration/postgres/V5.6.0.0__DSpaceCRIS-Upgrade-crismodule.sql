@@ -22,8 +22,9 @@ create table cris_pj_etab2policygroup (etab_id int4 not null, authorizedGroup va
 create table cris_pj_etab2policysingle (etab_id int4 not null, authorizedSingle varchar(255));
 create table cris_rp_etab2policygroup (etab_id int4 not null, authorizedGroup varchar(255));
 create table cris_rp_etab2policysingle (etab_id int4 not null, authorizedSingle varchar(255));
-create table cris_weperson (id int4 not null, groupName varchar(255), primary key (id));
-create table cris_wgroup (id int4 not null, regex varchar(255), primary key (id));
+create table cris_weperson (id int4 not null, filter text, primary key (id));
+create table cris_wgroup (id int4 not null, filter text, primary key (id));
+alter table jdyna_values add column customPointer int4;
 alter table cris_do_box2policygroup add constraint FK_fqxyx09rdfu2fdlml08828xk8 foreign key (box_id) references cris_do_box;
 alter table cris_do_box2policysingle add constraint FK_mjladl11m2680hn8o4btb4lly foreign key (box_id) references cris_do_box;
 alter table cris_do_tab2policygroup add constraint FK_j7d7vi6lj4h5wictl9sh6lmot foreign key (tab_id) references cris_do_tab;

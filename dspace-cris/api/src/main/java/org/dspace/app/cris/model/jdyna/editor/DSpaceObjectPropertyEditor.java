@@ -24,6 +24,7 @@ public class DSpaceObjectPropertyEditor extends AdvancedPropertyEditorSupport
 
     /** Model Class */
     private Class clazz;
+    private Integer type;
 
     /** The logger */
     private final static Log log = LogFactory
@@ -34,6 +35,14 @@ public class DSpaceObjectPropertyEditor extends AdvancedPropertyEditorSupport
         this.clazz = model;
         setMode(service);
     }
+    
+    public DSpaceObjectPropertyEditor(Integer type, Class model, String service)
+    {
+        this.type = type;
+        this.clazz = model;
+        setMode(service);
+    }
+
 
     @Override
     public void setAsText(String text) throws IllegalArgumentException
@@ -46,42 +55,7 @@ public class DSpaceObjectPropertyEditor extends AdvancedPropertyEditorSupport
         }
         else
         {
-            int type = 2;
-            if (EPerson.class.isAssignableFrom(clazz))
-            {
-                type = 5;
-            }
-            else if (Group.class.isAssignableFrom(clazz))
-            {
-                type = 6;
-            }
-            else if (Collection.class.isAssignableFrom(clazz))
-            {
-                type = 3;
-            }
-            else if (Community.class.isAssignableFrom(clazz))
-            {
-                type = 4;
-            }
-            Context context = null;
-            try
-            {
-                context = getContext();
-                setValue(DSpaceObject.find(context, type,
-                        Integer.parseInt(text)));
-            }
-            catch (Exception ex)
-            {
-
-            }
-            finally
-            {
-                if (context != null && context.isValid())
-                {
-                    context.abort();
-                }
-            }
-
+            setValue(Integer.parseInt(text));
         }
     }
 
@@ -107,8 +81,31 @@ public class DSpaceObjectPropertyEditor extends AdvancedPropertyEditorSupport
     public String getAsText()
     {
         log.debug("chiamato DSpaceObjectPropertyEditor - getAsText");
-        DSpaceObject valore = (DSpaceObject) getValue();
-        return (valore == null ? "" : "" + valore.getID());
+        Integer valore = (Integer) getValue();
+        if (MODE_CSV.equals(getMode()))
+        {
+            String displayValue = "";
+            Context context = null;
+            try
+            {
+                context = getContext();
+                displayValue = DSpaceObject.find(context, type,
+                        valore).getName();
+            }
+            catch (Exception ex)
+            {
+                log.debug("error DSpaceObjectPropertyEditor - getAsText" + ex.getMessage());
+            }
+            finally
+            {
+                if (context != null && context.isValid())
+                {
+                    context.abort();
+                }
+            }
+            return valore == null ? "" : "[ID=" + valore+ "]" + displayValue;
+        }
+        return (valore == null ? "" : "" + valore);
     }
 
 }
