@@ -241,6 +241,11 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
     }
 
     @Override
+    public void anonymizeGroupPolicies(Context c, Group group) throws SQLException {
+        resourcePolicyDAO.anonymizeByGroup(c, group);
+    }
+
+    @Override
     public void removeGroupPolicies(Context c, Group group) throws SQLException {
         resourcePolicyDAO.deleteByGroup(c, group);
     }

@@ -7,6 +7,7 @@
  */
 package org.dspace.eperson.service;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -290,4 +291,6 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @throws SQLException database exception
      */
     List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException;
+
+    public void delete(Context context, Group group, boolean anonymizePolicies) throws SQLException, AuthorizeException, IOException;
 }

@@ -107,6 +107,14 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
      }
 
     @Override
+    public void anonymizeByGroup(Context context, Group group) throws SQLException {
+        String queryString = "update ResourcePolicy set epersonGroup= (select id from Group where name='Anonymous') where epersonGroup= :epersonGroup";
+        Query query = createQuery(context, queryString);
+        query.setParameter("epersonGroup", group);
+        query.executeUpdate();
+    }
+
+    @Override
     public void deleteByDso(Context context, DSpaceObject dso) throws SQLException
     {
         String queryString = "delete from ResourcePolicy where dSpaceObject= :dSpaceObject";

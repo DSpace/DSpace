@@ -598,6 +598,13 @@ public class AuthorizeServiceImpl implements AuthorizeService
     }
 
     @Override
+    public void anonymizeGroupPolicies(Context c, Group group)
+            throws SQLException
+    {
+        resourcePolicyService.anonymizeGroupPolicies(c, group);
+    }
+
+    @Override
     public void removeGroupPolicies(Context c, Group group)
             throws SQLException
     {

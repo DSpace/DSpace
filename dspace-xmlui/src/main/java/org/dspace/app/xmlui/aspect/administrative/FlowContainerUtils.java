@@ -697,7 +697,8 @@ public class FlowContainerUtils
 		Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
 		
 		// Delete the old role, this will remove the default privileges.
-		groupService.delete(context, defaultRead);
+		authorizeService.removeGroupPolicies(context, collection, defaultRead);
+		groupService.delete(context, defaultRead, true);
 		
 		// Set anonymous as the default read group.
 		authorizeService.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ, anonymous);
