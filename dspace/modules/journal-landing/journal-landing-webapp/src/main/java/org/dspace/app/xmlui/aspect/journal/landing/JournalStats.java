@@ -339,7 +339,8 @@ public class JournalStats extends AbstractDSpaceTransformer
         Division wrapper = outer.addDivision(t.n, t.rend);
         Division items = wrapper.addDivision(ITEMS);
         ReferenceSet itemsContainer = items.addReferenceSet(t.n, ReferenceSet.TYPE_SUMMARY_LIST);
-        itemsContainer.setHead(t.refHead);
+        // The header is actually set in JournalDownloads.java.
+//        itemsContainer.setHead(t.refHead);
         Division vals = wrapper.addDivision(VALS);
         List valsList = vals.addList(t.n, List.TYPE_SIMPLE, t.n);
         valsList.setHead(t.valHead);
