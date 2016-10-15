@@ -228,10 +228,6 @@ public class PublicationUpdater extends HttpServlet {
                     updatedItems.add(buildItemSummary(item) + "\n\t" + message);
                 }
             }
-
-            if (!"".equals(message)) {
-                updatedItems.add(buildItemSummary(item) + "\n\t" + message);
-            }
         }
 
         if (updatedItems.size() > 0) {
