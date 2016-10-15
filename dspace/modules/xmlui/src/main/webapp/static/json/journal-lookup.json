@@ -208,9 +208,9 @@
         "sponsor" : "$120"
      },
      {
-        "sponsor" : "$120",
+        "sponsor" : "Ecological Society of America",
         "title" : "Ecological Monographs",
-        "hidden" : "Y",
+        "hidden" : "N",
         "issn" : "0012-9615",
         "submission" : "A",
         "embargo" : "Y",
@@ -559,6 +559,15 @@
         "integrated" : "Y"
      },
      {
+        "title" : "Journal of Systematics and Evolution",
+        "sponsor" : "Journal of Systematics and Evolution",
+        "submission" : "R",
+        "issn" : "1674-4918",
+        "embargo" : "Y",
+        "hidden" : "N",
+        "integrated" : "Y"
+     },
+     {
         "hidden" : "Y",
         "submission" : "A",
         "issn" : "1742-5662",
@@ -640,6 +649,15 @@
         "integrated" : "Y"
      },
      {
+        "integrated" : "N",
+        "embargo" : "N",
+        "issn" : "0078-1304",
+        "submission" : "A",
+        "hidden" : "N",
+        "title" : "North American Fauna",
+        "sponsor" : "US Fish & Wildlife Service"
+     },
+     {
         "sponsor" : "Pensoft",
         "title" : "Nota Lepidopterologica",
         "integrated" : "Y",
@@ -656,15 +674,6 @@
         "issn" : "0030-1299",
         "submission" : "A",
         "hidden" : "N"
-     },
-     {
-        "integrated" : "N",
-        "embargo" : "N",
-        "issn" : "0078-1304",
-        "submission" : "A",
-        "hidden" : "N",
-        "title" : "North American Fauna",
-        "sponsor" : "US Fish & Wildlife Service"
      },
      {
         "title" : "Open Biology",
@@ -889,6 +898,15 @@
         "hidden" : "Y",
         "integrated" : "N",
         "title" : "Systematic Botany",
+        "sponsor" : "American Society of Plant Taxonomists"
+     },
+     {
+        "issn" : "0737-8211",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "N",
+        "title" : "Systematic Botany Monographs",
         "sponsor" : "American Society of Plant Taxonomists"
      },
      {
