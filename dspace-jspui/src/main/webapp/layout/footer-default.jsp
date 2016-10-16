@@ -81,8 +81,7 @@
 	             		<%= footerNews %>
 	             	</div>
 	            </div> 
-	         </div>   
-			<div class="extra-footer row">
+			<div class="container-fluid extra-footer row">
       			<div id="footer_feedback" class="col-sm-4 pull-<%= isRtl ? "right":"left" %>">                                    
                      <a href="<%= request.getContextPath() %>/feedback"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
                 </div>

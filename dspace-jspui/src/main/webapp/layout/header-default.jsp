@@ -257,7 +257,11 @@
     {
 %>
 <div class="container">
+	<div class="row">
+		<div class="col-sm-12">
                 <dspace:include page="/layout/location-bar.jsp" />
+        </div>        
+    </div>
 </div>                
 <%
     }
@@ -266,7 +270,7 @@
 
 
         <%-- Page contents --%>
-<div class="container">
+<div class="container fullheight">
 <% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
 	<div class="row">
 		<div class="col-md-9 <%= isRtl ? "pull-right":"" %>">

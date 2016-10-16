@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-.banner img {background-color: #FFFFFF;padding:15px;margin:20px;}
+.banner img {background-color: #FFFFFF;padding:15px;margin-top:20px;}
 .brand h4 {color: #999999}
 #communitylist-top-menu a, #userloggedin-top-menu a {padding-top:0.3em;padding-bottom:0.3em;}
 #user-top-menu, #userloggedin-top-menu {margin-right: 15px;}
@@ -259,3 +259,46 @@ footer.navbar-bottom {
 	color: white;
 	background: gray;
 }
+
+.container{
+	background-color: #fff;
+	
+}
+
+ol.breadcrumb li a {
+    color: white;
+    font-weight: bold;
+    font-style: normal;
+}
+ol.btn-success {
+		background-color: #6389B8; !important;
+  		background-image: -webkit-gradient(linear, left 0%, left 100%, from(#6389B8), to(#6389B8));
+  		background-image: -webkit-linear-gradient(top, #6389B8, 0%, #6389B8, 100%);
+  		background-image: -moz-linear-gradient(top, #6389B8 0%, #6389B8 100%);
+  		background-image: linear-gradient(to bottom, #6389B8 0%, #6389B8 100%);
+  		background-repeat: repeat-x;
+  		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#6389B8;', endColorstr='#6389B8;', GradientType=0);		 
+		border-color: white;
+		}
+		
+		
+#content{
+	padding-bottom: 0px;
+}
+
+
+footer.navbar{
+	
+	border:0px;
+}
+
+.form-control{
+	color:#000;
+}
+
+.modal.in .modal-dialog {
+	margin:0px auto;
+	left: auto;
+	right:auto;
+}
+.fullheight {min-height: 40em;}
