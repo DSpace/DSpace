@@ -532,7 +532,25 @@
         format field.</p> --%>
                 <p class="alert alert-warning"><fmt:message key="jsp.tools.edit-item-form.note3"/></p>
 	<div class="table-responsive">
-        <table id="bitstream-edit-form-table" class="table" summary="Bitstream data table">
+    
+<%
+    Bundle[] bundles = item.getBundles();
+    row = "even";
+
+    for (int i = 0; i < bundles.length; i++)
+    {
+    	%>
+    <h3><%= bundles[i].getName() %> 
+    	<a class="btn btn-warning" target="_blank" 
+    		href="<%= request.getContextPath() %>/tools/edit-dso?resource_type=1&resource_id=<%= bundles[i].getID() %>"><fmt:message key="jsp.tools.general.edit"/></a>
+    		
+    		<% if (bRemoveBits) { %>
+            <button class="btn btn-danger" name="submit_delete_bundle_<%= bundles[i].getID() %>" value="<fmt:message key="jsp.tools.general.remove"/>">
+            	<span class="glyphicon glyphicon-trash"></span>
+            </button>
+            <% } %>		
+ 	</h3>	
+    <table id="bitstream-edit-form-table-<%= i %>" class="table" summary="Bitstream data table">
             <tr>
           <%-- <th class="oddRowEvenCol"><strong>Primary<br>Bitstream</strong></th>
                 <th class="oddRowOddCol"><strong>Name</strong></th>
@@ -549,13 +567,11 @@
                 <th id="t16" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem11"/></strong></th>
                 <th id="t17" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem12"/></strong></th>
                 <th id="t18" class="oddRowEvenCol">&nbsp;</th>
-            </tr>
-<%
-    Bundle[] bundles = item.getBundles();
-    row = "even";
-
-    for (int i = 0; i < bundles.length; i++)
-    {
+            </tr>    	
+    	
+    	
+    	
+<%    	
         Bitstream[] bitstreams = bundles[i].getBitstreams();
         for (int j = 0; j < bitstreams.length; j++)
         {
@@ -573,6 +589,7 @@
             	<td headers="t10" class="<%= row %>RowEvenCol" align="center">
                 	<%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
 					<a class="btn btn-info" target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;
+					<a class="btn btn-warning" target="_blank" href="<%= request.getContextPath() %>/tools/edit-dso?resource_type=0&resource_id=<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.edit"/></a>
 				</td>
                 <% if (bundles[i].getName().equals("ORIGINAL"))
                    { %>
@@ -664,9 +681,11 @@
 <%
             row = (row.equals("odd") ? "even" : "odd");
         }
+        %>
+        </table>
+        <%
     }
 %>
-        </table>
 	</div>
         
 

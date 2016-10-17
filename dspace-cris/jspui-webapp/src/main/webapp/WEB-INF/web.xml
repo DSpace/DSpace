@@ -278,6 +278,11 @@
 	</servlet>
 
 	<servlet>
+		<servlet-name>edit-dso</servlet-name>
+		<servlet-class>org.dspace.app.webui.servlet.admin.EditDSpaceObjectServlet</servlet-class>
+	</servlet>
+	
+	<servlet>
 		<servlet-name>edit-news</servlet-name>
 		<servlet-class>org.dspace.app.webui.servlet.admin.NewsEditServlet</servlet-class>
 	</servlet>
@@ -719,6 +724,11 @@
 		<url-pattern>/tools/edit-item</url-pattern>
 	</servlet-mapping>
 
+	<servlet-mapping>
+		<servlet-name>edit-dso</servlet-name>
+		<url-pattern>/tools/edit-dso</url-pattern>
+	</servlet-mapping>
+	
 	<servlet-mapping>
 		<servlet-name>edit-news</servlet-name>
 		<url-pattern>/dspace-admin/news-edit</url-pattern>

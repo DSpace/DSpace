@@ -862,6 +862,15 @@ public class EditItemServlet extends DSpaceServlet
                     .showJSP(request, response, "/tools/creative-commons-edit.jsp");
         }
         
+        if (button.startsWith("submit_delete_bundle_")) {
+        	Bundle bnd = Bundle.find(context, Integer.parseInt(button.substring("submit_delete_bundle_".length())));
+        	Bitstream[] bits = bnd.getBitstreams();
+        	for (Bitstream b : bits) {
+        		bnd.removeBitstream(b);
+        	}
+        	item.removeBundle(bnd);
+        }
+        
         if (button.equals("submit_addbitstream"))
         {
             // Show upload bitstream page
