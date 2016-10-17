@@ -155,12 +155,12 @@ public class EditTabDynamicObject extends
     }
     
     @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(AS tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(AS tabService, String specificPart)
     {        
         List<String> results = new ArrayList<String>();
         for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
             String shortName = pd.getShortName();
-            if(shortName.startsWith(getTypeDef().getShortName())) {
+            if(shortName.startsWith(specificPart)) {
                 results.add(shortName);
             }
         }
@@ -168,12 +168,12 @@ public class EditTabDynamicObject extends
     }
 
     @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(AS tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(AS tabService, String specificPart)
     {
         List<String> results = new ArrayList<String>();
         for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
             String shortName = pd.getShortName();
-            if(shortName.startsWith(getTypeDef().getShortName())) {
+            if(shortName.startsWith(specificPart)) {
                 results.add(shortName);
             }
         }

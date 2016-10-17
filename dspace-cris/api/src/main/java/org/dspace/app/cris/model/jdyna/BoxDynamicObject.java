@@ -129,12 +129,12 @@ public class BoxDynamicObject extends TypedBox<Containable, DynamicObjectType, D
 
     @Override
     public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
-            AS tabService)
+            AS tabService, String specificPart)
     {      
         List<String> results = new ArrayList<String>();
         for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
             String shortName = pd.getShortName();
-            if(shortName.startsWith(getTypeDef().getShortName())) {
+            if(shortName.startsWith(specificPart)) {
                 results.add(shortName);
             }
         }
@@ -143,12 +143,12 @@ public class BoxDynamicObject extends TypedBox<Containable, DynamicObjectType, D
 
     @Override
     public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
-            AS tabService)
+            AS tabService, String specificPart)
     {
         List<String> results = new ArrayList<String>();
         for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
             String shortName = pd.getShortName();
-            if(shortName.startsWith(getTypeDef().getShortName())) {
+            if(shortName.startsWith(specificPart)) {
                 results.add(shortName);
             }
         }

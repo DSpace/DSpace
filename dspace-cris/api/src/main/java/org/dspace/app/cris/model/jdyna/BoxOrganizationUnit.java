@@ -109,7 +109,7 @@ public class BoxOrganizationUnit extends Box<Containable> {
     
     @Override
     public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
-            AS tabService)
+            AS tabService, String specificPart)
     {       
         List<String> results = new ArrayList<String>();
         for(OUPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(OUPropertiesDefinition.class)) {
@@ -120,7 +120,7 @@ public class BoxOrganizationUnit extends Box<Containable> {
 
     @Override
     public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
-            AS tabService)
+            AS tabService, String specificPart)
     {
         List<String> results = new ArrayList<String>();
         for(OUPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(OUPropertiesDefinition.class)) {

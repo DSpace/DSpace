@@ -113,7 +113,7 @@ public class BoxResearcherPage extends Box<Containable>
     
     @Override
     public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
-            AS tabService)
+            AS tabService, String specificPart)
     {        
         List<String> results = new ArrayList<String>();
         for(RPPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(RPPropertiesDefinition.class)) {
@@ -124,7 +124,7 @@ public class BoxResearcherPage extends Box<Containable>
 
     @Override
     public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
-            AS tabService)
+            AS tabService, String specificPart)
     {
         List<String> results = new ArrayList<String>();
         for(RPPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(RPPropertiesDefinition.class)) {

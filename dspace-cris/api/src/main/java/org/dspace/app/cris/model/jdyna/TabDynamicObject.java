@@ -135,12 +135,12 @@ public class TabDynamicObject extends TypedAbstractTab<BoxDynamicObject, Dynamic
     }
     
     @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(AS tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(AS tabService, String adminSpecificPath)
     {        
         List<String> results = new ArrayList<String>();
         for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
             String shortName = pd.getShortName();
-            if(shortName.startsWith(getTypeDef().getShortName())) {
+            if(shortName.startsWith(adminSpecificPath)) {
                 results.add(shortName);
             }
         }
@@ -148,12 +148,12 @@ public class TabDynamicObject extends TypedAbstractTab<BoxDynamicObject, Dynamic
     }
 
     @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(AS tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(AS tabService, String adminSpecificPath)
     {
         List<String> results = new ArrayList<String>();
         for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
             String shortName = pd.getShortName();
-            if(shortName.startsWith(getTypeDef().getShortName())) {
+            if(shortName.startsWith(adminSpecificPath)) {
                 results.add(shortName);
             }
         }

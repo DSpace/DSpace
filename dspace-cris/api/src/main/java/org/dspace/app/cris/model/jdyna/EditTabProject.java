@@ -136,7 +136,7 @@ public class EditTabProject extends
     }
 
     @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(AS tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(AS tabService, String specificPart)
     {        
         List<String> results = new ArrayList<String>();
         for(ProjectPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(ProjectPropertiesDefinition.class)) {
@@ -146,7 +146,7 @@ public class EditTabProject extends
     }
 
     @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(AS tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(AS tabService, String specificPart)
     {
         List<String> results = new ArrayList<String>();
         for(ProjectPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(ProjectPropertiesDefinition.class)) {
