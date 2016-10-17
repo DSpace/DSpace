@@ -143,9 +143,9 @@ public class DynamicObjectDetailsController
         {
             mvc = super.handleDetails(request, response);
         }
-        catch (RuntimeException e)
+        catch (Exception e)
         {
-            return null;
+            throw new RuntimeException(e);
         }
         
         

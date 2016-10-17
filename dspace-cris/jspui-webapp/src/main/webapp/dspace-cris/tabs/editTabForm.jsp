@@ -254,30 +254,30 @@
 		</c:forEach></fieldset>
 
 		<c:if test="${empty tab.displayTab}">
-			<div id="hidden_first" style="padding: 0; margin: 0 10px;"><a id="hookuptab"				
+			<div id="hidden_first" style="padding: 0; margin: 0 10px;"><a id="hookuptab" class="btn btn-default pull-right"				 
 				href="#"> <span id="toggle_appear"> <fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.edittab-hookup" /></span> </a></div>
 			<div id="hidden_appear" style="display: none; float: right;"><c:set
 				var="contextPath"><%=request.getContextPath()%></c:set> <em
 				class="bodyText"><fmt:message
-				key="jsp.dspace-admin.hku.add-displaytab.message" /></em> <input
-				type="text" name="hookedtab" id="hookedtab" value="" /> <input
+				key="jsp.dspace-admin.hku.add-displaytab.message" /></em> <input 
+				type="text" name="hookedtab" id="hookedtab" value="" /> <input class="btn btn-default pull-right"
 				type="submit" name="hookupit"
 				value="<fmt:message key="jsp.layout.hku.researcher.button.hookup" />" />
 			</div>
 		</c:if>
 		<c:if test="${!empty tab.displayTab}">
-			<input type="submit" name="dehookupit" id="dehookupit"
+			<input type="submit" name="dehookupit" id="dehookupit" class="btn btn-default pull-right"
 				value="<fmt:message key="jsp.layout.hku.researcher.button.de-hookup" />" />
 		</c:if>
 
 		
-		<input type="submit" name="submit"
+		<input type="submit" name="submit" class="btn btn-primary pull-right"
 			value="<fmt:message key="jsp.layout.hku.researcher.button.save" />" />
 
 	</form:form>
 	<c:if test="${!empty tab.id && empty tab.displayTab}">
-		<div style="padding: 0; margin: 0 10px;"><a
+		<div style="padding: 0; margin: 0 10px;"><a class="btn btn-default pull-right"
 			href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createBox.htm?tabId=${tab.id}">
 		<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.newbox" />
 		</a></div>

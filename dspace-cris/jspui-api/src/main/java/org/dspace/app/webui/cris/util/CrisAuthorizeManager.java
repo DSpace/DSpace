@@ -43,7 +43,11 @@ public class CrisAuthorizeManager
       
         if (visibility != VisibilityTabConstant.POLICY)
         {
-            boolean isOwner = object.isOwner(currUser);
+            boolean isOwner = false;
+            
+            if(currUser!=null) {
+                isOwner = object.isOwner(currUser);
+            }
             
             // check admin authorization
             if (AuthorizeManager.isAdmin(context))
@@ -70,14 +74,22 @@ public class CrisAuthorizeManager
 
         }
         
-        List<String> listPolicySingle = authorizedObject.getAuthorizedSingle();
-        
-        if(listPolicySingle!=null && !listPolicySingle.isEmpty()) {
-            for(String policy : listPolicySingle) {
-                String data = object.getMetadata(policy);
-                if(StringUtils.isNotBlank(data)) {
-                    if(currUser.getID()==Integer.parseInt(data)) {
-                        return true;
+        if (currUser != null)
+        {
+            List<String> listPolicySingle = authorizedObject
+                    .getAuthorizedSingle();
+
+            if (listPolicySingle != null && !listPolicySingle.isEmpty())
+            {
+                for (String policy : listPolicySingle)
+                {
+                    String data = object.getMetadata(policy);
+                    if (StringUtils.isNotBlank(data))
+                    {
+                        if (currUser.getID() == Integer.parseInt(data))
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -91,7 +103,12 @@ public class CrisAuthorizeManager
                 if(StringUtils.isNotBlank(data)) {
                     Group group = Group.find(context, Integer.parseInt(data));
                     if(group!=null) {
-                        return true;
+                        if(currUser==null && group.getID()==0) {
+                            return Group.isMember(context, 0);
+                        }
+                        if(Group.isMember(context, group.getID())) {
+                            return true;
+                        }
                     }
                 }
             }
