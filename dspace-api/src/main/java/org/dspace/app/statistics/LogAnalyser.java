@@ -215,7 +215,7 @@ public class LogAnalyser
         
         // create context as super user
         Context context = new Context();
-        context.setIgnoreAuthorization(true);
+        context.turnOffAuthorisationSystem();
         
         // set up our command line variables
         String myLogDir = null;

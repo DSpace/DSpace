@@ -123,10 +123,9 @@ public class SWORDMETSIngester implements SWORDIngester
 			// authorisation briefly, because although the user may be
 			// able to add stuff to the repository, they may not have
 			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
+			context.turnOffAuthorisationSystem();
 			installedItem.update();
-			context.setIgnoreAuthorization(ignore);
+			context.restoreAuthSystemState();
 			
 			// for some reason, DSpace will not give you the handle automatically,
 			// so we have to look it up
