@@ -24,6 +24,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import it.cilea.osd.common.service.IPersistenceService;
 import it.cilea.osd.jdyna.model.Containable;
 import it.cilea.osd.jdyna.web.ITabService;
 import it.cilea.osd.jdyna.web.TypedBox;
@@ -127,10 +128,11 @@ public class BoxDynamicObject extends TypedBox<Containable, DynamicObjectType, D
     }  
 
     @Override
-    public List<String> getMetadataWithPolicySingle(ITabService tabService)
-    {        
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
+            AS tabService)
+    {      
         List<String> results = new ArrayList<String>();
-        for(DynamicPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
+        for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
             String shortName = pd.getShortName();
             if(shortName.startsWith(getTypeDef().getShortName())) {
                 results.add(shortName);
@@ -140,10 +142,11 @@ public class BoxDynamicObject extends TypedBox<Containable, DynamicObjectType, D
     }
 
     @Override
-    public List<String> getMetadataWithPolicyGroup(ITabService tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
+            AS tabService)
     {
         List<String> results = new ArrayList<String>();
-        for(DynamicPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
+        for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
             String shortName = pd.getShortName();
             if(shortName.startsWith(getTypeDef().getShortName())) {
                 results.add(shortName);
@@ -151,4 +154,5 @@ public class BoxDynamicObject extends TypedBox<Containable, DynamicObjectType, D
         }
         return results;
     }
+
 }

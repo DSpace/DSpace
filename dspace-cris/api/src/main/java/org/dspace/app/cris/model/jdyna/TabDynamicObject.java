@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
+import it.cilea.osd.common.service.IPersistenceService;
 import it.cilea.osd.jdyna.web.ITabService;
 import it.cilea.osd.jdyna.web.TypedAbstractTab;
 
@@ -36,6 +37,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
         @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findTabsByHolder", query = "from TabDynamicObject tab where :par0 in elements(tab.mask)", cacheable=true),
         @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.uniqueTabByShortName", query = "from TabDynamicObject tab where shortName = ?", cacheable=true),
 		@org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByAccessLevel", query = "from TabDynamicObject tab where visibility = ? order by priority", cacheable=true),
+		@org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByTypeAndAccessLevel", query = "from TabDynamicObject tab where typeDef = ? and visibility = ? order by priority", cacheable=true),
 		@org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByAdmin", query = "from TabDynamicObject tab where visibility = 1 or visibility = 2 or visibility = 3 order by priority", cacheable=true),
 		@org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByOwner", query = "from TabDynamicObject tab where visibility = 0 or visibility = 2 or visibility = 3 order by priority", cacheable=true),
 		@org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByAnonimous", query = "from TabDynamicObject tab where visibility = 3 order by priority", cacheable=true),
@@ -133,10 +135,10 @@ public class TabDynamicObject extends TypedAbstractTab<BoxDynamicObject, Dynamic
     }
     
     @Override
-    public List<String> getMetadataWithPolicySingle(ITabService tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(AS tabService)
     {        
         List<String> results = new ArrayList<String>();
-        for(DynamicPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
+        for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
             String shortName = pd.getShortName();
             if(shortName.startsWith(getTypeDef().getShortName())) {
                 results.add(shortName);
@@ -146,10 +148,10 @@ public class TabDynamicObject extends TypedAbstractTab<BoxDynamicObject, Dynamic
     }
 
     @Override
-    public List<String> getMetadataWithPolicyGroup(ITabService tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(AS tabService)
     {
         List<String> results = new ArrayList<String>();
-        for(DynamicPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
+        for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
             String shortName = pd.getShortName();
             if(shortName.startsWith(getTypeDef().getShortName())) {
                 results.add(shortName);

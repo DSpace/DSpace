@@ -155,6 +155,11 @@
 			&nbsp;
 		</div>
 		
+		<c:set var="VISIBILITYCONSTANTS" value="<%= VisibilityTabConstant.getValues() %>"/>
+		<c:if test="${!(specificPartPath eq 'rp')}">
+			<c:set var="VISIBILITYCONSTANTS" value="<%= VisibilityTabConstant.getLimitedValues() %>"/>
+		</c:if>	
+		
 		<spring:bind path="visibility">
 			<c:set var="inputValue">
 				<c:out value="${status.value}" escapeXml="true"></c:out>
@@ -167,7 +172,7 @@
 				key="jsp.layout.hku.label.visibility" /></label></span>
 
 			<div class="dynaFieldValue">
-			<c:forEach items="<%= VisibilityTabConstant.getValues() %>" var="item" varStatus="count">
+			<c:forEach items="${VISIBILITYCONSTANTS}" var="item" varStatus="count">
 				<input ${disabled} id="${inputName}_${count.count}" name="${inputName}" class="${inputName}"
 					type="radio" value="${item}"
 					<c:if test="${inputValue==item}">checked="checked"</c:if> />
@@ -202,7 +207,7 @@
 					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.eperson.select" /></option>
 					<c:if test="${!empty metadataWithPolicySingle}">
 					    <c:forEach var="option" items="${metadataWithPolicySingle}" varStatus="loop">	    	
-				            <option value="${option}"<c:if test="${!empty inputValue && fn:contains(inputValue, option)}"> selected="selected"</c:if>>${option}</option>     	
+				            <option value="${option}"<c:if test="${!empty inputValue && fn:contains(inputValue, option)}"> selected="selected"</c:if>>${researcher:getPropertyDefinitionLabel(specificPartPath,option)}(${option})</option>     	
 				        </c:forEach>        
 				    </c:if>
 				</select>
@@ -226,7 +231,7 @@
 					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.group.select" /></option>
 					<c:if test="${!empty metadataWithPolicyGroup}">
 					    <c:forEach var="option" items="${metadataWithPolicyGroup}" varStatus="loop">	    	
-				            <option value="${option}"<c:if test="${!empty inputValue && fn:contains(inputValue, option)}"> selected="selected"</c:if>>${option}</option>     	
+				            <option value="${option}"<c:if test="${!empty inputValue && fn:contains(inputValue, option)}"> selected="selected"</c:if>>${researcher:getPropertyDefinitionLabel(specificPartPath,option)}(${option})</option>     	
 				        </c:forEach>        
 				    </c:if>
 				</select>

@@ -23,6 +23,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import it.cilea.osd.common.service.IPersistenceService;
 import it.cilea.osd.jdyna.model.Containable;
 import it.cilea.osd.jdyna.web.Box;
 import it.cilea.osd.jdyna.web.ITabService;
@@ -111,20 +112,22 @@ public class BoxResearcherPage extends Box<Containable>
     }
     
     @Override
-    public List<String> getMetadataWithPolicySingle(ITabService tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
+            AS tabService)
     {        
         List<String> results = new ArrayList<String>();
-        for(RPPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicySingle(RPPropertiesDefinition.class)) {
+        for(RPPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(RPPropertiesDefinition.class)) {
             results.add(pd.getShortName());
         }
         return results;
     }
 
     @Override
-    public List<String> getMetadataWithPolicyGroup(ITabService tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
+            AS tabService)
     {
         List<String> results = new ArrayList<String>();
-        for(RPPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicyGroup(RPPropertiesDefinition.class)) {
+        for(RPPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(RPPropertiesDefinition.class)) {
             results.add(pd.getShortName());
         }
         return results;

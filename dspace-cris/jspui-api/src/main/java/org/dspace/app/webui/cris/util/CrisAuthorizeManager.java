@@ -1,0 +1,103 @@
+package org.dspace.app.webui.cris.util;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
+import org.dspace.app.cris.service.ApplicationService;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+
+import it.cilea.osd.jdyna.model.AuthorizationContext;
+import it.cilea.osd.jdyna.web.ITabService;
+
+public class CrisAuthorizeManager
+{
+
+    public static <A extends AuthorizationContext, T extends ACrisObject> boolean authorize(Context context, ITabService applicationService, Class<T> clazz, Integer id, A authorizedObject)
+            throws SQLException
+    {
+        Integer visibility = authorizedObject.getVisibility();
+        if(VisibilityTabConstant.HIGH.equals(visibility)) {
+            return true;
+        }
+        
+                
+        boolean result = false;
+        T object = null;
+        try
+        {
+            object = ((ApplicationService) applicationService).get(
+                    clazz, id);
+        }
+        catch (NumberFormatException e)
+        {
+            throw new RuntimeException(e);
+        }
+        
+        EPerson currUser = context.getCurrentUser();
+      
+        if (visibility != VisibilityTabConstant.POLICY)
+        {
+            boolean isOwner = object.isOwner(currUser);
+            
+            // check admin authorization
+            if (AuthorizeManager.isAdmin(context))
+            {
+                if (VisibilityTabConstant.ADMIN.equals(visibility)
+                        || VisibilityTabConstant.STANDARD.equals(visibility))
+                {
+                    return true;
+                }
+                if (isOwner)
+                {
+                    return true;
+                }
+                return false;
+            }
+            if (VisibilityTabConstant.LOW.equals(visibility)
+                    || VisibilityTabConstant.STANDARD.equals(visibility))
+            {
+                if (isOwner)
+                {
+                    return true;
+                }
+            }
+
+        }
+        
+        List<String> listPolicySingle = authorizedObject.getAuthorizedSingle();
+        
+        if(listPolicySingle!=null && !listPolicySingle.isEmpty()) {
+            for(String policy : listPolicySingle) {
+                String data = object.getMetadata(policy);
+                if(StringUtils.isNotBlank(data)) {
+                    if(currUser.getID()==Integer.parseInt(data)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        List<String> listPolicyGroup = authorizedObject.getAuthorizedGroup();
+        
+        if(listPolicyGroup!=null && !listPolicyGroup.isEmpty()) {
+            for(String policy : listPolicyGroup) {
+                String data = object.getMetadata(policy);
+                if(StringUtils.isNotBlank(data)) {
+                    Group group = Group.find(context, Integer.parseInt(data));
+                    if(group!=null) {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+}

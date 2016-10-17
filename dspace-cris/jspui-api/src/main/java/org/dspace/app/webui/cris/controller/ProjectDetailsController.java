@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,16 +22,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.Project;
+import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.BoxProject;
 import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.ProjectProperty;
 import org.dspace.app.cris.model.jdyna.TabProject;
+import org.dspace.app.cris.model.jdyna.TabResearcherPage;
+import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
 import org.dspace.app.cris.util.ICrisHomeProcessor;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.cris.metrics.ItemMetricsDTO;
+import org.dspace.app.webui.cris.util.CrisAuthorizeManager;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -39,6 +44,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.springframework.web.servlet.ModelAndView;
@@ -192,19 +198,22 @@ public class ProjectDetailsController
             HttpServletResponse response) throws SQLException, Exception
     {
 
-        // check admin authorization
-        Boolean isAdmin = null; // anonymous access
+        Integer entityId = extractEntityId(request);
+        
+        if(entityId==null) {
+            return null;
+        }
         Context context = UIUtil.obtainContext(request);
 
-        if (AuthorizeManager.isAdmin(context))
-        {
-            isAdmin = true; // admin
+        List<TabProject> tabs = applicationService.getList(TabProject.class);
+        List<TabProject> authorizedTabs = new LinkedList<TabProject>();
+        
+        for(TabProject tab : tabs) {
+            if(CrisAuthorizeManager.authorize(context, applicationService, Project.class, entityId, tab)) {
+                authorizedTabs.add(tab);
+            }
         }
-
-        List<TabProject> tabs = applicationService.getTabsByVisibility(
-                TabProject.class, isAdmin);
-
-        return tabs;
+        return authorizedTabs;
     }
 
     @Override
@@ -292,4 +301,10 @@ public class ProjectDetailsController
 	public void setProcessors(List<ICrisHomeProcessor<Project>> processors) {
 		this.processors = processors;
 	}
+	
+    @Override
+    protected boolean authorize(HttpServletRequest request, BoxProject box) throws SQLException
+    {
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), Project.class, extractEntityId(request), box);
+    }
 }

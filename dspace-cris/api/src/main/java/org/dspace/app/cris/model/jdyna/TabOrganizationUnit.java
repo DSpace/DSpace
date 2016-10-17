@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
+import it.cilea.osd.common.service.IPersistenceService;
 import it.cilea.osd.jdyna.web.AbstractTab;
 import it.cilea.osd.jdyna.web.ITabService;
 
@@ -25,6 +26,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.core.ConfigurationManager;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -95,45 +97,43 @@ public class TabOrganizationUnit extends AbstractTab<BoxOrganizationUnit>
         return ConfigurationManager.getProperty(CrisConstants.CFG_MODULE,"organizationunit.file.path");
     }
 
-    @Override
     public List<String> getAuthorizedSingle()
     {
         return authorizedSingle;
     }
 
-    @Override
     public void setAuthorizedSingle(List<String> authorizedSingle)
     {
         this.authorizedSingle = authorizedSingle; 
     }
 
-    @Override
     public List<String> getAuthorizedGroup()
     {
         return authorizedGroup;
     }
 
-    @Override
     public void setAuthorizedGroup(List<String> authorizedGroup)
     {
         this.authorizedGroup = authorizedGroup;
     }
 
     @Override
-    public List<String> getMetadataWithPolicySingle(ITabService tabService)
-    {        
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
+            AS tabService)
+    {
         List<String> results = new ArrayList<String>();
-        for(OUPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicySingle(OUPropertiesDefinition.class)) {
+        for(OUPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(OUPropertiesDefinition.class)) {
             results.add(pd.getShortName());
         }
         return results;
     }
 
     @Override
-    public List<String> getMetadataWithPolicyGroup(ITabService tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
+            AS tabService)
     {
         List<String> results = new ArrayList<String>();
-        for(OUPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicyGroup(OUPropertiesDefinition.class)) {
+        for(OUPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(OUPropertiesDefinition.class)) {
             results.add(pd.getShortName());
         }
         return results;

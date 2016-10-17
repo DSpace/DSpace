@@ -34,6 +34,7 @@ import org.dspace.app.cris.model.jdyna.DynamicProperty;
 import org.dspace.app.cris.model.jdyna.DynamicTypeNestedObject;
 import org.dspace.app.cris.model.jdyna.OUAdditionalFieldStorage;
 import org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage;
+import org.dspace.eperson.EPerson;
 
 
 @Entity
@@ -300,4 +301,12 @@ public class ResearchObject extends ACrisObjectWithTypeSupport<DynamicProperty, 
     {
         return ResearchObject.class;
     }
+
+    @Override
+    public boolean isOwner(EPerson eperson)
+    {
+        // TODO not implemented
+        return false;
+    }
+
 }

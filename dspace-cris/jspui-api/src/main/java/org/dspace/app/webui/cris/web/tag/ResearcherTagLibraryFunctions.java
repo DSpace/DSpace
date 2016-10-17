@@ -53,6 +53,9 @@ import org.dspace.app.cris.model.jdyna.BoxProject;
 import org.dspace.app.cris.model.jdyna.BoxResearcherPage;
 import org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DecoratorRPTypeNested;
+import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPAdditionalFieldStorage;
 import org.dspace.app.cris.model.jdyna.RPNestedObject;
 import org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition;
@@ -869,5 +872,31 @@ public class ResearcherTagLibraryFunctions
     public static <TP extends PropertiesDefinition, P extends Property<TP>> TP getPropertiesDefinition(Class<TP> clazz, String shortName)
     {
         return applicationService.findPropertiesDefinitionByShortName(clazz, shortName);
+    }
+    
+    public static <TP extends PropertiesDefinition, P extends Property<TP>> String getPropertyDefinitionLabel(String specificPart, String shortName) throws ClassNotFoundException
+    {
+        TP pd = null;
+        Class<TP> clazz = null;
+        switch (specificPart)
+        {
+        case "rp":
+            clazz = (Class<TP>)RPPropertiesDefinition.class;
+            break;
+        case "project":
+            clazz = (Class<TP>)ProjectPropertiesDefinition.class;
+            break;
+        case "ou":
+            clazz = (Class<TP>)OUPropertiesDefinition.class;
+            break;        
+        default:
+            clazz = (Class<TP>)DynamicPropertiesDefinition.class;
+            break;
+        }
+        pd = applicationService.findPropertiesDefinitionByShortName(clazz, shortName);
+        if(pd != null) {
+            return pd.getLabel();
+        }
+        return null;
     }
 }

@@ -31,6 +31,7 @@ import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUProperty;
 import org.dspace.app.cris.model.jdyna.OUTypeNestedObject;
 import org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage;
+import org.dspace.eperson.EPerson;
 
 @Entity
 @Table(name = "cris_orgunit", uniqueConstraints = @UniqueConstraint(columnNames={"sourceID","sourceRef"}))
@@ -264,4 +265,12 @@ public class OrganizationUnit extends
     {
         return OrganizationUnit.class;
     }
+
+    @Override
+    public boolean isOwner(EPerson eperson)
+    {
+        // TODO not implemented
+        return false;
+    }
+
 }

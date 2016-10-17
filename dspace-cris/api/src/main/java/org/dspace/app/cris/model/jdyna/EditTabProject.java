@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
+import it.cilea.osd.common.service.IPersistenceService;
 import it.cilea.osd.jdyna.web.AbstractEditTab;
 import it.cilea.osd.jdyna.web.ITabService;
 
@@ -135,20 +136,20 @@ public class EditTabProject extends
     }
 
     @Override
-    public List<String> getMetadataWithPolicySingle(ITabService tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(AS tabService)
     {        
         List<String> results = new ArrayList<String>();
-        for(ProjectPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicySingle(ProjectPropertiesDefinition.class)) {
+        for(ProjectPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(ProjectPropertiesDefinition.class)) {
             results.add(pd.getShortName());
         }
         return results;
     }
 
     @Override
-    public List<String> getMetadataWithPolicyGroup(ITabService tabService)
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(AS tabService)
     {
         List<String> results = new ArrayList<String>();
-        for(ProjectPropertiesDefinition pd : tabService.getAllPropertiesDefinitionWithPolicyGroup(ProjectPropertiesDefinition.class)) {
+        for(ProjectPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(ProjectPropertiesDefinition.class)) {
             results.add(pd.getShortName());
         }
         return results;
