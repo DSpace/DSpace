@@ -7,12 +7,11 @@
  */
 package org.dspace.app.webui.cris.controller;
 
-import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,17 +22,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.OrganizationUnit;
-import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUProperty;
 import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
+import org.dspace.app.cris.model.jdyna.TabProject;
+import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
 import org.dspace.app.cris.util.ICrisHomeProcessor;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.cris.metrics.ItemMetricsDTO;
+import org.dspace.app.webui.cris.util.CrisAuthorizeManager;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -42,9 +44,12 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.springframework.web.servlet.ModelAndView;
+
+import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
 
 /**
  * This SpringMVC controller is used to build the ResearcherPage details page.
@@ -189,20 +194,23 @@ public class OUDetailsController
             HttpServletRequest request, Map<String, Object> model,
             HttpServletResponse response) throws SQLException, Exception
     {
-
-        // check admin authorization
-        Boolean isAdmin = null; // anonymous access
+        
+        Integer entityId = extractEntityId(request);
+        
+        if(entityId==null) {
+            return null;
+        }
         Context context = UIUtil.obtainContext(request);
 
-        if (AuthorizeManager.isAdmin(context))
-        {
-            isAdmin = true; // admin
+        List<TabOrganizationUnit> tabs = applicationService.getList(TabOrganizationUnit.class);
+        List<TabOrganizationUnit> authorizedTabs = new LinkedList<TabOrganizationUnit>();
+        
+        for(TabOrganizationUnit tab : tabs) {
+            if(CrisAuthorizeManager.authorize(context, applicationService, OrganizationUnit.class, entityId, tab)) {
+                authorizedTabs.add(tab);
+            }
         }
-
-        List<TabOrganizationUnit> tabs = applicationService.getTabsByVisibility(
-                TabOrganizationUnit.class, isAdmin);
-
-        return tabs;
+        return authorizedTabs;
     }
 
     @Override
@@ -290,4 +298,10 @@ public class OUDetailsController
 	public void setProcessors(List<ICrisHomeProcessor<OrganizationUnit>> processors) {
 		this.processors = processors;
 	}
+	
+    @Override
+    protected boolean authorize(HttpServletRequest request, BoxOrganizationUnit box) throws SQLException
+    {
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), OrganizationUnit.class, extractEntityId(request), box);
+    }
 }

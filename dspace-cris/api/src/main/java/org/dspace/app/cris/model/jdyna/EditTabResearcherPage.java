@@ -7,11 +7,16 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
+import it.cilea.osd.common.service.IPersistenceService;
 import it.cilea.osd.jdyna.web.AbstractEditTab;
+import it.cilea.osd.jdyna.web.ITabService;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -53,6 +58,22 @@ public class EditTabResearcherPage extends
 
 	@OneToOne
 	private TabResearcherPage displayTab;
+	
+    @ElementCollection
+    @CollectionTable(
+          name="cris_rp_etab2policysingle",
+          joinColumns=@JoinColumn(name="etab_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedSingle;
+    
+    @ElementCollection
+    @CollectionTable(
+          name="cris_rp_etab2policygroup",
+          joinColumns=@JoinColumn(name="etab_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedGroup;
 
 	public EditTabResearcherPage() {
 		this.visibility = VisibilityTabConstant.ADMIN;
@@ -89,5 +110,51 @@ public class EditTabResearcherPage extends
     public String getFileSystemPath()
     {
         return ConfigurationManager.getProperty(CrisConstants.CFG_MODULE,"researcherpage.file.path");
+    }
+    
+    @Override
+    public List<String> getAuthorizedSingle()
+    {
+        return authorizedSingle;
+    }
+
+    @Override
+    public void setAuthorizedSingle(List<String> authorizedSingle)
+    {
+        this.authorizedSingle = authorizedSingle; 
+    }
+
+    @Override
+    public List<String> getAuthorizedGroup()
+    {
+        return authorizedGroup;
+    }
+
+    @Override
+    public void setAuthorizedGroup(List<String> authorizedGroup)
+    {
+        this.authorizedGroup = authorizedGroup;
+    }
+    
+    @Override
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
+            AS tabService, String specificPart)
+    {             
+        List<String> results = new ArrayList<String>();
+        for(RPPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(RPPropertiesDefinition.class)) {
+            results.add(pd.getShortName());
+        }
+        return results;
+    }
+
+    @Override
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
+            AS tabService, String specificPart)
+    {
+        List<String> results = new ArrayList<String>();
+        for(RPPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(RPPropertiesDefinition.class)) {
+            results.add(pd.getShortName());
+        }
+        return results;
     }
 }

@@ -7,11 +7,16 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
+import it.cilea.osd.common.service.IPersistenceService;
+import it.cilea.osd.jdyna.web.ITabService;
 import it.cilea.osd.jdyna.web.TypedAbstractTab;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -32,6 +37,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
         @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findTabsByHolder", query = "from TabDynamicObject tab where :par0 in elements(tab.mask)", cacheable=true),
         @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.uniqueTabByShortName", query = "from TabDynamicObject tab where shortName = ?", cacheable=true),
 		@org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByAccessLevel", query = "from TabDynamicObject tab where visibility = ? order by priority", cacheable=true),
+		@org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByTypeAndAccessLevel", query = "from TabDynamicObject tab where typeDef = ? and visibility = ? order by priority", cacheable=true),
 		@org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByAdmin", query = "from TabDynamicObject tab where visibility = 1 or visibility = 2 or visibility = 3 order by priority", cacheable=true),
 		@org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByOwner", query = "from TabDynamicObject tab where visibility = 0 or visibility = 2 or visibility = 3 order by priority", cacheable=true),
 		@org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByAnonimous", query = "from TabDynamicObject tab where visibility = 3 order by priority", cacheable=true),
@@ -50,7 +56,23 @@ public class TabDynamicObject extends TypedAbstractTab<BoxDynamicObject, Dynamic
             inverseJoinColumns = { @JoinColumn(name = "cris_do_box_id") })
 	@Cache(usage=CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private List<BoxDynamicObject> mask;
-	
+
+    @ElementCollection
+    @CollectionTable(
+          name="cris_do_tab2policysingle",
+          joinColumns=@JoinColumn(name="tab_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedSingle;
+    
+    @ElementCollection
+    @CollectionTable(
+          name="cris_do_tab2policygroup",
+          joinColumns=@JoinColumn(name="tab_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<String> authorizedGroup;
+    
 	@ManyToOne
 	private DynamicObjectType typeDef;
 	
@@ -88,5 +110,53 @@ public class TabDynamicObject extends TypedAbstractTab<BoxDynamicObject, Dynamic
         this.typeDef = typeDef;
     }
     
-   
+    @Override
+    public List<String> getAuthorizedSingle()
+    {
+        return authorizedSingle;
+    }
+
+    @Override
+    public void setAuthorizedSingle(List<String> authorizedSingle)
+    {
+        this.authorizedSingle = authorizedSingle; 
+    }
+
+    @Override
+    public List<String> getAuthorizedGroup()
+    {
+        return authorizedGroup;
+    }
+
+    @Override
+    public void setAuthorizedGroup(List<String> authorizedGroup)
+    {
+        this.authorizedGroup = authorizedGroup;
+    }
+    
+    @Override
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(AS tabService, String adminSpecificPath)
+    {        
+        List<String> results = new ArrayList<String>();
+        for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
+            String shortName = pd.getShortName();
+            if(shortName.startsWith(adminSpecificPath)) {
+                results.add(shortName);
+            }
+        }
+        return results;
+    }
+
+    @Override
+    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(AS tabService, String adminSpecificPath)
+    {
+        List<String> results = new ArrayList<String>();
+        for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
+            String shortName = pd.getShortName();
+            if(shortName.startsWith(adminSpecificPath)) {
+                results.add(shortName);
+            }
+        }
+        return results;
+    }
 }

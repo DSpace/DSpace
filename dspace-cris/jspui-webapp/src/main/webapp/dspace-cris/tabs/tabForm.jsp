@@ -20,7 +20,25 @@
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@page import="java.net.URL"%>
 <%@page import="org.dspace.app.cris.model.jdyna.VisibilityTabConstant"%>
-
+<c:set var="dspace.layout.head.last" scope="request">
+	<script type="text/javascript">
+	<!--
+	jQuery(document).ready(function(){
+		
+	    jQuery('.visibility').click(function(){
+	        if(jQuery(this).attr("value")=="<%= VisibilityTabConstant.POLICY %>"){
+	            jQuery("#chooserpolicymetadata").show();
+	        }
+	        else {
+	        	jQuery("#chooserpolicymetadata").hide();
+	        	jQuery(".policydropdown").val("");
+	        }
+	    });
+	});
+	-->
+	</script>
+</c:set>
+    
 <dspace:layout locbar="link" navbar="admin" style="submission"
 	titlekey="jsp.dspace-admin.edit-tab">
 
@@ -67,7 +85,7 @@
 		
 		<spring:bind path="tab.*">
 		<c:if test="${not empty status.errorMessages}">
-			<div class="error"><c:forEach var="error"
+			<div class="alert alert-danger"><c:forEach var="error"
 				items="${status.errorMessages}">
 	               ${error}<br />
 			</c:forEach></div>
@@ -75,7 +93,7 @@
 		</spring:bind>
 
 		<c:if test="${not empty status.errorMessages}">
-		<div class="error"><c:forEach var="error"
+		<div class="alert alert-danger"><c:forEach var="error"
 			items="${status.errorMessages}">
                  ${error}<br />
 		</c:forEach></div>
@@ -99,8 +117,11 @@
 			&nbsp;
 		</div>
 	
-			
-
+		<c:set var="VISIBILITYCONSTANTS" value="<%= VisibilityTabConstant.getValues() %>"/>
+		<c:if test="${!(specificPartPath eq 'rp')}">
+			<c:set var="VISIBILITYCONSTANTS" value="<%= VisibilityTabConstant.getLimitedValues() %>"/>
+		</c:if>	
+		
 		<spring:bind path="visibility">
 			<c:set var="inputValue">
 				<c:out value="${status.value}" escapeXml="true"></c:out>
@@ -113,8 +134,8 @@
 				key="jsp.layout.hku.label.visibility" /></label></span>
 
 			<div class="dynaFieldValue">
-			<c:forEach items="<%= VisibilityTabConstant.getValues() %>" var="item">
-				<input ${disabled} id="${inputName}" name="${inputName}"
+			<c:forEach items="${VISIBILITYCONSTANTS}" var="item" varStatus="count">
+				<input ${disabled} id="${inputName}_${count.count}" class="${inputName}" name="${inputName}"
 					type="radio" value="${item}"
 					<c:if test="${inputValue==item}">checked="checked"</c:if> />
 				<fmt:message
@@ -126,11 +147,63 @@
 			</div>
 			</div>
 		</spring:bind>
+
+		<c:if test="${tab.visibility!=4}">
+			<c:set var="chooservisibilityelement" value="style=\"display: none;\""/>
+		</c:if>		
+		<div id="chooserpolicymetadata" ${chooservisibilityelement}>
+		
+		<spring:bind path="authorizedSingle">
+			<c:set var="inputValue">
+				<c:out value="${status.value}" escapeXml="true"></c:out>
+			</c:set>
+			<c:set var="inputName">
+				<c:out value="${status.expression}" escapeXml="false"></c:out>
+			</c:set>
+
+			<div class="dynaField"><span class="dynaLabel"><label for="${inputName}"><fmt:message
+				key="jsp.layout.hku.label.authorized.eperson" /></label></span>
+
+			<div class="dynaFieldValue">
+				<select class="form-control policydropdown" id="${inputName}" name="${inputName}">
+					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.eperson.select" /></option>
+					<c:if test="${!empty metadataWithPolicySingle}">
+					    <c:forEach var="option" items="${metadataWithPolicySingle}" varStatus="loop">	    	
+				            <option value="${option}"<c:if test="${!empty inputValue && fn:contains(inputValue, option)}"> selected="selected"</c:if>>${researcher:getPropertyDefinitionLabel(specificPartPath,option)}(${option})</option>
+				        </c:forEach>        
+				    </c:if>
+				</select>
+			</div>
+			</div>
+		</spring:bind>
+		
+		<spring:bind path="authorizedGroup">
+			<c:set var="inputValue">
+				<c:out value="${status.value}" escapeXml="true"></c:out>
+			</c:set>
+			<c:set var="inputName">
+				<c:out value="${status.expression}" escapeXml="false"></c:out>
+			</c:set>
+
+			<div class="dynaField"><span class="dynaLabel"><label for="${inputName}"><fmt:message
+				key="jsp.layout.hku.label.authorized.group" /></label></span>
+
+			<div class="dynaFieldValue">
+				<select class="form-control policydropdown" id="${inputName}" name="${inputName}">
+					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.group.select" /></option>
+					<c:if test="${!empty metadataWithPolicyGroup}">
+					    <c:forEach var="option" items="${metadataWithPolicyGroup}" varStatus="loop">	    	
+				            <option value="${option}"<c:if test="${!empty inputValue && fn:contains(inputValue, option)}"> selected="selected"</c:if>>${researcher:getPropertyDefinitionLabel(specificPartPath,option)}(${option})</option>     	
+				        </c:forEach>        
+				    </c:if>
+				</select>
+			</div>
+			</div>
+		</spring:bind>
+		</div>
 		<div class="dynaClear">
 			&nbsp;
 		</div>
-		
-
 		<fieldset>
 		<legend><fmt:message key="jsp.layout.hku.label.tab.icon" /></legend>
 		<input type="file" size="50%" name="iconFile"/>
@@ -245,18 +318,18 @@
 		</fieldset>
 
 
-		<input type="submit"
+		<input type="submit" class="btn btn-primary pull-right"
 			value="<fmt:message key="jsp.layout.hku.researcher.button.save" />" />
 
 	</form:form>
 	<c:if test="${!empty tab.id}">
-	<div style="padding: 0; margin: 0 10px;"><a
+	<div style="padding: 0; margin: 0 10px;"><a class="btn btn-default pull-right"
 		href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createBox.htm?tabId=${tab.id}">
 	<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.newbox" />
 	</a></div>
 	</c:if>
 	<c:if test="${!empty edittabid}">
-	<div style="padding: 0; margin: 0 10px;"><a
+	<div style="padding: 0; margin: 0 10px;"><a class="btn btn-default pull-right"
 		href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/editEditTabs.htm?id=${edittabid}">
 	<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.tabtoedit" />
 	</a></div>

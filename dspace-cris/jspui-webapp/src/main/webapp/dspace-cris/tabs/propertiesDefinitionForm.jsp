@@ -143,11 +143,11 @@
 	<form:form commandName="propertiesdefinition" method="post">
 		<c:set value="${message}" var="message" scope="request" />
 		<c:if test="${!empty message}">
-			<div id="authority-message"><fmt:message key="${message}" /></div>
+			<div class="alert alert-default" id="authority-message"><fmt:message key="${message}" /></div>
 		</c:if>
 
 		<c:if test="${not empty messages}">
-			<div class="message" id="successMessages"><c:forEach var="msg"
+			<div class="alert alert-default" id="successMessages"><c:forEach var="msg"
 				items="${messages}">
 				<div id="authority-message">${msg}</div>
 			</c:forEach></div>
@@ -157,7 +157,7 @@
 		<%--  first bind on the object itself to display global errors - if available  --%>
 		<spring:bind path="propertiesdefinition">
 			<c:forEach items="${status.errorMessages}" var="error">
-				<span id="errorMessage"><fmt:message
+				<span class="alert alert-danger" id="errorMessage"><fmt:message
 					key="jsp.layout.hku.prefix-error-code" /> ${error}</span>
 				<br>
 			</c:forEach>
@@ -165,7 +165,7 @@
 
 		<spring:bind path="propertiesdefinition.*">
 		<c:if test="${not empty status.errorMessages}">
-			<div class="errorMessage"><c:forEach var="error"
+			<div class="alert alert-danger"><c:forEach var="error"
 				items="${status.errorMessages}">
 	               ${error}<br />
 			</c:forEach></div>
@@ -173,7 +173,7 @@
 		</spring:bind>
 
 		<c:if test="${not empty status.errorMessages}">
-		<div class="errorMessage"><c:forEach var="error"
+		<div class="alert alert-danger"><c:forEach var="error"
 			items="${status.errorMessages}">
                  ${error}<br />
 		</c:forEach></div>
@@ -513,7 +513,41 @@
 						</fieldset>											
 					</c:when>
 					<c:otherwise>
+					<c:choose>
+					<c:when test="${propertiesdefinition.rendering.type == 7}">
+						<fieldset>
+						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.widget.eperson" /></legend>
+							
+<%-- 						<dyna:text propertyPath="real.rendering.groupName"  visibility="false"
+							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.eperson.groupName" helpKey="help.jdyna.message.rendering.eperson.groupName"/>
+																			
+						<div class="dynaClear">
+							&nbsp;
+						</div>				 --%>		
+						
+						</fieldset>											
+					</c:when>
+					<c:otherwise>
+					<c:choose>
+					<c:when test="${propertiesdefinition.rendering.type == 6}">
+ 						<fieldset>
+						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.widget.group" /></legend>
+					
+<%-- 						<dyna:text propertyPath="real.rendering.regex"  visibility="false"
+							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.group.regex" helpKey="help.jdyna.message.rendering.group.regex"/>
+																			
+						<div class="dynaClear">
+							&nbsp;
+						</div>		 --%>				
+						
+						</fieldset>									
+					</c:when>
+					<c:otherwise>
 						<%-- nothing --%>
+					</c:otherwise>
+					</c:choose>
+					</c:otherwise>
+					</c:choose>
 					</c:otherwise>
 					</c:choose>					
 					</c:otherwise>

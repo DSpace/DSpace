@@ -7,11 +7,6 @@
  */
 package org.dspace.app.webui.cris.controller.jdyna;
 
-import it.cilea.osd.jdyna.model.PropertiesDefinition;
-import it.cilea.osd.jdyna.web.controller.SearchPointerController;
-import it.cilea.osd.jdyna.web.tag.DisplayPointerTagLibrary;
-import it.cilea.osd.jdyna.widget.WidgetPointer;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +18,15 @@ import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerDO;
-import org.dspace.app.cris.util.Researcher;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+
+import it.cilea.osd.jdyna.model.AWidget;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.utils.SelectableDTO;
+import it.cilea.osd.jdyna.web.controller.SearchPointerController;
+import it.cilea.osd.jdyna.web.tag.DisplayPointerTagLibrary;
+import it.cilea.osd.jdyna.widget.WidgetPointer;
 
 public class CrisSearchPointerController extends
         SearchPointerController<PropertiesDefinition, ACrisObject>
@@ -34,7 +35,7 @@ public class CrisSearchPointerController extends
     private CrisSearchService searchService;
 
     @Override
-    protected List<SelectableDTO> getResult(String query, String expression, String... filtro)
+    protected List<SelectableDTO> getResult(AWidget widget, String query, String expression, String... filtro)
     {
         Context context = null;
         List<SelectableDTO> results = new ArrayList<SelectableDTO>();
@@ -81,8 +82,16 @@ public class CrisSearchPointerController extends
     }
 
     @Override
-    protected String[] getFilter(WidgetPointer widgetPointer)
+    protected String getDisplay(AWidget widget)
     {
+        WidgetPointer widgetPointer = (WidgetPointer)widget;
+        return widgetPointer.getDisplay();
+    }
+    
+    @Override
+    protected String[] getFilter(AWidget widget)
+    {
+        WidgetPointer widgetPointer = (WidgetPointer)widget;
         String filtro = widgetPointer.getFiltro();
         Class target = widgetPointer.getTargetValoreClass();
 

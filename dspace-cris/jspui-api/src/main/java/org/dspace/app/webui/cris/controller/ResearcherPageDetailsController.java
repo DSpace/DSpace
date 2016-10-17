@@ -8,6 +8,7 @@
 package org.dspace.app.webui.cris.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,6 +35,7 @@ import org.dspace.app.cris.statistics.util.StatsConfig;
 import org.dspace.app.cris.util.ICrisHomeProcessor;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.cris.metrics.ItemMetricsDTO;
+import org.dspace.app.webui.cris.util.CrisAuthorizeManager;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -45,6 +47,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.statistics.SolrLogger;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
@@ -258,41 +261,21 @@ public class ResearcherPageDetailsController
             HttpServletResponse response) throws Exception
     {
         Integer researcherId = extractEntityId(request);
-        ResearcherPage researcher = null;
-        try
-        {
-            researcher = ((ApplicationService) applicationService).get(
-                    ResearcherPage.class, researcherId);
-        }
-        catch (NumberFormatException e)
-        {
+        
+        if(researcherId==null) {
             return null;
         }
         Context context = UIUtil.obtainContext(request);
-        EPerson currUser = context.getCurrentUser();
-        // check owner authorization
-        boolean isOwner = currUser != null && researcher.getEpersonID()!=null && (researcher.getEpersonID() == currUser.getID());
-        List<TabResearcherPage> tabs = new LinkedList<TabResearcherPage>();
-        // check admin authorization
-		if (AuthorizeManager.isAdmin(context))
-        {
-			tabs = applicationService.getTabsByVisibility(
-	                TabResearcherPage.class, true);
-			if(isOwner) {
-		        //admin authorization for LOW tab visibility (LOW are the tab show only to RP owner)
-				tabs.addAll(((ApplicationService)applicationService).getTabsByVisibility(TabResearcherPage.class, VisibilityTabConstant.LOW));
-			}
+
+        List<TabResearcherPage> tabs = applicationService.getList(TabResearcherPage.class);
+        List<TabResearcherPage> authorizedTabs = new LinkedList<TabResearcherPage>();
+        
+        for(TabResearcherPage tab : tabs) {
+            if(CrisAuthorizeManager.authorize(context, applicationService, ResearcherPage.class, researcherId, tab)) {
+                authorizedTabs.add(tab);
+            }
         }
-        else if (isOwner)
-        {
-        	tabs = applicationService.getTabsByVisibility(
-                    TabResearcherPage.class, false);
-        } else {
-        	//anonymous access
-        	tabs = applicationService.getTabsByVisibility(
-                    TabResearcherPage.class, null);
-        }
-        return tabs;
+        return authorizedTabs;
     }
 
     @Override
@@ -389,6 +372,12 @@ public class ResearcherPageDetailsController
     public void setProcessors(List<ICrisHomeProcessor<ResearcherPage>> processors)
     {
         this.processors = processors;
+    }
+
+    @Override
+    protected boolean authorize(HttpServletRequest request, BoxResearcherPage box) throws SQLException
+    {
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), ResearcherPage.class, extractEntityId(request), box);        
     }
 
 }
