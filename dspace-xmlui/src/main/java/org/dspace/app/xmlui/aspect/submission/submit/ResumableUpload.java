@@ -546,9 +546,13 @@ public class ResumableUpload extends AbstractAction
                     Context ctx = new Context();
                     ctx.setCurrentUser(user);
                     
+                    log.info("Create bitstream for user " + user.getEmail() + " submissionId: " + submissionId);
+                    
                     // find item
                     InProgressSubmission ips = WorkspaceItem.find(ctx, submissionId);
                     Item item = ips.getItem();
+                    
+                    log.info("Create bitstream on item " + item.getID());
                     
                     // create new bitstream
                     Bitstream b = this.createBitstream(ctx, file, item);
@@ -566,7 +570,8 @@ public class ResumableUpload extends AbstractAction
                     session.setAttribute(resumableIdentifier, b.getID());
                 }
                 catch(SQLException ex)
-                { 
+                {
+                    log.error("Problem with bitstream creation: " + ex.getMessage());
                     throw new RuntimeException(ex);
                 }
             }
