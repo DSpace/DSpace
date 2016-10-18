@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.license.factory.LicenseServiceFactory;
 import org.dspace.license.service.CreativeCommonsService;
@@ -59,7 +60,20 @@ public class CCLookup {
 	private List<CCLicenseField> licenseFields = new ArrayList<CCLicenseField>();
 	
 	protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
-	
+
+	static {
+		// if defined, set a proxy server for http requests to Creative Commons site
+		ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+		String proxyHost = configurationService.getProperty("http.proxy.host");
+		String proxyPort = configurationService.getProperty("http.proxy.port");
+
+		if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort))
+		{
+			System.setProperty("http.proxyHost", proxyHost);
+			System.setProperty("http.proxyPort", proxyPort);
+		}
+	}
+
 	/**
 	 * Constructs a new instance with the default web services root.
 	 *
