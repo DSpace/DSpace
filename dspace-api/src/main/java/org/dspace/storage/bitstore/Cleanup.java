@@ -2,7 +2,6 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
  * http://www.dspace.org/license/
  */
 package org.dspace.storage.bitstore;
@@ -19,7 +18,7 @@ import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 
 /**
  * Cleans up asset store.
- * 
+ *
  * @author Peter Breton
  * @version $Revision$
  */
@@ -30,63 +29,73 @@ public class Cleanup
 
     /**
      * Cleans up asset store.
-     * 
+     *
      * @param argv -
      *            Command-line arguments
      */
     public static void main(String[] argv)
     {
-        try
-        {
-            log.info("Cleaning up asset store");
-            
-            // set up command line parser
-            CommandLineParser parser = new PosixParser();
-            CommandLine line = null;
+        log.info("Cleaning up asset store");
 
-            // create an options object and populate it
-            Options options = new Options();
+        // set up command line parser
+        CommandLineParser parser = new PosixParser();
+        CommandLine line = null;
 
-            options.addOption("l", "leave", false, "Leave database records but delete file from assetstore");
-            options.addOption("v", "verbose", false, "Provide verbose output");
-            options.addOption("h", "help", false, "Help");
-            
-            try
-            {            	
-                line = parser.parse(options, argv);
-            }
-            catch (ParseException e)
-            {
-                log.fatal(e);
-                System.exit(1);
-            }
-            
+        // create an options object and populate it
+        Options options = new Options();
+        boolean deleteDbRecords = true;
+        boolean verbose = false;
+        int commitBatch = 100;
+        options.addOption("l", "leave", false, "Leave database records but delete file from assetstore");
+        options.addOption("b", "batchSize", true, "commitBatches, default " + commitBatch);
+        options.addOption("v", "verbose", false, "Provide verbose output");
+        options.addOption("h", "help", false, "Help");
+
+        try {
+            line = parser.parse(options, argv);
             // user asks for help
-            if (line.hasOption('h'))
-            {
+            if (line.hasOption('h')) {
                 printHelp(options);
-                System.exit(0);
-            }
-
-            boolean deleteDbRecords = true;
-            // Prune stage
-            if (line.hasOption('l'))
+                return;
+            } else  // actually do the work
             {
-            	log.debug("option l used setting flag to leave db records");
-                deleteDbRecords = false;    
+                deleteDbRecords = !line.hasOption('l');
+                verbose = line.hasOption('v');
+                if (line.hasOption('b')) {
+                    try {
+                        commitBatch = Integer.parseInt(line.getOptionValue('b'));
+                    } catch (NumberFormatException ne) {
+                        throw new RuntimeException( "'" + line.getOptionValue('b') + "' is not a positive integer");
+                    }
+                    if (commitBatch < 1) {
+                        throw new RuntimeException( "batchSize must be greater or equal 1");
+                    }
+                }
             }
-           	log.debug("leave db records = " + deleteDbRecords);
-            StorageServiceFactory.getInstance().getBitstreamStorageService().cleanup(deleteDbRecords, line.hasOption('v'));
-            
-            System.exit(0);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            printHelp(options);
+            System.exit(1);
         }
-        catch (Exception e)
-        {
+
+        if (log.isDebugEnabled()) {
+            log.debug("leave db records = " + !deleteDbRecords);
+            log.debug("batchSize = " + commitBatch);
+        }
+        if (verbose) {
+            System.out.println("leave db records = " + !deleteDbRecords);
+            System.out.println("batchSize = " + commitBatch);
+        }
+
+        try {
+            StorageServiceFactory.getInstance().getBitstreamStorageService().cleanup(deleteDbRecords, commitBatch, verbose);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
             log.fatal("Caught exception:", e);
             System.exit(1);
         }
     }
-    
+
     private static void printHelp(Options options)
     {
         HelpFormatter myhelp = new HelpFormatter();
