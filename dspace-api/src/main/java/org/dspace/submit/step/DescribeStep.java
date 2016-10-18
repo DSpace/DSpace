@@ -312,7 +312,7 @@ public class DescribeStep extends AbstractProcessingStep
                     }
                 }
             }
-            else if ((inputType.equals("onebox"))
+            else if (inputType.equals("number") || (inputType.equals("onebox"))
                     || (inputType.equals("twobox"))
                     || (inputType.equals("textarea")))
             {
