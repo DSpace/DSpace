@@ -261,7 +261,8 @@ public class UploadStep extends AbstractSubmissionStep
         //  If the user has already uploaded files provide a list for the user.
         if (bitstreams.size() > 0 || disableFileEditing)
         {
-            Table summary = div.addTable("submit-upload-summary",(bitstreams.size() * 2) + 2,7);
+            int cols = disableFileEditing?6:7;
+            Table summary = div.addTable("submit-upload-summary",(bitstreams.size() * 2) + 2, cols);
             summary.setHead(T_head2);
 
             Row header = summary.addRow(Row.ROLE_HEADER);
@@ -271,8 +272,9 @@ public class UploadStep extends AbstractSubmissionStep
             header.addCellContent(T_column3); // size
             header.addCellContent(T_column4); // description
             header.addCellContent(T_column5); // format
-            header.addCellContent(T_column6); // edit button
-
+            if(!disableFileEditing){
+                header.addCellContent(T_column6); // edit button
+            }
             for (Bitstream bitstream : bitstreams)
             {
                 UUID id = bitstream.getID();
@@ -344,8 +346,10 @@ public class UploadStep extends AbstractSubmissionStep
                     }
                 }
 
-                Button edit = row.addCell().addButton("submit_edit_"+id);
-                edit.setValue(T_submit_edit);
+                if(!disableFileEditing){
+                    Button edit = row.addCell().addButton("submit_edit_"+id);
+                    edit.setValue(T_submit_edit);
+                }
 
                 Row checksumRow = summary.addRow();
                 checksumRow.addCell();

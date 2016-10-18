@@ -262,7 +262,8 @@ public class UploadWithEmbargoStep extends UploadStep
         //  If the user has already uploaded files provide a list for the user.
         if (bitstreams.size() > 0 || disableFileEditing)
 		{
-	        Table summary = div.addTable("submit-upload-summary",(bitstreams.size() * 2) + 2,7);
+            int cols= disableFileEditing?6:7;
+	        Table summary = div.addTable("submit-upload-summary",(bitstreams.size() * 2) + 2,cols);
 	        summary.setHead(T_head2);
 	        
 	        Row header = summary.addRow(Row.ROLE_HEADER);
@@ -272,8 +273,10 @@ public class UploadWithEmbargoStep extends UploadStep
 	        header.addCellContent(T_column3); // size
 	        header.addCellContent(T_column4); // description
 	        header.addCellContent(T_column5); // format
-	        header.addCellContent(T_column6); // edit button
-	        
+            if(!disableFileEditing){
+	            header.addCellContent(T_column6); // edit button
+            }
+
 	        for (Bitstream bitstream : bitstreams)
 	        {
                 UUID id = bitstream.getID();
@@ -344,9 +347,11 @@ public class UploadWithEmbargoStep extends UploadStep
 	            		break;
 	            	}
 	            }
-	            
-	            Button edit = row.addCell().addButton("submit_edit_"+id);
-	            edit.setValue(T_submit_edit);
+
+                if(!disableFileEditing){
+                    Button edit = row.addCell().addButton("submit_edit_"+id);
+	                edit.setValue(T_submit_edit);
+                }
 
                 if(isAdvancedFormEnabled){
                     Button policy = row.addCell().addButton("submit_editPolicy_"+id);
@@ -355,7 +360,7 @@ public class UploadWithEmbargoStep extends UploadStep
 
                 Row checksumRow = summary.addRow();
 	            checksumRow.addCell();
-	            Cell checksumCell = checksumRow.addCell(null, null, 0, 6, null);
+	            Cell checksumCell = checksumRow.addCell(null, null, 0, cols, null);
 	            checksumCell.addHighlight("bold").addContent(T_checksum);
 	            checksumCell.addContent(" ");
 	            checksumCell.addContent(algorithm + ":" + checksum);
@@ -366,7 +371,7 @@ public class UploadWithEmbargoStep extends UploadStep
 	        	// Workflow users can not remove files.
 		        Row actionRow = summary.addRow();
 		        actionRow.addCell();
-		        Button removeSeleceted = actionRow.addCell(null, null, 0, 6, null).addButton("submit_remove_selected");
+		        Button removeSeleceted = actionRow.addCell(null, null, 0, cols, null).addButton("submit_remove_selected");
 		        removeSeleceted.setValue(T_submit_remove);
 	        }
 	        
