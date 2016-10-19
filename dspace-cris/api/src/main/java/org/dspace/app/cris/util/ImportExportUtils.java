@@ -561,6 +561,7 @@ public class ImportExportUtils {
                 
                 boolean delete = false;
                 boolean update = false;
+                boolean actionStatus = false;
                 if (action.equalsIgnoreCase(IBulkChange.ACTION_DELETE))
                 {
                         delete = true;
@@ -570,6 +571,11 @@ public class ImportExportUtils {
                     if (action.equalsIgnoreCase(IBulkChange.ACTION_UPDATE))
                     {
                         update = true;
+                    }
+                    else {
+                        if (action.equalsIgnoreCase(IBulkChange.ACTION_SHOW) || action.equalsIgnoreCase(IBulkChange.ACTION_HIDE)) {
+                            actionStatus = true;
+                        }
                     }
                 }
                 
@@ -642,7 +648,7 @@ public class ImportExportUtils {
                         AnagraficaUtils.reverseDTO(dto, crisObject,
                                 realFillTPS);
 
-                        if(toSaveOrUpdate) {
+                        if(toSaveOrUpdate || actionStatus) {
                             applicationService.saveOrUpdate(crisObjectClazz,
                                 crisObject);
                         }
