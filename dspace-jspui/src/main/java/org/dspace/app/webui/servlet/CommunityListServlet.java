@@ -25,6 +25,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -55,6 +56,11 @@ public class CommunityListServlet extends DSpaceServlet
     { 
            synchronized (staticLock) 
            {
+        	boolean showCommList = ConfigurationManager.getBooleanProperty("community-list.show.all",true);
+  		  	if(!showCommList && !AuthorizeManager.isAdmin(context)){
+  		  		throw new AuthorizeException("Only Admin can see the community list");
+  		  	}
+        	
             colMap = new HashMap<Integer, Collection[]>();
             commMap = new HashMap<Integer, Community[]>();
 

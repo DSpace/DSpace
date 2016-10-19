@@ -83,6 +83,8 @@
     if (StringUtils.isNotBlank(mlinksConf)) {
     	mlinks = StringUtils.split(mlinksConf, ",");
     }
+    
+    boolean showCommList = ConfigurationManager.getBooleanProperty("community-list.show.all",true);
 %>
 
        <div class="navbar-header">
@@ -97,8 +99,10 @@
          <ul id="top-menu" class="nav navbar-nav">
            <li id="home-top-menu" class="<%= currentPage.endsWith("/home.jsp")? 
         		   "active" : "" %>"><a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.layout.navbar-default.home"/></a></li>
+		  <% if(showCommList){ %>
 		   <li id="communitylist-top-menu" class="<%= currentPage.endsWith("/community-list")? 
         		   "active" : "" %>"><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a></li>
+        		 <% }%> 
            <% for (String mlink : mlinks) { %>
            <c:set var="exploremlink">
            <%= mlink.trim() %>

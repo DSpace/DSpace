@@ -31,6 +31,8 @@
 	if (StringUtils.isNotBlank(mlinksConf)) {
 		mlinks = StringUtils.split(mlinksConf, ",");
 	}
+	
+	boolean showCommList = ConfigurationManager.getBooleanProperty("community-list.show.all",true);
 %>
 
             <%-- Right-hand side bar if appropriate --%>
@@ -59,8 +61,11 @@
 	             			</div>
 	             			<div class="panel-body">
 	             			<ul>
+	    <% 	if(showCommList){ %>
            <li><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a></li>
-           <% for (String mlink : mlinks) { %>
+        <%	} 
+            for (String mlink : mlinks) { 
+         %>
            <c:set var="fmtkey">
            jsp.layout.navbar-default.cris.<%= mlink.trim() %>
            </c:set>
@@ -84,7 +89,7 @@
             	 	<fmt:message key="jsp.layout.footer-default.version-by"/> 
             	 	<a href="http://www.4science.it/en/dspace-and-dspace-cris-services/">
             	 		<img src="<%= request.getContextPath() %>/image/logo-4science-small.png"
-                                    alt="Logo CINECA" height="32px"/></a>
+                                    alt="Logo 4SCIENCE" height="32px"/></a>
 				</div>
 			</div>
 	    </footer>
