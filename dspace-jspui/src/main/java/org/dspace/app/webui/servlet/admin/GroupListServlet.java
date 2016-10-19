@@ -18,6 +18,7 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 /**
@@ -51,14 +52,37 @@ public class GroupListServlet extends DSpaceServlet
         {
             first = 0;
         }
+        int offset = UIUtil.getIntParameter(request, "offset");
+        if (first == -1)
+        {
+            first = 0;
+        }
+        if (offset == -1)
+        {
+            offset = 0;
+        }		
 
 		// Retrieve the e-people in the specified order
-		Group[] groups = Group.findAll(context, sortBy);
+		Group[] groups;
 		
+        String search = request.getParameter("search");
+        if (search != null && !search.equals(""))
+        {
+            groups = Group.search(context, search);
+            request.setAttribute("offset", Integer.valueOf(offset));
+        }
+        else
+        {
+            // Retrieve the e-people in the specified order
+            groups = Group.findAll(context, sortBy);
+            request.setAttribute("offset", Integer.valueOf(0));
+        }    
+        
 		// Set attributes for JSP
 		request.setAttribute("sortby", Integer.valueOf(sortBy));
 		request.setAttribute("first",  Integer.valueOf(first));
 		request.setAttribute("groups", groups);
+        request.setAttribute("search", search);
 		if (multiple)
 		{
 			request.setAttribute("multiple", Boolean.TRUE);
