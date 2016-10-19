@@ -523,6 +523,15 @@
         "integrated" : "Y"
      },
      {
+        "sponsor" : "Journal of Experimental Botany",
+        "title" : "Journal of Experimental Botany",
+        "hidden" : "Y",
+        "issn" : "0022-0957",
+        "submission" : "R",
+        "embargo" : "Y",
+        "integrated" : "Y"
+     },
+     {
         "sponsor" : "U.S. Fish and Wildlife Service",
         "title" : "Journal of Fish and Wildlife Management",
         "hidden" : "N",
