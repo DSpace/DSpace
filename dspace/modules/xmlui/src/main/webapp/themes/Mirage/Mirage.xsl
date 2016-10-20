@@ -398,15 +398,14 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
+                        <!-- Journal of Experimental Botany -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+experimental%5C+botany%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Experimental%5C+Botany"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JXB.png" alt="Journal of Experimental Botany" /></a>
                         <!-- ERJ Open Research -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aerj%5C+open%5C+research%5C%7C%5C%7C%5C%7CERJ%5C+Open%5C+Research"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ERJOR.png" alt="ERJ Open Research" /></a>
                         <!-- European Respiratory Journal -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aeuropean%5C+respiratory%5C+journal%5C%7C%5C%7C%5C%7CEuropean%5C+Respiratory%5C+Journal"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ERJ.png" alt="European Respiratory Journal" /></a>
                         <!-- Applications in Plant Sciences -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aapplications%5C+in%5C+plant%5C+sciences%5C%7C%5C%7C%5C%7CApplications%5C+in%5C+Plant%5C+Sciences"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-APPS.png" alt="Applications in Plant Sciences" /></a>
-                        <!-- Journal of Systematics and Evolution -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+systematics%5C+and%5C+evolution%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Systematics%5C+and%5C+Evolution"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JSE_Cover.png" alt="Journal of Systematics and Evolution" /></a>
-
                     </div>
                 </div>
             </div>
