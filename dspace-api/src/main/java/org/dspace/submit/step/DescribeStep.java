@@ -82,6 +82,9 @@ public class DescribeStep extends AbstractProcessingStep
     // the metadata language qualifier
     public static final String LANGUAGE_QUALIFIER = getDefaultLanguageQualifier();
 
+    // there were validation errors found
+    public static final int STATUS_ERROR_VALIDATION_FIELDS = 3;
+
     /** Constructor */
     public DescribeStep() throws ServletException
     {
@@ -221,6 +224,7 @@ public class DescribeStep extends AbstractProcessingStep
         // Clear required-field errors first since missing authority
         // values can add them too.
         clearErrorFields(request);
+        clearValidationErrorFields(request);
 
         // Step 2:
         // now update the item metadata.
@@ -256,12 +260,11 @@ public class DescribeStep extends AbstractProcessingStep
             String inputType = inputs[j].getInputType();
             if (inputType.equals("name"))
             {
-                readNames(request, item, schema, element, qualifier, inputs[j]
-                        .getRepeatable());
+                readNames(request, item, schema, element, qualifier, inputs[j]);
             }
             else if (inputType.equals("date"))
             {
-                readDate(request, item, schema, element, qualifier);
+                readDate(request, item, schema, element, qualifier, inputs[j]);
             }
             // choice-controlled input with "select" presentation type is
             // always rendered as a dropdown menu
@@ -280,6 +283,7 @@ public class DescribeStep extends AbstractProcessingStep
                         {
                             item.addMetadata(schema, element, qualifier, LANGUAGE_QUALIFIER,
                                     vals[z]);
+                            validateField(request, inputs[j], fieldKey, vals[z]);
                         }
                     }
                 }
@@ -287,7 +291,7 @@ public class DescribeStep extends AbstractProcessingStep
             else if (inputType.equals("series"))
             {
                 readSeriesNumbers(request, item, schema, element, qualifier,
-                        inputs[j].getRepeatable());
+                        inputs[j]);
             }
             else if (inputType.equals("qualdrop_value"))
             {
@@ -309,15 +313,15 @@ public class DescribeStep extends AbstractProcessingStep
                     {
                         item.addMetadata(schema, element, thisQual, null,
                                 thisVal);
+                        validateField(request, inputs[j], fieldKey, thisVal);
                     }
                 }
             }
-            else if ((inputType.equals("onebox"))
+            else if (inputType.equals("number") || (inputType.equals("onebox"))
                     || (inputType.equals("twobox"))
                     || (inputType.equals("textarea")))
             {
-                readText(request, item, schema, element, qualifier, inputs[j]
-                        .getRepeatable(), LANGUAGE_QUALIFIER);
+                readText(request, item, schema, element, qualifier, LANGUAGE_QUALIFIER, inputs[j]);
             }
             else
             {
@@ -375,12 +379,18 @@ public class DescribeStep extends AbstractProcessingStep
             }
         }
 
-        // Step 4:
-        // Save changes to database
-        subInfo.getSubmissionItem().update();
-
-        // commit changes
-        context.commit();
+        if (getValidationErrorFields(request) == null) 
+        {
+            // Step 4:
+            // Save changes to database
+            subInfo.getSubmissionItem().update();
+    
+            // commit changes
+            context.commit();
+        }
+        else {
+            return STATUS_ERROR_VALIDATION_FIELDS;
+        }
 
         // check for request for more input fields, first
         if (moreInput)
@@ -557,8 +567,10 @@ public class DescribeStep extends AbstractProcessingStep
      *            set to true if the field is repeatable on the form
      */
     protected void readNames(HttpServletRequest request, Item item,
-            String schema, String element, String qualifier, boolean repeated)
+            String schema, String element, String qualifier, DCInput dcInput)
     {
+        boolean repeated = dcInput.getRepeatable();
+        
         String metadataField = MetadataField
                 .formKey(schema, element, qualifier);
 
@@ -666,6 +678,7 @@ public class DescribeStep extends AbstractProcessingStep
                 }
 
                 // Add to the database -- unless required authority is missing
+                DCPersonName dcPersonName = new DCPersonName(l, f);
                 if (isAuthorityControlled)
                 {
                     String authKey = auths.size() > i ? auths.get(i) : null;
@@ -679,15 +692,17 @@ public class DescribeStep extends AbstractProcessingStep
                     else
                     {
                         item.addMetadata(schema, element, qualifier, null,
-                                new DCPersonName(l, f).toString(), authKey,
+                                dcPersonName.toString(), authKey,
                                 (sconf != null && sconf.length() > 0) ?
                                         Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                        validateField(request, dcInput, metadataField, dcPersonName.toString());
                     }
                 }
                 else
                 {
                     item.addMetadata(schema, element, qualifier, null,
-                            new DCPersonName(l, f).toString());
+                            dcPersonName.toString());
+                    validateField(request, dcInput, metadataField, dcPersonName.toString());
                 }
             }
         }
@@ -726,8 +741,9 @@ public class DescribeStep extends AbstractProcessingStep
      *            language to set (ISO code)
      */
     protected void readText(HttpServletRequest request, Item item, String schema,
-            String element, String qualifier, boolean repeated, String lang)
+            String element, String qualifier, String lang, DCInput dcInput)
     {
+        boolean repeated = dcInput.getRepeatable();
         // FIXME: Of course, language should be part of form, or determined
         // some other way
         String metadataField = MetadataField
@@ -815,13 +831,23 @@ public class DescribeStep extends AbstractProcessingStep
                         item.addMetadata(schema, element, qualifier, lang, s,
                                 authKey, (sconf != null && sconf.length() > 0) ?
                                         Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                        validateField(request, dcInput, metadataField, s);
                     }
                 }
                 else
                 {
                     item.addMetadata(schema, element, qualifier, lang, s);
+                    validateField(request, dcInput, metadataField, s);
                 }
             }
+        }
+    }
+
+    private void validateField(HttpServletRequest request, DCInput dcInput,
+            String metadataField, String s)
+    {
+        if(!(dcInput.validate(s))) {
+            addValidationErrorField(request, metadataField); 
         }
     }
 
@@ -847,7 +873,7 @@ public class DescribeStep extends AbstractProcessingStep
      * @throws SQLException
      */
     protected void readDate(HttpServletRequest request, Item item, String schema,
-            String element, String qualifier) throws SQLException
+            String element, String qualifier, DCInput dcInput) throws SQLException
     {
         String metadataField = MetadataField
                 .formKey(schema, element, qualifier);
@@ -867,6 +893,7 @@ public class DescribeStep extends AbstractProcessingStep
         {
             // Only put in date if there is one!
             item.addMetadata(schema, element, qualifier, null, d.toString());
+            validateField(request, dcInput, metadataField, d.toString());
         }
     }
 
@@ -905,8 +932,10 @@ public class DescribeStep extends AbstractProcessingStep
      *            set to true if the field is repeatable on the form
      */
     protected void readSeriesNumbers(HttpServletRequest request, Item item,
-            String schema, String element, String qualifier, boolean repeated)
+            String schema, String element, String qualifier, DCInput dcInput)
     {
+        boolean repeated = dcInput.getRepeatable();
+        
         String metadataField = MetadataField
                 .formKey(schema, element, qualifier);
 
@@ -966,8 +995,10 @@ public class DescribeStep extends AbstractProcessingStep
             // Only add non-empty
             if (!s.equals("") || !n.equals(""))
             {
+                DCSeriesNumber dcSeriesNumber = new DCSeriesNumber(s, n);
                 item.addMetadata(schema, element, qualifier, null,
-                        new DCSeriesNumber(s, n).toString());
+                        dcSeriesNumber.toString());
+                validateField(request, dcInput, metadataField, dcSeriesNumber.toString());
             }
         }
     }

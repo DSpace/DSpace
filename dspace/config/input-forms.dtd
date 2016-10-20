@@ -56,3 +56,5 @@
  <!ATTLIST vocabulary closed (true|false) "false"> 
 
  <!ELEMENT visibility (#PCDATA) >
+ 
+ <!ELEMENT validation (#PCDATA) >

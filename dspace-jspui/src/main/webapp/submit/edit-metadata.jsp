@@ -16,7 +16,6 @@
   -    submission.page   - the step in submission
   --%>
 
-<%@page import="org.apache.commons.lang.StringUtils"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.ArrayList" %>
@@ -55,6 +54,8 @@
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="java.util.Calendar"%>
+<%@ page import="java.util.Locale"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -698,6 +699,98 @@
       out.write(sb.toString());
     }
 
+    void doNumber(javax.servlet.jsp.JspWriter out, Item item,
+            String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required, boolean readonly,
+            int fieldCountIncr, String label, PageContext pageContext, int collectionID)
+            throws java.io.IOException
+    {
+            
+        String authorityType = getAuthorityType(pageContext, fieldName, collectionID);
+        Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+        int fieldCount = defaults.length + fieldCountIncr;
+        StringBuffer sb = new StringBuffer();
+        String val, auth;
+        int conf= 0;
+
+        if (fieldCount == 0)
+           fieldCount = 1;
+
+        sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
+          .append(label)
+          .append("</label>");
+        sb.append("<div class=\"col-md-10\">");  
+        for (int i = 0; i < fieldCount; i++)
+        {
+             if (i < defaults.length)
+             {
+               val = defaults[i].value.replaceAll("\"", "&quot;");
+               auth = defaults[i].authority;
+               conf = defaults[i].confidence;
+             }
+             else
+             {
+               val = "";
+               auth = "";
+               conf= unknownConfidence;
+             }
+
+             sb.append("<div class=\"row col-md-12\">");
+             String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
+             
+             sb.append("<div class=\"col-md-10\">");
+             if (authorityType != null)
+             {
+          	   sb.append("<div class=\"row col-md-10\">");
+             }
+             
+             sb.append("<div class=\"row col-md-4\">");
+             sb.append("<input class=\"form-control\" type=\"number\" step=\"any\"  name=\"")
+               .append(fieldNameIdx)
+               .append("\" id=\"")
+               .append(fieldNameIdx).append("\" value=\"")
+               .append(val +"\"")
+               .append(readonly?" disabled=\"disabled\" ":"")
+               .append("/>")  			              
+               .append("</div>").append("</div>");
+             
+             if (authorityType != null)
+             {
+          	   sb.append("<div class=\"col-md-2\">");
+  	           sb.append(doAuthority(pageContext, fieldName, i,  fieldCount,
+                                fieldName, auth, conf, false, repeatable,
+                                defaults, null, collectionID));
+             	   sb.append("</div></div>");
+             }             
+
+            if (repeatable && !readonly && i < defaults.length)
+            {
+               // put a remove button next to filled in values
+               sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+                 .append(fieldName)
+                 .append("_remove_")
+                 .append(i)
+                 .append("\" value=\"")
+                 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+                 .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
+            }
+            else if (repeatable && !readonly && i == fieldCount - 1)
+            {
+               // put a 'more' button next to the last space
+               sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
+                 .append(fieldName)
+                 .append("_add\" value=\"")
+                 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+                 .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
+            }
+
+            sb.append("</div>");
+          }
+        sb.append("</div>");
+        sb.append("</div><br/>");
+  	  
+        out.write(sb.toString());
+    }
+    
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required, boolean readonly,
       int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, int collectionID)
@@ -1366,6 +1459,25 @@
                    out.write(req);
            }
        }
+       else if ((si.getErrorsValidationFields()!= null) && (si.getErrorsValidationFields().contains(fieldName)))
+       {
+           if(inputs[z].requireValidation())
+           {
+                   if(si.getJumpToField()==null || si.getJumpToField().length()==0)
+                                si.setJumpToField(fieldName);
+				   Locale locale = I18nUtil.getSupportedLocale(request.getLocale());
+				   String message = "";
+				   Object[] i18nargs = new Object[] {inputs[z].getValidation()};
+                   try {
+                   		 message = I18nUtil.getMessage("jsp.submit.edit-metadata.validation.errors."+fieldName, i18nargs, locale, true);
+                   }
+                   catch(Exception ex) {
+                       message = I18nUtil.getMessage("jsp.submit.edit-metadata.validation.errors", i18nargs, locale);
+                   }
+                   String req = "<div class=\"alert alert-warning\">" + message + "<a name=\""+fieldName+"\"></a></div>";
+                   out.write(req);
+           }
+       }
        else
        {
                         //print out hints, if not null
@@ -1428,6 +1540,11 @@
        {
     	   doYear(false, out, item, fieldName, dcSchema, dcElement, dcQualifier,
                    repeatable, required, readonly, fieldCountIncr, label, pageContext, request);
+       }
+       else if (inputType.equals("number")) 
+       {
+    	   doNumber(out, item, fieldName, dcSchema, dcElement, dcQualifier,
+                   repeatable, required, readonly, fieldCountIncr, label, pageContext, collectionID);
        }
        else if (inputType.equals("series"))
        {

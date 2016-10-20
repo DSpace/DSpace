@@ -9,16 +9,21 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.util.IValidationSubmission;
 import org.dspace.app.util.SubmissionInfo;
+import org.dspace.app.util.ValidationMessage;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.utils.DSpace;
 
 /**
  * Verify step for DSpace. Processes the user response to the
@@ -65,8 +70,28 @@ public class VerifyStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        // nothing to process/save from the Verify Step.
-        return STATUS_COMPLETE;
+        DSpace dspace = new DSpace();
+
+        List<IValidationSubmission> checkSubmission = dspace.getServiceManager()
+               .getServicesByType(IValidationSubmission.class);
+        List<String> validationMessages = new LinkedList<String>();
+
+        for (IValidationSubmission i : checkSubmission)
+        {
+            List<ValidationMessage> check = i.check(context, subInfo);
+            for(ValidationMessage validationMessage : check) {
+                validationMessages.add(I18nUtil.getMessage(validationMessage.getI18nKey(),
+                        validationMessage.getParameters(), context));    
+            }
+        }
+
+        request.setAttribute("validationMessages", validationMessages);
+
+        if (validationMessages.isEmpty() || subInfo.isEditing() || subInfo.isInWorkflow()) {
+            return STATUS_COMPLETE;
+        }
+        
+        return -1;
     }
 
     /**

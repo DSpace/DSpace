@@ -7,17 +7,15 @@
     http://www.dspace.org/license/
 
 --%>
-<%@page import="org.dspace.app.util.SubmissionConfig"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.io.IOException" %>
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="javax.servlet.jsp.PageContext" %>
-
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Iterator" %>
-
+<%@ page import="org.dspace.app.util.SubmissionConfig"%>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
 <%@ page import="org.dspace.app.util.DCInputSet" %>
@@ -36,6 +34,8 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%
     request.setAttribute("LanguageSwitch", "hide");
@@ -72,6 +72,15 @@
 
         <p><fmt:message key="jsp.submit.review.info4"/></p>
 		<div class="container">
+		
+		<c:if test="${fn:length(validationMessages)>0}">
+			<div class="callout callout-danger">
+				<h5><fmt:message key="jsp.submit.review.validation.errors"/></h5>
+				<c:forEach var="i" items="${validationMessages}">
+					<p>${i}</p>
+				</c:forEach>
+			</div>
+		</c:if>
 <%
 		//loop through the list of review JSPs
 		while(reviewIterator.hasNext())
@@ -101,14 +110,25 @@
         <div class="col-md-6 pull-right btn-group">
 			<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.previous"/>" />
           	<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.cancelsave"/>" />
+        	<c:if test="${fn:length(validationMessages)>0}">
+	       		<c:set var="disableButtonNext">disabled="disabled"</c:set>
+	       	</c:if>
+	       	<div id="nextButtonDiv" data-original-title="<fmt:message key="jsp.submit.review.validation.failed"/>" data-placement="top">
           	<% if (last) { %>
-          	<input class="btn btn-primary col-md-4" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.complete"/>" />
+          	<input class="btn btn-primary col-md-4" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.complete"/>" ${disableButtonNext}/>
           	<% } else { %>
-          	<input class="btn btn-primary col-md-4" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.next"/>" />
+          	<input class="btn btn-primary col-md-4" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.review.button.next"/>" ${disableButtonNext}/>
           	<% } %>
+          	</div>
         </div>
 
 		<input type="hidden" name="pageCallerID" value="<%= request.getAttribute("pageCallerID")%>"/>
     </form>
-
+    <c:if test="${fn:length(validationMessages)>0}">
+	    <script type="text/javascript">
+		    jQuery( document ).ready(function() {
+		    	jQuery('#nextButtonDiv').tooltip();
+		    });
+	    </script>
+    </c:if>
 </dspace:layout>
