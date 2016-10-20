@@ -63,10 +63,12 @@ import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.TabProject;
 import org.dspace.app.cris.model.jdyna.TabResearcherPage;
 import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
+import org.dspace.app.cris.model.jdyna.widget.WidgetEPerson;
 import org.dspace.app.cris.model.jdyna.widget.WidgetFileDO;
 import org.dspace.app.cris.model.jdyna.widget.WidgetFileOU;
 import org.dspace.app.cris.model.jdyna.widget.WidgetFileProject;
 import org.dspace.app.cris.model.jdyna.widget.WidgetFileRP;
+import org.dspace.app.cris.model.jdyna.widget.WidgetGroup;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerDO;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerOU;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerPJ;
@@ -1108,7 +1110,17 @@ public class StartupMetadataConfiguratorTool
             builderW.addPropertyValue("urlPath",
                     "cris/uuid/${displayObject.uuid}");
 		}
-
+        else if (widget.equals("eperson"))
+        {
+            builderW = BeanDefinitionBuilder
+                    .genericBeanDefinition(WidgetEPerson.class);
+        }
+        else if (widget.equals("group"))
+        {
+            builderW = BeanDefinitionBuilder
+                    .genericBeanDefinition(WidgetGroup.class);
+        }
+            
 		builderW.getBeanDefinition().setAttribute("id", widget);
 		String widgetName = "widget" + widget;
 		ctx.registerBeanDefinition(widgetName, builderW.getBeanDefinition());
