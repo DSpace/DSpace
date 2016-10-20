@@ -26,8 +26,10 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.eperson.Group" %>
+<%@ page  import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.apache.commons.lang3.StringUtils" %>
 
 
 <%
@@ -38,25 +40,68 @@
     int sortBy = ((Integer)request.getAttribute("sortby" )).intValue();
     int first = ((Integer)request.getAttribute("first")).intValue();
 	boolean multiple = (request.getAttribute("multiple") != null);
-
+	String search = (String) request.getAttribute("search");
+	if (search == null) search = "";
+	int offset = ((Integer)request.getAttribute("offset")).intValue();
+	
 	// Make sure we won't run over end of list
-	int last = first + PAGESIZE;
+		int last;
+	if (search != null && !search.equals(""))
+	{
+		last = offset + PAGESIZE;	
+	}
+	else 
+	{
+	  last = first + PAGESIZE;
+	}
 	if (last >= groups.length) last = groups.length - 1;
 
 	// Index of first group on last page
 	int jumpEnd = ((groups.length - 1) / PAGESIZE) * PAGESIZE;
 
 	// Now work out values for next/prev page buttons
-	int jumpFiveBack = first - PAGESIZE * 5;
+	int jumpFiveBack;
+	if (search != null && !search.equals(""))
+	{
+	    jumpFiveBack = offset - PAGESIZE * 5;
+	}
+	else
+	{
+		jumpFiveBack = first - PAGESIZE * 5;
+	}
 	if (jumpFiveBack < 0) jumpFiveBack = 0;
-	
-	int jumpOneBack = first - PAGESIZE;
+
+	int jumpOneBack;
+	if (search != null && !search.equals(""))
+	{
+		jumpOneBack = offset - PAGESIZE;		
+	}
+	else
+	{
+	   jumpOneBack = first - PAGESIZE;
+	}
 	if (jumpOneBack < 0) jumpOneBack = 0;
 	
-	int jumpOneForward = first + PAGESIZE;
-	if (jumpOneForward > groups.length) jumpOneForward = first;
-	
-	int jumpFiveForward = first + PAGESIZE * 5;
+	int jumpOneForward;
+	if (search != null && !search.equals(""))
+	{
+		jumpOneForward = offset + PAGESIZE;
+	}
+	else
+	{
+		jumpOneForward = first + PAGESIZE;
+	}
+	if (jumpOneForward > groups.length) jumpOneForward = jumpEnd;
+
+	int jumpFiveForward;
+	if (search != null && !search.trim().equals(""))
+	{
+		jumpFiveForward = offset + PAGESIZE * 5;
+	}
+	else 
+	{
+		jumpFiveForward = first + PAGESIZE * 5;
+	}
 	if (jumpFiveForward > groups.length) jumpFiveForward = jumpEnd;
 	
 	// What's the link?
@@ -118,6 +163,22 @@ function clearGroups()
 			 group to the list on the main form. </p> --%>
 		<p class="submitFormHelp"><fmt:message key="jsp.tools.group-select-list.info1"/></p>
 <%  } %>
+
+<center>
+	<form method="get">
+	    <input type="hidden" name="first" value="<%= first %>" />
+	    <input type="hidden" name="sortby" value="<%= sortBy %>" />
+	    <input type="hidden" name="multiple" value="<%= multiple %>" />    
+	    <label for="search"><fmt:message key="jsp.tools.eperson-list.search.query"/></label>
+	    <input class="form-control" style="width:200px;"type="text" name="search" value="<%= search %>"/>
+	    <input class="btn btn-success" type="submit" value="<fmt:message key="jsp.tools.eperson-list.search.submit" />" />
+	<%
+	    if (search != null && !search.equals("")){   %>
+	    <a class="btn btn-warning" href="<%= request.getContextPath() + "/tools/group-select-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first="+first %>"><fmt:message key="jsp.tools.group-list.search.return-browse" /></a>	
+		<%}%>
+		
+	</form>
+</center>
     
 <%-- Controls for jumping around list--%>
 <div class="span12" style="text-align:center">
@@ -169,11 +230,12 @@ function clearGroups()
 	String closeWindow = (multiple ? "" : "window.close();");
 
 
-    for (int i = first; i <= last; i++)
+    for (int i = (search != null && !search.equals(""))?offset:first; i <= last; i++)
     {
         Group g = groups[i];
 		// Make sure no quotes in full name will mess up our Javascript
-        String fullname = g.getName().replace('\'', ' ');
+		
+        String fullname = StringUtils.isNotBlank(g.getName()) ? g.getName().replace('\'', ' ') : LocaleSupport.getLocalizedMessage(pageContext,"jsp.tools.group-select-list.untitled");
 %>
         <tr>
 			<td headers="t1" class="">
