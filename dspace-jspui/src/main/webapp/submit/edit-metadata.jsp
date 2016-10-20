@@ -16,7 +16,6 @@
   -    submission.page   - the step in submission
   --%>
 
-<%@page import="org.apache.commons.lang.StringUtils"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.ArrayList" %>
@@ -55,6 +54,8 @@
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="java.util.Calendar"%>
+<%@ page import="java.util.Locale"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -741,14 +742,16 @@
              {
           	   sb.append("<div class=\"row col-md-10\">");
              }
-             sb.append("<input class=\"form-control\" type=\"number\" name=\"")
+             
+             sb.append("<div class=\"row col-md-4\">");
+             sb.append("<input class=\"form-control\" type=\"number\" step=\"any\"  name=\"")
                .append(fieldNameIdx)
                .append("\" id=\"")
-               .append(fieldNameIdx).append("\" size=\"50\" value=\"")
+               .append(fieldNameIdx).append("\" value=\"")
                .append(val +"\"")
                .append(readonly?" disabled=\"disabled\" ":"")
                .append("/>")  			              
-               .append("</div>");
+               .append("</div>").append("</div>");
              
              if (authorityType != null)
              {
@@ -1453,6 +1456,25 @@
                    String req = "<div class=\"alert alert-warning\">" +
                                                         inputs[z].getWarning() +
                                                         "<a name=\""+fieldName+"\"></a></div>";
+                   out.write(req);
+           }
+       }
+       else if ((si.getErrorsValidationFields()!= null) && (si.getErrorsValidationFields().contains(fieldName)))
+       {
+           if(inputs[z].requireValidation())
+           {
+                   if(si.getJumpToField()==null || si.getJumpToField().length()==0)
+                                si.setJumpToField(fieldName);
+				   Locale locale = I18nUtil.getSupportedLocale(request.getLocale());
+				   String message = "";
+				   Object[] i18nargs = new Object[] {inputs[z].getValidation()};
+                   try {
+                   		 message = I18nUtil.getMessage("jsp.submit.edit-metadata.validation.errors."+fieldName, i18nargs, locale, true);
+                   }
+                   catch(Exception ex) {
+                       message = I18nUtil.getMessage("jsp.submit.edit-metadata.validation.errors", i18nargs, locale);
+                   }
+                   String req = "<div class=\"alert alert-warning\">" + message + "<a name=\""+fieldName+"\"></a></div>";
                    out.write(req);
            }
        }

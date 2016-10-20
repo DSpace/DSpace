@@ -179,6 +179,20 @@ public class JSPDescribeStep extends JSPStep
                 // reload this same JSP to display missing fields info
                 showEditMetadata(context, request, response, subInfo);
             }
+        }        
+        else if (status == DescribeStep.STATUS_ERROR_VALIDATION_FIELDS)
+        {
+            List<String> errorFields = DescribeStep.getValidationErrorFields(request);
+
+            // return to current edit metadata screen if any fields missing
+            if (errorFields.size() > 0)
+            {
+                subInfo.setJumpToField(errorFields.get(0));
+                subInfo.setErrorsValidationFields(errorFields);
+
+                // reload this same JSP to display missing fields info
+                showEditMetadata(context, request, response, subInfo);
+            }
         }
     }
 

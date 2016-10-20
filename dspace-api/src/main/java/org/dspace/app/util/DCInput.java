@@ -10,9 +10,13 @@ package org.dspace.app.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class representing a line in an input form.
@@ -21,6 +25,8 @@ import org.dspace.content.MetadataSchema;
  */
 public class DCInput
 {
+    private static final Logger log = LoggerFactory.getLogger(DCInput.class);
+    
     /** the DC element name */
     private String dcElement = null;
 
@@ -69,6 +75,8 @@ public class DCInput
     /** allowed document types */
     private List<String> typeBind = null;
 
+    private String validation;
+    
     /** 
      * The scope of the input sets, this restricts hidden metadata fields from 
      * view during workflow processing. 
@@ -138,7 +146,11 @@ public class DCInput
         		typeBind.add( type.trim() );
         	}
         }
-        
+        validation = fieldMap.get("validation");
+        if (StringUtils.isBlank(validation) && "number".equals(inputType))
+        {
+            validation = "\\d+";
+        }
     }
 
     /**
@@ -414,5 +426,47 @@ public class DCInput
 		
 		return typeBind.contains(typeName);
 	}
-	
+
+    public String getValidation()
+    {
+        return validation;
+    }
+
+    public void setValidation(String validation)
+    {
+        this.validation = validation;
+    }
+
+    public boolean validate(String value)
+    {
+        if (StringUtils.isNotBlank(value))
+        {
+            try
+            {
+                if (StringUtils.isNotBlank(validation))
+                {
+                    Pattern pattern = Pattern.compile(validation);
+                    if (!pattern.matcher(value).matches())
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (PatternSyntaxException ex)
+            {
+                log.error("Regex validation failed!", ex.getMessage());
+            }
+
+        }
+
+        return true;
+    }
+    
+    public boolean requireValidation() {
+        if (StringUtils.isNotBlank(getValidation()))
+        {
+            return true;
+        }
+        return false;
+    }
 }

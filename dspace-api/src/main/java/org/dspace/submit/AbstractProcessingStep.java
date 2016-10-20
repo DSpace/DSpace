@@ -98,6 +98,7 @@ public abstract class AbstractProcessingStep
     private Map<Integer, String> errorMessages = null;
 
     private static final String ERROR_FIELDS_ATTRIBUTE = "dspace.submit.error_fields";
+    private static final String ERROR_VALIDATION_FIELDS_ATTRIBUTE = "dspace.submit.error_validation_fields";
     
 
     /**
@@ -145,7 +146,10 @@ public abstract class AbstractProcessingStep
     {
         return (List<String>) request.getAttribute(ERROR_FIELDS_ATTRIBUTE);
     }
-    
+    public static final List<String> getValidationErrorFields(HttpServletRequest request)
+    {
+        return (List<String>) request.getAttribute(ERROR_VALIDATION_FIELDS_ATTRIBUTE);
+    }    
     /**
      * Sets the list of all UI fields which had errors that occurred during the
      * step processing. This list is for usage in generating the appropriate
@@ -171,7 +175,17 @@ public abstract class AbstractProcessingStep
             request.setAttribute(ERROR_FIELDS_ATTRIBUTE, errorFields);
         }
     }
-
+    private static final void setValidationErrorFields(HttpServletRequest request, List<String> errorFields)
+    {
+        if(errorFields==null)
+        {
+            request.removeAttribute(ERROR_VALIDATION_FIELDS_ATTRIBUTE);
+        }
+        else
+        {
+            request.setAttribute(ERROR_VALIDATION_FIELDS_ATTRIBUTE, errorFields);
+        }
+    }
     /**
      * Add a single UI field to the list of all error fields (which can
      * later be retrieved using getErrorFields())
@@ -199,7 +213,23 @@ public abstract class AbstractProcessingStep
         //save updated list
         setErrorFields(request, errorFields);
     }
+    
+    protected static final void addValidationErrorField(HttpServletRequest request, String fieldName)
+    {
+        //get current list
+        List<String> errorFields = getValidationErrorFields(request);
+        
+        if (errorFields == null)
+        {
+            errorFields = new ArrayList<String>();
+        }
 
+        //add this field
+        errorFields.add(fieldName);
+        
+        //save updated list
+        setValidationErrorFields(request, errorFields);
+    }
     /**
      * Clears the list of all fields that errored out during the previous step's
      * processing.
@@ -218,7 +248,16 @@ public abstract class AbstractProcessingStep
             setErrorFields(request, null);
         }
     }
-
+    protected static final void clearValidationErrorFields(HttpServletRequest request)
+    {
+        //get current list
+        List<String> errorFields = getValidationErrorFields(request);
+        
+        if (errorFields != null)
+        {
+            setValidationErrorFields(request, null);
+        }
+    }
     /**
      * Return the text of an error message based on the passed in error flag.
      * These error messages are used for non-interactive steps (so that they can
