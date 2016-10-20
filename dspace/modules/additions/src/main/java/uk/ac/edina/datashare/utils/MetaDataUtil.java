@@ -22,6 +22,8 @@ public class MetaDataUtil
     
     private static final String CREATOR_ELEMENT = "creator";
     
+    private static final String DATASHARE_SCHEMA = "ds";
+    
     private static final String DATE_ELEMENT             = "date";
     private static final String DATE_AVAILABLE_QUALIFIER = "available";
     private static final String DATE_COPYRIGHT_QUALIFIER = "copyright";
@@ -54,6 +56,9 @@ public class MetaDataUtil
     private static final String TITLE_ALTERNATIVE_QUALIFIER = "alternative";
     
     private static final String TYPE_ELEMENT = "type";
+    
+    private static final String TOMBSTONE_ELEMENT = "withdrawn";
+    private static final String TOMBSTONE_SHOW_QUALIFIER = "showtombstone";
     
     private static final String DEFAULT_LANG = "en";
     
@@ -527,6 +532,19 @@ public class MetaDataUtil
     }
     
     /**
+     * @param item DSpace item.
+     * @return Get show tombsomstone metadata value.
+     */
+    public static String getShowThombstone(Item item)
+    {
+        return getUnique(
+                item,
+                TOMBSTONE_ELEMENT,
+                TOMBSTONE_SHOW_QUALIFIER,
+                Item.ANY, DATASHARE_SCHEMA);
+    }
+    
+    /**
      * Get dublin core value for Subject DCC from a submission item. 
      * @param item DSpace submission item.
      * @return subject dcc dublin core value.
@@ -654,10 +672,29 @@ public class MetaDataUtil
             String qualifier,
             String lang)
     {
+        return getUnique(item, element, qualifier, lang, MetadataSchema.DC_SCHEMA);
+    }
+   
+    /**
+     * Get unique metadata value from DSpace item.
+     * @param item DSpace item.
+     * @param element Metadata element.
+     * @param qualifier Metadata qualifier.
+     * @param lang Metadata language.
+     * @param schema Metadata schema.
+     * @return Metadata value.
+     */
+    public static String getUnique(
+            Item item,
+            String element,
+            String qualifier,
+            String lang,
+            String schema)
+    {
         String value = null;
         
         Metadatum[] values = item.getMetadata(
-                MetadataSchema.DC_SCHEMA,
+                schema,
                 element,
                 qualifier,
                 lang);
@@ -667,7 +704,7 @@ public class MetaDataUtil
             value = values[0].value;
         }
         
-        return value;   
+        return value;  
     }
     
     /**

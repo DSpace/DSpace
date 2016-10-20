@@ -67,21 +67,31 @@
         <xsl:apply-templates select="mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim"
                              mode="itemDetailView-DIM"/>
 
+        <xsl:variable name="showTombstone">
+          <xsl:call-template name="showTombstome"/>
+        </xsl:variable>
+
         <!-- Generate the bitstream information from the file section -->
         <xsl:choose>
             <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
 
               <!-- DATASHARE - start -->
-              <xsl:call-template name="downloadAllButton"/>
-              <!-- DATASHARE - end -->
-
-                <h3><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h3>
-                <div class="file-list">
+              <xsl:choose>
+                <xsl:when test="$showTombstone = 'true'">
+                  <div id="item-page-tombstone">No download currently available for this item.</div>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="downloadAllButton"/>
+                  <h3><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h3>
+                  <div class="file-list">
                     <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE' or @USE='CC-LICENSE']">
-                        <xsl:with-param name="context" select="."/>
-                        <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
+                      <xsl:with-param name="context" select="."/>
+                      <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
                     </xsl:apply-templates>
-                </div>
+                  </div>
+                </xsl:otherwise>
+              </xsl:choose>
+              <!-- DATASHARE - end -->
             </xsl:when>
             <!-- Special case for handling ORE resource maps stored as DSpace bitstreams -->
             <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='ORE']">
@@ -133,7 +143,21 @@
                 <div class="col-sm-8">
                   <xsl:call-template name="itemSummaryView-DIM-citation"/>
                   <xsl:call-template name="itemSummaryView-DIM-description"/>
-                  <xsl:call-template name="itemSummaryView-DIM-file-section"/>
+
+                  <xsl:variable name="showTombstone">
+                    <xsl:call-template name="showTombstome"/>
+                  </xsl:variable>
+
+                  <xsl:choose>
+                    <xsl:when test="$showTombstone = 'true'">
+                      <div id="item-page-tombstone">No download currently available for this item.</div>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:call-template name="itemSummaryView-DIM-file-section"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+
+
                 </div>
             </div>
             <!-- DATASHARE - end -->
@@ -585,6 +609,16 @@
           </a>
         </div>
       </xsl:if>
+    </xsl:template>
+    <xsl:template name="showTombstome">
+      <xsl:choose>
+        <xsl:when test="not($document/dri:meta/dri:userMeta/dri:metadata[@element='identifier'][@qualifier='isAdmin'] = 'true') and //dim:field[@element='withdrawn'][@qualifier='showtombstone'] = 'true'">
+          <xsl:value-of select="true()"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="false()"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:template>
 
     <!-- DATASHARE - end -->

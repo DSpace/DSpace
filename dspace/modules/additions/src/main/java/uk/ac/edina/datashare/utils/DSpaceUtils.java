@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -621,6 +622,30 @@ public class DSpaceUtils
     {
         MetaDataUtil.setDateCopyright(info, Boolean.toString(useEmbargo));
     }
+    
+    /**
+     * @param context DSpace context.
+     * @param item DSpace item
+     * @return Whether a tombstone item record be shown?
+     */
+    public static boolean showTombstone(Context context, Item item){
+        boolean show = false;
+        
+        try{
+            if(!AuthorizeManager.isAdmin(context)){
+                String tomb = MetaDataUtil.getShowThombstone(item);
+                if(tomb != null){
+                    show = Boolean.parseBoolean(tomb);
+                }
+            }
+        }
+        catch(SQLException ex){
+            throw new RuntimeException("Problem determining access right", ex);
+        }
+        
+        return show;
+    }
+    
     
     /**
      * Create a citation for a given DSpace submission item.

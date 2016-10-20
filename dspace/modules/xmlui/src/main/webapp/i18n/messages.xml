@@ -2256,6 +2256,7 @@
     <message key="xmlui.dri2xhtml.METS-1.0.item-source">Source</message>
     <message key="xmlui.dri2xhtml.METS-1.0.item-subject-classification">Subject Classification</message>
     <message key="xmlui.dri2xhtml.METS-1.0.item-type">Type</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-withdrawn-showtombstone">Show Tombstone</message>
 	<!-- DATASHARE end -->
 
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Files in this item</message>

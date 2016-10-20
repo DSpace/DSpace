@@ -13,6 +13,7 @@ import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.Metadatum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
@@ -112,12 +113,32 @@ public class MetadataChecker {
             Item item,
             String element,
             String qualifier) throws IllegalStateException, SQLException{
+        return isAllowedMetadataField(context, item, MetadataSchema.DC_SCHEMA, element, qualifier);
+    }
+    
+    /**
+     * Is the external user allowed to populate this metadata field? 
+     * @param context DSpace context.
+     * @param item DSpace item.
+     * @param schema Metadata schema.
+     * @param element Dublin core element.
+     * @param qualifier Dublin core qualifier.
+     * @return True if user is allowed to populate the metadata field.
+     * @throws IllegalStateException
+     * @throws SQLException
+     */
+    public boolean isAllowedMetadataField(
+            Context context,
+            Item item,
+            String schema,
+            String element,
+            String qualifier) throws IllegalStateException, SQLException{
         boolean allowed = false;
         
         Collection collection = this.getCollection(context, item);
         if(collection != null){
             List<String> allowedList = this.getAllowedList(collection.getHandle());
-            String mdField = DSpaceUtils.getMdString(element, qualifier);
+            String mdField = DSpaceUtils.getMdString(schema, element, qualifier);
             allowed = allowedList.contains(mdField);
         }
 
@@ -215,6 +236,7 @@ public class MetadataChecker {
         required.add(DSpaceUtils.getMdString("rights"));
         allowed.add(DSpaceUtils.getMdString("rights"));
         allowed.add(DSpaceUtils.getMdString("coverage", "temporal"));
+        allowed.add(DSpaceUtils.getMdString("ds", "withdrawn", "showtombstone"));
     
         try{
             DCInputSet inputs = reader.getInputs(handle);

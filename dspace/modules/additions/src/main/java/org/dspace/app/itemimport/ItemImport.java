@@ -1206,6 +1206,14 @@ public class ItemImport
             value = "";
         }
         // //getElementData(n, "element");
+        
+        // DATASHARE - start
+        String altSchema = getAttributeValue(n, "schema");
+        if(altSchema != null && altSchema.length() > 0){
+            schema = altSchema;
+        }
+        // DATASHARE - end
+        
         String element = getAttributeValue(n, "element");
         String qualifier = getAttributeValue(n, "qualifier"); //NodeValue();
         // //getElementData(n,
@@ -1230,11 +1238,11 @@ public class ItemImport
         if (!isTest)
         {
             // DATASHARE - start
-            if(this.mdChecker.isAllowedMetadataField(c, i, element, qualifier)){
+            if(this.mdChecker.isAllowedMetadataField(c, i, schema, element, qualifier)){
                 i.addMetadata(schema, element, qualifier, language, value);
             }
             else{
-                log.warn("Metadata field " + DSpaceUtils.getMdString(element, qualifier) + " not allowed.");
+                System.out.println("Metadata field " + DSpaceUtils.getMdString(element, qualifier) + " not allowed.");
             }
             // DATASHARE - end
         }

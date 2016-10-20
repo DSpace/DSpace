@@ -31,6 +31,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 
+import uk.ac.edina.datashare.utils.DSpaceUtils;
 import uk.ac.edina.datashare.utils.MetaDataUtil;
 
 
@@ -544,7 +545,19 @@ public class Util {
      */
     public static boolean allowDownloadAll(Context context, Item item)
     {
-        return(!hasEmbargo(context, item) && !isLargeDownload(item) && !item.isWithdrawn());
+        boolean allow = !hasEmbargo(context, item) &&
+                !isLargeDownload(item) &&
+                !item.isWithdrawn() &&
+                !DSpaceUtils.showTombstone(context, item);
+        
+        if(!allow){
+            log.warn("Download not allowed: hasEmbargo " + hasEmbargo(context, item) +
+                    ". isLargeDownload: " +  isLargeDownload(item) + 
+                    ". isWithdrawn: " +  item.isWithdrawn() +
+                    ". showTombstone: " + DSpaceUtils.showTombstone(context, item));
+        }
+        
+        return allow;
     }
     
     /**

@@ -104,6 +104,8 @@ public class DownloadAllBitstreams extends AbstractReader implements Recyclable
                 else
                 {
                 	LOG.warn("Download all attempted for " + item.getName());
+                	Response response = ObjectModelHelper.getResponse(objectModel);
+                	response.setStatus(404);
                 }
             }
         }

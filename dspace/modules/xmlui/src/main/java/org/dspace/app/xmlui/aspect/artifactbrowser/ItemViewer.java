@@ -58,6 +58,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import uk.ac.edina.datashare.utils.DSpaceUtils;
+
 /**
  * Display a single item.
  *
@@ -110,7 +112,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
                 return "0"; // no item, something is wrong.
             }
 
-            return HashUtil.hash(dso.getHandle() + "full:" + showFullItem(objectModel));
+            // DATASHARE - start
+            String key = dso.getHandle() +
+                    "full:" + showFullItem(objectModel) +
+                    "tombstone:" + DSpaceUtils.showTombstone(context, (Item)dso);
+            return HashUtil.hash(key);
+            // DATASHARE - end
         }
         catch (SQLException sqle)
         {
@@ -367,24 +374,6 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        
-        // DataShare - start
-        /*if(Util.allowDownloadAll(context, item))
-        {
-	        final String CLS = "download-all";
-	        Division div = division.addDivision("download-all-top", CLS);
-	
-	        final String HREF = contextPath + "/download/" +
-	            dso.getHandle() + "/" + dso.getName().replaceAll(" ", "_") + ".zip";
-	        final String ICON = "go-down.png";
-	        final String HINT = "Download zip file containing all files in the item";
-	        
-	        Para para = div.addPara();
-	        para.addFigure(ICON, HREF, "");
-	        para.addXref(HREF, message("item.view.download-all"), null, HINT);
-	        para.addFigure(ICON, HREF, "");
-        }*/
-        // DataShare - end
         
         Para showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-top");
 
