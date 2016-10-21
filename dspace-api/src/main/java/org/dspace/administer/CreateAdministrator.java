@@ -237,7 +237,7 @@ public final class CreateAdministrator
     {
     	// Of course we aren't an administrator yet so we need to
     	// circumvent authorisation
-    	context.setIgnoreAuthorization(true);
+    	context.turnOffAuthorisationSystem();
     	
     	// Find administrator group
     	Group admins = groupService.findByName(context, Group.ADMIN);

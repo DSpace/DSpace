@@ -161,7 +161,7 @@ public class ReportGenerator
     {
         // create context as super user
         Context context = new Context();
-        context.setIgnoreAuthorization(true);
+        context.turnOffAuthorisationSystem();
         
         String myFormat = null;
         String myInput = null;

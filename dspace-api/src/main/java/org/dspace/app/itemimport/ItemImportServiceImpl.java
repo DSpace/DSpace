@@ -561,10 +561,16 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     {
         if (!isTest)
         {
+            ArrayList<Collection> removeList = new ArrayList<>();
             List<Collection> collections = myitem.getCollections();
 
-            // Remove item from all the collections it's in
+            // Save items to be removed to prevent concurrent modification exception DS-3322
             for (Collection collection : collections) {
+                removeList.add(collection);
+            }
+
+            // Remove item from all the collections it's in
+            for (Collection collection : removeList) {
                 collectionService.removeItem(c, collection, myitem);
             }
         }
@@ -1773,7 +1779,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 					context = new Context();
 					eperson = ePersonService.find(context, oldEPerson.getID());
 					context.setCurrentUser(eperson);
-					context.setIgnoreAuthorization(true);
+					context.turnOffAuthorisationSystem();
 					
 					boolean isResume = theResumeDir!=null;
 					

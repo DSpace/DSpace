@@ -61,7 +61,7 @@
     Boolean itemAdmin = (Boolean)request.getAttribute("admin_button");
     boolean isItemAdmin = (itemAdmin == null ? false : itemAdmin.booleanValue());
 
-    // Is the logged in user an admin or community admin or cllection admin
+    // Is the logged in user an admin or community admin or collection admin
     Boolean admin = (Boolean)request.getAttribute("is.admin");
     boolean isAdmin = (admin == null ? false : admin.booleanValue());
     
@@ -697,7 +697,7 @@
                                 List<Bundle> ccBundle = ContentServiceFactory.getInstance().getItemService().getBundles(item, "CC-LICENSE");
                                 s = ccBundle.size() > 0 ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.replacecc.button") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.addcc.button");
                 %>
-                    <input class="btn btn-success col-md-2" type="submit" name="submit_addcc" value="<%= s %>" />
+                    <input class="btn btn-success col-md-3" type="submit" name="submit_addcc" value="<%= s %>" />
                     <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>"/>
                     <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
                     

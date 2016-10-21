@@ -12,6 +12,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.license.LicenseMetadataValue;
+import org.jdom.Document;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,12 +40,6 @@ public interface CreativeCommonsService {
     */
     public void setLicenseRDF(Context context, Item item, String licenseRdf) throws SQLException, IOException, AuthorizeException;
 
-    /**
-     * This is a bit of the "do-the-right-thing" method for CC stuff in an item
-     */
-    public void setLicense(Context context, Item item,
-            String cc_license_url) throws SQLException, IOException,
-            AuthorizeException;
 
     /**
      * Used by DSpaceMetsIngester
@@ -72,9 +67,6 @@ public interface CreativeCommonsService {
     public String getLicenseURL(Context context, Item item) throws SQLException,
             IOException, AuthorizeException;
 
-    public String getLicenseText(Context context, Item item) throws SQLException,
-            IOException, AuthorizeException;
-
     public String getLicenseRDF(Context context, Item item) throws SQLException,
             IOException, AuthorizeException;
 
@@ -87,27 +79,47 @@ public interface CreativeCommonsService {
 
     /**
      * Get Creative Commons license Text, returning Bitstream object.
+     * 
      * @return bitstream or null.
+	 * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
      */
     public Bitstream getLicenseTextBitstream(Item item) throws SQLException,
             IOException, AuthorizeException;
 
-    public String fetchLicenseRdf(String ccResult);
-
-    /**
-    *
-    *  The next two methods are old CC.
-    * Remains until prev. usages are eliminated.
-    * @Deprecated
-    *
-    */
     /**
      * Get a few license-specific properties. We expect these to be cached at
      * least per server run.
      */
-    public String fetchLicenseText(String license_url);
-
-    public String fetchLicenseRDF(String license_url);
 
     public LicenseMetadataValue getCCField(String fieldId);
+    
+	/**
+	 * Apply same transformation on the document to retrieve only the most
+	 * relevant part of the document passed as parameter. If no transformation
+	 * is needed then take in consideration to empty the CreativeCommons.xml
+	 * 
+	 * @param license
+	 *            - an element that could be contains as part of your content
+	 *            the license rdf
+	 * @return the document license in textual format after the transformation
+	 */
+    public String fetchLicenseRDF(Document license);
+    
+	/**
+	 * Remove license information, delete also the bitstream
+	 * 
+	 * @param context
+	 *            - DSpace Context
+	 * @param uriField
+	 *            - the metadata field for license uri
+	 * @param nameField
+	 *            - the metadata field for license name
+	 * @param item
+	 *            - the item
+	 * @throws AuthorizeException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
+	public void removeLicense(Context context, LicenseMetadataValue uriField,
+			LicenseMetadataValue nameField, Item item) throws AuthorizeException, IOException, SQLException;
 }

@@ -1,6 +1,6 @@
 {
-    "name": "Mirage2",
-    "version": "0.1.1",
+    "name": "mirage2",
+    "version": "0.1.2",
     "dependencies": {
         "bootstrap-sass-official": "3.3.0",
         "modernizr": "2.8.3",
