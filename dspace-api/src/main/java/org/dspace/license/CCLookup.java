@@ -22,7 +22,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
-
+import org.dspace.license.factory.LicenseServiceFactory;
+import org.dspace.license.service.CreativeCommonsService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jaxen.JaxenException;
 import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Attribute;
@@ -30,10 +33,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 
 
 /**
@@ -58,7 +57,9 @@ public class CCLookup {
 	private SAXBuilder parser           = new SAXBuilder();
 	private List<CCLicense> licenses    = new ArrayList<CCLicense>();
 	private List<CCLicenseField> licenseFields = new ArrayList<CCLicenseField>();
-
+	
+	protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
+	
 	/**
 	 * Constructs a new instance with the default web services root.
 	 *
@@ -406,26 +407,14 @@ public class CCLookup {
 
 	public String getRdf()
 		throws IOException {
-		String myString = null;
-		java.io.ByteArrayOutputStream outputstream = new java.io.ByteArrayOutputStream();
+		String result = ""; 
 		try {
-			outputstream.write("<result>\n".getBytes()); 
-			JDOMXPath xpathRdf 				= new JDOMXPath("//result/rdf");
-			JDOMXPath xpathLicenseRdf 				= new JDOMXPath("//result/licenserdf");
-			XMLOutputter xmloutputter 	= new XMLOutputter();
-			Element rdfParent     				= ((Element)xpathRdf.selectSingleNode(this.license_doc));
-			xmloutputter.output(rdfParent, outputstream);
-			Element licenseRdfParent       = ((Element)xpathLicenseRdf.selectSingleNode(this.license_doc));
-			outputstream.write("\n".getBytes());
-			xmloutputter.output(licenseRdfParent, outputstream);
-			outputstream.write("\n</result>\n".getBytes());
+			result = creativeCommonsService.fetchLicenseRDF(license_doc);
 		} catch (Exception e) {
 			log.warn("An error occurred getting the rdf . . ." + e.getMessage() );
 			setSuccess(false);
-		} finally {
-			outputstream.close();
-			return outputstream.toString();
-		}
+		} 
+		return result;
 	}
 
 	public boolean isSuccess() {
