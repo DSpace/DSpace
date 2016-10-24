@@ -2280,7 +2280,7 @@ public class ItemImport
 					context = new Context();
 					eperson = EPerson.find(context, oldEPerson.getID());
 					context.setCurrentUser(eperson);
-					context.setIgnoreAuthorization(true);
+					context.turnOffAuthorisationSystem();
 					
 					boolean isResume = theResumeDir!=null;
 					
