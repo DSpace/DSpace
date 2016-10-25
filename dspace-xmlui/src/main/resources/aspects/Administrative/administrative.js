@@ -228,7 +228,7 @@ function assertAuthorized(objectType, objectID, action) {
 function canEditItem(itemID)
 {
 	var item = Item.find(getDSContext(),itemID);
-
+	
 	return item.canEdit();
 }
 
@@ -250,7 +250,7 @@ function assertEditItem(itemID) {
 function canEditCollection(collectionID)
 {
 	var collection = Collection.find(getDSContext(),collectionID);
-
+	
 	if (collection == null) {
 		return isAdministrator();
 	}
@@ -276,7 +276,7 @@ function assertEditCollection(collectionID) {
 function canAdminCollection(collectionID)
 {
 	var collection = Collection.find(getDSContext(),collectionID);
-
+	
 	if (collection == null) {
 		return isAdministrator();
 	}
@@ -304,9 +304,9 @@ function canEditCommunity(communityID)
 	if (communityID == -1) {
 		return isAdministrator();
 	}
-
+	
 	var community = Community.find(getDSContext(),communityID);
-
+	
 	if (community == null) {
 		return isAdministrator();
 	}
@@ -930,9 +930,9 @@ function doEditGroup(groupID)
     var groupName        = FlowGroupUtils.getName(getDSContext(),groupID);
     var memberEPeopleIDs = FlowGroupUtils.getEPeopleMembers(getDSContext(),groupID);
     var memberGroupIDs   = FlowGroupUtils.getGroupMembers(getDSContext(),groupID);
-
+    
     assertEditGroup(groupID);
-
+    
     var highlightEPersonID;
     var highlightGroupID;
     var type = "";
@@ -1613,7 +1613,7 @@ function doEditItemMetadata(itemID, templateCollectionID)
  * Curate an Item
  * Can only be performed by someone who is able to edit that Item.
  */
-function doCurateItem(itemID, task)
+function doCurateItem(itemID, task) 
 {
     var result;
 
@@ -2705,7 +2705,7 @@ function doCurateCollection(collectionID, task) {
                       sendPageAndWait("admin/collection/curateCollection",{"collectionID":collectionID,"select_curate_group":select_curate_group}, result);
                    } else {
                       sendPageAndWait("admin/collection/curateCollection",{"collectionID":collectionID}, result);
-                   }
+                   } 
 		   assertEditCollection(collectionID);
 		   result = null;
 		   if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") ||
@@ -3176,15 +3176,15 @@ function doDeleteCommunityRole(communityID,role)
  * Curate a DSpace Object, from site-wide Administrator tools
  * (Can only be performed by a DSpace Administrator)
  */
-function doCurate()
+function doCurate() 
 {
     var result;
-
+    
     assertAdministrator();
 
     var identifier;
     var curateTask;
-    do
+    do 
     {
         if (cocoon.request.get("select_curate_group"))
         {
@@ -3194,9 +3194,9 @@ function doCurate()
         }
         else
         {
-             sendPageAndWait("admin/curate/main",{"identifier":identifier,"curate_task":curateTask},result);
-        }
-
+             sendPageAndWait("admin/curate/main",{"identifier":identifier,"curate_task":curateTask},result);	   
+        } 
+       	   
         if (cocoon.request.get("submit_curate_task"))
         {
             result = FlowCurationUtils.processCurateObject(getDSContext(), cocoon.request);
@@ -3205,7 +3205,7 @@ function doCurate()
         {
             result = FlowCurationUtils.processQueueObject(getDSContext(), cocoon.request);
         }
-
+        
         //if 'identifier' parameter was set in result, pass it back to sendPageAndWait call (so it is prepopulated in Admin UI)
         if (result != null && result.getParameter("identifier")) {
             identifier = result.getParameter("identifier");
@@ -3213,14 +3213,14 @@ function doCurate()
         else if (!cocoon.request.get("select_curate_group")) {
              identifier = null;
         }
-
+       
         //if 'curate_task' parameter was set in result, pass it back to sendPageAndWait call (so it is prepopulated in Admin UI)
         if (result != null && result.getParameter("curate_task")) {
             curateTask = result.getParameter("curate_task");
         }
         else if (!cocoon.request.get("select_curate_group")) {
             curateTask = null;
-        }
+        }  
     }
     while (true);
 }
