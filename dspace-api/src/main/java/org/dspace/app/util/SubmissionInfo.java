@@ -145,7 +145,7 @@ public class SubmissionInfo extends HashMap
             collectionHandle = subItem.getCollection().getHandle();
             Item item = subItem.getItem();
             if (subItem instanceof EditItem) {
-                if (!AuthorizeManager.isAdmin(context)) {
+                if (!AuthorizeManager.isAdmin(context) && !item.canEdit()) {
                     throw new AuthorizeException("Unauthorized attempt to edit ItemID " + item.getID());
                 }
                 context.turnOffAuthorisationSystem();
