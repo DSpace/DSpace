@@ -260,8 +260,7 @@ public class DSpaceSwordAPI
 
                 // in order to be allowed to add the file back to the item, we need to ignore authorisations
                 // for a moment
-                boolean ignoreAuth = context.ignoreAuthorization();
-                context.setIgnoreAuthorization(true);
+                context.turnOffAuthorisationSystem();
 
                 String bundleName = ConfigurationManager.getProperty("swordv2-server", "bundle.name");
                 if (bundleName == null || "".equals(bundleName))
@@ -350,7 +349,7 @@ public class DSpaceSwordAPI
                 item.update();
 
                 // now reset the context ignore authorisation
-                context.setIgnoreAuthorization(ignoreAuth);
+                context.restoreAuthSystemState();
             }
         }
         catch (SQLException e)

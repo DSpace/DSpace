@@ -72,16 +72,11 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
     public static final String OFFSET = "offset";
     public static final String FACET_FIELD = "field";
 
-    private ConfigurationService config = null;
-
     private SearchService searchService = null;
 
     public BrowseFacet() {
-
         DSpace dspace = new DSpace();
-        config = dspace.getConfigurationService();
         searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
-
     }
 
     /**
@@ -445,6 +440,7 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
         // Clear out our item's cache.
         this.queryResults = null;
         this.validity = null;
+        this.queryResults = null;
         super.recycle();
     }
 

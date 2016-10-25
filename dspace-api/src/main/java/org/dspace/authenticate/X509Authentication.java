@@ -612,7 +612,7 @@ public class X509Authentication implements AuthenticationMethod
                                 "from=x.509, email=" + email));
 
                         // TEMPORARILY turn off authorisation
-                        context.setIgnoreAuthorization(true);
+                        context.turnOffAuthorisationSystem();
                         eperson = EPerson.create(context);
                         eperson.setEmail(email);
                         eperson.setCanLogIn(true);
@@ -620,7 +620,7 @@ public class X509Authentication implements AuthenticationMethod
                                 eperson);
                         eperson.update();
                         context.commit();
-                        context.setIgnoreAuthorization(false);
+                        context.restoreAuthSystemState();
                         context.setCurrentUser(eperson);
                         setSpecialGroupsFlag(request, email);
                         return SUCCESS;

@@ -79,9 +79,8 @@ public class ItemDepositor extends Depositor
 						"as well as attaching it to the item");
 
 				// in order to be allowed to add the file back to the item, we need to ignore authorisations
-				// for a moment
-				boolean ignoreAuth = context.ignoreAuthorization();
-				context.setIgnoreAuthorization(true);
+				// for a moment				
+				context.turnOffAuthorisationSystem();
 
 				String bundleName = ConfigurationManager.getProperty("sword-server", "bundle.name");
 				if (bundleName == null || "".equals(bundleName))
@@ -132,7 +131,7 @@ public class ItemDepositor extends Depositor
 				swordService.message("Original package stored as " + fn + ", in item bundle " + swordBundle);
 
 				// now reset the context ignore authorisation
-				context.setIgnoreAuthorization(ignoreAuth);
+				context.restoreAuthSystemState();
 
 				// set the media link for the created item
 				result.setMediaLink(urlManager.getMediaLink(bitstream));

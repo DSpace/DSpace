@@ -237,6 +237,9 @@ public class CSVOutputter extends AbstractReader implements Recyclable
     public void recycle() {
         this.request = null;
         this.response = null;
+        this.context = null;
+        this.writer = null;
+        super.recycle();
     }
     
 }
