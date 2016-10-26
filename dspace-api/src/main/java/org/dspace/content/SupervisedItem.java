@@ -142,22 +142,23 @@ public class SupervisedItem extends WorkspaceItem
     public Group[] getSupervisorGroups()
         throws SQLException
     {
-        Context ourContext = new Context();
-        
+        Context ourContext = null;
+        TableRowIterator tri = null;
         List<Group> groupList = new ArrayList<Group>();
-        String query = "SELECT epersongroup.* " +
-                       "FROM epersongroup, epersongroup2workspaceitem " +
-                       "WHERE epersongroup2workspaceitem.workspace_item_id" +
-                       " = ? " + 
-                       " AND epersongroup2workspaceitem.eperson_group_id =" +
-                       " epersongroup.eperson_group_id ";
         
-        TableRowIterator tri = DatabaseManager.queryTable(ourContext,
-                                    "epersongroup",
-                                    query, this.getID());
+        try {
+	        ourContext = new Context();
+	        String query = "SELECT epersongroup.* " +
+	                       "FROM epersongroup, epersongroup2workspaceitem " +
+	                       "WHERE epersongroup2workspaceitem.workspace_item_id" +
+	                       " = ? " + 
+	                       " AND epersongroup2workspaceitem.eperson_group_id =" +
+	                       " epersongroup.eperson_group_id ";
+	        
+	        tri = DatabaseManager.queryTable(ourContext,
+	                                    "epersongroup",
+	                                    query, this.getID());
 
-        try
-        {
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
@@ -173,6 +174,9 @@ public class SupervisedItem extends WorkspaceItem
             if (tri != null)
             {
                 tri.close();
+            }
+            if (ourContext != null && ourContext.isValid()) {
+            	ourContext.abort();
             }
         }
         

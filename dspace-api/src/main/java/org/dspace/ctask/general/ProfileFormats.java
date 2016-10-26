@@ -73,9 +73,10 @@ public class ProfileFormats extends AbstractCurationTask
     
     private void formatResults() throws IOException
     {
+    	Context c = null;
         try
         {
-            Context c = new Context();
+            c = new Context();
             StringBuilder sb = new StringBuilder();
             for (String fmt : fmtTable.keySet())
             {
@@ -91,6 +92,11 @@ public class ProfileFormats extends AbstractCurationTask
         catch (SQLException sqlE)
         {
             throw new IOException(sqlE.getMessage(), sqlE);
+        }
+        finally {
+        	if (c != null && c.isValid()) {
+        		c.abort();
+        	}
         }
     }
 }

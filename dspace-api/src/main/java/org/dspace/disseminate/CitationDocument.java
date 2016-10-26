@@ -128,10 +128,12 @@ public class CitationDocument {
         }
 
         if(citationEnabledCommunities != null && citationEnabledCommunities.length() > 0) {
-            try {
+        	Context context = null;
+        	try {
+            	context = new Context();
                 String[] communityChunks = citationEnabledCommunities.split(",");
                 for(String communityString : communityChunks) {
-                    Context context = new Context();
+                    
                     DSpaceObject dsoCommunity = HandleManager.resolveToObject(context, communityString.trim());
                     if(dsoCommunity instanceof Community) {
                         Community community = (Community)dsoCommunity;
@@ -148,6 +150,11 @@ public class CitationDocument {
             } catch (SQLException e) {
                 log.error(e.getMessage());
             }
+        	finally {
+        		if (context != null && context.isValid()) {
+        			context.abort();
+        		}
+        	}
 
         }
 
