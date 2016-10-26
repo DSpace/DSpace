@@ -180,31 +180,9 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
             try
             {
                 CrisMetrics metric = new CrisMetrics();
-                Metadatum metricValue = null;
-                if (mm.length > 0)
-                {
-                    metricValue = mm[0];
-                }
-
-                metric.setMetricType(metricValue.qualifier);
-
-                try
-                {
-                    if ("count".equals(mmd.getOperator()))
-                    {
-                        metric.setMetricCount(mm.length);
-                    }
-                    else
-                    {
-                        metric.setMetricCount(
-                                Double.parseDouble(metricValue.value));
-                    }
-                }
-                catch (NumberFormatException e)
-                {
-                    metric.setMetricCount(0);
-                }
-
+                
+                mmd.computeMetricCount(mm, item, metric);
+                
                 if (crisObject != null)
                 {
                     metric.setResourceId(crisObject.getID());

@@ -7,6 +7,8 @@
  */
 package org.dspace.app.cris.metrics.common.dao;
 
+import java.util.List;
+
 import org.dspace.app.cris.metrics.common.model.CrisMetrics;
 
 import it.cilea.osd.common.dao.PaginableObjectDao;
@@ -18,4 +20,8 @@ import it.cilea.osd.common.dao.PaginableObjectDao;
  */
 public interface CrisMetricsDao extends PaginableObjectDao<CrisMetrics, Integer> {
     public CrisMetrics uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(Integer resourceID, Integer resourceTypeId, String metricsType);
+
+    public List<CrisMetrics> uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsTypes(
+            Integer resourceID, Integer resourceTypeId,
+            List<String> metricsTypes);
 }

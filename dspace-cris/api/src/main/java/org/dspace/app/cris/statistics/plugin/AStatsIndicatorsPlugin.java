@@ -33,7 +33,7 @@ public abstract class AStatsIndicatorsPlugin implements StatsIndicatorsPlugin
         this.name = name;
     }
 
-    public void buildIndicator(MetricsPersistenceService pService, ApplicationService applicationService,
+    public static void buildIndicator(MetricsPersistenceService pService, ApplicationService applicationService,
             String uuid, Integer resourceType, Integer resourceId, Object value,
             String metricsType, Date startDate, Date endDate,
             Map<String, String> maps)

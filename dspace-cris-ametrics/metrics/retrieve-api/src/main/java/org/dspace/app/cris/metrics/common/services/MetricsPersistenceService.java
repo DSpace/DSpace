@@ -8,6 +8,7 @@
 package org.dspace.app.cris.metrics.common.services;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.app.cris.metrics.common.dao.CrisMetricsDao;
 import org.dspace.app.cris.metrics.common.dao.MetricsApplicationDao;
@@ -87,6 +88,11 @@ public class MetricsPersistenceService extends PersistenceService
     public CrisMetrics getLastMetricByResourceIDAndResourceTypeAndMetricsType(Integer resourceID, Integer resourceTypeId, String metricsType)
     {
         return metricsDao.uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(resourceID, resourceTypeId, metricsType);
+    }
+    
+    public List<CrisMetrics> getLastMetricByResourceIDAndResourceTypeAndMetricsTypes(Integer resourceID, Integer resourceTypeId, List<String> metricsTypes)
+    {
+        return metricsDao.uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsTypes(resourceID, resourceTypeId, metricsTypes);
     }
 
     @Override

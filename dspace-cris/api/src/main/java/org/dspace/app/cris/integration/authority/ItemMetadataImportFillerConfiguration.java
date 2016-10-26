@@ -7,8 +7,13 @@
  */
 package org.dspace.app.cris.integration.authority;
 
-import java.util.Date;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.dspace.app.cris.metrics.common.model.CrisMetrics;
+import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 
 public class ItemMetadataImportFillerConfiguration {
 	private Map<String, MappingDetails> mapping;
@@ -93,20 +98,8 @@ public class ItemMetadataImportFillerConfiguration {
 	   
     public static class MetricsMappingDetails extends MappingDetails {
         
-        private String operator;
-        
         private String rangeByYear;
                 
-        public String getOperator()
-        {
-            return operator;
-        }
-
-        public void setOperator(String operator)
-        {
-            this.operator = operator;
-        }
-
         public String getRangeByYear()
         {
             return rangeByYear;
@@ -117,5 +110,67 @@ public class ItemMetadataImportFillerConfiguration {
             this.rangeByYear = rangeByYear;
         }
 
+        public void computeMetricCount(Metadatum[] mm, Item item, CrisMetrics metric)
+        {
+            Metadatum metricValue = null;
+            if (mm.length > 0)
+            {
+                metricValue = mm[0];
+            }
+
+            metric.setMetricType(metricValue.qualifier);
+            
+            try
+            {
+                setupMetricCount(metricValue, mm, item, metric);
+            }
+            catch (NumberFormatException e)
+            {
+                metric.setMetricCount(0);
+            }            
+        }
+
+        public void setupMetricCount(Metadatum metricValue, Metadatum[] mm, Item item, CrisMetrics metric)
+        {
+            metric.setMetricCount(
+                    Double.parseDouble(metricValue.value));
+        }
+
+    }
+    
+    public static class MetricsMappingCountDetails extends MetricsMappingDetails {
+        
+        public void setupMetricCount(Metadatum metricValue, Metadatum[] mm, Item item, CrisMetrics metric)
+        {
+            metric.setMetricCount(mm.length);
+        }
+    }
+    
+    public static class MetricsMappingSumDetails extends MetricsMappingDetails {
+        
+        private List<String> mdFields;
+        
+        public void setupMetricCount(Metadatum metricValue, Metadatum[] mm, Item item, CrisMetrics metric)
+        {
+            double metriccount = 0;
+            for(String mdField : mdFields) {
+                String value = item.getMetadata(mdField);
+                if(StringUtils.isNotBlank(value)) {
+                    double element = Double.parseDouble(value);
+                    metriccount += element;
+                }
+            }
+            metric.setMetricCount(metriccount);
+        }
+
+        public List<String> getMdFields()
+        {
+            return mdFields;
+        }
+
+        public void setMdFields(List<String> mdFields)
+        {
+            this.mdFields = mdFields;
+        }
     }
 }
