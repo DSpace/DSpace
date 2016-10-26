@@ -55,6 +55,8 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     public void removeDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson) throws SQLException, AuthorizeException;
 
+    public void anonymizeGroupPolicies(Context c, Group group) throws SQLException;
+
     public void removeGroupPolicies(Context c, Group group) throws SQLException;
 
     public void removeDsoAndTypeNotEqualsToPolicies(Context c, DSpaceObject o, String type) throws SQLException, AuthorizeException;

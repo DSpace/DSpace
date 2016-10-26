@@ -349,6 +349,16 @@ public interface AuthorizeService {
     public void removePoliciesActionFilter(Context context, DSpaceObject dso, int actionID) throws SQLException, AuthorizeException;
 
     /**
+     * Anonymizes all policies relating to a particular group. FIXME doesn't check
+     * authorization
+     *
+     * @param c current context
+     * @param group the group
+     * @throws SQLException if there's a database problem
+     */
+    public void anonymizeGroupPolicies(Context c, Group group) throws SQLException;
+
+    /**
      * Removes all policies relating to a particular group. FIXME doesn't check
      * authorization
      *

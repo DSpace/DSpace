@@ -335,6 +335,11 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public void delete(Context context, Group group) throws SQLException {
+        delete(context, group, false);
+    }
+
+    @Override
+    public void delete(Context context, Group group, boolean anonymizePolicies) throws SQLException {
         if (group.isPermanent())
         {
             log.error("Attempt to delete permanent Group $", group.getName());
@@ -348,7 +353,11 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         group.getSupervisedItems().clear();
 
         // Remove any ResourcePolicies that reference this group
-        authorizeService.removeGroupPolicies(context, group);
+        if (anonymizePolicies) {
+            authorizeService.anonymizeGroupPolicies(context, group);
+        } else {
+            authorizeService.removeGroupPolicies(context, group);
+        }
 
         group.getMemberGroups().clear();
         group.getParentGroups().clear();
