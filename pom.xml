@@ -494,25 +494,6 @@
             </build>
         </profile>
 
-        <!--
-            If building with Java 8 (JDK 1.8), then disable the default 'doclint' validation.
-            'doclint' validates all Javadoc comments (see http://openjdk.java.net/jeps/172).
-            Unfortunately though, it also causes our release process to fail with Java 8,
-            as DSpace still has several modules with invalid Javadoc comments.
-            While we hope to clean this up in the future, for now we are forced to disable it.
-            See DS-3154 for more info.
-        -->
-        <profile>
-            <id>doclint-java8-disable</id>
-            <activation>
-                <jdk>[1.8,)</jdk>
-            </activation>
-            <properties>
-                <!-- Note: ${javadoc.opts} is passed to maven-javadoc-plugin below -->
-                <javadoc.opts>-Xdoclint:none</javadoc.opts>
-            </properties>
-        </profile>
-        
         <!-- PostgreSQL ships different JDBC drivers based on the version of Java
              you are running. See https://jdbc.postgresql.org/download.html
              These next two profiles handle pulling in the correct PostgreSQL JDBC driver. -->
@@ -803,9 +784,6 @@
                                 <goals>
                                     <goal>aggregate-jar</goal>
                                 </goals>
-                                <configuration>
-                                    <additionalparam>${javadoc.opts}</additionalparam>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
