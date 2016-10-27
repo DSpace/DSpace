@@ -1,6 +1,7 @@
 package org.dspace.app.cris.statistics.plugin;
 
 import java.util.List;
+import java.util.Map;
 
 import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.service.ApplicationService;
@@ -51,7 +52,8 @@ public abstract class AIndicatorBuilder
     @Override
     public void applyAdditional(Context context, ApplicationService applicationService,
             MetricsPersistenceService pService,
-            int numberOfValueComputed, int valueComputed, double additionalValueComputed, Integer resourceType,
+            Map<String, Integer> mapNumberOfValueComputed,
+            Map<String, Double> mapValueComputed, Map<String, Double> additionalValueComputed, Integer resourceType,
             Integer resourceId, String uuid)
     {
         //default nothing to apply
@@ -60,7 +62,8 @@ public abstract class AIndicatorBuilder
     @Override
     public abstract void computeMetric(Context context, ApplicationService applicationService,
             MetricsPersistenceService pService,
-            int numberOfValueComputed, int computedValue, Integer resourceType,
+            Map<String, Integer> mapNumberOfValueComputed,
+            Map<String, Double> mapValueComputed, Integer resourceType,
             Integer resourceId, String uuid) throws Exception;
 
     public String getName() {

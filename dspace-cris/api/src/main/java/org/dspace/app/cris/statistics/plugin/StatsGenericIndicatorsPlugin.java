@@ -92,7 +92,7 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
         // prepare structure to store each computed value from indicator
         // alghoritm
         Map<String, Integer> mapNumberOfValueComputed = new HashMap<String, Integer>();
-        Map<String, Integer> mapValueComputed = new HashMap<String, Integer>();
+        Map<String, Double> mapValueComputed = new HashMap<String, Double>();
         Map<String, Double> mapAdditionalValueComputed = new HashMap<String, Double>();
 
         SolrQuery query = new SolrQuery();
@@ -116,7 +116,7 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
                 // prepare structure to store each computed value from indicator
                 // alghoritm
                 mapNumberOfValueComputed = new HashMap<String, Integer>();
-                mapValueComputed = new HashMap<String, Integer>();
+                mapValueComputed = new HashMap<String, Double>();
                 mapAdditionalValueComputed = new HashMap<String, Double>();
             }
 
@@ -136,31 +136,21 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
             {
                 for (IIndicatorBuilder indicator : indicators)
                 {
-                    int numberOfValueComputed = mapNumberOfValueComputed
-                            .get(indicator.getName());
-                    int valueComputed = mapValueComputed
-                            .get(indicator.getName());
-                    double additionalValueComputed = mapAdditionalValueComputed
-                            .get(indicator.getName());
+
                     try
                     {
                         indicator.computeMetric(context, applicationService,
-                                pService, numberOfValueComputed, valueComputed,
+                                pService, mapNumberOfValueComputed, mapValueComputed,
                                 resourceType, resourceId, uuid);
                         indicator.applyAdditional(context, applicationService,
-                                pService, numberOfValueComputed, valueComputed,
-                                additionalValueComputed, resourceType,
+                                pService, mapNumberOfValueComputed, mapValueComputed,
+                                mapAdditionalValueComputed, resourceType,
                                 resourceId, uuid);
                     }
                     catch (Exception ex)
                     {
                         log.error(ex.getMessage(), ex);
                     }
-                    mapNumberOfValueComputed.put(indicator.getName(),
-                            numberOfValueComputed);
-                    mapValueComputed.put(indicator.getName(), valueComputed);
-                    mapAdditionalValueComputed.put(indicator.getName(),
-                            additionalValueComputed);
 
                 }
             }
@@ -184,7 +174,7 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
     private void buildIndicator(ApplicationService applicationService,
             MetricsPersistenceService pService,
             Map<String, Integer> mapNumberOfValueComputed,
-            Map<String, Integer> mapValueComputed,
+            Map<String, Double> mapValueComputed,
             Map<String, Double> mapAdditionalValueComputed,
             Integer resourceType, Integer resourceId, String uuid)
     {
@@ -259,6 +249,16 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
     public void setCrisEntityTypeId(Integer crisEntityTypeId)
     {
         this.crisEntityTypeId = crisEntityTypeId;
+    }
+
+    public List<IIndicatorBuilder> getIndicators()
+    {
+        return indicators;
+    }
+
+    public void setIndicators(List<IIndicatorBuilder> indicators)
+    {
+        this.indicators = indicators;
     }
 
 }

@@ -1,6 +1,7 @@
 package org.dspace.app.cris.statistics.plugin;
 
 import java.util.List;
+import java.util.Map;
 
 import org.dspace.app.cris.metrics.common.model.CrisMetrics;
 import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
@@ -12,9 +13,15 @@ public class IndicatorSumBuilder
 {
 
     public void computeMetric(Context context, ApplicationService applicationService,
-            MetricsPersistenceService pService, int numberOfValueComputed,
-            int valueComputed, Integer resourceType, Integer resourceId, String uuid)
+            MetricsPersistenceService pService, Map<String, Integer> mapNumberOfValueComputed,
+            Map<String, Double> mapValueComputed, Integer resourceType, Integer resourceId, String uuid)
     {
+
+        Double valueComputed = mapValueComputed
+                .containsKey(this.getName())
+                        ? mapValueComputed.get(this.getName())
+                        : 0;
+                                
         List<CrisMetrics> citations = pService
                 .getLastMetricByResourceIDAndResourceTypeAndMetricsTypes(
                         resourceId, resourceType, getInputs());
@@ -29,7 +36,8 @@ public class IndicatorSumBuilder
                     valueComputed += citation.getMetricCount();
                 }
             }
-
+            
+            mapValueComputed.put(this.getName(), valueComputed);
 
         }
     }

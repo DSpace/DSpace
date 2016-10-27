@@ -92,7 +92,7 @@ public class MetricsPersistenceService extends PersistenceService
     
     public List<CrisMetrics> getLastMetricByResourceIDAndResourceTypeAndMetricsTypes(Integer resourceID, Integer resourceTypeId, List<String> metricsTypes)
     {
-        return metricsDao.uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsTypes(resourceID, resourceTypeId, metricsTypes);
+        return metricsDao.findLastMetricByResourceIdAndResourceTypeIdAndMetricsTypes(resourceID, resourceTypeId, metricsTypes);
     }
 
     @Override

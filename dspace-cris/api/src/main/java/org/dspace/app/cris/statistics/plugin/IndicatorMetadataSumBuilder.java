@@ -1,10 +1,8 @@
 package org.dspace.app.cris.statistics.plugin;
 
-import java.sql.SQLException;
-import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.cris.metrics.common.model.CrisMetrics;
 import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.service.ApplicationService;
@@ -16,11 +14,16 @@ public class IndicatorMetadataSumBuilder extends AIndicatorBuilder
 
     public void computeMetric(Context context,
             ApplicationService applicationService,
-            MetricsPersistenceService pService, int numberOfValueComputed,
-            int valueComputed, Integer resourceType, Integer resourceId,
+            MetricsPersistenceService pService, Map<String, Integer> mapNumberOfValueComputed,
+            Map<String, Double> mapValueComputed, Integer resourceType, Integer resourceId,
             String uuid) throws Exception
     {
 
+        Double valueComputed = mapValueComputed
+                .containsKey(this.getName())
+                        ? mapValueComputed.get(this.getName())
+                        : 0;
+                                
         DSpaceObject object = null;
         if (resourceType >= CrisConstants.RP_TYPE_ID)
         {
@@ -42,7 +45,7 @@ public class IndicatorMetadataSumBuilder extends AIndicatorBuilder
                     valueComputed += Integer.parseInt(value);
                 }
             }
-
+            mapValueComputed.put(this.getName(), valueComputed);
         }
     }
 

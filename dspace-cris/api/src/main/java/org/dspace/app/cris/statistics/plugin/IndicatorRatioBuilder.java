@@ -1,5 +1,7 @@
 package org.dspace.app.cris.statistics.plugin;
 
+import java.util.Map;
+
 import org.dspace.app.cris.metrics.common.model.CrisMetrics;
 import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.service.ApplicationService;
@@ -14,10 +16,20 @@ public class IndicatorRatioBuilder
     @Override
     public void applyAdditional(Context context, ApplicationService applicationService,
             MetricsPersistenceService pService,
-            int numberOfValueComputed, int valueComputed,
-            double additionalValueComputed, Integer resourceType,
+            Map<String, Integer> mapNumberOfValueComputed,
+            Map<String, Double> mapValueComputed, Map<String, Double> mapAdditionalValueComputed, Integer resourceType,
             Integer resourceId, String uuid)
     {
+        Double valueComputed = mapValueComputed
+                .containsKey(this.getName())
+                        ? mapValueComputed.get(this.getName())
+                        : 0;
+        Double additionalValueComputed = mapAdditionalValueComputed
+                .containsKey(this.getName())
+                        ? mapAdditionalValueComputed
+                                .get(this.getName())
+                        : 0;
+                                
         if (valueComputed > 0)
         {
             CrisMetrics additional = pService
@@ -29,6 +41,10 @@ public class IndicatorRatioBuilder
                 additionalValueComputed = (valueComputed
                         / additional.getMetricCount());
             }
+            
+            mapValueComputed.put(this.getName(), valueComputed);
+            mapAdditionalValueComputed.put(this.getName(),
+                    additionalValueComputed);
         }
     }
 

@@ -34,7 +34,8 @@ import it.cilea.osd.common.model.Identifiable;
 @NamedQueries({
         @NamedQuery(name = "CrisMetrics.findAll", query = "from CrisMetrics order by id"),
         @NamedQuery(name = "CrisMetrics.count", query = "select count(*) from CrisMetrics"),
-        @NamedQuery(name = "CrisMetrics.uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType", query = "select cit from CrisMetrics cit where resourceId = :par0 and resourceTypeId = :par1 and metrictype = :par2 and timeStampInfo.timestampCreated.timestamp in (select max(timeStampInfo.timestampCreated.timestamp) from CrisMetrics cit where resourceId = :par0 and resourceTypeId = :par1 and metrictype = :par2 and last = true)")
+        @NamedQuery(name = "CrisMetrics.uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType", query = "select cit from CrisMetrics cit where resourceId = :par0 and resourceTypeId = :par1 and metrictype = :par2 and timeStampInfo.timestampCreated.timestamp in (select max(timeStampInfo.timestampCreated.timestamp) from CrisMetrics cit where resourceId = :par0 and resourceTypeId = :par1 and metrictype = :par2 and last = true)"),
+        @NamedQuery(name = "CrisMetrics.findLastMetricByResourceIdAndResourceTypeIdAndMetricsTypes", query = "select cit from CrisMetrics cit where resourceId = :par0 and resourceTypeId = :par1 and metrictype in (:par2) and last = true")
 })
 public class CrisMetrics implements Identifiable, HasTimeStampInfo
 {

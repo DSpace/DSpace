@@ -19,9 +19,10 @@ import it.cilea.osd.common.dao.PaginableObjectDao;
  * @author l.pascarelli
  */
 public interface CrisMetricsDao extends PaginableObjectDao<CrisMetrics, Integer> {
+    
     public CrisMetrics uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(Integer resourceID, Integer resourceTypeId, String metricsType);
 
-    public List<CrisMetrics> uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsTypes(
+    public List<CrisMetrics> findLastMetricByResourceIdAndResourceTypeIdAndMetricsTypes(
             Integer resourceID, Integer resourceTypeId,
             List<String> metricsTypes);
 }
