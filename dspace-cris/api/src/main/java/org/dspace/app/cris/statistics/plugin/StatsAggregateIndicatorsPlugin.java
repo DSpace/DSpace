@@ -8,6 +8,8 @@
 package org.dspace.app.cris.statistics.plugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +32,8 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.utils.DSpace;
 
+import com.sun.tools.javac.code.Attribute.Array;
+
 public class StatsAggregateIndicatorsPlugin<ACO extends ACrisObject>
         extends AStatsIndicatorsPlugin
 {
@@ -47,6 +51,8 @@ public class StatsAggregateIndicatorsPlugin<ACO extends ACrisObject>
 
     private Integer crisEntityTypeId;
 
+    private boolean buildMath = false;
+    
     @Override
     public void buildIndicator(Context context,
             ApplicationService applicationService, CrisSolrLogger statsService,
@@ -73,6 +79,7 @@ public class StatsAggregateIndicatorsPlugin<ACO extends ACrisObject>
         {
             int itemsCited = 0;
             int citations = 0;
+            List<Double> elements = new ArrayList<Double>();
             SolrQuery query = new SolrQuery();
             query.setQuery(queryDefault);
             query.addFilterQuery("{!field f=" + field + "}" + rp.getCrisID(),
@@ -99,6 +106,9 @@ public class StatsAggregateIndicatorsPlugin<ACO extends ACrisObject>
                     {
                         itemsCited++;
                         citations += citation.getMetricCount();
+                        if(buildMath) {
+                            elements.add(citation.getMetricCount());
+                        }
                     }
                 }
             }
@@ -112,6 +122,38 @@ public class StatsAggregateIndicatorsPlugin<ACO extends ACrisObject>
                     rp.getId(), itemsCited,
                     type + ConstantMetrics.SUFFIX_STATS_INDICATOR_TYPE_COUNT,
                     null, timestamp, null);
+            
+            if (buildMath)
+            {
+                if (elements != null && !elements.isEmpty())
+                {
+                    Double max = Collections.max(elements);
+                    Double min = Collections.min(elements);
+                    Double average = (double) citations / (double) itemsCited;
+                    Double median = null;
+                    Double[] elementsArray = new Double[elements.size()];
+                    elementsArray = elements.toArray(elementsArray);
+                    Arrays.sort(elementsArray);
+                    median = IndicatorsUtils.median(elementsArray);
+
+                    buildIndicator(pService, applicationService, rp.getUuid(),
+                            rp.getType(), rp.getId(), average,
+                            type + ConstantMetrics.SUFFIX_STATS_INDICATOR_TYPE_AVERAGE,
+                            null, timestamp, null);
+                    buildIndicator(pService, applicationService, rp.getUuid(),
+                            rp.getType(), rp.getId(), max,
+                            type + ConstantMetrics.SUFFIX_STATS_INDICATOR_TYPE_MAX,
+                            null, timestamp, null);
+                    buildIndicator(pService, applicationService, rp.getUuid(),
+                            rp.getType(), rp.getId(), min,
+                            type + ConstantMetrics.SUFFIX_STATS_INDICATOR_TYPE_MIN,
+                            null, timestamp, null);
+                    buildIndicator(pService, applicationService, rp.getUuid(),
+                            rp.getType(), rp.getId(), median,
+                            type + ConstantMetrics.SUFFIX_STATS_INDICATOR_TYPE_MEDIAN,
+                            null, timestamp, null);
+                }
+            }
         }
     }
 
@@ -163,6 +205,16 @@ public class StatsAggregateIndicatorsPlugin<ACO extends ACrisObject>
     public void setCrisEntityTypeId(Integer crisEntityTypeId)
     {
         this.crisEntityTypeId = crisEntityTypeId;
+    }
+
+    public boolean isBuildMath()
+    {
+        return buildMath;
+    }
+
+    public void setBuildMath(boolean buildMath)
+    {
+        this.buildMath = buildMath;
     }
 
 }

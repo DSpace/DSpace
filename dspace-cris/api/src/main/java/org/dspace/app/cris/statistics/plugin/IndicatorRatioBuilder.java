@@ -1,5 +1,6 @@
 package org.dspace.app.cris.statistics.plugin;
 
+import java.util.List;
 import java.util.Map;
 
 import org.dspace.app.cris.metrics.common.model.CrisMetrics;
@@ -17,7 +18,7 @@ public class IndicatorRatioBuilder
     public void applyAdditional(Context context, ApplicationService applicationService,
             MetricsPersistenceService pService,
             Map<String, Integer> mapNumberOfValueComputed,
-            Map<String, Double> mapValueComputed, Map<String, Double> mapAdditionalValueComputed, Integer resourceType,
+            Map<String, Double> mapValueComputed, Map<String, Double> mapAdditionalValueComputed, Map<String, List<Double>> mapElementsValueComputed, Integer resourceType,
             Integer resourceId, String uuid)
     {
         Double valueComputed = mapValueComputed

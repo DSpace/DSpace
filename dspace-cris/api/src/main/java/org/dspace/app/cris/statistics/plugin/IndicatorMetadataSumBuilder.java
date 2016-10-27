@@ -1,5 +1,6 @@
 package org.dspace.app.cris.statistics.plugin;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +16,7 @@ public class IndicatorMetadataSumBuilder extends AIndicatorBuilder
     public void computeMetric(Context context,
             ApplicationService applicationService,
             MetricsPersistenceService pService, Map<String, Integer> mapNumberOfValueComputed,
-            Map<String, Double> mapValueComputed, Integer resourceType, Integer resourceId,
+            Map<String, Double> mapValueComputed, Map<String, List<Double>> mapElementsValueComputed, Integer resourceType, Integer resourceId,
             String uuid) throws Exception
     {
 

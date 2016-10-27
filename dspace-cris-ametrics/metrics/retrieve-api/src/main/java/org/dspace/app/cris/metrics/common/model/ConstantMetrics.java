@@ -11,6 +11,11 @@ public class ConstantMetrics
 {
     public static String PREFIX_FIELD= "crismetrics_";
     
+    public static final String SUFFIX_STATS_INDICATOR_TYPE_AVERAGE = "_average";
+    public static final String SUFFIX_STATS_INDICATOR_TYPE_MEDIAN = "_median";
+    public static final String SUFFIX_STATS_INDICATOR_TYPE_MAX = "_max";
+    public static final String SUFFIX_STATS_INDICATOR_TYPE_MIN = "_min";
+    
     public static final String SUFFIX_STATS_INDICATOR_TYPE_AGGREGATE = "_aggregate";
     public static final String SUFFIX_STATS_INDICATOR_TYPE_RANKING = "_ranking";
     public static final String SUFFIX_STATS_INDICATOR_TYPE_COUNT = "_count";

@@ -8,6 +8,8 @@
 package org.dspace.app.cris.statistics.plugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -95,6 +97,8 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
         Map<String, Integer> mapNumberOfValueComputed = new HashMap<String, Integer>();
         Map<String, Double> mapValueComputed = new HashMap<String, Double>();
         Map<String, Double> mapAdditionalValueComputed = new HashMap<String, Double>();
+        Map<String, List<Double>> mapElementsValueComputed = new HashMap<String, List<Double>>();
+        
 
         SolrQuery query = new SolrQuery();
         query.setQuery(queryDefault);
@@ -119,6 +123,7 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
                 mapNumberOfValueComputed = new HashMap<String, Integer>();
                 mapValueComputed = new HashMap<String, Double>();
                 mapAdditionalValueComputed = new HashMap<String, Double>();
+                mapElementsValueComputed = new HashMap<String, List<Double>>();
             }
 
             Integer resourceType = (Integer) doc
@@ -141,11 +146,11 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
                     try
                     {
                         indicator.computeMetric(context, applicationService,
-                                pService, mapNumberOfValueComputed, mapValueComputed,
+                                pService, mapNumberOfValueComputed, mapValueComputed, mapElementsValueComputed,
                                 resourceType, resourceId, uuid);
                         indicator.applyAdditional(context, applicationService,
-                                pService, mapNumberOfValueComputed, mapValueComputed,
-                                mapAdditionalValueComputed, resourceType,
+                                pService, mapNumberOfValueComputed, mapValueComputed, 
+                                mapAdditionalValueComputed, mapElementsValueComputed, resourceType,
                                 resourceId, uuid);
                     }
                     catch (Exception ex)
@@ -159,7 +164,7 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
             {
                 buildIndicator(applicationService, pService,
                         mapNumberOfValueComputed, mapValueComputed,
-                        mapAdditionalValueComputed, resourceType, resourceId,
+                        mapAdditionalValueComputed, mapElementsValueComputed, resourceType, resourceId,
                         uuid);
             }
         }
@@ -167,7 +172,7 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
         {
             buildIndicator(applicationService, pService,
                     mapNumberOfValueComputed, mapValueComputed,
-                    mapAdditionalValueComputed, rp.getType(), rp.getId(),
+                    mapAdditionalValueComputed, mapElementsValueComputed, rp.getType(), rp.getId(),
                     rp.getUuid());
         }
     }
@@ -177,6 +182,7 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
             Map<String, Integer> mapNumberOfValueComputed,
             Map<String, Double> mapValueComputed,
             Map<String, Double> mapAdditionalValueComputed,
+            Map<String, List<Double>> mapElementsValueComputed,
             Integer resourceType, Integer resourceId, String uuid)
     {
         for (IIndicatorBuilder indicator : indicators)
@@ -206,6 +212,40 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
                             mapNumberOfValueComputed.get(indicator.getName()),
                             indicator.getOutput()
                                     + ConstantMetrics.SUFFIX_STATS_INDICATOR_TYPE_COUNT,
+                            null, timestamp, null);
+                }
+                if(mapElementsValueComputed.containsKey(indicator.getName()))
+                {
+                    List<Double> elementsValueComputed = mapElementsValueComputed
+                            .containsKey(this.getName())
+                                    ? mapElementsValueComputed.get(this.getName())
+                                    : new ArrayList<Double>();
+                                    
+                    Double max = Collections.max(elementsValueComputed);
+                    Double min = Collections.min(elementsValueComputed);
+                    
+                    Double median = null;
+                    Double[] elementsArray = new Double[elementsValueComputed.size()];
+                    elementsArray = elementsValueComputed.toArray(elementsArray);
+                    Double average = IndicatorsUtils.mean(elementsArray);
+                    Arrays.sort(elementsArray);                    
+                    median = IndicatorsUtils.median(elementsArray);
+                    
+                    buildIndicator(pService, applicationService, uuid, resourceType,
+                            resourceId, average,
+                            indicator.getOutput() + ConstantMetrics.SUFFIX_STATS_INDICATOR_TYPE_AVERAGE,
+                            null, timestamp, null);
+                    buildIndicator(pService, applicationService, uuid, resourceType,
+                            resourceId, max,
+                            indicator.getOutput() + ConstantMetrics.SUFFIX_STATS_INDICATOR_TYPE_MAX,
+                            null, timestamp, null);
+                    buildIndicator(pService, applicationService, uuid, resourceType,
+                            resourceId, min,
+                            indicator.getOutput() + ConstantMetrics.SUFFIX_STATS_INDICATOR_TYPE_MIN,
+                            null, timestamp, null);
+                    buildIndicator(pService, applicationService, uuid, resourceType,
+                            resourceId, median,
+                            indicator.getOutput() + ConstantMetrics.SUFFIX_STATS_INDICATOR_TYPE_MEDIAN,
                             null, timestamp, null);
                 }
             }
