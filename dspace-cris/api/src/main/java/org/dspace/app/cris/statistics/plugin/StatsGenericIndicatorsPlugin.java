@@ -25,6 +25,7 @@ import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.statistics.CrisSolrLogger;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.kernel.ServiceManager;
@@ -102,7 +103,7 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
             query.addFilterQuery("{!field f=" + field + "}" + rp.getCrisID(),
                     "NOT(withdrawn:true)");
         }
-        query.setFields("search.resourceid", "search.resourcetype");
+        query.setFields("search.resourceid", "search.resourcetype", "cris-uuid", "handle");
 
         query.setRows(Integer.MAX_VALUE);
 
@@ -125,8 +126,8 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
             Integer resourceId = (Integer) doc
                     .getFirstValue("search.resourceid");
             String uuid = "";
-            if (resourceType != 2)
-                uuid = (String) doc.getFirstValue("uuid");
+            if (resourceType != Constants.ITEM)
+                uuid = (String) doc.getFirstValue("cris-uuid");
             else
             {
                 uuid = (String) doc.getFirstValue("handle");
