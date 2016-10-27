@@ -648,6 +648,7 @@ public class OrcidPreferencesUtils {
 		    orcidProfile = orcidService.getProfile(ORCID, token);
 		}
 		catch(Exception ex) {
+		    log.warn("Failed populate ResearcherPage by Orcid", ex);
 		    return false;
 		}
 		if (orcidProfile != null) {
