@@ -139,12 +139,14 @@ public class StatsViewIndicatorsPlugin extends AStatsIndicatorsPlugin
                     log.error("Error retrieving stats", e);
                 }
             }
+            if(isRenewMetricsCache()) {
+                searchService.renewMetricsCache();
+            }   
         }
         catch (SearchServiceException e)
         {
             log.error("Error retrieving documents", e);
         }
-
     }
 
     public Integer getResourceTypeId()

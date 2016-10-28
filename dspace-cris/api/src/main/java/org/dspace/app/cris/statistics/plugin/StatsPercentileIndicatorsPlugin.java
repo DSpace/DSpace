@@ -86,6 +86,9 @@ public class StatsPercentileIndicatorsPlugin extends AStatsIndicatorsPlugin
             position++;
         }
 
+        if(isRenewMetricsCache()) {
+            searchService.renewMetricsCache();
+        }   
     }
 
     public void setQueryDefault(String queryDefault)

@@ -22,6 +22,8 @@ public abstract class AStatsIndicatorsPlugin implements StatsIndicatorsPlugin
 
     private String name;
 
+    private boolean renewMetricsCache = true;
+    
     @Override
     public String getName()
     {
@@ -67,6 +69,16 @@ public abstract class AStatsIndicatorsPlugin implements StatsIndicatorsPlugin
         indicator.setMetricType(metricsType);
 
         pService.saveOrUpdate(CrisMetrics.class, indicator);
+    }
+
+    public boolean isRenewMetricsCache()
+    {
+        return renewMetricsCache;
+    }
+
+    public void setRenewMetricsCache(boolean renewMetricsCache)
+    {
+        this.renewMetricsCache = renewMetricsCache;
     }
 
 }

@@ -3,15 +3,14 @@ package org.dspace.app.cris.statistics.plugin;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
-public class IndicatorSumBuilder<ACO extends DSpaceObject>
-        extends AIndicatorBuilder<ACO>
+public class IndicatorMetricSumBuilder<ACO extends DSpaceObject>
+        extends AIndicatorMetricSolrBuilder<ACO>
 {
 
     public void computeMetric(Context context,
@@ -29,14 +28,13 @@ public class IndicatorSumBuilder<ACO extends DSpaceObject>
 
         if (doc != null)
         {
-            
             for (String field : getFields())
             {
                 
-                String count = (String) doc
+                Double count = (Double) doc
                         .getFirstValue(field);
-                if(StringUtils.isNotBlank(count)) {
-                    valueComputed += Integer.parseInt(count);
+                if(count!=null && count>0) {
+                    valueComputed += count;
                 }
                 
             }

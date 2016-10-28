@@ -3,15 +3,14 @@ package org.dspace.app.cris.statistics.plugin;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
-public class IndicatorSumBuilder<ACO extends DSpaceObject>
-        extends AIndicatorBuilder<ACO>
+public class IndicatorMetricCountBuilder<ACO extends DSpaceObject>
+        extends AIndicatorMetricSolrBuilder<ACO>
 {
 
     public void computeMetric(Context context,
@@ -23,27 +22,21 @@ public class IndicatorSumBuilder<ACO extends DSpaceObject>
             SolrDocument doc, Integer resourceType, Integer resourceId,
             String uuid)
     {
+        Integer numberOfValueComputed = mapNumberOfValueComputed
+                .containsKey(this.getName())
+                        ? mapNumberOfValueComputed.get(this.getName()) : 0;
 
-        Double valueComputed = mapValueComputed.containsKey(this.getName())
-                ? mapValueComputed.get(this.getName()) : 0;
-
-        if (doc != null)
+        for (String field : getFields())
         {
-            
-            for (String field : getFields())
+
+            Double count = (Double) doc.getFirstValue(field);
+            if (count != null && count > 0)
             {
-                
-                String count = (String) doc
-                        .getFirstValue(field);
-                if(StringUtils.isNotBlank(count)) {
-                    valueComputed += Integer.parseInt(count);
-                }
-                
+                numberOfValueComputed++;
             }
 
-            mapValueComputed.put(this.getName(), valueComputed);
-
         }
-    }
+        mapNumberOfValueComputed.put(this.getName(), numberOfValueComputed);
+    }   
 
 }

@@ -1,17 +1,18 @@
 package org.dspace.app.cris.statistics.plugin;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
+import org.dspace.app.cris.metrics.common.model.CrisMetrics;
 import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
-public class IndicatorSumBuilder<ACO extends DSpaceObject>
-        extends AIndicatorBuilder<ACO>
+public class IndicatorMetricMathBuilder<ACO extends DSpaceObject>
+        extends AIndicatorMetricSolrBuilder<ACO>
 {
 
     public void computeMetric(Context context,
@@ -24,24 +25,23 @@ public class IndicatorSumBuilder<ACO extends DSpaceObject>
             String uuid)
     {
 
-        Double valueComputed = mapValueComputed.containsKey(this.getName())
-                ? mapValueComputed.get(this.getName()) : 0;
-
+        List<Double> elementsValueComputed = mapElementsValueComputed
+                .containsKey(this.getName())
+                        ? mapElementsValueComputed.get(this.getName())
+                        : new ArrayList<Double>();
         if (doc != null)
         {
-            
             for (String field : getFields())
             {
-                
-                String count = (String) doc
-                        .getFirstValue(field);
-                if(StringUtils.isNotBlank(count)) {
-                    valueComputed += Integer.parseInt(count);
+                Double count = (Double) doc.getFirstValue(field);
+                if(count!=null) {
+                    // sum, percentage, average, median, maximum,
+                    // minimum?!
+                    elementsValueComputed.add(count.doubleValue());
                 }
-                
             }
 
-            mapValueComputed.put(this.getName(), valueComputed);
+            mapElementsValueComputed.put(this.getName(), elementsValueComputed);
 
         }
     }

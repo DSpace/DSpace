@@ -32,6 +32,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.cris.integration.CrisEnhancer;
@@ -1013,5 +1014,14 @@ public class CrisSearchService extends SolrServiceImpl
             {
                 super.updateIndex(context, ids, force, type);
             }
+        }
+
+        public void renewMetricsCache() throws SearchServiceException
+        {            
+            SolrQuery solrQuery = new SolrQuery()
+                    .setQuery("*:*");
+            // Only return obj identifier fields in result doc
+            solrQuery.setFields("clearcache-crismetrics");            
+            search(solrQuery);
         }
 }

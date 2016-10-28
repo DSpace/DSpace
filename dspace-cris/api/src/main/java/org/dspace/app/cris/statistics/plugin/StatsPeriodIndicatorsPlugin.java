@@ -91,6 +91,10 @@ public class StatsPeriodIndicatorsPlugin extends AStatsIndicatorsPlugin
 
         pService.buildPeriodMetrics(context, frequency, type, rangeLimitSx,
                         rangeLimitDx);
+        
+        if(isRenewMetricsCache()) {
+            searchService.renewMetricsCache();
+        }   
     }
 
     public String getType()

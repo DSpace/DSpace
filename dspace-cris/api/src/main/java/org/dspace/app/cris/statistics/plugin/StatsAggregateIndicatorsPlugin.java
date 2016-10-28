@@ -102,7 +102,7 @@ public class StatsAggregateIndicatorsPlugin<ACO extends ACrisObject>
                     CrisMetrics citation = pService
                             .getLastMetricByResourceIDAndResourceTypeAndMetricsType(
                                     resourceId, resourceType, type);
-                    if (citation != null && citation.getMetricCount() > 0)
+                    if (citation != null)
                     {
                         itemsCited++;
                         citations += citation.getMetricCount();
@@ -155,6 +155,10 @@ public class StatsAggregateIndicatorsPlugin<ACO extends ACrisObject>
                 }
             }
         }
+        
+        if(isRenewMetricsCache()) {
+            searchService.renewMetricsCache();
+        }   
     }
 
     public void setQueryDefault(String queryDefault)
