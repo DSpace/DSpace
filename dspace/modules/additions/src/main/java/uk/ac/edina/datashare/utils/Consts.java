@@ -41,7 +41,7 @@ public interface Consts
     public static final String ENABLE_EMBARGO     = "enable_embargo";
     
     /** Embargo composite control field name */ 
-    public static final String EMBARGO_FIELD_NAME = "dc_date_available";
+    public static final String EMBARGO_FIELD_NAME = "dc_date_embargo";
     
     /** Embargo control year field name */ 
     public static final String EMBARGO_YEAR       = EMBARGO_FIELD_NAME + "_year";

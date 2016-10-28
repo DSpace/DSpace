@@ -35,7 +35,6 @@ import uk.ac.edina.datashare.utils.MetaDataUtil;
 /**
  * Override default DSpace DescribeStep to add geo-spatial functionality
  */
-@SuppressWarnings("deprecation")
 public class DescribeStep extends org.dspace.submit.step.DescribeStep
 {
 	private static Logger LOG = Logger.getLogger(DescribeStep.class);
@@ -223,7 +222,11 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep
             		status = Consts.EMBARGO_TOO_FAR_IN_FUTURE;
             	}
             }
-        }       
+        }
+        
+        if(status != currentStatus){
+            addErrorField(request, Consts.EMBARGO_FIELD_NAME);
+        }
         
         return status;
     }

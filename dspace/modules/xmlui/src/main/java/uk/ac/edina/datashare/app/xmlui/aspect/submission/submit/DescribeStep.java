@@ -10,11 +10,13 @@ import javax.servlet.ServletException;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
+import org.dspace.app.util.DCInput;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Composite;
+import org.dspace.app.xmlui.wing.element.Field;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Para;
@@ -367,4 +369,32 @@ public class DescribeStep extends org.dspace.app.xmlui.aspect.submission.submit.
 
         return describeSection;
     }    
+    
+    /**
+     * Datashare specific error messages.
+     * @param dcInput
+     * @param field
+     * @throws WingException
+     */
+    @Override
+    protected void setFieldError(DCInput dcInput, Field field) throws WingException{
+        switch(errorFlag){
+            case Consts.EMBARGO_IN_THE_PAST:{
+                field.addError(message("embargo.control.past"));
+                break;
+            }
+            case Consts.EMBARGO_TOO_FAR_IN_FUTURE:{
+                field.addError(message("embargo.control.future"));
+                break;
+            }
+            case Consts.INVALID_EMBARGO_STRING:{
+                field.addError(message("embargo.control.invalid"));
+                break;
+            }
+            default:{
+                super.setFieldError(dcInput, field);
+            }
+        }
+    }
+
 }

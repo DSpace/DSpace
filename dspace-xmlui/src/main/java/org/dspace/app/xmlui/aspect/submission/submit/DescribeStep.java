@@ -18,9 +18,9 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -41,13 +41,12 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
-import org.dspace.content.authority.MetadataAuthorityManager;
-import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.Choice;
+import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
-
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -1187,14 +1186,9 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        text.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        text.addError(T_required_field);
-                    }
+                    // DATASHARE - start
+                    this.setFieldError(dcInput, text);
+                    // DATASHARE - end
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
@@ -1292,4 +1286,23 @@ public class DescribeStep extends AbstractSubmissionStep
 
                 return clean;
         }
+        
+        // DATASHARE - start
+        /**
+         * Add error to DSpace field.
+         * @param dcInput
+         * @param field
+         * @throws WingException
+         */
+        protected void setFieldError(DCInput dcInput, Field field) throws WingException{
+            if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+            {
+                field.addError(dcInput.getWarning());
+            }
+            else
+            {
+                field.addError(T_required_field);
+            }
+        }
+        // DATASHARE - end
 }
