@@ -92,7 +92,7 @@ public class CreateStatReport {
         
         // create context as super user
         context = new Context();
-        context.setIgnoreAuthorization(true);
+        context.turnOffAuthorisationSystem();
         
         //get paths to directories
         outputLogDirectory = ConfigurationManager.getProperty("log.dir") + File.separator;

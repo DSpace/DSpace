@@ -683,7 +683,7 @@
                                 Bundle[] ccBundle = item.getBundles("CC-LICENSE");
                                 s = ccBundle.length > 0 ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.replacecc.button") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.addcc.button");
                 %>
-                    <input class="btn btn-success col-md-2" type="submit" name="submit_addcc" value="<%= s %>" />
+                    <input class="btn btn-success col-md-3" type="submit" name="submit_addcc" value="<%= s %>" />
                     <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>"/>
                     <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
                     

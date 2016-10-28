@@ -44,6 +44,7 @@ public class JSONControlledVocabularyReader extends AbstractReader {
                 IOUtils.copy(inputStream, out);
                 out.flush();
             }
+            out.close();
         } catch (Exception e) {
             log.error("Error while generating controlled vocabulary json, vocabulary identifier: " + vocabularyIdentifier, e);
         }

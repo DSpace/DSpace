@@ -7,13 +7,16 @@
  */
 package org.dspace.license;
 
-import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -26,11 +29,14 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.jdom.Document;
+import org.jdom.transform.JDOMResult;
+import org.jdom.transform.JDOMSource;
 
 public class CreativeCommons
 {
@@ -46,9 +52,17 @@ public class CreativeCommons
 
     /**
      * Some BitStream Names (BSN)
+     * 
+     * @deprecated use the metadata retrieved at {@link CreativeCommons#getCCField(String)} (see https://jira.duraspace.org/browse/DS-2604)
      */
+    @Deprecated
     private static final String BSN_LICENSE_URL = "license_url";
 
+    /**
+     * 
+     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
+     */
+    @Deprecated
     private static final String BSN_LICENSE_TEXT = "license_text";
 
     private static final String BSN_LICENSE_RDF = "license_rdf";
@@ -121,41 +135,6 @@ public class CreativeCommons
         setBitstreamFromBytes(item, bundle, BSN_LICENSE_RDF, bs_rdf_format, licenseRdf.getBytes());
     }
     
-
-    /**
-     * This is a bit of the "do-the-right-thing" method for CC stuff in an item
-     */
-    public static void setLicense(Context context, Item item,
-            String cc_license_url) throws SQLException, IOException,
-            AuthorizeException
-    {
-        Bundle bundle = getCcBundle(item);
-
-        // get some more information
-        String license_text = fetchLicenseText(cc_license_url);
-        String license_rdf = fetchLicenseRDF(cc_license_url);
-        
-        // set the formats
-        BitstreamFormat bs_url_format = BitstreamFormat.findByShortDescription(
-                context, "License");
-        BitstreamFormat bs_text_format = BitstreamFormat.findByShortDescription(
-                context, "CC License");
-        BitstreamFormat bs_rdf_format = BitstreamFormat.findByShortDescription(
-                context, "RDF XML");
-
-        // set the URL bitstream
-        setBitstreamFromBytes(item, bundle, BSN_LICENSE_URL, bs_url_format,
-                cc_license_url.getBytes());
-
-        // set the license text bitstream
-        setBitstreamFromBytes(item, bundle, BSN_LICENSE_TEXT, bs_text_format,
-                license_text.getBytes());
-
-        // set the RDF bitstream
-        setBitstreamFromBytes(item, bundle, BSN_LICENSE_RDF, bs_rdf_format,
-                license_rdf.getBytes());
-    }
-
     /**
      * Used by DSpaceMetsIngester
      *
@@ -224,8 +203,7 @@ public class CreativeCommons
         // verify it has correct contents
         try
         {
-            if ((getLicenseURL(item) == null) || (getLicenseText(item) == null)
-                    || (getLicenseRDF(item) == null))
+            if ((getLicenseURL(item) == null))
             {
                 return false;
             }
@@ -236,18 +214,6 @@ public class CreativeCommons
         }
 
         return true;
-    }
-
-    public static String getLicenseURL(Item item) throws SQLException,
-            IOException, AuthorizeException
-    {
-        return getStringFromBitstream(item, BSN_LICENSE_URL);
-    }
-
-    public static String getLicenseText(Item item) throws SQLException,
-            IOException, AuthorizeException
-    {
-        return getStringFromBitstream(item, BSN_LICENSE_TEXT);
     }
 
     public static String getLicenseRDF(Item item) throws SQLException,
@@ -269,56 +235,55 @@ public class CreativeCommons
     /**
      * Get Creative Commons license Text, returning Bitstream object.
      * @return bitstream or null.
+     * 
+     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
      */
+    @Deprecated
     public static Bitstream getLicenseTextBitstream(Item item) throws SQLException,
             IOException, AuthorizeException
     {
         return getBitstream(item, BSN_LICENSE_TEXT);
     }
+    
+	/**
+	 * Retrieve the license text
+	 * 
+	 * @param item - the item 
+	 * @return the license in textual format
+	 * @throws SQLException
+	 * @throws IOException
+	 * @throws AuthorizeException
+	 * 
+     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
+	 */
+	public static String getLicenseText(Item item) throws SQLException, IOException, AuthorizeException {
+		return getStringFromBitstream(item, BSN_LICENSE_TEXT);
+	}
+    
+	public static String getLicenseURL(Item item) throws SQLException, IOException, AuthorizeException {
+		String licenseUri = CreativeCommons.getCCField("uri").ccItemValue(item);
+		if (StringUtils.isNotBlank(licenseUri)) {
+			return licenseUri;
+		}
+		// JSPUI backward compatibility see https://jira.duraspace.org/browse/DS-2604
+		return getStringFromBitstream(item, BSN_LICENSE_URL);
+	}
 
-    public static String fetchLicenseRdf(String ccResult) {
-    	StringWriter result 			= new StringWriter();
-    	String licenseRdfString 		= new String("");
-        try {
-    		InputStream inputstream = new ByteArrayInputStream(ccResult.getBytes("UTF-8"));
-    		templates.newTransformer().transform(new StreamSource(inputstream), new StreamResult(result));
-    	} catch (TransformerException te) {
-    		throw new RuntimeException("Transformer exception " + te.getMessage(), te);
-    	} catch (IOException ioe) {
-    		throw new RuntimeException("IOexception " + ioe.getCause().toString(), ioe);
-    	} finally {
-    		return result.getBuffer().toString();
-    	}
-    }
-    
-    
-    /** 
-    *
-    *  The next two methods are old CC.
-    * Remains until prev. usages are eliminated.
-    * @Deprecated
-    *
-    */
     /**
-     * Get a few license-specific properties. We expect these to be cached at
-     * least per server run.
+     * Apply same transformation on the document to retrieve only the most relevant part of the document passed as parameter.
+     * If no transformation is needed then take in consideration to empty the CreativeCommons.xml
+     * 
+     * @param license - an element that could be contains as part of your content the license rdf
+     * @return the document license in textual format after the transformation
      */
-    public static String fetchLicenseText(String license_url)
-    {
-        String text_url = license_url;
-        byte[] urlBytes = fetchURL(text_url);
-
-        return (urlBytes != null) ? new String(urlBytes) : "";
-    }
-    
-    public static String fetchLicenseRDF(String license_url)
+    public static String fetchLicenseRDF(Document license)
     {
         StringWriter result = new StringWriter();
         
         try
         {
             templates.newTransformer().transform(
-                    new StreamSource(license_url + "rdf"),
+                    new JDOMSource(license),
                     new StreamResult(result)
                     );
         }
@@ -421,33 +386,6 @@ public class CreativeCommons
         return baos.toByteArray();
     }
 
-    /**
-     * Fetch the contents of a URL
-     */
-    private static byte[] fetchURL(String url_string)
-    {
-        try
-        {
-            String line = "";
-            URL url = new URL(url_string);
-            URLConnection connection = url.openConnection();
-            InputStream inputStream = connection.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder sb = new StringBuilder();
-
-            while ((line = reader.readLine()) != null)
-            {
-                sb.append(line);
-            }
-
-            return sb.toString().getBytes();
-        }
-        catch (Exception exc)
-        {
-            log.error(exc.getMessage());
-            return null;
-        }
-    }
     /**
      * Returns a metadata field handle for given field Id
      */
@@ -564,4 +502,34 @@ public class CreativeCommons
     		item.addMetadata(params[0], params[1], params[2], params[3], value);
     	}
     }
+
+	/**
+	 * Remove license information, delete also the bitstream
+	 * 
+	 * @param context - DSpace Context
+	 * @param uriField - the metadata field for license uri 
+	 * @param nameField - the metadata field for license name
+	 * @param item - the item
+	 * @throws AuthorizeException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
+	public static void removeLicense(Context context, MdField uriField,
+			MdField nameField, Item item) throws AuthorizeException, IOException, SQLException {
+		// only remove any previous licenses
+		String licenseUri = uriField.ccItemValue(item);
+		if (licenseUri != null) {
+			uriField.removeItemValue(item, licenseUri);
+			if (ConfigurationManager.getBooleanProperty("cc.submit.setname"))
+		    {
+		    	String licenseName = nameField.keyedItemValue(item, licenseUri);
+		    	nameField.removeItemValue(item, licenseName);
+		    }
+		    if (ConfigurationManager.getBooleanProperty("cc.submit.addbitstream"))
+		    {
+		    	removeLicense(context, item);
+		    }
+		}
+	}
+
 }

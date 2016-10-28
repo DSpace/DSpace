@@ -98,15 +98,14 @@ public class SimpleFileIngester implements SWORDIngester
 			}
 
 			// to do the updates, we need to ignore authorisation in the context
-			boolean ignoreAuth = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
+			context.turnOffAuthorisationSystem();
 
 			bs.update();
 			original.update();
 			item.update();
 
 			// reset the ignore authorisation
-			context.setIgnoreAuthorization(ignoreAuth);
+			context.restoreAuthSystemState();
 
 			DepositResult result = new DepositResult();
 			result.setHandle(urlManager.getBitstreamUrl(bs));

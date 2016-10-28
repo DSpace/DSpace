@@ -94,8 +94,6 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 	private final String sfxFile = ConfigurationManager.getProperty("dspace.dir")
             + File.separator + "config" + File.separator + "sfx.xml";
 
-	private String sfxQuery = null;
-
     private static final Logger log = LoggerFactory.getLogger(ItemViewer.class);
 
     /**
@@ -194,7 +192,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         String sfxserverUrl = ConfigurationManager.getProperty("sfx.server.url");
         if (sfxserverUrl != null && sfxserverUrl.length() > 0)
         {
-            sfxQuery = "";
+            String sfxQuery = "";
 
             // parse XML file -> XML document will be build
             sfxQuery = SFXFileReader.loadSFXFile(sfxFile, item);
