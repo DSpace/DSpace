@@ -493,19 +493,15 @@ public class EmbargoManager
      * Check for any items whose embargo is about to expire.
      * @param context
      */
-    private static void checkForExpiry(Context context) 
-    {
-        try
-        {
+    private static void checkForExpiry(Context context){
+        try{
             Date now = new Date();
             ItemIterator ii = Item.findByMetadataField(context, lift_schema, lift_element, lift_qualifier, Item.ANY);
-            while (ii.hasNext())
-            {
+            while (ii.hasNext()){
                 Item item = ii.next();
                 Metadatum lift[] = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
 
-                if (lift.length > 0)
-                {
+                if (lift.length > 0){
                     DCDate liftDate = new DCDate(lift[0].value);
                     
                     long diff = Math.abs(liftDate.toDate().getTime() - now.getTime());
