@@ -42,7 +42,7 @@ public class ImportService implements Destroyable {
     /**
      * Sets the importsources that will be used to delegate the retrieving and matching of records to
      * @param importSources A list of {@link MetadataSource} to set to this service
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     @Autowired(required = false)
     public void setImportSources(List<MetadataSource> importSources) throws MetadataSourceException {
@@ -61,176 +61,176 @@ public class ImportService implements Destroyable {
         return Collections.unmodifiableMap(importSources);
     }
 
-	/**
-	 * Utility method to find what import implementations match the imports uri.
-	 * @param uri the identifier of the import implementation or * for all
-	 * @return matching MetadataSource implementations
-	 */
+    /**
+     * Utility method to find what import implementations match the imports uri.
+     * @param uri the identifier of the import implementation or * for all
+     * @return matching MetadataSource implementations
+     */
     protected Collection<MetadataSource> matchingImports(String uri) {
         if (ANY.equals(uri)) {
             return importSources.values();
         } else {
-			if(importSources.containsKey(uri))
-				return Collections.singletonList(importSources.get(uri));
-			else
-				return Collections.emptyList();
-		}
+            if(importSources.containsKey(uri))
+                return Collections.singletonList(importSources.get(uri));
+            else
+                return Collections.emptyList();
+        }
     }
 
-	/** Finds records based on an item
-	 * Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
-	 * @param uri the identifier of the import implementation or * for all
-	 * @param item an item to base the search on
-	 * @return a collection of import records. Only the identifier of the found records may be put in the record.
-	 * @throws MetadataSourceException if the underlying imports throw any exception.
-	 */
+    /** Finds records based on an item
+     * Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
+     * @param uri the identifier of the import implementation or * for all
+     * @param item an item to base the search on
+     * @return a collection of import records. Only the identifier of the found records may be put in the record.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     public Collection<ImportRecord> findMatchingRecords(String uri, Item item) throws MetadataSourceException {
-		try {
-			List<ImportRecord> recordList = new LinkedList<ImportRecord>();
+        try {
+            List<ImportRecord> recordList = new LinkedList<ImportRecord>();
 
-			for (MetadataSource metadataSource : matchingImports(uri)) {
-				recordList.addAll(metadataSource.findMatchingRecords(item));
-			}
+            for (MetadataSource metadataSource : matchingImports(uri)) {
+                recordList.addAll(metadataSource.findMatchingRecords(item));
+            }
 
-			return recordList;
-		} catch (Exception e) {
-			throw new MetadataSourceException(e);
-		}
-	}
+            return recordList;
+        } catch (Exception e) {
+            throw new MetadataSourceException(e);
+        }
+    }
 
-	/** Finds records based on query object.
-	 *  Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
-	 * @param uri the identifier of the import implementation or * for all
-	 * @param query a query object to base the search on. The implementation decides how the query is interpreted.
-	 * @return a collection of import records. Only the identifier of the found records may be put in the record.
-	 * @throws MetadataSourceException
-	 */
+    /** Finds records based on query object.
+     *  Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
+     * @param uri the identifier of the import implementation or * for all
+     * @param query a query object to base the search on. The implementation decides how the query is interpreted.
+     * @return a collection of import records. Only the identifier of the found records may be put in the record.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     public Collection<ImportRecord> findMatchingRecords(String uri, Query query) throws MetadataSourceException {
-		try {
-			List<ImportRecord> recordList = new LinkedList<ImportRecord>();
-			for (MetadataSource metadataSource : matchingImports(uri)) {
-				recordList.addAll(metadataSource.findMatchingRecords(query));
-			}
+        try {
+            List<ImportRecord> recordList = new LinkedList<ImportRecord>();
+            for (MetadataSource metadataSource : matchingImports(uri)) {
+                recordList.addAll(metadataSource.findMatchingRecords(query));
+            }
 
-			return recordList;
-		} catch (Exception e) {
-			throw new MetadataSourceException(e);
-		}
-	}
+            return recordList;
+        } catch (Exception e) {
+            throw new MetadataSourceException(e);
+        }
+    }
 
-	/** Find the number of records matching a string query;
-	 *
-	 * @param uri the identifier of the import implementation or * for all
-	 * @param query a query to base the search on
-	 * @return the sum of the matching records over all import sources
-	 * @throws MetadataSourceException
-	 */
+    /** Find the number of records matching a string query;
+     *
+     * @param uri the identifier of the import implementation or * for all
+     * @param query a query to base the search on
+     * @return the sum of the matching records over all import sources
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     public int getNbRecords(String uri, String query) throws MetadataSourceException {
-		try {
-			int total = 0;
-			for (MetadataSource MetadataSource : matchingImports(uri)) {
-				total += MetadataSource.getNbRecords(query);
-			}
-			return total;
-		} catch (Exception e) {
-			throw new MetadataSourceException(e);
-		}
-	}
-	/** Find the number of records matching a query;
-	 *
-	 * @param uri the identifier of the import implementation or * for all
-	 * @param query a query object to base the search on  The implementation decides how the query is interpreted.
-	 * @return the sum of the matching records over all import sources
-	 * @throws MetadataSourceException
-	 */
-	public int getNbRecords(String uri, Query query) throws MetadataSourceException {
-		try {
-			int total = 0;
-			for (MetadataSource MetadataSource : matchingImports(uri)) {
-				total += MetadataSource.getNbRecords(query);
-			}
-			return total;
-		} catch (Exception e) {
-			throw new MetadataSourceException(e);
-		}
-	}
+        try {
+            int total = 0;
+            for (MetadataSource MetadataSource : matchingImports(uri)) {
+                total += MetadataSource.getNbRecords(query);
+            }
+            return total;
+        } catch (Exception e) {
+            throw new MetadataSourceException(e);
+        }
+    }
+    /** Find the number of records matching a query;
+     *
+     * @param uri the identifier of the import implementation or * for all
+     * @param query a query object to base the search on  The implementation decides how the query is interpreted.
+     * @return the sum of the matching records over all import sources
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    public int getNbRecords(String uri, Query query) throws MetadataSourceException {
+        try {
+            int total = 0;
+            for (MetadataSource MetadataSource : matchingImports(uri)) {
+                total += MetadataSource.getNbRecords(query);
+            }
+            return total;
+        } catch (Exception e) {
+            throw new MetadataSourceException(e);
+        }
+    }
 
-	/**  Find the number of records matching a string query. Supports pagination
-	 *
-	 * @param uri the identifier of the import implementation or * for all
-	 * @param query a query object to base the search on.  The implementation decides how the query is interpreted.
-	 * @param start offset to start at
-	 * @param count number of records to retrieve.
-	 * @return a set of records. Fully transformed.
-	 * @throws MetadataSourceException
-	 */
+    /**  Find the number of records matching a string query. Supports pagination
+     *
+     * @param uri the identifier of the import implementation or * for all
+     * @param query a query object to base the search on.  The implementation decides how the query is interpreted.
+     * @param start offset to start at
+     * @param count number of records to retrieve.
+     * @return a set of records. Fully transformed.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     public Collection<ImportRecord> getRecords(String uri, String query, int start, int count) throws MetadataSourceException {
-		try {
-			List<ImportRecord> recordList = new LinkedList<>();
-			for (MetadataSource metadataSource : matchingImports(uri)) {
-				recordList.addAll(metadataSource.getRecords(query, start, count));
-			}
-			return recordList;
-		} catch (Exception e) {
-			throw new MetadataSourceException(e);
-		}
-	}
+        try {
+            List<ImportRecord> recordList = new LinkedList<>();
+            for (MetadataSource metadataSource : matchingImports(uri)) {
+                recordList.addAll(metadataSource.getRecords(query, start, count));
+            }
+            return recordList;
+        } catch (Exception e) {
+            throw new MetadataSourceException(e);
+        }
+    }
 
-	/** Find the number of records matching a object query.
-	 *
-	 * @param uri the identifier of the import implementation or * for all
-	 * @param query a query object to base the search on.  The implementation decides how the query is interpreted.
-	 * @return a set of records. Fully transformed.
-	 * @throws MetadataSourceException
-	 */
+    /** Find the number of records matching a object query.
+     *
+     * @param uri the identifier of the import implementation or * for all
+     * @param query a query object to base the search on.  The implementation decides how the query is interpreted.
+     * @return a set of records. Fully transformed.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     public Collection<ImportRecord> getRecords(String uri, Query query) throws MetadataSourceException {
-		try {
-			List<ImportRecord> recordList = new LinkedList<>();
-			for (MetadataSource metadataSource : matchingImports(uri)) {
-				recordList.addAll(metadataSource.getRecords(query));
-			}
-			return recordList;
-		} catch (Exception e) {
-			throw new MetadataSourceException(e);
-		}
-	}
+        try {
+            List<ImportRecord> recordList = new LinkedList<>();
+            for (MetadataSource metadataSource : matchingImports(uri)) {
+                recordList.addAll(metadataSource.getRecords(query));
+            }
+            return recordList;
+        } catch (Exception e) {
+            throw new MetadataSourceException(e);
+        }
+    }
 
-	/** Get a single record from a source.
-	 * The first match will be returned
-	 * @param uri uri the identifier of the import implementation or * for all
-	 * @param id identifier for the record
-	 * @return a matching record
-	 * @throws MetadataSourceException
-	 */
+    /** Get a single record from a source.
+     * The first match will be returned
+     * @param uri uri the identifier of the import implementation or * for all
+     * @param id identifier for the record
+     * @return a matching record
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     public ImportRecord getRecord(String uri, String id) throws MetadataSourceException {
-		try {
-			for (MetadataSource metadataSource : matchingImports(uri)) {
-				if (metadataSource.getRecord(id) != null) return metadataSource.getRecord(id);
-	
-			}
-			return null;
-		} catch (Exception e) {
-			throw new MetadataSourceException(e);
-		}
-	}
-	/** Get a single record from the source.
-	 * The first match will be returned
-	 * @param uri uri the identifier of the import implementation or * for all
-	 * @param query a query matching a single record
-	 * @return a matching record
-	 * @throws MetadataSourceException
-	 */
+        try {
+            for (MetadataSource metadataSource : matchingImports(uri)) {
+                if (metadataSource.getRecord(id) != null) return metadataSource.getRecord(id);
+    
+            }
+            return null;
+        } catch (Exception e) {
+            throw new MetadataSourceException(e);
+        }
+    }
+    /** Get a single record from the source.
+     * The first match will be returned
+     * @param uri uri the identifier of the import implementation or * for all
+     * @param query a query matching a single record
+     * @return a matching record
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     public ImportRecord getRecord(String uri, Query query) throws MetadataSourceException {
-		try {
-			for (MetadataSource metadataSource : matchingImports(uri)) {
-				if (metadataSource.getRecord(query) != null) return metadataSource.getRecord(query);
-	
-			}
-			return null;
-		} catch (Exception e) {
-			throw new MetadataSourceException(e);
-		}
-	}
+        try {
+            for (MetadataSource metadataSource : matchingImports(uri)) {
+                if (metadataSource.getRecord(query) != null) return metadataSource.getRecord(query);
+    
+            }
+            return null;
+        } catch (Exception e) {
+            throw new MetadataSourceException(e);
+        }
+    }
 
     /** Retrieve the importUrls that are set on the importSources .
      *  @return a Collection of string, representing the configured importUrls

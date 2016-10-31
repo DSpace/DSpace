@@ -29,13 +29,13 @@ import org.apache.log4j.Logger;
 /**
  * @author Richard Jones
  *
- * Class to represent the principal configurations of the sword
+ * Class to represent the principal configurations of the SWORD
  * service being offered.  Not all configuration is available through
  * this class, but the most useful common options, and those with
  * default values are available
  *
- * Note that changes to values via the api will not be persisted
- * between sword requests.
+ * Note that changes to values via the API will not be persisted
+ * between SWORD requests.
  *
  * For detailed descriptions of configuration values, see the sword
  * configuration documentation
@@ -48,10 +48,10 @@ public class SWORDConfiguration
     public static final Logger log = Logger.getLogger(SWORDConfiguration.class);
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory
-            .getInstance().getBitstreamFormatService();
+        .getInstance().getBitstreamFormatService();
     
     protected ConfigurationService configurationService = DSpaceServicesFactory
-            .getInstance().getConfigurationService();
+        .getInstance().getConfigurationService();
 
     /** whether we can support noOp */
     private boolean noOp = true;
@@ -87,24 +87,24 @@ public class SWORDConfiguration
     public SWORDConfiguration()
     {
         // set the max upload size
-        int mus = configurationService
-                .getIntProperty("sword-server.max-upload-size");
+        int mus = configurationService.getIntProperty(
+            "sword-server.max-upload-size");
         if (mus > 0)
         {
             this.maxUploadSize = mus;
         }
 
         // set the mediation value
-        this.mediated = configurationService
-                .getBooleanProperty("sword-server.on-behalf-of.enable");
+        this.mediated = configurationService.getBooleanProperty(
+            "sword-server.on-behalf-of.enable");
 
         // find out if we keep the original as bitstream
-        this.keepOriginal = configurationService
-                .getBooleanProperty("sword-server.keep-original-package");
+        this.keepOriginal = configurationService.getBooleanProperty(
+            "sword-server.keep-original-package");
 
         // get the sword bundle
-        String bundle = configurationService
-                .getProperty("sword-server.bundle.name");
+        String bundle = configurationService.getProperty(
+            "sword-server.bundle.name");
         if (bundle != null && "".equals(bundle))
         {
             this.swordBundle = bundle;
@@ -112,12 +112,11 @@ public class SWORDConfiguration
 
         // find out if we keep the package as a file in specified directory
         this.keepPackageOnFailedIngest = configurationService
-                .getBooleanProperty("sword-server.keep-package-on-fail",
-                        false);
+            .getBooleanProperty("sword-server.keep-package-on-fail", false);
 
         // get directory path and name
-        this.failedPackageDir = configurationService
-                .getProperty("sword-server.failed-package.dir");
+        this.failedPackageDir = configurationService.getProperty(
+            "sword-server.failed-package.dir");
 
         // Get the accepted formats
         String[] acceptsFormats = configurationService
@@ -136,6 +135,8 @@ public class SWORDConfiguration
     /**
      * Get the bundle name that SWORD will store its original deposit
      * packages in, when storing them inside an item.
+     *
+     * @return bundle name where to store the original deposit packages
      */
     public String getSwordBundle()
     {
@@ -143,9 +144,11 @@ public class SWORDConfiguration
     }
 
     /**
-     * Set the bundle name that sword will store its original deposit
+     * Set the bundle name that SWORD will store its original deposit
      * packages in, when storing them inside an item.
-     * @param swordBundle
+     *
+     * @param swordBundle set bundle name where to store the original
+     *     deposit packages
      */
     public void setSwordBundle(String swordBundle)
     {
@@ -154,6 +157,8 @@ public class SWORDConfiguration
 
     /**
      * Is this a no-op deposit?
+     *
+     * @return true if this is a no-op deposit
      */
     public boolean isNoOp()
     {
@@ -163,7 +168,7 @@ public class SWORDConfiguration
     /**
      * Set whether this is a no-op deposit.
      *
-     * @param noOp
+     * @param noOp sets whether this is a no-op deposit
      */
     public void setNoOp(boolean noOp)
     {
@@ -172,6 +177,8 @@ public class SWORDConfiguration
 
     /**
      * Is this a verbose deposit?
+     *
+     * @return true if is verbose deposit
      */
     public boolean isVerbose()
     {
@@ -180,7 +187,8 @@ public class SWORDConfiguration
 
     /**
      * Set whether this is a verbose deposit.
-     * @param verbose
+     *
+     * @param verbose is verbose deposit?
      */
     public void setVerbose(boolean verbose)
     {
@@ -188,7 +196,9 @@ public class SWORDConfiguration
     }
 
     /**
-     * What is the max upload size (in bytes) for the sword interface?
+     * What is the max upload size (in bytes) for the SWORD interface?
+     *
+     * @return maximum upload size
      */
     public int getMaxUploadSize()
     {
@@ -196,8 +206,9 @@ public class SWORDConfiguration
     }
 
     /**
-     * set the max uplaod size (in bytes) for the sword interface
-     * @param maxUploadSize
+     * set the max upload size (in bytes) for the SWORD interface
+     *
+     * @param maxUploadSize maximum upload size to set
      */
     public void setMaxUploadSize(int maxUploadSize)
     {
@@ -206,6 +217,8 @@ public class SWORDConfiguration
 
     /**
      * Does the server support mediated deposit (aka on-behalf-of)?
+     *
+     * @return true if server supports mediated deposit
      */
     public boolean isMediated()
     {
@@ -214,7 +227,8 @@ public class SWORDConfiguration
 
     /**
      * Set whether the server supports mediated deposit (aka on-behalf-of).
-     * @param mediated
+     *
+     * @param mediated set whether server supports mediated deposit
      */
     public void setMediated(boolean mediated)
     {
@@ -223,6 +237,8 @@ public class SWORDConfiguration
 
     /**
      * Should the repository keep the original package?
+     *
+     * @return true if repository keeps copies of original package
      */
     public boolean isKeepOriginal()
     {
@@ -231,7 +247,8 @@ public class SWORDConfiguration
 
     /**
      * Set whether the repository should keep copies of the original package.
-     * @param keepOriginal
+     *
+     * @param keepOriginal set whether to keep copies of original package
      */
     public void setKeepOriginal(boolean keepOriginal)
     {
@@ -240,7 +257,9 @@ public class SWORDConfiguration
 
     /**
      * set whether the repository should write file of the original package if ingest fails
-     * @param keepOriginalOnFail
+     *
+     * @param keepOriginalOnFail set whether to keep copies of original
+     *     package if ingest fails
      */
     public void setKeepPackageOnFailedIngest(boolean keepOriginalOnFail)
     {
@@ -249,7 +268,9 @@ public class SWORDConfiguration
 
     /**
      * should the repository write file of the original package if ingest fails
-     * @return keepPackageOnFailedIngest
+     *
+     * @return true if repository keeps copies of original package if ingest
+     *     fails
      */
     public boolean isKeepPackageOnFailedIngest()
     {
@@ -258,7 +279,8 @@ public class SWORDConfiguration
 
     /**
      * set the directory to write file of the original package
-     * @param dir
+     *
+     * @param dir directory where original package is kept
      */
     public void setFailedPackageDir(String dir)
     {
@@ -268,7 +290,8 @@ public class SWORDConfiguration
     /**
      * directory location of the files with original packages
      * for failed ingests
-     * @return failedPackageDir
+     *
+     * @return dir directory where original package is kept
      */
     public String getFailedPackageDir()
     {
@@ -276,12 +299,17 @@ public class SWORDConfiguration
     }
 
     /**
-     * Get the list of mime types that the given dspace object will
+     * Get the list of MIME types that the given DSpace object will
      * accept as packages.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     target DSpace object
+     * @return the list of MIME types that the given DSpace object will
+     * accept as packages.
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public List<String> getAccepts(Context context, DSpaceObject dso)
             throws DSpaceSWORDException
@@ -315,10 +343,11 @@ public class SWORDConfiguration
     }
 
     /**
-     * Get the list of mime types that a Collection will accept as packages
+     * Get the list of MIME types that a Collection will accept as packages
      *
-     * @return the list of mime types
+     * @return the list of MIME types
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public List<String> getCollectionAccepts() throws DSpaceSWORDException
     {
@@ -343,6 +372,9 @@ public class SWORDConfiguration
      * how much  the server "likes" this packaging type
      *
      * @param col
+     *     target collection
+     * @return map of packaging URIs to Q values for the packaging types which
+     *     the given collection will accept.
      */
     public Map<String, Float> getAcceptPackaging(Collection col)
     {
@@ -407,9 +439,14 @@ public class SWORDConfiguration
      * object?
      *
      * @param mediaType
+     *     packaging/media type to check
      * @param dso
+     *     target DSpace object
+     * @return true if the given packaging/media type is supported by the
+     *     given DSpace object
      * @throws DSpaceSWORDException
-     * @throws SWORDErrorException
+     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException on generic SWORD exception
      */
     public boolean isSupportedMediaType(String mediaType, DSpaceObject dso)
             throws DSpaceSWORDException, SWORDErrorException
@@ -441,10 +478,17 @@ public class SWORDConfiguration
 
     /**
      * Is the given content MIME type acceptable to the given DSpace object?
+     *
      * @param context
+     *     The relevant DSpace Context.
      * @param type
+     *     MIME type to check
      * @param dso
+     *     target DSpace object
+     * @return true if the given content MIME type is acceptable
+     *     to the given DSpace object
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public boolean isAcceptableContentType(Context context, String type,
             DSpaceObject dso)
@@ -457,14 +501,15 @@ public class SWORDConfiguration
     /**
      * Get the temp directory for storing files during deposit.
      *
+     * @return temp directory for storing files during deposit
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getTempDir()
             throws DSpaceSWORDException
     {
         return (configurationService.getProperty("upload.temp.dir") != null)
-                ?
-                configurationService.getProperty("upload.temp.dir") :
-                System.getProperty("java.io.tmpdir");
+            ?  configurationService.getProperty("upload.temp.dir")
+            : System.getProperty("java.io.tmpdir");
     }
 }

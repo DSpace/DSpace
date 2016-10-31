@@ -480,13 +480,20 @@ public class CollectionWizardServlet extends DSpaceServlet
      * process input from basic info page
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param response
-     * @param collection
-     * @throws SQLException
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     private void processBasicInfo(Context context, HttpServletRequest request,
             HttpServletResponse response) throws SQLException,
@@ -616,16 +623,25 @@ public class CollectionWizardServlet extends DSpaceServlet
      * Work out which page to show next, and show it
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param response
+     *     Servlet's HTTP response object.
      * @param collection
+     *     DSpace Collection object.
      * @param stage
-     *            the stage the user just finished, or if PERMISSIONS, the
-     *            particular permissions page
-     * @throws SQLException
+     *     the stage the user just finished, or if PERMISSIONS, the
+     *     particular permissions page
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     private void showNextPage(Context context, HttpServletRequest request,
             HttpServletResponse response, Collection collection, int stage)

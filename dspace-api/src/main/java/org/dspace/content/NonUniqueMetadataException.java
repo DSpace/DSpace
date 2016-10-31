@@ -27,6 +27,7 @@ public class NonUniqueMetadataException extends Exception
      * Create an exception with only a message
      * 
      * @param message
+     *     message string
      */
     public NonUniqueMetadataException(String message)
     {

@@ -38,24 +38,32 @@ public interface URIGenerator {
      * type SITE, COMMUNITY, COLLECTION or ITEM only. Currently dspace-rdf 
      * doesn't support Bundles or Bitstreams as independent entity. This method
      * should work even if the DSpaceObject does not exist anymore.
-     * @param context
-     * @param type
-     * @param id
-     * @param handle
+     * @param context DSpace Context.
+     * @param type Type of the DSpaceObject you want to generate a URI for (e.g. 
+     *             {@link org.dspace.core.Constants#ITEM Constants.ITEM}.
+     * @param id UUID of the DSpaceObject you want to generate a URI for.
+     * @param handle Handle of the DSpaceObject you want to generate a URI for.
      * @param identifiers
+     *     list of identifiers
      * @return May return null, if no URI could be generated.
      * @see org.dspace.rdf.RDFUtil#generateIdentifier(Context, DSpaceObject)
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public String generateIdentifier(Context context, int type, UUID id, String handle, List<String> identifiers)
-            throws SQLException;
+        throws SQLException;
     
     /**
      * Shortcut for {@code generateIdentifier(context, dso.getType(), dso.getID(), dso.getHandle())}.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object to generate identifier for
      * @return May return null, if no URI could be generated.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public String generateIdentifier(Context context, DSpaceObject dso)
-            throws SQLException;
+        throws SQLException;
 }

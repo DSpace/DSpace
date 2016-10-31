@@ -94,8 +94,9 @@ public class DCInput
      * a HashMap
      * 
      * @param fieldMap
-     *            ???
+     *     
      * @param listMap
+     *     value-pairs map, computed from the forms definition XML file
      */
     public DCInput(Map<String, String> fieldMap, Map<String, List<String>> listMap)
     {

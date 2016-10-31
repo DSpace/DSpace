@@ -52,6 +52,10 @@ public class FileUploadRequest extends HttpServletRequestWrapper
      * 
      * @param req
      *            the original request
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws FileSizeLimitExceededException
+     *     if the file size if the uploaded item exceeded the limit
      */
     public FileUploadRequest(HttpServletRequest req) throws IOException, FileSizeLimitExceededException
     {
@@ -104,7 +108,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
                             String chunkPath = chunkDirPath + File.separator + "part" + parameters.get("resumableChunkNumber");
                             File fileDir = new File(chunkDirPath);
                             
-                            if(fileDir.exists())
+                            if (fileDir.exists())
                             {
                                 item.write(new File(chunkPath));
                             }
@@ -126,7 +130,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
                 }
             }
         }
-        catch(IOFileUploadException e){
+        catch(IOFileUploadException e) {
             if (!(e.getMessage().contains("Stream ended unexpectedly")))
             {
                 throw new IOException(e.getMessage(), e);
@@ -134,7 +138,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         }
         catch (Exception e)
         {
-            if(e.getMessage().contains("exceeds the configured maximum"))
+            if (e.getMessage().contains("exceeds the configured maximum"))
             {
                 // ServletFileUpload is not throwing the correct error, so this is workaround
                 // the request was rejected because its size (11302) exceeds the configured maximum (536)

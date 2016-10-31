@@ -345,8 +345,9 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * bitstream is uncertain, and the format is set to "unknown."
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param desc
-     *            the user's description of the format
+     *     the user's description of the format
      * @throws SQLException if database error
      */
     public void setUserFormatDescription(Context context, String desc) throws SQLException

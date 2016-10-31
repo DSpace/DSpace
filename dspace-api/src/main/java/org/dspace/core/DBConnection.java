@@ -49,12 +49,17 @@ public interface DBConnection<T> {
     /**
      * Reload a DSpace object from the database. This will make sure the object is valid and stored in the cache.
      * @param entity The DSpace object to reload
+     * @return 
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public <E extends ReloadableEntity> E reloadEntity(E entity) throws SQLException;
 
     /**
      * Remove a DSpace object from the cache when batch processing a large number of objects.
      * @param entity The DSpace object to reload
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException ;
 }

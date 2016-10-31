@@ -45,7 +45,13 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     /**
      * Find the eperson by their email address.
      *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param email
+     *     EPerson's email to search by
      * @return EPerson, or {@code null} if none such exists.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public EPerson findByEmail(Context context, String email)
             throws SQLException;
@@ -54,11 +60,13 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * Find the eperson by their netid.
      *
      * @param context
-     *            DSpace context
+     *     The relevant DSpace Context.
      * @param netId
-     *            Network ID
+     *     Network ID
      *
      * @return corresponding EPerson, or <code>null</code>
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public EPerson findByNetid(Context context, String netId)
             throws SQLException;
@@ -67,11 +75,13 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * Find the epeople that match the search query across firstname, lastname or email.
      *
      * @param context
-     *            DSpace context
+     *     The relevant DSpace Context.
      * @param query
-     *            The search string
+     *     The search string
      *
      * @return array of EPerson objects
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<EPerson> search(Context context, String query)
             throws SQLException;
@@ -82,15 +92,17 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * This method also allows offsets and limits for pagination purposes.
      *
      * @param context
-     *            DSpace context
+     *     The relevant DSpace Context.
      * @param query
-     *            The search string
+     *     The search string
      * @param offset
-     *            Inclusive offset
+     *     Inclusive offset
      * @param limit
-     *            Maximum number of matches returned
+     *     Maximum number of matches returned
      *
      * @return array of EPerson objects
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<EPerson> search(Context context, String query, int offset, int limit)
             throws SQLException;
@@ -100,11 +112,13 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * of creating the EPerson objects to store the results.
      *
      * @param context
-     *            DSpace context
+     *     The relevant DSpace Context.
      * @param query
-     *            The search string
+     *     The search string
      *
      * @return the number of epeople matching the query
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public int searchResultCount(Context context, String query)
             throws SQLException;
@@ -118,7 +132,13 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * <li><code>NETID</code></li>
      * </ul>
      *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param sortField
+     *     which field to sort EPersons by
      * @return array of EPerson objects
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<EPerson> findAll(Context context, int sortField)
             throws SQLException;
@@ -127,7 +147,13 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * Create a new eperson
      *
      * @param context
-     *            DSpace context object
+     *     The relevant DSpace Context.
+     * @return the created EPerson
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public EPerson create(Context context) throws SQLException,
             AuthorizeException;
@@ -135,22 +161,28 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     /**
      * Set the EPerson's password.
      *
+     * @param ePerson
+     *     EPerson whose password we want to set.
      * @param password
-     *            the new password.
+     *     the new password.
      */
     public void setPassword(EPerson ePerson, String password);
 
     /**
      * Set the EPerson's password hash.
      *
+     * @param ePerson
+     *     EPerson whose password hash we want to set.
      * @param password
-     *          hashed password, or null to set row data to NULL.
+     *     hashed password, or null to set row data to NULL.
      */
     public void setPasswordHash(EPerson ePerson, PasswordHash password);
 
     /**
      * Return the EPerson's password hash.
      *
+     * @param ePerson
+     *     EPerson whose password hash we want to get.
      * @return hash of the password, or null on failure (such as no password).
      */
     public PasswordHash getPasswordHash(EPerson ePerson);
@@ -159,33 +191,56 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * Check EPerson's password.  Side effect:  original unsalted MD5 hashes are
      * converted using the current algorithm.
      *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param ePerson
+     *     EPerson whose password we want to check
      * @param attempt
-     *            the password attempt
+     *     the password attempt
      * @return boolean successful/unsuccessful
      */
     public boolean checkPassword(Context context, EPerson ePerson, String attempt);
 
     /**
-     * Set a metadata value
+     * Set a metadata value (in the metadatavalue table) of the metadata field
+     * specified by 'field'.
      *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param ePerson
+     *     EPerson whose metadata we want to set.
      * @param field
-     *            the name of the metadata field to set
+     *     Metadata field we want to set (e.g. "phone").
      * @param value
-     *            value to set the field to
-     *
-     * @exception IllegalArgumentException
-     *                if the requested metadata field doesn't exist
+     *     Metadata value we want to set
+     * @throws SQLException
+     *     if the requested metadata field doesn't exist
      */
     @Deprecated
     public void setMetadata(Context context, EPerson ePerson, String field, String value) throws SQLException;
 
     /**
      * Retrieve all accounts which have a password but do not have a digest algorithm
-     * @param context the dspace context
+     *
+     * @param context
+     *     The relevant DSpace Context.
      * @return a list of epeople
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<EPerson> findUnsalted(Context context) throws SQLException;
 
+    /**
+     * Retrieve all accounts which have not logged in since the specified date
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param date
+     *     from which date
+     * @return a list of epeople
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     */
     public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException;
 
     /**
@@ -196,13 +251,48 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * An EPerson cannot be deleted if it exists in the item, workflowitem, or
      * tasklistitem tables.
      *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param ePerson
+     *     EPerson to find
      * @return List of tables that contain a reference to the eperson.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<String> getDeleteConstraints(Context context, EPerson ePerson) throws SQLException;
 
+    /**
+     * Retrieve all accounts which belong to at least one of the specified groups.
+     *
+     * @param c
+     *     The relevant DSpace Context.
+     * @param groups
+     *     set of eperson groups
+     * @return a list of epeople
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     */
     public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException;
 
+    /**
+     * Retrieve all accounts which are subscribed to receive information about new items.
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @return a list of epeople
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     */
     List<EPerson> findEPeopleWithSubscription(Context context) throws SQLException;
 
+    /**
+     * Count all accounts.
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @return the total number of epeople
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     */
     int countTotal(Context context) throws SQLException;
 }

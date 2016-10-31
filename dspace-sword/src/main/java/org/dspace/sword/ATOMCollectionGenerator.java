@@ -22,9 +22,10 @@ public abstract class ATOMCollectionGenerator
     protected SWORDService swordService;
 
     /**
-     * Create a new ATOM collection generator using the given sword service.
+     * Create a new ATOM collection generator using the given SWORD service.
      *
      * @param service
+     *     SWORD service
      */
     public ATOMCollectionGenerator(SWORDService service)
     {
@@ -35,7 +36,10 @@ public abstract class ATOMCollectionGenerator
      * Build the ATOM Collection which represents the given DSpace Object.
      *
      * @param dso
+     *     target DSpace object
+     * @return ATOM collection representing the DSpace object
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public abstract Collection buildCollection(DSpaceObject dso)
             throws DSpaceSWORDException;

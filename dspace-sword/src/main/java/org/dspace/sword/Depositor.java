@@ -19,17 +19,19 @@ import org.purl.sword.base.SWORDErrorException;
 public abstract class Depositor
 {
     /**
-     * The sword service implementation
+     * The SWORD service implementation
      */
     protected SWORDService swordService;
 
     /**
-     * Construct a new Depositor with the given sword service on the given
+     * Construct a new Depositor with the given SWORD service on the given
      * dspace object.  It is anticipated that extensions of this class will
      * specialise in certain kinds of dspace object
      *
      * @param swordService
+     *     SWORD service
      * @param dso
+     *     DSpace object
      */
     public Depositor(SWORDService swordService, DSpaceObject dso)
     {
@@ -37,11 +39,14 @@ public abstract class Depositor
     }
 
     /**
-     * Execute the deposit process with the given sword deposit.
+     * Execute the deposit process with the given SWORD deposit.
      *
      * @param deposit
-     * @throws SWORDErrorException
+     *     deposit request
+     * @return deposit result
+     * @throws SWORDErrorException on generic SWORD exception
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public abstract DepositResult doDeposit(Deposit deposit)
             throws SWORDErrorException, DSpaceSWORDException;
@@ -50,7 +55,9 @@ public abstract class Depositor
      * Undo any changes to the archive effected by the deposit
      *
      * @param result
+     *     deposit result
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public abstract void undoDeposit(DepositResult result)
             throws DSpaceSWORDException;

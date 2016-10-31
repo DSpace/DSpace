@@ -37,7 +37,7 @@ public class UpdateHandlePrefix
      * When invoked as a command-line tool, updates handle prefix
      *
      * @param args the command-line arguments, none used
-     * @throws java.lang.Exception
+     * @throws Exception on generic exception
      *
      */
     public static void main(String[] args) throws Exception
@@ -81,7 +81,7 @@ public class UpdateHandlePrefix
 
                 if (choiceString.equalsIgnoreCase("y"))
                 {
-                	context.turnOffAuthorisationSystem();
+                    context.turnOffAuthorisationSystem();
                     try {
                         log.info("Updating handle prefix from " + oldH + " to " + newH);
 
@@ -97,7 +97,7 @@ public class UpdateHandlePrefix
                         List<MetadataValue> metadataValues = metadataValueService.findByValueLike(context, "http://hdl.handle.net/");
                         int updMeta = metadataValues.size();
                         for (MetadataValue metadataValue : metadataValues) {
-                        	metadataValue.setValue(metadataValue.getValue().replace("http://hdl.handle.net/" + oldH, "http://hdl.handle.net/" + newH));
+                            metadataValue.setValue(metadataValue.getValue().replace("http://hdl.handle.net/" + oldH, "http://hdl.handle.net/" + newH));
                             metadataValueService.update(context, metadataValue, true);
                         }
                         System.out.println(

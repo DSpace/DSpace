@@ -22,9 +22,16 @@ public interface AtomCollectionGenerator
     /**
      * Build the ATOM Collection which represents the given DSpace Object.
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     target DSpace object
+     * @param config
+     *     SWORD configuration
+     * @return ATOM Collection which represents the given DSpace Object
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public SwordCollection buildCollection(Context context, DSpaceObject dso,
-            SwordConfigurationDSpace config) throws DSpaceSwordException;
+        SwordConfigurationDSpace config) throws DSpaceSwordException;
 }

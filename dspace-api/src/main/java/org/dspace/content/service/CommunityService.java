@@ -104,7 +104,7 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      *
      * @return the value of the metadata field
      *
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      *                if the requested metadata field doesn't exist
      * @deprecated
      */
@@ -123,9 +123,9 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      * @param value
      *            value to set the field to
      *
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      *                if the requested metadata field doesn't exist
-     * @exception java.util.MissingResourceException
+     * @throws MissingResourceException if resource missing
      * @throws SQLException if database error
      * @deprecated
      */
@@ -192,7 +192,12 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
     /**
      * Return an array of parent communities of this collection.
      *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param collection
+     *            collection to check
      * @return an array of parent communities
+     * @throws SQLException if database error
      */
     public List<Community> getAllParents(Context context, Collection collection) throws SQLException;
 

@@ -34,7 +34,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
      * Initialize PubmedLanguageMetadatumContributor and create the iso3toiso2 mapping used in the transforming of language codes
      */
     public PubmedLanguageMetadatumContributor() {
-        iso3toIso2=new HashMap<>();
+        iso3toIso2 = new HashMap<>();
         // Populate the languageMap with the mapping between iso3 and iso2 language codes
         for (Locale locale : Locale.getAvailableLocales()) {
             iso3toIso2.put(locale.getISO3Language(),locale.getLanguage());
@@ -43,6 +43,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
 
     /**
      * Initialize the PubmedLanguageMetadatumContributor class using a {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} and a language -{@link org.dspace.importer.external.metadatamapping.contributor.MetadataContributor}
+     *
      * @param field {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} used in mapping
      * @param language
      */
@@ -54,6 +55,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
 
     /**
      * Set the metadatafieldMapping used in the transforming of a record to actual metadata
+     *
      * @param metadataFieldMapping
      */
     @Override
@@ -63,12 +65,14 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
     }
 
     /**
+     *
+     *
      * @param t A class to retrieve metadata from.
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
      */
     @Override
     public Collection<MetadatumDTO> contributeMetadata(T t) {
-        List<MetadatumDTO> values=new LinkedList<MetadatumDTO>();
+        List<MetadatumDTO> values = new LinkedList<MetadatumDTO>();
 
         try {
             LinkedList<MetadatumDTO> languageList = (LinkedList<MetadatumDTO>) language.contributeMetadata(t);
@@ -86,6 +90,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
 
     /**
      * Return the MetadataContributor used while retrieving MetadatumDTO
+     *
      * @return MetadataContributor
      */
     public MetadataContributor getLanguage() {
@@ -94,6 +99,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
 
     /**
      * Setting the MetadataContributor
+     *
      * @param language MetadataContributor used while retrieving MetadatumDTO
      */
     public void setLanguage(MetadataContributor language) {
@@ -102,6 +108,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
 
     /**
      * Return the MetadataFieldConfig used while retrieving MetadatumDTO
+     *
      * @return MetadataFieldConfig
      */
     public MetadataFieldConfig getField() {
@@ -110,6 +117,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
 
     /**
      * Setting the MetadataFieldConfig
+     *
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
      */
     public void setField(MetadataFieldConfig field) {

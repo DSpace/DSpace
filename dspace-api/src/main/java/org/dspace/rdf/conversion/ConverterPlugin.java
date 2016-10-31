@@ -28,9 +28,14 @@ public interface ConverterPlugin {
      *                before converting any data!
      * @param dso The DSpaceObject that should be converted.
      * @return A Jena Model containing the generated RDF.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public Model convert(Context context, DSpaceObject dso)
-            throws SQLException, AuthorizeException;
+        throws SQLException, AuthorizeException;
     
     /**
      * Returns all type of DSpaceObjects that are supported by this plugin.

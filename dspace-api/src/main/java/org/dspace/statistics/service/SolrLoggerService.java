@@ -66,7 +66,7 @@ public interface SolrLoggerService {
      * Method just used to log the parents.
      * <ul>
      *  <li>Community log: owning comms.</li>
-     *  <li>Collection log: owning comms & their comms.</li>
+     *  <li>Collection log: owning comms and their comms.</li>
      *  <li>Item log: owning colls/comms.</li>
      *  <li>Bitstream log: owning item/colls/comms.</li>
      * </ul>
@@ -87,8 +87,10 @@ public interface SolrLoggerService {
      * Delete data from the index, as described by a query.
      *
      * @param query description of the records to be deleted.
-     * @throws java.io.IOException
-     * @throws org.apache.solr.client.solrj.SolrServerException
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SolrServerException
+     *     Exception from the Solr server to the solrj Java client.
      */
     public void removeIndex(String query) throws IOException,
             SolrServerException;
@@ -123,18 +125,22 @@ public interface SolrLoggerService {
      * Query used to get values grouped by the given facet field.
      *
      * @param query
-     *            the query to be used
+     *     the query to be used
+     * @param filterQuery
+     *     filter query
      * @param facetField
-     *            the facet field on which to group our values
+     *     the facet field on which to group our values
      * @param max
-     *            the max number of values given back (in case of 10 the top 10
-     *            will be given)
+     *     the max number of values given back (in case of 10 the top 10
+     *     will be given)
      * @param showTotal
-     *            a boolean determining whether the total amount should be given
-     *            back as the last element of the array
+     *     a boolean determining whether the total amount should be given
+     *     back as the last element of the array
+     * @param facetQueries
+     *     list of facet queries
      * @return an array containing our results
      * @throws SolrServerException
-     *             ...
+     *     Exception from the Solr server to the solrj Java client.
      */
     public ObjectCount[] queryFacetField(String query,
             String filterQuery, String facetField, int max, boolean showTotal,
@@ -144,24 +150,28 @@ public interface SolrLoggerService {
      * Query used to get values grouped by the date.
      *
      * @param query
-     *            the query to be used
+     *     the query to be used
+     * @param filterQuery
+     *     filter query
      * @param max
-     *            the max number of values given back (in case of 10 the top 10
-     *            will be given)
+     *     the max number of values given back (in case of 10 the top 10
+     *     will be given)
      * @param dateType
-     *            the type to be used (example: DAY, MONTH, YEAR)
+     *     the type to be used (example: DAY, MONTH, YEAR)
      * @param dateStart
-     *            the start date Format:(-3, -2, ..) the date is calculated
-     *            relatively on today
+     *     the start date Format:(-3, -2, ..) the date is calculated
+     *     relatively on today
      * @param dateEnd
-     *            the end date stop Format (-2, +1, ..) the date is calculated
-     *            relatively on today
+     *     the end date stop Format (-2, +1, ..) the date is calculated
+     *     relatively on today
      * @param showTotal
-     *            a boolean determining whether the total amount should be given
-     *            back as the last element of the array
+     *     a boolean determining whether the total amount should be given
+     *     back as the last element of the array
+     * @param context
+     *     The relevant DSpace Context.
      * @return and array containing our results
      * @throws SolrServerException
-     *             ...
+     *     Exception from the Solr server to the solrj Java client.
      */
     public ObjectCount[] queryFacetDate(String query,
             String filterQuery, int max, String dateType, String dateStart,

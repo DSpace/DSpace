@@ -22,8 +22,10 @@ public interface StyleSelection
      * Define which display style use for the item.
      * 
      * @param item
+     *     The DSpace Item to operate on.
      * @return the style name to use for display simple metadata of the item 
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public String getStyleForItem(Item item) throws SQLException;
 
@@ -32,6 +34,7 @@ public interface StyleSelection
      * The configuration has the following syntax: <code>schema.element[.qualifier|.*][(display-option)]</code> 
      * 
      * @param style
+     *     configuration of display style for item
      * @return An array of Strings each containing a metadata field and if given a display option.
      */
     public String[] getConfigurationForStyle(String style);

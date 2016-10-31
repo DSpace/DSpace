@@ -8,15 +8,18 @@
 package org.dspace.content.packager;
 
 /**
+ * <p>
  * This represents a failure when importing or exporting a package
  * caused by invalid unacceptable package format or contents; for
  * example, missing files that were mentioned in the manifest, or
  * extra files not in manifest, or lack of a manifest.
+ * </p>
  * <p>
  * When throwing a PackageValidationException, be sure the message
  * includes enough specific information to let the end user diagnose
  * the problem, i.e. what files appear to be missing from the manifest
  * or package, or the details of a checksum error on a file.
+ * </p>
  *
  * @author Larry Stone
  * @version $Revision$

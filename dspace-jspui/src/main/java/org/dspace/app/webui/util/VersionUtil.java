@@ -71,15 +71,19 @@ public class VersionUtil
      * Create a new version of the specified item, otherwise return null
      * 
      * @param context
-     *            The DSpace context
+     *     The relevant DSpace Context.
      * @param itemID
-     *            The id of the to-be-versioned item
+     *     The id of the to-be-versioned item
      * @param summary
-     *            The motif of the versioning
-     * @return Integer
+     *     The motif of the versioning
+     * @return Integer WorkspaceItem's Item ID
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static Integer processCreateNewVersion(Context context, UUID itemID,
             String summary) throws SQLException, AuthorizeException,
@@ -117,14 +121,18 @@ public class VersionUtil
      * Modify latest version
      * 
      * @param context
-     *            The DSpace context
+     *     The relevant DSpace Context.
      * @param itemID
-     *            The id of the to-be-versioned item
+     *     The id of the to-be-versioned item
      * @param summary
-     *            The motif of the versioning
+     *     The motif of the versioning
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static void processUpdateVersion(Context context, UUID itemID,
             String summary) throws SQLException, AuthorizeException,
@@ -157,13 +165,18 @@ public class VersionUtil
      * Restore a version
      * 
      * @param versionID
-     *            id of the version to restore
+     *     id of the version to restore
      * @param context
-     *            The DSpace context
+     *     The relevant DSpace Context.
      * @param summary
+     *     The motif of the versioning
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static void processRestoreVersion(Context context, int versionID,
             String summary) throws SQLException, AuthorizeException,
@@ -180,15 +193,19 @@ public class VersionUtil
      * Delete version(s)
      * 
      * @param context
-     *            The DSpace context
+     *     The relevant DSpace Context.
      * @param versionIDs
-     *            list of versionIDs to delete
+     *     list of versionIDs to delete
      * @param itemId
-     * 
+     *     Which DSpace Item to operate on.
      * @return latest version item id or null if all versions has been removed
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static Item processDeleteVersions(Context context, UUID itemId,
             String[] versionIDs) throws SQLException, AuthorizeException,
@@ -235,9 +252,12 @@ public class VersionUtil
      * then return null.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     Which DSpace Item to operate on.
      * @return the latest version of the item
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static Version checkLatestVersion(Context context, Item item)
             throws SQLException
@@ -267,9 +287,12 @@ public class VersionUtil
      * Check item if it is in workspace or workflow
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     Which DSpace Item to operate on.
      * @return true if item is in workflow or workspace
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static boolean isItemInSubmission(Context context, Item item)
             throws SQLException
@@ -289,7 +312,9 @@ public class VersionUtil
      * dc.identifier
      * 
      * @param item
+     *     Which DSpace Item to operate on.
      * @param version
+     *     item version
      * @return array of string
      * @deprecated Use {@link UIUtil#getItemIdentifier(org.dspace.core.Context, org.dspace.content.Item)} instead.
      */
@@ -324,6 +349,7 @@ public class VersionUtil
      * Retrieve the summary for the version
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param stringVersionID
      * @return version summary string
      */

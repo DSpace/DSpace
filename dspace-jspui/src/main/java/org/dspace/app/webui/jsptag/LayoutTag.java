@@ -29,10 +29,8 @@ import org.dspace.core.ConfigurationManager;
 
 /**
  * Tag for HTML page layout ("skin").
- * <P>
  * This tag <em>sets</em> request attributes that should be used by the header
  * and footer to render the page appropriately:
- * <P>
  * <ul>
  * <li><code>dspace.layout.title</code> - title of page</li>
  * <li><code>dspace.layout.locbar</code> - value will Boolean true or false
@@ -58,10 +56,8 @@ import org.dspace.core.ConfigurationManager;
  * (e.g. <code>rss_1.0</code>). Hence, this array will have 3<i>n</i>
  * elements where <i>n</i> is the number of feeds.</li>
  * </ul>
- * <p>
  *
  * * Additionally the following parameter may be set elsewhere in a Servlet.
- * <p>
  * <ul>
  * <li><code>dspace.layout.head</code> - extra data to include verbatim in
  * the &lt;head&gt; element of the page</li>
@@ -69,7 +65,6 @@ import org.dspace.core.ConfigurationManager;
  * 
  * Furthermore it sets the content type of the response to text/html using UTF-8
  * to ensure this will be returned in the HTTP header.
- * </p>
  * 
  * @author Robert Tansley
  * @version $Revision$
@@ -272,58 +267,58 @@ public class LayoutTag extends BodyTagSupport
         if (feedData != null && ! "NONE".equals(feedData))
         {
             // set the links' reference - community or collection
-        	boolean commLinks = feedData.startsWith("comm:");
-        	boolean collLinks = feedData.startsWith("coll:");
-        	if ( commLinks )
-        	{
+            boolean commLinks = feedData.startsWith("comm:");
+            boolean collLinks = feedData.startsWith("coll:");
+            if ( commLinks )
+            {
                 Community com = (Community)request.getAttribute("dspace.community");
-        		request.setAttribute("dspace.layout.feedref", com.getHandle());
-        	}
-        	else if( collLinks )
-        	{
-        		Collection col = (Collection)request.getAttribute("dspace.collection");
-        		request.setAttribute("dspace.layout.feedref", col.getHandle());
-        	}
-        	else //feed is across all of DSpace and not Community/Collection specific
-        	{
-        		request.setAttribute("dspace.layout.feedref", FeedServlet.SITE_FEED_KEY);
-        	}
-        	
-        	// build a list of link attributes for each link format
-        	String[] formats = feedData.substring(feedData.indexOf(':')+1).split(",");
-        	List<String> linkParts = new ArrayList<String>();
-        	// each link has a mime-type, title, and format (used in href URL)
-        	for (int i = 0; i < formats.length; i++)
-        	{
-        		if("rss_1.0".equals(formats[i]))
-        		{
-        			linkParts.add("rdf+xml");
-        		}
-        		else
-        		{
-        			linkParts.add("rss+xml");
-        		}
-        		
-        		if (commLinks)
-        		{
-        			linkParts.add("Items in Community");
-        		}
-        		else if(collLinks)
-        		{
-        			linkParts.add("Items in Collection");
-        		}
-        		else
-        		{
-        			linkParts.add("Items in " + ConfigurationManager.getProperty("dspace.name"));
-        		}
-        		
-        		linkParts.add(formats[i]);
-        	}
-        	request.setAttribute("dspace.layout.linkparts", linkParts);
+                request.setAttribute("dspace.layout.feedref", com.getHandle());
+            }
+            else if( collLinks )
+            {
+                Collection col = (Collection)request.getAttribute("dspace.collection");
+                request.setAttribute("dspace.layout.feedref", col.getHandle());
+            }
+            else //feed is across all of DSpace and not Community/Collection specific
+            {
+                request.setAttribute("dspace.layout.feedref", FeedServlet.SITE_FEED_KEY);
+            }
+            
+            // build a list of link attributes for each link format
+            String[] formats = feedData.substring(feedData.indexOf(':')+1).split(",");
+            List<String> linkParts = new ArrayList<String>();
+            // each link has a mime-type, title, and format (used in href URL)
+            for (int i = 0; i < formats.length; i++)
+            {
+                if("rss_1.0".equals(formats[i]))
+                {
+                    linkParts.add("rdf+xml");
+                }
+                else
+                {
+                    linkParts.add("rss+xml");
+                }
+                
+                if (commLinks)
+                {
+                    linkParts.add("Items in Community");
+                }
+                else if(collLinks)
+                {
+                    linkParts.add("Items in Collection");
+                }
+                else
+                {
+                    linkParts.add("Items in " + ConfigurationManager.getProperty("dspace.name"));
+                }
+                
+                linkParts.add(formats[i]);
+            }
+            request.setAttribute("dspace.layout.linkparts", linkParts);
         }
         else
         {
-        	request.setAttribute("dspace.layout.feedref", "NONE" );
+            request.setAttribute("dspace.layout.feedref", "NONE" );
         }
 
         return EVAL_BODY_BUFFERED;

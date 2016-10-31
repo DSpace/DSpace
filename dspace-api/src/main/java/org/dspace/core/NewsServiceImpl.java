@@ -35,27 +35,27 @@ public class NewsServiceImpl implements NewsService
 {
     private final Logger log = LoggerFactory.getLogger(NewsServiceImpl.class);
 
-	private List<String> acceptableFilenames;
+    private List<String> acceptableFilenames;
 
     @Autowired(required = true)
     private ConfigurationService configurationService;
-	
-	public void setAcceptableFilenames(List<String> acceptableFilenames) {
+    
+    public void setAcceptableFilenames(List<String> acceptableFilenames) {
         this.acceptableFilenames = addLocalesToAcceptableFilenames(acceptableFilenames);
     }
 
-    protected List<String> addLocalesToAcceptableFilenames(List<String> acceptableFilenames){
+    protected List<String> addLocalesToAcceptableFilenames(List<String> acceptableFilenames) {
         String [] locales = configurationService.getArrayProperty("webui.supported.locales");
         List<String> newAcceptableFilenames = new ArrayList<>();
         newAcceptableFilenames.addAll(acceptableFilenames);
-        for(String local : locales){
-            for(String acceptableFilename : acceptableFilenames){
+        for (String local : locales) {
+            for (String acceptableFilename : acceptableFilenames) {
                 int lastPoint = acceptableFilename.lastIndexOf(".");
                 newAcceptableFilenames.add(
-                        acceptableFilename.substring(0, lastPoint)
-                                + "_"
-                                + local
-                                + acceptableFilename.substring(lastPoint));
+                    acceptableFilename.substring(0, lastPoint)
+                        + "_"
+                        + local
+                        + acceptableFilename.substring(lastPoint));
             }
         }
         return newAcceptableFilenames;
@@ -68,9 +68,9 @@ public class NewsServiceImpl implements NewsService
     @Override
     public String readNewsFile(String newsFile)
     {
-    	if (!validate(newsFile)) {
-    		throw new IllegalArgumentException("The file "+ newsFile + " is not a valid news file");
-    	}
+        if (!validate(newsFile)) {
+            throw new IllegalArgumentException("The file " + newsFile + " is not a valid news file");
+        }
         String fileName = getNewsFilePath();
 
         fileName += newsFile;
@@ -106,9 +106,9 @@ public class NewsServiceImpl implements NewsService
     @Override
     public String writeNewsFile(String newsFile, String news)
     {
-    	if (!validate(newsFile)) {
-    		throw new IllegalArgumentException("The file "+ newsFile + " is not a valid news file");
-    	}
+        if (!validate(newsFile)) {
+            throw new IllegalArgumentException("The file "+ newsFile + " is not a valid news file");
+        }
         String fileName = getNewsFilePath();
 
         fileName += newsFile;
@@ -138,11 +138,11 @@ public class NewsServiceImpl implements NewsService
         return filePath;
     }
     
-	@Override
-	public boolean validate(String newsName) {
-		if (acceptableFilenames != null) {
-			return acceptableFilenames.contains(newsName);
-		}
-		return false;
-	}
+    @Override
+    public boolean validate(String newsName) {
+        if (acceptableFilenames != null) {
+            return acceptableFilenames.contains(newsName);
+        }
+        return false;
+    }
 }

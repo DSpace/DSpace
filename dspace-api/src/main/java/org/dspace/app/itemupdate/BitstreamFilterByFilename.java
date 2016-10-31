@@ -16,38 +16,38 @@ import org.dspace.content.Bitstream;
  *
  */
 public class BitstreamFilterByFilename extends BitstreamFilter {
-	
-	protected Pattern pattern;
+    
+    protected Pattern pattern;
     protected String filenameRegex;
-	
-	public BitstreamFilterByFilename()
-	{
-		//empty
-	}
+    
+    public BitstreamFilterByFilename()
+    {
+        //empty
+    }
 
-	/**
-	 *   Tests bitstream by matching the regular expression in the 
-	 *   properties against the bitstream name
-	 * 
-         * @param bitstream Bitstream
-	 * @return whether bitstream name matches the regular expression
-         * @exception BitstreamFilterException if filter error
-	 */
-	@Override
+    /**
+     * Tests bitstream by matching the regular expression in the 
+     * properties against the bitstream name
+     * 
+     * @param bitstream Bitstream
+     * @return whether bitstream name matches the regular expression
+     * @throws BitstreamFilterException if filter error
+     */
+    @Override
     public boolean accept(Bitstream bitstream) throws BitstreamFilterException
-	{		
-		if (filenameRegex == null)
-		{
-			filenameRegex = props.getProperty("filename");
-			if (filenameRegex == null)
-			{
-				throw new BitstreamFilterException("BitstreamFilter property 'filename' not found.");
-			}
-			pattern = Pattern.compile(filenameRegex);
-		}
-		
-		Matcher m = pattern.matcher(bitstream.getName());
-		return m.matches();
-	}	
+    {        
+        if (filenameRegex == null)
+        {
+            filenameRegex = props.getProperty("filename");
+            if (filenameRegex == null)
+            {
+                throw new BitstreamFilterException("BitstreamFilter property 'filename' not found.");
+            }
+            pattern = Pattern.compile(filenameRegex);
+        }
+        
+        Matcher m = pattern.matcher(bitstream.getName());
+        return m.matches();
+    }    
  
 }

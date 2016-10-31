@@ -42,6 +42,8 @@ public interface SupervisorService {
      * @param group   the group to be doing the supervising
      *
      * @return boolean  true if there is an order that matches, false if not
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public boolean isOrder(Context context, WorkspaceItem workspaceItem, Group group)
         throws SQLException;
@@ -54,6 +56,11 @@ public interface SupervisorService {
      * @param context   the context this object exists in
      * @param workspaceItem  the ID of the workspace item
      * @param group   the ID of the group to be removed from the item
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void remove(Context context, WorkspaceItem workspaceItem, Group group)
         throws SQLException, AuthorizeException;
@@ -65,6 +72,11 @@ public interface SupervisorService {
      * @param group   the ID of the group which will supervise
      * @param workspaceItem  the ID of the workspace item to be supervised
      * @param policy    String containing the policy type to be used
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void add(Context context, Group group, WorkspaceItem workspaceItem, int policy)
         throws SQLException, AuthorizeException;

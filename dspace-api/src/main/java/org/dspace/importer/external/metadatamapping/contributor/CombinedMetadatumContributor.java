@@ -36,6 +36,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
     /**
      *
+     *
      * @param field {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} used in mapping
      * @param metadatumContributors A list of MetadataContributor
      * @param separator A separator used to differentiate between different values
@@ -48,6 +49,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
     /**
      * Set the metadatafieldMapping used in the transforming of a record to actual metadata
+     *
      * @param metadataFieldMapping
      */
     @Override
@@ -63,6 +65,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
      * a separate Metadatum object is created for each index of Metadatum returned from the calls to
      * MetadatumContributor.contributeMetadata(t) for each MetadatumContributor in the metadatumContributors list.
      * We assume that each contributor returns the same amount of Metadatum objects
+     *
      * @param t the object we are trying to translate
      * @return a collection of metadata composed by each MetadataContributor
      */
@@ -84,7 +87,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
             for (LinkedList<MetadatumDTO> metadatums : metadatumLists) {
                 value.append(metadatums.get(i).getValue());
 
-                if(!metadatums.equals(metadatumLists.getLast())) {
+                if (!metadatums.equals(metadatumLists.getLast())) {
                     value.append(separator);
                 }
             }
@@ -96,6 +99,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
     /**
      * Return the MetadataFieldConfig used while retrieving MetadatumDTO
+     *
      * @return MetadataFieldConfig
      */
     public MetadataFieldConfig getField() {
@@ -104,6 +108,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
     /**
      * Setting the MetadataFieldConfig
+     *
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
      */
     public void setField(MetadataFieldConfig field) {
@@ -112,6 +117,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
     /**
      * Return the List of MetadataContributor objects set to this class
+     *
      * @return metadatumContributors, list of MetadataContributor
      */
     public LinkedList<MetadataContributor> getMetadatumContributors() {
@@ -120,6 +126,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
     /**
      * Set the List of MetadataContributor objects set to this class
+     *
      * @param metadatumContributors A list of MetadatumContributor classes
      */
     public void setMetadatumContributors(LinkedList<MetadataContributor> metadatumContributors) {
@@ -128,6 +135,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
     /**
      * Return the separator used to differentiate between distinct values
+     *
      * @return the separator used to differentiate between distinct values
      */
     public String getSeparator() {
@@ -136,7 +144,9 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
     /**
      * Set the separator used to differentiate between distinct values
+     *
      * @param separator
+     *     separator used to differentiate between distinct values
      */
     public void setSeparator(String separator) {
         this.separator = separator;

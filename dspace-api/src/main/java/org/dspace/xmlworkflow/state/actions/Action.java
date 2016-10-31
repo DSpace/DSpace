@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * This abstract class represents an api action
  * Each step in the xml workflow consists of a number of actions
- * this abstract action contains some utility methods & the methods
+ * this abstract action contains some utility methods and the methods
  * that each of these actions must implement including:
  * activating, execution, ... 
  *

@@ -287,19 +287,20 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 	}
 
 	
-	/**
-	 * Adds a table layout to the page
-	 * 
-	 * @param mainDiv
-	 *            the div to add the table to
-	 * @param display
-	 * @throws SAXException
-	 * @throws WingException
-	 * @throws ParseException
-	 * @throws IOException
-	 * @throws SolrServerException
-	 * @throws SQLException
-	 */
+    /**
+     * Adds a table layout to the page
+     * 
+     * @param mainDiv
+     *            the div to add the table to
+     * @param display
+     * @throws SAXException
+     * @throws WingException
+     * @throws ParseException
+     * @throws IOException
+     * @throws SolrServerException
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     */
 	private void addDisplayTable(Division mainDiv, StatisticsTable display)
 			throws SAXException, WingException, SQLException,
 			SolrServerException, IOException, ParseException {

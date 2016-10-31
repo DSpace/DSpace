@@ -305,9 +305,13 @@ public class EditCommunitiesServlet extends DSpaceServlet
      * needed/allowed for the community edit form
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param community
+     *     DSpace Community object.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     private void storeAuthorizeAttributeCommunityEdit(Context context,
             HttpServletRequest request, Community community) throws SQLException
@@ -363,9 +367,13 @@ public class EditCommunitiesServlet extends DSpaceServlet
      * needed/allowed for the collection edit form
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param community
+     *     DSpace Community object.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     static void storeAuthorizeAttributeCollectionEdit(Context context,
             HttpServletRequest request, Collection collection) throws SQLException

@@ -46,8 +46,12 @@ public interface WorkflowCuratorService {
     /**
      * Determines and executes curation of a Workflow item.
      *
+     * @param curator the Curator object
      * @param c the user context
      * @param wfId the workflow id
+     * @return true if curation was completed or not required,
+     *         false if no workflow item found for id
+     *         or item was rejected
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error
      * @throws SQLException if database error
@@ -55,6 +59,18 @@ public interface WorkflowCuratorService {
     public boolean curate(Curator curator, Context c, String wfId)
             throws AuthorizeException, IOException, SQLException;
 
+    /**
+     * Determines and executes curation of a Workflow item.
+     *
+     * @param curator the Curator object
+     * @param c the user context
+     * @param wfi the workflow item
+     * @return true if curation was completed or not required,
+     *         false if item was rejected
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     */
     public boolean curate(Curator curator, Context c, BasicWorkflowItem wfi)
             throws AuthorizeException, IOException, SQLException;
 }

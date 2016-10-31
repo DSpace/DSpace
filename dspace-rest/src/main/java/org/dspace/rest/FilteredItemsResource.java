@@ -61,144 +61,157 @@ public class FilteredItemsResource extends Resource {
      * through expand parameter.
      * 
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of collection. Options are: "all", "parentCommunityList",
-     *            "parentCommunity", "items", "license" and "logo". If you want
-     *            to use multiple options, it must be separated by commas.
+     *     String in which is what you want to add to returned instance
+     *     of collection. Options are: "all", "parentCommunityList",
+     *     "parentCommunity", "items", "license" and "logo". If you want
+     *     to use multiple options, it must be separated by commas.
      * @param limit
-     *            Limit value for items in list in collection. Default value is
-     *            100.
+     *     Limit value for items in list in collection. Default value is
+     *     100.
      * @param offset
-     *            Offset of start index in list of items of collection. Default
-     *            value is 0.
+     *     Offset of start index in list of items of collection. Default
+     *     value is 0.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param filters
-     *            Comma separated list of Item Filters to use to evaluate against
-     *            the items in a collection
-	 * @param query_field
-	 *            List of metadata fields to evaluate in a metadata query.
-	 *            Each list value is used in conjunction with a query_op and query_field.
-	 * @param query_op
-	 *            List of metadata operators to use in a metadata query.
-	 *            Each list value is used in conjunction with a query_field and query_field.
-	 * @param query_val
-	 *            List of metadata values to evaluate in a metadata query.
-	 *            Each list value is used in conjunction with a query_value and query_op.
- 	 * @param collSel
-	 *            List of collections to query.
+     *     Comma separated list of Item Filters to use to evaluate against
+     *     the items in a collection
+     * @param query_field
+     *     List of metadata fields to evaluate in a metadata query.
+     *     Each list value is used in conjunction with a query_op and query_field.
+     * @param query_op
+     *     List of metadata operators to use in a metadata query.
+     *     Each list value is used in conjunction with a query_field and query_field.
+     * @param query_val
+     *     List of metadata values to evaluate in a metadata query.
+     *     Each list value is used in conjunction with a query_value and query_op.
+     * @param collSel
+     *     List of collections to query.
      * @param headers
-     *            If you want to access to collection under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the collection as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
+     * @param servletContext
+     *     Context of the servlet container.
      * @return Return instance of collection. It can also return status code
-     *         NOT_FOUND(404) if id of collection is incorrect or status code
-     *         UNATHORIZED(401) if user has no permission to read collection.
+     *     NOT_FOUND(404) if id of collection is incorrect or status code
+     *     UNATHORIZED(401) if user has no permission to read collection.
      * @throws WebApplicationException
-     *             It is thrown when was problem with database reading
-     *             (SQLException) or problem with creating
-     *             context(ContextException). It is thrown by NOT_FOUND and
-     *             UNATHORIZED status codes, too.
+     *     It is thrown when was problem with database reading
+     *     (SQLException) or problem with creating
+     *     context(ContextException). It is thrown by NOT_FOUND and
+     *     UNATHORIZED status codes, too.
      */
-	@GET
+    @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public org.dspace.rest.common.ItemFilter getItemQuery(@QueryParam("expand") String expand, 
-    		@QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
-    		@QueryParam("filters") @DefaultValue("is_item,all_filters") String filters,
+            @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+            @QueryParam("filters") @DefaultValue("is_item,all_filters") String filters,
             @QueryParam("query_field[]") @DefaultValue("dc.title") List<String> query_field,
             @QueryParam("query_op[]") @DefaultValue("exists") List<String> query_op,
             @QueryParam("query_val[]") @DefaultValue("") List<String> query_val,
             @QueryParam("collSel[]") @DefaultValue("") List<String> collSel,
-    		@Context HttpHeaders headers, @Context HttpServletRequest request, @Context ServletContext servletContext) {
+            @Context HttpHeaders headers, @Context HttpServletRequest request, @Context ServletContext servletContext) {
         org.dspace.core.Context context = null;
         ItemFilterSet itemFilterSet = new ItemFilterSet(filters, true);
         ItemFilter result = itemFilterSet.getAllFiltersFilter();
         try {
             context = createContext();
             if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
-                context.turnOffAuthorisationSystem();            	
+                context.turnOffAuthorisationSystem();                
             }
             
             int index = Math.min(query_field.size(), Math.min(query_op.size(), query_val.size()));
             List<ItemFilterQuery> itemFilterQueries = new ArrayList<ItemFilterQuery>();
             for(int i=0; i<index; i++){
-            	itemFilterQueries.add(new ItemFilterQuery(query_field.get(i), query_op.get(i), query_val.get(i)));
+                itemFilterQueries.add(new ItemFilterQuery(query_field.get(i), query_op.get(i), query_val.get(i)));
             }
 
             String regexClause = configurationService.getProperty("rest.regex-clause");
             if (regexClause == null) {
-            	regexClause = "";
+                regexClause = "";
             }
 
-    		List<UUID> uuids = getUuidsFromStrings(collSel);
-    		List<List<MetadataField>> listFieldList = getMetadataFieldsList(context, query_field);    		
+            List<UUID> uuids = getUuidsFromStrings(collSel);
+            List<List<MetadataField>> listFieldList = getMetadataFieldsList(context, query_field);            
 
             Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, listFieldList, query_op, query_val, uuids, regexClause, offset, limit);
              
             int count = itemFilterSet.processSaveItems(context, servletContext, childItems, true, expand);
-    	    writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
-    	    result.annotateQuery(query_field, query_op, query_val);
-    	    result.setUnfilteredItemCount(count);
-    	    context.complete();
+            writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
+            result.annotateQuery(query_field, query_op, query_val);
+            result.setUnfilteredItemCount(count);
+            context.complete();
         } catch (IOException e) {
             processException(e.getMessage(), context);
         } catch (SQLException e) {
-        	processException(e.getMessage(), context);
+            processException(e.getMessage(), context);
         } catch (AuthorizeException e) {
-        	processException(e.getMessage(), context);
+            processException(e.getMessage(), context);
         } catch (ContextException e) {
-        	processException("Unauthorized filtered item query. " + e.getMessage(), context);
-		} finally {
-			processFinally(context);
+            processException("Unauthorized filtered item query. " + e.getMessage(), context);
+        } finally {
+            processFinally(context);
         }
         return result;
     }
-	
-	private List<List<MetadataField>> getMetadataFieldsList(org.dspace.core.Context context, List<String> query_field) throws SQLException {
-		List<List<MetadataField>> listFieldList = new ArrayList<List<MetadataField>>();
-		for(String s: query_field) {
-			ArrayList<MetadataField> fields = new ArrayList<MetadataField>();
-			listFieldList.add(fields);
-			if (s.equals("*")) {
-				continue;
-			}
-        	String schema = "";
-        	String element = "";
-        	String qualifier = null;
-        	String[] parts = s.split("\\.");
-        	if (parts.length>0) {
-        		schema = parts[0];
-        	}
-        	if (parts.length>1) {
-        		element = parts[1];
-        	}
-        	if (parts.length>2) {
-        		qualifier = parts[2];
-        	}
+    
+    private List<List<MetadataField>> getMetadataFieldsList(org.dspace.core.Context context, List<String> query_field) throws SQLException {
+        List<List<MetadataField>> listFieldList = new ArrayList<List<MetadataField>>();
+        for(String s: query_field) {
+            ArrayList<MetadataField> fields = new ArrayList<MetadataField>();
+            listFieldList.add(fields);
+            if (s.equals("*")) {
+                continue;
+            }
+            String schema = "";
+            String element = "";
+            String qualifier = null;
+            String[] parts = s.split("\\.");
+            if (parts.length>0) {
+                schema = parts[0];
+            }
+            if (parts.length>1) {
+                element = parts[1];
+            }
+            if (parts.length>2) {
+                qualifier = parts[2];
+            }
         
-        	if (Item.ANY.equals(qualifier)) {
-    			for(MetadataField mf: metadataFieldService.findFieldsByElementNameUnqualified(context, schema, element)){
-        			fields.add(mf);        		    				
-    			}
-        	} else {
-    			MetadataField mf = metadataFieldService.findByElement(context, schema, element, qualifier);
-    			if (mf != null) {
-        			fields.add(mf);    				
-    			}
-        	}
-		}
-		return listFieldList;
-	}
-	
-	private List<UUID> getUuidsFromStrings(List<String> collSel) {
-		List<UUID> uuids = new ArrayList<UUID>();
-		for(String s: collSel) {
-			try {
-				uuids.add(UUID.fromString(s));
-			} catch (IllegalArgumentException e) {
-				log.warn("Invalid collection UUID: " + s);
-			}
-		}
-		return uuids;
-	}
+            if (Item.ANY.equals(qualifier)) {
+                for(MetadataField mf: metadataFieldService.findFieldsByElementNameUnqualified(context, schema, element)){
+                    fields.add(mf);                                    
+                }
+            } else {
+                MetadataField mf = metadataFieldService.findByElement(context, schema, element, qualifier);
+                if (mf != null) {
+                    fields.add(mf);                    
+                }
+            }
+        }
+        return listFieldList;
+    }
+    
+    private List<UUID> getUuidsFromStrings(List<String> collSel) {
+        List<UUID> uuids = new ArrayList<UUID>();
+        for(String s: collSel) {
+            try {
+                uuids.add(UUID.fromString(s));
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid collection UUID: " + s);
+            }
+        }
+        return uuids;
+    }
     
 }

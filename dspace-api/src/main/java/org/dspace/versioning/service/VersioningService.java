@@ -34,7 +34,14 @@ public interface VersioningService {
      * To keep version numbers stable we do not delete versions, we do only set 
      * the item, date, summary and eperson null. This methods returns only those
      * versions that have an item assigned.
+     *
+     * @param c
+     *     The relevant DSpace Context.
+     * @param vh
+     *     version history
      * @return All versions of a version history that have an item assigned.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     List<Version> getVersionsByHistory(Context c, VersionHistory vh) throws SQLException;
 

@@ -47,26 +47,42 @@ public class FilteredCollectionsResource extends Resource {
      * through expand parameter.
      * 
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of collection. Options are: "all", "parentCommunityList",
-     *            "parentCommunity", "topCommunity", "items", "license" and "logo". 
-     *            If you want to use multiple options, it must be separated by commas.
+     *     String in which is what you want to add to returned instance
+     *     of collection. Options are: "all", "parentCommunityList",
+     *     "parentCommunity", "topCommunity", "items", "license" and "logo". 
+     *     If you want to use multiple options, it must be separated by commas.
      * @param limit
-     *            Limit value for items in list in collection. Default value is
-     *            100.
+     *     Limit value for items in list in collection. Default value is
+     *     100.
      * @param offset
-     *            Offset of start index in list of items of collection. Default
-     *            value is 0.
+     *     Offset of start index in list of items of collection. Default
+     *     value is 0.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param filters
+     *     Comma separated list of Item Filters to use to evaluate against
+     *     the items in a collection
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
+     * @param servletContext
+     *     Context of the servlet container.
      * @param headers
-     *            If you want to access to collections under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the collections as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return array of collection, on which has logged user permission
-     *         to view.
+     *     to view.
      * @throws WebApplicationException
-     *             It is thrown when was problem with database reading
-     *             (SQLException) or problem with creating
-     *             context(ContextException).
+     *     It is thrown when was problem with database reading
+     *     (SQLException) or problem with creating
+     *     context(ContextException).
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
@@ -131,33 +147,46 @@ public class FilteredCollectionsResource extends Resource {
      * through expand parameter.
      * 
      * @param collection_id
-     *            Id of collection in DSpace.
+     *     Id of collection in DSpace.
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of collection. Options are: "all", "parentCommunityList",
-     *            "parentCommunity", "topCommunity", "items", "license" and "logo". 
-     *            If you want to use multiple options, it must be separated by commas.
+     *     String in which is what you want to add to returned instance
+     *     of collection. Options are: "all", "parentCommunityList",
+     *     "parentCommunity", "topCommunity", "items", "license" and "logo". 
+     *     If you want to use multiple options, it must be separated by commas.
      * @param limit
-     *            Limit value for items in list in collection. Default value is
-     *            100.
+     *     Limit value for items in list in collection. Default value is
+     *     100.
      * @param offset
-     *            Offset of start index in list of items of collection. Default
-     *            value is 0.
+     *     Offset of start index in list of items of collection. Default
+     *     value is 0.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param filters
-     *            Comma separated list of Item Filters to use to evaluate against
-     *            the items in a collection
+     *     Comma separated list of Item Filters to use to evaluate against
+     *     the items in a collection
      * @param headers
-     *            If you want to access to collection under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the collection as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
+     * @param servletContext
+     *     Context of the servlet container.
      * @return Return instance of collection. It can also return status code
-     *         NOT_FOUND(404) if id of collection is incorrect or status code
-     *         UNATHORIZED(401) if user has no permission to read collection.
+     *     NOT_FOUND(404) if id of collection is incorrect or status code
+     *     UNATHORIZED(401) if user has no permission to read collection.
      * @throws WebApplicationException
-     *             It is thrown when was problem with database reading
-     *             (SQLException) or problem with creating
-     *             context(ContextException). It is thrown by NOT_FOUND and
-     *             UNATHORIZED status codes, too.
+     *     It is thrown when was problem with database reading
+     *     (SQLException) or problem with creating
+     *     context(ContextException). It is thrown by NOT_FOUND and
+     *     UNATHORIZED status codes, too.
      */
     @GET
     @Path("/{collection_id}")

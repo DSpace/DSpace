@@ -40,11 +40,12 @@ public class XMLUtil
      * Loads a W3C XML document from a file.
      * 
      * @param filename
-     *            The name of the file to be loaded
+     *     The name of the file to be loaded
      * @return a document object model object representing the XML file
      * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws ParserConfigurationException if XML parser configuration error
+     * @throws SAXException if XML parsing error
      */
     public static Document loadXML(String filename) throws IOException,
             ParserConfigurationException, SAXException

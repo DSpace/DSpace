@@ -104,7 +104,7 @@ public class PostgresUtils
      * <P>
      * This requirement is only needed for PostgreSQL databases.
      * It doesn't matter what schema pgcrypto is installed in, as long as it exists.
-     * @return true if everything is installed & up-to-date. False otherwise.
+     * @return true if everything is installed and up-to-date. False otherwise.
      */
     public static boolean isPgcryptoUpToDate()
     {

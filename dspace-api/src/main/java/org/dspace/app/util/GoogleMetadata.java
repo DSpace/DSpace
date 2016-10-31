@@ -229,6 +229,7 @@ public class GoogleMetadata
      * first-encountered instance of the field for this Item.
      * 
      * @param fieldName
+     *     metadata field name
      * @return successful?
      */
     protected boolean addSingleField(String fieldName)
@@ -262,7 +263,7 @@ public class GoogleMetadata
         if (config.equals("$simple-pdf"))
         {
             String pdf_url = getPDFSimpleUrl(item);
-            if(pdf_url.length() > 0)
+            if (pdf_url.length() > 0)
             {
                 metadataMappings.put(fieldName, pdf_url);
                 return true;
@@ -291,6 +292,7 @@ public class GoogleMetadata
      * instead of an aggregate.
      * 
      * @param configFilter
+     *     list of DC metadata fields separated by "|" characters
      * @return The first configured match of metadata field for the item.
      */
     protected MetadataValue resolveMetadataField(String configFilter)
@@ -309,6 +311,7 @@ public class GoogleMetadata
      * A plural version of resolveMetadata for aggregate fields.
      * 
      * @param configFilter
+     *     list of DC metadata fields separated by "|" characters
      * @return Aggregate of all matching metadata fields configured in the first
      *         option field-set to return any number of filter matches.
      */
@@ -328,7 +331,9 @@ public class GoogleMetadata
      * configuration filter.
      * 
      * @param configFilter
+     *     list of DC metadata fields separated by "|" characters
      * @param returnType
+     *     GoogleMetadata.SINGLE / GoogleMetadata.MULTI / GoogleMetadata.ALL_FIELDS_IN_OPTION
      * @return Array of configuration to item-field matches
      */
     protected ArrayList<MetadataValue> resolveMetadata(String configFilter,
@@ -350,8 +355,7 @@ public class GoogleMetadata
 
         if (log.isDebugEnabled())
         {
-            log
-                    .debug("Resolved Fields For This Item Per Configuration Filter:");
+            log.debug("Resolved Fields For This Item Per Configuration Filter:");
             for (int i = 0; i < parsedOptions.size(); i++)
             {
                 ArrayList<String> optionFields = parsedOptions.get(i);
@@ -445,6 +449,7 @@ public class GoogleMetadata
      * configuration.
      * 
      * @param configFilter
+     *     list of DC metadata fields separated by "|" characters
      * @return array of parsed options or null
      */
     protected ArrayList<ArrayList<String>> parseOptions(String configFilter)
@@ -720,7 +725,7 @@ public class GoogleMetadata
         // Dissertations
         if (itemIsDissertation())
         {
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("ITEM TYPE:  DISSERTATION");
             }
 
@@ -731,7 +736,7 @@ public class GoogleMetadata
         // Patents
         if (itemIsPatent())
         {
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("ITEM TYPE:  PATENT");
             }
 
@@ -750,7 +755,7 @@ public class GoogleMetadata
         // Tech Reports
         if (itemIsTechReport())
         {
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("ITEM TYPE:  TECH REPORT");
             }
             addSingleField(TECH_REPORT_NUMBER);
@@ -758,7 +763,7 @@ public class GoogleMetadata
         }
 
 
-        if(!itemIsDissertation() && !itemIsTechReport()) {
+        if (!itemIsDissertation() && !itemIsTechReport()) {
             // PUBLISHER
             addSingleField(PUBLISHER);
         }
@@ -1004,31 +1009,31 @@ public class GoogleMetadata
      * is in the default content bundle, and that the item only has one public bitstream
      * and it is a PDF.
      *
-     * @param item
+     * @param item item to get PDF URL from
      * @return URL that the PDF can be directly downloaded from
      */
     protected String getPDFSimpleUrl(Item item)
     {
         try {
-	        Bitstream bitstream = findLinkableFulltext(item);
-	        if (bitstream != null) {
-		        StringBuilder path = new StringBuilder();
-		        path.append(ConfigurationManager.getProperty("dspace.url"));
+            Bitstream bitstream = findLinkableFulltext(item);
+            if (bitstream != null) {
+                StringBuilder path = new StringBuilder();
+                path.append(ConfigurationManager.getProperty("dspace.url"));
 
-		        if (item.getHandle() != null) {
-			        path.append("/bitstream/");
-			        path.append(item.getHandle());
-			        path.append("/");
-			        path.append(bitstream.getSequenceID());
-		        } else {
-			        path.append("/retrieve/");
-			        path.append(bitstream.getID());
-		        }
+                if (item.getHandle() != null) {
+                    path.append("/bitstream/");
+                    path.append(item.getHandle());
+                    path.append("/");
+                    path.append(bitstream.getSequenceID());
+                } else {
+                    path.append("/retrieve/");
+                    path.append(bitstream.getID());
+                }
 
-		        path.append("/");
-		        path.append(Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
-		        return path.toString();
-	        }
+                path.append("/");
+                path.append(Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
+                return path.toString();
+            }
         } catch (UnsupportedEncodingException ex) {
             log.debug(ex.getMessage());
         } catch (SQLException ex) {
@@ -1038,22 +1043,24 @@ public class GoogleMetadata
         return "";
     }
 
-	/**
-	 * A bitstream is considered linkable fulltext when it is either
-	 * <ul>
-	 *     <li>the item's only bitstream (in the ORIGINAL bundle); or</li>
-	 *     <li>the primary bitstream</li>
-	 * </ul>
-	 * Additionally, this bitstream must be publicly viewable.
-	 * @param item
-	 * @return a linkable bitstream or null if none found
-	 * @throws SQLException if database error
-	 */
-	protected Bitstream findLinkableFulltext(Item item) throws SQLException {
-		Bitstream bestSoFar = null;
-		int bitstreamCount = 0;
-		List<Bundle> contentBundles = itemService.getBundles(item, "ORIGINAL");
-		for (Bundle bundle : contentBundles) {
+    /**
+     * A bitstream is considered linkable fulltext when it is either
+     * <ul>
+     *     <li>the item's only bitstream (in the ORIGINAL bundle); or</li>
+     *     <li>the primary bitstream</li>
+     * </ul>
+     * Additionally, this bitstream must be publicly viewable.
+     *
+     * @param item
+     *     bitstream's parent item
+     * @return a linkable bitstream or null if none found
+     * @throws SQLException if database error
+     */
+    protected Bitstream findLinkableFulltext(Item item) throws SQLException {
+        Bitstream bestSoFar = null;
+        int bitstreamCount = 0;
+        List<Bundle> contentBundles = itemService.getBundles(item, "ORIGINAL");
+        for (Bundle bundle : contentBundles) {
             List<Bitstream> bitstreams = bundle.getBitstreams();
             for (Bitstream candidate : bitstreams) {
                 if (candidate.equals(bundle.getPrimaryBitstream())) { // is primary -> use this one
@@ -1068,25 +1075,32 @@ public class GoogleMetadata
             }
         }
 
-		return bestSoFar;
-	}
+        return bestSoFar;
+    }
 
-	protected boolean isPublic(Bitstream bitstream) {
-		if (bitstream == null) {
-			return false;
-		}
-		boolean result = false;
-		Context context = null;
-		try {
-			context = new Context();
-			result = AuthorizeServiceFactory.getInstance().getAuthorizeService().authorizeActionBoolean(context, bitstream, Constants.READ, true);
-		} catch (SQLException e) {
-			log.error("Cannot determine whether bitstream is public, assuming it isn't. bitstream_id=" + bitstream.getID(), e);
-		}
-		return result;
-	}
+    /**
+     * Find out whether bitstream is readable by the public.
+     * 
+     * @param bitstream
+     *     the target bitstream
+     * @return whether bitstream is readable by the Anonymous group
+     */
+    protected boolean isPublic(Bitstream bitstream) {
+        if (bitstream == null) {
+            return false;
+        }
+        boolean result = false;
+        Context context = null;
+        try {
+            context = new Context();
+            result = AuthorizeServiceFactory.getInstance().getAuthorizeService().authorizeActionBoolean(context, bitstream, Constants.READ, true);
+        } catch (SQLException e) {
+            log.error("Cannot determine whether bitstream is public, assuming it isn't. bitstream_id=" + bitstream.getID(), e);
+        }
+        return result;
+    }
 
-	/**
+    /**
      * 
      * 
      * @param field
@@ -1122,6 +1136,7 @@ public class GoogleMetadata
     /**
      * If metadata field contains multiple values, then add each value to the map separately
      * @param FIELD
+     *     metadata field
      */
     protected void addMultipleValues(String FIELD)
     {
@@ -1201,6 +1216,7 @@ public class GoogleMetadata
      * metadata practice.
      * 
      * @param dConfig
+     *     configured fields (from google-metadata.properties)
      * @return item matches configuration
      */
     protected boolean identifyItemType(String dConfig)
@@ -1223,7 +1239,7 @@ public class GoogleMetadata
                 if (mdPairs.containsKey(parsedPair[0].trim()))
                 {
                     mdPairs.get(parsedPair[0].trim()).add(parsedPair[1]);
-                    if(log.isDebugEnabled()) {
+                    if (log.isDebugEnabled()) {
                         log.debug("Registering Type Identifier:  " + parsedPair[0] + " => " + parsedPair[1]);
                     }
                 }

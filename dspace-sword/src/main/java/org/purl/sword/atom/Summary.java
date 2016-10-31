@@ -18,20 +18,20 @@ import org.purl.sword.base.XmlName;
  */
 public class Summary extends TextConstruct
 {
-   private static final XmlName XML_NAME =
-      new XmlName(Namespaces.PREFIX_ATOM, "summary", Namespaces.NS_ATOM);
-
-   /** 
-    * Create a new instance and set the prefix to 
-    * 'atom' and the local name to 'summary'. 
-    */
-   public Summary()
-   {
-      super(XML_NAME);
-   }
-
-   public static XmlName elementName()
-   {
-       return XML_NAME;
-   }
+    private static final XmlName XML_NAME =
+        new XmlName(Namespaces.PREFIX_ATOM, "summary", Namespaces.NS_ATOM);
+ 
+    /** 
+     * Create a new instance and set the prefix to 
+     * 'atom' and the local name to 'summary'. 
+     */
+    public Summary()
+    {
+        super(XML_NAME);
+    }
+ 
+    public static XmlName elementName()
+    {
+        return XML_NAME;
+    }
 }

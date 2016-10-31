@@ -55,6 +55,10 @@ public class DnsLookup {
 
     /**
      * Resolve a host name to an IPv4 address.
+     *
+     * @param hostname
+     *     hostname to resolve to IP
+     * @return IPv4 address
      * @throws IOException from infrastructure or no resolution.
      */
     public static String forward(String hostname)

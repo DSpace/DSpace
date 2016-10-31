@@ -60,9 +60,10 @@ public class SWORDService
 
     /**
      * Construct a new service instance around the given authenticated
-     * sword context
+     * SWORD context
      *
      * @param sc
+     *     authenticated SWORD context
      */
     public SWORDService(SWORDContext sc)
     {
@@ -130,6 +131,7 @@ public class SWORDService
      * looking code up
      *
      * @param message
+     *     message to register with the verboseDescription member variable
      */
     public void message(String message)
     {
@@ -150,8 +152,12 @@ public class SWORDService
      * Construct the most appropriate filename for the incoming deposit.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param deposit
+     *     deposit request
      * @param original
+     *     is original?
+     * @return the most appropriate filename for the incoming deposit
      * @throws DSpaceSWORDException
      */
     public String getFilename(Context context, Deposit deposit,
@@ -160,8 +166,8 @@ public class SWORDService
     {
         try
         {
-            BitstreamFormat bf = bitstreamFormatService
-                    .findByMIMEType(context, deposit.getContentType());
+            BitstreamFormat bf = bitstreamFormatService.findByMIMEType(
+                context, deposit.getContentType());
             List<String> exts = null;
             if (bf != null)
             {
@@ -193,6 +199,8 @@ public class SWORDService
 
     /**
      * Get the name of the temp files that should be used.
+     *
+     * @return the name of the temp file that should be used
      */
     public String getTempFilename()
     {

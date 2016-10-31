@@ -18,15 +18,15 @@ import org.dspace.core.factory.CoreServiceFactory;
  * Types can be defined or configured using the plugin manager:
  * 
  * plugin.named.org.dspace.sort.OrderFormatDelegate=
- * 		org.dspace.sort.OrderFormatTitleMarc21=title
- * 		org.dspace.sort.OrderFormatAuthor=author
+ *         org.dspace.sort.OrderFormatTitleMarc21=title
+ *         org.dspace.sort.OrderFormatAuthor=author
  * 
  * The following standard types have been defined by default, but can be reconfigured
  * via the plugin manager:
  * 
- * author	= org.dspace.sort.OrderFormatAuthor
- * title	= org.dspace.sort.OrderFormatTitle
- * text 	= org.dspace.sort.OrderFormatText
+ * author    = org.dspace.sort.OrderFormatAuthor
+ * title    = org.dspace.sort.OrderFormatTitle
+ * text     = org.dspace.sort.OrderFormatText
  * 
  * IMPORTANT - If you change any of the orderings, you need to rebuild the browse sort columns
  * (ie. run 'index-all', or 'dsrun org.dspace.browse.InitializeBrowse')
@@ -36,14 +36,14 @@ import org.dspace.core.factory.CoreServiceFactory;
  */
 public class OrderFormat
 {
-	public static final String AUTHOR = "author";
-	public static final String TITLE  = "title";
-	public static final String TEXT   = "text";
-	public static final String DATE   = "date";
+    public static final String AUTHOR = "author";
+    public static final String TITLE  = "title";
+    public static final String TEXT   = "text";
+    public static final String DATE   = "date";
     public static final String AUTHORITY = "authority";
-	
-	// Array of all available order delegates - avoids excessive calls to plugin manager
-	private static final String[] delegates = CoreServiceFactory.getInstance().getPluginService().getAllPluginNames(OrderFormatDelegate.class);
+    
+    // Array of all available order delegates - avoids excessive calls to plugin manager
+    private static final String[] delegates = CoreServiceFactory.getInstance().getPluginService().getAllPluginNames(OrderFormatDelegate.class);
 
     private static final OrderFormatDelegate authorDelegate = new OrderFormatAuthor();
     private static final OrderFormatDelegate titleDelegate  = new OrderFormatTitle();
@@ -53,26 +53,39 @@ public class OrderFormat
     
     /**
      * Generate a sort string for the given DC metadata
+     * @param value
+     *     metadata value
+     * @param language
+     *     metadata language code
+     * @param type
+     *     metadata type
+     *     {@see OrderFormat.AUTHOR}
+     *     {@see OrderFormat.TITLE}
+     *     {@see OrderFormat.TEXT}
+     *     {@see OrderFormat.DATE}
+     *     {@see OrderFormat.AUTHORITY}
+     * @return sort string
+     *     
      */
     public static String makeSortString(String value, String language, String type)
     {
-    	OrderFormatDelegate delegate = null;
-    	
+        OrderFormatDelegate delegate = null;
+        
         // If there is no value, return null
         if (value == null)
         {
             return null;
         }
 
-    	// If a named index has been supplied
-    	if (type != null && type.length() > 0)
-    	{
-    		// Use a delegate if one is configured
+        // If a named index has been supplied
+        if (type != null && type.length() > 0)
+        {
+            // Use a delegate if one is configured
             delegate = OrderFormat.getDelegate(type);
-        	if (delegate != null)
-        	{
-        		return delegate.makeSortString(value, language);
-        	}
+            if (delegate != null)
+            {
+                return delegate.makeSortString(value, language);
+            }
 
             // No delegates found, so apply defaults
             if (type.equalsIgnoreCase(OrderFormat.AUTHOR) && authorDelegate != null)
@@ -99,9 +112,9 @@ public class OrderFormat
             {
               return authorityDelegate.makeSortString(value, language);
             }
-    	}
+        }
 
-    	return value;
+        return value;
     }
 
     /**
@@ -109,18 +122,18 @@ public class OrderFormat
      */
     private static OrderFormatDelegate getDelegate(String name)
     {
-   		if (name != null && name.length() > 0)
-   		{
-   			// Check the cached array of names to see if the delegate has been configured
-	   		for (int idx = 0; idx < delegates.length; idx++)
-	   		{
-	   			if (delegates[idx].equals(name))
-	   			{
-	   				return (OrderFormatDelegate)CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(OrderFormatDelegate.class, name);
-	   			}
-	   		}
-   		}
-   		
-    	return null;
+           if (name != null && name.length() > 0)
+           {
+               // Check the cached array of names to see if the delegate has been configured
+               for (int idx = 0; idx < delegates.length; idx++)
+               {
+                   if (delegates[idx].equals(name))
+                   {
+                       return (OrderFormatDelegate)CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(OrderFormatDelegate.class, name);
+                   }
+               }
+           }
+           
+        return null;
     }
 }

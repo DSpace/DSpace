@@ -26,34 +26,57 @@ public interface XmlWorkflowItemService extends WorkflowItemService<XmlWorkflowI
     /**
      * return all workflowitems for a certain page
      *
-     * @param context  active context
+     * @param context
+     *     The relevant DSpace Context.
+     * @param page
+     *     paging: page number
+     * @param pagesize
+     *     paging: items per page
      * @return WorkflowItem list of all the workflow items in system
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<XmlWorkflowItem> findAll(Context context, Integer page, Integer pagesize) throws SQLException;
 
     /**
      * return all workflowitems for a certain page with a certain collection
      *
-     * @param collection  active context
+     * @param context
+     *     The relevant DSpace Context.
+     * @param page
+     *     paging: page number
+     * @param pagesize
+     *     paging: items per page
+     * @param collection
+     *     restrict to this collection
      * @return WorkflowItem list of all the workflow items in system
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<XmlWorkflowItem> findAllInCollection(Context context, Integer page, Integer pagesize, Collection collection) throws SQLException;
 
     /**
      * return how many workflow items appear in the database
      *
-     * @param context  active context
+     * @param context
+     *     The relevant DSpace Context.
      * @return the number of workflow items
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public int countAll(Context context) throws SQLException;
 
     /**
      * return how many workflow items that appear in the collection
      *
-     * @param context  active context
+     * @param context
+     *     The relevant DSpace Context.
+     * @param collection
+     *     restrict to this collection
      * @return the number of workflow items
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public int countAllInCollection(Context context, Collection collection) throws SQLException;
-
 
 }

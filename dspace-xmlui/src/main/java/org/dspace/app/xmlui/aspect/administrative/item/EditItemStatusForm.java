@@ -250,13 +250,14 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
     }
 
     /**
-	 * Add a disabled button with a "not allowed" notice
-	 * @param item
-	 * @param buttonName
-	 * @param buttonLabel
-	 * @throws WingException
-	 * @throws SQLException
-	 */
+     * Add a disabled button with a "not allowed" notice
+     * @param item
+     * @param buttonName
+     * @param buttonLabel
+     * @throws WingException
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     */
 	private void addNotAllowedButton(org.dspace.app.xmlui.wing.element.Item item, String buttonName, Message buttonLabel) throws WingException, SQLException
 	{
 		Button button = item.addButton(buttonName);

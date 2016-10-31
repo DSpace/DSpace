@@ -48,6 +48,7 @@ public class DepositManager
      * the SWORD service implementation
      *
      * @param service
+     *     SWORD service
      */
     public DepositManager(SWORDService service)
     {
@@ -70,17 +71,17 @@ public class DepositManager
         if (dso instanceof Collection)
         {
             CollectionService collectionService = ContentServiceFactory
-                    .getInstance().getCollectionService();
+                .getInstance().getCollectionService();
             swordService.message(
-                    "Location resolves to collection with handle: " +
-                            dso.getHandle() +
-                            " and name: " +
-                            collectionService.getName((Collection) dso));
+                "Location resolves to collection with handle: " +
+                dso.getHandle() +
+                " and name: " +
+                collectionService.getName((Collection) dso));
         }
         else if (dso instanceof Item)
         {
             swordService.message("Location resolves to item with handle: " +
-                    dso.getHandle());
+                dso.getHandle());
         }
 
         return dso;
@@ -91,8 +92,13 @@ public class DepositManager
      * the deposit process.  The returned DepositRequest can be
      * used then to assemble the SWORD response.
      *
+     * @param deposit
+     *     deposit request
      * @return the response to the deposit request
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException on generic SWORD exception
+     * @throws SWORDAuthenticationException Thrown if the authentication fails
      */
     public DepositResponse deposit(Deposit deposit)
             throws DSpaceSWORDException, SWORDErrorException,
@@ -120,22 +126,21 @@ public class DepositManager
             {
                 oboEmail = swordContext.getOnBehalfOf().getEmail();
             }
-            log.info(LogManager
-                    .getHeader(context, "deposit_failed_authorisation",
-                            "user=" +
-                                    swordContext.getAuthenticated().getEmail() +
-                                    ",on_behalf_of=" + oboEmail));
+            log.info(LogManager.getHeader(context,
+                "deposit_failed_authorisation",
+                "user=" + swordContext.getAuthenticated().getEmail() +
+                ",on_behalf_of=" + oboEmail));
             throw new SWORDAuthenticationException(
-                    "Cannot submit to the given collection with this context");
+                "Cannot submit to the given collection with this context");
         }
 
         // make a note of the authentication in the verbose string
         swordService.message("Authenticated user: " +
-                swordContext.getAuthenticated().getEmail());
+            swordContext.getAuthenticated().getEmail());
         if (swordContext.getOnBehalfOf() != null)
         {
             swordService.message("Depositing on behalf of: " +
-                    swordContext.getOnBehalfOf().getEmail());
+                swordContext.getOnBehalfOf().getEmail());
         }
 
         // determine which deposit engine we initialise
@@ -143,22 +148,22 @@ public class DepositManager
         if (dso instanceof Collection)
         {
             swordService.message(
-                    "Initialising depositor for an Item in a Collection");
+                "Initialising depositor for an Item in a Collection");
             dep = new CollectionDepositor(swordService, dso);
         }
         else if (dso instanceof Item)
         {
             swordService.message(
-                    "Initialising depositor for a Bitstream in an Item");
+                "Initialising depositor for a Bitstream in an Item");
             dep = new ItemDepositor(swordService, dso);
         }
 
         if (dep == null)
         {
             log.error(
-                    "The specified deposit target does not exist, or is not a collection or an item");
+                "The specified deposit target does not exist, or is not a collection or an item");
             throw new DSpaceSWORDException(
-                    "Deposit target is not a collection or an item");
+                "Deposit target is not a collection or an item");
         }
 
         DepositResult result = null;
@@ -201,21 +206,20 @@ public class DepositManager
         DSpaceATOMEntry dsatom = null;
         if (result.getItem() != null)
         {
-            swordService
-                    .message("Initialising ATOM entry generator for an Item");
+            swordService.message("Initialising ATOM entry generator for an Item");
             dsatom = new ItemEntryGenerator(swordService);
         }
         else if (result.getBitstream() != null)
         {
             swordService.message(
-                    "Initialising ATOM entry generator for a Bitstream");
+                "Initialising ATOM entry generator for a Bitstream");
             dsatom = new BitstreamEntryGenerator(swordService);
         }
         if (dsatom == null)
         {
             log.error("The deposit failed, see exceptions for explanation");
             throw new DSpaceSWORDException(
-                    "Result of deposit did not yield an Item or a Bitstream");
+                "Result of deposit did not yield an Item or a Bitstream");
         }
         SWORDEntry entry = dsatom.getSWORDEntry(result, deposit);
 
@@ -225,17 +229,17 @@ public class DepositManager
         {
             dep.undoDeposit(result);
             swordService.message(
-                    "NoOp Requested: Removed all traces of submission");
+                "NoOp Requested: Removed all traces of submission");
         }
 
         entry.setNoOp(deposit.isNoOp());
 
         Date finish = new Date();
         long delta = finish.getTime() - start.getTime();
-        swordService
-                .message("Total time for deposit processing: " + delta + " ms");
+        swordService.message(
+            "Total time for deposit processing: " + delta + " ms");
         entry.setVerboseDescription(
-                swordService.getVerboseDescription().toString());
+            swordService.getVerboseDescription().toString());
 
         response.setEntry(entry);
 
@@ -243,10 +247,11 @@ public class DepositManager
     }
 
     /**
-     *   Store original package on disk and companion file containing SWORD headers as found in the deposit object
-     *   Also write companion file with header info from the deposit object.
+     * Store original package on disk and companion file containing SWORD
+     * headers as found in the deposit object
+     * Also write companion file with header info from the deposit object.
      *
-     * @param deposit
+     * @param deposit        the original deposit request
      */
     private void storePackageAsFile(Deposit deposit) throws IOException
     {
@@ -256,26 +261,26 @@ public class DepositManager
         if (!dir.exists() || !dir.isDirectory())
         {
             throw new IOException(
-                    "Directory does not exist for writing packages on ingest error.");
+                "Directory does not exist for writing packages on ingest error.");
         }
 
         String filenameBase =
-                "sword-" + deposit.getUsername() + "-" + (new Date()).getTime();
+            "sword-" + deposit.getUsername() + "-" + (new Date()).getTime();
 
         File packageFile = new File(path, filenameBase);
         File headersFile = new File(path, filenameBase + "-headers");
 
         InputStream is = new BufferedInputStream(
-                new FileInputStream(deposit.getFile()));
+            new FileInputStream(deposit.getFile()));
         OutputStream fos = new BufferedOutputStream(
-                new FileOutputStream(packageFile));
+            new FileOutputStream(packageFile));
         Utils.copy(is, fos);
         fos.close();
         is.close();
 
         //write companion file with headers
         PrintWriter pw = new PrintWriter(
-                new BufferedWriter(new FileWriter(headersFile)));
+            new BufferedWriter(new FileWriter(headersFile)));
 
         pw.println("Content-Disposition=" + deposit.getContentDisposition());
         pw.println("Content-Type=" + deposit.getContentType());

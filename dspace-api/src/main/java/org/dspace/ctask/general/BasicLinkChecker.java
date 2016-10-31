@@ -113,7 +113,10 @@ public class BasicLinkChecker extends AbstractCurationTask
     /**
      * Check the URL and perform appropriate reporting
      *
-     * @param url The URL to check
+     * @param url
+     *     The URL to check
+     * @param results
+     *     Result string with HTTP status codes
      * @return If the URL was OK or not
      */
     protected boolean checkURL(String url, StringBuilder results)

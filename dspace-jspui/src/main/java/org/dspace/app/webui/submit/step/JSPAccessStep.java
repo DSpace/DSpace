@@ -159,6 +159,8 @@ public class JSPAccessStep extends JSPStep
      *            The current submission information object
      * 
      * @return the number of pages in this step
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      */
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException

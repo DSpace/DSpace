@@ -84,7 +84,7 @@ public abstract class AbstractMetadataFieldMapping<RecordType> implements Metada
 
     /**
      * Retrieve the metadataFieldMap set to this class
-     * @return Map<MetadataFieldConfig, MetadataContributor<RecordType>> representing the metadataFieldMap
+     * @return a map representing the metadataFieldMap
      */
     public Map<MetadataFieldConfig, MetadataContributor<RecordType>> getMetadataFieldMap() {
         return metadataFieldMap;

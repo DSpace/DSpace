@@ -183,7 +183,9 @@ public class Dataset {
     }
 
     /**
-     * Returns false if this dataset only contains zero's.
+     * Returns false if this dataset only contains zeroes.
+     *
+     * @return false if this dataset only contains zeroes.
      */
     public boolean containsNonZeroValues(){
         if (matrix != null) {
