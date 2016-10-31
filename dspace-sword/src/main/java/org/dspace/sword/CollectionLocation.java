@@ -42,8 +42,10 @@ public class CollectionLocation
      * unless configuration changes are made to DSpace
      *
      * @param collection
+     *     collection to query
      * @return The Deposit URL
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getLocation(Collection collection)
             throws DSpaceSWORDException
@@ -59,6 +61,7 @@ public class CollectionLocation
      * @param location    the URL to resolve to a collection
      * @return The collection to which the url resolves
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public Collection getCollection(Context context, String location)
             throws DSpaceSWORDException
@@ -85,7 +88,7 @@ public class CollectionLocation
             if (!(dso instanceof Collection))
             {
                 throw new DSpaceSWORDException(
-                        "The deposit URL does not resolve to a valid collection");
+                    "The deposit URL does not resolve to a valid collection");
             }
 
             return (Collection) dso;
@@ -94,7 +97,7 @@ public class CollectionLocation
         {
             log.error("Caught exception:", e);
             throw new DSpaceSWORDException(
-                    "There was a problem resolving the collection", e);
+                "There was a problem resolving the collection", e);
         }
     }
 
@@ -113,12 +116,13 @@ public class CollectionLocation
      *
      * @return the base URL for sword deposit
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     private String getBaseUrl()
             throws DSpaceSWORDException
     {
-        String depositUrl = ConfigurationManager
-                .getProperty("sword-server", "deposit.url");
+        String depositUrl = ConfigurationManager.getProperty(
+            "sword-server", "deposit.url");
         if (depositUrl == null || "".equals(depositUrl))
         {
             String dspaceUrl = ConfigurationManager
@@ -126,7 +130,7 @@ public class CollectionLocation
             if (dspaceUrl == null || "".equals(dspaceUrl))
             {
                 throw new DSpaceSWORDException(
-                        "Unable to construct deposit urls, due to missing/invalid config in sword.deposit.url and/or dspace.baseUrl");
+                    "Unable to construct deposit urls, due to missing/invalid config in sword.deposit.url and/or dspace.baseUrl");
             }
 
             try
@@ -138,8 +142,8 @@ public class CollectionLocation
             catch (MalformedURLException e)
             {
                 throw new DSpaceSWORDException(
-                        "Unable to construct deposit urls, due to invalid dspace.baseUrl " +
-                                e.getMessage(), e);
+                    "Unable to construct deposit urls, due to invalid dspace.baseUrl " +
+                    e.getMessage(), e);
             }
 
         }

@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The core authentication & authorization provider, this provider is called when logging in & will process
+ * The core authentication and authorization provider. This provider is called when logging in.
  *
  * @author Roeland Dillen (roeland at atmire dot com)
  * @author kevinvandevelde at atmire.com

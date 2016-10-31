@@ -68,12 +68,14 @@ public class Resource
      * if there was a problem creating context.
      * 
      * @return Newly created context with the logged in user unless the specified user was null.
-     *         If user is null, create the context without a logged in user.
+     *     If user is null, create the context without a logged in user.
      * @throws ContextException
-     *             Thrown in case of a problem creating context. Can be caused by
-     *             SQLException error in creating context or finding the user to
-     *             log in. Can be caused by AuthorizeException if there was a
-     *             problem authorizing the found user.
+     *     Thrown in case of a problem creating context. Can be caused by
+     *     SQLException error in creating context or finding the user to
+     *     log in. Can be caused by AuthorizeException if there was a
+     *     problem authorizing the found user.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     protected static org.dspace.core.Context createContext() throws ContextException, SQLException {
         org.dspace.core.Context context = new org.dspace.core.Context();
@@ -95,15 +97,26 @@ public class Resource
     /**
      * Records a statistics event about an object used via REST API.
      * @param dspaceObject
-     *            DSpace object on which a request was performed.
+     *     DSpace object on which a request was performed.
      * @param action
-     *            Action that was performed.
+     *     Action that was performed.
      * @param user_ip
+     *     User's IP address.
      * @param user_agent
+     *     User agent string (specifies browser used and its version).
      * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
+     *     If you want to access the item as the user logged into the
+     *     context. The header "rest-dspace-token" with the token passed
+     *     from the login method must be set.
      * @param request
+     *     Servlet's HTTP request object.
      * @param context
+     *     Context which must be aborted.
      */
     protected void writeStats(DSpaceObject dspaceObject, UsageEvent.Action action,
                               String user_ip, String user_agent, String xforwardedfor, HttpHeaders headers, HttpServletRequest request, Context context)
@@ -131,11 +144,11 @@ public class Resource
      * context.
      * 
      * @param message
-     *            Message, which will be printed to error stream.
+     *     Message, which will be printed to error stream.
      * @param context
-     *            Context which must be aborted.
+     *     Context which must be aborted.
      * @throws WebApplicationException
-     *             This exception is throw for user of REST api.
+     *     This exception is throw for user of REST api.
      */
     protected static void processException(String message, org.dspace.core.Context context) throws WebApplicationException
     {
@@ -152,9 +165,9 @@ public class Resource
      * and abort DSpace context, if was not properly ended.
      *
      * @param context
-     *            Context which must be aborted.
+     *     Context which must be aborted.
      * @throws WebApplicationException
-     *             This exception is throw for user of REST api.
+     *     This exception is thrown for user of REST API.
      */
     protected void processFinally(org.dspace.core.Context context) throws WebApplicationException
     {
@@ -170,7 +183,7 @@ public class Resource
      * Split string with regex ".".
      * 
      * @param key
-     *            String which will be splitted.
+     *     String which will be splitted.
      * @return String array filed with separated string.
      */
     protected String[] mySplit(String key)
@@ -203,7 +216,7 @@ public class Resource
      * org.dspace.core.Constants.{READ,WRITE,DELETE}.
      * 
      * @param action
-     *            Constant from org.dspace.core.Constants.*
+     *     Constant from org.dspace.core.Constants.*
      * @return String representation. read or write or delete.
      */
     protected String getActionString(int action)

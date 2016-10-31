@@ -251,8 +251,9 @@ public class SimpleZipContentIngester extends AbstractSwordContentIngester
      * The human readable description of the treatment this ingester has
      * put the deposit through
      *
-     * @return
+     * @return human readable description
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     private String getTreatment() throws DSpaceSwordException
     {

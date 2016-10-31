@@ -29,20 +29,20 @@ public class SortOption
     public static final String ASCENDING  = "ASC";
     public static final String DESCENDING = "DESC";
 
-    /** the sort configuration number */
-	private int number;
-	
-	/** the name of the sort */
-	private String name;
-	
-	/** the metadata field to sort on */
-	private String metadata;
-	
-	/** the type of data we are sorting by */
-	private String type;
-	
-	/** the metadata broken down into bits for convenience */
-	private String[] mdBits;
+    /** the number of the sort option as given in the config file */
+    private int number;
+    
+    /** the name of the sort */
+    private String name;
+    
+    /** the metadata field to sort on */
+    private String metadata;
+    
+    /** the type of data we are sorting by */
+    private String type;
+    
+    /** the metadata broken down into bits for convenience */
+    private String[] mdBits;
 
     /** should the sort option be visible for user selection */
     private boolean visible;
@@ -53,10 +53,10 @@ public class SortOption
         try
         {
             Set<SortOption> newSortOptionsSet = new TreeSet<SortOption>(new Comparator<SortOption>() {
-	            @Override
-	            public int compare(SortOption sortOption, SortOption sortOption1) {
-		            return Integer.valueOf(sortOption.getNumber()).compareTo(Integer.valueOf(sortOption1.getNumber()));
-	            }
+                @Override
+                public int compare(SortOption sortOption, SortOption sortOption1) {
+                    return Integer.valueOf(sortOption.getNumber()).compareTo(Integer.valueOf(sortOption1.getNumber()));
+                }
             });
             int idx = 1;
             String option;
@@ -75,39 +75,45 @@ public class SortOption
             log.fatal("Unable to load SortOptions", se);
         }
     }
-	/**
-	 * Construct a new SortOption object with the given parameters
-	 * 
-	 * @param number
-	 * @param name
-	 * @param md
-	 * @param type
-	 * @throws SortException if sort error
-	 */
-	public SortOption(int number, String name, String md, String type)
-		throws SortException
-	{
-		this.name = name;
-		this.type = type;
-		this.metadata = md;
-		this.number = number;
+    /**
+     * Construct a new SortOption object with the given parameters
+     * 
+     * @param number
+     *     the number of the sort option as given in the config file
+     * @param name
+     *     sort option name
+     * @param md
+     *     the metadata field to sort on
+     * @param type
+     *     the type of data we are sorting by
+     * @throws SortException if sort error
+     */
+    public SortOption(int number, String name, String md, String type)
+        throws SortException
+    {
+        this.name = name;
+        this.type = type;
+        this.metadata = md;
+        this.number = number;
         this.visible = true;
         generateMdBits();
-	}
+    }
 
-	/**
-	 * Construct a new SortOption object using the definition from the configuration
-	 * 
-	 * @param number
-	 * @param definition
-	 * @throws SortException if sort error
-	 */
-	public SortOption(int number, String definition)
-		throws SortException
-	{
-		this.number = number;
-		
-		String rx = "(\\w+):([\\w\\.\\*]+):(\\w+):?(\\w*)";
+    /**
+     * Construct a new SortOption object using the definition from the configuration
+     * 
+     * @param number
+     *     the number of the sort option as given in the config file
+     * @param definition
+     *     definition from the configuration
+     * @throws SortException if sort error
+     */
+    public SortOption(int number, String definition)
+        throws SortException
+    {
+        this.number = number;
+        
+        String rx = "(\\w+):([\\w\\.\\*]+):(\\w+):?(\\w*)";
         Pattern pattern = Pattern.compile(rx);
         Matcher matcher = pattern.matcher(definition);
         
@@ -133,71 +139,71 @@ public class SortOption
         }
 
         generateMdBits();
-	}
+    }
 
     /**
-	 * @return Returns the metadata.
-	 */
-	public String getMetadata()
-	{
-		return metadata;
-	}
+     * @return Returns the metadata.
+     */
+    public String getMetadata()
+    {
+        return metadata;
+    }
 
-	/**
-	 * @param metadata The metadata to set.
-	 */
-	public void setMetadata(String metadata)
-	{
-		this.metadata = metadata;
-	}
+    /**
+     * @param metadata The metadata to set.
+     */
+    public void setMetadata(String metadata)
+    {
+        this.metadata = metadata;
+    }
 
-	/**
-	 * @return Returns the name.
-	 */
-	public String getName()
-	{
-		return name;
-	}
+    /**
+     * @return Returns the name.
+     */
+    public String getName()
+    {
+        return name;
+    }
 
-	/**
-	 * @param name The name to set.
-	 */
-	public void setName(String name)
-	{
-		this.name = name;
-	}
+    /**
+     * @param name The name to set.
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
-	/**
-	 * @return Returns the type.
-	 */
-	public String getType()
-	{
-		return type;
-	}
+    /**
+     * @return Returns the type.
+     */
+    public String getType()
+    {
+        return type;
+    }
 
-	/**
-	 * @param type The type to set.
-	 */
-	public void setType(String type)
-	{
-		this.type = type;
-	}
+    /**
+     * @param type The type to set.
+     */
+    public void setType(String type)
+    {
+        this.type = type;
+    }
 
-	/**
-	 * @return Returns the number.
-	 */
-	public int getNumber()
-	{
-		return number;
-	}
+    /**
+     * @return Returns the sort option number (as given in the config file).
+     */
+    public int getNumber()
+    {
+        return number;
+    }
 
-	/**
-	 * @param number The number to set.
-	 */
-	public void setNumber(int number)
-	{
-		this.number = number;
-	}
+    /**
+     * @param number The number to set.
+     */
+    public void setNumber(int number)
+    {
+        this.number = number;
+    }
 
     /**
      * Should this sort option be made visible in the UI
@@ -209,29 +215,29 @@ public class SortOption
     }
 
     /**
-	 * @return	a 3 element array of the metadata bits
-	 */
-	public String[] getMdBits()
+     * @return    a 3-element array of the metadata bits
+     */
+    public String[] getMdBits()
     {
-    	return (String[]) ArrayUtils.clone(mdBits);
+        return (String[]) ArrayUtils.clone(mdBits);
     }
     
-	/**
-	 * Tell the class to generate the metadata bits
-	 * 
-	 * @throws SortException if sort error
-	 */
+    /**
+     * Tell the class to generate the metadata bits
+     * 
+     * @throws SortException if sort error
+     */
     private void generateMdBits()
-    	throws SortException
+        throws SortException
     {
-    	try
-    	{
-    		mdBits = interpretField(metadata, null);
-    	}
-    	catch(IOException e)
-    	{
-    		throw new SortException(e);
-    	}
+        try
+        {
+            mdBits = interpretField(metadata, null);
+        }
+        catch(IOException e)
+        {
+            throw new SortException(e);
+        }
     }
     
     /**
@@ -240,59 +246,64 @@ public class SortOption
      * representation up by its delimiter (.), and stick it in an array, inserting
      * the value of the init parameter when there is no metadata field part.
      * 
-     * @param mfield	the string representation of the metadata
-     * @param init	the default value of the array elements
-     * @return	a three element array with schema, element and qualifier respectively
+     * @param mfield    the string representation of the metadata
+     * @param init    the default value of the array elements
+     * @return    a 3-element array with schema, element and qualifier respectively
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public final String[] interpretField(String mfield, String init)
-    	throws IOException
+        throws IOException
     {
-    	StringTokenizer sta = new StringTokenizer(mfield, ".");
-    	String[] field = {init, init, init};
-    	
-    	int i = 0;
-    	while (sta.hasMoreTokens())
-    	{
-    		field[i++] = sta.nextToken();
-    	}
-    	
-    	// error checks to make sure we have at least a schema and qualifier for both
-    	if (field[0] == null || field[1] == null)
-    	{
-    		throw new IOException("at least a schema and element be " +
-    				"specified in configuration.  You supplied: " + mfield);
-    	}
-    	
-    	return field;
+        StringTokenizer sta = new StringTokenizer(mfield, ".");
+        String[] field = {init, init, init};
+        
+        int i = 0;
+        while (sta.hasMoreTokens())
+        {
+            field[i++] = sta.nextToken();
+        }
+        
+        // error checks to make sure we have at least a schema and qualifier for both
+        if (field[0] == null || field[1] == null)
+        {
+            throw new IOException("at least a schema and element be " +
+                    "specified in configuration.  You supplied: " + mfield);
+        }
+        
+        return field;
     }
     
     /**
      * Is this a date field?
+     * @return true if is date
      */
     public boolean isDate()
     {
-    	if ("date".equals(type))
+        if ("date".equals(type))
         {
             return true;
         }
 
-    	return false;
+        return false;
     }
     
     /**
      * Is the default sort option?
+     * @return true if is default sort option
      */
     public boolean isDefault()
     {
-    	if (number == 0)
-    	{
-    		return true;
-    	}
-    	return false;
+        if (number == 0)
+        {
+            return true;
+        }
+        return false;
     }
 
     /**
      * Return all the configured sort options.
+     * @return a set of the configured sort options
      * @throws SortException if sort error
      */
     public static Set<SortOption> getSortOptions() throws SortException
@@ -308,6 +319,8 @@ public class SortOption
     /**
      * Get the defined sort option by number (.1, .2, etc).
      * @param number
+     *     the number of the sort option as given in the config file
+     * @return the configured sort option with given number
      * @throws SortException if sort error
      */
     public static SortOption getSortOption(int number) throws SortException
@@ -325,6 +338,7 @@ public class SortOption
     
     /**
      * Get the default sort option - initially, just the first one defined.
+     * @return the first configured sort option
      * @throws SortException if sort error
      */
     public static SortOption getDefaultSortOption() throws SortException

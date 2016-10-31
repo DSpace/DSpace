@@ -25,7 +25,7 @@ public class CommandRunner
 {
     /**
      * 
-     * @param args commandline args
+     * @param args the command line arguments given
      * @throws IOException if IO error
      * @throws FileNotFoundException if file doesn't exist
      */

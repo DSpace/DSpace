@@ -140,9 +140,12 @@ public class EZIDRequest
     /**
      * Fetch the metadata bound to an identifier.
      *
+     * @param name
+     *     identifier name
+     * @return Decoded response data evoked by a request made to EZID.
      * @throws IdentifierException if the response is error or body malformed.
      * @throws IOException if the HTTP request fails.
-     * @throws URISyntaxException
+     * @throws URISyntaxException if host or authority is bad.
      */
     public EZIDResponse lookup(String name)
             throws IdentifierException, IOException, URISyntaxException
@@ -161,8 +164,13 @@ public class EZIDRequest
      * request path. Note: to "reserve" a given identifier, include "_status =
      * reserved" in {@code metadata}.
      *
+     * @param name
+     *     identifier name
      * @param metadata ANVL-encoded key/value pairs.
      * @return Decoded response data evoked by a request made to EZID.
+     * @throws IdentifierException if the response is error or body malformed.
+     * @throws IOException if the HTTP request fails.
+     * @throws URISyntaxException if host or authority is bad.
      */
     public EZIDResponse create(String name, Map<String, String> metadata)
             throws IOException, IdentifierException, URISyntaxException
@@ -186,6 +194,9 @@ public class EZIDRequest
      *
      * @param metadata ANVL-encoded key/value pairs.
      * @return Decoded response data evoked by a request made to EZID.
+     * @throws IdentifierException if the response is error or body malformed.
+     * @throws IOException if the HTTP request fails.
+     * @throws URISyntaxException if host or authority is bad.
      */
     public EZIDResponse mint(Map<String, String> metadata)
             throws IOException, IdentifierException, URISyntaxException
@@ -207,9 +218,15 @@ public class EZIDRequest
     /**
      * Alter the metadata bound to an identifier.
      *
-     * @param metadata fields to be altered. Leave the value of a field's empty
-     *                 to delete the field.
+     * @param name
+     *     identifier name
+     * @param metadata
+     *     metadata fields to be altered. Leave the value of a field's empty
+     *     to delete the field.
      * @return Decoded response data evoked by a request made to EZID.
+     * @throws IdentifierException if the response is error or body malformed.
+     * @throws IOException if the HTTP request fails.
+     * @throws URISyntaxException if host or authority is bad.
      */
     public EZIDResponse modify(String name, Map<String, String> metadata)
             throws IOException, IdentifierException, URISyntaxException
@@ -230,6 +247,13 @@ public class EZIDRequest
 
     /**
      * Destroy a reserved identifier. Fails if ID was ever public.
+     *
+     * @param name
+     *     identifier name
+     * @return Decoded response data evoked by a request made to EZID.
+     * @throws IdentifierException if the response is error or body malformed.
+     * @throws IOException if the HTTP request fails.
+     * @throws URISyntaxException if host or authority is bad.
      */
     public EZIDResponse delete(String name)
             throws IOException, IdentifierException, URISyntaxException
@@ -245,6 +269,13 @@ public class EZIDRequest
 
     /**
      * Remove a public identifier from view.
+     *
+     * @param name
+     *     identifier name
+     * @return Decoded response data evoked by a request made to EZID.
+     * @throws IdentifierException if the response is error or body malformed.
+     * @throws IOException if the HTTP request fails.
+     * @throws URISyntaxException if host or authority is bad.
      */
     public EZIDResponse withdraw(String name)
             throws IOException, IdentifierException, URISyntaxException
@@ -257,7 +288,14 @@ public class EZIDRequest
     /**
      * Remove a public identifier from view, with a reason.
      *
-     * @param reason annotation for the item's unavailability.
+     * @param name
+     *     identifier name
+     * @param reason
+     *     annotation for the item's unavailability.
+     * @return Decoded response data evoked by a request made to EZID.
+     * @throws IdentifierException if the response is error or body malformed.
+     * @throws IOException if the HTTP request fails.
+     * @throws URISyntaxException if host or authority is bad.
      */
     public EZIDResponse withdraw(String name, String reason)
             throws IOException, IdentifierException, URISyntaxException
@@ -269,6 +307,9 @@ public class EZIDRequest
 
     /**
      * Create ANVL-formatted name/value pairs from a Map.
+     *
+     * @param raw
+     *     
      */
     private static String formatMetadata(Map<String, String> raw)
     {

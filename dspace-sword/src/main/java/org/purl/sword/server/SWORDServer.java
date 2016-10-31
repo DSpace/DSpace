@@ -32,10 +32,10 @@ public interface SWORDServer {
 	 * 
 	 * @param sdr The Service Document Request object
 	 * 
-	 * @exception SWORDAuthenticationException Thrown if the authentication fails
-	 * @exception SWORDErrorException Thrown if there was an error with the input not matching
+	 * @throws SWORDAuthenticationException Thrown if the authentication fails
+	 * @throws SWORDErrorException Thrown if there was an error with the input not matching
 	 *            the capabilities of the server
-	 * @exception SWORDException Thrown in an un-handalable Exception occurs. 
+	 * @throws SWORDException Thrown in an un-handalable Exception occurs. 
 	 *            This will be dealt with by sending a HTTP 500 Server Exception
 	 *
 	 * @return The ServiceDocument representing the service document
@@ -48,10 +48,10 @@ public interface SWORDServer {
 	 * 
 	 * @param deposit The Deposit object
 	 * 
-	 * @exception SWORDAuthenticationException Thrown if the authentication fails
-	 * @exception SWORDErrorException Thrown if there was an error with the input not matching
+	 * @throws SWORDAuthenticationException Thrown if the authentication fails
+	 * @throws SWORDErrorException Thrown if there was an error with the input not matching
 	 *            the capabilities of the server
-	 * @exception SWORDException Thrown if an un-handalable Exception occurs. 
+	 * @throws SWORDException Thrown if an un-handalable Exception occurs. 
 	 *            This will be dealt with by sending a HTTP 500 Server Exception
 	 * 
 	 * @return The response to the deposit
@@ -64,10 +64,10 @@ public interface SWORDServer {
 	 * 
 	 * @param adr The Atom Document Request object
 	 * 
-	 * @exception SWORDAuthenticationException Thrown if the authentication fails
-	 * @exception SWORDErrorException Thrown if there was an error with the input not matching
+	 * @throws SWORDAuthenticationException Thrown if the authentication fails
+	 * @throws SWORDErrorException Thrown if there was an error with the input not matching
 	 *            the capabilities of the server
-	 * @exception SWORDException Thrown if an un-handalable Exception occurs. 
+	 * @throws SWORDException Thrown if an un-handalable Exception occurs. 
 	 *            This will be dealt with by sending a HTTP 500 Server Exception
 	 * 
 	 * @return The response to the atom document request

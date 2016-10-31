@@ -48,7 +48,7 @@ public class CommunityFiliator
 
     /**
      *
-     * @param argv arguments
+     * @param argv the command line arguments given
      * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception

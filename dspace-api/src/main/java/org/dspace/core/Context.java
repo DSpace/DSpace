@@ -130,7 +130,7 @@ public class Context
     /**
      * Initializes a new context object. 
      *
-     * @exception SQLException
+     * @throws SQLException
      *                if there was an error obtaining a database connection
      */
     private void init()
@@ -337,7 +337,7 @@ public class Context
      * Calling complete() on a Context which is no longer valid (isValid()==false),
      * is a no-op.
      * 
-     * @exception SQLException
+     * @throws SQLException
      *                if there was an error completing the database transaction
      *                or closing the connection
      */
@@ -448,6 +448,7 @@ public class Context
      * Add an event to be dispatched when this context is committed.
      * 
      * @param event
+     *     event to be dispatched
      */
     public void addEvent(Event event)
     {
@@ -634,6 +635,7 @@ public class Context
      * means that more memory is consumed by the cache. This also has a negative impact on the query performance. In
      * that case you should consider clearing the cache (see {@link Context#clearCache() clearCache}).
      *
+     * @return connection cache size
      * @throws SQLException When connecting to the active cache fails.
      */
     public long getCacheSize() throws SQLException {

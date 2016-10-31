@@ -32,19 +32,19 @@ public class LicenseMetadataValue {
 
     private String[] params = new String[4];
 
-   	public LicenseMetadataValue(String fieldName)
-   	{
-   		if (fieldName != null && fieldName.length() > 0)
-   		{
-   			String[] fParams = fieldName.split("\\.");
-   			for (int i = 0; i < fParams.length; i++)
-   			{
-   				params[i] = fParams[i];
-   			}
-   			params[3] = Item.ANY;
-   		}
-        itemService = ContentServiceFactory.getInstance().getItemService();
-   	}
+        public LicenseMetadataValue(String fieldName)
+        {
+            if (fieldName != null && fieldName.length() > 0)
+            {
+                String[] fParams = fieldName.split("\\.");
+                for (int i = 0; i < fParams.length; i++)
+                {
+                    params[i] = fParams[i];
+                }
+                params[3] = Item.ANY;
+            }
+            itemService = ContentServiceFactory.getInstance().getItemService();
+        }
 
     /**
      * Returns first value that matches Creative Commons 'shibboleth',
@@ -75,6 +75,13 @@ public class LicenseMetadataValue {
      * @param item - the item to read
      * @param key - the key for desired value
      * @return value - the value associated with key or null if no such value
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public String keyedItemValue(Item item, String key)
         throws AuthorizeException, IOException, SQLException
@@ -82,7 +89,7 @@ public class LicenseMetadataValue {
          CCLookup ccLookup = new CCLookup();
          ccLookup.issue(key);
          String matchValue = ccLookup.getLicenseName();
-        List<MetadataValue> dcvalues = itemService.getMetadata(item, params[0], params[1], params[2], params[3]);
+         List<MetadataValue> dcvalues = itemService.getMetadata(item, params[0], params[1], params[2], params[3]);
          for (MetadataValue dcvalue : dcvalues)
          {
              if (dcvalue.getValue().equals(matchValue))
@@ -96,8 +103,17 @@ public class LicenseMetadataValue {
     /**
      * Removes the passed value from the set of values for the field in passed item.
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param item - the item to update
      * @param value - the value to remove
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void removeItemValue(Context context, Item item, String value)
             throws AuthorizeException, IOException, SQLException
@@ -121,8 +137,12 @@ public class LicenseMetadataValue {
     /**
      * Adds passed value to the set of values for the field in passed item.
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param item - the item to update
      * @param value - the value to add in this field
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public void addItemValue(Context context, Item item, String value) throws SQLException {
         itemService.addMetadata(context, item, params[0], params[1], params[2], params[3], value);

@@ -106,6 +106,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
     protected final WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     /**
+     * <p>
      * An instance of ZipMdrefManager holds the state needed to retrieve the
      * contents of an external metadata stream referenced by an
      * <code>mdRef</code> element in a Zipped up METS manifest.
@@ -244,7 +245,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                     license);
 
             //if ingestion was successful
-            if(dso!=null)
+            if (dso!=null)
             {
                 // Log whether we finished an ingest (create new obj) or a restore
                 // (restore previously existing obj)
@@ -338,7 +339,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 // Retrieve the manifest file entry (named mets.xml)
                 ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
 
-                if(manifestEntry!=null)
+                if (manifestEntry!=null)
                 {
                     // parse the manifest and sanity-check it.
                     manifest = METSManifest.create(zip.getInputStream(manifestEntry),
@@ -404,7 +405,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             catch(UnsupportedOperationException e)
             {
                 //If user specified to skip item ingest if any "missing parent" error message occur
-                if(params.getBooleanProperty("skipIfParentMissing", false))
+                if (params.getBooleanProperty("skipIfParentMissing", false))
                 {
                     //log a warning instead of throwing an error
                     log.warn(LogManager.getHeader(context, "package_ingest",
@@ -518,7 +519,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             
             // Finally, if item is still in the workspace, then we actually need
             // to install it into the archive & assign its handle.
-            if(wsi!=null)
+            if (wsi!=null)
             {
                 // Finish creating the item. This actually assigns the handle,
                 // and will either install item immediately or start a workflow, based on params
@@ -531,7 +532,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // Add logo if one is referenced from manifest
             addContainerLogo(context, dso, manifest, pkgFile, params);
 
-            if(type==Constants.COLLECTION)
+            if (type==Constants.COLLECTION)
             {
                 //Add template item if one is referenced from manifest (only for Collections)
                 addTemplateItem(context, dso, manifest, pkgFile, params, callback);
@@ -670,11 +671,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
             // have subclass manage license since it may be extra package file.
             Collection owningCollection = (Collection) ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getParentObject(context, dso);
-            if(owningCollection == null)
+            if (owningCollection == null)
             {
                 //We are probably dealing with an item that isn't archived yet
                 InProgressSubmission inProgressSubmission = workspaceItemService.findByItem(context, item);
-                if(inProgressSubmission == null)
+                if (inProgressSubmission == null)
                 {
                     inProgressSubmission = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
                 }
@@ -817,7 +818,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
              // Set bitstream sequence id, if known
             String seqID = mfile.getAttributeValue("SEQ");
-            if(seqID!=null && !seqID.isEmpty())
+            if (seqID!=null && !seqID.isEmpty())
                 bitstream.setSequenceID(Integer.parseInt(seqID));
             
             // crosswalk this bitstream's administrative metadata located in
@@ -878,18 +879,18 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 bundle = bundleService.create(context, item, bundleName);
             }
 
-	        String mfileGrp = mfile.getAttributeValue("ADMID");
-	        if (mfileGrp != null)
-	        {
-		        manifest.crosswalkBundle(context, params, bundle, mfileGrp,mdRefCallback);
-	        }
-	        else
-	        {
-		        if (log.isDebugEnabled())
-		        {
-		            log.debug("Ingesting bundle with no ADMID, not crosswalking bundle metadata");
-		        }
-	        }
+            String mfileGrp = mfile.getAttributeValue("ADMID");
+            if (mfileGrp != null)
+            {
+                manifest.crosswalkBundle(context, params, bundle, mfileGrp,mdRefCallback);
+            }
+            else
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Ingesting bundle with no ADMID, not crosswalking bundle metadata");
+                }
+            }
 
             bundleService.update(context, bundle);
         }// end for each manifest file
@@ -1044,7 +1045,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             CrosswalkException, PackageValidationException
     {
         //Template items only valid for collections
-        if(dso.getType()!=Constants.COLLECTION)
+        if (dso.getType()!=Constants.COLLECTION)
             return;
         
         Collection collection = (Collection) dso;
@@ -1052,18 +1053,18 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         //retrieve list of all <div>s representing child objects from manifest
         List childObjList = manifest.getChildObjDivs();
 
-        if(childObjList!=null && !childObjList.isEmpty())
+        if (childObjList!=null && !childObjList.isEmpty())
         {
             Element templateItemDiv = null;
 
             Iterator childIterator = childObjList.iterator();
             //Search for the child with a type of "DSpace ITEM Template"
-            while(childIterator.hasNext())
+            while (childIterator.hasNext())
             {
                 Element childDiv = (Element) childIterator.next();
                 String childType = childDiv.getAttributeValue("TYPE");
                 //should be the only child of type "ITEM" with "Template" for a suffix
-                if(childType.contains(Constants.typeText[Constants.ITEM]) &&
+                if (childType.contains(Constants.typeText[Constants.ITEM]) &&
                    childType.endsWith(AbstractMETSDisseminator.TEMPLATE_TYPE_SUFFIX))
                 {
                     templateItemDiv = childDiv;
@@ -1072,11 +1073,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             }
 
             //If an Template Item was found, create it with the specified metadata
-            if(templateItemDiv!=null)
+            if (templateItemDiv!=null)
             {
                 //make sure this templateItemDiv is associated with one or more dmdSecs
                 String templateDmdIds = templateItemDiv.getAttributeValue("DMDID");
-                if(templateDmdIds!=null)
+                if (templateDmdIds!=null)
                 {
                     //create our template item & get a reference to it
                     itemService.createTemplateItem(context, collection);
@@ -1193,7 +1194,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                         null);
 
                 //if ingestion was successful
-                if(dso!=null)
+                if (dso!=null)
                 {
                     // Log that we created an object
                     log.info(LogManager.getHeader(context, "package_replace",
@@ -1222,7 +1223,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             }
 
             //if ingest/restore/replace successful
-            if(dso!=null)
+            if (dso!=null)
             {
                 // Check if the Packager is currently running recursively.
                 // If so, this means the Packager will attempt to recursively
@@ -1547,14 +1548,16 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * 
      * @param context the DSpace context
      * @param dso DSpace Object
-     * @param manifest the METSManifest
+     * @param manifest
+     *     the METSManifest
      * @param callback
-*            the MdrefManager (manages all external metadata files
-*            referenced by METS <code>mdref</code> elements)
+     *     the MdrefManager (manages all external metadata files
+     *     referenced by METS <code>mdref</code> elements)
      * @param dmds
-*            array of Elements, each a METS <code>dmdSec</code> that
-*            applies to the Item as a whole.
+     *     array of Elements, each a METS <code>dmdSec</code> that
+     *     applies to the Item as a whole.
      * @param params
+     *     Packager Parameters
      * @throws CrosswalkException if crosswalk error
      * @throws PackageValidationException if package validation error
      * @throws IOException if IO error
@@ -1586,10 +1589,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      *            the DSpace context
      * @param item Item
      * @param collection
-     *            DSpace Collection to which the item is being submitted.
+     *     DSpace Collection to which the item is being submitted.
      * @param license
-     *            optional user-supplied Deposit License text (may be null)
+     *     optional user-supplied Deposit License text (may be null)
      * @param params
+     *     Packager Parameters
      * @throws PackageValidationException if package validation error
      * @throws IOException if IO error
      * @throws SQLException if database error

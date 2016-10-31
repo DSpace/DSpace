@@ -40,7 +40,9 @@ public interface DOIConnector {
      * to inactive.</p>
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param doi
+     *     DOI string to "delete"
      * @throws DOIIdentifierException if DOI error
      */
     public void deleteDOI(Context context, String doi)
@@ -56,8 +58,11 @@ public interface DOIConnector {
      * DOIIdentifierException.DOI_ALREADY_EXISTS}.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object to associate to the DOI
      * @param doi
+     *     DOI string to reserve
      * @throws DOIIdentifierException if DOI error
      */
     public void reserveDOI(Context context, DSpaceObject dso, String doi)
@@ -74,8 +79,11 @@ public interface DOIConnector {
      * {@code DOIIdentifierException.RESERVE_FIRST}.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object to associate to the DOI
      * @param doi
+     *     DOI string to register
      * @throws DOIIdentifierException if DOI error
      */
     public void registerDOI(Context context, DSpaceObject dso, String doi)
@@ -88,8 +96,11 @@ public interface DOIConnector {
      * for the specified DSpace Object before it sends the metadata update.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object associated to the DOI
      * @param doi
+     *     DOI string to update (metadata)
      * @throws DOIIdentifierException if DOI error
      */
     public void updateMetadata(Context context, DSpaceObject dso, String doi)

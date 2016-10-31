@@ -14,33 +14,33 @@ package org.purl.sword.client;
  */
 public class SWORDClientException extends Exception
 {
-   /**
-    * Create a new exception, without a message. 
-    */
-   public SWORDClientException()
-   {
-      super();
-   }
-   
-   /**
-    * Create a new exception with the specified message. 
-    * 
-    * @param message The message. 
-    */
-   public SWORDClientException( String message)
-   {
-      super(message);   
-   }
-   
-   /** 
-    * Create a new exception with the specified message and set
-    * the exception that generated this error. 
-    * 
-    * @param message The message. 
-    * @param cause The original exception. 
-    */
-   public SWORDClientException( String message, Exception cause)
-   {
-      super(message, cause);   
-   }
+    /**
+     * Create a new exception, without a message. 
+     */
+    public SWORDClientException()
+    {
+       super();
+    }
+    
+    /**
+     * Create a new exception with the specified message. 
+     * 
+     * @param message The message. 
+     */
+    public SWORDClientException( String message)
+    {
+       super(message);   
+    }
+    
+    /** 
+     * Create a new exception with the specified message and set
+     * the exception that generated this error. 
+     * 
+     * @param message The message. 
+     * @param cause The original exception. 
+     */
+    public SWORDClientException( String message, Exception cause)
+    {
+       super(message, cause);   
+    }
 }

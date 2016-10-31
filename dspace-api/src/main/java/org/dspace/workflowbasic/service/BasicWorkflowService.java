@@ -84,8 +84,13 @@ public interface BasicWorkflowService extends WorkflowService<BasicWorkflowItem>
      * claimed and owned by an EPerson. The GUI displays this info on the
      * MyDSpace page.
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param e
-     *            The EPerson we want to fetch owned tasks for.
+     *     The EPerson we want to fetch owned tasks for.
+     * @return list of basic workflow items
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<BasicWorkflowItem> getOwnedTasks(Context context, EPerson e)
             throws java.sql.SQLException;
@@ -94,18 +99,32 @@ public interface BasicWorkflowService extends WorkflowService<BasicWorkflowItem>
      * getPooledTasks() returns a List of WorkflowItems an EPerson could claim
      * (as a reviewer, etc.) for display on a user's MyDSpace page.
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param e
-     *            The Eperson we want to fetch the pooled tasks for.
+     *     The Eperson we want to fetch the pooled tasks for.
+     * @return list of basic workflow items
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<BasicWorkflowItem> getPooledTasks(Context context, EPerson e) throws SQLException;
 
     /**
      * claim() claims a workflow task for an EPerson
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param workflowItem
-     *            WorkflowItem to do the claim on
+     *     WorkflowItem to do the claim on
      * @param e
-     *            The EPerson doing the claim
+     *     The EPerson doing the claim
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void claim(Context context, BasicWorkflowItem workflowItem, EPerson e)
             throws SQLException, IOException, AuthorizeException;
@@ -119,11 +138,18 @@ public interface BasicWorkflowService extends WorkflowService<BasicWorkflowItem>
      * submitter of a successful submission
      *
      * @param context
-     *            Context
+     *     The relevant DSpace Context.
      * @param workflowItem
-     *            WorkflowItem do do the approval on
+     *     WorkflowItem do do the approval on
      * @param e
-     *            EPerson doing the approval
+     *     EPerson doing the approval
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void advance(Context context, BasicWorkflowItem workflowItem, EPerson e)
             throws SQLException, IOException, AuthorizeException;
@@ -136,17 +162,23 @@ public interface BasicWorkflowService extends WorkflowService<BasicWorkflowItem>
      * submitter of a successful submission
      *
      * @param context
-     *            Context
+     *     The relevant DSpace Context.
      * @param workflowItem
-     *            WorkflowItem do do the approval on
+     *     WorkflowItem do do the approval on
      * @param e
-     *            EPerson doing the approval
-     *
+     *     EPerson doing the approval
      * @param curate
-     *            boolean indicating whether curation tasks should be done
-     *
+     *     boolean indicating whether curation tasks should be done
      * @param record
-     *            boolean indicating whether to record action
+     *     boolean indicating whether to record action
+     * @return true if the item was successfully archived
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public boolean advance(Context context, BasicWorkflowItem workflowItem, EPerson e,
                                   boolean curate, boolean record)
@@ -161,6 +193,13 @@ public interface BasicWorkflowService extends WorkflowService<BasicWorkflowItem>
      *            WorkflowItem to operate on
      * @param e
      *            EPerson doing the operation
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void unclaim(Context context, BasicWorkflowItem workflowItem, EPerson e)
             throws SQLException, IOException, AuthorizeException;
@@ -182,6 +221,9 @@ public interface BasicWorkflowService extends WorkflowService<BasicWorkflowItem>
      * get the title of the item in this workflow
      *
      * @param wi  the workflow item object
+     * @return item title
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public String getItemTitle(BasicWorkflowItem wi) throws SQLException;
 
@@ -189,6 +231,9 @@ public interface BasicWorkflowService extends WorkflowService<BasicWorkflowItem>
      * get the name of the eperson who started this workflow
      *
      * @param wi  the workflow item
+     * @return submitter's name
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public String getSubmitterName(BasicWorkflowItem wi) throws SQLException;
 }

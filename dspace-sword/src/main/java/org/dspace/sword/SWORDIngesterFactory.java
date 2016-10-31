@@ -34,12 +34,19 @@ public class SWORDIngesterFactory
      * of the interface to return.
      *
      * To configure how this method will respond, configure the package ingester
-     * for the appropriate media types and defaults.  See the sword configuration
+     * for the appropriate media types and defaults.  See the SWORD configuration
      * documentation for more details.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param deposit
+     *     deposit request
+     * @param dso
+     *     target DSpace object
+     * @return SWORD ingester implementation
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException on generic SWORD exception
      */
     public static SWORDIngester getInstance(Context context, Deposit deposit,
             DSpaceObject dso)
@@ -50,27 +57,27 @@ public class SWORDIngesterFactory
         if (dso instanceof Collection)
         {
             SWORDIngester ingester = (SWORDIngester) pluginService
-                    .getNamedPlugin(SWORDIngester.class, deposit.getPackaging());
+                .getNamedPlugin(SWORDIngester.class, deposit.getPackaging());
             if (ingester == null)
             {
                 throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT,
-                        "No ingester configured for this package type");
+                    "No ingester configured for this package type");
             }
             return ingester;
         }
         else if (dso instanceof Item)
         {
             SWORDIngester ingester = (SWORDIngester) pluginService
-                    .getNamedPlugin(SWORDIngester.class, "SimpleFileIngester");
+                .getNamedPlugin(SWORDIngester.class, "SimpleFileIngester");
             if (ingester == null)
             {
                 throw new DSpaceSWORDException(
-                        "SimpleFileIngester is not configured in plugin manager");
+                    "SimpleFileIngester is not configured in plugin manager");
             }
             return ingester;
         }
 
         throw new DSpaceSWORDException(
-                "No ingester could be found which works for this DSpace Object");
+            "No ingester could be found which works for this DSpace Object");
     }
 }

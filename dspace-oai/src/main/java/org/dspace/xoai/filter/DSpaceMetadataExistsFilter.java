@@ -22,7 +22,7 @@ import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
  * This filter allows one to retrieve (from the data source) those items
  * which contains at least one metadata field value defined, it allows
  * one to define multiple metadata fields to check against.
- * <p/>
+ * <p>
  * One line summary: At least one metadata field defined
  *
  * @author Ariel J. Lira (arieljlira at gmail dot com)

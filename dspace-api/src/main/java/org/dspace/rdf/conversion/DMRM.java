@@ -26,6 +26,7 @@ public class DMRM {
     public static final String NS = "http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0#";
     
     /** <p>The namespace of the vocabulary as a string</p>
+     *  @return Namespace URI
      *  @see #NS */
     public static String getURI() {return NS;}
     

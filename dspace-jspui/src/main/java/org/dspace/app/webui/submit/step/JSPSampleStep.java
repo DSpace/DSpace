@@ -33,15 +33,15 @@ import org.dspace.submit.step.SampleStep;
  * processing class!
  * <p>
  * This step can be added to any Submission process (for testing purposes) by
- * adding the following to the appropriate <submission-process> tag in the
+ * adding the following to the appropriate &lt;submission-processi&gt; tag in the
  * /config/item-submission.xml:
  * 
- * <step> 
- * <heading>Sample</heading>
- * <processing-class>org.dspace.submit.step.SampleStep</processing-class>
- * <jspui-binding>org.dspace.app.webui.submit.step.JSPSampleStep</jspui-binding> 
- * <workflow-editable>true</workflow-editable>
- * </step>
+ * &lt;step&gt;
+ * &lt;heading&gt;Sample&lt;/heading&gt;
+ * &lt;processing-class&gt;org.dspace.submit.step.SampleStep&lt;/processing-class&gt;
+ * &lt;jspui-binding&gt;org.dspace.app.webui.submit.step.JSPSampleStep&lt;/jspui-binding&gt;
+ * &lt;workflow-editable&gt;true&lt;/workflow-editable&gt;
+ * &lt;/step&gt;
  *
  * <P>
  * The following methods are called in this order:
@@ -99,6 +99,15 @@ public class JSPSampleStep extends JSPStep
      *            current servlet response object
      * @param subInfo
      *            submission info object
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void doPreProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
@@ -327,6 +336,8 @@ public class JSPSampleStep extends JSPStep
      *            The current submission information object
      * 
      * @return the number of pages in this step
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      */
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException

@@ -49,9 +49,10 @@ public abstract class DSpaceATOMEntry
     protected Deposit deposit = null;
 
     /**
-     * Create a new atom entry object around the given service
+     * Create a new ATOM entry object around the given service
      *
      * @param service
+     *     SWORD service implementation
      */
     protected DSpaceATOMEntry(SWORDService service)
     {
@@ -77,7 +78,10 @@ public abstract class DSpaceATOMEntry
      * of the Bitstream.
      *
      * @param dso
+     *     target DSpace object
+     * @return SWORD entry for the given DSpace object
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public SWORDEntry getSWORDEntry(DSpaceObject dso)
             throws DSpaceSWORDException
@@ -94,7 +98,7 @@ public abstract class DSpaceATOMEntry
         else
         {
             throw new DSpaceSWORDException(
-                    "Can only recover a sword entry for a bitstream via this method");
+                "Can only recover a sword entry for a bitstream via this method");
         }
 
         this.constructEntry();
@@ -112,6 +116,8 @@ public abstract class DSpaceATOMEntry
      * @param result    the result of the deposit operation
      * @param deposit        the original deposit request
      * @return the SWORDEntry for the item
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public SWORDEntry getSWORDEntry(DepositResult result, Deposit deposit)
             throws DSpaceSWORDException
@@ -133,6 +139,7 @@ public abstract class DSpaceATOMEntry
      * Construct the entry
      *
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     protected void constructEntry()
             throws DSpaceSWORDException
@@ -197,8 +204,8 @@ public abstract class DSpaceATOMEntry
      */
     protected void addGenerator()
     {
-        boolean identify = ConfigurationManager
-                .getBooleanProperty("sword-server", "identify-version");
+        boolean identify = ConfigurationManager.getBooleanProperty(
+            "sword-server", "identify-version");
         SWORDUrlManager urlManager = swordService.getUrlManager();
         String softwareUri = urlManager.getGeneratorUrl();
         if (identify)
@@ -262,6 +269,8 @@ public abstract class DSpaceATOMEntry
      * Add all the subject classifications from the bibliographic
      * metadata.
      *
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     abstract void addCategories() throws DSpaceSWORDException;
 
@@ -269,6 +278,8 @@ public abstract class DSpaceATOMEntry
      * Set the content type that DSpace received.  This is just
      * "application/zip" in this default implementation.
      *
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     abstract void addContentElement() throws DSpaceSWORDException;
 
@@ -278,18 +289,25 @@ public abstract class DSpaceATOMEntry
      * passed handle is used.  It is set in the form that
      * they can be used to access the resource over http (i.e.
      * a real URL).
+     *
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     abstract void addIdentifier() throws DSpaceSWORDException;
 
     /**
      * Add links associated with this item.
      *
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     abstract void addLinks() throws DSpaceSWORDException;
 
     /**
      * Add the date of publication from the bibliographic metadata
      *
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     abstract void addPublishDate() throws DSpaceSWORDException;
 
@@ -297,24 +315,32 @@ public abstract class DSpaceATOMEntry
      * Add rights information.  This attaches an href to the URL
      * of the item's licence file
      *
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     abstract void addRights() throws DSpaceSWORDException;
 
     /**
      * Add the summary/abstract from the bibliographic metadata
      *
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     abstract void addSummary() throws DSpaceSWORDException;
 
     /**
      * Add the title from the bibliographic metadata
      *
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     abstract void addTitle() throws DSpaceSWORDException;
 
     /**
      * Add the date that this item was last updated
      *
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     abstract void addLastUpdatedDate() throws DSpaceSWORDException;
 }

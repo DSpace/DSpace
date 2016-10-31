@@ -24,13 +24,20 @@ public interface RequestItemService {
 
     /**
      * Generate a request item representing the request and put it into the DB
-     * @param context context
-     * @param bitstream bitstream
-     * @param item item
-     * @param reqMessage message
-     * @param allFiles all files flag
+     * @param context
+     *     The relevant DSpace Context.
+     * @param bitstream
+     *     The requested bitstream
+     * @param item
+     *     The requested item
+     * @param reqMessage
+     *     Request message text
+     * @param allFiles
+     *     true indicates that all bitstreams of this item are requested
      * @param reqEmail email
-     * @param reqName name
+     *     Requester email
+     * @param reqName
+     *     Requester name
      * @return the token of the request item
      * @throws SQLException if database error
      */
@@ -41,8 +48,11 @@ public interface RequestItemService {
 
     /**
      * Save updates to the record. Only accept_request, and decision_date are set-able.
+     *
      * @param context
+     *     The relevant DSpace Context.
      * @param requestItem
+     *     requested item
      */
     public void update(Context context, RequestItem requestItem);
 

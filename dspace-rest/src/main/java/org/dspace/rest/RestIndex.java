@@ -50,7 +50,9 @@ public class RestIndex {
      * Return html page with information about REST api. It contains methods all
      * methods provide by REST api.
      * 
-     * @return HTML page which has information about all methods of REST api.
+     * @param servletContext
+     *     Context of the servlet container.
+     * @return HTML page which has information about all methods of REST API.
      */
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -248,9 +250,11 @@ public class RestIndex {
      * epersonEMAIL: user@example.com
      * epersonNAME: John Doe
      * @param headers
-     *            Request header which contains the header named
-     *            "rest-dspace-token" containing the token as value.
-     * @return status
+     *     Request header which contains the header named
+     *     "rest-dspace-token" containing the token as value.
+     * @return status the Status object with information about REST API
+     * @throws UnsupportedEncodingException
+     *     The Character Encoding is not supported.
      */
     @GET
     @Path("/status")

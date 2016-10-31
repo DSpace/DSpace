@@ -26,14 +26,17 @@ public class SWORDAuthentication
      * given DSpace Context?
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param un
+     *     username
      * @param pw
+     *     password
      * @return true if yes, false if not
      */
     public boolean authenticates(Context context, String un, String pw)
     {
-        AuthenticationService authService = AuthenticateServiceFactory
-                .getInstance().getAuthenticationService();
+        AuthenticationService authService =
+            AuthenticateServiceFactory.getInstance().getAuthenticationService();
         int auth = authService.authenticate(context, un, pw, null, null);
         return auth == AuthenticationMethod.SUCCESS;
     }

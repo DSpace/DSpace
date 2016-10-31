@@ -38,6 +38,8 @@ public class IPMatcherTest
     /**
      * This also tests instantiation of correct masked and unmasked IPv6 addresses.
      * @throws IPMatcherException
+     *             if there is an error parsing the specification (i.e. it is
+     *             somehow malformed)
      */
     @BeforeClass
     static public void setUp() throws IPMatcherException

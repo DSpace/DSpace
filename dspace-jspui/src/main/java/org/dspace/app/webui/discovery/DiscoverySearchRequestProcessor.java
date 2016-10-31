@@ -320,14 +320,14 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         {
             try
             {
-				DSpaceObject pDso = ContentServiceFactory.getInstance().getDSpaceObjectService(scope)
-						.getParentObject(context, scope);
+                DSpaceObject pDso = ContentServiceFactory.getInstance().getDSpaceObjectService(scope)
+                        .getParentObject(context, scope);
                 while (pDso != null)
                 {
                     // add to the available scopes in reverse order
                     scopes.add(0, pDso);
                     pDso = ContentServiceFactory.getInstance().getDSpaceObjectService(pDso)
-    						.getParentObject(context, pDso);
+                            .getParentObject(context, pDso);
                 }
                 scopes.add(scope);
                 if (scope instanceof Community)
@@ -436,10 +436,9 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         }
         catch (SearchServiceException e)
         {
-            log.error(
-                    LogManager.getHeader(context, "search", "query="
-                            + queryArgs.getQuery() + ",scope=" + scope
-                            + ",error=" + e.getMessage()), e);
+            log.error(LogManager.getHeader(context, "search", "query="
+                + queryArgs.getQuery() + ",scope=" + scope
+                + ",error=" + e.getMessage()), e);
             request.setAttribute("search.error", true);
             request.setAttribute("search.error.message", e.getMessage());
         }
@@ -451,13 +450,15 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
      * Export the search results as a csv file
      * 
      * @param context
-     *            The DSpace context
+     *     The relevant DSpace Context.
      * @param response
-     *            The request object
+     *     Servlet's HTTP response object.
      * @param items
-     *            The result items
+     *     search results (list of items)
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      */
     protected void exportMetadata(Context context,
             HttpServletResponse response, List<Item> items) throws IOException,

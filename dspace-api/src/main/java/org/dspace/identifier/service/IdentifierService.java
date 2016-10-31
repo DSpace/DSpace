@@ -32,6 +32,7 @@ public interface IdentifierService {
      * with a given Identifier type.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso the object to be identified.
      * @param identifier instance of an Identifier of the required type.
      * @return the matching identifier, or the site identifier if the object
@@ -44,6 +45,7 @@ public interface IdentifierService {
      * to lookup the provided DSpaceObject.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso the object to be identified.
      * @return the matching identifiers, or the site identifier if the object
      *  is a Site, or an empty array if no matching identifier is found.
@@ -60,7 +62,10 @@ public interface IdentifierService {
      * TODO: Verify null is returned.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param identifier
+     *     instance of an Identifier of the required type.
+     * @return the DSpace object associated with the identifier
      * @throws IdentifierNotFoundException if identifier not found
      * @throws IdentifierNotResolvableException if identifier not resolvable
      */
@@ -71,7 +76,9 @@ public interface IdentifierService {
      * Reserves any identifiers necessary based on the capabilities of all providers in the service.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object to be reserved
      * @throws AuthorizeException if authorization error
      * @throws SQLException if database error
      * @throws IdentifierException if identifier error
@@ -85,8 +92,11 @@ public interface IdentifierService {
      * can process the same identifier.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object to be reserved
      * @param identifier
+     *     instance of an Identifier of the required type.
      * @throws AuthorizeException if authorization error
      * @throws SQLException if database error
      * @throws IdentifierException if identifier error
@@ -96,7 +106,9 @@ public interface IdentifierService {
     /**
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object to be registered
      * @throws AuthorizeException if authorization error
      * @throws SQLException if database error
      * @throws IdentifierException if identifier error
@@ -111,8 +123,11 @@ public interface IdentifierService {
      * can process the same identifier.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object to be registered
      * @param identifier
+     *     instance of an Identifier of the required type.
      * @throws AuthorizeException if authorization error
      * @throws SQLException if database error
      * @throws IdentifierException if identifier error
@@ -124,7 +139,9 @@ public interface IdentifierService {
      * all providers in no particular order.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object to be deleted
      * @throws AuthorizeException if authorization error
      * @throws SQLException if database error
      * @throws IdentifierException if identifier error
@@ -137,8 +154,11 @@ public interface IdentifierService {
      * can process the same identifier.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object to be deleted
      * @param identifier
+     *     instance of an Identifier of the required type.
      * @throws AuthorizeException if authorization error
      * @throws SQLException if database error
      * @throws IdentifierException if identifier error

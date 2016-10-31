@@ -93,7 +93,7 @@ public class SwordDisseminatorFactory
                                 }
                             }
 
-                            if(StringUtils.isNotEmpty(disseminateFormat))
+                            if (StringUtils.isNotEmpty(disseminateFormat))
                             {
                                 disseminator.setContentType(disseminateFormat);
                             }

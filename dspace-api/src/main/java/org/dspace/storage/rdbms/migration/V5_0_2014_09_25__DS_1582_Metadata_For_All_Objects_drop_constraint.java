@@ -46,6 +46,11 @@ public class V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint
     /**
      * Actually migrate the existing database
      * @param connection
+     *     SQL Connection object
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     @Override
     public void migrate(Connection connection)

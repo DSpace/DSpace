@@ -61,6 +61,7 @@ public abstract class AbstractRemoteMetadataSource {
 
     /**
      * Return the warning message used for logging during exception catching
+     *
      * @return a "warning" String
      */
     public String getWarning() {
@@ -69,7 +70,9 @@ public abstract class AbstractRemoteMetadataSource {
 
     /**
      * Set the warning message used for logging
+     *
      * @param warning
+     *     warning message
      */
     public void setWarning(String warning) {
         this.warning = warning;
@@ -77,6 +80,7 @@ public abstract class AbstractRemoteMetadataSource {
 
     /**
      * Return the number of retries that have currently been undertaken
+     *
      * @return the number of retries
      */
     public int getRetry() {
@@ -84,7 +88,8 @@ public abstract class AbstractRemoteMetadataSource {
     }
     /**
      * Return the number of max retries that can be undertaken before separate functionality kicks in
-     * @return the number of maximum retries
+     *
+     * @return maximum number of retries
      */
     public int getMaxRetry() {
         return maxRetry;
@@ -92,7 +97,9 @@ public abstract class AbstractRemoteMetadataSource {
 
     /**
      * Set the number of maximum retries before throwing on the exception
+     *
      * @param maxRetry
+     *     maximum number of retries
      */
     @Resource(name="maxRetry")
     public void setMaxRetry(int maxRetry) {
@@ -101,6 +108,7 @@ public abstract class AbstractRemoteMetadataSource {
 
     /**
      * Retrieve the operationId
+     *
      * @return A randomly generated UUID. generated during the retry method
      */
     public String getOperationId() {
@@ -109,6 +117,7 @@ public abstract class AbstractRemoteMetadataSource {
 
     /**
      * Retrieve the last encountered exception
+     *
      * @return An Exception object, the last one encountered in the retry method
      */
     public Exception getError() {
@@ -117,7 +126,8 @@ public abstract class AbstractRemoteMetadataSource {
 
     /**
      * Set the last encountered error
-     * @param error
+     *
+     * @param error exception to set
      */
     public void setError(Exception error) {
         this.error = error;
@@ -187,6 +197,7 @@ public abstract class AbstractRemoteMetadataSource {
 
     /**
      * Handles a given exception or throws on a {@link org.dspace.importer.external.exception.MetadataSourceException} if no ExceptionHandler is set
+     *
      * @param retry The number of retries before the exception was thrown on
      * @param exception The exception to handle
      * @param operationId The id of the operation that threw the exception
@@ -199,12 +210,14 @@ public abstract class AbstractRemoteMetadataSource {
             for (SourceExceptionHandler exceptionHandler : exceptionHandlers) {
                 exceptionHandler.handle(this);
             }
-        }else{
+        } else {
             throwSourceException(retry, exception, operationId);
         }
     }
 
-    /** Retrieve a list of SourceExceptionHandler objects that have an instanceof the exception configured to them.
+    /**
+     * Retrieve a list of SourceExceptionHandler objects that have an instanceof the exception configured to them.
+     *
      * @param exception The exception to base the retrieval of {@link org.dspace.importer.external.exception.SourceExceptionHandler} on
      * @return a list of {@link org.dspace.importer.external.exception.SourceExceptionHandler} objects
      */
@@ -217,11 +230,13 @@ public abstract class AbstractRemoteMetadataSource {
         return null;
     }
 
-    /** Throw a {@link MetadataSourceException}
+    /**
+     * Throw a {@link MetadataSourceException}
+     *
      * @param retry The number of retries before the exception was thrown on
      * @param exception The exception to throw
      * @param operationId The id of the operation that threw the exception
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if no ExceptionHandler is configured for the given exception
      */
     protected void throwSourceException(int retry, Exception exception, String operationId) throws MetadataSourceException {
         throwSourceExceptionHook();
@@ -239,7 +254,7 @@ public abstract class AbstractRemoteMetadataSource {
     /**
      * Attempts to init a session
      *
-     * @throws Exception
+     * @throws Exception on generic exception
      */
     public abstract void init() throws Exception;
 

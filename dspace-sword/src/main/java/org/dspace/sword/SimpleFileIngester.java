@@ -39,27 +39,31 @@ import java.util.List;
 public class SimpleFileIngester implements SWORDIngester
 {
 
-    protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
+    protected ItemService itemService =
+        ContentServiceFactory.getInstance().getItemService();
 
-    protected BundleService bundleService = ContentServiceFactory.getInstance()
-            .getBundleService();
+    protected BundleService bundleService =
+        ContentServiceFactory.getInstance().getBundleService();
 
-    protected BitstreamService bitstreamService = ContentServiceFactory
-            .getInstance().getBitstreamService();
+    protected BitstreamService bitstreamService =
+        ContentServiceFactory.getInstance().getBitstreamService();
 
-    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory
-            .getInstance().getBitstreamFormatService();
+    protected BitstreamFormatService bitstreamFormatService =
+        ContentServiceFactory.getInstance().getBitstreamFormatService();
 
     /**
      * Perform the ingest using the given deposit object onto the specified
      * target DSpace object, using the SWORD service implementation.
      *
      * @param service
+     *     SWORD service implementation
      * @param deposit
+     *     deposit request
      * @param target
+     *     target DSpace object
      * @throws DSpaceSWORDException
-     * @throws SWORDErrorException
+     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException on generic SWORD exception
      */
     public DepositResult ingest(SWORDService service, Deposit deposit,
             DSpaceObject target)
@@ -70,7 +74,7 @@ public class SimpleFileIngester implements SWORDIngester
             if (!(target instanceof Item))
             {
                 throw new DSpaceSWORDException(
-                        "SimpleFileIngester can only be loaded for deposit onto DSpace Items");
+                    "SimpleFileIngester can only be loaded for deposit onto DSpace Items");
             }
             Item item = (Item) target;
 
@@ -118,8 +122,8 @@ public class SimpleFileIngester implements SWORDIngester
 
             swordService.message("File created in item with filename " + fn);
 
-            BitstreamFormat bf = bitstreamFormatService
-                    .findByMIMEType(context, deposit.getContentType());
+            BitstreamFormat bf = bitstreamFormatService.findByMIMEType(
+                context, deposit.getContentType());
             if (bf != null)
             {
                 bs.setFormat(context, bf);

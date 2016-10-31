@@ -85,6 +85,15 @@ public abstract class JSPStep
      *            current servlet response object
      * @param subInfo
      *            submission info object
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public abstract void doPreProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
@@ -113,6 +122,15 @@ public abstract class JSPStep
      *            submission info object
      * @param status
      *            any status/errors reported by doProcessing() method
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public abstract void doPostProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo, int status)
@@ -136,6 +154,7 @@ public abstract class JSPStep
      *            current servlet response object
      * @param subInfo
      *            submission info object
+     * @return URL path of the JSP to review this step's information
      */
     public abstract String getReviewJSP(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo);

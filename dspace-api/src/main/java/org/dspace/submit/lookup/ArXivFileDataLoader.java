@@ -58,6 +58,7 @@ public class ArXivFileDataLoader extends FileDataLoader
 
     /**
      * @param filename
+     *     Name of file to load ArXiv data from.
      */
     public ArXivFileDataLoader(String filename)
     {
@@ -65,9 +66,9 @@ public class ArXivFileDataLoader extends FileDataLoader
     }
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see gr.ekt.bte.core.DataLoader#getRecords()
+     * {@see gr.ekt.bte.core.DataLoader#getRecords()}
+     *
+     * @throws MalformedSourceException 
      */
     @Override
     public RecordSet getRecords() throws MalformedSourceException

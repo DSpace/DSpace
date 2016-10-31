@@ -34,12 +34,12 @@ import gr.ekt.bte.core.Value;
 public class MapConverterModifier extends AbstractModifier
 {
 
-	protected String mappingFile; //The properties absolute filename
-	
+    protected String mappingFile; //The properties absolute filename
+    
     protected String converterNameFile; //The properties filename
 
     protected ConfigurationService configurationService;
-	
+    
     protected Map<String, String> mapping;
 
     protected String defaultValue = "";
@@ -123,6 +123,7 @@ public class MapConverterModifier extends AbstractModifier
     }
     /**
      * @param name
+     *     Name of file to load ArXiv data from.
      */
     public MapConverterModifier(String name)
     {

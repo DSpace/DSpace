@@ -114,6 +114,7 @@ public class ResolvedTask
     /**
      * Returns whether task should be distributed through containers
      * 
+     * @return whether task should be distributed through containers
      */
     public boolean isDistributive()
     {
@@ -123,6 +124,7 @@ public class ResolvedTask
     /**
      * Returns whether task alters (mutates) it's target objects
      * 
+     * @return whether task alters (mutates) it's target objects
      */
     public boolean isMutative()
     {
@@ -139,6 +141,11 @@ public class ResolvedTask
     	return codes;
     }
     
+    /**
+     * Returns whether task is not scripted (curation task)
+     * 
+     * @return true if this task is not scripted
+     */
     private boolean unscripted()
     {
     	return sTask == null;

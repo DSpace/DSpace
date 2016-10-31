@@ -13,13 +13,15 @@ import java.net.Inet6Address;
 import java.net.UnknownHostException;
 
 /**
+ * <p>
  * Quickly tests whether a given IP address matches an IP range. An
  * {@code IPMatcher} is initialized with a particular IP range specification.
  * Calls to {@link IPMatcher#match(String) match} method will then quickly
  * determine whether a given IP falls within that range.
+ * </p>
  * <p>
  * Supported range specifications are:
- * <p>
+ * </p>
  * <ul>
  * <li>Full IPv4 address, e.g. {@code 12.34.56.78}</li>
  * <li>Full IPv6 address, e.g. {@code 2001:18e8:3:171:218:8bff:fe2a:56a4}</li>
@@ -32,7 +34,7 @@ import java.net.UnknownHostException;
  * 
  * @version $Revision$
  * @author Robert Tansley
- * @author  Ben Bosman
+ * @author Ben Bosman
  * @author Roeland Dillen
  */
 public class IPMatcher

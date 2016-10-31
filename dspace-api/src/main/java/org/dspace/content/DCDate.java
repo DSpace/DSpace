@@ -516,7 +516,7 @@ public class DCDate
 
     public String displayUTCDate(boolean showTime, Locale locale)
     {
-          // forcibly truncate month name to 3 chars -- XXX FIXME?
+        // forcibly truncate month name to 3 chars -- XXX FIXME?
         String monthName = getMonthName(getMonthUTC(), locale);
         if (monthName.length() > 2)
             monthName = monthName.substring(0, 3);
@@ -540,7 +540,7 @@ public class DCDate
         }
     }
 
-    /**
+     /**
       * Test if the requested level of granularity is within that of the date.
       *
       * @param dg
@@ -594,23 +594,21 @@ public class DCDate
      * Get a date representing the current instant in time.
      *
      * @return a DSpaceDate object representing the current instant.
-
      */
     public static DCDate getCurrent()
     {
         return (new DCDate(new Date()));
     }
 
-       /**
+    /**
      * Get a month's name for a month between 1 and 12. Any invalid month value
      * (e.g. 0 or -1) will return a value of "Unspecified".
      *
      * @param m
-     *            the month number
-     *
+     *     the month number
      * @param locale
-        * 
-        * @return the month name.
+     *     which locale to render the month name in
+     * @return the month name.
      */
     public static String getMonthName(int m, Locale locale)
     {

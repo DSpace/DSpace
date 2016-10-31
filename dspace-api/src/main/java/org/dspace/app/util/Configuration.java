@@ -36,8 +36,7 @@ public class Configuration
      * </ul>
      * If the property does not exist, nothing is written.
      *
-     * @param argv
-     *            command-line arguments
+     * @param argv the command line arguments given
      */
     public static void main(String[] argv)
     {
