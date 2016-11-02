@@ -286,6 +286,13 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             if(DSpaceUtils.showTombstone(context, item)){
                 String URL = request.getContextPath() + "/bitstream/item/" + item.getID();
                 log.warn("Attempt to view tombstoned bitstream: " + URL + " : bitstream ID: " + bitstreamID);
+                
+                // Interrupt this request
+                String header = parameters.getParameter("header", null);
+                String message = parameters.getParameter("message", null);
+                String characters = parameters.getParameter("characters", null);
+                AuthenticationUtil.interruptRequest(objectModel, header, message, characters);
+                
                 HttpServletResponse httpResponse = (HttpServletResponse)
                         objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                 httpResponse.sendRedirect(request.getContextPath() + "/restricted-resource");
