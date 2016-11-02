@@ -270,13 +270,37 @@ public class WorkspaceItemTest extends AbstractUnitTest
      * Test of update method, of class WorkspaceItem.
      */
     @Test
-    public void testUpdate() throws Exception
+    public void testUpdateAuth() throws Exception
     {
-        //TODO: how can we verify it works?
-        wi.update();
-        System.out.println("update");
+		// no need to mockup the authorization as we are the same user that have
+		// created the wi
+        boolean pBefore = wi.isPublishedBefore();
+        wi.setPublishedBefore(!pBefore);
+    	wi.update();
+    	context.removeCached(wi, wi.getID());
+        wi = WorkspaceItem.find(context, wi.getID());
+    	assertTrue("testUpdate", pBefore != wi.isPublishedBefore());
     }
 
+    /**
+     * Test of update method, of class WorkspaceItem with no WRITE auth.
+     */
+    @Test(expected=AuthorizeException.class)
+    public void testUpdateNoAuth() throws Exception
+    {
+    	new NonStrictExpectations(AuthorizeManager.class)
+        {{
+             // Remove Item WRITE perms
+        	AuthorizeManager.authorizeActionBoolean((Context) any, (Item) any,
+                    Constants.WRITE); result = false; 
+        	AuthorizeManager.authorizeAction((Context) any, (Item) any,
+                     Constants.WRITE); result = new AuthorizeException();
+        }};
+        boolean pBefore = wi.isPublishedBefore();
+        wi.setPublishedBefore(!pBefore);
+    	wi.update();
+    	fail("Exception expected");
+    }
     /**
      * Test of deleteAll method, of class WorkspaceItem.
      */

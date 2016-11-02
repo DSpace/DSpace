@@ -31,6 +31,9 @@
 <%
     Group[] groups =
         (Group[]) request.getAttribute("groups");
+	String search = (String) request.getAttribute("search");
+	if (search == null) search = "";
+
 %>
 
 <dspace:layout style="submission" titlekey="jsp.tools.group-list.title"
@@ -49,12 +52,29 @@
   	
 	<p class="alert alert-info"><fmt:message key="jsp.tools.group-list.note1"/></p>	
 	<p class="alert alert-warning"><fmt:message key="jsp.tools.group-list.note2"/></p>
+
+<center>
+	<form class="form-inline" method="get">
+	    <label for="search"><fmt:message key="jsp.tools.eperson-list.search.query"/></label>
+	    <input class="form-control" style="width:200px;"type="text" name="search" value="<%= search %>"/>
+	    <input class="btn btn-success" type="submit" value="<fmt:message key="jsp.tools.eperson-list.search.submit" />" />
+	<%
+	    if (search != null && !search.equals("")){   %>
+	    <a class="btn btn-warning" href="<%= request.getContextPath() + "/tools/group-edit" %>"><fmt:message key="jsp.tools.group-list.search.return-browse" /></a>	
+		<%}%>
+		
+	</form>
+</center>
+<br/>
+
+
    	
     <form method="post" action="">
         <div class="row col-md-offset-5">
 	    	<input class="btn btn-success" type="submit" name="submit_add" value="<fmt:message key="jsp.tools.group-list.create.button"/>" />
         </div>
     </form>
+    
 	<br/>
 	
     <table class="table" summary="Group data display table">

@@ -118,7 +118,11 @@
 <div id="tabs">
 	<ul>
 		<li><a href="#tabs-search"><fmt:message key="jsp.submit.start-lookup-submission.tabs.search" /></a></li>
+		<%		
+	if ((searchProviders != null && searchProviders.size() > 0) || (identifiers != null && identifiers.size()>0)) {
+	%>
 		<li><a href="#tabs-result"><fmt:message key="jsp.submit.start-lookup-submission.tabs.result" /></a></li>
+	<% } %>
 	</ul>
 	<div id="tabs-search">
 	<!-- da qui -->
@@ -201,7 +205,10 @@
 	    </div>
 	  </div>
 <% } %>	
-	<div class="panel panel-default">
+
+<% if (identifiers != null && identifiers.size()>0) {
+	%>
+			<div class="panel panel-default">
 	    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
 	      <h4 class="panel-title">
 	        <a>
@@ -216,9 +223,6 @@
 		<input type="hidden" id="iuuid-identifier" name="iuuid" value=""/>
 		<input type="hidden" id="fuuid-identifier" name="fuuid" value=""/>
 		<input type="hidden" id="collectionid-identifier" name="collectionid" value=""/>
-<% if (identifiers != null && identifiers.size()>0) {
-	%>
-		
 		<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.identifiers.hints"/></p>
 <%	
 		for (String identifier : identifiers)
@@ -322,14 +326,19 @@
 		
 	} %>
 </div>
-	<div id="tabs-result">
+	<%		
+	if ((searchProviders != null && searchProviders.size() > 0) || (identifiers != null && identifiers.size()>0)) {
+	%>
+ 	<div id="tabs-result">
 		<div id="empty-result">
 			<p class="alert alert-warning"><fmt:message key="jsp.submit.start-lookup-submission.noresult"/></p>
 			<div id="no_result_manual_submission"></div>
 		</div>
 		<div id="result-list"></div>
 	</div>
-
+<% 
+		
+	} %>
 		<div class="clearFix">&nbsp;</div>
         <button type="button" class="btn btn-default col-md-2 pull-right exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button>
     </div>

@@ -702,4 +702,9 @@ public class ResearcherPage extends
         return ResearcherPage.class;
     }
 
+    @Override
+    public boolean isOwner(EPerson eperson)
+    {
+        return eperson != null && this.getEpersonID()!=null && (this.getEpersonID() == eperson.getID());
+    }
 }

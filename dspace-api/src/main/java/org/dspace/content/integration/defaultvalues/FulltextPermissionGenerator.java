@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
@@ -22,14 +23,15 @@ import org.dspace.core.Context;
 
 public class FulltextPermissionGenerator implements EnhancedValuesGenerator
 {
-
+	/** log4j logger */
+    private static Logger log = Logger.getLogger(FulltextPermissionGenerator.class);
+    
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     
     @Override
     public DefaultValuesBean generateValues(Item item, String schema,
             String element, String qualifier, String value)
     {
-
         Context context = null;
         DefaultValuesBean result = new DefaultValuesBean();
         String values = "none";
@@ -54,7 +56,10 @@ public class FulltextPermissionGenerator implements EnhancedValuesGenerator
         }
         catch (Exception ex)
         {
-            if (context != null && context.isValid())
+        	log.error(ex.getMessage(), ex);
+        }
+        finally {
+        	if (context != null && context.isValid())
             {
                 context.abort();
             }

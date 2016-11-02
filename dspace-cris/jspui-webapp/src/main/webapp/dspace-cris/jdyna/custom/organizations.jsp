@@ -40,9 +40,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="jdynatags" prefix="dyna"%>
 
-<c:set var="dspace.layout.head" scope="request">
-	<link href="<%=request.getContextPath() %>/css/misctable.css" type="text/css" rel="stylesheet" />
-</c:set>
 <c:set var="root"><%=request.getContextPath()%></c:set>
 <c:set var="info" value="${componentinfomap}" scope="page" />
 <%
@@ -116,13 +113,7 @@
 	%>
 
 <div class="panel-group col-md-12" id="${holder.shortName}">
-<c:set var="extraCSS">
-	<c:choose>
-		<c:when test="${holder.priority % 10 == 2}">col-md-6</c:when>
-		<c:otherwise>col-md-12</c:otherwise>
-	</c:choose>
-</c:set>
-	<div class="panel panel-default ${extraCSS}">
+	<div class="panel panel-default">
     	<div class="panel-heading">
     		<h4 class="panel-title">
         		<a data-toggle="collapse" data-parent="#${holder.shortName}" href="#collapseOne${holder.shortName}">

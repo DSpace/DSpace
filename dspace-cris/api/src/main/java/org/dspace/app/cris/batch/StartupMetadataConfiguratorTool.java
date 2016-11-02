@@ -24,6 +24,7 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.BoxDynamicObject;
 import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.BoxProject;
@@ -62,10 +63,12 @@ import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.TabProject;
 import org.dspace.app.cris.model.jdyna.TabResearcherPage;
 import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
+import org.dspace.app.cris.model.jdyna.widget.WidgetEPerson;
 import org.dspace.app.cris.model.jdyna.widget.WidgetFileDO;
 import org.dspace.app.cris.model.jdyna.widget.WidgetFileOU;
 import org.dspace.app.cris.model.jdyna.widget.WidgetFileProject;
 import org.dspace.app.cris.model.jdyna.widget.WidgetFileRP;
+import org.dspace.app.cris.model.jdyna.widget.WidgetGroup;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerDO;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerOU;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerPJ;
@@ -568,7 +571,38 @@ public class StartupMetadataConfiguratorTool
                 tabRP.setPriority(Integer.parseInt(priority));
                 tabRP.setTitle(label);
                 tabRP.setVisibility(accessLevel);
+                if (TabDynamicObject.class.isAssignableFrom(clazzTab))
+                {
+                    TabDynamicObject tabDynamicObject = (TabDynamicObject) tabRP;
+                    tabDynamicObject
+                            .setTypeDef(applicationService.findTypoByShortName(
+                                    DynamicObjectType.class, row.get(0)));
+                }
+                if (EditTabDynamicObject.class.isAssignableFrom(clazzTab))
+                {
+                    EditTabDynamicObject tabDynamicObject = (EditTabDynamicObject) tabRP;
+                    tabDynamicObject
+                            .setTypeDef(applicationService.findTypoByShortName(
+                                    DynamicObjectType.class, row.get(0)));
+                }
                 applicationService.saveOrUpdate(clazzTab, tabRP);
+            }
+            else
+            {
+                if (TabDynamicObject.class.isAssignableFrom(clazzTab))
+                {
+                    TabDynamicObject tabDynamicObject = (TabDynamicObject) tabRP;
+                    tabDynamicObject
+                            .setTypeDef(applicationService.findTypoByShortName(
+                                    DynamicObjectType.class, row.get(0)));
+                }
+                if (EditTabDynamicObject.class.isAssignableFrom(clazzTab))
+                {
+                    EditTabDynamicObject tabDynamicObject = (EditTabDynamicObject) tabRP;
+                    tabDynamicObject
+                            .setTypeDef(applicationService.findTypoByShortName(
+                                    DynamicObjectType.class, row.get(0)));
+                }
             }
         }
     }
@@ -615,6 +649,10 @@ public class StartupMetadataConfiguratorTool
                 box.setTitle(label);
                 box.setUnrelevant(unrelevant);
                 box.setVisibility(accessLevel);
+                if(BoxDynamicObject.class.isAssignableFrom(clazzBox)) {
+                    BoxDynamicObject boxDynamicObject = (BoxDynamicObject)box;
+                    boxDynamicObject.setTypeDef(applicationService.findTypoByShortName(DynamicObjectType.class, row.get(0)));
+                }
                 applicationService.saveOrUpdate(clazzBox, box);
             }
         }
@@ -735,8 +773,8 @@ public class StartupMetadataConfiguratorTool
 				}
 			}
 
-            int fieldIndex;
-            if (widget.equals("nested"))  fieldIndex=11; else fieldIndex=10;
+            int fieldIndex = 10;
+//            if (widget.equals("nested"))  fieldIndex=11; else fieldIndex=10;
             
             
             String displayFormat = list.get(fieldIndex++);
@@ -1072,7 +1110,17 @@ public class StartupMetadataConfiguratorTool
             builderW.addPropertyValue("urlPath",
                     "cris/uuid/${displayObject.uuid}");
 		}
-
+        else if (widget.equals("eperson"))
+        {
+            builderW = BeanDefinitionBuilder
+                    .genericBeanDefinition(WidgetEPerson.class);
+        }
+        else if (widget.equals("group"))
+        {
+            builderW = BeanDefinitionBuilder
+                    .genericBeanDefinition(WidgetGroup.class);
+        }
+            
 		builderW.getBeanDefinition().setAttribute("id", widget);
 		String widgetName = "widget" + widget;
 		ctx.registerBeanDefinition(widgetName, builderW.getBeanDefinition());

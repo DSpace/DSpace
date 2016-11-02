@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,14 +28,20 @@ import org.dspace.app.cris.model.OrganizationUnit;
 import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.BoxDynamicObject;
+import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DynamicProperty;
 import org.dspace.app.cris.model.jdyna.TabDynamicObject;
+import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
+import org.dspace.app.cris.model.jdyna.TabProject;
+import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
 import org.dspace.app.cris.util.ICrisHomeProcessor;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.app.webui.cris.metrics.ItemMetricsDTO;
+import org.dspace.app.webui.cris.util.CrisAuthorizeManager;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -43,6 +50,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.springframework.web.servlet.ModelAndView;
@@ -135,9 +143,9 @@ public class DynamicObjectDetailsController
         {
             mvc = super.handleDetails(request, response);
         }
-        catch (RuntimeException e)
+        catch (Exception e)
         {
-            return null;
+            throw new RuntimeException(e);
         }
         
         
@@ -149,13 +157,31 @@ public class DynamicObjectDetailsController
         }
         
         List<ICrisHomeProcessor<ResearchObject>> resultProcessors = new ArrayList<ICrisHomeProcessor<ResearchObject>>();
+        Map<String, Object> extraTotal = new HashMap<String, Object>();
+        Map<String, ItemMetricsDTO> metricsTotal = new HashMap<String, ItemMetricsDTO>();
+        List<String> metricsTypeTotal = new ArrayList<String>();
         for (ICrisHomeProcessor processor : processors)
         {
             if (ResearchObject.class.isAssignableFrom(processor.getClazz()))
             {
                 processor.process(context, request, response, dyn);
+                Map<String, Object> extra = (Map<String, Object>)request.getAttribute("extra");
+                if(extra!=null && !extra.isEmpty()) {
+                    Map<String, ItemMetricsDTO> metrics = (Map<String, ItemMetricsDTO>)extra.get("metrics");
+                    List<String> metricTypes = (List<String>)extra.get("metricTypes");
+                    if(metrics!=null && !metrics.isEmpty()) {
+                        metricsTotal.putAll(metrics);
+                    }
+                    if(metricTypes!=null && !metricTypes.isEmpty()) {
+                        metricsTypeTotal.addAll(metricTypes);
+                    }
+                }
             }
         }
+        extraTotal.put("metricTypes", metricsTypeTotal);
+        extraTotal.put("metrics", metricsTotal);
+        request.setAttribute("extra", extraTotal);  
+        
         
         request.setAttribute("sectionid", StatsConfig.DETAILS_SECTION);
         new DSpace().getEventService().fireEvent(
@@ -175,20 +201,24 @@ public class DynamicObjectDetailsController
             HttpServletRequest request, Map<String, Object> model,
             HttpServletResponse response) throws SQLException, Exception
     {
-
-        // check admin authorization
-        Boolean isAdmin = null; // anonymous access
+       
+        Integer entityId = extractEntityId(request);
+        
+        if(entityId==null) {
+            return null;
+        }
         Context context = UIUtil.obtainContext(request);
 
-        if (AuthorizeManager.isAdmin(context))
-        {
-            isAdmin = true; // admin
+        List<TabDynamicObject> tabs = applicationService.findTabByType(tabClass, extractDynamicObject(request).getTypo());
+        List<TabDynamicObject> authorizedTabs = new LinkedList<TabDynamicObject>();
+        
+        for(TabDynamicObject tab : tabs) {
+            if(CrisAuthorizeManager.authorize(context, applicationService, ResearchObject.class, entityId, tab)) {
+                authorizedTabs.add(tab);
+            }
         }
-
-        List<TabDynamicObject> tabs = applicationService.getTabsByVisibilityAndTypo(
-                TabDynamicObject.class, isAdmin, extractDynamicObject(request).getTypo());
-
-        return tabs;
+        return authorizedTabs;
+        
     }
 
     @Override
@@ -276,4 +306,10 @@ public class DynamicObjectDetailsController
     public void setProcessors(List<ICrisHomeProcessor<ResearchObject>> processors) {
 		this.processors = processors;
 	}
+    
+    @Override
+    protected boolean authorize(HttpServletRequest request, BoxDynamicObject box) throws SQLException
+    {
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), ResearchObject.class, extractEntityId(request), box);
+    }
 }

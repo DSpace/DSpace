@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
@@ -22,6 +23,7 @@ import java.util.List;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.workflow.WorkflowItem;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
@@ -1517,7 +1519,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of canEditBoolean method, of class Collection.
+     * Test of canEdit method, of class Item.
      */
     @Test
     public void testCanEditBooleanAuth() throws Exception
@@ -1542,7 +1544,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of canEditBoolean method, of class Collection.
+     * Test of canEdit method, of class Item.
      */
     @Test
     public void testCanEditBooleanAuth2() throws Exception
@@ -1567,7 +1569,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of canEditBoolean method, of class Collection.
+     * Test of canEdit method, of class Item.
      */
     @Test
     public void testCanEditBooleanAuth3() throws Exception
@@ -1594,7 +1596,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of canEditBoolean method, of class Collection.
+     * Test of canEdit method, of class Item.
      */
     @Test
     public void testCanEditBooleanAuth4() throws Exception
@@ -1616,11 +1618,34 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         }};
 
         // Ensure person with WRITE perms on the Collection can edit item
-        assertTrue("testCanEditBooleanAuth3 0", it.canEdit());
+        assertTrue("testCanEditBooleanAuth4 0", it.canEdit());
     }
 
     /**
-     * Test of canEditBoolean method, of class Collection.
+     * Test of canEdit method, of class Item.
+     */
+    @Test
+    public void testCanEditBooleanAuth5() throws Exception
+    {
+        // Test Inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow Item WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Item) any,
+                    Constants.WRITE); result = new AuthorizeException();
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,anyBoolean); result = null;
+        }};
+
+        Collection c = Collection.create(context);
+        c.createTemplateItem();
+        c.update();
+        assertTrue("testCanEditBooleanNoAuth5 0", c.getTemplateItem().canEdit());
+    }
+    
+    /**
+     * Test of canEdit method, of class Item.
      */
     @Test
     public void testCanEditBooleanNoAuth() throws Exception
@@ -1647,6 +1672,87 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         context.restoreAuthSystemState();
 
         assertFalse("testCanEditBooleanNoAuth 0", it.canEdit());
+    }
+
+    /**
+     * Test of canEdit method, of class Item.
+     */
+    @Test
+    public void testCanEditBooleanNoAuth2() throws Exception
+    {
+        // Test Inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow Item WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Item) any,
+                    Constants.WRITE); result = new AuthorizeException();
+            // Disallow parent Community WRITE and ADD perms
+            AuthorizeManager.authorizeAction((Context) any, (Community) any,
+                    Constants.WRITE,anyBoolean); result = new AuthorizeException();
+            AuthorizeManager.authorizeAction((Context) any, (Community) any,
+                    Constants.ADD,anyBoolean); result = new AuthorizeException();
+            // Allow parent Collection ADD perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.ADD,anyBoolean); result = null;
+        }};
+
+        Collection c = Collection.create(context);
+        WorkspaceItem wi = WorkspaceItem.create(context, c, true);
+        assertFalse("testCanEditBooleanNoAuth2 0", wi.getItem().canEdit());
+    }
+
+    /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmission() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = Collection.create(context);
+        WorkspaceItem wi = WorkspaceItem.create(context, c, true);
+    	context.restoreAuthSystemState();
+        assertTrue("testIsInProgressSubmission 0", wi.getItem().isInProgressSubmission());
+    }
+    
+    /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmissionFalse() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = Collection.create(context);
+        WorkspaceItem wi = WorkspaceItem.create(context, c, true);
+        Item item = InstallItem.installItem(context, wi);
+    	context.restoreAuthSystemState();
+        assertFalse("testIsInProgressSubmissionFalse 0", item.isInProgressSubmission());
+    }
+
+    /**
+     * Test of isInProgressSubmission method, of class Item.
+     * @throws AuthorizeException 
+     * @throws SQLException 
+     * @throws IOException 
+     * 
+     */
+    @Test
+    public void testIsInProgressSubmissionFalse2() throws SQLException, AuthorizeException, IOException
+    {
+    	context.turnOffAuthorisationSystem();
+    	Collection c = Collection.create(context);
+        c.createTemplateItem();
+        c.update();
+        Item item = c.getTemplateItem();
+    	context.restoreAuthSystemState();
+        assertFalse("testIsInProgressSubmissionFalse2 0", item.isInProgressSubmission());
     }
 
     /**

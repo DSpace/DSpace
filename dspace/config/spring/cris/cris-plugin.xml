@@ -42,6 +42,7 @@
 	
 	<bean class="org.dspace.app.cris.integration.authority.ItemMetadataImportFiller" id="fullitemMetadataConfiguration" abstract="true">
 		<property name="applicationService" ref="applicationService" />
+		<property name="metricsPersistenceService" ref="org.dspace.app.cris.metrics.common.services.MetricsPersistenceService" />
 		<property name="allowsUpdateByDefault" value="true" />
 		<property name="configurations">
 			<bean class="java.util.HashMap" />

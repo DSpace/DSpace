@@ -81,6 +81,8 @@ import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.TabProject;
 import org.dspace.app.cris.model.jdyna.TabResearcherPage;
 import org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree;
+import org.dspace.app.cris.model.jdyna.widget.WidgetEPerson;
+import org.dspace.app.cris.model.jdyna.widget.WidgetGroup;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerDO;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerOU;
 import org.dspace.app.cris.model.jdyna.widget.WidgetPointerPJ;
@@ -2414,6 +2416,8 @@ public class ImportExportUtils {
 		else if (widget instanceof WidgetLink) return "link";
 		else if (widget instanceof WidgetPointer) return "pointer";
 		else if (widget instanceof WidgetBoolean) return "boolean";
+		else if (widget instanceof WidgetEPerson) return "eperson";
+		else if (widget instanceof WidgetGroup) return "group";
 		else if (widget instanceof WidgetFile) {
 			return ((WidgetFile) widget).isShowPreview()?"image":"file";
 		}

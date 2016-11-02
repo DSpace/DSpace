@@ -72,6 +72,7 @@ public class SubmissionInfo extends HashMap
 
     /** If non-empty, form-relative indices of missing fields */
     private List<String> missingFields;
+    private List<String> errorsValidationFields;
 
     /** Specific bundle we're dealing with */
     private Bundle bundle;
@@ -735,6 +736,27 @@ public class SubmissionInfo extends HashMap
     public void setCodeCallerPage(Integer codeCallerPage)
     {
         this.codeCallerPage = codeCallerPage;
+    }
+
+    /**
+     * Return form related indices of the validation error fields
+     * 
+     * @return a List of fields in error
+     */
+    public List<String> getErrorsValidationFields()
+    {
+        return this.errorsValidationFields;
+    }
+
+    /**
+     * Sets the form related indices of the validation error fields
+     * 
+     * @param errorsValidationFields
+     *            the List of fields in error
+     */
+    public void setErrorsValidationFields(List<String> errorsValidationFields)
+    {
+        this.errorsValidationFields = errorsValidationFields;
     }
 
 }

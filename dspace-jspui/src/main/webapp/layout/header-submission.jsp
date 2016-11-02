@@ -56,6 +56,7 @@
    	    <link href="<%= request.getContextPath() %>/static/css/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 		<link href="<%= request.getContextPath() %>/static/css/jstree/themes/default/style.min.css" rel="stylesheet"/>
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
+	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/number-polyfill.css" type="text/css" />
 <%
     if (!"NONE".equals(feedRef))
     {
@@ -93,7 +94,7 @@
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jdyna/jdyna.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"></script>    
 	<script type='text/javascript'>
 		var j = jQuery.noConflict();
 		var $ = jQuery.noConflict();

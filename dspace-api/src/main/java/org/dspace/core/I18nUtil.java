@@ -7,18 +7,19 @@
  */
 package org.dspace.core;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.StringTokenizer;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
-
-import java.io.File;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-import java.util.ResourceBundle.Control;
-import java.util.StringTokenizer;
-import java.util.List;
-import java.util.ArrayList;
+import org.dspace.utils.DSpace;
+import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
 
 
 
@@ -46,6 +47,8 @@ public class I18nUtil
     // delimiters between elements of UNIX/POSIX locale spec, e.g. en_US.UTF-8
     private static final String LOCALE_DELIMITERS = " _.";
 
+    private static MessageSource messageSource;
+    
     /**
      * Gets the default locale as defined in dspace.cfg If no default locale is
      * defined, the Locale of the JVM is used
@@ -271,31 +274,12 @@ public class I18nUtil
      */
     public static String getMessage(String key, Locale locale)
     {
-    	return getMessage(key, locale, false);
+        return getMessage(key, locale, false);
     }
     
     public static String getMessage(String key, Locale locale, boolean throwExcIfNotFound)
     {
-        if (locale == null)
-        {
-            locale = DEFAULTLOCALE;
-        }
-        ResourceBundle.Control control = 
-            ResourceBundle.Control.getNoFallbackControl(
-            ResourceBundle.Control.FORMAT_DEFAULT);
-
-        ResourceBundle messages = ResourceBundle.getBundle("Messages", locale, control);
-        try {
-            String message = messages.getString(key.trim());
-            return message;
-        } catch (MissingResourceException e) {
-            if (throwExcIfNotFound) {
-            	throw e;
-            }
-        	log.error("'" + key + "' translation undefined in locale '"
-                    + locale.toString() + "'");
-            return key;
-        }
+       return getMessage(key, null, locale, false);
     }
     
     /**
@@ -459,5 +443,81 @@ public class I18nUtil
             }
         }
         return resultList.toArray(new Locale[resultList.size()]);
+    }
+    
+    public static String getMessage(String key, Object[] args, Context c)
+            throws MissingResourceException {
+        return getMessage(key.trim(), args, c.getCurrentLocale());
+    }
+    
+    /**
+     * Get the appropriate localized version for the message string for a given key and parameters
+     * 
+     * @param key 
+     *        String - name of the key to get the message for
+     * @param args 
+     *        Object[] - arguments for substitution
+     * @param locale
+     *        Locale - to get the message for
+     *          
+     * @return
+     * @throws MissingResourceException
+     */
+    public static String getMessage(String key, Object[] args, Locale locale) throws MissingResourceException
+    {
+        return getMessage(key, args, locale, false);
+    }
+    
+    /**
+     * 
+     * Get the appropriate localized version for the message string for a given key and parameters
+     *  
+     * @param key 
+     *        String - name of the key to get the message for
+     * @param args 
+     *        Object[] - arguments for substitution
+     * @param locale
+     *        Locale - to get the message for
+     * @param throwExcIfNotFound
+     *        boolean - false if you want fail silent 
+     * 
+     * @return
+     * @throws MissingResourceException
+     */
+    public static String getMessage(String key, Object[] args, Locale locale, boolean throwExcIfNotFound) throws MissingResourceException
+    {
+        String message = "";
+        if (locale == null)
+        {
+            locale = DEFAULTLOCALE;
+        }
+        
+        try {
+            message = getMessageSource().getMessage(key.trim(), args, locale);
+        } catch (MissingResourceException | NoSuchMessageException e) {
+            if (throwExcIfNotFound) {
+                throw new MissingResourceException(e.getMessage(), messageSource
+                        .getClass().toString(), key);
+            }
+            log.error("'" + key + "' translation undefined in locale '"
+                    + locale.toString() + "'");
+            return key;
+        }
+        return message;
+    }
+    
+    
+    public static MessageSource getMessageSource() {
+        if (I18nUtil.messageSource == null) {
+            DSpace dspace = new DSpace();
+            I18nUtil.messageSource = dspace.getServiceManager().getServiceByName("messageSource", MessageSource.class);
+        }
+        return I18nUtil.messageSource;
+    }
+    
+    
+    public static void setMessageSource(MessageSource messageSource)
+    {
+        I18nUtil.messageSource = messageSource;
     }
 }

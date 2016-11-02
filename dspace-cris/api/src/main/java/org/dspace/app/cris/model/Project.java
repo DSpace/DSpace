@@ -31,6 +31,7 @@ import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.ProjectProperty;
 import org.dspace.app.cris.model.jdyna.ProjectTypeNestedObject;
 import org.dspace.app.cris.model.jdyna.RPAdditionalFieldStorage;
+import org.dspace.eperson.EPerson;
 
 @Entity
 @Table(name = "cris_project", uniqueConstraints = @UniqueConstraint(columnNames={"sourceID","sourceRef"}))
@@ -281,5 +282,11 @@ public class Project extends ACrisObject<ProjectProperty, ProjectPropertiesDefin
     {
         return Project.class;
     }
-    
+
+    @Override
+    public boolean isOwner(EPerson eperson)
+    {
+        // TODO not implemented
+        return false;
+    }
 }

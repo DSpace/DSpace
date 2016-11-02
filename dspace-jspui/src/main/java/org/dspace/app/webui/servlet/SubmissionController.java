@@ -50,6 +50,8 @@ import org.dspace.submit.AbstractProcessingStep;
 import com.google.gson.Gson;
 import java.util.Collections;
 import javax.servlet.http.HttpSession;
+
+import org.dspace.submit.step.DescribeStep;
 import org.dspace.submit.step.UploadStep;
 
 /**
@@ -640,7 +642,6 @@ public class SubmissionController extends DSpaceServlet
             AuthorizeException
     {
         int result = doSaveCurrentState(context, request, response, subInfo, currentStepConfig);
-        
         // find current Step number
         int currentStepNum;
         if (currentStepConfig == null)
@@ -653,80 +654,85 @@ public class SubmissionController extends DSpaceServlet
         }
 
         int currPage=AbstractProcessingStep.getCurrentPage(request);
-        double currStepAndPage = Double.parseDouble(currentStepNum+"."+currPage);
-        // default value if we are in workflow
-        double stepAndPageReached = -1;
-        
-        if (!subInfo.isInWorkflow() && !subInfo.isEditing())
-        {
-            stepAndPageReached = Double.parseDouble(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
-        }
-        
-        if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage != stepAndPageReached)
-        {
+        if (result == DescribeStep.STATUS_ERROR_VALIDATION_FIELDS) {
             doStep(context, request, response, subInfo, currentStepNum);
-        }
-        
-        //Check to see if we are actually just going to a
-        //previous PAGE within the same step.
-        int currentPageNum = AbstractProcessingStep.getCurrentPage(request);
-        
-        boolean foundPrevious = false;
-        
-        //since there are pages before this one in this current step
-        //just go backwards one page.
-        if(currentPageNum > 1)
-        {
-            //decrease current page number
-            AbstractProcessingStep.setCurrentPage(request, currentPageNum-1);
-     
-            foundPrevious = true;
-            
-            //send user back to the beginning of same step!
-            //NOTE: the step should handle going back one page
-            // in its doPreProcessing() method
-            setBeginningOfStep(request, true);
+        } else {
 
-            doStep(context, request, response, subInfo, currentStepNum);
-        }
-        // Since we cannot go back one page, 
-        // check if there is a step before this step. 
-        // If so, go backwards one step
-        else if (currentStepNum > FIRST_STEP)
-        {
+            double currStepAndPage = Double.parseDouble(currentStepNum+"."+currPage);
+            // default value if we are in workflow
+            double stepAndPageReached = -1;
             
-            currentStepConfig = getPreviousVisibleStep(request, subInfo);
-            
-            if(currentStepConfig != null)
+            if (!subInfo.isInWorkflow() && !subInfo.isEditing())
             {
-                currentStepNum = currentStepConfig.getStepNumber();
-                foundPrevious = true;
+                stepAndPageReached = Double.parseDouble(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
             }
+            
+            if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage != stepAndPageReached)
+            {
+                doStep(context, request, response, subInfo, currentStepNum);
+            }
+            
+            //Check to see if we are actually just going to a
+            //previous PAGE within the same step.
+            int currentPageNum = AbstractProcessingStep.getCurrentPage(request);
+            
+            boolean foundPrevious = false;
+            
+            //since there are pages before this one in this current step
+            //just go backwards one page.
+            if(currentPageNum > 1)
+            {
+                //decrease current page number
+                AbstractProcessingStep.setCurrentPage(request, currentPageNum-1);
+         
+                foundPrevious = true;
                 
-            if(foundPrevious)
-            {    
-                //flag to JSPStepManager that we are going backwards
-                //an entire step
-                request.setAttribute("step.backwards", Boolean.TRUE);
-                
-                // flag that we are going back to the start of this step (for JSPStepManager class)
+                //send user back to the beginning of same step!
+                //NOTE: the step should handle going back one page
+                // in its doPreProcessing() method
                 setBeginningOfStep(request, true);
     
                 doStep(context, request, response, subInfo, currentStepNum);
-            }    
-        }
+            }
+            // Since we cannot go back one page, 
+            // check if there is a step before this step. 
+            // If so, go backwards one step
+            else if (currentStepNum > FIRST_STEP)
+            {
+                
+                currentStepConfig = getPreviousVisibleStep(request, subInfo);
+                
+                if(currentStepConfig != null)
+                {
+                    currentStepNum = currentStepConfig.getStepNumber();
+                    foundPrevious = true;
+                }
+                    
+                if(foundPrevious)
+                {    
+                    //flag to JSPStepManager that we are going backwards
+                    //an entire step
+                    request.setAttribute("step.backwards", Boolean.TRUE);
+                    
+                    // flag that we are going back to the start of this step (for JSPStepManager class)
+                    setBeginningOfStep(request, true);
         
-        //if there is no previous, visible step, throw an error!
-        if(!foundPrevious)
-        {
-            log.error(LogManager
-                    .getHeader(context, "no_previous_visible_step",
-                            "Attempting to go to previous step for step="
-                                    + currentStepNum + "." +
-                                    "NO PREVIOUS VISIBLE STEP OR PAGE FOUND!"));
-
-            JSPManager.showIntegrityError(request, response);
-        }
+                    doStep(context, request, response, subInfo, currentStepNum);
+                }    
+            }
+            
+            //if there is no previous, visible step, throw an error!
+            if(!foundPrevious)
+            {
+                log.error(LogManager
+                        .getHeader(context, "no_previous_visible_step",
+                                "Attempting to go to previous step for step="
+                                        + currentStepNum + "." +
+                                        "NO PREVIOUS VISIBLE STEP OR PAGE FOUND!"));
+    
+                JSPManager.showIntegrityError(request, response);
+            }
+            }
     }
 
     /**
@@ -804,48 +810,51 @@ public class SubmissionController extends DSpaceServlet
         {
             int result = doSaveCurrentState(context, request, response,
                     subInfo, currentStepConfig);
-
-            // Now, if the request was a multi-part (file upload), we need to
-            // get the original request back out, as the wrapper causes problems
-            // further down the line.
-            if (request instanceof FileUploadRequest)
-            {
-                FileUploadRequest fur = (FileUploadRequest) request;
-                request = fur.getOriginalRequest();
-            }
-
             int currStep = currentStepConfig.getStepNumber();
-            int currPage = AbstractProcessingStep.getCurrentPage(request);
-            double currStepAndPage = Double.parseDouble(currStep + "." + currPage);
-            // default value if we are in workflow
-            double stepAndPageReached = -1;
-            
-            if (!subInfo.isInWorkflow() && !subInfo.isEditing())
-            {
-                stepAndPageReached = Double.parseDouble(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
-            }
-            
-            if (result != AbstractProcessingStep.STATUS_COMPLETE
-                    && currStepAndPage != stepAndPageReached)
-            {
+            if (result == DescribeStep.STATUS_ERROR_VALIDATION_FIELDS) {
                 doStep(context, request, response, subInfo, currStep);
-            }
-            else
-            {
-                // save page info to request (for the step to access)
-                AbstractProcessingStep.setCurrentPage(request, nextPage);
-
-                // flag that we are going back to the start of this step (for
-                // JSPStepManager class)
-                setBeginningOfStep(request, true);
-
-                log.debug("Jumping to Step " + nextStep + " and Page "
-                        + nextPage);
-
-                // do the step (the step should take care of going to
-                // the specified page)
-                doStep(context, request, response, subInfo, nextStep);
-            }
+            } else {
+                // Now, if the request was a multi-part (file upload), we need to
+                // get the original request back out, as the wrapper causes problems
+                // further down the line.
+                if (request instanceof FileUploadRequest)
+                {
+                    FileUploadRequest fur = (FileUploadRequest) request;
+                    request = fur.getOriginalRequest();
+                }
+                
+                int currPage = AbstractProcessingStep.getCurrentPage(request);
+                double currStepAndPage = Double.parseDouble(currStep + "." + currPage);
+                // default value if we are in workflow
+                double stepAndPageReached = -1;
+                
+                if (!subInfo.isInWorkflow() && !subInfo.isEditing())
+                {
+                    stepAndPageReached = Double.parseDouble(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
+                }
+                
+                if (result != AbstractProcessingStep.STATUS_COMPLETE
+                        && currStepAndPage != stepAndPageReached)
+                {
+                    doStep(context, request, response, subInfo, currStep);
+                }
+                else
+                {
+                    // save page info to request (for the step to access)
+                    AbstractProcessingStep.setCurrentPage(request, nextPage);
+    
+                    // flag that we are going back to the start of this step (for
+                    // JSPStepManager class)
+                    setBeginningOfStep(request, true);
+    
+                    log.debug("Jumping to Step " + nextStep + " and Page "
+                            + nextPage);
+    
+                    // do the step (the step should take care of going to
+                    // the specified page)
+                    doStep(context, request, response, subInfo, nextStep);
+                }
+                }
         }
     }
 
@@ -925,26 +934,31 @@ public class SubmissionController extends DSpaceServlet
                 
                 int result = doSaveCurrentState(context, request, response, subInfo,
                         stepConfig);
-                
-                int currStep=stepConfig.getStepNumber();
-                int currPage=AbstractProcessingStep.getCurrentPage(request);
-                double currStepAndPage = Float.parseFloat(currStep+"."+currPage);
-                double stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
-                
-                if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage < stepAndPageReached){
-                    setReachedStepAndPage(subInfo, currStep, currPage);
+                if (result == DescribeStep.STATUS_ERROR_VALIDATION_FIELDS) {
+                    setCancellationInProgress(request, false);                    
+                    int currStep = stepConfig.getStepNumber();
+                    doStep(context, request, response, subInfo, currStep);
+                } else {
+                    int currStep=stepConfig.getStepNumber();
+                    int currPage=AbstractProcessingStep.getCurrentPage(request);
+                    double currStepAndPage = Float.parseFloat(currStep+"."+currPage);
+                    double stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
+                    
+                    if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage < stepAndPageReached){
+                        setReachedStepAndPage(subInfo, currStep, currPage);
+                    }
+                    
+                    //commit
+                    context.commit();
+                    
+                    // save changes to submission info & step info for JSP
+                    saveSubmissionInfo(request, subInfo);
+                    saveCurrentStepConfig(request, stepConfig);
+    
+                    // forward to cancellation confirmation JSP
+                    showProgressAwareJSP(request, response, subInfo,
+                            "/submit/cancel.jsp");
                 }
-                
-                //commit
-                context.commit();
-                
-                // save changes to submission info & step info for JSP
-                saveSubmissionInfo(request, subInfo);
-                saveCurrentStepConfig(request, stepConfig);
-
-                // forward to cancellation confirmation JSP
-                showProgressAwareJSP(request, response, subInfo,
-                        "/submit/cancel.jsp");
             }
         }
     }

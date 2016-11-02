@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<!-- start of XML -->
+
+<dspace-dc-types>
+
+	<dspace-header>
+		<title>Group Types Registry</title>
+		<contributor.author>Luigi Andrea Pascarelli</contributor.author>
+		<contributor.editor>$Author$</contributor.editor>
+		<date.created>$Date$</date.created>
+		<description>$Log$</description>
+		<description.version>$Revision$</description.version>
+	</dspace-header>
+
+	<dc-schema>
+		<name>group</name>
+		<namespace>http://www.dspace.org</namespace>
+	</dc-schema>
+
+	<dc-type>
+		<schema>group</schema>
+		<element>notrelevant</element>
+		<qualifier></qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+
+</dspace-dc-types>

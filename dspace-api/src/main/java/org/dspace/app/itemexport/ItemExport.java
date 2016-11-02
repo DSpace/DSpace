@@ -209,7 +209,7 @@ public class ItemExport
         }
 
         Context c = new Context();
-        c.setIgnoreAuthorization(true);
+        c.turnOffAuthorisationSystem();
 
         if (myType == Constants.ITEM)
         {
@@ -474,10 +474,10 @@ public class ItemExport
                     language = "";
                 }
 
-                utf8 = ("  <Metadatum element=\"" + dcv.element + "\" "
+                utf8 = ("  <dcvalue element=\"" + dcv.element + "\" "
                         + "qualifier=\"" + qualifier + "\""
                         + language + ">"
-                        + Utils.addEntities(dcv.value) + "</Metadatum>\n")
+                        + Utils.addEntities(dcv.value) + "</dcvalue>\n")
                         .getBytes("UTF-8");
 
                 if ((!migrate) ||
@@ -513,9 +513,9 @@ public class ItemExport
                 (dateAccessioned != null) &&
                 (!dateIssued.equals(dateAccessioned)))
             {
-                utf8 = ("  <Metadatum element=\"date\" "
+                utf8 = ("  <dcvalue element=\"date\" "
                         + "qualifier=\"issued\">"
-                        + Utils.addEntities(dateIssued) + "</Metadatum>\n")
+                        + Utils.addEntities(dateIssued) + "</dcvalue>\n")
                         .getBytes("UTF-8");
                 out.write(utf8, 0, utf8.length);
             }

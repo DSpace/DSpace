@@ -45,7 +45,18 @@
     			<entry key="submitter">
     				<bean class="org.dspace.content.generator.SubmitterValueGenerator" />
     			</entry>
+    			<entry key="date">
+    				<bean class="org.dspace.content.generator.DateValueGenerator" />
+    			</entry>
     		</map>
     	</property>
     </bean>
+    
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>Messages</value>
+            </list>
+        </property>
+    </bean>    
 </beans>

@@ -45,10 +45,6 @@ import org.hibernate.Session;
 
 import it.cilea.osd.common.core.SingleTimeStampInfo;
 import it.cilea.osd.common.model.Identifiable;
-import it.cilea.osd.jdyna.dao.TabDao;
-import it.cilea.osd.jdyna.model.Containable;
-import it.cilea.osd.jdyna.web.IPropertyHolder;
-import it.cilea.osd.jdyna.web.Tab;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -973,11 +969,6 @@ public class ApplicationService extends ExtendedTabService
     	clearCache();
     }
 
-	public <H extends IPropertyHolder<Containable>, T extends Tab<H>> List<T> getTabsByVisibility(Class<T> modelClass, Integer level) {	
-		TabDao<H, T> dao = (TabDao<H, T>) getDaoByModel(modelClass);
-		return dao.findByAccessLevel(level);
-	}
-	
 	public List<OrcidQueue> findOrcidQueueByResearcherId(String crisId) {
 		return orcidQueueDao.findOrcidQueueByOwner(crisId);
 	}

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.webui.submit.step;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
@@ -18,8 +19,11 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.LicenseUtils;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.license.CCLicense;
+import org.dspace.license.CCLookup;
 import org.dspace.license.CreativeCommons;
 import org.dspace.submit.step.LicenseStep;
 
@@ -28,6 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * License step for DSpace JSP-UI. Presents the user with license information
@@ -104,6 +110,15 @@ public class JSPCCLicenseStep extends JSPStep
         boolean exists = CreativeCommons.hasLicense(context, item);
         request.setAttribute("cclicense.exists", Boolean.valueOf(exists));
 
+        String ccLocale = ConfigurationManager.getProperty("cc.license.locale");
+        /** Default locale to 'en' */
+        ccLocale = (StringUtils.isNotBlank(ccLocale)) ? ccLocale : "en";
+        request.setAttribute("cclicense.locale", ccLocale);
+        
+        CCLookup cclookup = new CCLookup();
+        Collection<CCLicense> collectionLicenses = cclookup.getLicenses(ccLocale);
+        request.setAttribute("cclicense.licenses", collectionLicenses);
+        
         JSPStepManager.showJSP(request, response, subInfo, CC_LICENSE_JSP);
 
     }

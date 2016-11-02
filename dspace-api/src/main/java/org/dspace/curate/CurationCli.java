@@ -164,7 +164,7 @@ public class CurationCli
         }
         else
         {
-            c.setIgnoreAuthorization(true);
+            c.turnOffAuthorisationSystem();
         }
 
         Curator curator = new Curator();

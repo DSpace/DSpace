@@ -285,11 +285,23 @@ public class GroupEditServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        Group[] groups = Group.findAll(c, Group.NAME);
+        Group[] groups;
 
+        String search = request.getParameter("search");
+        if (search != null && !search.equals(""))
+        {
+            groups = Group.search(c, search);
+
+        }
+        else
+        {
+            // Retrieve the e-people in the specified order
+            groups = Group.findAll(c,Group.NAME);
+        }  
         // if( groups == null ) { System.out.println("groups are null"); }
         // else System.out.println("# of groups: " + groups.length);
         request.setAttribute("groups", groups);
+        request.setAttribute("search", search);
 
         JSPManager.showJSP(request, response, "/tools/group-list.jsp");
         c.complete();

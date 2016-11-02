@@ -294,6 +294,7 @@ public class BitstreamResource extends Resource
         org.dspace.core.Context context = null;
         InputStream inputStream = null;
         String type = null;
+        String name = null;
 
         try
         {
@@ -306,6 +307,7 @@ public class BitstreamResource extends Resource
             log.trace("Bitsream(id=" + bitstreamId + ") data was successfully read.");
             inputStream = dspaceBitstream.retrieve();
             type = dspaceBitstream.getFormat().getMIMEType();
+            name = dspaceBitstream.getName();
 
             context.complete();
         }
@@ -334,7 +336,9 @@ public class BitstreamResource extends Resource
             processFinally(context);
         }
 
-        return Response.ok(inputStream).type(type).build();
+        return Response.ok(inputStream).type(type)
+                .header("Content-Disposition", "attachment; filename=\"" + name + "\"")
+                .build();
     }
 
     /**
@@ -781,7 +785,7 @@ public class BitstreamResource extends Resource
     }
 
     /**
-     * Find bitstream from DSpace database. This encapsulatets the
+     * Find bitstream from DSpace database. This encapsulates the
      * org.dspace.content.Bitstream.find method with a check whether the item exists and
      * whether the user logged into the context has permission to preform the requested action.
      *

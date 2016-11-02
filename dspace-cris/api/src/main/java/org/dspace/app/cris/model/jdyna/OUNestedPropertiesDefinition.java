@@ -27,6 +27,8 @@ import javax.persistence.Table;
     @NamedQuery(name = "OUNestedPropertiesDefinition.uniqueIdByShortName", query = "select id from OUNestedPropertiesDefinition where shortName = ?"),
     @NamedQuery(name = "OUNestedPropertiesDefinition.uniqueByShortName", query = "from OUNestedPropertiesDefinition where shortName = ?"),
     @NamedQuery(name = "OUNestedPropertiesDefinition.findValoriDaMostrare", query = "from OUNestedPropertiesDefinition where showInList = true"),
+    @NamedQuery(name = "OUNestedPropertiesDefinition.findAllWithPolicySingle", query = "from OUNestedPropertiesDefinition where rendering in (from WidgetEPerson)"),
+    @NamedQuery(name = "OUNestedPropertiesDefinition.findAllWithPolicyGroup", query = "from OUNestedPropertiesDefinition where rendering in (from WidgetGroup)"),
     @NamedQuery(name = "OUNestedPropertiesDefinition.likeByShortName", query = "from OUNestedPropertiesDefinition where shortName LIKE :par0", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") })
 })
 public class OUNestedPropertiesDefinition extends

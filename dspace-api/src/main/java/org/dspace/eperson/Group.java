@@ -1529,4 +1529,8 @@ public class Group extends DSpaceObject
         adminGroup.setName("Administrator");
         adminGroup.update();
     }
+    
+    public boolean isNotRelevant() {
+        return getMetadataFirstValue(MetadataSchema.GROUP_SCHEMA, "notrelevant", null, Item.ANY)!=null;
+    }
 }
