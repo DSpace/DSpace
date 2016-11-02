@@ -495,6 +495,9 @@ public class HandleServlet extends DSpaceServlet
             HttpServletResponse response, Community community)
             throws ServletException, IOException, SQLException, AuthorizeException
     {
+        // Ensure the user has authorisation
+        AuthorizeManager.authorizeAction(context, community, Constants.READ);
+        
         // Handle click on a browse or search button
         if (!handleButton(request, response, community.getHandle()))
         {
@@ -642,6 +645,10 @@ public class HandleServlet extends DSpaceServlet
             Collection collection) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+        
+        // Ensure the user has authorisation
+        AuthorizeManager.authorizeAction(context, collection, Constants.READ);
+        
         // Handle click on a browse or search button
         if (!handleButton(request, response, collection.getHandle()))
         {
