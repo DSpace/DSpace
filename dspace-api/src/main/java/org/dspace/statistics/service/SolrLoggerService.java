@@ -98,6 +98,8 @@ public interface SolrLoggerService {
 
     public void markRobotsByIP();
 
+    public void markRobotsByUserAgent();
+    
     public void markRobotByUserAgent(String agent);
 
     public void deleteRobotsByIsBotFlag();

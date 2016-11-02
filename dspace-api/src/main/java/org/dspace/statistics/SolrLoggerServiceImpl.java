@@ -733,6 +733,34 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     @Override
+    public void markRobotsByUserAgent(){
+    	for(String agent : SpiderDetector.getSpiderAgents())
+    	{
+    		try {
+                /* Result Process to alter record to be identified as a bot */
+                ResultProcessor processor = new ResultProcessor(){
+                    @Override
+                    public void process(SolrDocument doc) throws IOException, SolrServerException {
+                        doc.removeFields("isBot");
+                        doc.addField("isBot", true);
+                        SolrInputDocument newInput = ClientUtils.toSolrInputDocument(doc);
+                        solr.add(newInput);
+                    }
+                };
+
+                /* query for user agent, exclude results previously set as bots. */
+                //white spaces must be parsed to be interpreted by solr
+                processor.execute("userAgent:/"+agent+"/ AND -isBot:true");
+                
+                solr.commit();
+            } catch (Exception e) {
+                log.error(e.getMessage(),e);
+            }
+    	}
+        
+    }
+    
+    @Override
     public void markRobotByUserAgent(String agent){
         try {
 
