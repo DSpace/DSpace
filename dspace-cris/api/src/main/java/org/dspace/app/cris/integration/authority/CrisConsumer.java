@@ -113,8 +113,10 @@ public class CrisConsumer implements Consumer
                     if (CRISAuthority.class
                             .isAssignableFrom(choiceAuthority.getClass()))
                     {
+                        int idx = 0;
                         for (Metadatum dcval : Metadatums)
                         {
+                            dcval.setPlace(idx);
                             String authority = dcval.authority;
                             if (StringUtils.isNotBlank(authority))
                             {
@@ -184,7 +186,7 @@ public class CrisConsumer implements Consumer
                                     toBuildMetadata.put(valueHashed, metadata);
                                 }
                             }
-
+                            idx++;
                         }
                     }
                 }
@@ -345,6 +347,7 @@ public class CrisConsumer implements Consumer
                     Metadatum newValue = Metadatum.copy();
                     newValue.authority = toBuildAuthority.get(orcid);
                     newValue.confidence = Choices.CF_ACCEPTED;
+                    newValue.setPlace(Metadatum.getPlace());
                     item.replaceMetadataValue(Metadatum, newValue);
                 }
             }

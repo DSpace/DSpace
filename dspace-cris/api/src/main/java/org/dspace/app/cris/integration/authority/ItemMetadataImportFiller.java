@@ -107,7 +107,6 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
                     MappingDetails details = entry.getValue();
                     if (details instanceof MetricsMappingDetails)
                     {
-                        
                         MetricsMappingDetails mmd = (MetricsMappingDetails)details;
                         buildMetric(context, item, crisObject, m, mdInput, mmd, metricsPersistenceService);
                     }
@@ -143,9 +142,16 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
                     {
                         try
                         {
-                            Metadatum value = inputs[idx];
+                            Metadatum value = null;
+                            try {
+                                value = inputs[m.getPlace()];
+                            }
+                            catch (Exception ex) {
+                                value = inputs[idx];
+                            }
                             Object dcvalue = buildGenericValue(context, item,
                                     value, details);
+                            
                             if (!containsValue(props, dcvalue))
                             {
                                 ResearcherPageUtils.buildGenericValue(
@@ -173,7 +179,6 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
             ACrisObject crisObject, Metadatum m, String mdInput,
             MetricsMappingDetails mmd, MetricsPersistenceService metricService)
     {
-
         Metadatum[] mm = item.getMetadataByMetadataString(mdInput);
         if (mm != null && mm.length > 0)
         {
@@ -181,7 +186,7 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
             {
                 CrisMetrics metric = new CrisMetrics();
                 
-                mmd.computeMetricCount(mm, item, metric);
+                mmd.computeMetricCount(m.getPlace(), mm, item, metric);
                 
                 if (crisObject != null)
                 {

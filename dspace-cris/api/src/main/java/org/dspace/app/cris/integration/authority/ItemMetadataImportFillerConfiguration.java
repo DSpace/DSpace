@@ -110,12 +110,19 @@ public class ItemMetadataImportFillerConfiguration {
             this.rangeByYear = rangeByYear;
         }
 
-        public void computeMetricCount(Metadatum[] mm, Item item, CrisMetrics metric)
+        public void computeMetricCount(int idx, Metadatum[] mm, Item item, CrisMetrics metric)
         {
             Metadatum metricValue = null;
             if (mm.length > 0)
             {
-                metricValue = mm[0];
+                try
+                {
+                    metricValue = mm[idx];
+                }
+                catch (Exception ex)
+                {
+                    metricValue = mm[0];
+                }
             }
 
             metric.setMetricType(metricValue.qualifier);

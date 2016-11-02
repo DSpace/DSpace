@@ -40,7 +40,7 @@ public class Metadatum
     /** Authority control confidence. */
     public int confidence = Choices.CF_UNSET;
 
-
+    private int place;
 
     public Metadatum copy() {
         Metadatum copy = new Metadatum();
@@ -51,6 +51,7 @@ public class Metadatum
         copy.language = this.language;
         copy.qualifier = this.qualifier;
         copy.schema = this.schema;
+        copy.place = getPlace();
         return copy;
     }
     /**
@@ -125,5 +126,13 @@ public class Metadatum
         result = 31 * result + (authority != null ? authority.hashCode() : 0);
         result = 31 * result + confidence;
         return result;
+    }
+    public int getPlace()
+    {  
+        return place;
+    }
+    public void setPlace(int place)
+    {
+        this.place = place;
     }
 }
