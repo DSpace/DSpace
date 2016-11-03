@@ -66,6 +66,13 @@ public class JournalDownloads extends AbstractDSpaceTransformer
         Division items = inner.addDivision(Const.ITEMS);
         Division vals = inner.addDivision(Const.VALS);
         ReferenceSet itemsContainer = items.addReferenceSet(Const.ITEMS, ReferenceSet.TYPE_SUMMARY_LIST);
+        if (downloadsRange.equals(Const.solrQueryMonth)) {
+            itemsContainer.setHead(Const.T_desc_month);
+        } else if (downloadsRange.equals(Const.solrQueryYear)) {
+            itemsContainer.setHead(Const.T_desc_year);
+        } else if (downloadsRange.equals(Const.solrQueryAlltime)) {
+            itemsContainer.setHead(Const.T_desc_alltime);
+        }
         org.dspace.app.xmlui.wing.element.List countList = vals.addList(Const.ITEMS, org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, Const.ITEMS);
         countList.setHead(Const.T_ref_head);
         for(Item item : refs.keySet()) {
