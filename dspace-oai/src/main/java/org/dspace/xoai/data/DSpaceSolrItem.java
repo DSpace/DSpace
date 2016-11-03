@@ -21,7 +21,7 @@ import java.util.Collection;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 public class DSpaceSolrItem extends DSpaceItem
 {

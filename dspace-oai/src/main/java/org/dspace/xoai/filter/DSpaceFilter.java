@@ -18,7 +18,7 @@ import org.dspace.xoai.services.api.FieldResolver;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 public abstract class DSpaceFilter implements Filter
 {

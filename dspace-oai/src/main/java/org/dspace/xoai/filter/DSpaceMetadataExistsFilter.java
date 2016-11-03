@@ -25,8 +25,8 @@ import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
  * <p/>
  * One line summary: At least one metadata field defined
  *
- * @author Ariel J. Lira <arieljlira@gmail.com>
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Ariel J. Lira (arieljlira at gmail dot com)
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 public class DSpaceMetadataExistsFilter extends DSpaceFilter {
     private static final Logger log = LogManager
