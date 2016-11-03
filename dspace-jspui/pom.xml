@@ -70,6 +70,8 @@
                         <exclude>**/javascripts/**</exclude>
                         <exclude>**/fonts/**</exclude>
                         <exclude>**/resumable.js</exclude>
+                        <exclude>**/number-polyfill.css</exclude>
+                        <exclude>**/rebel.xml</exclude>
                     </excludes>
                 </configuration>
             </plugin>

@@ -1,3 +1,12 @@
+<%--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+--%>
 <%@page import="java.util.Map"%>
 <%@page import="org.dspace.app.webui.servlet.DoiFactoryServlet"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
