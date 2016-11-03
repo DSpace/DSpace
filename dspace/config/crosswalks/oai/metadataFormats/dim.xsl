@@ -5,7 +5,7 @@
 	in the LICENSE and NOTICE files at the root of the source tree and available 
 	online at http://www.dspace.org/license/ 
 	
-	Developed by DSpace @ Lyncode <dspace@lyncode.com> 
+	Developed by DSpace @ Lyncode (dspace at lyncode dot com) 
 	
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"

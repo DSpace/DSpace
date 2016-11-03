@@ -8,7 +8,7 @@
 
     http://www.dspace.org/license/
 
-	Developed by DSpace @ Lyncode <dspace@lyncode.com> 
+	Developed by DSpace @ Lyncode (dspace at lyncode dot com) 
 
  -->
 <xsl:stylesheet 
