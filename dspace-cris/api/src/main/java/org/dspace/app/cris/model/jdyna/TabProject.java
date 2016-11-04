@@ -93,21 +93,24 @@ public class TabProject extends AbstractTab<BoxProject> {
     }
     
 
-    @Override
     public List<String> getAuthorizedSingle()
     {
+        if(this.authorizedSingle==null) {
+            this.authorizedSingle = new ArrayList<String>();
+        }
         return authorizedSingle;
     }
 
-    @Override
     public void setAuthorizedSingle(List<String> authorizedSingle)
     {
         this.authorizedSingle = authorizedSingle; 
     }
 
-    @Override
     public List<String> getAuthorizedGroup()
     {
+        if(this.authorizedGroup==null) {
+            this.authorizedGroup = new ArrayList<String>();
+        }
         return authorizedGroup;
     }
 
