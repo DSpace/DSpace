@@ -168,7 +168,10 @@ public class StartupMetadataConfiguratorTool
         Map<String, List<List<String>>> tab2boxMap = new HashMap<String, List<List<String>>>();
         Map<String, List<List<String>>> etab2boxMap = new HashMap<String, List<List<String>>>();
         Map<String, List<List<String>>> box2metadataMap = new HashMap<String, List<List<String>>>();
-
+        Map<String, List<List<String>>> tab2Policies = new HashMap<String, List<List<String>>>();
+        Map<String, List<List<String>>> etab2Policies = new HashMap<String, List<List<String>>>();
+        Map<String, List<List<String>>> box2Policies= new HashMap<String, List<List<String>>>();
+        
 		Map<String, List<String>> controlledListMap = new HashMap<String, List<String>>();
 
         PlatformTransactionManager transactionManager = (PlatformTransactionManager) dspace
@@ -192,7 +195,12 @@ public class StartupMetadataConfiguratorTool
             buildMap(workbook, "tab2box", tab2boxMap, 0);
             buildMap(workbook, "etab2box", etab2boxMap, 0);
             buildMap(workbook, "box2metadata", box2metadataMap, 0);
+            buildMap(workbook, "tabpolicy", tab2Policies, 0);
+            buildMap(workbook, "etabpolicy", etab2Policies, 0);
+            buildMap(workbook, "boxpolicy", box2Policies, 0);
+            
 			buildControlledList(workbook, "controlledlist", controlledListMap);
+			
 
 			buildResearchObject(workbook, "utilsdata", applicationService, transactionManager, status);
 			
@@ -282,44 +290,46 @@ public class StartupMetadataConfiguratorTool
             for (String key : tabMap.keySet())
             {
                 List<List<String>> rows = tabMap.get(key);
+                List<List<String>> policies = tab2Policies.get(key);
                 if (key.equals("rp"))
                 {
-                    buildTab(applicationService, rows, TabResearcherPage.class);
+                    buildTab(applicationService, rows, policies, TabResearcherPage.class);
                 }
                 else if (key.equals("pj"))
                 {
-                    buildTab(applicationService, rows, TabProject.class);
+                    buildTab(applicationService, rows, policies, TabProject.class);
                 }
                 else if (key.equals("ou"))
                 {
-                    buildTab(applicationService, rows,
+                    buildTab(applicationService, rows, policies, 
                             TabOrganizationUnit.class);
                 }
                 else
                 {
-                    buildTab(applicationService, rows, TabDynamicObject.class);
+                    buildTab(applicationService, rows, policies, TabDynamicObject.class);
                 }
             }
             for (String key : etabMap.keySet())
             {
                 List<List<String>> rows = etabMap.get(key);
+                List<List<String>> policies = etab2Policies.get(key);
                 if (key.equals("rp"))
-                {
-                    buildTab(applicationService, rows,
+                { 
+                    buildTab(applicationService, rows, policies,
                             EditTabResearcherPage.class);
                 }
                 else if (key.equals("pj"))
                 {
-                    buildTab(applicationService, rows, EditTabProject.class);
+                    buildTab(applicationService, rows, policies, EditTabProject.class);
                 }
                 else if (key.equals("ou"))
                 {
-                    buildTab(applicationService, rows,
+                    buildTab(applicationService, rows, policies,
                             EditTabOrganizationUnit.class);
                 }
                 else
                 {
-                    buildTab(applicationService, rows,
+                    buildTab(applicationService, rows, policies,
                             EditTabDynamicObject.class);
                 }
             }
@@ -327,22 +337,23 @@ public class StartupMetadataConfiguratorTool
             for (String key : boxMap.keySet())
             {
                 List<List<String>> rows = boxMap.get(key);
+                List<List<String>> policies = box2Policies.get(key);
                 if (key.equals("rp"))
                 {
-                    buildBox(applicationService, rows, BoxResearcherPage.class);
+                    buildBox(applicationService, rows, policies, BoxResearcherPage.class);
                 }
                 else if (key.equals("pj"))
                 {
-                    buildBox(applicationService, rows, BoxProject.class);
+                    buildBox(applicationService, rows, policies, BoxProject.class);
                 }
                 else if (key.equals("ou"))
                 {
-                    buildBox(applicationService, rows,
+                    buildBox(applicationService, rows, policies,
                             BoxOrganizationUnit.class);
                 }
                 else
                 {
-                    buildBox(applicationService, rows, BoxDynamicObject.class);
+                    buildBox(applicationService, rows, policies, BoxDynamicObject.class);
                 }
             }
 
@@ -532,7 +543,7 @@ public class StartupMetadataConfiguratorTool
 	}
 
     private static <H extends IPropertyHolder<Containable>, T extends Tab<H>> void buildTab(
-            ApplicationService applicationService, List<List<String>> rows,
+            ApplicationService applicationService, List<List<String>> rows, List<List<String>> policies,
             Class<T> clazzTab)
                     throws InstantiationException, IllegalAccessException
     {
@@ -542,19 +553,23 @@ public class StartupMetadataConfiguratorTool
             String label = row.get(2);
             boolean mandatory = row.get(3).equals("y") ? true : false;
             String priority = row.get(4);
-            Integer accessLevel = AccessLevelConstants.ADMIN_ACCESS;
+            Integer accessLevel = VisibilityTabConstant.ADMIN;
             String tmpAccessLevel = row.get(5);
             if (tmpAccessLevel.equals("STANDARD_ACCESS"))
             {
-                accessLevel = AccessLevelConstants.STANDARD_ACCESS;
+                accessLevel = VisibilityTabConstant.STANDARD;
             }
             else if (tmpAccessLevel.equals("HIGH_ACCESS"))
             {
-                accessLevel = AccessLevelConstants.HIGH_ACCESS;
+                accessLevel = VisibilityTabConstant.HIGH;
             }
             else if (tmpAccessLevel.equals("LOW_ACCESS"))
             {
-                accessLevel = AccessLevelConstants.LOW_ACCESS;
+                accessLevel = VisibilityTabConstant.LOW;
+            }
+            else if (tmpAccessLevel.equals("POLICY_ACCESS"))
+            {
+                accessLevel = VisibilityTabConstant.POLICY;
             }
             String ext = row.get(6);
             String mime = row.get(7);
@@ -565,50 +580,62 @@ public class StartupMetadataConfiguratorTool
             {
                 tabRP = clazzTab.newInstance();
                 tabRP.setShortName(shortName);
-                tabRP.setExt(ext);
-                tabRP.setMime(mime);
-                tabRP.setMandatory(mandatory);
-                tabRP.setPriority(Integer.parseInt(priority));
-                tabRP.setTitle(label);
-                tabRP.setVisibility(accessLevel);
-                if (TabDynamicObject.class.isAssignableFrom(clazzTab))
-                {
-                    TabDynamicObject tabDynamicObject = (TabDynamicObject) tabRP;
-                    tabDynamicObject
-                            .setTypeDef(applicationService.findTypoByShortName(
-                                    DynamicObjectType.class, row.get(0)));
-                }
-                if (EditTabDynamicObject.class.isAssignableFrom(clazzTab))
-                {
-                    EditTabDynamicObject tabDynamicObject = (EditTabDynamicObject) tabRP;
-                    tabDynamicObject
-                            .setTypeDef(applicationService.findTypoByShortName(
-                                    DynamicObjectType.class, row.get(0)));
-                }
-                applicationService.saveOrUpdate(clazzTab, tabRP);
+
             }
-            else
+            if (TabDynamicObject.class.isAssignableFrom(clazzTab))
             {
-                if (TabDynamicObject.class.isAssignableFrom(clazzTab))
-                {
-                    TabDynamicObject tabDynamicObject = (TabDynamicObject) tabRP;
-                    tabDynamicObject
-                            .setTypeDef(applicationService.findTypoByShortName(
-                                    DynamicObjectType.class, row.get(0)));
-                }
-                if (EditTabDynamicObject.class.isAssignableFrom(clazzTab))
-                {
-                    EditTabDynamicObject tabDynamicObject = (EditTabDynamicObject) tabRP;
-                    tabDynamicObject
-                            .setTypeDef(applicationService.findTypoByShortName(
-                                    DynamicObjectType.class, row.get(0)));
-                }
+                TabDynamicObject tabDynamicObject = (TabDynamicObject) tabRP;
+                tabDynamicObject
+                        .setTypeDef(applicationService.findTypoByShortName(
+                                DynamicObjectType.class, row.get(0)));
             }
+            if (EditTabDynamicObject.class.isAssignableFrom(clazzTab))
+            {
+                EditTabDynamicObject tabDynamicObject = (EditTabDynamicObject) tabRP;
+                tabDynamicObject
+                        .setTypeDef(applicationService.findTypoByShortName(
+                                DynamicObjectType.class, row.get(0)));
+            }
+            internalUpdateTab(applicationService, policies, clazzTab, row,
+                    shortName, label, mandatory, priority, accessLevel, ext,
+                    mime, tabRP);
         }
     }
 
+    private static <H extends IPropertyHolder<Containable>, T extends Tab<H>> void internalUpdateTab(
+            ApplicationService applicationService, List<List<String>> policies,
+            Class<T> clazzTab, List<String> row, String shortName, String label,
+            boolean mandatory, String priority, Integer accessLevel, String ext,
+            String mime, T tabRP)
+    {
+        tabRP.setExt(ext);
+        tabRP.setMime(mime);
+        tabRP.setMandatory(mandatory);
+        tabRP.setPriority(Integer.parseInt(priority));
+        tabRP.setTitle(label);
+        tabRP.setVisibility(accessLevel);
+        if(VisibilityTabConstant.POLICY.equals(tabRP.getVisibility())) {
+            tabRP.getAuthorizedGroup().clear();
+            tabRP.getAuthorizedSingle().clear();
+            for(List<String> lpolicy : policies) {                      
+                if("group".equals(lpolicy.get(3))) {  
+                    if(shortName.equals(lpolicy.get(1))) {    
+                        tabRP.getAuthorizedGroup().add(lpolicy.get(2));    
+                    }
+                } else {
+                    if("eperson".equals(lpolicy.get(3))) {  
+                        if(shortName.equals(lpolicy.get(1))) {    
+                            tabRP.getAuthorizedSingle().add(lpolicy.get(2));    
+                        }
+                    }    
+                }
+            }
+        }
+        applicationService.saveOrUpdate(clazzTab, tabRP);
+    }
+
     private static <H extends Box<Containable>> void buildBox(
-            ApplicationService applicationService, List<List<String>> rows,
+            ApplicationService applicationService, List<List<String>> rows, List<List<String>> policies,
             Class<H> clazzBox)
                     throws InstantiationException, IllegalAccessException
     {
@@ -626,36 +653,70 @@ public class StartupMetadataConfiguratorTool
             String tmpAccessLevel = row.get(7);
             if (tmpAccessLevel.equals("STANDARD_ACCESS"))
             {
-                accessLevel = AccessLevelConstants.STANDARD_ACCESS;
+                accessLevel = VisibilityTabConstant.STANDARD;
             }
             else if (tmpAccessLevel.equals("HIGH_ACCESS"))
             {
-                accessLevel = AccessLevelConstants.HIGH_ACCESS;
+                accessLevel = VisibilityTabConstant.HIGH;
             }
             else if (tmpAccessLevel.equals("LOW_ACCESS"))
             {
-                accessLevel = AccessLevelConstants.LOW_ACCESS;
+                accessLevel = VisibilityTabConstant.LOW;
             }
-
+            else if (tmpAccessLevel.equals("POLICY_ACCESS"))
+            {
+                accessLevel = VisibilityTabConstant.POLICY;
+            }
             H box = applicationService.getBoxByShortName(clazzBox, shortname);
 
             if (box == null)
             {
                 box = clazzBox.newInstance();
-                box.setCollapsed(collapse);
-                box.setExternalJSP(externaljsp);
-                box.setPriority(Integer.parseInt(priority));
                 box.setShortName(shortname);
-                box.setTitle(label);
-                box.setUnrelevant(unrelevant);
-                box.setVisibility(accessLevel);
-                if(BoxDynamicObject.class.isAssignableFrom(clazzBox)) {
-                    BoxDynamicObject boxDynamicObject = (BoxDynamicObject)box;
-                    boxDynamicObject.setTypeDef(applicationService.findTypoByShortName(DynamicObjectType.class, row.get(0)));
+            }
+            
+            internalUpdateBox(applicationService, policies, clazzBox, row,
+                    collapse, externaljsp, priority, shortname, label,
+                    unrelevant, accessLevel, box);
+        }
+    }
+
+    private static <H extends Box<Containable>> void internalUpdateBox(
+            ApplicationService applicationService, List<List<String>> policies,
+            Class<H> clazzBox, List<String> row, boolean collapse,
+            String externaljsp, String priority, String shortname, String label,
+            boolean unrelevant, Integer accessLevel, H box)
+    {
+        box.setCollapsed(collapse);
+        box.setExternalJSP(externaljsp);
+        box.setPriority(Integer.parseInt(priority));
+        box.setTitle(label);
+        box.setUnrelevant(unrelevant);
+        box.setVisibility(accessLevel);
+        if(BoxDynamicObject.class.isAssignableFrom(clazzBox)) {
+            BoxDynamicObject boxDynamicObject = (BoxDynamicObject)box;
+            boxDynamicObject.setTypeDef(applicationService.findTypoByShortName(DynamicObjectType.class, row.get(0)));
+        }
+        if(VisibilityTabConstant.POLICY.equals(box.getVisibility())) {
+            box.getAuthorizedGroup().clear();
+            box.getAuthorizedSingle().clear();
+            for(List<String> lpolicy : policies) {                      
+                if(!lpolicy.isEmpty()) {
+                    if("group".equals(lpolicy.get(3))) {  
+                        if(shortname.equals(lpolicy.get(1))) {    
+                            box.getAuthorizedGroup().add(lpolicy.get(2));    
+                        }
+                    } else {
+                        if("eperson".equals(lpolicy.get(3))) {  
+                            if(shortname.equals(lpolicy.get(1))) {    
+                                box.getAuthorizedSingle().add(lpolicy.get(2));    
+                            }
+                        }    
+                    }
                 }
-                applicationService.saveOrUpdate(clazzBox, box);
             }
         }
+        applicationService.saveOrUpdate(clazzBox, box);
     }
 
 	private static void buildResearchObject(Workbook workbook, String sheetName,
