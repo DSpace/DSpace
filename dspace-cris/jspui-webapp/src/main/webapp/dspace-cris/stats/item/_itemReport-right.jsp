@@ -19,7 +19,7 @@
 <c:if test="${monthlysubscribed}">&amp;freq=30</c:if>
 </c:set>
 
- <div style="margin-top:1.5em;" class="form-group">
+ <div style="margin-top:2.3em;" class="form-group">
 	<ul class="nav nav-tabs">
 				<c:if test="${type ne 'bitstream'}">
 					<c:set var="activeBitstream"></c:set><li class="active"><a href="${link}&amp;type=item"><fmt:message key="view.stats.tab.statistics.view" /></a></li>

@@ -19,11 +19,11 @@
 <c:if test="${weeklysubscribed}">&amp;freq=7</c:if>
 <c:if test="${monthlysubscribed}">&amp;freq=30</c:if>
 </c:set>
- <div style="margin-top:1.5em;" class="form-group">
+ <div style="margin-top:2.3em;" class="form-group">
 	<div class="col-md-12">
 		<div>
 		<ul class="nav nav-tabs">
-			<li class="<c:if test="${type ne 'item' && type ne 'bitstream'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}"><fmt:message key="view.stats-collection.selectedObject.page.title" /></a></li>
+			<li class="<c:if test="${type ne 'item' && type ne 'bitstream'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=selected"><fmt:message key="view.stats-collection.selectedObject.page.title" /></a></li>
 			<li class="<c:if test="${type eq 'item'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=item"><fmt:message key="view.stats-collection.top.item.page.title" /></a></li>
 			<li class="<c:if test="${type eq 'bitstream'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=bitstream"><fmt:message key="view.stats-collection.top.bitstream.page.title" /></a></li>
 		 <c:if test="${data.seeUpload}">			
