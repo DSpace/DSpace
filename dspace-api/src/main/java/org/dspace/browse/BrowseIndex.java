@@ -13,6 +13,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
@@ -697,6 +698,43 @@ public final class BrowseIndex
 
         return bis;
     }
+    
+    /**
+     * Get an array of the browse indices for the current configuration of the communities 
+     * 
+     * @return	an array of all the current browse indices for communities
+     * @throws BrowseException
+     */
+    public static BrowseIndex[] getBrowseCommunityIndices()
+    	throws BrowseException
+    {
+
+        ArrayList<BrowseIndex> browseIndices = new ArrayList<BrowseIndex>();
+        String commBrowseIdx = ConfigurationManager.getProperty("webui.browse.community.index");
+        
+        if(!StringUtils.isNotBlank(commBrowseIdx)){
+        	return getBrowseIndices();
+        }
+        
+        String[] browseIdxs = StringUtils.split(commBrowseIdx, ",");
+        
+        for(String idx: browseIdxs){
+        	String definition = ConfigurationManager.getProperty("webui.browse.index." + idx);
+        	if(StringUtils.isNotBlank(definition)){
+                BrowseIndex bi = new BrowseIndex(definition, Integer.parseInt(idx));
+    			bi.displayFrequencies = Boolean.valueOf(ConfigurationManager
+    					.getBooleanProperty("webui.browse.metadata.show-freq."
+    							+ idx, true));
+
+                browseIndices.add(bi);
+        	}
+        	
+        }
+        BrowseIndex[] bis = new BrowseIndex[browseIndices.size()];
+        bis = browseIndices.toArray(bis);
+
+        return bis;
+    }    
 
     /**
      * Get the browse index from configuration with the specified name.

@@ -68,7 +68,7 @@
     boolean remove_button = (remove_b == null ? false : remove_b.booleanValue());
 
 	// get the browse indices
-    BrowseIndex[] bis = BrowseIndex.getBrowseIndices();
+    BrowseIndex[] bis = BrowseIndex.getBrowseCommunityIndices();
 
     // Put the metadata values into guaranteed non-null variables
     String name = community.getMetadata("name");
