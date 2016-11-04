@@ -385,12 +385,12 @@ public class SolrBrowseDAO implements BrowseDAO
         if (isAscending)
         {
         	// esclusive right range query [] is for inclusive, {} for esclusive
-            query.setQuery("bi_"+column + "_sort" + ": [* TO \"" + value + "\"}");
+            query.setQuery("bi_"+column + "_sort" + ":[* TO \"" + value + "\"}");
         }
         else
         {
         	// esclusive left range query
-            query.setQuery("bi_" + column + "_sort" + ": {\"" + value + "\" TO *]");
+            query.setQuery("bi_" + column + "_sort" + ":{\"" + value + "\" TO *]");
 	        query.addFilterQueries("-(bi_" + column + "_sort" + ":" + value + "*)");
         }
 	    boolean includeUnDiscoverable = itemsWithdrawn || !itemsDiscoverable;
