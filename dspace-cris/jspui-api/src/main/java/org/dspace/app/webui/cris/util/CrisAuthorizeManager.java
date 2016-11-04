@@ -18,37 +18,38 @@ import it.cilea.osd.jdyna.web.ITabService;
 public class CrisAuthorizeManager
 {
 
-    public static <A extends AuthorizationContext, T extends ACrisObject> boolean authorize(Context context, ITabService applicationService, Class<T> clazz, Integer id, A authorizedObject)
-            throws SQLException
+    public static <A extends AuthorizationContext, T extends ACrisObject> boolean authorize(
+            Context context, ITabService applicationService, Class<T> clazz,
+            Integer id, A authorizedObject) throws SQLException
     {
         Integer visibility = authorizedObject.getVisibility();
-        if(VisibilityTabConstant.HIGH.equals(visibility)) {
+        if (VisibilityTabConstant.HIGH.equals(visibility))
+        {
             return true;
         }
-        
-                
+
         boolean result = false;
         T object = null;
         try
         {
-            object = ((ApplicationService) applicationService).get(
-                    clazz, id);
+            object = ((ApplicationService) applicationService).get(clazz, id);
         }
         catch (NumberFormatException e)
         {
             throw new RuntimeException(e);
         }
-        
+
         EPerson currUser = context.getCurrentUser();
-      
+
         if (visibility != VisibilityTabConstant.POLICY)
         {
             boolean isOwner = false;
-            
-            if(currUser!=null) {
+
+            if (currUser != null)
+            {
                 isOwner = object.isOwner(currUser);
             }
-            
+
             // check admin authorization
             if (AuthorizeManager.isAdmin(context))
             {
@@ -73,7 +74,7 @@ public class CrisAuthorizeManager
             }
 
         }
-        
+
         if (currUser != null)
         {
             List<String> listPolicySingle = authorizedObject
@@ -94,27 +95,41 @@ public class CrisAuthorizeManager
                 }
             }
         }
-        
+
         List<String> listPolicyGroup = authorizedObject.getAuthorizedGroup();
-        
-        if(listPolicyGroup!=null && !listPolicyGroup.isEmpty()) {
-            for(String policy : listPolicyGroup) {
-                String data = object.getMetadata(policy);
-                if(StringUtils.isNotBlank(data)) {
-                    Group group = Group.find(context, Integer.parseInt(data));
-                    if(group!=null) {
-                        if(currUser==null && group.getID()==0) {
-                            return Group.isMember(context, 0);
-                        }
-                        if(Group.isMember(context, group.getID())) {
-                            return true;
+
+        if (listPolicyGroup != null && !listPolicyGroup.isEmpty())
+        {
+            for (String policy : listPolicyGroup)
+            {
+                List<String> policies = object.getMetadataValue(policy);
+                for (String data : policies)
+                {
+                    if (StringUtils.isNotBlank(data))
+                    {
+                        Group group = Group.find(context,
+                                Integer.parseInt(data));
+                        if (group != null)
+                        {
+                            if (currUser == null && group.getID() == 0)
+                            {
+                                boolean isMember = Group.isMember(context, 0);
+                                if (isMember)
+                                {
+                                    return true;
+                                }
+                            }
+                            if (Group.isMember(context, group.getID()))
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
             }
         }
-        
+
         return result;
     }
-    
+
 }
