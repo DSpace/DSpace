@@ -8,7 +8,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>		
-        <root.basedir>${basedir}/../..</root.basedir>
+        <root.basedir>${basedir}/../../..</root.basedir>
 	</properties>
 
 	<parent>

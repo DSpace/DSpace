@@ -1,3 +1,11 @@
+--
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
+--
+-- http://www.dspace.org/license/
+--
+
 create table cris_do_box2policygroup (box_id number(10,0) not null, authorizedGroup varchar2(255 char));
 create table cris_do_box2policysingle (box_id number(10,0) not null, authorizedSingle varchar2(255 char));
 create table cris_do_tab2policygroup (tab_id number(10,0) not null, authorizedGroup varchar2(255 char));
