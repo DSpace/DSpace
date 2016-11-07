@@ -711,51 +711,52 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             List<Collection> allCollections = new ArrayList<>();
             
-            for( ResourcePolicy rp: collectionsPolicies){
-                Collection collection = ContentServiceFactory.getInstance().getCollectionService()
-                        .find(context, rp.getdSpaceObject().getID());
-                allCollections.add(collection);
-            }
-
-            if (CollectionUtils.isNotEmpty(communitiesPolicies) || CollectionUtils.isNotEmpty(allCollections)) 
-            {
-                locationQuery.append("location:( ");
-
-                for (int i = 0; i< communitiesPolicies.size(); i++) 
-                {
-                    ResourcePolicy rp = communitiesPolicies.get(i);
-                    Community community = ContentServiceFactory.getInstance().getCommunityService()
-                            .find(context, rp.getdSpaceObject().getID());
-                
-                    locationQuery.append("m").append(community.getID());
-
-                    if (i != (communitiesPolicies.size() - 1)) {
-                        locationQuery.append(" OR ");
-                    }
-                    allCollections.addAll(ContentServiceFactory.getInstance().getCommunityService()
-                            .getAllCollections(context, community));
-                }
-
-                Iterator<Collection> collIter = allCollections.iterator();
-
-                if (communitiesPolicies.size() > 0 && allCollections.size() > 0) {
-                    locationQuery.append(" OR ");
-                }
-
-                while (collIter.hasNext()) {
-                    locationQuery.append("l").append(collIter.next().getID());
-
-                    if (collIter.hasNext()) {
-                        locationQuery.append(" OR ");
-                    }
-                }
-                locationQuery.append(")");
+            if(communitiesPolicies.size() != 0 || collectionsPolicies.size() != 0){
+            	
+            	locationQuery.append("location:( ");
+            	
+            	locationQuery.append(this.getLocationOfEachResourcePolicy(communitiesPolicies, context));
+            	
+            	locationQuery.append(this.getLocationOfEachResourcePolicy(collectionsPolicies, context));
+	            
+	            locationQuery.append(" )");
             } else {
                 log.warn("We have a collection or community admin with ID: " + context.getCurrentUser().getID()
                         + " without any administrable collection or community!");
             }
         }
         return locationQuery.toString();
+    }
+    
+    private String getLocationOfEachResourcePolicy(List<ResourcePolicy> resourcePolicies, Context context) throws SQLException{
+    	
+    	StringBuilder locationQuery = new StringBuilder();
+
+    	for (int i = 0; i< resourcePolicies.size(); i++) 
+    	{
+    		ResourcePolicy rp = resourcePolicies.get(i);
+    		
+    		if(rp.getdSpaceObject() instanceof Collection)
+    		{
+    			Collection collection = ContentServiceFactory.getInstance().getCollectionService()
+    					.find(context, rp.getdSpaceObject().getID());
+            
+    			locationQuery.append("l").append(collection.getID());
+    		}
+    		else if(rp.getdSpaceObject() instanceof Community)
+    		{
+    			Community community = ContentServiceFactory.getInstance().getCommunityService()
+                        .find(context, rp.getdSpaceObject().getID());
+            
+                locationQuery.append("m").append(community.getID());
+    		}
+    		
+    		if (i != (resourcePolicies.size() - 1))
+    		{
+                locationQuery.append(" OR ");
+            }
+        }
+    	return locationQuery.toString();
     }
 
     /**
