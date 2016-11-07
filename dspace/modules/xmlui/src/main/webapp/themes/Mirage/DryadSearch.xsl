@@ -27,6 +27,7 @@
             <xsl:with-param name="itemUrl" select="false"/>
             <xsl:with-param name="itemWithdrawn" select="$itemWithdrawn"/>
             <xsl:with-param name="doiIdentifier" select="$doiIdentifier"/>
+            <xsl:with-param name="isWorkflow" select="boolean(.//dim:field[@element='workflow'][@mdschema='internal'][@qualifier='submitted'])"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -47,6 +48,7 @@
         <xsl:param name="itemUrl"/>
         <xsl:param name="itemWithdrawn"/>
         <xsl:param name="doiIdentifier"/>
+        <xsl:param name="isWorkflow" select="false()"/>
 
         <div class="artifact-description" style="padding: 6px;">
             <xsl:element name="a">
@@ -174,18 +176,22 @@
                     </span>
                     <xsl:text> </xsl:text>
                 </xsl:if>
-                <span class="doi">
-                    <xsl:variable name="id"
-                                  select="dim:field[@element='identifier'][not(@qualifier)][@mdschema='dc'][1]"/>
-                     <xsl:choose>         
-                       <xsl:when test="$id[starts-with(., 'doi')]">
-                        <xsl:value-of select="concat('http://dx.doi.org/',substring-after($id,'doi:'))"/>
-                       </xsl:when>
-                       <xsl:when test="$id[starts-with(.,'http')]">
-                         <xsl:value-of select="$id"/>
-                       </xsl:when>
-                     </xsl:choose>
-                </span>
+                <xsl:if test="not($isWorkflow)">
+                    <xsl:if test="$doiIdentifier">
+                    <span class="doi">
+                        <xsl:variable name="id"
+                                      select="dim:field[@element='identifier'][not(@qualifier)][@mdschema='dc'][1]"/>
+                         <xsl:choose>
+                           <xsl:when test="$id[starts-with(., 'doi')]">
+                            <xsl:value-of select="concat('http://dx.doi.org/',substring-after($id,'doi:'))"/>
+                           </xsl:when>
+                           <xsl:when test="$id[starts-with(.,'http')]">
+                             <xsl:value-of select="$id"/>
+                           </xsl:when>
+                         </xsl:choose>
+                    </span>
+                    </xsl:if>
+                </xsl:if>
             </xsl:element>
             <span class="Z3988">
                 <xsl:attribute name="title">
