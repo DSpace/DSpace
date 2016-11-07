@@ -1,0 +1,34 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Bitstream</title>
+        <contributor.author>Andrea Bollini</contributor.author>
+        <contributor.author>Luigi Andrea Pascarelli</contributor.author>
+        <contributor.author>Riccardo Fazio</contributor.author>
+    </dspace-header>
+
+    <dc-schema>
+        <name>bundle</name>
+        <namespace>http://dspace.org/bundle</namespace>
+    </dc-schema>
+
+    <dc-schema>
+        <name>bitstream</name>
+        <namespace>http://dspace.org/bitstream</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>bitstream</schema>
+        <element>viewer</element>
+        <qualifier>provider</qualifier>
+        <scope_note>Metadata field used to register custom viewer</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>bitstream</schema>
+        <element>master</element>
+        <scope_note>Metadata field used to link an alternative (mostly
+					for access) copy to the master one</scope_note>
+    </dc-type>
+
+</dspace-dc-types>
