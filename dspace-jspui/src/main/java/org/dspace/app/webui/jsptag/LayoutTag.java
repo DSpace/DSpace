@@ -196,6 +196,11 @@ public class LayoutTag extends BodyTagSupport
                         parentLinks.add("/handle/" + comms[i].getHandle());
                     }
                 }
+                Community com = (Community) request.getAttribute("dspace.community");
+                if (com != null) {
+                	parents.add(com.getMetadata("name"));
+                    parentLinks.add("/handle/" + com.getHandle());
+                }
             }
             else if (locbar.equalsIgnoreCase("nolink"))
             {
