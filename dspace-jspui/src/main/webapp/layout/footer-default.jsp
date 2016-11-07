@@ -51,10 +51,11 @@
     }
 %>
 </div>
+<br/>
 </main>
             <%-- Page footer --%>
             <footer class="navbar navbar-inverse navbar-bottom navbar-square">
-	             <div class="container">
+             <div class="container">
 	             <div class="row">
 					<div class="col-md-3 col-sm-6">
 	             		<div class="panel panel-default">
@@ -81,6 +82,7 @@
 	             		<%= footerNews %>
 	             	</div>
 	            </div> 
+            </div>
 			<div class="container-fluid extra-footer row">
       			<div id="footer_feedback" class="col-sm-4 pull-<%= isRtl ? "right":"left" %>">                                    
                      <a href="<%= request.getContextPath() %>/feedback"><fmt:message key="jsp.layout.footer-default.feedback"/></a>

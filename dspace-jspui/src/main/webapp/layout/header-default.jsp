@@ -242,11 +242,11 @@
 		
 		
 		</div>
-		  <div class="col-sm-4 brand pull-<%= isRtl ?"right" :"left" %>">
+		  <div class="col-sm-8 brand pull-<%= isRtl ?"right" :"left" %>">
 		<h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
         <fmt:message key="jsp.layout.header-default.brand.description" /> 
         </div>
-        <div class="col-sm-8 hidden-xs pull-<%= isRtl ?"left" :"right" %>"><img class="img-responsive" src="<%= request.getContextPath() %>/image/logo-trasparent.png" alt="DSpace logo" />
+        <div class="col-sm-4 hidden-xs pull-<%= isRtl ?"left" :"right" %>"><img class="img-responsive" src="<%= request.getContextPath() %>/image/logo.gif" alt="DSpace logo" />
         </div>
 	</div>
 </div>	
