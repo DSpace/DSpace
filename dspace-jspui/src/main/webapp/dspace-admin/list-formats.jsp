@@ -161,8 +161,7 @@
                         </select>
                      </div>
                      <div class="form-group">
-                        <input class="form-control"
-                               type="checkbox"
+                        <input type="checkbox"
                                name="internal"
                                value="true"
                                <%= format.isInternal() ? " checked=\"checked\"" : "" %>/>
