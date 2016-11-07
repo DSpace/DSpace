@@ -50,6 +50,8 @@ public class Community extends DSpaceObject{
     private List<Community> subcommunities = new ArrayList<Community>();
 
     private List<Collection> collections = new ArrayList<Collection>();
+    // Permissions
+    private Permission permission;
 
     public Community(){}
 
@@ -60,6 +62,8 @@ public class Community extends DSpaceObject{
 
     private void setup(org.dspace.content.Community community, ServletContext servletContext, String expand, Context context) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
+        PermissionUtil permUtil = new PermissionUtil();
+
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
@@ -115,6 +119,13 @@ public class Community extends DSpaceObject{
             }
         } else {
             this.addExpand("logo");
+        }
+
+        if(expandFields.contains("permission") | expandFields.contains("all")) {
+            this.setPermission(permUtil.getPermission(context, community));
+
+        } else {
+            this.addExpand("permission");
         }
 
         if(!expandFields.contains("all")) {
@@ -195,5 +206,9 @@ public class Community extends DSpaceObject{
 	public void setSubcommunities(List<Community> subcommunities) {
 		this.subcommunities = subcommunities;
 	}
+
+    public void setPermission(Permission permission) {this.permission = permission; }
+
+    public Permission getPermission() {return permission; }
     
 }
