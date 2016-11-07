@@ -42,6 +42,8 @@ public class Collection extends DSpaceObject {
     private Bitstream logo;
     private Community parentCommunity;
     private List<Community> parentCommunityList = new ArrayList<Community>();
+    // Permissions
+    private Permission permission;
 
     private List<Item> items = new ArrayList<Item>();
 
@@ -61,6 +63,7 @@ public class Collection extends DSpaceObject {
 
     private void setup(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
+        PermissionUtil permUtil = new PermissionUtil();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
@@ -115,6 +118,13 @@ public class Collection extends DSpaceObject {
         }
         else {
         	this.addExpand("logo");
+        }
+
+        if(expandFields.contains("permission") | expandFields.contains("all")) {
+            this.setPermission(permUtil.getPermission(context, collection));
+
+        } else {
+            this.addExpand("permission");
         }
 
         if(!expandFields.contains("all")) {
@@ -203,4 +213,8 @@ public class Collection extends DSpaceObject {
 	public void setSidebarText(String sidebarText) {
 		this.sidebarText = sidebarText;
 	}
+
+    public void setPermission(Permission permission) {this.permission = permission; }
+
+    public Permission getPermission() {return permission; }
 }
