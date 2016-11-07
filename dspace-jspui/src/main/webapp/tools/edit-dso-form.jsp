@@ -220,10 +220,13 @@
 						<td><fmt:message key="jsp.tools.edit-dso-form.parents" />
 						</td>
 						<td>
+							<% if (parent != null) { %>
 							<%= parent.getName() %> - <%= parent.getTypeText() %> ID: <%= parent.getID() %> 
 							<a class="btn btn-warning"
     							href="<%= request.getContextPath() %>/tools/edit-dso?resource_type=<%= parent.getType() %>&resource_id=<%= parent.getID() %>"><fmt:message key="jsp.tools.general.edit"/></a></h3>	
-							
+							<% } else { %>
+								<fmt:message key="jsp.tools.edit-dso-form.na" />
+							<% } %>
 						</td>
 					</tr>
 					<tr>
