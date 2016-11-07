@@ -197,9 +197,14 @@ public class LayoutTag extends BodyTagSupport
                     }
                 }
                 Community com = (Community) request.getAttribute("dspace.community");
-                if (com != null) {
+                Collection coll = (Collection) request.getAttribute("dspace.collection");
+                if (com != null && coll == null) {
                 	parents.add(com.getMetadata("name"));
                     parentLinks.add("/handle/" + com.getHandle());
+                }
+                if (coll != null) {
+                	parents.add(coll.getMetadata("name"));
+                    parentLinks.add("/handle/" + coll.getHandle());
                 }
             }
             else if (locbar.equalsIgnoreCase("nolink"))
