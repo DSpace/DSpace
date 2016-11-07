@@ -103,6 +103,75 @@ public class MediaFilterManager
         }
     }
     
+    public static void init(String[] filterNames) {
+        if (filterNames == null)
+        { 
+            //retrieve list of all enabled media filter plugins!
+            String enabledPlugins = ConfigurationManager.getProperty(MEDIA_FILTER_PLUGINS_KEY);
+            filterNames = enabledPlugins.split(",\\s*");
+        }
+                
+        //initialize an array of our enabled filters
+        List<FormatFilter> filterList = new ArrayList<FormatFilter>();
+                
+        //set up each filter
+        for(int i=0; i< filterNames.length; i++)
+        {
+            //get filter of this name & add to list of filters
+            FormatFilter filter = (FormatFilter) PluginManager.getNamedPlugin(FormatFilter.class, filterNames[i]);
+            if(filter==null)
+            {   
+                System.err.println("\nERROR: Unknown MediaFilter specified (either from command-line or in dspace.cfg): '" + filterNames[i] + "'");
+                System.exit(1);
+            }
+            else
+            {   
+                filterList.add(filter);
+                       
+                String filterClassName = filter.getClass().getName();
+                           
+                String pluginName = null;
+                           
+                //If this filter is a SelfNamedPlugin,
+                //then the input formats it accepts may differ for
+                //each "named" plugin that it defines.
+                //So, we have to look for every key that fits the
+                //following format: filter.<class-name>.<plugin-name>.inputFormats
+                if( SelfNamedPlugin.class.isAssignableFrom(filter.getClass()) )
+                {
+                    //Get the plugin instance name for this class
+                    pluginName = ((SelfNamedPlugin) filter).getPluginInstanceName();
+                }
+            
+                
+                //Retrieve our list of supported formats from dspace.cfg
+                //For SelfNamedPlugins, format of key is:  
+                //  filter.<class-name>.<plugin-name>.inputFormats
+                //For other MediaFilters, format of key is: 
+                //  filter.<class-name>.inputFormats
+                String formats = ConfigurationManager.getProperty(
+                    FILTER_PREFIX + "." + filterClassName + 
+                    (pluginName!=null ? "." + pluginName : "") +
+                    "." + INPUT_FORMATS_SUFFIX);
+            
+                //add to internal map of filters to supported formats	
+                if (formats != null)
+                {
+                    //For SelfNamedPlugins, map key is:  
+                    //  <class-name><separator><plugin-name>
+                    //For other MediaFilters, map key is just:
+                    //  <class-name>
+                    filterFormats.put(filterClassName + 
+        	            (pluginName!=null ? FILTER_PLUGIN_SEPARATOR + pluginName : ""),
+        	            Arrays.asList(formats.split(",[\\s]*")));
+                }
+            }//end if filter!=null
+        }//end for
+        
+        //store our filter list into an internal array
+        filterClasses = (FormatFilter[]) filterList.toArray(new FormatFilter[filterList.size()]);
+    }
+    
     public static void main(String[] argv) throws Exception
     {
         // set headless for non-gui workstations
@@ -199,7 +268,7 @@ public class MediaFilterManager
         	}
         }
 
-        String filterNames[] = null;
+        String[] filterNames = null;
         if(line.hasOption('p'))
         {
             //specified which media filter plugins we are using
@@ -214,70 +283,8 @@ public class MediaFilterManager
                 System.exit(1);
              }
         }
-        else
-        { 
-            //retrieve list of all enabled media filter plugins!
-            String enabledPlugins = ConfigurationManager.getProperty(MEDIA_FILTER_PLUGINS_KEY);
-            filterNames = enabledPlugins.split(",\\s*");
-        }
-                
-        //initialize an array of our enabled filters
-        List<FormatFilter> filterList = new ArrayList<FormatFilter>();
-                
-        //set up each filter
-        for(int i=0; i< filterNames.length; i++)
-        {
-            //get filter of this name & add to list of filters
-            FormatFilter filter = (FormatFilter) PluginManager.getNamedPlugin(FormatFilter.class, filterNames[i]);
-            if(filter==null)
-            {   
-                System.err.println("\nERROR: Unknown MediaFilter specified (either from command-line or in dspace.cfg): '" + filterNames[i] + "'");
-                System.exit(1);
-            }
-            else
-            {   
-                filterList.add(filter);
-                       
-                String filterClassName = filter.getClass().getName();
-                           
-                String pluginName = null;
-                           
-                //If this filter is a SelfNamedPlugin,
-                //then the input formats it accepts may differ for
-                //each "named" plugin that it defines.
-                //So, we have to look for every key that fits the
-                //following format: filter.<class-name>.<plugin-name>.inputFormats
-                if( SelfNamedPlugin.class.isAssignableFrom(filter.getClass()) )
-                {
-                    //Get the plugin instance name for this class
-                    pluginName = ((SelfNamedPlugin) filter).getPluginInstanceName();
-                }
-            
-                
-                //Retrieve our list of supported formats from dspace.cfg
-                //For SelfNamedPlugins, format of key is:  
-                //  filter.<class-name>.<plugin-name>.inputFormats
-                //For other MediaFilters, format of key is: 
-                //  filter.<class-name>.inputFormats
-                String formats = ConfigurationManager.getProperty(
-                    FILTER_PREFIX + "." + filterClassName + 
-                    (pluginName!=null ? "." + pluginName : "") +
-                    "." + INPUT_FORMATS_SUFFIX);
-            
-                //add to internal map of filters to supported formats	
-                if (formats != null)
-                {
-                    //For SelfNamedPlugins, map key is:  
-                    //  <class-name><separator><plugin-name>
-                    //For other MediaFilters, map key is just:
-                    //  <class-name>
-                    filterFormats.put(filterClassName + 
-        	            (pluginName!=null ? FILTER_PLUGIN_SEPARATOR + pluginName : ""),
-        	            Arrays.asList(formats.split(",[\\s]*")));
-                }
-            }//end if filter!=null
-        }//end for
-        
+        init(filterNames);
+
         //If verbose, print out loaded mediafilter info
         if(isVerbose)
         {   
@@ -300,10 +307,6 @@ public class MediaFilterManager
              }
         }
               
-        //store our filter list into an internal array
-        filterClasses = (FormatFilter[]) filterList.toArray(new FormatFilter[filterList.size()]);
-        
-        
         //Retrieve list of identifiers to skip (if any)
         String skipIds[] = null;
         if(line.hasOption('s'))
