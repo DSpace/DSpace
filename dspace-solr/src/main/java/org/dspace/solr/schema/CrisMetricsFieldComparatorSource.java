@@ -16,12 +16,18 @@ import org.dspace.solr.util.CrisMetricsUpdateListener;
 
 public class CrisMetricsFieldComparatorSource extends FieldComparatorSource
 {
-    
+	private String coreName;
+    public CrisMetricsFieldComparatorSource(String coreName) {
+		super();
+    	this.coreName = coreName;
+	}
+	
+	
     @Override
     public FieldComparator newComparator(String fieldname, int numHits,
             int sortPos, boolean reversed) throws IOException
     {
-        return new CrisMetricFieldComparator(fieldname, numHits);
+        return new CrisMetricFieldComparator(coreName, fieldname, numHits);
     }
 
     // adapted from DocFieldComparator
@@ -38,8 +44,11 @@ public class CrisMetricsFieldComparatorSource extends FieldComparatorSource
 
         private String fieldName;
         
-        CrisMetricFieldComparator(String fieldName, int numHits)
+        private String coreName;
+        
+        CrisMetricFieldComparator(String coreName, String fieldName, int numHits)
         {
+        	this.coreName = coreName;
             this.fieldName = fieldName;
             docIDs = new int[numHits];
         }
@@ -47,8 +56,8 @@ public class CrisMetricsFieldComparatorSource extends FieldComparatorSource
         @Override
         public int compare(int slot1, int slot2)
         {
-            Double metric = getMetric(fieldName, docIDs[slot1]);
-            Double metric2 = getMetric(fieldName, docIDs[slot2]);
+            Double metric = getMetric(coreName, fieldName, docIDs[slot1]);
+            Double metric2 = getMetric(coreName, fieldName, docIDs[slot2]);
             if(metric!=null && metric2==null) {
                 return 1; 
             } else {
@@ -69,8 +78,8 @@ public class CrisMetricsFieldComparatorSource extends FieldComparatorSource
         @Override
         public int compareBottom(int doc)
         {
-            Double metric = getMetric(fieldName, bottom);
-            Double metric2 = getMetric(fieldName, docBase + doc);
+            Double metric = getMetric(coreName, fieldName, bottom);
+            Double metric2 = getMetric(coreName, fieldName, docBase + doc);
             if(metric!=null && metric2==null) {
                 return 1; 
             } else {
@@ -102,12 +111,12 @@ public class CrisMetricsFieldComparatorSource extends FieldComparatorSource
         @Override
         public Double value(int slot)
         {
-            return getMetric(fieldName, docIDs[slot]);
+            return getMetric(coreName, fieldName, docIDs[slot]);
         }
 
-        private Double getMetric(String metric, int docId)
+        private Double getMetric(String coreName, String metric, int docId)
         {
-            return CrisMetricsUpdateListener.getMetric(metric, docId);
+            return CrisMetricsUpdateListener.getMetric(coreName, metric, docId);
         }
 
         @Override

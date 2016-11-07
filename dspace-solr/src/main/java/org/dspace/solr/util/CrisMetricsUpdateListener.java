@@ -33,24 +33,21 @@ import org.apache.solr.search.SolrIndexSearcher;
 
 public class CrisMetricsUpdateListener implements SolrEventListener
 {
-    private static Date cacheAcquisition;
+    private static Map<String, Date> cacheAcquisition = new HashMap<String, Date>();
     
-    private static long cacheVersion;
+    private static Map<String, Long> cacheVersion = new HashMap<String, Long>();
     
     private static final int cacheValidity = 24*60*60000;
 
-    private static final Map<String, Map<Integer, Double>> metrics = new HashMap<String, Map<Integer, Double>>();
+    private static final Map<String, Map<String, Map<Integer, Double>>> metrics = new HashMap<String, Map<String, Map<Integer, Double>>>();
 
-    private static final Map<String, Map<Integer, ExtraInfo>> extraInfo = new HashMap<String, Map<Integer, ExtraInfo>>();
+    private static final Map<String, Map<String, Map<Integer, ExtraInfo>>> extraInfo = new HashMap<String, Map<String, Map<Integer, ExtraInfo>>>();
     
     private SolrCore core;
-
-    private static Map<String, String> dbprops;
 
     public CrisMetricsUpdateListener(SolrCore core)
     {
         this.core = core;
-        dbprops = new HashMap<String, String>();
     }
 
     ////////////// SolrEventListener methods /////////////////
@@ -58,25 +55,7 @@ public class CrisMetricsUpdateListener implements SolrEventListener
     @Override
     public void init(NamedList args)
     {
-        try
-        {
-            SolrResourceLoader loader = core.getResourceLoader();
-            List<String> lines = loader.getLines("database.properties");
-            for (String line : lines)
-            {
-                if (StringUtils.isEmpty(line) || line.startsWith("#"))
-                {
-                    continue;
-                }
-                String[] kv = StringUtils.split(line, "=");
-                dbprops.put(kv[0], kv[1]);
-            }
-            Class.forName(dbprops.get("database.driverClassName"));
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
+    	/* NOOP */
     }
 
     @Override
@@ -100,12 +79,12 @@ public class CrisMetricsUpdateListener implements SolrEventListener
 
     ////////////// Service methods /////////////////////
 
-    public static Double getMetric(String metric, int docId)
+    public static Double getMetric(String coreName, String metric, int docId)
     {
-
-        if (metrics.containsKey(metric))
+    	Map<String, Map<Integer, Double>> m = metrics.get(coreName);
+        if (m != null && m.containsKey(metric))
         {
-            Map<Integer, Double> values = metrics.get(metric);
+            Map<Integer, Double> values = m.get(metric);
             if (values.containsKey(docId))
             {
                 return values.get(docId);
@@ -114,12 +93,12 @@ public class CrisMetricsUpdateListener implements SolrEventListener
         return null;
     }
 
-    public static ExtraInfo getRemark(String metric, int docId)
+    public static ExtraInfo getRemark(String coreName, String metric, int docId)
     {
-
-        if (extraInfo.containsKey(metric))
+    	Map<String, Map<Integer, ExtraInfo>> ei = extraInfo.get(coreName);
+        if (ei != null && ei.containsKey(metric))
         {
-            Map<Integer, ExtraInfo> values = extraInfo.get(metric);
+            Map<Integer, ExtraInfo> values = ei.get(metric);
             if (values.containsKey(docId))
             {
                 return values.get(docId);
@@ -155,6 +134,7 @@ public class CrisMetricsUpdateListener implements SolrEventListener
             }
             Date endSearch = new Date();            
             long searcherTime = endSearch.getTime() - startSearch.getTime();
+            Map<String, String> dbprops = getDBProps(searcher.getCore());
             
             Date startQuery = new Date();
             conn = DriverManager.getConnection(dbprops.get("database.url"),
@@ -222,32 +202,73 @@ public class CrisMetricsUpdateListener implements SolrEventListener
                 }
             }
         }
-        extraInfo.clear();
-        metrics.clear();
-        extraInfo.putAll(metricsRemarksCopy);
-        metrics.putAll(metricsCopy);
+        
+        String coreName = searcher.getCore().getName();
+        Map<String, Map<Integer, Double>> m = metrics.get(coreName); 
+        Map<String, Map<Integer, ExtraInfo>> ei = extraInfo.get(coreName);
+        
+        if (ei != null) {
+        	ei.clear();
+        }
+        else {
+        	ei = new HashMap<String, Map<Integer, ExtraInfo>>();
+        	extraInfo.put(coreName, ei);
+        }
+        if (m != null) {
+        	m.clear();
+        }
+        else {
+        	m = new HashMap<String, Map<Integer, Double>>();
+        	metrics.put(coreName, m);
+        }
+        ei.putAll(metricsRemarksCopy);
+        m.putAll(metricsCopy);
     }
 
-    public static void renewCache(SolrIndexSearcher newSearcher) throws IOException
+	private static Map<String, String> getDBProps(SolrCore core) {
+		Map<String, String> dbprops = new HashMap<String, String>();
+
+		try {
+			SolrResourceLoader loader = core.getResourceLoader();
+			List<String> lines = loader.getLines("database.properties");
+			for (String line : lines) {
+				if (StringUtils.isEmpty(line) || line.startsWith("#")) {
+					continue;
+				}
+				String[] kv = StringUtils.split(line, "=");
+				dbprops.put(kv[0], kv[1]);
+			}
+			Class.forName(dbprops.get("database.driverClassName"));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return dbprops;
+    }
+
+	public static void renewCache(SolrIndexSearcher newSearcher) throws IOException
     {
-    	cacheVersion = newSearcher.getOpenTime();
-        cacheAcquisition = new Date();
+		String coreName = newSearcher.getCore().getName();
+    	cacheVersion.put(coreName, newSearcher.getOpenTime());
+        cacheAcquisition.put(coreName, new Date());
         populateRanks(newSearcher);
     }
 
-    public static Map<String, Map<Integer, Double>> getMetrics()
+    public static Map<String, Map<Integer, Double>> getMetrics(String coreName)
     {
-        return metrics;
+        return metrics.get(coreName);
     }
 
-    public static Map<String, Map<Integer, ExtraInfo>> getExtrainfo()
+    public static Map<String, Map<Integer, ExtraInfo>> getExtrainfo(String coreName)
     {
-        return extraInfo;
+        return extraInfo.get(coreName);
     }
     
 	public static boolean isCacheInvalid(SolrIndexSearcher searcher) {
-      Date now = new Date();
-		return cacheAcquisition == null || (now.getTime() - cacheAcquisition.getTime() > cacheValidity)
-				|| cacheVersion != searcher.getOpenTime();
+		String coreName = searcher.getCore().getName();
+		Date ca = cacheAcquisition.get(coreName);
+		Long cv = cacheVersion.get(coreName);
+		Date now = new Date();
+		return ca == null || (now.getTime() - ca.getTime() > cacheValidity)
+				|| cv.longValue() != searcher.getOpenTime();
 	}
 }

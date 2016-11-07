@@ -480,7 +480,7 @@
           </analyzer>
       </fieldType>
       
-      <fieldType name="crismetrics_t" class="org.dspace.solr.schema.CrisMetricsFieldType"/>
+      <fieldType name="crismetrics_t" class="org.dspace.solr.schema.CrisMetricsFieldType" coreName="${solr.core.name}" />
  </types>
 
 

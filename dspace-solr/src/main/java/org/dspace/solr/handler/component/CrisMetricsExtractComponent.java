@@ -67,6 +67,7 @@ public class CrisMetricsExtractComponent extends SearchComponent
             SolrDocumentList rl = new SolrDocumentList();
             rl.setNumFound(slice.docs.matches());
             rl.setStart(slice.docs.offset());
+            String coreName = searcher.getCore().getName();
             for (DocIterator it = slice.docs.iterator(); it.hasNext();)
             {
                 int docId = it.nextDoc();
@@ -92,9 +93,9 @@ public class CrisMetricsExtractComponent extends SearchComponent
                 }
                 for (String metric : metricsField)
                 {
-                    Double result = CrisMetricsUpdateListener.getMetric(metric,
+					Double result = CrisMetricsUpdateListener.getMetric(coreName, metric,
                             docId);
-                    ExtraInfo extraInfo = CrisMetricsUpdateListener.getRemark(metric,
+                    ExtraInfo extraInfo = CrisMetricsUpdateListener.getRemark(coreName, metric,
                             docId);
                     if (result != null)
                     {
@@ -128,6 +129,7 @@ public class CrisMetricsExtractComponent extends SearchComponent
         }
         String[] fls = StringUtils.split(flp, ",");
         IndexSchema schema = rb.req.getSchema();
+        String coreName = rb.req.getSearcher().getCore().getName();
         for (String fl : fls)
         {
             if ("*".equals(fl))
@@ -141,7 +143,7 @@ public class CrisMetricsExtractComponent extends SearchComponent
                         fields.add(fieldname);
                     }
                     Map<String, Map<Integer, Double>> tmp = CrisMetricsUpdateListener
-                            .getMetrics();
+                            .getMetrics(coreName);
                     if (tmp != null && !tmp.isEmpty())
                     {
                         for (String key : tmp.keySet())
