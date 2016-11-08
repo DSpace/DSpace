@@ -18,6 +18,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -36,7 +37,11 @@ import it.cilea.osd.jdyna.web.ITabService;
 		@NamedQuery(name = "BoxProject.findAll", query = "from BoxProject order by priority asc"),
 		@NamedQuery(name = "BoxProject.findContainableByHolder", query = "from Containable containable where containable in (select m from BoxProject box join box.mask m where box.id = ?)"),
 		@NamedQuery(name = "BoxProject.findHolderByContainable", query = "from BoxProject box where :par0 in elements(box.mask)"),
-		@NamedQuery(name = "BoxProject.uniqueBoxByShortName", query = "from BoxProject box where shortName = ?")
+		@NamedQuery(name = "BoxProject.uniqueBoxByShortName", query = "from BoxProject box where shortName = ?"),
+        @NamedQuery(name = "BoxProject.findAuthorizedGroupById", query = "select box.authorizedGroup from BoxProject box where box.id = ?"),
+        @NamedQuery(name = "BoxProject.findAuthorizedGroupByShortname", query = "select box.authorizedGroup from BoxProject box where box.shortName = ?"),
+        @NamedQuery(name = "BoxProject.findAuthorizedSingleById", query = "select box.authorizedSingle from BoxProject box where box.id = ?"),
+        @NamedQuery(name = "BoxProject.findAuthorizedSingleByShortname", query = "select box.authorizedSingle from BoxProject box where box.shortName = ?")
 })		
 public class BoxProject extends Box<Containable> {
     	
@@ -47,21 +52,21 @@ public class BoxProject extends Box<Containable> {
 	@Cache(usage=CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private List<Containable> mask;
 
-    @ElementCollection
-    @CollectionTable(
+	@ManyToMany
+    @JoinTable(
           name="cris_pj_box2policysingle",
           joinColumns=@JoinColumn(name="box_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedSingle;
+    private List<ProjectPropertiesDefinition> authorizedSingle;
     
-    @ElementCollection
-    @CollectionTable(
+	@ManyToMany
+    @JoinTable(
           name="cris_pj_box2policygroup",
           joinColumns=@JoinColumn(name="box_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedGroup;
+    private List<ProjectPropertiesDefinition> authorizedGroup;
 	
 	public BoxProject() {
 		this.visibility = VisibilityTabConstant.ADMIN;
@@ -83,51 +88,30 @@ public class BoxProject extends Box<Containable> {
 		this.mask = mask;
 	}
 
-    public List<String> getAuthorizedSingle()
+    public List<ProjectPropertiesDefinition> getAuthorizedSingle()
     {
         if(this.authorizedSingle==null) {
-            this.authorizedSingle = new ArrayList<String>();
+            this.authorizedSingle = new ArrayList<ProjectPropertiesDefinition>();
         }
         return authorizedSingle;
     }
 
-    public void setAuthorizedSingle(List<String> authorizedSingle)
+    public void setAuthorizedSingle(List<ProjectPropertiesDefinition> authorizedSingle)
     {
         this.authorizedSingle = authorizedSingle; 
     }
 
-    public List<String> getAuthorizedGroup()
+    public List<ProjectPropertiesDefinition> getAuthorizedGroup()
     {
         if(this.authorizedGroup==null) {
-            this.authorizedGroup = new ArrayList<String>();
+            this.authorizedGroup = new ArrayList<ProjectPropertiesDefinition>();
         }
         return authorizedGroup;
     }
 
-    public void setAuthorizedGroup(List<String> authorizedGroup)
+    public void setAuthorizedGroup(List<ProjectPropertiesDefinition> authorizedGroup)
     {
         this.authorizedGroup = authorizedGroup;
     }
 	
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
-            AS tabService, String specificPart)
-    {  
-        List<String> results = new ArrayList<String>();
-        for(ProjectPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(ProjectPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
-
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
-            AS tabService, String specificPart)
-    {
-        List<String> results = new ArrayList<String>();
-        for(ProjectPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(ProjectPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
 }

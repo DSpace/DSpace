@@ -21,6 +21,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -41,8 +42,11 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
         @NamedQuery(name = "TabOrganizationUnit.findByAccessLevel", query = "from TabOrganizationUnit tab where visibility = ? order by priority"),
         @NamedQuery(name = "TabOrganizationUnit.findByAdmin", query = "from TabOrganizationUnit tab where visibility = 1 or visibility = 2 or visibility = 3 order by priority"),
         @NamedQuery(name = "TabOrganizationUnit.findByOwner", query = "from TabOrganizationUnit tab where visibility = 0 or visibility = 2 or visibility = 3 order by priority"),
-        @NamedQuery(name = "TabOrganizationUnit.findByAnonimous", query = "from TabOrganizationUnit tab where visibility = 3 order by priority")
-
+        @NamedQuery(name = "TabOrganizationUnit.findByAnonimous", query = "from TabOrganizationUnit tab where visibility = 3 order by priority"),
+        @NamedQuery(name = "TabOrganizationUnit.findAuthorizedGroupById", query = "select tab.authorizedGroup from TabOrganizationUnit tab where tab.id = ?"),
+        @NamedQuery(name = "TabOrganizationUnit.findAuthorizedGroupByShortname", query = "select tab.authorizedGroup from TabOrganizationUnit tab where tab.shortName = ?"),
+        @NamedQuery(name = "TabOrganizationUnit.findAuthorizedSingleById", query = "select tab.authorizedSingle from TabOrganizationUnit tab where tab.id = ?"),
+        @NamedQuery(name = "TabOrganizationUnit.findAuthorizedSingleByShortname", query = "select tab.authorizedSingle  from TabOrganizationUnit tab where tab.shortName = ?")
 })
 public class TabOrganizationUnit extends AbstractTab<BoxOrganizationUnit>
 {
@@ -55,21 +59,21 @@ public class TabOrganizationUnit extends AbstractTab<BoxOrganizationUnit>
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<BoxOrganizationUnit> mask;
 
-    @ElementCollection
-    @CollectionTable(
+    @ManyToMany
+    @JoinTable(
           name="cris_ou_tab2policysingle",
           joinColumns=@JoinColumn(name="tab_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedSingle;
+    private List<OUPropertiesDefinition> authorizedSingle;
     
-    @ElementCollection
-    @CollectionTable(
+    @ManyToMany
+    @JoinTable(
           name="cris_ou_tab2policygroup",
           joinColumns=@JoinColumn(name="tab_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedGroup;
+    private List<OUPropertiesDefinition> authorizedGroup;
     
     public TabOrganizationUnit()
     {
@@ -97,51 +101,30 @@ public class TabOrganizationUnit extends AbstractTab<BoxOrganizationUnit>
         return ConfigurationManager.getProperty(CrisConstants.CFG_MODULE,"organizationunit.file.path");
     }
 
-    public List<String> getAuthorizedSingle()
+    public List<OUPropertiesDefinition> getAuthorizedSingle()
     {
         if(this.authorizedSingle==null) {
-            this.authorizedSingle = new ArrayList<String>();
+            this.authorizedSingle = new ArrayList<OUPropertiesDefinition>();
         }
         return authorizedSingle;
     }
 
-    public void setAuthorizedSingle(List<String> authorizedSingle)
+    public void setAuthorizedSingle(List<OUPropertiesDefinition> authorizedSingle)
     {
         this.authorizedSingle = authorizedSingle; 
     }
 
-    public List<String> getAuthorizedGroup()
+    public List<OUPropertiesDefinition> getAuthorizedGroup()
     {
         if(this.authorizedGroup==null) {
-            this.authorizedGroup = new ArrayList<String>();
+            this.authorizedGroup = new ArrayList<OUPropertiesDefinition>();
         }
         return authorizedGroup;
     }
 
-    public void setAuthorizedGroup(List<String> authorizedGroup)
+    public void setAuthorizedGroup(List<OUPropertiesDefinition> authorizedGroup)
     {
         this.authorizedGroup = authorizedGroup;
     }
 
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
-            AS tabService, String specificPart)
-    {
-        List<String> results = new ArrayList<String>();
-        for(OUPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(OUPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
-
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
-            AS tabService, String specificPart)
-    {
-        List<String> results = new ArrayList<String>();
-        for(OUPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(OUPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
 }

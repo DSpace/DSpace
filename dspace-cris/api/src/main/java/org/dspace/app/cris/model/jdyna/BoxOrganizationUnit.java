@@ -18,6 +18,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -27,6 +28,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import it.cilea.osd.common.service.IPersistenceService;
 import it.cilea.osd.jdyna.model.Containable;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.web.Box;
 import it.cilea.osd.jdyna.web.ITabService;
 
@@ -36,7 +38,11 @@ import it.cilea.osd.jdyna.web.ITabService;
 		@NamedQuery(name = "BoxOrganizationUnit.findAll", query = "from BoxOrganizationUnit order by priority asc"),
 		@NamedQuery(name = "BoxOrganizationUnit.findContainableByHolder", query = "from Containable containable where containable in (select m from BoxOrganizationUnit box join box.mask m where box.id = ?)"),
 		@NamedQuery(name = "BoxOrganizationUnit.findHolderByContainable", query = "from BoxOrganizationUnit box where :par0 in elements(box.mask)"),
-		@NamedQuery(name = "BoxOrganizationUnit.uniqueBoxByShortName", query = "from BoxOrganizationUnit box where shortName = ?")
+		@NamedQuery(name = "BoxOrganizationUnit.uniqueBoxByShortName", query = "from BoxOrganizationUnit box where shortName = ?"),
+        @NamedQuery(name = "BoxOrganizationUnit.findAuthorizedGroupById", query = "select box.authorizedGroup from BoxOrganizationUnit box where box.id = ?"),
+        @NamedQuery(name = "BoxOrganizationUnit.findAuthorizedGroupByShortname", query = "select box.authorizedGroup from BoxOrganizationUnit box where box.shortName = ?"),
+        @NamedQuery(name = "BoxOrganizationUnit.findAuthorizedSingleById", query = "select box.authorizedSingle from BoxOrganizationUnit box where box.id = ?"),
+        @NamedQuery(name = "BoxOrganizationUnit.findAuthorizedSingleByShortname", query = "select box.authorizedSingle from BoxOrganizationUnit box where box.shortName = ?")
 })		
 public class BoxOrganizationUnit extends Box<Containable> {
 	
@@ -47,21 +53,21 @@ public class BoxOrganizationUnit extends Box<Containable> {
 	@Cache(usage=CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private List<Containable> mask;
 
-    @ElementCollection
-    @CollectionTable(
+	@ManyToMany
+    @JoinTable(
           name="cris_ou_box2policysingle",
           joinColumns=@JoinColumn(name="box_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedSingle;
+    private List<OUPropertiesDefinition> authorizedSingle;
     
-    @ElementCollection
-    @CollectionTable(
+    @ManyToMany
+    @JoinTable(
           name="cris_ou_box2policygroup",
           joinColumns=@JoinColumn(name="box_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedGroup;
+    private List<OUPropertiesDefinition> authorizedGroup;
 	
 	public BoxOrganizationUnit() {
 		this.visibility = VisibilityTabConstant.ADMIN;
@@ -83,51 +89,30 @@ public class BoxOrganizationUnit extends Box<Containable> {
 		this.mask = mask;
 	}
 
-    public List<String> getAuthorizedSingle()
+    public List<OUPropertiesDefinition> getAuthorizedSingle()
     {
         if(this.authorizedSingle==null) {
-            this.authorizedSingle = new ArrayList<String>();
+            this.authorizedSingle = new ArrayList<OUPropertiesDefinition>();
         }
         return authorizedSingle;
     }
 
-    public void setAuthorizedSingle(List<String> authorizedSingle)
+    public void setAuthorizedSingle(List<OUPropertiesDefinition> authorizedSingle)
     {
         this.authorizedSingle = authorizedSingle; 
     }
 
-    public List<String> getAuthorizedGroup()
+    public List<OUPropertiesDefinition> getAuthorizedGroup()
     {
         if(this.authorizedGroup==null) {
-            this.authorizedGroup = new ArrayList<String>();
+            this.authorizedGroup = new ArrayList<OUPropertiesDefinition>();
         }
         return authorizedGroup;
     }
 
-    public void setAuthorizedGroup(List<String> authorizedGroup)
+    public void setAuthorizedGroup(List<OUPropertiesDefinition> authorizedGroup)
     {
         this.authorizedGroup = authorizedGroup;
     }
     
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
-            AS tabService, String specificPart)
-    {       
-        List<String> results = new ArrayList<String>();
-        for(OUPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(OUPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
-
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
-            AS tabService, String specificPart)
-    {
-        List<String> results = new ArrayList<String>();
-        for(OUPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(OUPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
 }

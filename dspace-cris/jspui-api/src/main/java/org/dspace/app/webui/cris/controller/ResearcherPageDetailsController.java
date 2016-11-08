@@ -271,7 +271,7 @@ public class ResearcherPageDetailsController
         List<TabResearcherPage> authorizedTabs = new LinkedList<TabResearcherPage>();
         
         for(TabResearcherPage tab : tabs) {
-            if(CrisAuthorizeManager.authorize(context, applicationService, ResearcherPage.class, researcherId, tab)) {
+            if(CrisAuthorizeManager.authorize(context, applicationService, ResearcherPage.class, RPPropertiesDefinition.class, researcherId, tab)) {
                 authorizedTabs.add(tab);
             }
         }
@@ -377,7 +377,7 @@ public class ResearcherPageDetailsController
     @Override
     protected boolean authorize(HttpServletRequest request, BoxResearcherPage box) throws SQLException
     {
-        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), ResearcherPage.class, extractEntityId(request), box);        
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), ResearcherPage.class, RPPropertiesDefinition.class, extractEntityId(request), box);        
     }
 
 }

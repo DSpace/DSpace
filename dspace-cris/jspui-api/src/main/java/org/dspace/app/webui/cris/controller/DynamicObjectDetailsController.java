@@ -213,7 +213,7 @@ public class DynamicObjectDetailsController
         List<TabDynamicObject> authorizedTabs = new LinkedList<TabDynamicObject>();
         
         for(TabDynamicObject tab : tabs) {
-            if(CrisAuthorizeManager.authorize(context, applicationService, ResearchObject.class, entityId, tab)) {
+            if(CrisAuthorizeManager.authorize(context, applicationService, ResearchObject.class, DynamicPropertiesDefinition.class, entityId, tab)) {
                 authorizedTabs.add(tab);
             }
         }
@@ -310,6 +310,6 @@ public class DynamicObjectDetailsController
     @Override
     protected boolean authorize(HttpServletRequest request, BoxDynamicObject box) throws SQLException
     {
-        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), ResearchObject.class, extractEntityId(request), box);
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), ResearchObject.class, DynamicPropertiesDefinition.class, extractEntityId(request), box);
     }
 }

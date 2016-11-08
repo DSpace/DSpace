@@ -17,14 +17,18 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.core.ConfigurationManager;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import it.cilea.osd.common.service.IPersistenceService;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.web.AbstractTab;
 import it.cilea.osd.jdyna.web.ITabService;
 
@@ -38,7 +42,11 @@ import it.cilea.osd.jdyna.web.ITabService;
 		@org.hibernate.annotations.NamedQuery(name = "TabResearcherPage.findByAccessLevel", query = "from TabResearcherPage tab where visibility = ? order by priority", cacheable=true),
 		@org.hibernate.annotations.NamedQuery(name = "TabResearcherPage.findByAdmin", query = "from TabResearcherPage tab where visibility = 1 or visibility = 2 or visibility = 3 order by priority", cacheable=true),
 		@org.hibernate.annotations.NamedQuery(name = "TabResearcherPage.findByOwner", query = "from TabResearcherPage tab where visibility = 0 or visibility = 2 or visibility = 3 order by priority", cacheable=true),
-		@org.hibernate.annotations.NamedQuery(name = "TabResearcherPage.findByAnonimous", query = "from TabResearcherPage tab where visibility = 3 order by priority", cacheable=true)
+		@org.hibernate.annotations.NamedQuery(name = "TabResearcherPage.findByAnonimous", query = "from TabResearcherPage tab where visibility = 3 order by priority", cacheable=true),
+		@org.hibernate.annotations.NamedQuery(name = "TabResearcherPage.findAuthorizedGroupById", query = "select tab.authorizedGroup from TabResearcherPage tab where tab.id = ?"),
+		@org.hibernate.annotations.NamedQuery(name = "TabResearcherPage.findAuthorizedGroupByShortname", query = "select tab.authorizedGroup from TabResearcherPage tab where tab.shortName = ?"),
+		@org.hibernate.annotations.NamedQuery(name = "TabResearcherPage.findAuthorizedSingleById", query = "select tab.authorizedSingle from TabResearcherPage tab where tab.id = ?"),
+		@org.hibernate.annotations.NamedQuery(name = "TabResearcherPage.findAuthorizedSingleByShortname", query = "select tab.authorizedSingle from TabResearcherPage tab where tab.shortName = ?")
 })
 public class TabResearcherPage extends AbstractTab<BoxResearcherPage> {
 
@@ -50,21 +58,21 @@ public class TabResearcherPage extends AbstractTab<BoxResearcherPage> {
 	@Cache(usage=CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private List<BoxResearcherPage> mask;
 
-    @ElementCollection
-    @CollectionTable(
+	@ManyToMany
+    @JoinTable(
           name="cris_rp_tab2policysingle",
           joinColumns=@JoinColumn(name="tab_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedSingle;
+    private List<RPPropertiesDefinition> authorizedSingle;
     
-    @ElementCollection
-    @CollectionTable(
+	@ManyToMany
+    @JoinTable(
           name="cris_rp_tab2policygroup",
           joinColumns=@JoinColumn(name="tab_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedGroup;
+    private List<RPPropertiesDefinition> authorizedGroup;
 	
 	public TabResearcherPage() {
 		this.visibility = VisibilityTabConstant.ADMIN;
@@ -91,52 +99,30 @@ public class TabResearcherPage extends AbstractTab<BoxResearcherPage> {
     }
     
 
-    public List<String> getAuthorizedSingle()
+    public List<RPPropertiesDefinition> getAuthorizedSingle()
     {
         if(this.authorizedSingle==null) {
-            this.authorizedSingle = new ArrayList<String>();
+            this.authorizedSingle = new ArrayList<RPPropertiesDefinition>();
         }
         return authorizedSingle;
     }
 
-    public void setAuthorizedSingle(List<String> authorizedSingle)
+    public void setAuthorizedSingle(List<RPPropertiesDefinition> authorizedSingle)
     {
         this.authorizedSingle = authorizedSingle; 
     }
 
-    public List<String> getAuthorizedGroup()
+    public List<RPPropertiesDefinition> getAuthorizedGroup()
     {
         if(this.authorizedGroup==null) {
-            this.authorizedGroup = new ArrayList<String>();
+            this.authorizedGroup = new ArrayList<RPPropertiesDefinition>();
         }
         return authorizedGroup;
     }
 
-    @Override
-    public void setAuthorizedGroup(List<String> authorizedGroup)
+    public void setAuthorizedGroup(List<RPPropertiesDefinition> authorizedGroup)
     {
         this.authorizedGroup = authorizedGroup;
     }
-    
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
-            AS tabService, String specificPart)
-    {       
-        List<String> results = new ArrayList<String>();
-        for(RPPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(RPPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
 
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
-            AS tabService, String specificPart)
-    {
-        List<String> results = new ArrayList<String>();
-        for(RPPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(RPPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
 }

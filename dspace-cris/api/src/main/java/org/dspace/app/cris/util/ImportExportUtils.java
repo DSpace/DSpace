@@ -80,6 +80,7 @@ import org.dspace.app.cris.model.jdyna.TabDynamicObject;
 import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.TabProject;
 import org.dspace.app.cris.model.jdyna.TabResearcherPage;
+import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
 import org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree;
 import org.dspace.app.cris.model.jdyna.widget.WidgetEPerson;
 import org.dspace.app.cris.model.jdyna.widget.WidgetGroup;
@@ -1821,6 +1822,10 @@ public class ImportExportUtils {
         WritableSheet box2metadataSheet = workbook.createSheet("box2metadata", 7);
         WritableSheet utilsdataSheet = workbook.createSheet("utilsdata", 8);
         WritableSheet controlledlistSheet = workbook.createSheet("controlledlist", 9);
+        WritableSheet tabpolicySheet = workbook.createSheet("tabpolicy", 10);
+        WritableSheet etabpolicySheet = workbook.createSheet("etabpolicy", 11);
+        WritableSheet boxpolicySheet = workbook.createSheet("boxpolicy", 12);
+        
         Map<String, Class<? extends PropertiesDefinition>> propDefTypes = new HashMap<String, Class<? extends PropertiesDefinition>>();
         propDefTypes.put("rp", RPPropertiesDefinition.class);
         propDefTypes.put("pj", ProjectPropertiesDefinition.class);
@@ -1837,10 +1842,11 @@ public class ImportExportUtils {
         nestedpropDefTypes.put("ou", OUNestedPropertiesDefinition.class);
         
         Map<Integer, String> accessLevels = new HashMap<Integer, String>();
-        accessLevels.put(AccessLevelConstants.ADMIN_ACCESS, "ADMIN_ACCESS");
-        accessLevels.put(AccessLevelConstants.STANDARD_ACCESS, "STANDARD_ACCESS");
-        accessLevels.put(AccessLevelConstants.HIGH_ACCESS, "HIGH_ACCESS");
-        accessLevels.put(AccessLevelConstants.LOW_ACCESS, "LOW_ACCESS");
+        accessLevels.put(VisibilityTabConstant.ADMIN, "ADMIN_ACCESS");
+        accessLevels.put(VisibilityTabConstant.STANDARD, "STANDARD_ACCESS");
+        accessLevels.put(VisibilityTabConstant.HIGH, "HIGH_ACCESS");
+        accessLevels.put(VisibilityTabConstant.LOW, "LOW_ACCESS");
+        accessLevels.put(VisibilityTabConstant.POLICY, "POLICY_ACCESS");
 
         Map<String, Class<? extends Tab>> tabTypes = new HashMap<String, Class<? extends Tab>>();
         tabTypes.put("rp", TabResearcherPage.class);
@@ -1859,7 +1865,7 @@ public class ImportExportUtils {
         
         int colIdx = 0;
         for (String pDefHeader : new String[]{
-        		"TARGET", "SHORTNAME", "LABEL", "RIPETIBILE", "PRIORITY", "HELP",
+        		"TARGET", "SHORTNAME", "LABEL", "REPEATABLE", "PRIORITY", "HELP",
 				"ACCESS LEVEL", "MANDATORY", "WIDGET", "POINTER CLASS", "RENDERING", "LABEL-SIZE", "FIELD-WIDTH",   
 				"FIELD-HEIGHT", "NEW-LINE", "NONE" }) {
         	propertiesdefinitionSheet.addCell(new Label(colIdx, 0, pDefHeader));
@@ -1867,7 +1873,7 @@ public class ImportExportUtils {
         }
         
         colIdx = 0;
-		for (String pDefHeader : new String[] { "TARGET", "SHORTNAME", "LABEL", "RIPETIBILE", "PRIORITY", "HELP",
+		for (String pDefHeader : new String[] { "TARGET", "SHORTNAME", "LABEL", "REPEATABLE", "PRIORITY", "HELP",
 				"ACCESS LEVEL", "MANDATORY", "WIDGET", "POINTER CLASS", "ANCESTOR", "RENDERING", "LABEL-SIZE",
 				"FIELD-WIDTH", "FIELD-HEIGHT", "NEW-LINE", "NONE" }) {
 			nesteddefinitionSheet.addCell(new Label(colIdx, 0, pDefHeader));
@@ -1902,7 +1908,16 @@ public class ImportExportUtils {
 			box2metadataSheet.addCell(new Label(colIdx, 0, pDefHeader));
 			colIdx++;
 		}
-		
+
+        colIdx = 0;
+        for (String pDefHeader : new String[] { "TARGET", "SHORTNAME", "METADATA", "TYPE" })
+        {
+            tabpolicySheet.addCell(new Label(colIdx, 0, pDefHeader));
+            etabpolicySheet.addCell(new Label(colIdx, 0, pDefHeader));
+            boxpolicySheet.addCell(new Label(colIdx, 0, pDefHeader)); 
+            colIdx++;
+        }
+	        
 		utilsdataSheet.addCell(new Label(0, 0, "nested"));
 		utilsdataSheet.addCell(new Label(0, 1, "text"));
 		utilsdataSheet.addCell(new Label(0, 2, "date"));
@@ -1926,6 +1941,7 @@ public class ImportExportUtils {
 		utilsdataSheet.addCell(new Label(3, 1, "STANDARD_ACCESS"));
 		utilsdataSheet.addCell(new Label(3, 2, "ADMIN_ACCESS"));
 		utilsdataSheet.addCell(new Label(3, 3, "LOW_ACCESS"));
+		utilsdataSheet.addCell(new Label(3, 4, "POLICY_ACCESS"));
 		
         int rowIdx = 1;
         int rowNestedIdx = 1;
@@ -2107,6 +2123,24 @@ public class ImportExportUtils {
 					tab2boxSheet.addCell(new Label(2, rowTab2boxIdx, box.getShortName()));
 					rowTab2boxIdx++;
 				}
+				
+				int idxPolicy = 1;
+				List<PropertiesDefinition> policies = applicationService.findPDAuthorizationGroupInTab(tabTypes.get(oType), tab.getId());
+				for(PropertiesDefinition policy : policies) {
+				    tabpolicySheet.addCell(new Label(0, idxPolicy, oType));
+				    tabpolicySheet.addCell(new Label(1, idxPolicy, tab.getShortName()));
+				    tabpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
+				    tabpolicySheet.addCell(new Label(3, idxPolicy, "group"));
+				    idxPolicy++;
+				}
+				policies = applicationService.findPDAuthorizationSingleInTab(tabTypes.get(oType), tab.getId());
+                for(PropertiesDefinition policy : policies) {
+                    tabpolicySheet.addCell(new Label(0, idxPolicy, oType));
+                    tabpolicySheet.addCell(new Label(1, idxPolicy, tab.getShortName()));
+                    tabpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
+                    tabpolicySheet.addCell(new Label(3, idxPolicy, "eperson"));
+                    idxPolicy++;
+                }
             }
             
             List<? extends Tab> etabs = applicationService
@@ -2134,6 +2168,26 @@ public class ImportExportUtils {
 					etab2boxSheet.addCell(new Label(2, rowETab2boxIdx, box.getShortName()));
 					rowETab2boxIdx++;
 				}
+				
+                int idxPolicy = 1;
+                
+                List<PropertiesDefinition> policies = applicationService.findPDAuthorizationGroupInTab(tabTypes.get(oType), tab.getId());
+                for(PropertiesDefinition policy : policies) {
+                    etabpolicySheet.addCell(new Label(0, idxPolicy, oType));
+                    etabpolicySheet.addCell(new Label(1, idxPolicy, tab.getShortName()));
+                    etabpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
+                    etabpolicySheet.addCell(new Label(3, idxPolicy, "group"));
+                    idxPolicy++;
+                }
+                
+                policies = applicationService.findPDAuthorizationSingleInTab(tabTypes.get(oType), tab.getId());
+                for(PropertiesDefinition policy : policies) {
+                    etabpolicySheet.addCell(new Label(0, idxPolicy, oType));
+                    etabpolicySheet.addCell(new Label(1, idxPolicy, tab.getShortName()));
+                    etabpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
+                    etabpolicySheet.addCell(new Label(3, idxPolicy, "eperson"));
+                    idxPolicy++;
+                }
             }
             
             List<? extends Box> boxes = applicationService
@@ -2158,6 +2212,26 @@ public class ImportExportUtils {
 					box2metadataSheet.addCell(new Label(2, rowBox2metadataIdx, pdef.getShortName()));
 					rowBox2metadataIdx++;
 				}
+				
+                int idxPolicy = 1;
+                List<PropertiesDefinition> policies = applicationService.findPDAuthorizationGroupInBox(boxTypes.get(oType),
+                        box.getId());
+                for(PropertiesDefinition policy : policies) {
+                    boxpolicySheet.addCell(new Label(0, idxPolicy, oType));
+                    boxpolicySheet.addCell(new Label(1, idxPolicy, box.getShortName()));
+                    boxpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
+                    boxpolicySheet.addCell(new Label(3, idxPolicy, "group"));
+                    idxPolicy++;
+                }
+                policies = applicationService.findPDAuthorizationSingleInBox(boxTypes.get(oType),
+                        box.getId());
+                for(PropertiesDefinition policy : policies) {
+                    boxpolicySheet.addCell(new Label(0, idxPolicy, oType));
+                    boxpolicySheet.addCell(new Label(1, idxPolicy, box.getShortName()));
+                    boxpolicySheet.addCell(new Label(2, idxPolicy, policy.getShortName()));
+                    boxpolicySheet.addCell(new Label(3, idxPolicy, "eperson"));
+                    idxPolicy++;
+                }
             }
         }
         

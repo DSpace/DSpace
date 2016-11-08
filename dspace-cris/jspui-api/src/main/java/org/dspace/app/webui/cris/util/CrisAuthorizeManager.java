@@ -13,13 +13,14 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 import it.cilea.osd.jdyna.model.AuthorizationContext;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.web.ITabService;
 
 public class CrisAuthorizeManager
 {
 
-    public static <A extends AuthorizationContext, T extends ACrisObject> boolean authorize(
-            Context context, ITabService applicationService, Class<T> clazz,
+    public static <A extends AuthorizationContext, T extends ACrisObject, PD extends PropertiesDefinition> boolean authorize(
+            Context context, ITabService applicationService, Class<T> clazz, Class<PD> classPD,
             Integer id, A authorizedObject) throws SQLException
     {
         Integer visibility = authorizedObject.getVisibility();
@@ -77,14 +78,14 @@ public class CrisAuthorizeManager
 
         if (currUser != null)
         {
-            List<String> listPolicySingle = authorizedObject
+            List<PD> listPolicySingle = authorizedObject
                     .getAuthorizedSingle();
 
             if (listPolicySingle != null && !listPolicySingle.isEmpty())
             {
-                for (String policy : listPolicySingle)
+                for (PD policy : listPolicySingle)
                 {
-                    String data = object.getMetadata(policy);
+                    String data = object.getMetadata(policy.getShortName());
                     if (StringUtils.isNotBlank(data))
                     {
                         if (currUser.getID() == Integer.parseInt(data))
@@ -96,13 +97,13 @@ public class CrisAuthorizeManager
             }
         }
 
-        List<String> listPolicyGroup = authorizedObject.getAuthorizedGroup();
+        List<PD> listPolicyGroup = authorizedObject.getAuthorizedGroup();
 
         if (listPolicyGroup != null && !listPolicyGroup.isEmpty())
         {
-            for (String policy : listPolicyGroup)
+            for (PD policy : listPolicyGroup)
             {
-                List<String> policies = object.getMetadataValue(policy);
+                List<String> policies = object.getMetadataValue(policy.getShortName());
                 for (String data : policies)
                 {
                     if (StringUtils.isNotBlank(data))

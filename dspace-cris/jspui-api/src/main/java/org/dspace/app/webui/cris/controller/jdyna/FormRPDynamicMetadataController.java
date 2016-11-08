@@ -141,7 +141,7 @@ public class FormRPDynamicMetadataController
         for (BoxResearcherPage iph : propertyHoldersCurrentAccessLevel)
         {
             List<IContainable> temp = getApplicationService()
-                    .<BoxResearcherPage, it.cilea.osd.jdyna.web.Tab<BoxResearcherPage>> findContainableInPropertyHolder(
+                    .<BoxResearcherPage, it.cilea.osd.jdyna.web.Tab<BoxResearcherPage>, RPPropertiesDefinition> findContainableInPropertyHolder(
                             getClazzBox(), iph.getId());            
             mapBoxToContainables.put(iph.getShortName(), temp);
             pDInTab.addAll(temp);
@@ -221,7 +221,7 @@ public class FormRPDynamicMetadataController
             }
             else
             {
-                EditTabResearcherPage fuzzyEditTab = (EditTabResearcherPage)((ApplicationService)getApplicationService()).<BoxResearcherPage, TabResearcherPage, EditTabResearcherPage>getEditTabByDisplayTab(Integer.parseInt(paramFuzzyTabId),EditTabResearcherPage.class);
+                EditTabResearcherPage fuzzyEditTab = (EditTabResearcherPage)((ApplicationService)getApplicationService()).<BoxResearcherPage, TabResearcherPage, EditTabResearcherPage, RPPropertiesDefinition>getEditTabByDisplayTab(Integer.parseInt(paramFuzzyTabId),EditTabResearcherPage.class);
                 areaId = fuzzyEditTab.getId();
             }
         }
@@ -255,7 +255,7 @@ public class FormRPDynamicMetadataController
             {
                 tipProprietaInArea
                         .addAll(getApplicationService()
-                                .<BoxResearcherPage, it.cilea.osd.jdyna.web.Tab<BoxResearcherPage>> findContainableInPropertyHolder(
+                                .<BoxResearcherPage, it.cilea.osd.jdyna.web.Tab<BoxResearcherPage>, RPPropertiesDefinition> findContainableInPropertyHolder(
                                         BoxResearcherPage.class,
                                         iph.getId()));
             }
@@ -263,7 +263,7 @@ public class FormRPDynamicMetadataController
             {
                 tipProprietaInArea
                         .addAll(getApplicationService()
-                                .<BoxResearcherPage, it.cilea.osd.jdyna.web.Tab<BoxResearcherPage>> findContainableInPropertyHolder(
+                                .<BoxResearcherPage, it.cilea.osd.jdyna.web.Tab<BoxResearcherPage>, RPPropertiesDefinition> findContainableInPropertyHolder(
                                         getClazzBox(), iph.getId()));
             }
         }
@@ -349,7 +349,7 @@ public class FormRPDynamicMetadataController
 
             tipProprietaInArea
                     .addAll(getApplicationService()
-                            .<BoxResearcherPage, it.cilea.osd.jdyna.web.Tab<BoxResearcherPage>> findContainableInPropertyHolder(
+                            .<BoxResearcherPage, it.cilea.osd.jdyna.web.Tab<BoxResearcherPage>, RPPropertiesDefinition> findContainableInPropertyHolder(
                                     getClazzBox(), iph.getId()));
 
         }
@@ -426,7 +426,7 @@ public class FormRPDynamicMetadataController
 
             tipProprietaInArea
                     .addAll(getApplicationService()
-                            .<BoxResearcherPage, it.cilea.osd.jdyna.web.Tab<BoxResearcherPage>> findContainableInPropertyHolder(
+                            .<BoxResearcherPage, it.cilea.osd.jdyna.web.Tab<BoxResearcherPage>, RPPropertiesDefinition> findContainableInPropertyHolder(
                                     getClazzBox(), iph.getId()));
 
         }

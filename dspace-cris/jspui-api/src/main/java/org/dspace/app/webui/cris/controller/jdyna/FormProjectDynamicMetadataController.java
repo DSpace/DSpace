@@ -27,6 +27,7 @@ import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.dto.ProjectAnagraficaObjectDTO;
 import org.dspace.app.cris.model.jdyna.BoxProject;
 import org.dspace.app.cris.model.jdyna.EditTabProject;
+import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage;
 import org.dspace.app.cris.model.jdyna.ProjectNestedObject;
 import org.dspace.app.cris.model.jdyna.ProjectNestedPropertiesDefinition;
@@ -134,7 +135,7 @@ public class FormProjectDynamicMetadataController
         for (BoxProject iph : propertyHoldersCurrentAccessLevel)
         {
             List<IContainable> temp = getApplicationService()
-                    .<BoxProject, it.cilea.osd.jdyna.web.Tab<BoxProject>> findContainableInPropertyHolder(
+                    .<BoxProject, it.cilea.osd.jdyna.web.Tab<BoxProject>, ProjectPropertiesDefinition> findContainableInPropertyHolder(
                             getClazzBox(), iph.getId());
             mapBoxToContainables.put(iph.getShortName(), temp);
             pDInTab.addAll(temp);
@@ -191,7 +192,7 @@ public class FormProjectDynamicMetadataController
             else
             {
                 EditTabProject fuzzyEditTab = (EditTabProject) ((ApplicationService) getApplicationService())
-                        .<BoxProject, TabProject, EditTabProject>getEditTabByDisplayTab(
+                        .<BoxProject, TabProject, EditTabProject, ProjectPropertiesDefinition>getEditTabByDisplayTab(
                                 Integer.parseInt(paramFuzzyTabId),
                                 EditTabProject.class);
                 areaId = fuzzyEditTab.getId();
@@ -226,14 +227,14 @@ public class FormProjectDynamicMetadataController
             {
                 tipProprietaInArea
                         .addAll(getApplicationService()
-                                .<BoxProject, it.cilea.osd.jdyna.web.Tab<BoxProject>> findContainableInPropertyHolder(
+                                .<BoxProject, it.cilea.osd.jdyna.web.Tab<BoxProject>, ProjectPropertiesDefinition> findContainableInPropertyHolder(
                                         BoxProject.class, iph.getId()));
             }
             else
             {
                 tipProprietaInArea
                         .addAll(getApplicationService()
-                                .<BoxProject, it.cilea.osd.jdyna.web.Tab<BoxProject>> findContainableInPropertyHolder(
+                                .<BoxProject, it.cilea.osd.jdyna.web.Tab<BoxProject>, ProjectPropertiesDefinition> findContainableInPropertyHolder(
                                         getClazzBox(), iph.getId()));
             }
         }
@@ -317,7 +318,7 @@ public class FormProjectDynamicMetadataController
 
             tipProprietaInArea
                     .addAll(getApplicationService()
-                            .<BoxProject, it.cilea.osd.jdyna.web.Tab<BoxProject>> findContainableInPropertyHolder(
+                            .<BoxProject, it.cilea.osd.jdyna.web.Tab<BoxProject>, ProjectPropertiesDefinition> findContainableInPropertyHolder(
                                     getClazzBox(), iph.getId()));
 
         }
@@ -393,7 +394,7 @@ public class FormProjectDynamicMetadataController
 
             tipProprietaInArea
                     .addAll(getApplicationService()
-                            .<BoxProject, it.cilea.osd.jdyna.web.Tab<BoxProject>> findContainableInPropertyHolder(
+                            .<BoxProject, it.cilea.osd.jdyna.web.Tab<BoxProject>, ProjectPropertiesDefinition> findContainableInPropertyHolder(
                                     getClazzBox(), iph.getId()));
 
         }

@@ -105,10 +105,10 @@ import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.read.biff.BiffException;
 
-public class StartupMetadataConfiguratorTool
+public class ImportCRISDataModelConfiguration
 {
     private static Logger log = Logger
-            .getLogger(StartupMetadataConfiguratorTool.class);
+            .getLogger(ImportCRISDataModelConfiguration.class);
 
     private static boolean append = false;
 
@@ -200,7 +200,6 @@ public class StartupMetadataConfiguratorTool
             buildMap(workbook, "boxpolicy", box2Policies, 0);
             
 			buildControlledList(workbook, "controlledlist", controlledListMap);
-			
 
 			buildResearchObject(workbook, "utilsdata", applicationService, transactionManager, status);
 			
@@ -293,20 +292,20 @@ public class StartupMetadataConfiguratorTool
                 List<List<String>> policies = tab2Policies.get(key);
                 if (key.equals("rp"))
                 {
-                    buildTab(applicationService, rows, policies, TabResearcherPage.class);
+                    buildTab(applicationService, rows, policies, TabResearcherPage.class, RPPropertiesDefinition.class);
                 }
                 else if (key.equals("pj"))
                 {
-                    buildTab(applicationService, rows, policies, TabProject.class);
+                    buildTab(applicationService, rows, policies, TabProject.class, ProjectPropertiesDefinition.class);
                 }
                 else if (key.equals("ou"))
                 {
                     buildTab(applicationService, rows, policies, 
-                            TabOrganizationUnit.class);
+                            TabOrganizationUnit.class, OUPropertiesDefinition.class);
                 }
                 else
                 {
-                    buildTab(applicationService, rows, policies, TabDynamicObject.class);
+                    buildTab(applicationService, rows, policies, TabDynamicObject.class, DynamicPropertiesDefinition.class);
                 }
             }
             for (String key : etabMap.keySet())
@@ -316,21 +315,21 @@ public class StartupMetadataConfiguratorTool
                 if (key.equals("rp"))
                 { 
                     buildTab(applicationService, rows, policies,
-                            EditTabResearcherPage.class);
+                            EditTabResearcherPage.class, RPPropertiesDefinition.class);
                 }
                 else if (key.equals("pj"))
                 {
-                    buildTab(applicationService, rows, policies, EditTabProject.class);
+                    buildTab(applicationService, rows, policies, EditTabProject.class, ProjectPropertiesDefinition.class);
                 }
                 else if (key.equals("ou"))
                 {
                     buildTab(applicationService, rows, policies,
-                            EditTabOrganizationUnit.class);
+                            EditTabOrganizationUnit.class, OUPropertiesDefinition.class);
                 }
                 else
                 {
                     buildTab(applicationService, rows, policies,
-                            EditTabDynamicObject.class);
+                            EditTabDynamicObject.class, DynamicPropertiesDefinition.class);
                 }
             }
 
@@ -340,20 +339,20 @@ public class StartupMetadataConfiguratorTool
                 List<List<String>> policies = box2Policies.get(key);
                 if (key.equals("rp"))
                 {
-                    buildBox(applicationService, rows, policies, BoxResearcherPage.class);
+                    buildBox(applicationService, rows, policies, BoxResearcherPage.class, RPPropertiesDefinition.class);
                 }
                 else if (key.equals("pj"))
                 {
-                    buildBox(applicationService, rows, policies, BoxProject.class);
+                    buildBox(applicationService, rows, policies, BoxProject.class, ProjectPropertiesDefinition.class);
                 }
                 else if (key.equals("ou"))
                 {
                     buildBox(applicationService, rows, policies,
-                            BoxOrganizationUnit.class);
+                            BoxOrganizationUnit.class, OUPropertiesDefinition.class);
                 }
                 else
                 {
-                    buildBox(applicationService, rows, policies, BoxDynamicObject.class);
+                    buildBox(applicationService, rows, policies, BoxDynamicObject.class, DynamicPropertiesDefinition.class);
                 }
             }
 
@@ -542,9 +541,9 @@ public class StartupMetadataConfiguratorTool
 
 	}
 
-    private static <H extends IPropertyHolder<Containable>, T extends Tab<H>> void buildTab(
+    private static <H extends IPropertyHolder<Containable>, T extends Tab<H>, PD extends PropertiesDefinition> void buildTab(
             ApplicationService applicationService, List<List<String>> rows, List<List<String>> policies,
-            Class<T> clazzTab)
+            Class<T> clazzTab, Class<PD> clazzPD)
                     throws InstantiationException, IllegalAccessException
     {
         for (List<String> row : rows)
@@ -598,15 +597,15 @@ public class StartupMetadataConfiguratorTool
             }
             internalUpdateTab(applicationService, policies, clazzTab, row,
                     shortName, label, mandatory, priority, accessLevel, ext,
-                    mime, tabRP);
+                    mime, tabRP, clazzPD);
         }
     }
 
-    private static <H extends IPropertyHolder<Containable>, T extends Tab<H>> void internalUpdateTab(
+    private static <H extends IPropertyHolder<Containable>, T extends Tab<H>, PD extends PropertiesDefinition> void internalUpdateTab(
             ApplicationService applicationService, List<List<String>> policies,
             Class<T> clazzTab, List<String> row, String shortName, String label,
             boolean mandatory, String priority, Integer accessLevel, String ext,
-            String mime, T tabRP)
+            String mime, T tabRP, Class<PD> clazzPD)
     {
         tabRP.setExt(ext);
         tabRP.setMime(mime);
@@ -617,26 +616,28 @@ public class StartupMetadataConfiguratorTool
         if(VisibilityTabConstant.POLICY.equals(tabRP.getVisibility())) {
             tabRP.getAuthorizedGroup().clear();
             tabRP.getAuthorizedSingle().clear();
-            for(List<String> lpolicy : policies) {                      
-                if("group".equals(lpolicy.get(3))) {  
-                    if(shortName.equals(lpolicy.get(1))) {    
-                        tabRP.getAuthorizedGroup().add(lpolicy.get(2));    
-                    }
-                } else {
-                    if("eperson".equals(lpolicy.get(3))) {  
+            if(policies!=null && !policies.isEmpty()) {
+                for(List<String> lpolicy : policies) {                      
+                    if("group".equals(lpolicy.get(3))) {  
                         if(shortName.equals(lpolicy.get(1))) {    
-                            tabRP.getAuthorizedSingle().add(lpolicy.get(2));    
+                            tabRP.getAuthorizedGroup().add(applicationService.findPropertiesDefinitionByShortName(clazzPD, lpolicy.get(2)));    
                         }
-                    }    
+                    } else {
+                        if("eperson".equals(lpolicy.get(3))) {  
+                            if(shortName.equals(lpolicy.get(1))) {    
+                                tabRP.getAuthorizedSingle().add(applicationService.findPropertiesDefinitionByShortName(clazzPD, lpolicy.get(2)));    
+                            }
+                        }    
+                    }
                 }
             }
         }
         applicationService.saveOrUpdate(clazzTab, tabRP);
     }
 
-    private static <H extends Box<Containable>> void buildBox(
+    private static <H extends Box<Containable>, PD extends PropertiesDefinition> void buildBox(
             ApplicationService applicationService, List<List<String>> rows, List<List<String>> policies,
-            Class<H> clazzBox)
+            Class<H> clazzBox, Class<PD> clazzPD)
                     throws InstantiationException, IllegalAccessException
     {
         for (List<String> row : rows)
@@ -677,15 +678,15 @@ public class StartupMetadataConfiguratorTool
             
             internalUpdateBox(applicationService, policies, clazzBox, row,
                     collapse, externaljsp, priority, shortname, label,
-                    unrelevant, accessLevel, box);
+                    unrelevant, accessLevel, box, clazzPD);
         }
     }
 
-    private static <H extends Box<Containable>> void internalUpdateBox(
+    private static <H extends Box<Containable>, PD extends PropertiesDefinition> void internalUpdateBox(
             ApplicationService applicationService, List<List<String>> policies,
             Class<H> clazzBox, List<String> row, boolean collapse,
-            String externaljsp, String priority, String shortname, String label,
-            boolean unrelevant, Integer accessLevel, H box)
+            String externaljsp, String priority, String shortName, String label,
+            boolean unrelevant, Integer accessLevel, H box, Class<PD> clazzPD)
     {
         box.setCollapsed(collapse);
         box.setExternalJSP(externaljsp);
@@ -701,18 +702,16 @@ public class StartupMetadataConfiguratorTool
             box.getAuthorizedGroup().clear();
             box.getAuthorizedSingle().clear();
             for(List<String> lpolicy : policies) {                      
-                if(!lpolicy.isEmpty()) {
-                    if("group".equals(lpolicy.get(3))) {  
-                        if(shortname.equals(lpolicy.get(1))) {    
-                            box.getAuthorizedGroup().add(lpolicy.get(2));    
-                        }
-                    } else {
-                        if("eperson".equals(lpolicy.get(3))) {  
-                            if(shortname.equals(lpolicy.get(1))) {    
-                                box.getAuthorizedSingle().add(lpolicy.get(2));    
-                            }
-                        }    
+                if("group".equals(lpolicy.get(3))) {  
+                    if(shortName.equals(lpolicy.get(1))) {    
+                        box.getAuthorizedGroup().add(applicationService.findPropertiesDefinitionByShortName(clazzPD, lpolicy.get(2)));    
                     }
+                } else {
+                    if("eperson".equals(lpolicy.get(3))) {  
+                        if(shortName.equals(lpolicy.get(1))) {    
+                            box.getAuthorizedSingle().add(applicationService.findPropertiesDefinitionByShortName(clazzPD, lpolicy.get(2)));    
+                        }
+                    }    
                 }
             }
         }

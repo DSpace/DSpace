@@ -10,7 +10,8 @@ package org.dspace.app.cris.dao;
 import it.cilea.osd.jdyna.dao.PropertyHolderDao;
 
 import org.dspace.app.cris.model.jdyna.BoxProject;
+import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
 
-public interface ProjectBoxDao extends PropertyHolderDao<BoxProject> {
+public interface ProjectBoxDao extends PropertyHolderDao<BoxProject,ProjectPropertiesDefinition> {
 
 }

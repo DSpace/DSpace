@@ -42,7 +42,11 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 		@NamedQuery(name = "EditTabProject.findByAccessLevel", query = "from EditTabProject tab where visibility = ? order by priority"),
 		@NamedQuery(name = "EditTabProject.findByAdmin", query = "from EditTabProject tab where visibility = 1 or visibility = 2 or visibility = 3 order by priority"),
 	    @NamedQuery(name = "EditTabProject.findByOwner", query = "from EditTabProject tab where visibility = 0 or visibility = 2 or visibility = 3 order by priority"),
-	    @NamedQuery(name = "EditTabProject.findByAnonimous", query = "from EditTabProject tab where visibility = 3 order by priority")
+	    @NamedQuery(name = "EditTabProject.findByAnonimous", query = "from EditTabProject tab where visibility = 3 order by priority"),
+        @NamedQuery(name = "EditTabProject.findAuthorizedGroupById", query = "select tab.authorizedGroup from EditTabProject tab where tab.id = ?"),
+        @NamedQuery(name = "EditTabProject.findAuthorizedGroupByShortname", query = "select tab.authorizedGroup from EditTabProject tab where tab.shortName = ?"),
+        @NamedQuery(name = "EditTabProject.findAuthorizedSingleById", query = "select tab.authorizedSingle from EditTabProject tab where tab.id = ?"),
+        @NamedQuery(name = "EditTabProject.findAuthorizedSingleByShortname", query = "select tab.authorizedSingle  from EditTabProject tab where tab.shortName = ?")	    
 })
 public class EditTabProject extends
 		AbstractEditTab<BoxProject,TabProject> {
@@ -58,21 +62,21 @@ public class EditTabProject extends
 	@OneToOne
 	private TabProject displayTab;
 
-    @ElementCollection
-    @CollectionTable(
+	@ManyToMany
+	@JoinTable(
           name="cris_pj_etab2policysingle",
           joinColumns=@JoinColumn(name="etab_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedSingle;
+    private List<ProjectPropertiesDefinition> authorizedSingle;
     
-    @ElementCollection
-    @CollectionTable(
+	@ManyToMany
+	@JoinTable(
           name="cris_pj_etab2policygroup",
           joinColumns=@JoinColumn(name="etab_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedGroup;
+    private List<ProjectPropertiesDefinition> authorizedGroup;
     
 	public EditTabProject() {
 		this.visibility = VisibilityTabConstant.ADMIN;
@@ -112,46 +116,25 @@ public class EditTabProject extends
     }
 
     @Override
-    public List<String> getAuthorizedSingle()
+    public List<ProjectPropertiesDefinition> getAuthorizedSingle()
     {
         return authorizedSingle;
     }
 
-    @Override
-    public void setAuthorizedSingle(List<String> authorizedSingle)
+    public void setAuthorizedSingle(List<ProjectPropertiesDefinition> authorizedSingle)
     {
         this.authorizedSingle = authorizedSingle; 
     }
 
     @Override
-    public List<String> getAuthorizedGroup()
+    public List<ProjectPropertiesDefinition> getAuthorizedGroup()
     {
         return authorizedGroup;
     }
 
-    @Override
-    public void setAuthorizedGroup(List<String> authorizedGroup)
+    public void setAuthorizedGroup(List<ProjectPropertiesDefinition> authorizedGroup)
     {
         this.authorizedGroup = authorizedGroup;
     }
 
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(AS tabService, String specificPart)
-    {        
-        List<String> results = new ArrayList<String>();
-        for(ProjectPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(ProjectPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
-
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(AS tabService, String specificPart)
-    {
-        List<String> results = new ArrayList<String>();
-        for(ProjectPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(ProjectPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
 }

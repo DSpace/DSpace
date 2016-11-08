@@ -18,6 +18,8 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
@@ -34,7 +36,11 @@ import it.cilea.osd.jdyna.web.ITabService;
         @org.hibernate.annotations.NamedQuery(name = "BoxResearcherPage.findAll", query = "from BoxResearcherPage order by priority asc"),
         @org.hibernate.annotations.NamedQuery(name = "BoxResearcherPage.findContainableByHolder", query = "from Containable containable where containable in (select m from BoxResearcherPage box join box.mask m where box.id = ?)", cacheable = true),
         @org.hibernate.annotations.NamedQuery(name = "BoxResearcherPage.findHolderByContainable", query = "from BoxResearcherPage box where :par0 in elements(box.mask)", cacheable = true),
-        @org.hibernate.annotations.NamedQuery(name = "BoxResearcherPage.uniqueBoxByShortName", query = "from BoxResearcherPage box where shortName = ?") })
+        @org.hibernate.annotations.NamedQuery(name = "BoxResearcherPage.uniqueBoxByShortName", query = "from BoxResearcherPage box where shortName = ?"),
+        @org.hibernate.annotations.NamedQuery(name = "BoxResearcherPage.findAuthorizedGroupById", query = "select box.authorizedGroup from BoxResearcherPage box where box.id = ?"),
+        @org.hibernate.annotations.NamedQuery(name = "BoxResearcherPage.findAuthorizedGroupByShortname", query = "select box.authorizedGroup from BoxResearcherPage box where box.shortName = ?"),
+        @org.hibernate.annotations.NamedQuery(name = "BoxResearcherPage.findAuthorizedSingleById", query = "select box.authorizedSingle from BoxResearcherPage box where box.id = ?"),
+        @org.hibernate.annotations.NamedQuery(name = "BoxResearcherPage.findAuthorizedSingleByShortname", query = "select box.authorizedSingle from BoxResearcherPage box where box.shortName = ?")})
 public class BoxResearcherPage extends Box<Containable>
 {
 
@@ -45,21 +51,21 @@ public class BoxResearcherPage extends Box<Containable>
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<Containable> mask;
 
-    @ElementCollection
-    @CollectionTable(
+    @ManyToMany
+    @JoinTable(
           name="cris_rp_box2policysingle",
           joinColumns=@JoinColumn(name="box_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedSingle;
+    private List<RPPropertiesDefinition> authorizedSingle;
     
-    @ElementCollection
-    @CollectionTable(
+    @ManyToMany
+    @JoinTable(
           name="cris_rp_box2policygroup",
           joinColumns=@JoinColumn(name="box_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedGroup;
+    private List<RPPropertiesDefinition> authorizedGroup;
     
     public BoxResearcherPage()
     {
@@ -87,52 +93,31 @@ public class BoxResearcherPage extends Box<Containable>
     }
 
 
-    public List<String> getAuthorizedSingle()
+    public List<RPPropertiesDefinition> getAuthorizedSingle()
     {
         if(this.authorizedSingle==null) {
-            this.authorizedSingle = new ArrayList<String>();
+            this.authorizedSingle = new ArrayList<RPPropertiesDefinition>();
         }
         return authorizedSingle;
     }
 
-    public void setAuthorizedSingle(List<String> authorizedSingle)
+    public void setAuthorizedSingle(List<RPPropertiesDefinition> authorizedSingle)
     {
         this.authorizedSingle = authorizedSingle; 
     }
 
-    public List<String> getAuthorizedGroup()
+    public List<RPPropertiesDefinition> getAuthorizedGroup()
     {
         if(this.authorizedGroup==null) {
-            this.authorizedGroup = new ArrayList<String>();
+            this.authorizedGroup = new ArrayList<RPPropertiesDefinition>();
         }
         return authorizedGroup;
     }
 
-    public void setAuthorizedGroup(List<String> authorizedGroup)
+    public void setAuthorizedGroup(List<RPPropertiesDefinition> authorizedGroup)
     {
         this.authorizedGroup = authorizedGroup;
     }
     
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
-            AS tabService, String specificPart)
-    {        
-        List<String> results = new ArrayList<String>();
-        for(RPPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(RPPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
-
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
-            AS tabService, String specificPart)
-    {
-        List<String> results = new ArrayList<String>();
-        for(RPPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(RPPropertiesDefinition.class)) {
-            results.add(pd.getShortName());
-        }
-        return results;
-    }
 
 }

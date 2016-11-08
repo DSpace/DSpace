@@ -10,7 +10,8 @@ package org.dspace.app.cris.dao;
 import it.cilea.osd.jdyna.dao.PropertyHolderDao;
 
 import org.dspace.app.cris.model.jdyna.BoxResearcherPage;
+import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 
-public interface RPBoxDao extends PropertyHolderDao<BoxResearcherPage> {
+public interface RPBoxDao extends PropertyHolderDao<BoxResearcherPage,RPPropertiesDefinition> {
 
 }
