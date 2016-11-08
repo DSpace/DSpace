@@ -420,7 +420,14 @@
         <name>load-cris-configuration</name>
         <description>Load CRIS configuration from an XLS file</description>
         <step>
-            <class>org.dspace.app.cris.batch.StartupMetadataConfiguratorTool</class>
+            <class>org.dspace.app.cris.batch.ImportCRISDataModelConfiguration</class>
         </step>
     </command>
+	<command>
+        <name>export-cris-configuration</name>
+        <description>Export CRIS configuration from an XLS file</description>
+        <step>
+            <class>org.dspace.app.cris.batch.ExportCRISDataModelConfiguration</class>
+        </step>
+    </command>    
 </commands>
