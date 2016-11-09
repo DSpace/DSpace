@@ -62,7 +62,6 @@ public class Community extends DSpaceObject{
 
     private void setup(org.dspace.content.Community community, ServletContext servletContext, String expand, Context context) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
-        PermissionUtil permUtil = new PermissionUtil();
 
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
@@ -122,7 +121,7 @@ public class Community extends DSpaceObject{
         }
 
         if(expandFields.contains("permission") | expandFields.contains("all")) {
-            this.setPermission(permUtil.getPermission(context, community));
+            this.setPermission(Permission.getPermission(context, community));
 
         } else {
             this.addExpand("permission");

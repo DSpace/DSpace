@@ -2,6 +2,7 @@ package org.dspace.rest.common;
 
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -26,12 +27,12 @@ public class Permission {
     public Permission() {}
 
     /**
-     * Constructor to check system administrator status.
+     * Public constructor used to test system administrator status.
      * @param context
      */
     public Permission(Context context) {
         try {
-            this.isSystemAdmin = authorizeService.isAdmin(context);
+            this.isSystemAdmin = AuthorizeServiceFactory.getInstance().getAuthorizeService().isAdmin(context);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -39,16 +40,33 @@ public class Permission {
     }
 
     /**
-     * Constructor for permissions on a dspace object.
+     * Private constructor for asset permissions.
      * @param canSubmit
      * @param canAdminister
      * @param canWrite
      */
-    public Permission(boolean canSubmit, boolean canAdminister, boolean canWrite) {
+    private Permission(boolean canSubmit, boolean canAdminister, boolean canWrite) {
 
         this.canSubmit = canSubmit;
         this.canAdminister = canAdminister;
         this.canWrite = canWrite;
+
+    }
+
+    /**
+     * Static method returns permissions for the asset and context.
+     * @param context  current user context
+     * @param asset the <code>DSpaceObject</code>
+     * @return  <code>Permission</code> object
+     * @throws SQLException
+     */
+    public static Permission getPermission(Context context, org.dspace.content.DSpaceObject asset) throws SQLException {
+
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        boolean canSubmit = authorizeService.authorizeActionBoolean(context, asset, Constants.ADD);
+        boolean canAdminister = authorizeService.authorizeActionBoolean(context, asset, Constants.ADMIN);
+        boolean canWrite = authorizeService.authorizeActionBoolean(context, asset, Constants.WRITE);
+        return new Permission(canSubmit, canAdminister, canWrite);
 
     }
 
@@ -86,6 +104,5 @@ public class Permission {
     public boolean getSystemAdmin() {
         return this.isSystemAdmin;
     }
-
 
 }

@@ -81,6 +81,7 @@ public class Resource
                 context.setCurrentUser(EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, authentication.getName()));
             } else {
                 context.setCurrentUser(EPersonServiceFactory.getInstance().getEPersonService().findByNetid(context, authentication.getName()));
+            }
         }
 
         return context;

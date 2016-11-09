@@ -63,7 +63,7 @@ public class Collection extends DSpaceObject {
 
     private void setup(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
-        PermissionUtil permUtil = new PermissionUtil();
+
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
@@ -121,7 +121,7 @@ public class Collection extends DSpaceObject {
         }
 
         if(expandFields.contains("permission") | expandFields.contains("all")) {
-            this.setPermission(permUtil.getPermission(context, collection));
+            this.setPermission(Permission.getPermission(context, collection));
 
         } else {
             this.addExpand("permission");
@@ -217,4 +217,5 @@ public class Collection extends DSpaceObject {
     public void setPermission(Permission permission) {this.permission = permission; }
 
     public Permission getPermission() {return permission; }
+
 }

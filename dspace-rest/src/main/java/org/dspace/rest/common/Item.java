@@ -66,7 +66,7 @@ public class Item extends DSpaceObject {
 
     private void setup(org.dspace.content.Item item, ServletContext servletContext, String expand, Context context) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
-        PermissionUtil permUtil = new PermissionUtil();
+
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
@@ -139,7 +139,7 @@ public class Item extends DSpaceObject {
         }
 
         if(expandFields.contains("permission") | expandFields.contains("all")) {
-            this.setPermission(permUtil.getPermission(context, item));
+            this.setPermission(Permission.getPermission(context, item));
 
         } else {
             this.addExpand("permission");
