@@ -11,7 +11,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.HttpHost;
@@ -1327,7 +1327,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             log.warn("Error while indexing sort date field, item: " + item.getHandle() + " metadata field: " + field + " date value: " + date);
                         }
                     }else{
-                        doc.addField(field + "_sort", value);
+                        doc.addField(field + "_sort", StringUtils.stripAccents(value));
                     }
                     sortFieldsAdded.add(field);
                 }
