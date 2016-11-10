@@ -35,6 +35,7 @@
 		
 	<bean class="org.dspace.app.webui.cris.metrics.MetricsCrisHomeProcessor"
 		id="rpHomeProcessor">
+		<property name="configurator" ref="org.dspace.app.webui.cris.metrics.MetricsProcessorConfigurator"/>
 		<property name="rankingLevels">
 			<list>
 				<value>1</value>
@@ -155,4 +156,39 @@
 			</map>
 		</property>
 	</bean>
+	
+	<bean class="org.dspace.app.webui.cris.metrics.MetricsProcessorConfigurator"
+		name="org.dspace.app.webui.cris.metrics.MetricsProcessorConfigurator">
+		<property name="mapFormatter">
+			<map>
+				<entry key="default">
+					<ref local="defaultNumberFormatter" />
+				</entry>
+			</map>
+		</property>
+	</bean>			
+	
+	<bean id="defaultNumberFormatter"
+		class="org.dspace.app.webui.cris.metrics.NumberFormatter">
+		<property name="type" value="NUMBER"/>
+		<property name="maxFractionDigits" value="0"/>
+	</bean>
+	
+	<bean id="exampleDefaultPercentNumberFormatter"
+		class="org.dspace.app.webui.cris.metrics.NumberFormatter">
+		<property name="type" value="PERCENT"/>
+		<property name="minFractionDigits" value="3"/>		
+	</bean>
+		
+	<bean id="examplePercentWithFractionalNumberFormatter"
+		class="org.dspace.app.webui.cris.metrics.NumberFormatter">
+		<property name="type" value="PERCENT"/>
+		<property name="minFractionDigits" value="3"/>		
+	</bean>
+	
+	<bean id="exampleNumberFormatter"
+		class="org.dspace.app.webui.cris.metrics.NumberFormatter">
+		<property name="type" value="NUMBER"/>
+		<property name="minFractionDigits" value="3"/>
+	</bean>	
 </beans>

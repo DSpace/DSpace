@@ -35,7 +35,8 @@ public class MetricsCrisHomeProcessor<ACO extends ACrisObject> implements ICrisH
 	private List<String> metricTypes;
 	private Class<ACO> clazz;
 	private SearchService searchService;
-
+	private MetricsProcessorConfigurator configurator;
+	
 	@Override
 	public void process(Context context, HttpServletRequest request, HttpServletResponse response, ACO item)
 			throws PluginException, AuthorizeException {
@@ -63,6 +64,7 @@ public class MetricsCrisHomeProcessor<ACO extends ACrisObject> implements ICrisH
 			for (String t : metricTypes) {	
 				ItemMetricsDTO dto = new ItemMetricsDTO();
 				dto.type=t;
+				dto.setFormatter(configurator.getFormatter(t));
 				dto.counter=(Double) doc.getFieldValue(field+t);
 				dto.last1=(Double) doc.getFieldValue(field+t+"_last1");
 				dto.last2=(Double) doc.getFieldValue(field+t+"_last2");;
@@ -137,5 +139,10 @@ public class MetricsCrisHomeProcessor<ACO extends ACrisObject> implements ICrisH
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
+    }
+
+    public void setConfigurator(MetricsProcessorConfigurator configurator)
+    {
+        this.configurator = configurator;
     }
 }

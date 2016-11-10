@@ -1,4 +1,13 @@
-truncate table cris_do_box2policygroup;
+--
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
+--
+-- http://www.dspace.org/license/
+--
+BEGIN
+	EXECUTE IMMEDIATE
+'truncate table cris_do_box2policygroup;
 truncate table cris_do_box2policysingle;
 truncate table cris_do_etab2policygroup;
 truncate table cris_do_etab2policysingle; 
@@ -93,4 +102,9 @@ alter table cris_rp_box2policysingle add constraint FK_lesynsrx0csubq5a0sx31tv5w
 alter table cris_rp_etab2policygroup add constraint FK_461h8h92wrvyxxxywunkopdol foreign key (authorizedGroup_id) references cris_rp_pdef;
 alter table cris_rp_etab2policysingle add constraint FK_fkbp74vg34qxh8k788jey45sd foreign key (authorizedSingle_id) references cris_rp_pdef;
 alter table cris_rp_tab2policygroup add constraint FK_jtscxfde3kfpxuniwnox0rvy6 foreign key (authorizedGroup_id) references cris_rp_pdef;
-alter table cris_rp_tab2policysingle add constraint FK_jvw45mrhe2due2meew4jneqfc foreign key (authorizedSingle_id) references cris_rp_pdef;
+alter table cris_rp_tab2policysingle add constraint FK_jvw45mrhe2due2meew4jneqfc foreign key (authorizedSingle_id) references cris_rp_pdef;'
+	EXCEPTION
+	WHEN OTHERS
+    THEN
+       NULL;
+END;

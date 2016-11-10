@@ -5,8 +5,9 @@
 --
 -- http://www.dspace.org/license/
 --
-
-create table cris_do_box2policygroup (box_id number(10,0) not null, authorizedGroup varchar2(255 char));
+BEGIN
+	EXECUTE IMMEDIATE
+'create table cris_do_box2policygroup (box_id number(10,0) not null, authorizedGroup varchar2(255 char));
 create table cris_do_box2policysingle (box_id number(10,0) not null, authorizedSingle varchar2(255 char));
 create table cris_do_tab2policygroup (tab_id number(10,0) not null, authorizedGroup varchar2(255 char));
 create table cris_do_tab2policysingle (tab_id number(10,0) not null, authorizedSingle varchar2(255 char));
@@ -56,4 +57,9 @@ alter table cris_ou_etab2policysingle add constraint FK_6cw0xrjng41aedd4mk76jcm3
 alter table cris_pj_etab2policygroup add constraint FK_cpnidos6chf15smpf365k9u2d foreign key (etab_id) references cris_pj_etab;
 alter table cris_pj_etab2policysingle add constraint FK_c370hgq2gwt1fk1cpn92y5wof foreign key (etab_id) references cris_pj_etab;
 alter table cris_rp_etab2policygroup add constraint FK_i8ye9656ab432x6ylqvi3eiek foreign key (etab_id) references cris_rp_etab;
-alter table cris_rp_etab2policysingle add constraint FK_r9o249od95444ipvgrnij3uvl foreign key (etab_id) references cris_rp_etab;
+alter table cris_rp_etab2policysingle add constraint FK_r9o249od95444ipvgrnij3uvl foreign key (etab_id) references cris_rp_etab;'
+	EXCEPTION
+	WHEN OTHERS
+    THEN
+       NULL;
+END;
