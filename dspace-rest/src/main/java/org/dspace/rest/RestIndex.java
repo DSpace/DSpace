@@ -7,20 +7,6 @@
  */
 package org.dspace.rest;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
-import java.util.Iterator;
-
-import javax.servlet.ServletContext;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.*;
-import javax.ws.rs.core.Context;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationMethod;
@@ -33,6 +19,17 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.rest.common.Status;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.utils.DSpace;
+
+import javax.servlet.ServletContext;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.util.Iterator;
 
 /**
  * Root of RESTful api. It provides login and logout. Also have method for
@@ -247,15 +244,13 @@ public class RestIndex {
      * authenticated: true | false
      * epersonEMAIL: user@example.com
      * epersonNAME: John Doe
-     * @param headers
-     *            Request header which contains the header named
-     *            "rest-dspace-token" containing the token as value.
+	 *
      * @return status
      */
     @GET
     @Path("/status")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Status status(@Context HttpHeaders headers) throws UnsupportedEncodingException {
+    public Status status() throws UnsupportedEncodingException {
         org.dspace.core.Context context = null;
 
         try {

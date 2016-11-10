@@ -13,6 +13,8 @@
 
   <xs:element name="metadataentry" type="metadataEntry"/>
 
+  <xs:element name="permission" type="permission"/>
+
   <xs:element name="resourcepolicy" type="resourcePolicy"/>
 
   <xs:element name="status" type="status"/>
@@ -82,6 +84,7 @@
           <xs:element name="numberItems" type="xs:int" minOccurs="0"/>
           <xs:element name="parentCommunity" type="community" minOccurs="0"/>
           <xs:element name="parentCommunityList" type="community" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element ref="permission" minOccurs="0"/>
           <xs:element name="shortDescription" type="xs:string" minOccurs="0"/>
           <xs:element name="sidebarText" type="xs:string" minOccurs="0"/>
         </xs:sequence>
@@ -100,6 +103,7 @@
           <xs:element name="parentCollection" type="collection" minOccurs="0"/>
           <xs:element name="parentCollectionList" type="collection" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
           <xs:element name="parentCommunityList" type="community" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element ref="permission" minOccurs="0"/>
           <xs:element name="withdrawn" type="xs:string" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
@@ -124,12 +128,22 @@
           <xs:element name="introductoryText" type="xs:string" minOccurs="0"/>
           <xs:element name="logo" type="bitstream" minOccurs="0"/>
           <xs:element name="parentCommunity" type="community" minOccurs="0"/>
+          <xs:element ref="permission" minOccurs="0"/>
           <xs:element name="shortDescription" type="xs:string" minOccurs="0"/>
           <xs:element name="sidebarText" type="xs:string" minOccurs="0"/>
           <xs:element name="subcommunities" type="community" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="permission">
+    <xs:sequence>
+      <xs:element name="canAdminister" type="xs:boolean"/>
+      <xs:element name="canSubmit" type="xs:boolean"/>
+      <xs:element name="canWrite" type="xs:boolean"/>
+      <xs:element name="systemAdmin" type="xs:boolean"/>
+    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="status">

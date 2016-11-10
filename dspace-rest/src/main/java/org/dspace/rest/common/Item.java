@@ -54,6 +54,8 @@ public class Item extends DSpaceObject {
     List<Community> parentCommunityList;
     List<MetadataEntry> metadata;
     List<Bitstream> bitstreams;
+    // Permissions
+    Permission permission;
 
     public Item(){}
 
@@ -64,6 +66,7 @@ public class Item extends DSpaceObject {
 
     private void setup(org.dspace.content.Item item, ServletContext servletContext, String expand, Context context) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
+
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
@@ -135,6 +138,14 @@ public class Item extends DSpaceObject {
             this.addExpand("bitstreams");
         }
 
+        if(expandFields.contains("permission") | expandFields.contains("all")) {
+            this.setPermission(Permission.getPermission(context, item));
+
+        } else {
+            this.addExpand("permission");
+        }
+
+
         if(!expandFields.contains("all")) {
             this.addExpand("all");
         }
@@ -204,4 +215,8 @@ public class Item extends DSpaceObject {
 	public void setBitstreams(List<Bitstream> bitstreams) {
 		this.bitstreams = bitstreams;
 	}
+
+    public void setPermission(Permission permission) {this.permission = permission; }
+
+    public Permission getPermission() {return permission; }
 }

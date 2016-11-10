@@ -7,20 +7,19 @@
  */
 package org.dspace.rest.common;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class TestJAXBSchema {
 
@@ -53,6 +52,7 @@ public class TestJAXBSchema {
                 Item.class,
                 MetadataEntry.class,
                 ResourcePolicy.class,
+                Permission.class,
                 Status.class
                 );
         context.generateSchema(resolver);

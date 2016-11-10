@@ -7,35 +7,25 @@
  */
 package org.dspace.rest;
 
-import java.net.CookieHandler;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Superclass of all resource classes in REST API. It has methods for creating
@@ -86,7 +76,12 @@ public class Resource
             for (SimpleGrantedAuthority grantedAuthority : specialGroups) {
                 context.setSpecialGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, grantedAuthority.getAuthority()).getID());
             }
-            context.setCurrentUser(EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, authentication.getName()));
+            // The principal can be represented as an email address or a netid.
+            if (EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, authentication.getName()) != null) {
+                context.setCurrentUser(EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, authentication.getName()));
+            } else {
+                context.setCurrentUser(EPersonServiceFactory.getInstance().getEPersonService().findByNetid(context, authentication.getName()));
+            }
         }
 
         return context;
