@@ -173,4 +173,22 @@
 		<property name="type" value="NUMBER"/>
 		<property name="maxFractionDigits" value="0"/>
 	</bean>
+	
+	<bean id="exampleDefaultPercentNumberFormatter"
+		class="org.dspace.app.webui.cris.metrics.NumberFormatter">
+		<property name="type" value="PERCENT"/>
+		<property name="minFractionDigits" value="3"/>		
+	</bean>
+		
+	<bean id="examplePercentWithFractionalNumberFormatter"
+		class="org.dspace.app.webui.cris.metrics.NumberFormatter">
+		<property name="type" value="PERCENT"/>
+		<property name="minFractionDigits" value="3"/>		
+	</bean>
+	
+	<bean id="exampleNumberFormatter"
+		class="org.dspace.app.webui.cris.metrics.NumberFormatter">
+		<property name="type" value="NUMBER"/>
+		<property name="minFractionDigits" value="3"/>
+	</bean>	
 </beans>

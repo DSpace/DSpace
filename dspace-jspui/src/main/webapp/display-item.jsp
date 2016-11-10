@@ -401,16 +401,85 @@ if (dedupEnabled && admin_button) { %>
 		</span>
 		</c:if>
 		</h4>
-		<span id="metric-counter-${metricType}" class="metric-counter"><fmt:formatNumber value="${metrics[metricType].counter}" type="${metrics[metricType].formatter.type}" maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}" /></span>
+		<span id="metric-counter-${metricType}" class="metric-counter">
+		<c:choose>		
+		<c:when test="${!empty metrics[metricType].formatter.type}">
+		<c:choose>
+		<c:when test="${!(metrics[metricType].formatter.type eq 'PERCENT')}">
+			<fmt:formatNumber value="${metrics[metricType].counter}" 
+				type="${metrics[metricType].formatter.type}"
+				maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}"
+				minFractionDigits="${metrics[metricType].formatter.minFractionDigits}"/>
+		</c:when>
+		<c:otherwise>
+			<fmt:formatNumber value="${metrics[metricType].counter/100}" 
+				type="${metrics[metricType].formatter.type}"
+				maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}"
+				minFractionDigits="${metrics[metricType].formatter.minFractionDigits}"/>
+		</c:otherwise>
+		</c:choose>
+		</c:when>		
+		<c:otherwise>
+			<fmt:formatNumber value="${metrics[metricType].counter}" 
+				pattern="${metrics[metricType].formatter.pattern}"/>
+		</c:otherwise>
+		</c:choose>
+		</span>
 	</div>
 	<c:if test="${not empty metrics[metricType].last1}">
 	<div class="row">
 		<div class="col-xs-6 text-left">
 			<fmt:message key="jsp.display-item.citation.last1" />
-			<br/><fmt:formatNumber value="${metrics[metricType].last1}" type="${metrics[metricType].formatter.type}" maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}" /></div>
+			<br/>
+				<c:choose>		
+					<c:when test="${!empty metrics[metricType].formatter.type}">
+					<c:choose>
+						<c:when test="${!(metrics[metricType].formatter.type eq 'PERCENT')}">
+							<fmt:formatNumber value="${metrics[metricType].last1}" 
+								type="${metrics[metricType].formatter.type}"
+								maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}"
+								minFractionDigits="${metrics[metricType].formatter.minFractionDigits}"/>
+						</c:when>
+						<c:otherwise>
+							<fmt:formatNumber value="${metrics[metricType].last1/100}" 
+								type="${metrics[metricType].formatter.type}"
+								maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}"
+								minFractionDigits="${metrics[metricType].formatter.minFractionDigits}"/>
+						</c:otherwise>
+					</c:choose>
+					</c:when>		
+					<c:otherwise>
+						<fmt:formatNumber value="${metrics[metricType].last1}" 
+							pattern="${metrics[metricType].formatter.pattern}"/>
+					</c:otherwise>
+				</c:choose>			
+		</div>
 		<div class="col-xs-6 text-right">
 			<fmt:message key="jsp.display-item.citation.last2" />
-			<br/><fmt:formatNumber value="${metrics[metricType].last2}" type="${metrics[metricType].formatter.type}" maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}" /></div>
+			<br/>
+				<c:choose>		
+					<c:when test="${!empty metrics[metricType].formatter.type}">
+					<c:choose>
+						<c:when test="${!(metrics[metricType].formatter.type eq 'PERCENT')}">
+							<fmt:formatNumber value="${metrics[metricType].last2}" 
+								type="${metrics[metricType].formatter.type}"
+								maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}"
+								minFractionDigits="${metrics[metricType].formatter.minFractionDigits}"/>
+						</c:when>
+						<c:otherwise>
+							<fmt:formatNumber value="${metrics[metricType].last2/100}" 
+								type="${metrics[metricType].formatter.type}"
+								maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}"
+								minFractionDigits="${metrics[metricType].formatter.minFractionDigits}"/>
+						</c:otherwise>
+					</c:choose>
+					</c:when>		
+					<c:otherwise>
+						<fmt:formatNumber value="${metrics[metricType].last2}" 
+							pattern="${metrics[metricType].formatter.pattern}"/>
+					</c:otherwise>
+				</c:choose>				
+		</div>
 	</div>
 	</c:if>
 	<div class="row">
