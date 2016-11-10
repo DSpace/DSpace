@@ -311,9 +311,9 @@ public class WorkflowItem implements InProgressSubmission {
                         int numMatched = 0;
                         for (int j = 0; j < itemAuthors.length; j++) {
                             for (Author a : manuscript.getAuthorList()) {
-                                double score = JournalUtils.getHamrScore(itemAuthors[j].value, a.fullName());
+                                double score = JournalUtils.getHamrScore(itemAuthors[j].value, a.getUnicodeFullName());
                                 if (score > 0.7) {
-                                    log.debug("author " + itemAuthors[j].value + " matched " + a.fullName() + " with a score of " + score);
+                                    log.debug("author " + itemAuthors[j].value + " matched " + a.getUnicodeFullName() + " with a score of " + score);
                                     numMatched++;
                                     break;
                                 }

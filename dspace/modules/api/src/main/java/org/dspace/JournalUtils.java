@@ -427,7 +427,7 @@ public class JournalUtils {
             ArrayList<String> lastNames = new ArrayList<String>();
             for (Author a : queryManuscript.getAuthorList()) {
                 // replace any hyphens in the last names with spaces for tokenizing.
-                lastNames.add(a.familyName.replaceAll("-"," "));
+                lastNames.add(a.getNormalizedFamilyName().replaceAll("-"," "));
             }
             queryString.append(StringUtils.join(lastNames.toArray(), " ").replaceAll("[^a-zA-Z\\s]", ""));
             queryString.append(" ");
