@@ -446,7 +446,7 @@ public class JournalUtils {
             if (itemsNode != null && itemsNode.isArray()) {
                 JsonNode bestItem = itemsNode.get(0);
                 float score = bestItem.path("score").floatValue();
-                if (score > 2.0) {
+                if (score > 3.0) {
                     matchedManuscript = manuscriptFromCrossRefJSON(bestItem, queryManuscript.getJournalConcept());
                 }
             } else {
