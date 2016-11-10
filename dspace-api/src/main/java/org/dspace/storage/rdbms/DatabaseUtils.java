@@ -570,6 +570,13 @@ public class DatabaseUtils
             return null;
         }
 
+        if(tableExists(connection, "cris_rp_box2policygroup")) {
+            if(tableColumnExists(connection, "cris_rp_box2policygroup", "authorizedgroup_id", null, null)) {
+                return "5.6.0.1";
+            }            
+            return "5.6.0.0";
+        }        
+        
         if(tableColumnExists(connection, "imp_record_to_item", "imp_sourceref", null, null)) {
             return "5.5.1.2";
         }
