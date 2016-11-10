@@ -401,16 +401,16 @@ if (dedupEnabled && admin_button) { %>
 		</span>
 		</c:if>
 		</h4>
-		<span id="metric-counter-${metricType}" class="metric-counter"><fmt:formatNumber value="${metrics[metricType].counter}" type="NUMBER" maxFractionDigits="0" /></span>
+		<span id="metric-counter-${metricType}" class="metric-counter"><fmt:formatNumber value="${metrics[metricType].counter}" type="${metrics[metricType].formatter.type}" maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}" /></span>
 	</div>
 	<c:if test="${not empty metrics[metricType].last1}">
 	<div class="row">
 		<div class="col-xs-6 text-left">
 			<fmt:message key="jsp.display-item.citation.last1" />
-			<br/><fmt:formatNumber value="${metrics[metricType].last1}" type="NUMBER" maxFractionDigits="0" /></div>
+			<br/><fmt:formatNumber value="${metrics[metricType].last1}" type="${metrics[metricType].formatter.type}" maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}" /></div>
 		<div class="col-xs-6 text-right">
 			<fmt:message key="jsp.display-item.citation.last2" />
-			<br/><fmt:formatNumber value="${metrics[metricType].last2}" type="NUMBER" maxFractionDigits="0" /></div>
+			<br/><fmt:formatNumber value="${metrics[metricType].last2}" type="${metrics[metricType].formatter.type}" maxFractionDigits="${metrics[metricType].formatter.maxFractionDigits}" /></div>
 	</div>
 	</c:if>
 	<div class="row">
