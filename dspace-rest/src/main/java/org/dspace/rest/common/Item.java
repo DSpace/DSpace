@@ -55,7 +55,7 @@ public class Item extends DSpaceObject {
     List<MetadataEntry> metadata;
     List<Bitstream> bitstreams;
     // Permissions
-     Permission permission;
+    Permission permission;
 
     public Item(){}
 
