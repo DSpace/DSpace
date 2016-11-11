@@ -1,0 +1,95 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<html>
+<head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
+    <!-- sortable.js can be obtained at http://www.kryogenix.org/code/browser/sorttable/ -->
+    <!-- <script src="sorttable.js"></script> -->
+
+    <script src="restReport.js"></script>
+    <script src="restQueryReport.js"></script>
+    <script src="spin.js"></script>
+    <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css"></link>
+    <link rel="stylesheet" type="text/css" href="restClient.css"></link>
+    <title>DSpace REST Query Client</title>
+</head>
+<body>
+<a href="index.html">Collection Filter</a>
+<span id="currentUser"></span>
+<hr/>
+<h1>DSpace REST Query Client</h1>
+<div id="querydiv">
+  <div id='metadatadiv'>
+    <h3>Collection Selector</h3>
+    <div id="collSelector">
+    </div>
+    <h3>Metadata Field Queries</h3>
+    <div>
+      <fieldset id="predefqueries">
+        <label>Pre-defined Queries</label>
+        <select id="predefselect">
+        </select>
+      </fieldset>
+      <div id="queries">
+      </div>
+      <div>
+        <button class="query-button" disabled="disabled" class="activate">Run Item Query</button>
+      </div>
+    </div>
+    <h3>Limit/Paginate Queries</h3>
+    <div id="queries-page">
+      <div>
+        <label for="limit">Limit:</label>
+        <select id="limit" name="limit">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100" selected>100</option>
+          <option value="250">250</option>
+          <option value="1000">1000</option>
+        </select>
+        <label for="offset"> Offset:</label><input id="offset" name="offset" value="0"/>
+      </div>
+      <div>
+        <button class="query-button" disabled="disabled" class="activate">Run Item Query</button>
+      </div>
+    </div>
+    <h3>Filters</h3>
+    <div>
+      <div>
+        <button class="query-button" disabled="disabled" class="activate">Run Item Query</button>
+      </div>
+      <div id='filterdiv'>
+      </div>
+      <div>
+        <button class="query-button" disabled="disabled" class="activate">Run Item Query</button>
+      </div>
+    </div>
+    <h3>Additional data to return</h3>
+    <div id="queries-aux">
+      <div id="show-fields"></div>
+      <div>
+        <button class="query-button" disabled="disabled" class="activate">Run Item Query</button>
+      </div>
+    </div>
+    <h3>Item Results</h3>
+    <div id='itemdiv'>
+      <h3></h3>  
+      <div><a class="this-search" href="#">URL to current search</a></div>
+      <div><button id="prev">Prev Page</button><button id="next">Next Page</button><button id="export">Export for Metadata Update</button></div>
+      <table id="itemtable" class="sortable">
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>
