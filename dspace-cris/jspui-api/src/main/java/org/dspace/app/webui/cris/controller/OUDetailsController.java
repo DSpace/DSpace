@@ -206,7 +206,7 @@ public class OUDetailsController
         List<TabOrganizationUnit> authorizedTabs = new LinkedList<TabOrganizationUnit>();
         
         for(TabOrganizationUnit tab : tabs) {
-            if(CrisAuthorizeManager.authorize(context, applicationService, OrganizationUnit.class, entityId, tab)) {
+            if(CrisAuthorizeManager.authorize(context, applicationService, OrganizationUnit.class, OUPropertiesDefinition.class, entityId, tab)) {
                 authorizedTabs.add(tab);
             }
         }
@@ -302,6 +302,6 @@ public class OUDetailsController
     @Override
     protected boolean authorize(HttpServletRequest request, BoxOrganizationUnit box) throws SQLException
     {
-        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), OrganizationUnit.class, extractEntityId(request), box);
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), OrganizationUnit.class, OUPropertiesDefinition.class, extractEntityId(request), box);
     }
 }

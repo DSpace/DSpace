@@ -10,10 +10,11 @@ package org.dspace.app.cris.dao;
 import it.cilea.osd.jdyna.dao.TabDao;
 
 import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
+import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
 
 
 
-public interface OUTabDao extends TabDao<BoxOrganizationUnit,TabOrganizationUnit> {
+public interface OUTabDao extends TabDao<BoxOrganizationUnit,TabOrganizationUnit,OUPropertiesDefinition> {
 
 }

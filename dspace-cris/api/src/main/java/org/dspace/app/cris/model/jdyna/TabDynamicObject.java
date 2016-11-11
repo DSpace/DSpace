@@ -44,7 +44,11 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 		@org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findTabByType", query = "from TabDynamicObject where typeDef = ?", cacheable=true),
         @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByAdminAndTypoDef", query = "from TabDynamicObject tab where ((visibility = 1 or visibility = 2 or visibility = 3) and typeDef = ?) order by priority", cacheable=true),
         @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByOwnerAndTypoDef", query = "from TabDynamicObject tab where ((visibility = 0 or visibility = 2 or visibility = 3) and typeDef = ?) order by priority", cacheable=true),                                                      
-        @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByAnonimousAndTypoDef", query = "from TabDynamicObject tab where (visibility = 3 and typeDef = ?) order by priority", cacheable=true)
+        @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findByAnonimousAndTypoDef", query = "from TabDynamicObject tab where (visibility = 3 and typeDef = ?) order by priority", cacheable=true),
+        @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findAuthorizedGroupById", query = "select tab.authorizedGroup from TabDynamicObject tab where tab.id = ?"),
+        @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findAuthorizedGroupByShortname", query = "select tab.authorizedGroup from TabDynamicObject tab where tab.shortName = ?"),
+        @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findAuthorizedSingleById", query = "select tab.authorizedSingle from TabDynamicObject tab where tab.id = ?"),
+        @org.hibernate.annotations.NamedQuery(name = "TabDynamicObject.findAuthorizedSingleByShortname", query = "select tab.authorizedSingle  from TabDynamicObject tab where tab.shortName = ?")
 		
 })
 public class TabDynamicObject extends TypedAbstractTab<BoxDynamicObject, DynamicObjectType, DynamicPropertiesDefinition> {
@@ -57,21 +61,21 @@ public class TabDynamicObject extends TypedAbstractTab<BoxDynamicObject, Dynamic
 	@Cache(usage=CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 	private List<BoxDynamicObject> mask;
 
-    @ElementCollection
-    @CollectionTable(
+	@ManyToMany
+    @JoinTable(
           name="cris_do_tab2policysingle",
           joinColumns=@JoinColumn(name="tab_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedSingle;
+    private List<DynamicPropertiesDefinition> authorizedSingle;
     
-    @ElementCollection
-    @CollectionTable(
+    @ManyToMany
+    @JoinTable(
           name="cris_do_tab2policygroup",
           joinColumns=@JoinColumn(name="tab_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedGroup;
+    private List<DynamicPropertiesDefinition> authorizedGroup;
     
 	@ManyToOne
 	private DynamicObjectType typeDef;
@@ -110,55 +114,30 @@ public class TabDynamicObject extends TypedAbstractTab<BoxDynamicObject, Dynamic
         this.typeDef = typeDef;
     }
     
-    public List<String> getAuthorizedSingle()
+    public List<DynamicPropertiesDefinition> getAuthorizedSingle()
     {
         if(this.authorizedSingle==null) {
-            this.authorizedSingle = new ArrayList<String>();
+            this.authorizedSingle = new ArrayList<DynamicPropertiesDefinition>();
         }
         return authorizedSingle;
     }
 
-    public void setAuthorizedSingle(List<String> authorizedSingle)
+    public void setAuthorizedSingle(List<DynamicPropertiesDefinition> authorizedSingle)
     {
         this.authorizedSingle = authorizedSingle; 
     }
 
-    public List<String> getAuthorizedGroup()
+    public List<DynamicPropertiesDefinition> getAuthorizedGroup()
     {
         if(this.authorizedGroup==null) {
-            this.authorizedGroup = new ArrayList<String>();
+            this.authorizedGroup = new ArrayList<DynamicPropertiesDefinition>();
         }
         return authorizedGroup;
     }
 
-    public void setAuthorizedGroup(List<String> authorizedGroup)
+    public void setAuthorizedGroup(List<DynamicPropertiesDefinition> authorizedGroup)
     {
         this.authorizedGroup = authorizedGroup;
     }
     
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(AS tabService, String adminSpecificPath)
-    {        
-        List<String> results = new ArrayList<String>();
-        for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
-            String shortName = pd.getShortName();
-            if(shortName.startsWith(adminSpecificPath)) {
-                results.add(shortName);
-            }
-        }
-        return results;
-    }
-
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(AS tabService, String adminSpecificPath)
-    {
-        List<String> results = new ArrayList<String>();
-        for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
-            String shortName = pd.getShortName();
-            if(shortName.startsWith(adminSpecificPath)) {
-                results.add(shortName);
-            }
-        }
-        return results;
-    }
 }

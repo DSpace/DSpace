@@ -570,6 +570,20 @@ public class DatabaseUtils
             return null;
         }
 
+        // First, is this a migration from DSpace to DSpace-CRIS? If the DSpace was already migrated with flyway check for an "cris_rpage" table.
+        if(!tableExists(connection, "cris_rpage"))
+        {
+            // Item table exist. This database must be a DSpace already migrated on DSpace 3.x/4.x/5.x
+            return checkOldVersion(connection, true);
+        }
+        
+        if(tableExists(connection, "cris_rp_box2policygroup")) {
+            if(tableColumnExists(connection, "cris_rp_box2policygroup", "authorizedgroup_id", null, null)) {
+                return "5.6.0.1";
+            }            
+            return "5.6.0.0";
+        }        
+        
         if(tableColumnExists(connection, "imp_record_to_item", "imp_sourceref", null, null)) {
             return "5.5.1.2";
         }
@@ -678,6 +692,21 @@ public class DatabaseUtils
             return "1.8";
         }
 
+        return checkOldVersion(connection, false);
+    }
+
+
+
+    private static String checkOldVersion(Connection connection, boolean check18)
+            throws SQLException
+    {
+        if(check18) {
+            // Is this DSpace 1.8.x? Look for the "bitstream_order" column in the "bundle2bitstream" table
+            if(tableColumnExists(connection, "bundle2bitstream", "bitstream_order", null, null))
+            {               
+                return "1.8";
+            }
+        }
         // Is this DSpace 1.7.x? Look for the "dctyperegistry_seq" to NOT exist (it was deleted in 1.7)
         // NOTE: DSPACE 1.7.x only differs from 1.6 in a deleted sequence.
         if(!sequenceExists(connection, "dctyperegistry_seq"))

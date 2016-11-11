@@ -10,7 +10,8 @@ package org.dspace.app.cris.dao;
 import it.cilea.osd.jdyna.dao.PropertyHolderDao;
 
 import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
+import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 
-public interface OUBoxDao extends PropertyHolderDao<BoxOrganizationUnit> {
+public interface OUBoxDao extends PropertyHolderDao<BoxOrganizationUnit,OUPropertiesDefinition> {
 
 }

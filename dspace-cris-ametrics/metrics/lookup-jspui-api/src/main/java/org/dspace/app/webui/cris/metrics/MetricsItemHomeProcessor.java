@@ -66,17 +66,18 @@ public class MetricsItemHomeProcessor implements ItemHomeProcessor {
 			throws PluginException, AuthorizeException {
 		SearchService searchService = new DSpace().getServiceManager().getServiceByName(SearchService.class.getName(),
 				SearchService.class);
+		MetricsProcessorConfigurator configurator = new DSpace().getServiceManager().getServiceByName(MetricsProcessorConfigurator.class.getName(), MetricsProcessorConfigurator.class);
 		SolrQuery solrQuery = new SolrQuery();
 		solrQuery.setQuery("search.uniqueid:"+ Constants.ITEM + "-"+item.getID());
 		solrQuery.setRows(1);
-		String field = ConstantMetrics.PREFIX_FIELD;
+		String prefixField = ConstantMetrics.PREFIX_FIELD;
         for (String t : metricTypes) {
-			solrQuery.addField(field+t);
-			solrQuery.addField(field+t+"_last1");
-			solrQuery.addField(field+t+"_last2");
-			solrQuery.addField(field+t+"_ranking");
-			solrQuery.addField(field+t+"_remark");
-			solrQuery.addField(field+t+"_time");
+			solrQuery.addField(prefixField+t);
+			solrQuery.addField(prefixField+t+"_last1");
+			solrQuery.addField(prefixField+t+"_last2");
+			solrQuery.addField(prefixField+t+"_ranking");
+			solrQuery.addField(prefixField+t+"_remark");
+			solrQuery.addField(prefixField+t+"_time");
 		}
 		try {
 			QueryResponse resp = searchService.search(solrQuery);
@@ -88,11 +89,12 @@ public class MetricsItemHomeProcessor implements ItemHomeProcessor {
 			for (String t : metricTypes) {	
 				ItemMetricsDTO dto = new ItemMetricsDTO();
 				dto.type=t;
-				dto.counter=(Double) doc.getFieldValue(field+t);
-				dto.last1=(Double) doc.getFieldValue(field+t+"_last1");
-				dto.last2=(Double) doc.getFieldValue(field+t+"_last2");
-				dto.ranking=(Double) doc.getFieldValue(field+t+"_ranking");
-				dto.time=(Date) doc.getFieldValue(field+t+"_time");
+				dto.setFormatter(configurator.getFormatter(t));
+				dto.counter=(Double) doc.getFieldValue(prefixField+t);
+				dto.last1=(Double) doc.getFieldValue(prefixField+t+"_last1");
+				dto.last2=(Double) doc.getFieldValue(prefixField+t+"_last2");
+				dto.ranking=(Double) doc.getFieldValue(prefixField+t+"_ranking");
+				dto.time=(Date) doc.getFieldValue(prefixField+t+"_time");
 				if (dto.ranking != null) {
 					for (int lev : rankingLevels) {
 						if ((dto.ranking * 100) < lev) {
@@ -101,7 +103,7 @@ public class MetricsItemHomeProcessor implements ItemHomeProcessor {
 						}
 					}
 				}
-				dto.moreLink=(String) doc.getFieldValue(field+t+"_remark");
+				dto.moreLink=(String) doc.getFieldValue(prefixField+t+"_remark");
 				metricsList.add(dto);
 			}
 		

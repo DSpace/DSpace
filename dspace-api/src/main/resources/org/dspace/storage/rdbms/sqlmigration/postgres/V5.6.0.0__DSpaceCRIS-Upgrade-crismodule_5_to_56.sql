@@ -6,6 +6,8 @@
 -- http://www.dspace.org/license/
 --
 
+do $$
+begin
 create table cris_do_box2policygroup (box_id int4 not null, authorizedGroup varchar(255));
 create table cris_do_box2policysingle (box_id int4 not null, authorizedSingle varchar(255));
 create table cris_do_tab2policygroup (tab_id int4 not null, authorizedGroup varchar(255));
@@ -57,3 +59,11 @@ alter table cris_pj_etab2policygroup add constraint FK_cpnidos6chf15smpf365k9u2d
 alter table cris_pj_etab2policysingle add constraint FK_c370hgq2gwt1fk1cpn92y5wof foreign key (etab_id) references cris_pj_etab;
 alter table cris_rp_etab2policygroup add constraint FK_i8ye9656ab432x6ylqvi3eiek foreign key (etab_id) references cris_rp_etab;
 alter table cris_rp_etab2policysingle add constraint FK_r9o249od95444ipvgrnij3uvl foreign key (etab_id) references cris_rp_etab;
+exception when others then
+ 
+    raise notice 'The transaction is in an uncommittable state. '
+                     'Transaction was rolled back';
+ 
+    raise notice 'Yo this is good! --> % %', SQLERRM, SQLSTATE;
+end;
+$$ language 'plpgsql';

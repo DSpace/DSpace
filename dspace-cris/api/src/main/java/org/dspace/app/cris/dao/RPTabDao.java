@@ -10,10 +10,11 @@ package org.dspace.app.cris.dao;
 import it.cilea.osd.jdyna.dao.TabDao;
 
 import org.dspace.app.cris.model.jdyna.BoxResearcherPage;
+import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.TabResearcherPage;
 
 
 
-public interface RPTabDao extends TabDao<BoxResearcherPage,TabResearcherPage> {
+public interface RPTabDao extends TabDao<BoxResearcherPage,TabResearcherPage,RPPropertiesDefinition> {
 
 }

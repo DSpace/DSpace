@@ -203,11 +203,11 @@
 				key="jsp.layout.hku.label.authorized.eperson" /></label></span>
 
 			<div class="dynaFieldValue">
-				<select class="form-control policydropdown" id="${inputName}" name="${inputName}">
-					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.eperson.select" /></option>
+				<select multiple="multiple" class="form-control policydropdown" id="${inputName}" name="${inputName}">
+					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.eperson.select" /></option>									
 					<c:if test="${!empty metadataWithPolicySingle}">
 					    <c:forEach var="option" items="${metadataWithPolicySingle}" varStatus="loop">	    	
-				            <option value="${option}"<c:if test="${!empty inputValue && fn:contains(inputValue, option)}"> selected="selected"</c:if>>${researcher:getPropertyDefinitionLabel(specificPartPath,option)}(${option})</option>     	
+				            <option value="${option.id}"<c:if test="${!empty inputValue && fn:contains(inputValue, option.id)}"> selected="selected"</c:if>>${option.label}(${option.shortName})</option>
 				        </c:forEach>        
 				    </c:if>
 				</select>
@@ -227,17 +227,17 @@
 				key="jsp.layout.hku.label.authorized.group" /></label></span>
 
 			<div class="dynaFieldValue">
-				<select class="form-control policydropdown" id="${inputName}" name="${inputName}">
-					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.group.select" /></option>
+				<select multiple="multiple" class="form-control policydropdown" id="${inputName}" name="${inputName}">
+					<option value=""><fmt:message key="jsp.layout.hku.label.authorized.group.select" /></option>				
 					<c:if test="${!empty metadataWithPolicyGroup}">
 					    <c:forEach var="option" items="${metadataWithPolicyGroup}" varStatus="loop">	    	
-				            <option value="${option}"<c:if test="${!empty inputValue && fn:contains(inputValue, option)}"> selected="selected"</c:if>>${researcher:getPropertyDefinitionLabel(specificPartPath,option)}(${option})</option>     	
+				            <option value="${option.id}"<c:if test="${!empty inputValue && fn:contains(inputValue, option.id)}"> selected="selected"</c:if>>${option.label} - Shortname: ${option.shortName}</option>     	
 				        </c:forEach>        
 				    </c:if>
 				</select>
 			</div>
 			</div>
-		</spring:bind>		
+		</spring:bind>	
 		</div>
 		<div class="dynaClear">
 			&nbsp;

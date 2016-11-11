@@ -11,11 +11,12 @@ import it.cilea.osd.jdyna.dao.EditTabDao;
 
 import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.EditTabOrganizationUnit;
+import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
 
 
 
-public interface OUEditTabDao extends EditTabDao<BoxOrganizationUnit,TabOrganizationUnit,EditTabOrganizationUnit> {
+public interface OUEditTabDao extends EditTabDao<BoxOrganizationUnit,TabOrganizationUnit,EditTabOrganizationUnit,OUPropertiesDefinition> {
 
 	
 }

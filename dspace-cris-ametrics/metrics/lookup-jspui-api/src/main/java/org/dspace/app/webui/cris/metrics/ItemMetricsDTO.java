@@ -18,6 +18,7 @@ public class ItemMetricsDTO {
 	public Double last2;
 	public String moreLink;
 	public Date time;
+	private NumberFormatter formatter;
 	
 	public void setType(String type) {
 		this.type = type;
@@ -68,5 +69,13 @@ public class ItemMetricsDTO {
 	public void setTime(Date time)
     {
         this.time = time;
+    }
+    public NumberFormatter getFormatter()
+    {
+        return formatter;
+    }
+    public void setFormatter(NumberFormatter formatter)
+    {
+        this.formatter = formatter;
     }
 }

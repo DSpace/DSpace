@@ -11,11 +11,12 @@ import it.cilea.osd.jdyna.dao.EditTabDao;
 
 import org.dspace.app.cris.model.jdyna.BoxProject;
 import org.dspace.app.cris.model.jdyna.EditTabProject;
+import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.TabProject;
 
 
 
-public interface ProjectEditTabDao extends EditTabDao<BoxProject,TabProject,EditTabProject> {
+public interface ProjectEditTabDao extends EditTabDao<BoxProject,TabProject,EditTabProject,ProjectPropertiesDefinition> {
 
 	
 }

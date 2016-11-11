@@ -264,3 +264,13 @@ function isBrowser(b,v) {
 		  else  versionOk = (v <= parseInt(navigator.appVersion));
 		  return browserOk && versionOk;
 }
+
+function itemListCheckAll(checkBoxName){
+	var el = document.getElementsByName(checkBoxName);
+	
+	for(var i=0; i < el.length; i++){
+		if((el[i].type == 'checkbox')){
+			el[i].checked= document.getElementById(checkBoxName+"checker").checked;
+		}
+	}
+}

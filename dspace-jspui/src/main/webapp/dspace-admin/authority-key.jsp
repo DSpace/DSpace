@@ -110,12 +110,12 @@
     <dspace:itemlist items="<%= items_ambiguos %>" disableCrossLinks="true"
                      linkToEdit="true"  radioButton="false" inputName="items_ambiguos" />
     
-                   <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" />
+                   <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" class="btn btn-success"/>
 <%
     if (!bRequired)
     {
  %>
-    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  />
+    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  class="btn btn-danger" />
 <%
     } 
     }
@@ -126,12 +126,12 @@
     <dspace:itemlist items="<%= items_uncertain %>" disableCrossLinks="true"
                      linkToEdit="true"  radioButton="false" inputName="items_uncertain" />
     
-    <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" />
+    <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" class="btn btn-success" />
 <%
     if (!bRequired)
     {
  %>
-    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  />
+    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  class="btn btn-danger"/>
 <%
     }
     }
@@ -142,12 +142,12 @@
     <dspace:itemlist items="<%= items_novalue %>" disableCrossLinks="true"
                      linkToEdit="true"  radioButton="false" inputName="items_novalue" />
     
-    <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" />
+    <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" class="btn btn-success" />
 <%
     if (!bRequired)
     {
  %>
-    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  />
+    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  class="btn btn-danger" />
 <%
     }
     }
@@ -158,12 +158,12 @@
     <dspace:itemlist items="<%= items_failed %>" disableCrossLinks="true"
                      linkToEdit="true"  radioButton="false" inputName="items_failed" />
     
-    <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" />
+    <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" class="btn btn-success" />
 <%
     if (!bRequired)
     {
  %>
-    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  />
+    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  class="btn btn-danger" />
 <%
     }
     }
@@ -175,12 +175,12 @@
      <dspace:itemlist items="<%= items_notfound %>" disableCrossLinks="true"
                       linkToEdit="true"  radioButton="false" inputName="items_notfound" />
      
-     <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" />
+     <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" class="btn btn-success" />
  <%
      if (!bRequired)
      {
   %>
-     <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  />
+     <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  class="btn btn-danger"/>
  <%
      }
      }
@@ -191,12 +191,12 @@
     <dspace:itemlist items="<%= items_unset %>" disableCrossLinks="true"
                      linkToEdit="true"  radioButton="false" inputName="items_unset" />
     
-    <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" />
+    <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" class="btn btn-success"/>
 <%
     if (!bRequired)
     {
  %>
-    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  />
+    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  class="btn btn-danger"/>
 <%
     }
     }
@@ -208,12 +208,12 @@
                      linkToEdit="true"  radioButton="false" inputName="items_reject" />
     
                                               
-    <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" />
+    <input type="submit" name="submit_accept" value="<fmt:message key="jsp.dspace-admin.authority-key.accept" />" class="btn btn-success"/>
 <%
     if (!bRequired)
     {
  %>
-    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  />
+    <input type="submit" name="submit_reject" value="<fmt:message key="jsp.dspace-admin.authority-key.reject" />"  class="btn btn-danger"/>
 <%
     }
     }
@@ -227,11 +227,11 @@
 
 <div class="authority-key-nav-link">
 <% if (prevKey != null) { %>
-<a href="<%= request.getContextPath() %>/dspace-admin/authority?<%= scopeParam %>&key=<%= URLEncoder.encode(prevKey, "UTF-8") %>"><fmt:message key="jsp.dspace-admin.authority-key.previous" /></a>
+<a class="btn btn-link" href="<%= request.getContextPath() %>/dspace-admin/authority?<%= scopeParam %>&key=<%= URLEncoder.encode(prevKey, "UTF-8") %>"><fmt:message key="jsp.dspace-admin.authority-key.previous" /></a>
 <% } %>
-<a href="<%= request.getContextPath() %>/dspace-admin/authority?<%= scopeParam %>"><fmt:message key="jsp.dspace-admin.authority-key.list" /></a>
+<a class="btn btn-default" href="<%= request.getContextPath() %>/dspace-admin/authority?<%= scopeParam %>"><fmt:message key="jsp.dspace-admin.authority-key.list" /></a>
 <% if (nextKey != null) { %>
-<a href="<%= request.getContextPath() %>/dspace-admin/authority?<%= scopeParam %>&key=<%= URLEncoder.encode(nextKey, "UTF-8") %>"><fmt:message key="jsp.dspace-admin.authority-key.next" /></a>
+<a class="btn btn-link" href="<%= request.getContextPath() %>/dspace-admin/authority?<%= scopeParam %>&key=<%= URLEncoder.encode(nextKey, "UTF-8") %>"><fmt:message key="jsp.dspace-admin.authority-key.next" /></a>
 <% } %>
 </div>
 </dspace:layout>

@@ -10,6 +10,7 @@ package org.dspace.app.cris.service;
 import it.cilea.osd.jdyna.model.AccessLevelConstants;
 import it.cilea.osd.jdyna.model.Containable;
 import it.cilea.osd.jdyna.model.IContainable;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.web.AbstractEditTab;
 import it.cilea.osd.jdyna.web.AbstractTab;
 import it.cilea.osd.jdyna.web.Box;

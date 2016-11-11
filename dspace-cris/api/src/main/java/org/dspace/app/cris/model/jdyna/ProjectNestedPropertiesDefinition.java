@@ -29,6 +29,8 @@ import javax.persistence.Table;
     @NamedQuery(name = "ProjectNestedPropertiesDefinition.findValoriDaMostrare", query = "from ProjectNestedPropertiesDefinition where showInList = true"),
     @NamedQuery(name = "ProjectNestedPropertiesDefinition.findAllWithPolicySingle", query = "from ProjectNestedPropertiesDefinition where rendering in (from WidgetEPerson)"),
     @NamedQuery(name = "ProjectNestedPropertiesDefinition.findAllWithPolicyGroup", query = "from ProjectNestedPropertiesDefinition where rendering in (from WidgetGroup)"),
+    @NamedQuery(name = "ProjectNestedPropertiesDefinition.likeAllWithPolicySingle", query = "from ProjectNestedPropertiesDefinition where shortName = ? and rendering in (from WidgetEPerson)"),
+    @NamedQuery(name = "ProjectNestedPropertiesDefinition.likeAllWithPolicyGroup", query = "from ProjectNestedPropertiesDefinition where shortName = ? and rendering in (from WidgetGroup)"),
     @NamedQuery(name = "ProjectNestedPropertiesDefinition.likeByShortName", query = "from ProjectNestedPropertiesDefinition where shortName LIKE :par0", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") })
 })
 public class ProjectNestedPropertiesDefinition extends

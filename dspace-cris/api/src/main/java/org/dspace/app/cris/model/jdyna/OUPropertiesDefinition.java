@@ -27,6 +27,8 @@ import javax.persistence.Transient;
     @NamedQuery(name = "OUPropertiesDefinition.findValoriDaMostrare", query = "from OUPropertiesDefinition where showInList = true"),
     @NamedQuery(name = "OUPropertiesDefinition.findAllWithPolicySingle", query = "from OUPropertiesDefinition where rendering in (from WidgetEPerson)"),
     @NamedQuery(name = "OUPropertiesDefinition.findAllWithPolicyGroup", query = "from OUPropertiesDefinition where rendering in (from WidgetGroup)"),
+    @NamedQuery(name = "OUPropertiesDefinition.likeAllWithPolicySingle", query = "from OUPropertiesDefinition where shortName = ? and rendering in (from WidgetEPerson)"),
+    @NamedQuery(name = "OUPropertiesDefinition.likeAllWithPolicyGroup", query = "from OUPropertiesDefinition where shortName = ? and rendering in (from WidgetGroup)"),
     @NamedQuery(name = "OUPropertiesDefinition.likeByShortName", query = "from OUPropertiesDefinition where shortName LIKE :par0", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") })
 })
 public class OUPropertiesDefinition extends PropertiesDefinition {

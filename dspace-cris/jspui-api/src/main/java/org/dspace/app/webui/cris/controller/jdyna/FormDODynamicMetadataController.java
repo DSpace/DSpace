@@ -141,7 +141,7 @@ public class FormDODynamicMetadataController
         for (BoxDynamicObject iph : propertyHoldersCurrentAccessLevel)
         {
             List<IContainable> temp = getApplicationService()
-                    .<BoxDynamicObject, it.cilea.osd.jdyna.web.Tab<BoxDynamicObject>> findContainableInPropertyHolder(
+                    .<BoxDynamicObject, it.cilea.osd.jdyna.web.Tab<BoxDynamicObject>, DynamicPropertiesDefinition> findContainableInPropertyHolder(
                             getClazzBox(), iph.getId());
             mapBoxToContainables.put(iph.getShortName(), temp);
             pDInTab.addAll(temp);
@@ -200,7 +200,7 @@ public class FormDODynamicMetadataController
             else
             {
                 EditTabDynamicObject fuzzyEditTab = (EditTabDynamicObject) ((ApplicationService) getApplicationService())
-                        .<BoxDynamicObject, TabDynamicObject, EditTabDynamicObject>getEditTabByDisplayTab(
+                        .<BoxDynamicObject, TabDynamicObject, EditTabDynamicObject, DynamicPropertiesDefinition>getEditTabByDisplayTab(
                                 Integer.parseInt(paramFuzzyTabId),
                                 EditTabDynamicObject.class);
                 areaId = fuzzyEditTab.getId();
@@ -235,14 +235,14 @@ public class FormDODynamicMetadataController
             {
                 tipProprietaInArea
                         .addAll(getApplicationService()
-                                .<BoxDynamicObject, it.cilea.osd.jdyna.web.Tab<BoxDynamicObject>> findContainableInPropertyHolder(
+                                .<BoxDynamicObject, it.cilea.osd.jdyna.web.Tab<BoxDynamicObject>, DynamicPropertiesDefinition> findContainableInPropertyHolder(
                                         BoxDynamicObject.class, iph.getId()));
             }
             else
             {
                 tipProprietaInArea
                         .addAll(getApplicationService()
-                                .<BoxDynamicObject, it.cilea.osd.jdyna.web.Tab<BoxDynamicObject>> findContainableInPropertyHolder(
+                                .<BoxDynamicObject, it.cilea.osd.jdyna.web.Tab<BoxDynamicObject>, DynamicPropertiesDefinition> findContainableInPropertyHolder(
                                         getClazzBox(), iph.getId()));
             }
         }
@@ -327,7 +327,7 @@ public class FormDODynamicMetadataController
 
             tipProprietaInArea
                     .addAll(getApplicationService()
-                            .<BoxDynamicObject, it.cilea.osd.jdyna.web.Tab<BoxDynamicObject>> findContainableInPropertyHolder(
+                            .<BoxDynamicObject, it.cilea.osd.jdyna.web.Tab<BoxDynamicObject>, DynamicPropertiesDefinition> findContainableInPropertyHolder(
                                     getClazzBox(), iph.getId()));
 
         }
@@ -403,7 +403,7 @@ public class FormDODynamicMetadataController
 
             tipProprietaInArea
                     .addAll(getApplicationService()
-                            .<BoxDynamicObject, it.cilea.osd.jdyna.web.Tab<BoxDynamicObject>> findContainableInPropertyHolder(
+                            .<BoxDynamicObject, it.cilea.osd.jdyna.web.Tab<BoxDynamicObject>, DynamicPropertiesDefinition> findContainableInPropertyHolder(
                                     getClazzBox(), iph.getId()));
 
         }

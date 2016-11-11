@@ -209,7 +209,7 @@ public class ProjectDetailsController
         List<TabProject> authorizedTabs = new LinkedList<TabProject>();
         
         for(TabProject tab : tabs) {
-            if(CrisAuthorizeManager.authorize(context, applicationService, Project.class, entityId, tab)) {
+            if(CrisAuthorizeManager.authorize(context, applicationService, Project.class, ProjectPropertiesDefinition.class, entityId, tab)) {
                 authorizedTabs.add(tab);
             }
         }
@@ -305,6 +305,6 @@ public class ProjectDetailsController
     @Override
     protected boolean authorize(HttpServletRequest request, BoxProject box) throws SQLException
     {
-        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), Project.class, extractEntityId(request), box);
+        return CrisAuthorizeManager.authorize(UIUtil.obtainContext(request), getApplicationService(), Project.class, ProjectPropertiesDefinition.class, extractEntityId(request), box);
     }
 }

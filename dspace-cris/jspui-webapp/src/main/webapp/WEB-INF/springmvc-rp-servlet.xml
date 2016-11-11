@@ -28,7 +28,16 @@
 					value-ref="researchObjectEditor" />		
 				<entry
 					key="org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition"
-					value-ref="dynamicPropertiesDefinitionEditor" />		
+					value-ref="dynamicPropertiesDefinitionEditor" />
+				<entry
+					key="org.dspace.app.cris.model.jdyna.RPPropertiesDefinition"
+					value-ref="rpPropertiesDefinitionEditor" />
+				<entry
+					key="org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition"
+					value-ref="projectPropertiesDefinitionEditor" />
+				<entry
+					key="org.dspace.app.cris.model.jdyna.OUPropertiesDefinition"
+					value-ref="ouPropertiesDefinitionEditor" />										
 				<entry				
 					key="org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition"
 					value-ref="decoratorRPPropertiesDefinitionEditor" />
@@ -471,10 +480,14 @@
 	</bean>
 
 	<bean id="listRPBoxController" class="it.cilea.osd.jdyna.controller.BoxsController">
-		<constructor-arg>
+		<constructor-arg index="0">
 			<value>org.dspace.app.cris.model.jdyna.BoxResearcherPage
 			</value>
 		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="applicationService">
 			<ref bean="applicationService" />
 		</property>
@@ -506,6 +519,10 @@
 			<value>org.dspace.app.cris.model.jdyna.EditTabResearcherPage
 			</value>
 		</constructor-arg>
+		<constructor-arg index="3">
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="successView">
 			<value>redirect:/cris/administrator/rp/listTabs.htm</value>
 		</property>
@@ -582,10 +599,14 @@
 	</bean>
 
 	<bean id="deleteRPBoxController" class="it.cilea.osd.jdyna.controller.BoxsController">
-		<constructor-arg>
+		<constructor-arg index="0">
 			<value>org.dspace.app.cris.model.jdyna.BoxResearcherPage
 			</value>
 		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="applicationService">
 			<ref bean="applicationService" />
 		</property>
@@ -1226,6 +1247,10 @@
 			<value>org.dspace.app.cris.model.jdyna.EditTabResearcherPage
 			</value>
 		</constructor-arg>
+		<constructor-arg index="3">
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="successView">
 			<value>redirect:/cris/administrator/rp/listEditTabs.htm</value>
 		</property>
@@ -2009,9 +2034,13 @@
 	</bean>
 
 	<bean id="listProjectBoxController" class="it.cilea.osd.jdyna.controller.BoxsController">
-		<constructor-arg>
+		<constructor-arg index="0">
 			<value>org.dspace.app.cris.model.jdyna.BoxProject</value>
 		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="applicationService">
 			<ref bean="applicationService" />
 		</property>
@@ -2044,6 +2073,10 @@
 			<value>org.dspace.app.cris.model.jdyna.EditTabProject
 			</value>
 		</constructor-arg>
+		<constructor-arg index="3">
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="successView">
 			<value>redirect:/cris/administrator/project/listTabs.htm</value>
 		</property>
@@ -2120,10 +2153,14 @@
 	</bean>
 
 	<bean id="deleteProjectBoxController" class="it.cilea.osd.jdyna.controller.BoxsController">
-		<constructor-arg>
+		<constructor-arg index="0">
 			<value>org.dspace.app.cris.model.jdyna.BoxProject
 			</value>
 		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="applicationService">
 			<ref bean="applicationService" />
 		</property>
@@ -2691,6 +2728,10 @@
 			<value>org.dspace.app.cris.model.jdyna.EditTabProject
 			</value>
 		</constructor-arg>
+		<constructor-arg index="3">
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="successView">
 			<value>redirect:/cris/administrator/project/listEditTabs.htm</value>
 		</property>
@@ -3575,9 +3616,13 @@
 	</bean>
 
 	<bean id="listOUBoxController" class="it.cilea.osd.jdyna.controller.BoxsController">
-		<constructor-arg>
+		<constructor-arg index="0">
 			<value>org.dspace.app.cris.model.jdyna.BoxOrganizationUnit</value>
 		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="applicationService">
 			<ref bean="applicationService" />
 		</property>
@@ -3610,6 +3655,10 @@
 			<value>org.dspace.app.cris.model.jdyna.EditTabOrganizationUnit
 			</value>
 		</constructor-arg>
+		<constructor-arg index="3">
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="successView">
 			<value>redirect:/cris/administrator/ou/listTabs.htm</value>
 		</property>
@@ -3686,10 +3735,14 @@
 	</bean>
 
 	<bean id="deleteOUBoxController" class="it.cilea.osd.jdyna.controller.BoxsController">
-		<constructor-arg>
+		<constructor-arg index="0">
 			<value>org.dspace.app.cris.model.jdyna.BoxOrganizationUnit
 			</value>
 		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="applicationService">
 			<ref bean="applicationService" />
 		</property>
@@ -4256,6 +4309,10 @@
 			<value>org.dspace.app.cris.model.jdyna.EditTabOrganizationUnit
 			</value>
 		</constructor-arg>
+		<constructor-arg index="3">
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="successView">
 			<value>redirect:/cris/administrator/ou/listEditTabs.htm</value>
 		</property>
@@ -5433,6 +5490,10 @@
 			</value>
 		</constructor-arg>
 		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition
+			</value>
+		</constructor-arg>		
+		<constructor-arg index="2">
 			<value>org.dspace.app.cris.model.jdyna.DynamicObjectType
 			</value>
 		</constructor-arg>
@@ -5468,6 +5529,10 @@
 			<value>org.dspace.app.cris.model.jdyna.DynamicObjectType
 			</value>
 		</constructor-arg>
+		<constructor-arg index="4">
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="successView">
 			<value>redirect:/cris/administrator/other/2ndlevel/listTabs.htm</value>
 		</property>
@@ -5551,6 +5616,10 @@
 			</value>
 		</constructor-arg>
 		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition
+			</value>
+		</constructor-arg>		
+		<constructor-arg index="2">
 			<value>org.dspace.app.cris.model.jdyna.DynamicObjectType
 			</value>
 		</constructor-arg>
@@ -6226,6 +6295,10 @@
 			<value>org.dspace.app.cris.model.jdyna.DynamicObjectType
 			</value>
 		</constructor-arg>
+		<constructor-arg index="4">
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition
+			</value>
+		</constructor-arg>		
 		<property name="successView">
 			<value>redirect:/cris/administrator/other/2ndlevel/listEditTabs.htm</value>
 		</property>
@@ -7388,7 +7461,31 @@
 		<property name="applicationService" ref="applicationService">
 		</property>
 	</bean>
+
+	<bean id="rpPropertiesDefinitionEditor" class="it.cilea.osd.jdyna.editor.ModelPropertyEditor">
+		<constructor-arg>
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition</value>
+		</constructor-arg>
+		<property name="applicationService" ref="applicationService">
+		</property>
+	</bean>
+
+	<bean id="ouPropertiesDefinitionEditor" class="it.cilea.osd.jdyna.editor.ModelPropertyEditor">
+		<constructor-arg>
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition</value>
+		</constructor-arg>
+		<property name="applicationService" ref="applicationService">
+		</property>
+	</bean>
 	
+	<bean id="projectPropertiesDefinitionEditor" class="it.cilea.osd.jdyna.editor.ModelPropertyEditor">
+		<constructor-arg>
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition</value>
+		</constructor-arg>
+		<property name="applicationService" ref="applicationService">
+		</property>
+	</bean>
+				
 	<bean id="decoratorRPPropertiesDefinitionEditor" class="it.cilea.osd.jdyna.editor.ModelPropertyEditor">
 		<constructor-arg>
 			<value>org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition

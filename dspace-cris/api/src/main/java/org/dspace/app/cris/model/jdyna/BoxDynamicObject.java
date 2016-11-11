@@ -19,6 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
@@ -36,7 +37,11 @@ import it.cilea.osd.jdyna.web.TypedBox;
         @org.hibernate.annotations.NamedQuery(name = "BoxDynamicObject.findContainableByHolder", query = "from Containable containable where containable in (select m from BoxDynamicObject box join box.mask m where box.id = ?)", cacheable = true),
         @org.hibernate.annotations.NamedQuery(name = "BoxDynamicObject.findHolderByContainable", query = "from BoxDynamicObject box where :par0 in elements(box.mask)", cacheable = true),
         @org.hibernate.annotations.NamedQuery(name = "BoxDynamicObject.uniqueBoxByShortName", query = "from BoxDynamicObject box where shortName = ?"),
-        @org.hibernate.annotations.NamedQuery(name = "BoxDynamicObject.findBoxByType", query = "from BoxDynamicObject box where box.typeDef = ?", cacheable=true)        
+        @org.hibernate.annotations.NamedQuery(name = "BoxDynamicObject.findBoxByType", query = "from BoxDynamicObject box where box.typeDef = ?", cacheable=true),
+        @org.hibernate.annotations.NamedQuery(name = "BoxDynamicObject.findAuthorizedGroupById", query = "select box.authorizedGroup from BoxDynamicObject box where box.id = ?"),
+        @org.hibernate.annotations.NamedQuery(name = "BoxDynamicObject.findAuthorizedGroupByShortname", query = "select box.authorizedGroup from BoxDynamicObject box where box.shortName = ?"),
+        @org.hibernate.annotations.NamedQuery(name = "BoxDynamicObject.findAuthorizedSingleById", query = "select box.authorizedSingle from BoxDynamicObject box where box.id = ?"),
+        @org.hibernate.annotations.NamedQuery(name = "BoxDynamicObject.findAuthorizedSingleByShortname", query = "select box.authorizedSingle from BoxDynamicObject box where box.shortName = ?")
 })
 public class BoxDynamicObject extends TypedBox<Containable, DynamicObjectType, DynamicPropertiesDefinition>
 {
@@ -51,21 +56,21 @@ public class BoxDynamicObject extends TypedBox<Containable, DynamicObjectType, D
     @ManyToOne
     private DynamicObjectType typeDef;
 
-    @ElementCollection
-    @CollectionTable(
+    @ManyToMany
+    @JoinTable(
           name="cris_do_box2policysingle",
           joinColumns=@JoinColumn(name="box_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedSingle;
+    private List<DynamicPropertiesDefinition> authorizedSingle;
     
-    @ElementCollection
-    @CollectionTable(
+    @ManyToMany
+    @JoinTable(
           name="cris_do_box2policygroup",
           joinColumns=@JoinColumn(name="box_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<String> authorizedGroup;
+    private List<DynamicPropertiesDefinition> authorizedGroup;
     
     public BoxDynamicObject()
     {
@@ -102,57 +107,31 @@ public class BoxDynamicObject extends TypedBox<Containable, DynamicObjectType, D
         this.typeDef = typeDef;
     }
 
-    public List<String> getAuthorizedSingle()
+    
+    public List<DynamicPropertiesDefinition> getAuthorizedSingle()
     {
         if(this.authorizedSingle==null) {
-            this.authorizedSingle = new ArrayList<String>();
+            this.authorizedSingle = new ArrayList<DynamicPropertiesDefinition>();
         }
         return authorizedSingle;
     }
 
-    public void setAuthorizedSingle(List<String> authorizedSingle)
+    public void setAuthorizedSingle(List<DynamicPropertiesDefinition> authorizedSingle)
     {
         this.authorizedSingle = authorizedSingle; 
     }
 
-    public List<String> getAuthorizedGroup()
+    public List<DynamicPropertiesDefinition> getAuthorizedGroup()
     {
         if(this.authorizedGroup==null) {
-            this.authorizedGroup = new ArrayList<String>();
+            this.authorizedGroup = new ArrayList<DynamicPropertiesDefinition>();
         }
         return authorizedGroup;
     }
 
-    public void setAuthorizedGroup(List<String> authorizedGroup)
+    public void setAuthorizedGroup(List<DynamicPropertiesDefinition> authorizedGroup)
     {
         this.authorizedGroup = authorizedGroup;
     }
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicySingle(
-            AS tabService, String specificPart)
-    {      
-        List<String> results = new ArrayList<String>();
-        for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicySingle(DynamicPropertiesDefinition.class)) {
-            String shortName = pd.getShortName();
-            if(shortName.startsWith(specificPart)) {
-                results.add(shortName);
-            }
-        }
-        return results;
-    }
-
-    @Override
-    public <AS extends IPersistenceService> List<String> getMetadataWithPolicyGroup(
-            AS tabService, String specificPart)
-    {
-        List<String> results = new ArrayList<String>();
-        for(DynamicPropertiesDefinition pd : ((ITabService)tabService).getAllPropertiesDefinitionWithPolicyGroup(DynamicPropertiesDefinition.class)) {
-            String shortName = pd.getShortName();
-            if(shortName.startsWith(specificPart)) {
-                results.add(shortName);
-            }
-        }
-        return results;
-    }
-
+    
 }
