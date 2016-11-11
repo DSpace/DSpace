@@ -5,6 +5,7 @@
 --
 -- http://www.dspace.org/license/
 --
+
 BEGIN
 	EXECUTE IMMEDIATE
 'create table cris_do_box2policygroup (box_id number(10,0) not null, authorizedGroup varchar2(255 char));
