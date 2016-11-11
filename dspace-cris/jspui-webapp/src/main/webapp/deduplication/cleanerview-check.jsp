@@ -133,8 +133,23 @@
 			item_id = j(this).data('item_id');
 			j( "#dialog-confirm-delete" ).modal("show");	
 		});
+		
+		j(".check").click(function(){
+			var checkboxid = j(this).prop("id")
+			var formName = checkboxid.replace("dedupcheckall","itemform");
+			var el = document.getElementsByName(formName)[0].elements;
+
+			for(var i=0; i < el.length; i++){
+				if((el[i].type == 'checkbox') && (el[i].name == 'itemstomerge')){
+					el[i].checked= j(this).prop("checked");
+				}
+			}
+		});
+
+		
 	});
 	
+
 	function countChecked(gridSize, formName){
 		if(gridSize==2){
 			return true;
@@ -247,6 +262,9 @@
 						<% if(grid.get(key).size()>1) {%>
 							<input class="pull-right btn btn-xs btn-primary" type="submit" name="submittargetchoice" value='<fmt:message key="jsp.layout.submit.checkduplicate.compare"/>'/>
 							<input class="btn btn-default pull-right btn btn-xs" type="submit" name="submitunrelatedall" value='<fmt:message key="jsp.layout.submit.checkduplicate.reject"/>'/>				
+						<%} %>
+						<% if(grid.get(key).size()>2){%>
+						   <input type="checkbox" id="dedupcheckall_<%=i %>" class="pull-left check" />&nbsp;<fmt:message key="jsp.layout.submit.checkall"/>
 						<%} %>
 					</div>
 					<table class="table table-striped table-bordered">
