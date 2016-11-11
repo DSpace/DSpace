@@ -331,7 +331,7 @@ public class ItemListTag extends TagSupport {
 			if (inputName != null) { // cilea, add the checkbox column
 				out.println("<th>");
 				if (!radioButton) { // add a "checkall" button
-					out.print("<input data-checkboxname=\""+inputName+"\" name=\""+inputName+"checker\" id=\""+inputName+"checker\" type=\"checkbox\" />");
+					out.print("<input data-checkboxname=\""+inputName+"\" name=\""+inputName+"checker\" id=\""+inputName+"checker\" type=\"checkbox\" onclick=\"itemListCheckAll('"+inputName+"')\"/>");
 				}
 				out.print("</th>");
 			}
@@ -576,7 +576,7 @@ public class ItemListTag extends TagSupport {
 								+ "Row"
 								+ cOddOrEven[cOddOrEven.length - 2]
 								+ "Col\" nowrap>"
-								+ "<input type=\"button\" value=\"Edit Item\" onclick=\"javascript:self.location='"
+								+ "<input class=\"btn btn-default\" type=\"button\" value=\"Edit Item\" onclick=\"javascript:self.location='"
 								+ hrq.getContextPath()
 								+ "/tools/edit-item?handle="
 								+ items[i].getHandle() + "'\"" + "/>" + "</td>");
