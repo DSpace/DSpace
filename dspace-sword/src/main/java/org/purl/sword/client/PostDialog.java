@@ -177,7 +177,7 @@ implements ActionListener, ChangeListener
  
     /**
      * 
-     * @param parentFrame
+     * @param parentFrame the parent of this dialog.
      */
     public PostDialog(JFrame parentFrame)
     {

@@ -135,7 +135,7 @@ public class RDFUtil {
      *             {@link org.dspace.core.Constants#ITEM Constants.ITEM}.
      * @param id UUID of the DSpaceObject you want to generate a URI for.
      * @param handle Handle of the DSpaceObject you want to generate a URI for.
-     * @param identifier
+     * @param identifier identifiers of the object.
      *     
      * @return URI to identify the DSO or null if no URI could be generated.
      *         This can happen f.e. if you use a URIGenerator that uses

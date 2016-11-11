@@ -160,8 +160,8 @@ public class Content extends XmlElement implements SwordElementInterface
     /**
      * Unmarshall the content element into the data in this object. 
      * 
-     * @param content
-     * @param validationProperties
+     * @param content the element to unmarshall.
+     * @param validationProperties UNKNOWN.  PLEASE DOCUMENT.
      * @return SWORD validation info
      * @throws UnmarshallException If the element does not contain a
      *                             content element or if there are problems
@@ -245,9 +245,9 @@ public class Content extends XmlElement implements SwordElementInterface
  
     /**
      * 
-     * @param elements
-     * @param attributes
-     * @param validationContext
+     * @param elements add results to this.
+     * @param attributes add these too.
+     * @param validationContext UNKNOWN.  PLEASE DOCUMENT.
      * @return SWORD validation info
      */
     protected SwordValidationInfo validate(List<SwordValidationInfo> elements,

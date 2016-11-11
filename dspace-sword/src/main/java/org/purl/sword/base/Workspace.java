@@ -185,8 +185,9 @@ public class Workspace extends XmlElement implements SwordElementInterface
  
     /**
      *
-     * @param workspace
-     * @param validationProperties
+     * @param workspace the element to unmarshall.
+     * @param validationProperties UNKNOWN.  PLEASE DOCUMENT.
+     * @return UNKNOWN.  PLEASE DOCUMENT.
      * @throws UnmarshallException If the element does not contain a
      *                             workspace element or if there are problems
      *                             accessing the data. 
@@ -272,7 +273,9 @@ public class Workspace extends XmlElement implements SwordElementInterface
  
     /**
      * 
-     * @param existing
+     * @param existing add results to this.
+     * @param validationContext UNKNOWN.  PLEASE DOCUMENT.
+     * @return UNKNOWN.  PLEASE DOCUMENT.
      */
     protected SwordValidationInfo validate(List<SwordValidationInfo> existing,
             Properties validationContext)

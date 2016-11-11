@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Required;
  * Provide service for DOIs using DataCite.
  * 
  * <p>This class handles reservation, registration and deletion of DOIs using
- * the direct API from {@link <a href="http://www.datacite.org">DataCite</a>}.
+ * the direct API from <a href="http://www.datacite.org">DataCite</a>.
  * Please pay attention that some members of DataCite offer special services
  * and want their customers to use special APIs. If you are unsure ask your
  * registration agency.</p>

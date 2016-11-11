@@ -346,11 +346,12 @@ public class VersionUtil
     }
     
     /**
-     * Retrieve the summary for the version
+     * Retrieve the summary for the version.
      * 
      * @param context
      *     The relevant DSpace Context.
      * @param stringVersionID
+     *     An encoded integer version number.
      * @return version summary string
      */
     public static String getSummary(Context context, String stringVersionID)

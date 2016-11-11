@@ -528,8 +528,8 @@ public class StatisticsImporter
 
     /**
      * Inner class to hold a cache of reverse lookups of IP addresses
-     * @param <K>
-     * @param <V>
+     * @param <K> key type.
+     * @param <V> value type.
      */
     static class DNSCache<K,V> extends LinkedHashMap<K,V>
     {

@@ -574,8 +574,8 @@ public class Entry extends XmlElement implements SwordElementInterface
  
     /**
      *
-     * @param info
-     * @param validationContext
+     * @param info add results to this.  If null, a new one is created.
+     * @param validationContext UNKNOWN.  PLEASE DOCUMENT.
      * @return SWORD validation info
      */
     protected SwordValidationInfo validate(SwordValidationInfo info,

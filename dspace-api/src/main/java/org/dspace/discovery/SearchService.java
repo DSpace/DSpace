@@ -132,10 +132,10 @@ public interface SearchService {
     String createLocationQueryForAdministrableItems(Context context) throws SQLException;
 
     /**
-     * Transforms the metadata field of the given sort configuration into the indexed field which we can then use in our solr queries
+     * Transforms the metadata field of the given sort configuration into the indexed field which we can then use in our Solr queries.
      *
      * @param metadataField the metadata field
-     * @param type @see org.dspace.discovery.configuration.DiscoveryConfigurationParameters
+     * @param type see {@link org.dspace.discovery.configuration.DiscoveryConfigurationParameters}
      * @return the indexed field
      */
     String toSortFieldIndex(String metadataField, String type);

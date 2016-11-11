@@ -53,11 +53,11 @@ public class ConsumerProfile
      *            configuration name of the consumer profile
      * @return a new ConsumerProfile; never null.
      * @throws IllegalArgumentException if no class or no filters configured for the specified consumer
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException passed through.
      *     
-     * @throws InstantiationException
+     * @throws InstantiationException passed through.
      *     
-     * @throws IllegalAccessException
+     * @throws IllegalAccessException passed through.
      *     
      */
     public static ConsumerProfile makeConsumerProfile(String name)
@@ -73,11 +73,11 @@ public class ConsumerProfile
      * Get class and filters from DSpace Configuration.
      * 
      * @throws IllegalArgumentException if no class or no filters configured for the specified consumer
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException passed through.
      *     
-     * @throws InstantiationException
+     * @throws InstantiationException passed through.
      *     
-     * @throws IllegalAccessException
+     * @throws IllegalAccessException passed through.
      *     
      */
     

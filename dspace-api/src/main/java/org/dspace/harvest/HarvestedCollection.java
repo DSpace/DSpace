@@ -94,7 +94,7 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
     /** 
      * A function to set all harvesting-related parameters at once 
      * @param type
-     *     harvest type (TYPE_NONE, TYPE_DMD, TYPE_DMDREF, TYPE_FULL) {@see HarvestedCollection}
+     *     harvest type (TYPE_NONE, TYPE_DMD, TYPE_DMDREF, TYPE_FULL)
      * @param oaiSource
      *     base URL of the OAI-PMH server
      * @param oaiSetId
@@ -113,7 +113,7 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
      * Setters for the appropriate harvesting-related columns
      *
      * @param type
-     *     harvest type (TYPE_NONE, TYPE_DMD, TYPE_DMDREF, TYPE_FULL) {@see HarvestedCollection}
+     *     harvest type (TYPE_NONE, TYPE_DMD, TYPE_DMDREF, TYPE_FULL
      */
     public void setHarvestType(int type) {
         this.harvestType = type;

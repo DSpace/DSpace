@@ -100,9 +100,9 @@ public class SWORDErrorDocument extends SWORDEntry
  
     /**
      * 
-     * @param entry
-     * @param validationProperties
-     * @throws org.purl.sword.base.UnmarshallException
+     * @param entry an element to unmarshall.
+     * @param validationProperties UNKNOWN.  PLEASE DOCUMENT.
+     * @throws org.purl.sword.base.UnmarshallException passed through.
      */
     public SwordValidationInfo unmarshall(Element entry, Properties validationProperties)
     throws UnmarshallException
@@ -155,7 +155,7 @@ public class SWORDErrorDocument extends SWORDEntry
  
     /**
      *
-     * @param validationContext
+     * @param validationContext UNKNOWN.  PLEASE DOCUMENT.
      * @return SWORD validation info
      */
     public SwordValidationInfo validate(Properties validationContext)
@@ -165,8 +165,8 @@ public class SWORDErrorDocument extends SWORDEntry
  
     /**
      * 
-     * @param info
-     * @param validationContext
+     * @param info add results to this.
+     * @param validationContext unused.
      * @return SWORD validation info
      */
     protected SwordValidationInfo validate(SwordValidationInfo info,

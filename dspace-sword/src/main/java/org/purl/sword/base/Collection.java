@@ -679,9 +679,9 @@ public class Collection extends XmlElement implements SwordElementInterface
  
     /**
      *
-     * @param existing
-     * @param attributes
-     * @param validationContext
+     * @param existing add results to this.
+     * @param attributes UNKNOWN.  PLEASE DOCUMENT.
+     * @param validationContext UNKNOWN.  PLEASE DOCUMENT.
      * @return SWORD validation info
      */
     protected SwordValidationInfo validate(List<SwordValidationInfo> existing,

@@ -148,7 +148,7 @@ public interface SubscribeService {
      *
      * @param context
      *            DSpace context
-     * @param eperson
+     * @param ePerson
      *            find out if this e-person is subscribed
      * @throws SQLException
      *     An exception that provides information on a database access error or other errors.

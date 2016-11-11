@@ -59,13 +59,13 @@ public class OrderFormat
      *     metadata language code
      * @param type
      *     metadata type
-     *     {@see OrderFormat.AUTHOR}
-     *     {@see OrderFormat.TITLE}
-     *     {@see OrderFormat.TEXT}
-     *     {@see OrderFormat.DATE}
-     *     {@see OrderFormat.AUTHORITY}
      * @return sort string
      *     
+     * @see OrderFormat#AUTHOR
+     * @see OrderFormat#TITLE
+     * @see OrderFormat#TEXT
+     * @see OrderFormat#DATE
+     * @see #AUTHORITY
      */
     public static String makeSortString(String value, String language, String type)
     {

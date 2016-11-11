@@ -165,7 +165,7 @@ public class SWORDContext
      * operations are flushed.  You should, in general, not try to commit the contexts directly
      * when using the SWORD API.
      *
-     * @throws DSpaceSWORDException
+     * @throws DSpaceSWORDException on database error.
      */
     public void commit()
             throws DSpaceSWORDException

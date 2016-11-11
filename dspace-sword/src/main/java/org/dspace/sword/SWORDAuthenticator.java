@@ -109,7 +109,7 @@ public class SWORDAuthenticator
      * @param request
      *     service document request
      * @return authenticated SWORD context
-     * @throws SWORDException
+     * @throws SWORDException passed through.
      * @throws SWORDErrorException on generic SWORD exception
      * @throws SWORDAuthenticationException Thrown if the authentication fails
      */
@@ -142,7 +142,7 @@ public class SWORDAuthenticator
      * @param request
      *     ATOM document request
      * @return a SWORDContext object containing the relevant users
-     * @throws SWORDException
+     * @throws SWORDException passed through.
      * @throws SWORDErrorException on generic SWORD exception
      * @throws SWORDAuthenticationException Thrown if the authentication fails
      */
@@ -215,7 +215,7 @@ public class SWORDAuthenticator
      * @param deposit
      *     deposit request
      * @return a SWORDContext object containing the relevant users
-     * @throws SWORDException
+     * @throws SWORDException passed through.
      * @throws SWORDErrorException on generic SWORD exception
      * @throws SWORDAuthenticationException Thrown if the authentication fails
      */

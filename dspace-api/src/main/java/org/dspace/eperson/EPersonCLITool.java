@@ -48,7 +48,7 @@ public class EPersonCLITool {
      *
      * @param argv the command line arguments given
      * @throws ParseException
-     *     Base for Exceptions thrown during parsing of a command-line. {@see org.apache.commons.cli.ParseException}
+     *     Base for Exceptions thrown during parsing of a command-line.
      * @throws SQLException
      *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException

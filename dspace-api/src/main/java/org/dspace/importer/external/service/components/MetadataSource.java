@@ -86,7 +86,7 @@ public interface MetadataSource {
      *  Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
      * @param query a query object to base the search on.
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException passed through.
      */
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException;
 }

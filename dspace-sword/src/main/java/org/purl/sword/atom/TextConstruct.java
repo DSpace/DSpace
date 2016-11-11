@@ -147,8 +147,8 @@ implements SwordElementInterface
  
     /**
      * 
-     * @param text The text element. 
-     * @param validationProperties
+     * @param text The text element.
+     * @param validationProperties UNKNOWN.  PLEASE DOCUMENT.
      * @return SWORD validation info
      * @throws UnmarshallException If the specified element is not of
      *                             the correct type, where the localname is used
@@ -251,9 +251,9 @@ implements SwordElementInterface
  
     /**
      *
-     * @param existing
-     * @param attributeItems
-     * @param validationContext
+     * @param existing add results to this.
+     * @param attributeItems add these too.
+     * @param validationContext UNKNOWN.  PLEASE DOCUMENT.
      * @return SWORD validation info
      */
     protected SwordValidationInfo validate(List<SwordValidationInfo> existing,

@@ -50,7 +50,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
 
     /**
      * Set the metadataFieldMapping of this SimpleXpathMetadatumContributor
-     * @param metadataFieldMapping
+     * @param metadataFieldMapping the new mapping.
      */
     public void setMetadataFieldMapping(MetadataFieldMapping<OMElement,MetadataContributor<OMElement>> metadataFieldMapping) {
         this.metadataFieldMapping = metadataFieldMapping;
@@ -58,7 +58,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
 
     /**
      * Set the prefixToNamespaceMapping for this object,
-     * @param prefixToNamespaceMapping
+     * @param prefixToNamespaceMapping the new mapping.
      */
     @Resource(name="isiFullprefixMapping")
     public void setPrefixToNamespaceMapping(Map<String, String> prefixToNamespaceMapping) {

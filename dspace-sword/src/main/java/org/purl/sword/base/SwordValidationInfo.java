@@ -312,6 +312,7 @@ public class SwordValidationInfo {
 
     /**
      *
+     * @return the iterator.
      */
     public Iterator<SwordValidationInfo> getValidationAttributeInfoIterator()
     {
@@ -320,6 +321,7 @@ public class SwordValidationInfo {
 
     /**
      *
+     * @return the iterator.
      */
     public Iterator<SwordValidationInfo> getUnmarshallElementInfoIterator()
     {
@@ -328,6 +330,7 @@ public class SwordValidationInfo {
 
     /**
      * 
+     * @return the iterator.
      */
     public Iterator<SwordValidationInfo> getUnmarshallAttributeInfoIterator()
     {
@@ -350,8 +353,8 @@ public class SwordValidationInfo {
 
     /**
      * 
-     * @param elementItems
-     * @param attributeItems
+     * @param elementItems UNKNOWN.  PLEASE DOCUMENT.
+     * @param attributeItems UNKNOWN.  PLEASE DOCUMENT.
      */
     public void addUnmarshallValidationInfo(
             List<SwordValidationInfo> elementItems,

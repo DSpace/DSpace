@@ -373,6 +373,7 @@ public class Service extends XmlElement implements SwordElementInterface
      * @param service
      *     element to unmarshall
      * @param validationProperties
+     *     UNKNOWN.  PLEASE DOCUMENT.
      * @return SWORD validation info
      * @throws UnmarshallException If the element does not contain a
      *      content element or if there are problems
@@ -528,8 +529,8 @@ public class Service extends XmlElement implements SwordElementInterface
  
     /**
      *
-     * @param existing
-     * @param validationContext
+     * @param existing add results to this.
+     * @param validationContext UNKNOWN.  PLEASE DOCUMENT.
      * @return validation information
      */
     protected SwordValidationInfo validate(List<SwordValidationInfo> existing,

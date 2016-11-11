@@ -447,7 +447,7 @@ public class SWORDUrlManager
      * @param url
      *     URL to check
      * @return true if the given URL the base media link URL
-     * @throws DSpaceSWORDException
+     * @throws DSpaceSWORDException passed through.
      */
     public boolean isBaseMediaLinkUrl(String url)
             throws DSpaceSWORDException
@@ -461,6 +461,7 @@ public class SWORDUrlManager
      *
      * @param bitstream
      *     target bitstream
+     * @return a URL to the given Bitstream.
      * @throws DSpaceSWORDException
      *     can be thrown by the internals of the DSpace SWORD implementation
      */
@@ -514,8 +515,12 @@ public class SWORDUrlManager
     }
 
     /**
-     * Get the base media link URL.
+     * Get the base media link URL.  It can be configured using
+     * {@code sword-server.media-link.url}.  If not configured, it will be
+     * calculated using {@code dspace.baseUrl} and the constant path
+     * {@code /sword/media-link}.
      *
+     * @return that URL.
      * @throws DSpaceSWORDException
      *     can be thrown by the internals of the DSpace SWORD implementation
      */
