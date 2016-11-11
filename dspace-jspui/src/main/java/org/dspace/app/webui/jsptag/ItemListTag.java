@@ -576,7 +576,7 @@ public class ItemListTag extends TagSupport {
 								+ "Row"
 								+ cOddOrEven[cOddOrEven.length - 2]
 								+ "Col\" nowrap>"
-								+ "<input type=\"button\" value=\"Edit Item\" onclick=\"javascript:self.location='"
+								+ "<input class=\"btn btn-default\" type=\"button\" value=\"Edit Item\" onclick=\"javascript:self.location='"
 								+ hrq.getContextPath()
 								+ "/tools/edit-item?handle="
 								+ items[i].getHandle() + "'\"" + "/>" + "</td>");
