@@ -151,5 +151,26 @@
                 <module>xmlui-mirage2</module>
             </modules>
         </profile>
+        
+        <profile>
+            <id>addon-ckan</id>
+            <activation>
+                <property>
+                    <name>ckan.on</name>
+                </property>
+            </activation>
+            <dependencies>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-ckan-api</artifactId>
+						 <type>jar</type>
+			        </dependency>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-ckan-jspui</artifactId>
+						 <type>war</type>
+			        </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 </project>
